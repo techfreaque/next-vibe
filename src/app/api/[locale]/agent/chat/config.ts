@@ -204,3 +204,11 @@ export const DEFAULT_TOOL_IDS = [
   aliasToPathMap[MEMORY_UPDATE_ALIAS],
   aliasToPathMap[MEMORY_DELETE_ALIAS],
 ] as const;
+
+/**
+ * Default AI tools that require confirmation
+ * These tools will prompt the user before execution when called by the AI
+ */
+export const DEFAULT_TOOL_CONFIRMATION_IDS = [
+  aliasToPathMap[MEMORY_DELETE_ALIAS],
+] as const;

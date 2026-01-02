@@ -83,7 +83,9 @@ export const pulseNotifications = pgTable("pulse_notifications", {
   id: uuid("id").primaryKey().defaultRandom(),
   pulseExecutionId: uuid("pulse_execution_id").references(
     () => pulseExecutions.id,
-    { onDelete: "cascade" },
+    {
+      onDelete: "cascade",
+    },
   ),
 
   // Notification details

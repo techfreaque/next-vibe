@@ -14,8 +14,6 @@ import type { ChatMessage } from "../../../../../db";
 import { ChatMessageRole } from "../../../../../enum";
 import type { ModelId } from "../../../../../model-access/models";
 
-export const REQUIRE_TOOL_CONFIRMATION = false;
-
 export interface AnswerAsAIDeps {
   logger: EndpointLogger;
   aiStream: UseAIStreamReturn;
@@ -31,7 +29,7 @@ export interface AnswerAsAIDeps {
     selectedCharacter: string;
     temperature: number;
     maxTokens: number;
-    enabledToolIds: string[];
+    enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
   };
   deductCredits: (creditCost: number, feature: string) => void;
 }
@@ -106,9 +104,9 @@ export async function answerAsAI(
         temperature: settings.temperature,
         maxTokens: settings.maxTokens,
         tools:
-          settings.enabledToolIds?.map((toolId) => ({
-            toolId,
-            requiresConfirmation: REQUIRE_TOOL_CONFIRMATION,
+          settings.enabledTools?.map((tool) => ({
+            toolId: tool.id,
+            requiresConfirmation: tool.requiresConfirmation,
           })) ?? null,
         messageHistory: messageHistory ?? null,
         attachments: attachments && attachments.length > 0 ? attachments : null,

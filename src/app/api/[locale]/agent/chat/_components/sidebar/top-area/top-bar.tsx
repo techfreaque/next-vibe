@@ -88,6 +88,7 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
               size="icon"
               className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
               title={t("app.chat.common.settings")}
+              suppressHydrationWarning
             >
               <Settings className="h-5 w-5" />
             </Button>

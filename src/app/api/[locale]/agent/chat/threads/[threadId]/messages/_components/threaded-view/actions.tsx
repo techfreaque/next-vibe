@@ -233,7 +233,9 @@ export function ThreadedMessageActions({
         <Button
           variant="ghost"
           size="unset"
-          onClick={(): void => messageActions.startRetry(message.id)}
+          onClick={(): void => {
+            void messageActions.startRetry(message);
+          }}
           className="flex items-center gap-1 px-2 py-1 rounded hover:bg-yellow-500/10 text-muted-foreground hover:text-yellow-400 transition-all"
           title={t("app.chat.threadedView.actions.retryWithDifferent")}
         >

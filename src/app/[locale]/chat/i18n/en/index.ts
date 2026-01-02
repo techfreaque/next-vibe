@@ -116,6 +116,7 @@ export const translations = {
       resetToDefault: "Reset to Default",
       stats: "{{enabled}} of {{total}} tools enabled",
       aliases: "Aliases",
+      requireConfirmation: "Require confirmation before use",
     },
   },
 

@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import type { CoreMessage } from "ai";
+import type { CoreMessage, JSONValue } from "ai";
 import { eq } from "drizzle-orm";
 import {
   ErrorResponseTypes,
@@ -14,7 +14,6 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-import type { z } from "zod";
 
 import { creditValidator } from "@/app/api/[locale]/credits/validator";
 import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
@@ -43,14 +42,11 @@ import {
   calculateMessageDepth,
   createUserMessage,
   fetchMessageHistory,
-  handleEditOperation,
-  handleRetryOperation,
 } from "../../chat/threads/[threadId]/messages/repository";
 import { ensureThread } from "../../chat/threads/repository";
 import { SpeechToTextRepository } from "../../speech-to-text/repository";
-import type { AiStreamPostRequestOutput } from "../definition";
+import { type AiStreamPostRequestOutput } from "../definition";
 import { createMetadataSystemMessage } from "../message-metadata-generator";
-import { CONTINUE_CONVERSATION_PROMPT } from "../system-prompt";
 import { buildSystemPrompt } from "../system-prompt-builder";
 
 export interface StreamSetupResult {
@@ -66,7 +62,7 @@ export interface StreamSetupResult {
   threadId: string;
   isNewThread: boolean;
   messageDepth: number;
-  userMessageId: string;
+  userMessageId: string | null;
   aiMessageId: string;
   messages: CoreMessage[];
   systemPrompt: string;
@@ -100,7 +96,18 @@ export interface StreamSetupResult {
       data?: string; // base64 for incognito
     }>;
   };
-}
+  /** File upload promise (server threads only) - resolves when files finish uploading */
+  fileUploadPromise?: Promise<{
+    success: boolean;
+    userMessageId: string;
+    attachments?: Array<{
+      id: string;
+      url: string;
+      filename: string;
+      mimeType: string;
+      size: number;
+    }>;
+  }>;
 }
 
 export async function setupAiStream(params: {
@@ -118,6 +125,21 @@ export async function setupAiStream(params: {
 > {
   const { data, locale, logger, user, userId, leadId, ipAddress, t } = params;
   const isIncognito = data.rootFolderId === "incognito";
+
+  // File upload promise for server threads (captured for SSE event emission)
+  let fileUploadPromise:
+    | Promise<{
+        success: boolean;
+        userMessageId: string;
+        attachments?: Array<{
+          id: string;
+          url: string;
+          filename: string;
+          mimeType: string;
+          size: number;
+        }>;
+      }>
+    | undefined;
 
   logger.info("[Setup] RECOMPILED - Setting up AI stream", {
     operation: data.operation,
@@ -264,7 +286,7 @@ export async function setupAiStream(params: {
   });
 
   let operationResult: {
-    threadId: string | null | undefined;
+    threadId: string;
     parentMessageId: string | null | undefined;
     content: string;
     role: ChatMessageRole;
@@ -274,10 +296,13 @@ export async function setupAiStream(params: {
   let voiceTranscription: StreamSetupResult["voiceTranscription"] = null;
 
   switch (data.operation) {
-    case "send": {
-      // Check if audio input is provided - transcribe first
+    case "send":
+    case "retry":
+    case "edit":
+      // All operations work the same - check for audio input transcription
       if (data.audioInput?.file) {
         logger.info("[Setup] Audio input detected, transcribing...", {
+          operation: data.operation,
           fileSize: data.audioInput.file.size,
           fileType: data.audioInput.file.type,
         });
@@ -316,67 +341,19 @@ export async function setupAiStream(params: {
 
         // Use transcribed text as content
         operationResult = {
-          ...data,
+          threadId: data.threadId,
+          parentMessageId: data.parentMessageId,
           content: transcribedText,
+          role: data.role,
         };
       } else {
-        operationResult = data;
-      }
-      break;
-    }
-
-    case "retry":
-      if (isIncognito) {
-        logger.info("Retry operation in incognito mode", {
-          parentMessageId: data.parentMessageId,
-        });
-        operationResult = data;
-      } else {
-        const retryResult = await handleRetryOperation(data, userId, logger);
-        if (!retryResult) {
-          return {
-            success: false,
-            error: fail({
-              message: "app.api.agent.chat.aiStream.post.errors.notFound.title",
-              errorType: ErrorResponseTypes.NOT_FOUND,
-            }),
-          };
-        }
-        operationResult = retryResult;
-      }
-      break;
-
-    case "edit":
-      if (isIncognito) {
+        // No audio - use provided content
         operationResult = {
           threadId: data.threadId,
           parentMessageId: data.parentMessageId,
           content: data.content,
           role: data.role,
         };
-      } else {
-        if (!userId) {
-          logger.error("Edit operation requires user ID");
-          return {
-            success: false,
-            error: fail({
-              message:
-                "app.api.agent.chat.aiStream.post.errors.forbidden.title",
-              errorType: ErrorResponseTypes.FORBIDDEN,
-            }),
-          };
-        }
-        const editResult = await handleEditOperation(data, userId, logger);
-        if (!editResult) {
-          return {
-            success: false,
-            error: fail({
-              message: "app.api.agent.chat.aiStream.post.errors.notFound.title",
-              errorType: ErrorResponseTypes.NOT_FOUND,
-            }),
-          };
-        }
-        operationResult = editResult;
       }
       break;
 
@@ -567,14 +544,14 @@ export async function setupAiStream(params: {
     if (isIncognito && data.messageHistory) {
       updatedToolMessage = data.messageHistory.find(
         (msg) => msg.id === data.toolConfirmation!.messageId,
-      ) as ChatMessage | undefined;
+      );
     } else if (userId) {
       const [dbMessage] = await db
         .select()
         .from(chatMessages)
         .where(eq(chatMessages.id, data.toolConfirmation.messageId))
         .limit(1);
-      updatedToolMessage = dbMessage as ChatMessage | undefined;
+      updatedToolMessage = dbMessage;
     }
 
     if (updatedToolMessage?.metadata?.toolCall) {
@@ -652,24 +629,21 @@ export async function setupAiStream(params: {
       toolConfirmationResult,
       voiceMode: data.voiceMode
         ? {
-            streamTTS: data.voiceMode.streamTTS ?? false,
-            callMode: data.voiceMode.callMode ?? false,
-            voice: data.voiceMode.voice ?? "MALE",
+            enabled: data.voiceMode.enabled ?? false,
+            voice: data.voiceMode.voice ?? DEFAULT_TTS_VOICE,
           }
         : null,
       voiceTranscription,
+      userMessageMetadata,
+      fileUploadPromise,
     },
   };
 }
 
 /**
  * Build message context for AI
+ * Force recompile: 2026-01-01
  */
-// Define the message history schema with proper date transformations
-const messageHistorySchema = selectChatMessageSchema.extend({
-  createdAt: dateSchema,
-  updatedAt: dateSchema,
-});
 
 async function buildMessageContext(params: {
   operation: "send" | "retry" | "edit" | "answer-as-ai";
@@ -680,10 +654,28 @@ async function buildMessageContext(params: {
   userId: string | undefined;
   isIncognito: boolean;
   rootFolderId?: DefaultFolderId;
-  messageHistory?: Array<z.infer<typeof messageHistorySchema>> | null;
+  messageHistory?: NonNullable<AiStreamPostRequestOutput["messageHistory"]>;
   logger: EndpointLogger;
   upcomingResponseContext?: { model: string; character: string | null };
+  userMessageMetadata?: {
+    attachments?: Array<{
+      id: string;
+      url: string;
+      filename: string;
+      mimeType: string;
+      size: number;
+      data?: string;
+    }>;
+  };
 }): Promise<CoreMessage[]> {
+  params.logger.info("[BuildMessageContext] === FUNCTION CALLED ===", {
+    operation: params.operation,
+    isIncognito: params.isIncognito,
+    hasUserId: !!params.userId,
+    hasThreadId: !!params.threadId,
+    hasUserMessageMetadata: !!params.userMessageMetadata,
+    attachmentCount: params.userMessageMetadata?.attachments?.length ?? 0,
+  });
   // SECURITY: Reject messageHistory for non-incognito threads
   // Non-incognito threads must fetch history from database to prevent manipulation
   if (!params.isIncognito && params.messageHistory) {
@@ -702,25 +694,14 @@ async function buildMessageContext(params: {
   }
 
   if (params.operation === "answer-as-ai") {
-    // For incognito mode, use provided message history
     if (params.isIncognito && params.messageHistory) {
-      const messages = toAiSdkMessages(
+      return toAiSdkMessages(
         params.messageHistory,
         params.rootFolderId,
         params.upcomingResponseContext,
       );
-      if (params.content.trim()) {
-        messages.push({ role: "user", content: params.content });
-      } else {
-        messages.push({
-          role: "user",
-          content: CONTINUE_CONVERSATION_PROMPT,
-        });
-      }
-      return messages;
     }
 
-    // For non-incognito mode, fetch from database
     if (
       !params.isIncognito &&
       params.userId &&
@@ -739,31 +720,17 @@ async function buildMessageContext(params: {
 
       if (parentIndex !== -1) {
         const contextMessages = allMessages.slice(0, parentIndex + 1);
-        const messages = toAiSdkMessages(
+        return toAiSdkMessages(
           contextMessages,
           params.rootFolderId,
           params.upcomingResponseContext,
         );
-
-        if (params.content.trim()) {
-          messages.push({ role: "user", content: params.content });
-        } else {
-          messages.push({
-            role: "user",
-            content: CONTINUE_CONVERSATION_PROMPT,
-          });
-        }
-        return messages;
       }
       params.logger.error("Parent message not found in thread", {
         parentMessageId: params.parentMessageId,
         threadId: params.threadId,
       });
-      return params.content.trim()
-        ? [{ role: "user", content: params.content }]
-        : [];
-    } else if (params.content.trim()) {
-      return [{ role: "user", content: params.content }];
+      return [];
     }
     return [];
   } else if (!params.isIncognito && params.userId && params.threadId) {
@@ -773,21 +740,50 @@ async function buildMessageContext(params: {
       params.logger,
       params.parentMessageId ?? null, // Pass parent message ID for branch filtering, convert undefined to null
     );
+
+    // Fetch file data for attachments in history
+    const { getStorageAdapter } = await import("../../chat/storage");
+    const storage = getStorageAdapter();
+
+    for (const message of history) {
+      if (message.metadata?.attachments) {
+        for (const attachment of message.metadata.attachments) {
+          // If attachment has URL but no base64 data, fetch from storage
+          if (attachment.url && !attachment.data) {
+            const base64Data = await storage.readFileAsBase64(
+              attachment.id,
+              params.threadId,
+            );
+            if (base64Data) {
+              attachment.data = base64Data;
+              params.logger.debug(
+                "[BuildMessageContext] Fetched file data for attachment",
+                {
+                  attachmentId: attachment.id,
+                  filename: attachment.filename,
+                },
+              );
+            }
+          }
+        }
+      }
+    }
+
+    // Return ONLY past messages - new message comes from content/attachments params
     const historyMessages = toAiSdkMessages(
       history,
       params.rootFolderId,
       params.upcomingResponseContext,
     );
-    const currentMessage = toAiSdkMessage({
-      role: params.role,
-      content: params.content,
-    });
-    if (!currentMessage) {
-      return historyMessages;
-    }
-    return [...historyMessages, currentMessage];
+    params.logger.debug(
+      "[BuildMessageContext] Returning history for server mode",
+      {
+        historyLength: historyMessages.length,
+      },
+    );
+    return historyMessages;
   } else if (params.isIncognito && params.messageHistory) {
-    // Incognito mode with message history: use provided history from client
+    // Incognito mode: Return ONLY past messages - new message comes from content/attachments params
     params.logger.debug("Using provided message history for incognito mode", {
       operation: params.operation,
       historyLength: params.messageHistory.length,
@@ -797,28 +793,20 @@ async function buildMessageContext(params: {
       params.rootFolderId,
       params.upcomingResponseContext,
     );
-    // Don't add empty content as a message (happens with tool confirmations)
-    if (!params.content.trim()) {
-      return historyMessages;
-    }
-    const currentMessage = toAiSdkMessage({
-      role: params.role,
-      content: params.content,
-    });
-    if (!currentMessage) {
-      return historyMessages;
-    }
-    return [...historyMessages, currentMessage];
+    params.logger.debug(
+      "[BuildMessageContext] Returning history for incognito mode",
+      {
+        historyLength: historyMessages.length,
+      },
+    );
+    return historyMessages;
   }
-  // Fallback: no thread or no history (new conversation)
-  const currentMessage = toAiSdkMessage({
-    role: params.role,
-    content: params.content,
+
+  params.logger.info("[BuildMessageContext] No history (new conversation)", {
+    operation: params.operation,
+    hasThreadId: !!params.threadId,
   });
-  if (!currentMessage) {
-    return [];
-  }
-  return [currentMessage];
+  return [];
 }
 
 /**
@@ -869,7 +857,7 @@ function toAiSdkMessage(
           content: [
             {
               type: "tool-result",
-              toolCallId: message.id, // Use message ID as tool call ID
+              toolCallId: toolCall.toolCallId, // Use actual AI SDK tool call ID for proper result matching
               toolName: toolCall.toolName,
               output,
             },
@@ -961,12 +949,15 @@ async function handleToolConfirmationInSetup(params: {
       : toolCall.args;
 
     // Load and execute tool
+    // Note: Tool confirmation already happened - this is executing the confirmed tool
+    // So we pass an empty confirmation config (no tools need confirmation)
     const toolsResult = await loadTools({
       requestedTools: [toolCall.toolName],
       user,
       locale,
       logger,
       systemPrompt: "",
+      toolConfirmationConfig: new Map(), // Empty - tool already confirmed
     });
 
     const toolEntry = Object.entries(toolsResult.tools ?? {}).find(
@@ -1143,4 +1134,93 @@ function toAiSdkMessages(
   }
 
   return result;
+}
+
+/**
+ * Process and upload file attachments to storage adapter
+ * Validates file types and uploads files in parallel
+ */
+async function processFileAttachments(params: {
+  attachments: File[];
+  threadId: string;
+  userMessageId: string;
+  userId: string | undefined;
+  logger: EndpointLogger;
+}): Promise<
+  | {
+      success: false;
+      error: ResponseType<never>;
+    }
+  | {
+      success: true;
+      data: Array<{
+        id: string;
+        url: string;
+        filename: string;
+        mimeType: string;
+        size: number;
+      }>;
+    }
+> {
+  const { attachments, threadId, userMessageId, userId, logger } = params;
+
+  const { getStorageAdapter } = await import("../../chat/storage");
+  const { isAllowedFileType } = await import("../../chat/incognito/file-utils");
+  const storage = getStorageAdapter();
+
+  logger.info("[File Processing] Uploading file attachments to storage", {
+    fileCount: attachments.length,
+  });
+
+  const processedAttachments: Array<{
+    id: string;
+    url: string;
+    filename: string;
+    mimeType: string;
+    size: number;
+  }> = [];
+
+  for (const file of attachments) {
+    // Validate file type
+    if (!isAllowedFileType(file.type)) {
+      logger.error("[File Processing] File type not allowed", {
+        filename: file.name,
+        mimeType: file.type,
+      });
+      return {
+        success: false,
+        error: fail({
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          message: "app.api.shared.errorTypes.validation_error",
+          messageParams: {
+            issue: `File type not allowed: ${file.type}`,
+          },
+        }),
+      };
+    }
+
+    const result = await storage.uploadFile(file, {
+      filename: file.name,
+      mimeType: file.type,
+      threadId,
+      messageId: userMessageId,
+      userId,
+    });
+    processedAttachments.push({
+      id: result.fileId,
+      url: result.url,
+      filename: result.metadata.originalFilename,
+      mimeType: result.metadata.mimeType,
+      size: result.metadata.size,
+    });
+  }
+
+  logger.info("[File Processing] File attachments uploaded successfully", {
+    uploadedCount: processedAttachments.length,
+  });
+
+  return {
+    success: true,
+    data: processedAttachments,
+  };
 }

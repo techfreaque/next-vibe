@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
     endpointRenderer: {
       submit: "Absenden",
       submitting: "Wird gesendet...",
+      cancel: "Abbrechen",
     },
     container: {
       noContent: "Kein Inhalt",

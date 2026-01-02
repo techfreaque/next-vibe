@@ -11,7 +11,7 @@ import {
   DEFAULT_TTS_VOICE,
   type TtsVoiceValue,
 } from "../../text-to-speech/enum";
-import { DEFAULT_TOOL_IDS } from "../config";
+import { DEFAULT_TOOL_IDS, DEFAULT_TOOL_CONFIRMATION_IDS } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { ViewMode, type ViewModeValue } from "../enum";
 import {
@@ -21,6 +21,14 @@ import {
 import { ModelId, type ModelId as ModelIdType } from "../model-access/models";
 
 export type { ChatFolder, ChatMessage, ChatThread };
+
+/**
+ * Enabled tool configuration
+ */
+export interface EnabledTool {
+  id: string;
+  requiresConfirmation: boolean;
+}
 
 /**
  * Chat settings type
@@ -34,7 +42,7 @@ export interface ChatSettings {
   ttsVoice: typeof TtsVoiceValue;
   theme: "light" | "dark";
   viewMode: typeof ViewModeValue;
-  enabledToolIds: string[];
+  enabledTools: EnabledTool[];
 }
 
 /**
@@ -107,7 +115,12 @@ const getDefaultSettings = (): ChatSettings => ({
   ttsVoice: DEFAULT_TTS_VOICE,
   theme: "dark",
   viewMode: ViewMode.LINEAR,
-  enabledToolIds: [...DEFAULT_TOOL_IDS],
+  enabledTools: DEFAULT_TOOL_IDS.map((id) => ({
+    id,
+    requiresConfirmation: DEFAULT_TOOL_CONFIRMATION_IDS.some(
+      (confirmId) => confirmId === id,
+    ),
+  })),
 });
 
 // Helper to load settings from localStorage (client-only, called after mount)
@@ -119,38 +132,33 @@ const loadSettings = async (): Promise<ChatSettings> => {
   }
 
   try {
-    const stored = await storage.getItem("chat-settings");
+    const stored = await storage.getItem("chat-settings-v2");
     if (stored) {
       const parsed = JSON.parse(stored) as Partial<ChatSettings>;
 
-      // Validate tool IDs against aliasToPathMap
-      // Filter out any tools that no longer exist
-      if (parsed.enabledToolIds && Array.isArray(parsed.enabledToolIds)) {
-        const validToolIds = parsed.enabledToolIds.filter((toolId) => {
-          // Check if the tool exists in aliasToPathMap
-          return toolId in aliasToPathMap;
-        });
-
-        // If some tools were filtered out, update localStorage
-        if (validToolIds.length !== parsed.enabledToolIds.length) {
-          const cleanedSettings = {
+      // Validate enabled tools against aliasToPathMap
+      let enabledTools = parsed.enabledTools || defaults.enabledTools;
+      if (Array.isArray(enabledTools)) {
+        const validTools = enabledTools.filter(
+          (tool) => tool.id in aliasToPathMap,
+        );
+        if (validTools.length !== enabledTools.length) {
+          enabledTools = validTools;
+          // Save cleaned settings
+          const cleanedSettings: ChatSettings = {
             ...defaults,
             ...parsed,
-            enabledToolIds: validToolIds,
+            enabledTools,
           };
-          // Save the cleaned settings back to localStorage
           void saveSettings(cleanedSettings);
           return cleanedSettings;
         }
-
-        parsed.enabledToolIds = validToolIds;
       }
 
-      // User has stored settings - return them as-is without merging defaults
-      // This preserves the user's explicit tool choices
       return {
         ...defaults,
         ...parsed,
+        enabledTools,
       };
     }
     // No stored settings - return defaults (new user gets default tools)
@@ -168,7 +176,7 @@ const saveSettings = async (settings: ChatSettings): Promise<void> => {
   }
 
   try {
-    await storage.setItem("chat-settings", JSON.stringify(settings));
+    await storage.setItem("chat-settings-v2", JSON.stringify(settings));
   } catch {
     // Silently fail
   }

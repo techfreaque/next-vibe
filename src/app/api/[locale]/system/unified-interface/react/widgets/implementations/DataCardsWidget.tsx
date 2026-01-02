@@ -32,8 +32,22 @@ export const DataCardsWidget = <const TKey extends string>({
     return <Div className={className}>—</Div>;
   }
 
+  // Read layout config from field UI
+  const layoutColumns =
+    "ui" in field &&
+    field.ui &&
+    typeof field.ui === "object" &&
+    "layout" in field.ui &&
+    field.ui.layout &&
+    typeof field.ui.layout === "object" &&
+    "columns" in field.ui.layout &&
+    typeof field.ui.layout.columns === "number"
+      ? field.ui.layout.columns
+      : undefined;
+
   const { cards, columns } = data;
-  const gridCols = getGridClassName(columns as 1 | 2 | 3);
+  const finalColumns = layoutColumns ?? columns;
+  const gridCols = getGridClassName(finalColumns as 1 | 2 | 3);
 
   let fieldDefinitions: Record<string, UnifiedField<string>> = {};
   if (

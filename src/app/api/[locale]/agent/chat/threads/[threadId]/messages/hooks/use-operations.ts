@@ -100,7 +100,7 @@ interface MessageOperationsDeps {
     selectedCharacter: string;
     temperature: number;
     maxTokens: number;
-    enabledToolIds: string[];
+    enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
   };
   setInput: (input: string) => void;
   setAttachments: (attachments: File[] | ((prev: File[]) => File[])) => void;
@@ -326,7 +326,9 @@ export function useMessageOperations(
           deleteIncognitoMessage(messageId);
           logger.debug(
             "Message operations: Deleted incognito message from localStorage",
-            { messageId },
+            {
+              messageId,
+            },
           );
         } catch (error) {
           logger.error(

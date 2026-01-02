@@ -322,7 +322,9 @@ export function BuyCreditsTab({
                 <Span>
                   {t(
                     "app.subscription.subscription.buy.subscription.features.credits",
-                    { count: subscriptionCredits },
+                    {
+                      count: subscriptionCredits,
+                    },
                   )}
                 </Span>
               </Div>
@@ -331,7 +333,9 @@ export function BuyCreditsTab({
                 <Span>
                   {t(
                     "app.subscription.subscription.buy.subscription.features.expiry",
-                    { modelCount: TOTAL_MODEL_COUNT },
+                    {
+                      modelCount: TOTAL_MODEL_COUNT,
+                    },
                   )}
                 </Span>
               </Div>

@@ -107,7 +107,7 @@ export interface UseChatReturn {
   ttsVoice: typeof TtsVoiceValue;
   sidebarCollapsed: boolean;
   viewMode: ChatSettings["viewMode"];
-  enabledToolIds: string[];
+  enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
   setSelectedCharacter: (character: string) => void;
   setSelectedModel: (model: ModelId) => void;
   setTemperature: (temp: number) => void;
@@ -116,7 +116,9 @@ export interface UseChatReturn {
   setTTSVoice: (voice: typeof TtsVoiceValue) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   setViewMode: (mode: ChatSettings["viewMode"]) => void;
-  setEnabledToolIds: (toolIds: string[]) => void;
+  setEnabledTools: (
+    tools: Array<{ id: string; requiresConfirmation: boolean }>,
+  ) => void;
 
   // Credits
   initialCredits: CreditsGetResponseOutput;
@@ -223,8 +225,9 @@ export interface UseChatReturn {
   answeringMessageId: string | null;
   answerContent: string;
   editorAttachments: File[];
+  isLoadingRetryAttachments: boolean;
   startEdit: (messageId: string) => void;
-  startRetry: (messageId: string) => void;
+  startRetry: (message: ChatMessage) => Promise<void>;
   startAnswer: (messageId: string) => void;
   cancelEditorAction: () => void;
   setAnswerContent: (content: string) => void;
@@ -598,12 +601,12 @@ export function useChat(
     input,
     attachments,
     isLoading,
-    enabledToolIds: settingsOps.settings.enabledToolIds,
+    enabledTools: settingsOps.settings.enabledTools,
     sendMessage: messageOps.sendMessage,
     setInput: setInputAndSaveDraft,
     setSelectedModel: settingsOps.setSelectedModel,
     setSelectedCharacter: settingsOps.setSelectedCharacter,
-    setEnabledToolIds: settingsOps.setEnabledToolIds,
+    setEnabledTools: settingsOps.setEnabledTools,
     inputRef,
     locale,
     logger,
@@ -687,7 +690,7 @@ export function useChat(
     ttsVoice: settingsOps.settings.ttsVoice,
     sidebarCollapsed,
     viewMode: settingsOps.settings.viewMode,
-    enabledToolIds: settingsOps.settings.enabledToolIds,
+    enabledTools: settingsOps.settings.enabledTools,
     setSelectedCharacter: settingsOps.setSelectedCharacter,
     setSelectedModel: settingsOps.setSelectedModel,
     setTemperature: settingsOps.setTemperature,
@@ -696,7 +699,7 @@ export function useChat(
     setTTSVoice: settingsOps.setTTSVoice,
     setSidebarCollapsed,
     setViewMode: settingsOps.setViewMode,
-    setEnabledToolIds: settingsOps.setEnabledToolIds,
+    setEnabledTools: settingsOps.setEnabledTools,
 
     // Message operations
     sendMessage: messageOps.sendMessage,
@@ -759,6 +762,7 @@ export function useChat(
     answeringMessageId: editorActions.answeringMessageId,
     answerContent: editorActions.answerContent,
     editorAttachments: editorActions.editorAttachments,
+    isLoadingRetryAttachments: editorActions.isLoadingRetryAttachments,
     startEdit: editorActions.startEdit,
     startRetry: editorActions.startRetry,
     startAnswer: editorActions.startAnswer,

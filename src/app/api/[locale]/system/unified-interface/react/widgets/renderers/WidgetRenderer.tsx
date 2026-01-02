@@ -67,6 +67,8 @@ export interface WidgetRendererProps<TKey extends string> {
   form?: UseFormReturn<FieldValues>;
   /** Callback to trigger when submit button is clicked (e.g., refetch for GET, submit for POST) */
   onSubmit?: () => void;
+  /** Callback to trigger when cancel button is clicked (e.g., decline tool confirmation) */
+  onCancel?: () => void;
   /** Whether the form is currently submitting/loading */
   isSubmitting?: boolean;
   /** Endpoint definition (required for some widgets like FormFieldWidget) */
@@ -109,6 +111,7 @@ export function WidgetRenderer<const TKey extends string>({
   style,
   form,
   onSubmit,
+  onCancel,
   isSubmitting,
   endpoint,
 }: WidgetRendererProps<TKey>): JSX.Element {
@@ -121,6 +124,7 @@ export function WidgetRenderer<const TKey extends string>({
     style,
     form,
     onSubmit,
+    onCancel,
     isSubmitting,
     endpoint,
   };
@@ -152,6 +156,7 @@ function renderWidget<const TKey extends string>(
     style?: React.CSSProperties;
     form?: UseFormReturn<FieldValues>;
     onSubmit?: () => void;
+    onCancel?: () => void;
     isSubmitting?: boolean;
     endpoint: CreateApiEndpointAny;
   },

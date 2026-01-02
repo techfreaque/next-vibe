@@ -8,18 +8,14 @@ import { parseError } from "next-vibe/shared/utils";
 import { getLastMessageInBranch } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { DEFAULT_TTS_VOICE } from "../../../../../../text-to-speech/enum";
 import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
 import { DefaultFolderId } from "../../../../../config";
-import { createCreditUpdateCallback } from "../../../../../credit-updater";
-import type { ChatMessage } from "../../../../../db";
-import { ChatMessageRole } from "../../../../../enum";
+import type { ChatMessage, ChatThread } from "../../../../../db";
+import { ThreadStatus } from "../../../../../enum";
 import { useChatStore } from "../../../../../hooks/store";
 import type { ModelId } from "../../../../../model-access/models";
-import { useVoiceModeStore } from "../../../../../voice-mode/store";
-import { getCallModeKey } from "../../../../../voice-mode/types";
 
-import { REQUIRE_TOOL_CONFIRMATION } from "./answer-as-ai";
+import { createAndSendUserMessage } from "./shared";
 
 export interface SendMessageParams {
   content: string;
@@ -52,7 +48,7 @@ export interface SendMessageDeps {
     selectedCharacter: string;
     temperature: number;
     maxTokens: number;
-    enabledToolIds: string[];
+    enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
   };
   setInput: (input: string) => void;
   setAttachments: (attachments: File[] | ((prev: File[]) => File[])) => void;
@@ -144,24 +140,50 @@ export async function sendMessage(
           : null;
     }
 
-    const userMessageId = crypto.randomUUID();
     let createdThreadIdForNewThread: string | null = null;
 
     // Ensure thread ID (create for new threads)
     if (!threadIdToUse) {
       createdThreadIdForNewThread = crypto.randomUUID();
 
+      // CRITICAL: Add thread to store BEFORE navigation and BEFORE creating messages
+      // This ensures the thread exists when messages are filtered by thread ID
+      const newThread: ChatThread = {
+        id: createdThreadIdForNewThread,
+        userId: null,
+        leadId: null,
+        title: content.slice(0, 50) || "New Chat",
+        rootFolderId: currentRootFolderId,
+        folderId: currentSubFolderId,
+        status: ThreadStatus.ACTIVE,
+        defaultModel: null,
+        defaultCharacter: null,
+        systemPrompt: null,
+        pinned: false,
+        archived: false,
+        tags: [],
+        preview: null,
+        metadata: {},
+        rolesView: null,
+        rolesEdit: null,
+        rolesPost: null,
+        rolesModerate: null,
+        rolesAdmin: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      useChatStore.getState().addThread(newThread);
+
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
         const { createIncognitoThread } = await import(
           "../../../../../incognito/storage"
         );
-        const newThread = await createIncognitoThread(
+        await createIncognitoThread(
           content.slice(0, 50) || "New Chat",
           currentRootFolderId,
           currentSubFolderId,
           createdThreadIdForNewThread,
         );
-        useChatStore.getState().addThread(newThread);
       }
     }
 
@@ -172,108 +194,30 @@ export async function sendMessage(
       return;
     }
 
-    // Navigate immediately BEFORE API call
+    // Navigate immediately BEFORE creating messages
     if (onThreadCreated) {
       onThreadCreated(finalThreadId, currentRootFolderId, currentSubFolderId);
     }
 
-    // Create user message immediately (BEFORE API call)
-    const parentDepth = parentMessageId
-      ? (messageHistory?.find((m) => m.id === parentMessageId)?.depth ?? 0)
-      : 0;
-
-    const createdUserMessage: ChatMessage = {
-      id: userMessageId,
-      threadId: finalThreadId,
-      role: ChatMessageRole.USER,
-      content: params.audioInput ? "" : content,
-      parentId: parentMessageId,
-      depth: parentDepth + 1,
-      sequenceId: null,
-      authorId:
-        currentRootFolderId === DefaultFolderId.INCOGNITO ? "incognito" : null,
-      authorName: null,
-      authorAvatar: null,
-      authorColor: null,
-      isAI: false,
-      model: settings.selectedModel,
-      character: settings.selectedCharacter,
-      errorType: null,
-      errorMessage: null,
-      errorCode: null,
-      edited: false,
-      originalId: null,
-      tokens: null,
-      metadata: params.audioInput
-        ? { isTranscribing: true }
-        : params.attachments.length > 0
-          ? {}
-          : {},
-      upvotes: 0,
-      downvotes: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      searchVector: null,
-    };
-
-    // Add message to UI immediately
-    useChatStore.getState().addMessage(createdUserMessage);
-
-    // Save to localStorage (incognito only)
-    if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-      const { saveMessageWithAttachments } = await import(
-        "../../../../../incognito/storage"
-      );
-      await saveMessageWithAttachments(createdUserMessage, params.attachments);
-    }
-
-    // Voice mode settings
-    const voiceModeSettings = useVoiceModeStore.getState().settings;
-    const callModeKey = getCallModeKey(
-      settings.selectedModel,
-      settings.selectedCharacter ?? "default",
-    );
-    const isCallModeEnabled =
-      voiceModeSettings.callModeByConfig?.[callModeKey] ?? false;
-
-    const effectiveVoiceMode = isCallModeEnabled
-      ? {
-          enabled: true,
-          voice: DEFAULT_TTS_VOICE,
-        }
-      : null;
-
-    // Start AI stream
-    await aiStream.startStream(
+    // Use shared function for message creation and sending
+    await createAndSendUserMessage(
       {
-        operation: "send" as const,
-        rootFolderId: currentRootFolderId,
-        subFolderId: currentSubFolderId ?? null,
-        threadId: finalThreadId,
-        userMessageId,
-        parentMessageId: parentMessageId ?? null,
         content,
-        role: ChatMessageRole.USER,
-        model: settings.selectedModel,
-        character: settings.selectedCharacter ?? null,
-        temperature: settings.temperature,
-        maxTokens: settings.maxTokens,
-        tools:
-          settings.enabledToolIds?.map((toolId) => ({
-            toolId,
-            requiresConfirmation: REQUIRE_TOOL_CONFIRMATION,
-          })) ?? null,
-        toolConfirmation: params.toolConfirmation ?? null,
-        messageHistory: messageHistory ?? null,
-        attachments: params.attachments.length > 0 ? params.attachments : null,
-        voiceMode: effectiveVoiceMode,
-        audioInput: params.audioInput ?? { file: null },
+        parentMessageId,
+        threadId: finalThreadId,
+        audioInput: params.audioInput,
+        attachments: params.attachments,
+        operation: "send",
+        messageHistory, // Pass pre-loaded message history for incognito mode
+        toolConfirmation: params.toolConfirmation,
       },
       {
-        onContentDone: createCreditUpdateCallback(
-          settings.selectedModel,
-          deductCredits,
-        ),
+        logger,
+        aiStream,
+        currentRootFolderId,
+        currentSubFolderId,
+        settings,
+        deductCredits,
       },
     );
 

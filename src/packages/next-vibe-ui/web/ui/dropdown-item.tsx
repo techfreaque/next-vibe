@@ -67,7 +67,9 @@ export function DropdownItem(props: DropdownItemProps): JSX.Element {
                 ? icon
                 : React.createElement(
                     icon as React.ComponentType<{ className?: string }>,
-                    { className: "w-6 h-6 size-6" },
+                    {
+                      className: "w-6 h-6 size-6",
+                    },
                   )}
           </span>
         )}

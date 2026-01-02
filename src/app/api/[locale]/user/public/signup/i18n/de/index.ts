@@ -168,7 +168,8 @@ export const translations: typeof enTranslations = {
     title: "Anmeldefehler",
     validation: {
       title: "Validierungsfehler",
-      description: "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut",
+      description:
+        "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -387,7 +388,8 @@ export const translations: typeof enTranslations = {
   email: {
     title: "Willkommen bei {{appName}}, {{privateName}}!",
     subject: "Willkommen bei {{appName}} - Deine unzensierte KI wartet",
-    previewText: "Zugriff auf 38 KI-Modelle ohne Filter oder Einschränkungen. Starte jetzt mit 20 kostenlosen Credits!",
+    previewText:
+      "Zugriff auf 38 KI-Modelle ohne Filter oder Einschränkungen. Starte jetzt mit 20 kostenlosen Credits!",
     welcomeMessage: "Du bist dabei! Willkommen bei unzensierten KI-Gesprächen",
     description:
       "Dein Account ist bereit. Du hast 20 kostenlose Credits, um mit jedem unserer 38 KI-Modelle zu chatten – darunter Claude Sonnet 4.5, GPT-5.2 Pro, Gemini 3 Pro, Kimi K2, DeepSeek R1 und exklusive unzensierte Modelle wie UncensoredLM v1.2, FreedomGPT Liberty und Grok 4. Keine Filter. Keine Einschränkungen. Nur ehrliche KI-Gespräche.",
@@ -400,9 +402,11 @@ export const translations: typeof enTranslations = {
     feature4: "Private, Inkognito-, Geteilte und Öffentliche Chat-Modi",
     feature5: "Community-Forum mit anderen KI-Enthusiasten",
     needMore: "Bereit für unbegrenzte Gespräche?",
-    needMoreDesc: "Hol dir 40× mehr Credits – 800/Monat für nur 8 €! Das ist unbegrenzter Zugang zu allen 38 Modellen ohne tägliche Limits. Perfekt für ernsthafte KI-Nutzer. Plus: Abonniere und schalte die Möglichkeit frei, Credit-Pakete zu kaufen, die niemals ablaufen – ideal für Power-User, die zusätzliche Credits auf Abruf brauchen.",
+    needMoreDesc:
+      "Hol dir 40× mehr Credits – 800/Monat für nur 8 €! Das ist unbegrenzter Zugang zu allen 38 Modellen ohne tägliche Limits. Perfekt für ernsthafte KI-Nutzer. Plus: Abonniere und schalte die Möglichkeit frei, Credit-Pakete zu kaufen, die niemals ablaufen – ideal für Power-User, die zusätzliche Credits auf Abruf brauchen.",
     viewPlans: "Jetzt auf Unlimited upgraden",
-    signoff: "Willkommen in der Zukunft der KI-Gespräche,\nDas {{appName}} Team",
+    signoff:
+      "Willkommen in der Zukunft der KI-Gespräche,\nDas {{appName}} Team",
     ps: "P.S. Deine Privatsphäre ist uns wichtig. Wähle den Inkognito-Modus, um Gespräche nur auf deinem Gerät zu speichern – sie werden niemals an unsere Server gesendet.",
   },
 };

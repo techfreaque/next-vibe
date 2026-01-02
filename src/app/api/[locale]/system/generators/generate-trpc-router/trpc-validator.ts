@@ -77,7 +77,9 @@ export function validateTRPCIntegration(
       result.errors.push(
         t(
           "app.api.system.generators.generateTrpcRouter.trpcValidator.apiDirectoryNotFound",
-          { resolvedApiDir },
+          {
+            resolvedApiDir,
+          },
         ),
       );
       result.success = false;
@@ -91,7 +93,9 @@ export function validateTRPCIntegration(
       logger.info(
         t(
           "app.api.system.generators.generateTrpcRouter.trpcValidator.foundRouteFiles",
-          { count: routeFiles.length.toString() },
+          {
+            count: routeFiles.length.toString(),
+          },
         ),
       );
     }
@@ -140,7 +144,9 @@ export function validateTRPCIntegration(
       logger.info(
         t(
           "app.api.system.generators.generateTrpcRouter.trpcValidator.validationComplete",
-          { status },
+          {
+            status,
+          },
         ),
       );
       logger.info(
@@ -157,7 +163,9 @@ export function validateTRPCIntegration(
     result.errors.push(
       t(
         "app.api.system.generators.generateTrpcRouter.trpcValidator.validationFailed",
-        { message: parseError(error).message },
+        {
+          message: parseError(error).message,
+        },
       ),
     );
     result.success = false;
@@ -289,7 +297,9 @@ function validateRouteFile(
     validation.errors.push(
       t(
         "app.api.system.generators.generateTrpcRouter.trpcValidator.failedToReadRoute",
-        { message: parseError(error).message },
+        {
+          message: parseError(error).message,
+        },
       ),
     );
   }
@@ -384,25 +394,33 @@ export function generateValidationReport(
   lines.push(
     t(
       "app.api.system.generators.generateTrpcRouter.trpcValidator.reportStatus",
-      { status: statusText },
+      {
+        status: statusText,
+      },
     ),
   );
   lines.push(
     t(
       "app.api.system.generators.generateTrpcRouter.trpcValidator.reportRouteFiles",
-      { count: result.routeFiles.length.toString() },
+      {
+        count: result.routeFiles.length.toString(),
+      },
     ),
   );
   lines.push(
     t(
       "app.api.system.generators.generateTrpcRouter.trpcValidator.reportErrors",
-      { count: result.errors.length.toString() },
+      {
+        count: result.errors.length.toString(),
+      },
     ),
   );
   lines.push(
     t(
       "app.api.system.generators.generateTrpcRouter.trpcValidator.reportWarnings",
-      { count: result.warnings.length.toString() },
+      {
+        count: result.warnings.length.toString(),
+      },
     ),
   );
   lines.push("");
@@ -445,7 +463,9 @@ export function generateValidationReport(
     lines.push(
       t(
         "app.api.system.generators.generateTrpcRouter.trpcValidator.definitionField",
-        { status: definitionStatus },
+        {
+          status: definitionStatus,
+        },
       ),
     );
 
@@ -455,7 +475,9 @@ export function generateValidationReport(
     lines.push(
       t(
         "app.api.system.generators.generateTrpcRouter.trpcValidator.enhancedHandlerField",
-        { status: enhancedHandlerStatus },
+        {
+          status: enhancedHandlerStatus,
+        },
       ),
     );
 
@@ -463,7 +485,9 @@ export function generateValidationReport(
     lines.push(
       t(
         "app.api.system.generators.generateTrpcRouter.trpcValidator.trpcExportField",
-        { status: trpcExportStatus },
+        {
+          status: trpcExportStatus,
+        },
       ),
     );
 
@@ -471,7 +495,9 @@ export function generateValidationReport(
     lines.push(
       t(
         "app.api.system.generators.generateTrpcRouter.trpcValidator.nextExportField",
-        { status: nextExportStatus },
+        {
+          status: nextExportStatus,
+        },
       ),
     );
 

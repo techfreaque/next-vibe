@@ -26,7 +26,9 @@ export interface SettingsOperations {
   setTTSVoice: (voice: typeof TtsVoiceValue) => void;
   setTheme: (theme: "light" | "dark") => void;
   setViewMode: (mode: ChatSettings["viewMode"]) => void;
-  setEnabledToolIds: (toolIds: string[]) => void;
+  setEnabledTools: (
+    tools: Array<{ id: string; requiresConfirmation: boolean }>,
+  ) => void;
 }
 
 /**
@@ -119,9 +121,9 @@ export function useSettings(deps: {
     [updateSettings],
   );
 
-  const setEnabledToolIds = useCallback(
-    (toolIds: string[]) => {
-      updateSettings({ enabledToolIds: toolIds });
+  const setEnabledTools = useCallback(
+    (tools: Array<{ id: string; requiresConfirmation: boolean }>) => {
+      updateSettings({ enabledTools: tools });
     },
     [updateSettings],
   );
@@ -136,6 +138,6 @@ export function useSettings(deps: {
     setTTSVoice,
     setTheme,
     setViewMode,
-    setEnabledToolIds,
+    setEnabledTools,
   };
 }

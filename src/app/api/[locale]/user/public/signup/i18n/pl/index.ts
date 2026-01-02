@@ -63,8 +63,7 @@ export const translations: typeof enTranslations = {
       validation: {
         required: "Hasło jest wymagane",
         minLength: "Hasło musi mieć co najmniej 8 znaków",
-        complexity:
-          "Hasło musi zawierać wielką literę, małą literę i cyfrę",
+        complexity: "Hasło musi zawierać wielką literę, małą literę i cyfrę",
       },
     },
     confirmPassword: {
@@ -386,7 +385,8 @@ export const translations: typeof enTranslations = {
   email: {
     title: "Witamy w {{appName}}, {{privateName}}!",
     subject: "Witamy w {{appName}} - Twoja niecenzurowana AI czeka",
-    previewText: "Dostęp do 38 modeli AI bez filtrów i ograniczeń. Zacznij już teraz z 20 darmowymi creditami!",
+    previewText:
+      "Dostęp do 38 modeli AI bez filtrów i ograniczeń. Zacznij już teraz z 20 darmowymi creditami!",
     welcomeMessage: "Jesteś w środku! Witamy w niecenzurowanych rozmowach z AI",
     description:
       "Twoje konto jest gotowe. Masz 20 darmowych creditów, aby zacząć rozmawiać z dowolnym z naszych 38 modeli AI – w tym Claude Sonnet 4.5, GPT-5.2 Pro, Gemini 3 Pro, Kimi K2, DeepSeek R1 oraz ekskluzywne niecenzurowane modele jak UncensoredLM v1.2, FreedomGPT Liberty i Grok 4. Bez filtrów. Bez ograniczeń. Tylko szczere rozmowy z AI.",
@@ -399,7 +399,8 @@ export const translations: typeof enTranslations = {
     feature4: "Tryby czatu: Prywatny, Incognito, Współdzielony i Publiczny",
     feature5: "Forum społeczności z innymi entuzjastami AI",
     needMore: "Gotowy na nieograniczone rozmowy?",
-    needMoreDesc: "Zdobądź 40× więcej creditów – 800/miesiąc za jedyne 8 €! To nieograniczony dostęp do wszystkich 38 modeli bez dziennych limitów. Idealne dla poważnych użytkowników AI. Plus: zasubskrybuj i odblokuj możliwość zakupu pakietów creditów, które nigdy nie wygasają – idealne dla power userów potrzebujących dodatkowych creditów na żądanie.",
+    needMoreDesc:
+      "Zdobądź 40× więcej creditów – 800/miesiąc za jedyne 8 €! To nieograniczony dostęp do wszystkich 38 modeli bez dziennych limitów. Idealne dla poważnych użytkowników AI. Plus: zasubskrybuj i odblokuj możliwość zakupu pakietów creditów, które nigdy nie wygasają – idealne dla power userów potrzebujących dodatkowych creditów na żądanie.",
     viewPlans: "Przejdź na Unlimited teraz",
     signoff: "Witamy w przyszłości rozmów z AI,\nZespół {{appName}}",
     ps: "P.S. Twoja prywatność jest dla nas ważna. Wybierz tryb Incognito, aby przechowywać rozmowy tylko na Twoim urządzeniu – nigdy nie są wysyłane na nasze serwery.",

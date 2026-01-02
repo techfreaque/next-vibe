@@ -513,11 +513,7 @@ export class RouteDelegationHandler {
 
       if (verbose) {
         // eslint-disable-next-line i18next/no-literal-string
-        return `❌ Error: ${detailedError}\n\nFull Response:\n${JSON.stringify(
-          result,
-          null,
-          2,
-        )}`;
+        return `❌ Error: ${detailedError}\n\nFull Response:\n${JSON.stringify(result, null, 2)}`;
       }
       // eslint-disable-next-line i18next/no-literal-string
       return `❌ Error: ${detailedError}`;

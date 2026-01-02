@@ -23,6 +23,7 @@ import {
   type ContentDeltaEventData,
   type ContentDoneEventData,
   type ErrorEventData,
+  type FilesUploadedEventData,
   type MessageCreatedEventData,
   parseSSEEvent,
   type ReasoningDeltaEventData,
@@ -491,6 +492,41 @@ export function useAIStream(
                 break;
               }
 
+              case StreamEventType.FILES_UPLOADED: {
+                const eventData = event.data as FilesUploadedEventData;
+                logger.debug(
+                  "[FILES_UPLOADED] Updating message with attachment metadata",
+                  {
+                    messageId: eventData.messageId,
+                    attachmentCount: eventData.attachments.length,
+                  },
+                );
+
+                // Update the user message with uploaded attachment metadata
+                // Remove isUploadingAttachments flag and add actual attachment data
+                const currentMessage =
+                  useChatStore.getState().messages[eventData.messageId];
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { isUploadingAttachments, ...preservedMetadata } =
+                  currentMessage?.metadata ?? {};
+
+                useChatStore.getState().updateMessage(eventData.messageId, {
+                  metadata: {
+                    ...preservedMetadata,
+                    attachments: eventData.attachments,
+                  },
+                });
+
+                logger.info(
+                  "[FILES_UPLOADED] Message updated with attachments",
+                  {
+                    messageId: eventData.messageId,
+                    attachmentCount: eventData.attachments.length,
+                  },
+                );
+                break;
+              }
+
               case StreamEventType.CONTENT_DELTA: {
                 const eventData = event.data as ContentDeltaEventData;
                 // Get fresh state from store to avoid stale closure
@@ -937,7 +973,9 @@ export function useAIStream(
                     } catch (error) {
                       logger.error(
                         "Failed to check chat store for incognito thread",
-                        { error: parseError(error).message },
+                        {
+                          error: parseError(error).message,
+                        },
                       );
                     }
                   })();

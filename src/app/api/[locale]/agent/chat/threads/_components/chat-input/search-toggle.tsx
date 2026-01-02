@@ -25,17 +25,17 @@ interface SearchToggleProps {
  * Search Toggle Component
  * Convenience UI for toggling the search tool on/off
  * Note: Search is treated as one of the ~130 tools, but has a quick-access toggle for convenience
- * The toggle reads/writes to the same enabledToolIds state as the tools modal
+ * The toggle reads/writes to the same enabledTools state as the tools modal
  */
 export function SearchToggle({
   disabled = false,
   locale,
 }: SearchToggleProps): JSX.Element {
-  const { enabledToolIds, setEnabledToolIds: onToolsChange } = useChatContext();
+  const { enabledTools, setEnabledTools } = useChatContext();
   const { t } = simpleT(locale);
 
   // Check if search tool is enabled
-  const enabled = enabledToolIds.includes(SEARCH_TOOL_NAME);
+  const enabled = enabledTools.some((tool) => tool.id === SEARCH_TOOL_NAME);
 
   const titleText = enabled
     ? t("app.chat.searchToggle.enabledTitle")
@@ -46,15 +46,20 @@ export function SearchToggle({
       return;
     }
 
-    // Toggle search tool in the enabledToolIds array
+    // Toggle search tool in the enabledTools array
     if (checked) {
       // Add search tool if not already present
-      if (!enabledToolIds.includes(SEARCH_TOOL_NAME)) {
-        onToolsChange([...enabledToolIds, SEARCH_TOOL_NAME]);
+      if (!enabledTools.some((tool) => tool.id === SEARCH_TOOL_NAME)) {
+        setEnabledTools([
+          ...enabledTools,
+          { id: SEARCH_TOOL_NAME, requiresConfirmation: false },
+        ]);
       }
     } else {
       // Remove search tool
-      onToolsChange(enabledToolIds.filter((id) => id !== SEARCH_TOOL_NAME));
+      setEnabledTools(
+        enabledTools.filter((tool) => tool.id !== SEARCH_TOOL_NAME),
+      );
     }
   };
 

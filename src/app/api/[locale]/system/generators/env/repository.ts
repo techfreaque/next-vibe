@@ -319,7 +319,9 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
     const header = generateFileHeader(
       "AUTO-GENERATED FILE - DO NOT EDIT",
       "Env Generator",
-      { command: "vibe generate:env" },
+      {
+        command: "vibe generate:env",
+      },
     );
 
     // Generate imports
@@ -419,7 +421,9 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
     const header = generateFileHeader(
       "AUTO-GENERATED FILE - DO NOT EDIT",
       "Env Generator",
-      { command: "vibe generate:env" },
+      {
+        command: "vibe generate:env",
+      },
     );
 
     // Generate imports

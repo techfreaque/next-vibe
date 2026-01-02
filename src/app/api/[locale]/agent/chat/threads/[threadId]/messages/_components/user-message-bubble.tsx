@@ -23,7 +23,7 @@ interface UserMessageBubbleProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
   onBranch?: (messageId: string) => void;
-  onRetry?: (messageId: string) => void;
+  onRetry?: (message: ChatMessage) => Promise<void>;
   onDelete?: (messageId: string) => void;
   showAuthor?: boolean;
   rootFolderId: DefaultFolderId;
@@ -90,8 +90,7 @@ export function UserMessageBubble({
         {/* Actions - Fixed height container to maintain consistent spacing */}
         <Div className="h-10 sm:h-8 flex items-center justify-end">
           <UserMessageActions
-            messageId={message.id}
-            content={message.content}
+            message={message}
             locale={locale}
             logger={logger}
             onBranch={onBranch}

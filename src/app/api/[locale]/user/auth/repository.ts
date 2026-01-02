@@ -1354,7 +1354,9 @@ export class AuthRepository {
       if (!rolesResult.success) {
         logger.warn(
           "Failed to fetch user roles for CLI token, using default CUSTOMER role",
-          { userId },
+          {
+            userId,
+          },
         );
       }
 

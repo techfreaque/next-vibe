@@ -119,7 +119,9 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
           if (existsSync(packageJsonPath)) {
             const packageJson = JSON.parse(
               await readFile(packageJsonPath, encoding),
-            ) as { version?: string };
+            ) as {
+              version?: string;
+            };
             version = packageJson.version;
           }
         } catch {

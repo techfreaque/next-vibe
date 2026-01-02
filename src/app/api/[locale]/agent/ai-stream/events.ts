@@ -33,6 +33,8 @@ export enum StreamEventType {
   // Voice mode events
   VOICE_TRANSCRIBED = "voice-transcribed",
   AUDIO_CHUNK = "audio-chunk",
+  // File upload event
+  FILES_UPLOADED = "files-uploaded",
 }
 
 /**
@@ -157,6 +159,23 @@ export interface AudioChunkEventData {
 }
 
 /**
+ * Files uploaded event data
+ * Emitted when file attachments finish uploading to storage (server threads only)
+ */
+export interface FilesUploadedEventData {
+  /** Message ID that contains the attachments */
+  messageId: string;
+  /** Uploaded attachment metadata */
+  attachments: Array<{
+    id: string;
+    url: string;
+    filename: string;
+    mimeType: string;
+    size: number;
+  }>;
+}
+
+/**
  * Event type to data mapping
  */
 export interface StreamEventDataMap {
@@ -172,6 +191,8 @@ export interface StreamEventDataMap {
   // Voice mode events
   [StreamEventType.VOICE_TRANSCRIBED]: VoiceTranscribedEventData;
   [StreamEventType.AUDIO_CHUNK]: AudioChunkEventData;
+  // File upload event
+  [StreamEventType.FILES_UPLOADED]: FilesUploadedEventData;
 }
 
 /**
@@ -259,6 +280,13 @@ export const createStreamEvent = {
     data: AudioChunkEventData,
   ): StreamEvent<StreamEventType.AUDIO_CHUNK> => ({
     type: StreamEventType.AUDIO_CHUNK,
+    data,
+  }),
+
+  filesUploaded: (
+    data: FilesUploadedEventData,
+  ): StreamEvent<StreamEventType.FILES_UPLOADED> => ({
+    type: StreamEventType.FILES_UPLOADED,
     data,
   }),
 };

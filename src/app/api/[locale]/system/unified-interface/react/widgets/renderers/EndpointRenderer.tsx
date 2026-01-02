@@ -186,6 +186,7 @@ export function EndpointRenderer<
   locale,
   form: externalForm,
   onSubmit,
+  onCancel,
   data,
   isSubmitting = false,
   children,
@@ -262,6 +263,7 @@ export function EndpointRenderer<
         context={context}
         form={form as UseFormReturn<FieldValues>}
         onSubmit={handleWidgetSubmit}
+        onCancel={onCancel}
         isSubmitting={isSubmitting}
         endpoint={endpoint}
       />

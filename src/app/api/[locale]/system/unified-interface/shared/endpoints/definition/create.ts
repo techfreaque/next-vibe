@@ -171,6 +171,11 @@ export interface ApiEndpoint<
    * Credit cost for this endpoint (0 = free, undefined = free)
    */
   readonly credits?: number;
+  /**
+   * Whether this tool requires confirmation before execution when called by AI
+   * Defaults to false (no confirmation required)
+   */
+  readonly requiresConfirmation?: boolean;
   /** Icon identifier */
   readonly icon: IconValue;
 

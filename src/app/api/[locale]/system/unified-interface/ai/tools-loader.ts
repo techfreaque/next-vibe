@@ -43,6 +43,7 @@ function createToolFromEndpoint(
     locale: CountryLanguage;
     logger: EndpointLogger;
   },
+  requiresConfirmation: boolean,
 ): CoreTool {
   const { t } = getTranslatorFromEndpoint(endpoint)(context.locale);
   // Generate description
@@ -75,6 +76,33 @@ function createToolFromEndpoint(
   // Create AI SDK CoreTool
   const toolName = endpointToToolName(endpoint);
 
+  // Generate schemas for splitting params
+  const requestDataSchema = endpoint.fields
+    ? (generateSchemaForUsage<typeof endpoint.fields, FieldUsage.RequestData>(
+        endpoint.fields,
+        FieldUsage.RequestData,
+      ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever)
+    : z.never();
+
+  const urlPathParamsSchema = endpoint.fields
+    ? (generateSchemaForUsage<
+        typeof endpoint.fields,
+        FieldUsage.RequestUrlParams
+      >(endpoint.fields, FieldUsage.RequestUrlParams) as
+        | z.ZodObject<Record<string, z.ZodTypeAny>>
+        | z.ZodNever)
+    : z.never();
+
+  // Get field names for each schema
+  const requestDataFields =
+    requestDataSchema instanceof z.ZodObject
+      ? Object.keys(requestDataSchema.shape)
+      : [];
+  const urlPathParamsFields =
+    urlPathParamsSchema instanceof z.ZodObject
+      ? Object.keys(urlPathParamsSchema.shape)
+      : [];
+
   return tool({
     description,
     inputSchema,
@@ -82,11 +110,24 @@ function createToolFromEndpoint(
       // Params are already validated and transformed by the validate function above
       const transformedParams = params;
 
+      // Split combined params into data and urlPathParams
+      const data: Record<string, never> = {};
+      const urlPathParams: Record<string, never> = {};
+
+      for (const [key, value] of Object.entries(transformedParams)) {
+        if (urlPathParamsFields.includes(key)) {
+          urlPathParams[key] = value as never;
+        } else if (requestDataFields.includes(key)) {
+          data[key] = value as never;
+        }
+      }
+
       // Execute using shared generic handler
       // toolName must be in full path format: "agent.brave-search.GET"
       const result = await routeExecutionExecutor.executeGenericHandler({
         toolName,
-        data: transformedParams as Record<string, never>,
+        data,
+        urlPathParams,
         user: context.user,
         locale: context.locale,
         logger: context.logger,
@@ -94,9 +135,13 @@ function createToolFromEndpoint(
       });
 
       if (!result.success) {
-        // Throw error for AI SDK
+        // Throw error for AI SDK with translated message
+        const errorMessage = result.message
+          ? t(result.message, result.messageParams)
+          : t("errors.toolExecutionFailed");
         // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
-        throw new Error(result.message ?? "errors.toolExecutionFailed");
+        // eslint-disable-next-line @typescript-eslint/only-throw-error -- Tool error must be thrown for AI SDK
+        throw new Error(errorMessage);
       }
 
       // Return the data to AI SDK
@@ -162,6 +207,8 @@ export async function loadTools(params: {
   locale: CountryLanguage;
   logger: EndpointLogger;
   systemPrompt: string;
+  /** Map of tool IDs to their confirmation requirements (from API request) */
+  toolConfirmationConfig?: Map<string, boolean>;
 }): Promise<{
   tools: Record<string, CoreTool> | undefined;
   systemPrompt: string;
@@ -184,18 +231,25 @@ export async function loadTools(params: {
     );
 
     // Filter by requested toolNames (full path with underscores or alias)
+    params.logger.info("[Tools Loader] === FILTERING TOOLS ===", {
+      requestedTools: params.requestedTools,
+      allEndpointsCount: allEndpoints.length,
+    });
+
     const enabledEndpoints = allEndpoints.filter((e) => {
       const fullPath = endpointToToolName(e);
       const matchesByFullPath = params.requestedTools!.includes(fullPath);
       const matchesByAlias = e.aliases
         ? e.aliases.some((alias) => params.requestedTools!.includes(alias))
         : false;
-      return matchesByFullPath || matchesByAlias;
+      const matched = matchesByFullPath || matchesByAlias;
+      return matched;
     });
 
-    params.logger.debug("Loaded tools by toolNames", {
+    params.logger.info("Loaded tools by toolNames", {
       requestedCount: params.requestedTools.length,
       loadedCount: enabledEndpoints.length,
+      enabledPaths: enabledEndpoints.map((e) => endpointToToolName(e)),
     });
 
     if (enabledEndpoints.length === 0) {
@@ -209,22 +263,32 @@ export async function loadTools(params: {
     for (const endpoint of enabledEndpoints) {
       const aiSdkToolName = endpointToToolName(endpoint);
       try {
+        // Check if this tool requires confirmation from the API request config
+        const requiresConfirmation =
+          params.toolConfirmationConfig?.get(aiSdkToolName) ?? false;
+
         params.logger.debug("Creating tool", {
           toolName: aiSdkToolName,
           endpoint: [...endpoint.path],
+          requiresConfirmation,
         });
 
-        const createdTool = createToolFromEndpoint(endpoint, {
-          user: params.user,
-          locale: params.locale,
-          logger: params.logger,
-        });
+        const createdTool = createToolFromEndpoint(
+          endpoint,
+          {
+            user: params.user,
+            locale: params.locale,
+            logger: params.logger,
+          },
+          requiresConfirmation,
+        );
 
         // Use full toolName format (e.g., "v1_core_agent_brave-search_GET")
         toolsMap.set(aiSdkToolName, createdTool);
 
         params.logger.debug("Tool created successfully", {
           toolName: aiSdkToolName,
+          requiresConfirmation,
         });
       } catch (error) {
         const parsedError = parseError(error);

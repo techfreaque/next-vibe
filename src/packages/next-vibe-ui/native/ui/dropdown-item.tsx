@@ -41,7 +41,9 @@ export function DropdownItem({
               : typeof icon === "function"
                 ? React.createElement(
                     icon as React.ComponentType<{ className?: string }>,
-                    { className: "w-6 h-6" },
+                    {
+                      className: "w-6 h-6",
+                    },
                   )
                 : null}
           </View>

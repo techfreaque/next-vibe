@@ -171,9 +171,7 @@ export async function navigateFolders(
       // Display current path with styling
       const pathString = formatPath(currentPath);
       logger.log(
-        `\n${chalk.dim(
-          "Current location: ",
-        )}${chalk.green.bold(`📂 ${pathString}`)}`,
+        `\n${chalk.dim("Current location: ")}${chalk.green.bold(`📂 ${pathString}`)}`,
       );
       logger.log(`${chalk.dim("─".repeat(70))}\n`);
 

@@ -196,6 +196,7 @@ class AiStreamRepository implements IAiStreamRepository {
       voiceMode,
       voiceTranscription,
       userMessageMetadata,
+      fileUploadPromise,
     } = setupResult.data;
 
     let systemPrompt = initialSystemPrompt;
@@ -215,6 +216,7 @@ class AiStreamRepository implements IAiStreamRepository {
         locale,
         logger,
         systemPrompt,
+        toolConfirmationResult,
       });
       systemPrompt = updatedSystemPrompt;
 
@@ -299,6 +301,68 @@ class AiStreamRepository implements IAiStreamRepository {
               encoder,
               logger,
             });
+
+            // Handle file upload promise in background (server threads only)
+            // When upload completes, emit FILES_UPLOADED event to update UI
+            if (fileUploadPromise && userMessageId) {
+              void fileUploadPromise
+                .then((result) => {
+                  if (result.success && result.attachments) {
+                    logger.info(
+                      "[File Processing] File upload completed - emitting FILES_UPLOADED event",
+                      {
+                        messageId: result.userMessageId,
+                        attachmentCount: result.attachments.length,
+                      },
+                    );
+
+                    // Emit FILES_UPLOADED event to update UI with attachment metadata
+                    const filesUploadedEvent = createStreamEvent.filesUploaded({
+                      messageId: result.userMessageId,
+                      attachments: result.attachments,
+                    });
+
+                    try {
+                      controller.enqueue(
+                        encoder.encode(formatSSEEvent(filesUploadedEvent)),
+                      );
+                      logger.info(
+                        "[File Processing] FILES_UPLOADED event emitted",
+                        {
+                          messageId: result.userMessageId,
+                          attachmentCount: result.attachments.length,
+                        },
+                      );
+                    } catch (error) {
+                      logger.error(
+                        "[File Processing] Failed to emit FILES_UPLOADED event",
+                        {
+                          error: parseError(error),
+                          messageId: result.userMessageId,
+                        },
+                      );
+                    }
+                  } else {
+                    logger.warn(
+                      "[File Processing] File upload failed - no event emitted",
+                      {
+                        messageId: result.userMessageId,
+                        success: result.success,
+                      },
+                    );
+                  }
+                  return undefined;
+                })
+                .catch((error) => {
+                  logger.error(
+                    "[File Processing] File upload promise rejected",
+                    {
+                      error: parseError(error),
+                      messageId: userMessageId,
+                    },
+                  );
+                });
+            }
 
             // Calculate initial parent and depth for AI message
             // This will be updated if reasoning occurs
@@ -894,6 +958,11 @@ class AiStreamRepository implements IAiStreamRepository {
     locale: CountryLanguage;
     logger: EndpointLogger;
     systemPrompt: string;
+    toolConfirmationResult?: {
+      messageId: string;
+      sequenceId: string;
+      toolCall: ToolCall;
+    };
   }): Promise<{
     tools: Record<string, CoreTool> | undefined;
     toolsConfig: Map<string, { requiresConfirmation: boolean }>;
@@ -959,7 +1028,7 @@ class AiStreamRepository implements IAiStreamRepository {
     subFolderId: string | null;
     content: string;
     operation: "send" | "retry" | "edit" | "answer-as-ai";
-    userMessageId: string;
+    userMessageId: string | null;
     effectiveRole: ChatMessageRole;
     effectiveParentMessageId: string | null | undefined;
     messageDepth: number;
@@ -1011,7 +1080,8 @@ class AiStreamRepository implements IAiStreamRepository {
     });
 
     // Emit VOICE_TRANSCRIBED event if audio was transcribed
-    if (voiceTranscription?.wasTranscribed) {
+    // Voice transcription only happens for "send" operations where userMessageId is not null
+    if (voiceTranscription?.wasTranscribed && userMessageId) {
       logger.debug("Emitting VOICE_TRANSCRIBED event", {
         messageId: userMessageId,
         textLength: effectiveContent.length,
@@ -1695,8 +1765,12 @@ class AiStreamRepository implements IAiStreamRepository {
       toolsConfigSize: toolsConfig.size,
     });
 
+    // Extract tool call ID from AI SDK (used for matching tool results)
+    const toolCallId = part.toolCallId; // AI SDK provides unique ID for each tool call
+
     // Create tool call with args from AI SDK
     const toolCallData: ToolCall = {
+      toolCallId, // CRITICAL: Store AI SDK tool call ID for proper result matching
       toolName: part.toolName,
       args: toolCallArgs,
       creditsUsed: 0,
@@ -1707,7 +1781,6 @@ class AiStreamRepository implements IAiStreamRepository {
 
     // Create tool message ID and emit to UI immediately
     const toolMessageId = crypto.randomUUID();
-    const toolCallId = part.toolCallId; // AI SDK provides unique ID for each tool call
 
     // Emit MESSAGE_CREATED event for UI (immediate feedback)
     // Include toolCall object so frontend can render tool display

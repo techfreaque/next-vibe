@@ -57,24 +57,27 @@ const { GET } = createEndpoint({
       memories: responseArrayField(
         {
           type: WidgetType.DATA_CARDS,
+          layout: {
+            type: LayoutType.GRID,
+            columns: 1,
+          },
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
             title:
               "app.api.agent.chat.memories.get.response.memories.memory.title" as const,
-            layoutType: LayoutType.GRID,
-            columns: 2,
+            layoutType: LayoutType.STACKED,
+            columns: 12,
           },
           { response: true },
           {
             memoryNumber: responseField(
               {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.memories.get.response.memories.memory.memoryNumber.content" as const,
+                type: WidgetType.BADGE,
+                text: "app.api.agent.chat.memories.get.response.memories.memory.memoryNumber.text" as const,
               },
-              z.coerce.number(),
+              z.coerce.number().int(),
             ),
             content: responseField(
               {
@@ -84,21 +87,23 @@ const { GET } = createEndpoint({
               },
               z.string(),
             ),
-            tags: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.memories.get.response.memories.memory.tags.content" as const,
-              },
-              z.array(z.string()),
-            ),
             priority: responseField(
               {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.memories.get.response.memories.memory.priority.content" as const,
+                type: WidgetType.BADGE,
+                text: "app.api.agent.chat.memories.get.response.memories.memory.priority.text" as const,
               },
               z.coerce.number(),
+            ),
+            tags: responseArrayField(
+              {
+                type: WidgetType.DATA_LIST,
+              },
+              responseField(
+                {
+                  type: WidgetType.BADGE,
+                },
+                z.string(),
+              ),
             ),
             createdAt: responseField(
               {
@@ -263,7 +268,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.agent.chat.memories.post.response.id.content" as const,
         },
-        z.coerce.int(),
+        z.coerce.number().int(),
       ),
     },
   ),

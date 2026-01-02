@@ -55,7 +55,9 @@ export abstract class BaseRecorder implements Recorder {
       throw new RecorderError(
         "Recording already in progress",
         "RECORDING_IN_PROGRESS",
-        { currentPath: this._currentPath },
+        {
+          currentPath: this._currentPath,
+        },
       );
     }
 
@@ -112,7 +114,9 @@ export abstract class BaseRecorder implements Recorder {
       throw new RecorderError(
         `Failed to stop recording: ${String(error)}`,
         "STOP_FAILED",
-        { error: error instanceof Error ? error.message : String(error) },
+        {
+          error: error instanceof Error ? error.message : String(error),
+        },
       );
     }
   }

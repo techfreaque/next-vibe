@@ -28,7 +28,7 @@ interface UseInputHandlersProps {
   input: string;
   attachments: File[];
   isLoading: boolean;
-  enabledToolIds: string[];
+  enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
   sendMessage: (
     params: {
       content: string;
@@ -53,7 +53,9 @@ interface UseInputHandlersProps {
   setInput: (input: string) => void;
   setSelectedModel: (modelId: ModelId) => void;
   setSelectedCharacter: (characterId: string) => void;
-  setEnabledToolIds: (toolIds: string[]) => void;
+  setEnabledTools: (
+    tools: Array<{ id: string; requiresConfirmation: boolean }>,
+  ) => void;
   inputRef: React.RefObject<TextareaRefObject | null>;
   locale: CountryLanguage;
   logger: EndpointLogger;
@@ -81,12 +83,12 @@ export function useInputHandlers({
   input,
   attachments,
   isLoading,
-  enabledToolIds,
+  enabledTools,
   sendMessage,
   setInput,
   setSelectedModel,
   setSelectedCharacter,
-  setEnabledToolIds,
+  setEnabledTools,
   inputRef,
   locale,
   logger,
@@ -246,8 +248,11 @@ export function useInputHandlers({
 
       // Auto-remove search tool if the new model doesn't support tools
       const SEARCH_TOOL_ID = "get_v1_core_agent_brave-search";
-      if (!model.supportsTools && enabledToolIds.includes(SEARCH_TOOL_ID)) {
-        setEnabledToolIds(enabledToolIds.filter((id) => id !== SEARCH_TOOL_ID));
+      if (
+        !model.supportsTools &&
+        enabledTools.some((t) => t.id === SEARCH_TOOL_ID)
+      ) {
+        setEnabledTools(enabledTools.filter((t) => t.id !== SEARCH_TOOL_ID));
         logger.info("Auto-disabled search tool - model doesn't support tools", {
           modelId,
           modelName: model.name,
@@ -256,7 +261,7 @@ export function useInputHandlers({
 
       setSelectedModel(modelId);
     },
-    [setSelectedModel, enabledToolIds, setEnabledToolIds, logger],
+    [setSelectedModel, setEnabledTools, logger, enabledTools],
   );
 
   const handleFillInputWithPrompt = useCallback(

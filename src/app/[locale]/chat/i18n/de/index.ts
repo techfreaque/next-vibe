@@ -119,6 +119,7 @@ export const translations: typeof enTranslations = {
       resetToDefault: "Auf Standard zurücksetzen",
       stats: "{{enabled}} von {{total}} Tools aktiviert",
       aliases: "Aliase",
+      requireConfirmation: "Bestätigung vor Verwendung erforderlich",
     },
   },
 

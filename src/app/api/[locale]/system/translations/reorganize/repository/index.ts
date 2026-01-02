@@ -119,7 +119,9 @@ export class TranslationReorganizeRepositoryImpl {
         output.push(
           t(
             "app.api.system.translations.reorganize.post.messages.backupCreated",
-            { path: backupPath },
+            {
+              path: backupPath,
+            },
           ),
         );
       }
@@ -161,7 +163,9 @@ export class TranslationReorganizeRepositoryImpl {
         output.push(
           t(
             "app.api.system.translations.reorganize.post.messages.removingKeys",
-            { count: unusedKeys },
+            {
+              count: unusedKeys,
+            },
           ),
         );
         filteredTranslations = this.removeUnusedKeys(

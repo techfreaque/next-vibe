@@ -5,6 +5,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { GitBranch, RotateCcw, Trash2 } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -14,19 +15,17 @@ import { CopyButton } from "./copy-button";
 import { MessageActionButton } from "./message-action-button";
 
 interface UserMessageActionsProps {
-  messageId: string;
-  content: string;
+  message: ChatMessage;
   locale: CountryLanguage;
   logger: EndpointLogger;
   onBranch?: (messageId: string) => void;
-  onRetry?: (messageId: string) => void;
+  onRetry?: (message: ChatMessage) => Promise<void>;
   onDelete?: (messageId: string) => void;
   className?: string;
 }
 
 export function UserMessageActions({
-  messageId,
-  content,
+  message,
   locale,
   logger,
   onBranch,
@@ -50,12 +49,12 @@ export function UserMessageActions({
         className,
       )}
     >
-      <CopyButton content={content} locale={locale} logger={logger} />
+      <CopyButton content={message.content} locale={locale} logger={logger} />
 
       {onBranch && (
         <MessageActionButton
           icon={GitBranch}
-          onClick={() => onBranch(messageId)}
+          onClick={() => onBranch(message.id)}
           title={t("app.chat.common.userMessageActions.branch")}
         />
       )}
@@ -63,7 +62,9 @@ export function UserMessageActions({
       {onRetry && (
         <MessageActionButton
           icon={RotateCcw}
-          onClick={() => onRetry(messageId)}
+          onClick={(): void => {
+            void onRetry(message);
+          }}
           title={t("app.chat.common.userMessageActions.retry")}
         />
       )}
@@ -71,7 +72,7 @@ export function UserMessageActions({
       {onDelete && (
         <MessageActionButton
           icon={Trash2}
-          onClick={() => onDelete(messageId)}
+          onClick={() => onDelete(message.id)}
           title={t("app.chat.common.userMessageActions.deleteMessage")}
           variant="destructive"
         />

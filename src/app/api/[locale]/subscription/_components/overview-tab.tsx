@@ -131,7 +131,9 @@ export function OverviewTab({
                 <P className="text-sm text-blue-700 dark:text-blue-300">
                   {t(
                     "app.subscription.subscription.overview.howItWorks.free.description",
-                    { count: freeCredits },
+                    {
+                      count: freeCredits,
+                    },
                   )}
                 </P>
               </Div>

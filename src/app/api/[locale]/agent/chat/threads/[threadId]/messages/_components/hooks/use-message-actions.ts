@@ -5,7 +5,10 @@
 
 import { useCallback, useState } from "react";
 
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
+import { loadMessageAttachments } from "./load-message-attachments";
 
 export type MessageActionType = "edit" | "retry" | "answer" | null;
 
@@ -22,6 +25,7 @@ export interface UseMessageActionsReturn {
   deletingMessageId: string | null;
   answerContent: string;
   editorAttachments: File[];
+  isLoadingRetryAttachments: boolean;
 
   // Check if a message is in a specific state
   isEditing: (messageId: string) => boolean;
@@ -31,7 +35,7 @@ export interface UseMessageActionsReturn {
 
   // Action handlers
   startEdit: (messageId: string) => void;
-  startRetry: (messageId: string) => void;
+  startRetry: (message: ChatMessage) => Promise<void>;
   startAnswer: (messageId: string) => void;
   startDelete: (messageId: string) => void;
   cancelAction: () => void;
@@ -92,6 +96,8 @@ export function useMessageActions(
   );
   const [answerContent, setAnswerContent] = useState<string>("");
   const [editorAttachments, setEditorAttachments] = useState<File[]>([]);
+  const [isLoadingRetryAttachments, setIsLoadingRetryAttachments] =
+    useState<boolean>(false);
 
   // Check functions
   const isEditing = useCallback(
@@ -119,6 +125,7 @@ export function useMessageActions(
     setDeletingMessageId(null);
     setAnswerContent("");
     setEditorAttachments([]);
+    setIsLoadingRetryAttachments(false);
   }, []);
 
   // Start action handlers
@@ -131,11 +138,17 @@ export function useMessageActions(
   );
 
   const startRetry = useCallback(
-    (messageId: string) => {
+    async (message: ChatMessage) => {
       resetAllActions();
-      setRetryingMessageId(messageId);
+      setIsLoadingRetryAttachments(true);
+
+      const attachments = await loadMessageAttachments(message, logger);
+      setEditorAttachments(attachments);
+
+      setIsLoadingRetryAttachments(false);
+      setRetryingMessageId(message.id);
     },
-    [resetAllActions],
+    [resetAllActions, logger],
   );
 
   const startAnswer = useCallback(
@@ -305,6 +318,7 @@ export function useMessageActions(
     deletingMessageId,
     answerContent,
     editorAttachments,
+    isLoadingRetryAttachments,
     isEditing,
     isRetrying,
     isAnswering,

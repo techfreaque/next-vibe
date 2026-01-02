@@ -14,16 +14,14 @@ import {
   loadDraft,
   saveDraft,
 } from "@/app/api/[locale]/agent/chat/hooks/use-input-autosave";
-import {
-  base64ToFile,
-  urlToFile,
-} from "@/app/api/[locale]/agent/chat/incognito/file-utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { DivRefObject } from "@/packages/next-vibe-ui/web/ui/div";
 import type {
   TextareaKeyboardEvent,
   TextareaRefObject,
 } from "@/packages/next-vibe-ui/web/ui/textarea";
+
+import { loadMessageAttachments } from "./load-message-attachments";
 
 export type EditorActionType = "branch" | null;
 
@@ -95,6 +93,16 @@ export function useMessageEditor({
     };
     void loadDraftForMessage();
   }, [draftKey, message.id, logger]);
+
+  useEffect(() => {
+    const loadAttachments = async (): Promise<void> => {
+      const files = await loadMessageAttachments(message, logger);
+      if (files.length > 0) {
+        setAttachments(files);
+      }
+    };
+    void loadAttachments();
+  }, [message, logger]);
 
   // Wrapper function to save content and draft together
   const setContentAndSaveDraft = useCallback(

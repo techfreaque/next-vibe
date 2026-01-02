@@ -114,8 +114,10 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.EMAIL,
               label: "app.api.user.public.signup.fields.email.label",
-              description: "app.api.user.public.signup.fields.email.description",
-              placeholder: "app.api.user.public.signup.fields.email.placeholder",
+              description:
+                "app.api.user.public.signup.fields.email.description",
+              placeholder:
+                "app.api.user.public.signup.fields.email.placeholder",
               columns: 12,
               order: 3,
             },
@@ -238,7 +240,8 @@ const { POST } = createEndpoint({
               // Show as readonly card when prefilled from server (only if value unchanged)
               prefillDisplay: {
                 variant: "card",
-                labelKey: "app.api.user.public.signup.fields.referralCode.label",
+                labelKey:
+                  "app.api.user.public.signup.fields.referralCode.label",
               },
             },
             z.string().optional(),

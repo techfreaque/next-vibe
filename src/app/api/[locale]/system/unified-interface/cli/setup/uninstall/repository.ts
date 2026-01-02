@@ -134,7 +134,9 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
           if (existsSync(packageJsonPath)) {
             const packageJson = JSON.parse(
               await readFile(packageJsonPath, "utf8"),
-            ) as { version?: string };
+            ) as {
+              version?: string;
+            };
             version = packageJson.version;
           }
         } catch {

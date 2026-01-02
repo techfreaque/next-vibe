@@ -79,6 +79,7 @@ export function SidebarFooter({
             aria-label={
               isExpanded ? "Collapse account section" : "Expand account section"
             }
+            suppressHydrationWarning
           >
             <Span className="flex flex-row items-center gap-2 min-w-0 flex-1">
               {/* Credits display */}
@@ -119,7 +120,10 @@ export function SidebarFooter({
 
         {/* Expandable Content with smooth animation */}
         <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-          <Div className="px-2 py-2 flex flex-col gap-2 bg-muted/20 border-t border-border/50">
+          <Div
+            className="px-2 py-2 flex flex-col gap-2 bg-muted/20 border-t border-border/50"
+            suppressHydrationWarning
+          >
             {/* Account Section */}
             <Div className="flex flex-col gap-0.5">
               {/* Login/Profile - Primary action */}

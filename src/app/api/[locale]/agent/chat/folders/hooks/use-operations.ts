@@ -95,7 +95,11 @@ export function useFolderOperations(
       if (rootFolderId === DefaultFolderId.INCOGNITO) {
         logger.debug(
           "Folder operations: Creating incognito folder (localStorage only)",
-          { name, rootFolderId, parentId },
+          {
+            name,
+            rootFolderId,
+            parentId,
+          },
         );
 
         const { generateIncognitoId, saveFolder } = await import(
@@ -218,7 +222,9 @@ export function useFolderOperations(
       if (folder && folder.rootFolderId === "incognito") {
         logger.debug(
           "Folder operations: Updating incognito folder (localStorage only)",
-          { folderId },
+          {
+            folderId,
+          },
         );
 
         const { saveFolder } = await import("../../incognito/storage");
@@ -273,7 +279,9 @@ export function useFolderOperations(
       if (folder && folder.rootFolderId === "incognito") {
         logger.debug(
           "Folder operations: Deleting incognito folder (localStorage only)",
-          { folderId },
+          {
+            folderId,
+          },
         );
 
         const { deleteFolder: deleteIncognitoFolder } = await import(

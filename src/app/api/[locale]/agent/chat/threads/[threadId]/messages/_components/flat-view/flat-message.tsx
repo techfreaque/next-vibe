@@ -317,7 +317,8 @@ export function FlatMessage({
             user={user}
           />
         </Div>
-      ) : messageActions.retryingMessageId === message.id ? (
+      ) : messageActions.retryingMessageId === message.id &&
+        !messageActions.isLoadingRetryAttachments ? (
         <Div className="my-2">
           <ModelCharacterSelectorModal
             titleKey="app.chat.flatView.retryModal.title"
@@ -338,7 +339,9 @@ export function FlatMessage({
                 logger.debug(
                   "FlatMessageView",
                   "Character selection changed (no handler)",
-                  { character },
+                  {
+                    character,
+                  },
                 );
               })
             }
@@ -485,7 +488,9 @@ export function FlatMessage({
                 logger.debug(
                   "FlatMessageView",
                   "Character selection changed (no handler)",
-                  { character },
+                  {
+                    character,
+                  },
                 );
               })
             }
@@ -591,7 +596,7 @@ export function FlatMessage({
                 variant="ghost"
                 size="unset"
                 onClick={(): void => {
-                  messageActions.startRetry(message.id);
+                  void messageActions.startRetry(message);
                 }}
                 className="text-foreground hover:text-foreground/80 hover:underline transition-colors"
                 title={t("app.chat.flatView.actions.retryWithDifferent")}

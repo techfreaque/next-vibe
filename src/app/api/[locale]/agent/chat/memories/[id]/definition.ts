@@ -203,6 +203,7 @@ const { DELETE } = createEndpoint({
   path: ["agent", "chat", "memories", "[id]"],
   aliases: [MEMORY_DELETE_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  requiresConfirmation: true,
 
   title: "app.api.agent.chat.memories.id.delete.title" as const,
   description: "app.api.agent.chat.memories.id.delete.description" as const,

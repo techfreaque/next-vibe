@@ -26,7 +26,10 @@ import {
   type SignupPostRequestOutput,
   type SignupPostResponseOutput,
 } from "./definition";
-import { createTrackingContext,type TrackingContext } from "../../../emails/smtp-client/components/tracking_context.email";
+import {
+  createTrackingContext,
+  type TrackingContext,
+} from "../../../emails/smtp-client/components/tracking_context.email";
 import { EmailTemplate } from "../../../emails/smtp-client/components/template.email";
 
 // ============================================================================

@@ -79,6 +79,8 @@ export const LinearMessageView = React.memo(function LinearMessageView({
     retryingMessageId,
     answeringMessageId,
     answerContent,
+    editorAttachments,
+    isLoadingRetryAttachments,
     startEdit: onStartEdit,
     startRetry: onStartRetry,
     startAnswer: onStartAnswer,
@@ -244,7 +246,8 @@ export const LinearMessageView = React.memo(function LinearMessageView({
 
       {messages.map((message, index) => {
         const isEditing = editingMessageId === message.id;
-        const isRetrying = retryingMessageId === message.id;
+        const isRetrying =
+          retryingMessageId === message.id && !isLoadingRetryAttachments;
         const isAnswering = answeringMessageId === message.id;
 
         // Check if this message has branches (multiple children)
@@ -316,9 +319,14 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                           /* no-op */
                         })
                       }
-                      onConfirm={(): void => {
+                      onConfirm={async (): Promise<void> => {
                         if (onRetryMessage) {
-                          void onRetryMessage(message.id);
+                          void onRetryMessage(
+                            message.id,
+                            editorAttachments.length > 0
+                              ? editorAttachments
+                              : undefined,
+                          );
                         }
                         onCancelAction();
                       }}

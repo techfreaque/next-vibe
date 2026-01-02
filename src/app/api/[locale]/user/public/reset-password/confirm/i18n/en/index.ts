@@ -5,19 +5,25 @@ export const translations = {
   email: {
     title: "Your {{appName}} Password Has Been Reset",
     subject: "Password Successfully Reset - {{appName}}",
-    previewText: "Your password has been reset successfully. You can now log in and continue chatting with 38 AI models.",
+    previewText:
+      "Your password has been reset successfully. You can now log in and continue chatting with 38 AI models.",
     greeting: "Hello,",
-    confirmationMessage: "Your {{appName}} password has been successfully reset.",
-    successMessage: "Your password reset is complete! You can now log in to your account with your new password and continue exploring uncensored AI conversations.",
-    loginInstructions: "You can now log in with your new password and access all 38 AI models.",
+    confirmationMessage:
+      "Your {{appName}} password has been successfully reset.",
+    successMessage:
+      "Your password reset is complete! You can now log in to your account with your new password and continue exploring uncensored AI conversations.",
+    loginInstructions:
+      "You can now log in with your new password and access all 38 AI models.",
     loginButton: "Log In to {{appName}}",
-    securityInfo: "This password change was completed from {{ipAddress}} on {{resetTime}}.",
+    securityInfo:
+      "This password change was completed from {{ipAddress}} on {{resetTime}}.",
     securityWarning:
       "If you did not make this change, your account may be compromised. Please contact our support team immediately.",
     securityTip:
       "For your security, we recommend using a strong, unique password and enabling two-factor authentication.",
     didntMakeChange: "Didn't Make This Change?",
-    didntMakeChangeInfo: "If you didn't reset your password, contact our support team immediately at {{supportEmail}}. Your account security is our priority.",
+    didntMakeChangeInfo:
+      "If you didn't reset your password, contact our support team immediately at {{supportEmail}}. Your account security is our priority.",
     securityBestPractices: "Security Best Practices",
     bestPractice1: "Use a unique password for {{appName}}",
     bestPractice2: "Enable two-factor authentication",

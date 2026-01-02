@@ -66,7 +66,8 @@ export class PasswordRepository {
     } catch (error) {
       logger.error("Error finding valid reset token", parseError(error));
       return fail({
-        message: "app.api.user.public.resetPassword.errors.tokenValidationFailed",
+        message:
+          "app.api.user.public.resetPassword.errors.tokenValidationFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -136,7 +137,9 @@ export class PasswordRepository {
   /**
    * Delete expired password resets
    */
-  static async deleteExpired(logger: EndpointLogger): Promise<ResponseType<null>> {
+  static async deleteExpired(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<null>> {
     try {
       const now = new Date();
       await db
@@ -205,7 +208,8 @@ export class PasswordRepository {
 
         if (!results || results.length === 0) {
           return fail({
-            message: "app.api.user.public.resetPassword.errors.tokenCreationFailed",
+            message:
+              "app.api.user.public.resetPassword.errors.tokenCreationFailed",
             errorType: ErrorResponseTypes.DATABASE_ERROR,
           });
         }
@@ -237,7 +241,10 @@ export class PasswordRepository {
           SECRET_KEY,
         );
 
-        const resetRecordResponse = await this.findByUserId(payload.userId, logger);
+        const resetRecordResponse = await this.findByUserId(
+          payload.userId,
+          logger,
+        );
         if (!resetRecordResponse.success || !resetRecordResponse.data) {
           return fail({
             message: "app.api.user.public.resetPassword.errors.tokenInvalid",
@@ -247,9 +254,14 @@ export class PasswordRepository {
 
         const resetRecord = resetRecordResponse.data;
         if (resetRecord.expiresAt < new Date()) {
-          const deleteResponse = await this.deleteByUserId(payload.userId, logger);
+          const deleteResponse = await this.deleteByUserId(
+            payload.userId,
+            logger,
+          );
           if (!deleteResponse.success) {
-            logger.debug("Failed to delete expired token", { userId: payload.userId });
+            logger.debug("Failed to delete expired token", {
+              userId: payload.userId,
+            });
           }
 
           return fail({
@@ -272,7 +284,8 @@ export class PasswordRepository {
     } catch (error) {
       logger.error("Error verifying JWT token", parseError(error));
       return fail({
-        message: "app.api.user.public.resetPassword.errors.tokenVerificationFailed",
+        message:
+          "app.api.user.public.resetPassword.errors.tokenVerificationFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -335,7 +348,8 @@ export class PasswordRepository {
     } catch (error) {
       logger.error("Error verifying password reset token", parseError(error));
       return fail({
-        message: "app.api.user.public.resetPassword.errors.tokenVerificationFailed",
+        message:
+          "app.api.user.public.resetPassword.errors.tokenVerificationFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -359,7 +373,8 @@ export class PasswordRepository {
     return success({
       response: {
         valid: true,
-        message: "app.api.user.public.resetPassword.validate.response.validationMessage",
+        message:
+          "app.api.user.public.resetPassword.validate.response.validationMessage",
         userId: verifyResult.data,
         expiresAt: undefined,
         nextSteps: [
@@ -381,7 +396,8 @@ export class PasswordRepository {
     return success({
       response: {
         success: true,
-        message: "app.api.user.public.resetPassword.request.response.success.message",
+        message:
+          "app.api.user.public.resetPassword.request.response.success.message",
         nextSteps: [
           "app.api.user.public.resetPassword.request.response.nextSteps.checkEmail",
           "app.api.user.public.resetPassword.request.response.nextSteps.clickLink",
@@ -417,7 +433,8 @@ export class PasswordRepository {
 
       if (!updatedUser) {
         return fail({
-          message: "app.api.user.public.resetPassword.errors.passwordUpdateFailed",
+          message:
+            "app.api.user.public.resetPassword.errors.passwordUpdateFailed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -482,7 +499,10 @@ export class PasswordRepository {
       const resetPayload = resetPayloadResponse.data;
 
       if (resetPayload.email !== email) {
-        logger.debug("Email mismatch", { email, tokenEmail: resetPayload.email });
+        logger.debug("Email mismatch", {
+          email,
+          tokenEmail: resetPayload.email,
+        });
         return fail({
           message: "app.api.user.public.resetPassword.errors.emailMismatch",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
@@ -507,7 +527,10 @@ export class PasswordRepository {
         return updateResponse as ResponseType<string>;
       }
 
-      logger.debug("Password reset successful", { userId: resetPayload.userId, email });
+      logger.debug("Password reset successful", {
+        userId: resetPayload.userId,
+        email,
+      });
       return success("app.api.user.auth.resetPassword.success");
     } catch (error) {
       logger.error("Error confirming password reset", parseError(error));

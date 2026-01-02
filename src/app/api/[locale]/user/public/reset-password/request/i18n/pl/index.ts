@@ -9,17 +9,24 @@ export const translations: typeof enTranslations = {
   email: {
     title: "Zresetuj swoje hasło {{appName}}",
     subject: "Żądanie resetowania hasła - {{appName}}",
-    previewText: "Zresetuj swoje hasło, aby odzyskać dostęp do swojego konta {{appName}} i kontynuować rozmowy z 38 modelami AI.",
+    previewText:
+      "Zresetuj swoje hasło, aby odzyskać dostęp do swojego konta {{appName}} i kontynuować rozmowy z 38 modelami AI.",
     greeting: "Witaj,",
-    requestInfo: "Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta {{appName}}.",
-    instructions: "Kliknij przycisk poniżej, aby utworzyć nowe hasło. Ten link jest ważny przez 24 godziny i może być użyty tylko raz.",
+    requestInfo:
+      "Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta {{appName}}.",
+    instructions:
+      "Kliknij przycisk poniżej, aby utworzyć nowe hasło. Ten link jest ważny przez 24 godziny i może być użyty tylko raz.",
     buttonText: "Zresetuj moje hasło",
-    expirationInfo: "Ten bezpieczny link wygasa za 24 godziny dla Twojego bezpieczeństwa.",
-    securityInfo: "Dla Twojego bezpieczeństwa, to resetowanie hasła zostało zażądane z {{ipAddress}} dnia {{requestTime}}.",
+    expirationInfo:
+      "Ten bezpieczny link wygasa za 24 godziny dla Twojego bezpieczeństwa.",
+    securityInfo:
+      "Dla Twojego bezpieczeństwa, to resetowanie hasła zostało zażądane z {{ipAddress}} dnia {{requestTime}}.",
     didntRequest: "Nie żądałeś tego?",
-    didntRequestInfo: "Jeśli nie żądałeś resetowania hasła, możesz bezpiecznie zignorować ten e-mail. Twoje hasło pozostanie niezmienione, a Twoje konto jest bezpieczne.",
+    didntRequestInfo:
+      "Jeśli nie żądałeś resetowania hasła, możesz bezpiecznie zignorować ten e-mail. Twoje hasło pozostanie niezmienione, a Twoje konto jest bezpieczne.",
     needHelp: "Potrzebujesz pomocy?",
-    needHelpInfo: "Jeśli masz problemy z resetowaniem hasła lub dostępem do swojego konta, nasz zespół wsparcia jest tutaj, aby pomóc.",
+    needHelpInfo:
+      "Jeśli masz problemy z resetowaniem hasła lub dostępem do swojego konta, nasz zespół wsparcia jest tutaj, aby pomóc.",
     supportButton: "Skontaktuj się ze wsparciem",
     signoff: "Bądź bezpieczny,\nZespół {{appName}}",
     footer: "To jest automatyczne powiadomienie bezpieczeństwa z {{appName}}",

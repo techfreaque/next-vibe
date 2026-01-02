@@ -128,7 +128,9 @@ export class ResourceCleanupRegistry {
             : { message: String(cleanupError) };
         logger.warn(
           "app.api.system.unifiedInterface.cli.vibe.utils.debug.cleanupFunctionFailed",
-          { cleanupError: error },
+          {
+            cleanupError: error,
+          },
         );
       }
     }
@@ -503,7 +505,9 @@ export class CliResourceManager {
           const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
           logger.info(
             "app.api.system.unifiedInterface.cli.vibe.utils.debug.executionTime",
-            { totalSeconds },
+            {
+              totalSeconds,
+            },
           );
           logger.info(
             "app.api.system.unifiedInterface.cli.vibe.utils.debug.performanceBreakdown",
@@ -577,7 +581,9 @@ export class CliResourceManager {
           : { message: String(cleanupError) };
       logger.warn(
         "app.api.system.unifiedInterface.cli.vibe.utils.debug.cleanupError",
-        { cleanupError: error },
+        {
+          cleanupError: error,
+        },
       );
       process.exit(1);
     }

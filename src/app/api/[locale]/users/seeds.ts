@@ -50,7 +50,9 @@ export async function dev(
     if (!adminUserResponse.success || !adminUserResponse.data) {
       logger.error(
         "❌ Admin user not found, skipping users management seeding",
-        { error: adminUserResponse.message || "User not found" },
+        {
+          error: adminUserResponse.message || "User not found",
+        },
       );
       return;
     }
@@ -197,7 +199,9 @@ export async function test(
     if (!adminUserResponse.success || !adminUserResponse.data) {
       logger.error(
         "❌ Admin user not found, skipping test users management seeding",
-        { error: adminUserResponse.message || "User not found" },
+        {
+          error: adminUserResponse.message || "User not found",
+        },
       );
       return;
     }

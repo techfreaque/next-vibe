@@ -165,8 +165,9 @@ export class SignupRepositoryImpl implements SignupRepository {
       await LeadAuthRepository.linkLeadToUser(user.leadId, userData.id, logger);
 
       // Link referral code if provided manually in form
-      const { ReferralRepository } =
-        await import("../../../referral/repository");
+      const { ReferralRepository } = await import(
+        "../../../referral/repository"
+      );
       if (referralCode) {
         logger.debug("Linking manual referral code to lead", {
           referralCode,
@@ -330,8 +331,13 @@ export class SignupRepositoryImpl implements SignupRepository {
     role: UserRoleValue = UserRole.CUSTOMER,
   ): Promise<ResponseType<StandardUserType>> {
     try {
-      const { email, password, privateName, publicName, subscribeToNewsletter } =
-        userInput;
+      const {
+        email,
+        password,
+        privateName,
+        publicName,
+        subscribeToNewsletter,
+      } = userInput;
 
       // Create user data object
       const userData = {

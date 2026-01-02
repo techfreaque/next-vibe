@@ -49,8 +49,8 @@ export function AIToolsModal({
 }: AIToolsModalProps): JSX.Element {
   // Get state and callbacks from context
   const {
-    enabledToolIds,
-    setEnabledToolIds: onToolsChange,
+    enabledTools,
+    setEnabledTools,
     isToolsModalOpen: open,
     setToolsModalOpen: onOpenChange,
   } = useChatContext();
@@ -141,19 +141,44 @@ export function AIToolsModal({
 
   // Toggle a single tool
   const handleToggleTool = (toolName: string): void => {
-    const isEnabled = enabledToolIds.includes(toolName);
+    const isEnabled = enabledTools.some((t) => t.id === toolName);
+    const tool = availableTools.find((t) => t.toolName === toolName);
 
     if (isEnabled) {
-      // Remove from enabled list
-      onToolsChange(enabledToolIds.filter((id) => id !== toolName));
+      // Disable tool: remove from list
+      setEnabledTools(enabledTools.filter((t) => t.id !== toolName));
     } else {
-      // Add to enabled list
-      onToolsChange([...enabledToolIds, toolName]);
+      // Enable tool: add with default confirmation setting
+      setEnabledTools([
+        ...enabledTools,
+        {
+          id: toolName,
+          requiresConfirmation: tool?.requiresConfirmation ?? false,
+        },
+      ]);
     }
 
     logger.debug("AIToolsModal", "Tool toggled", {
       toolName,
       enabled: !isEnabled,
+      requiresConfirmation: tool?.requiresConfirmation,
+    });
+  };
+
+  // Toggle confirmation for a single tool
+  const handleToggleConfirmation = (toolName: string): void => {
+    setEnabledTools(
+      enabledTools.map((t) =>
+        t.id === toolName
+          ? { ...t, requiresConfirmation: !t.requiresConfirmation }
+          : t,
+      ),
+    );
+
+    const tool = enabledTools.find((t) => t.id === toolName);
+    logger.debug("AIToolsModal", "Tool confirmation toggled", {
+      toolName,
+      requiresConfirmation: !tool?.requiresConfirmation,
     });
   };
 
@@ -161,22 +186,25 @@ export function AIToolsModal({
   const handleToggleAll = (): void => {
     const allEndpointIds = filteredTools.map((tool) => tool.toolName);
     const allEnabled = allEndpointIds.every((id) =>
-      enabledToolIds.includes(id),
+      enabledTools.some((t) => t.id === id),
     );
 
     if (allEnabled) {
       // Disable all visible tools
-      const remainingEnabled = enabledToolIds.filter(
-        (id) => !allEndpointIds.includes(id),
+      const remainingEnabled = enabledTools.filter(
+        (t) => !allEndpointIds.includes(t.id),
       );
-      onToolsChange(remainingEnabled);
+      setEnabledTools(remainingEnabled);
       logger.debug("AIToolsModal", "All visible tools disabled");
     } else {
       // Enable all visible tools (merge with existing)
-      const uniqueEnabled = [
-        ...new Set([...enabledToolIds, ...allEndpointIds]),
-      ];
-      onToolsChange(uniqueEnabled);
+      const visibleToolsToAdd = filteredTools
+        .filter((tool) => !enabledTools.some((t) => t.id === tool.toolName))
+        .map((tool) => ({
+          id: tool.toolName,
+          requiresConfirmation: tool.requiresConfirmation ?? false,
+        }));
+      setEnabledTools([...enabledTools, ...visibleToolsToAdd]);
       logger.debug("AIToolsModal", "All visible tools enabled");
     }
   };
@@ -187,9 +215,9 @@ export function AIToolsModal({
       return false;
     }
     return filteredTools.every((tool) =>
-      enabledToolIds.includes(tool.toolName),
+      enabledTools.some((t) => t.id === tool.toolName),
     );
-  }, [filteredTools, enabledToolIds]);
+  }, [filteredTools, enabledTools]);
 
   // Toggle category expansion
   const toggleCategory = (category: string): void => {
@@ -208,18 +236,23 @@ export function AIToolsModal({
   ): void => {
     const categoryEndpointIds = categoryTools.map((t) => t.toolName);
     const allEnabled = categoryEndpointIds.every((id) =>
-      enabledToolIds.includes(id),
+      enabledTools.some((t) => t.id === id),
     );
 
     if (allEnabled) {
       // Disable all tools in category
-      onToolsChange(
-        enabledToolIds.filter((id) => !categoryEndpointIds.includes(id)),
+      setEnabledTools(
+        enabledTools.filter((t) => !categoryEndpointIds.includes(t.id)),
       );
     } else {
       // Enable all tools in category
-      const newIds = new Set([...enabledToolIds, ...categoryEndpointIds]);
-      onToolsChange([...newIds]);
+      const categoryToolsToAdd = categoryTools
+        .filter((tool) => !enabledTools.some((t) => t.id === tool.toolName))
+        .map((tool) => ({
+          id: tool.toolName,
+          requiresConfirmation: tool.requiresConfirmation ?? false,
+        }));
+      setEnabledTools([...enabledTools, ...categoryToolsToAdd]);
     }
   };
 
@@ -235,7 +268,14 @@ export function AIToolsModal({
 
   // Reset to default tools
   const handleResetToDefault = (): void => {
-    onToolsChange([...DEFAULT_TOOL_IDS]);
+    const defaultTools = DEFAULT_TOOL_IDS.map((id) => {
+      const tool = availableTools.find((t) => t.toolName === id);
+      return {
+        id,
+        requiresConfirmation: tool?.requiresConfirmation ?? false,
+      };
+    });
+    setEnabledTools(defaultTools);
     logger.debug("AIToolsModal", "Reset to default tools", {
       defaultToolIds: [...DEFAULT_TOOL_IDS],
     });
@@ -346,7 +386,7 @@ export function AIToolsModal({
                   const isExpanded = expandedCategories.has(category);
                   const categoryEndpointIds = tools.map((t) => t.toolName);
                   const allCategoryEnabled = categoryEndpointIds.every((id) =>
-                    enabledToolIds.includes(id),
+                    enabledTools.some((t) => t.id === id),
                   );
 
                   return (
@@ -367,7 +407,7 @@ export function AIToolsModal({
                         <Badge variant="secondary" className="text-xs">
                           {
                             categoryEndpointIds.filter((id) =>
-                              enabledToolIds.includes(id),
+                              enabledTools.some((t) => t.id === id),
                             ).length
                           }{" "}
                           / {tools.length}
@@ -384,72 +424,107 @@ export function AIToolsModal({
                       {isExpanded && (
                         <Div className="px-4 pb-3 flex flex-col gap-2 border-t">
                           {tools.map((tool) => {
-                            const isEnabled = enabledToolIds.includes(
-                              tool.toolName,
+                            const isEnabled = enabledTools.some(
+                              (t) => t.id === tool.toolName,
                             );
+                            const requiresConfirmation =
+                              enabledTools.find((t) => t.id === tool.toolName)
+                                ?.requiresConfirmation ?? false;
 
                             return (
                               <Div
                                 key={tool.toolName}
-                                onClick={() => handleToggleTool(tool.toolName)}
                                 className={cn(
-                                  "w-full text-left px-3 py-2 rounded-md border transition-all cursor-pointer",
+                                  "w-full text-left px-3 py-2 rounded-md border transition-all",
                                   "hover:border-primary/50 hover:bg-accent/50",
-                                  "flex items-start gap-3",
+                                  "flex flex-col gap-2",
                                   isEnabled && "border-primary bg-primary/5",
                                 )}
                               >
-                                <Checkbox
-                                  checked={isEnabled}
-                                  onCheckedChange={() =>
+                                {/* Main tool info with enable checkbox */}
+                                <Div
+                                  onClick={() =>
                                     handleToggleTool(tool.toolName)
                                   }
-                                  className="mt-0.5 shrink-0"
-                                  onClick={(e) => e.stopPropagation()}
-                                />
+                                  className="flex items-start gap-3 cursor-pointer"
+                                >
+                                  <Checkbox
+                                    checked={isEnabled}
+                                    onCheckedChange={() =>
+                                      handleToggleTool(tool.toolName)
+                                    }
+                                    className="mt-0.5 shrink-0"
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
 
-                                <Div className="flex-1 min-w-0">
-                                  {/* Title from definition */}
-                                  <Div className="flex items-center gap-2">
-                                    <P className="text-sm font-medium line-clamp-2">
-                                      {tool.description}
-                                    </P>
-                                    <Badge
-                                      variant="outline"
-                                      className="text-[10px] px-1.5 py-0 font-mono shrink-0"
-                                    >
-                                      {tool.method}
-                                    </Badge>
-                                  </Div>
-
-                                  {/* Technical name (toolName) */}
-                                  <P className="text-[11px] text-muted-foreground/80 mt-1 font-mono">
-                                    {tool.toolName}
-                                  </P>
-
-                                  {/* Aliases */}
-                                  {tool.aliases && tool.aliases.length > 0 && (
-                                    <P className="text-[10px] text-muted-foreground/70 mt-1 font-mono">
-                                      {t("app.chat.aiTools.modal.aliases")}:{" "}
-                                      {tool.aliases.join(", ")}
-                                    </P>
-                                  )}
-
-                                  {/* Tags */}
-                                  {tool.tags.length > 0 && (
-                                    <Div className="flex flex-wrap gap-1 mt-1.5">
-                                      {tool.tags.slice(0, 3).map((tag) => (
-                                        <Badge
-                                          key={tag}
-                                          variant="secondary"
-                                          className="text-[10px] px-1.5 py-0"
-                                        >
-                                          {tag}
-                                        </Badge>
-                                      ))}
+                                  <Div className="flex-1 min-w-0">
+                                    {/* Title from definition */}
+                                    <Div className="flex items-center gap-2">
+                                      <P className="text-sm font-medium line-clamp-2">
+                                        {tool.description}
+                                      </P>
+                                      <Badge
+                                        variant="outline"
+                                        className="text-[10px] px-1.5 py-0 font-mono shrink-0"
+                                      >
+                                        {tool.method}
+                                      </Badge>
                                     </Div>
-                                  )}
+
+                                    {/* Technical name (toolName) */}
+                                    <P className="text-[11px] text-muted-foreground/80 mt-1 font-mono">
+                                      {tool.toolName}
+                                    </P>
+
+                                    {/* Aliases */}
+                                    {tool.aliases &&
+                                      tool.aliases.length > 0 && (
+                                        <P className="text-[10px] text-muted-foreground/70 mt-1 font-mono">
+                                          {t("app.chat.aiTools.modal.aliases")}:{" "}
+                                          {tool.aliases.join(", ")}
+                                        </P>
+                                      )}
+
+                                    {/* Tags */}
+                                    {tool.tags.length > 0 && (
+                                      <Div className="flex flex-wrap gap-1 mt-1.5">
+                                        {tool.tags.slice(0, 3).map((tag) => (
+                                          <Badge
+                                            key={tag}
+                                            variant="secondary"
+                                            className="text-[10px] px-1.5 py-0"
+                                          >
+                                            {tag}
+                                          </Badge>
+                                        ))}
+                                      </Div>
+                                    )}
+                                  </Div>
                                 </Div>
+
+                                {/* Confirmation toggle - only show when tool is enabled */}
+                                {isEnabled && (
+                                  <Div
+                                    onClick={() =>
+                                      handleToggleConfirmation(tool.toolName)
+                                    }
+                                    className="flex items-center gap-2 pl-9 cursor-pointer hover:bg-accent/30 -mx-1 px-1 py-1 rounded"
+                                  >
+                                    <Checkbox
+                                      checked={requiresConfirmation}
+                                      onCheckedChange={() =>
+                                        handleToggleConfirmation(tool.toolName)
+                                      }
+                                      className="h-3.5 w-3.5"
+                                      onClick={(e) => e.stopPropagation()}
+                                    />
+                                    <Span className="text-[11px] text-muted-foreground">
+                                      {t(
+                                        "app.chat.aiTools.modal.requireConfirmation",
+                                      )}
+                                    </Span>
+                                  </Div>
+                                )}
                               </Div>
                             );
                           })}
@@ -466,7 +541,7 @@ export function AIToolsModal({
           <Div className="shrink-0 pt-2 border-t">
             <P className="text-xs text-muted-foreground text-center">
               {t("app.chat.aiTools.modal.stats", {
-                enabled: enabledToolIds.length,
+                enabled: enabledTools.length,
                 total: availableTools.length,
               })}
             </P>

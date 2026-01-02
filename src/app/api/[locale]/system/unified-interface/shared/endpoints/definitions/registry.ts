@@ -28,6 +28,7 @@ export interface SerializableToolMetadata {
   toolName: string;
   allowedRoles: UserRoleValue[];
   aliases?: string[];
+  requiresConfirmation?: boolean;
 }
 
 export interface IDefinitionsRegistry {
@@ -216,6 +217,7 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
           ? [...definition.allowedRoles]
           : [],
         aliases: definition.aliases ? [...definition.aliases] : undefined,
+        requiresConfirmation: definition.requiresConfirmation,
       };
     });
   }

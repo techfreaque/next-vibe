@@ -42,6 +42,20 @@ export function extractDataListData(
       return null;
     }
 
+    // Check if array contains simple values (strings, numbers) or objects
+    const firstItem = value[0];
+    const isSimpleValueArray =
+      typeof firstItem !== "object" || firstItem === null;
+
+    if (isSimpleValueArray) {
+      // For simple value arrays, return them as-is
+      // The DataListWidget will handle rendering via WidgetRenderer
+      return {
+        items: value as ListItem[],
+        showBullets: true,
+      };
+    }
+
     const filteredItems: ListItem[] = [];
     for (const item of value) {
       if (isListItem(item)) {

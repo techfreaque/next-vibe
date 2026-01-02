@@ -39,7 +39,9 @@ export abstract class BaseTyper implements Typer {
       throw new TyperError(
         "Required dependencies not available",
         "MISSING_DEPENDENCIES",
-        { backend: this._backend },
+        {
+          backend: this._backend,
+        },
       );
     }
 

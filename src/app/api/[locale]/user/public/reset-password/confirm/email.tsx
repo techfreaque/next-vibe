@@ -24,7 +24,10 @@ import type {
   ResetPasswordConfirmPostRequestOutput,
   ResetPasswordConfirmPostResponseOutput,
 } from "./definition";
-import { createTrackingContext,type TrackingContext } from "@/app/api/[locale]/emails/smtp-client/components/tracking_context.email";
+import {
+  createTrackingContext,
+  type TrackingContext,
+} from "@/app/api/[locale]/emails/smtp-client/components/tracking_context.email";
 import { EmailTemplate } from "@/app/api/[locale]/emails/smtp-client/components/template.email";
 
 // ============================================================================

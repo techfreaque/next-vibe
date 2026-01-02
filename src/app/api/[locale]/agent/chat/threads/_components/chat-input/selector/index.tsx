@@ -770,6 +770,7 @@ export function Selector({
             buttonClassName,
           )}
           data-tour={TOUR_DATA_ATTRS.MODEL_SELECTOR}
+          suppressHydrationWarning
         >
           {/* Character icon */}
           <Span className="flex items-center justify-center w-5 h-5 shrink-0">

@@ -60,6 +60,7 @@ export function ChatMessages({
   const chat = useChatContext();
   const {
     activeThread,
+    activeThreadId,
     activeThreadMessages,
     isLoading,
     viewMode,
@@ -97,15 +98,11 @@ export function ChatMessages({
       messageMap.set(msg.id, msg);
     }
 
-    // Get the current thread ID from the first persisted message
-    // All persisted messages should have the same threadId since they're already filtered
-    const currentThreadId = activeThreadMessages[0]?.threadId;
-
     // Override with streaming messages (they have the latest content)
     // IMPORTANT: Only merge streaming messages that belong to the current thread
     for (const streamMsg of Object.values(streamingMessages)) {
       // Skip streaming messages from other threads
-      if (currentThreadId && streamMsg.threadId !== currentThreadId) {
+      if (activeThreadId && streamMsg.threadId !== activeThreadId) {
         continue;
       }
 
@@ -151,7 +148,7 @@ export function ChatMessages({
     }
 
     return [...messageMap.values()];
-  }, [activeThreadMessages, streamingMessages]);
+  }, [activeThreadMessages, streamingMessages, activeThreadId]);
 
   // Check if user is at bottom of scroll
   const isAtBottom = useCallback((): boolean => {

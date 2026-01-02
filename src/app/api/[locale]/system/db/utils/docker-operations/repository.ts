@@ -281,7 +281,10 @@ export class DockerOperationsRepositoryImpl
           child.kill("SIGTERM");
           const errorMessage = t(
             "app.api.system.db.utils.dockerOperations.messages.timeoutError",
-            { timeout, command },
+            {
+              timeout,
+              command,
+            },
           );
           reject(new Error(errorMessage));
         }, timeout);
@@ -338,7 +341,10 @@ export class DockerOperationsRepositoryImpl
           logger.error(
             t(
               "app.api.system.db.utils.dockerOperations.messages.commandFailed",
-              { code: String(code), command },
+              {
+                code: String(code),
+                command,
+              },
             ),
           );
         }

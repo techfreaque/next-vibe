@@ -60,12 +60,15 @@ export function DataListWidget<const TKey extends string>({
   const { items, title, maxItems } = data;
 
   let fieldDefinitions: Record<string, UnifiedField<string>> = {};
+  let childField: UnifiedField<string> | null = null;
+  let isSimpleValueArray = false;
+
   if (
     "type" in field &&
     (field.type === "array" || field.type === "array-optional")
   ) {
     if ("child" in field && field.child) {
-      const childField = field.child as UnifiedField<string>;
+      childField = field.child as UnifiedField<string>;
       if (
         "type" in childField &&
         (childField.type === "object" || childField.type === "object-optional")
@@ -76,6 +79,9 @@ export function DataListWidget<const TKey extends string>({
             UnifiedField<string>
           >;
         }
+      } else {
+        // Simple value array (string, number, etc.)
+        isSimpleValueArray = true;
       }
     }
   }
@@ -83,6 +89,24 @@ export function DataListWidget<const TKey extends string>({
   const displayItems = showAll ? items : getListDisplayItems(items, maxItems);
   const remainingCount = getRemainingListItemsCount(items.length, maxItems);
   const hasMore = !showAll && remainingCount > 0;
+
+  // For simple value arrays, render as inline list
+  if (isSimpleValueArray && childField) {
+    return (
+      <Div className={cn("flex flex-wrap gap-2", className)}>
+        {displayItems.map((item, index: number) => (
+          <WidgetRenderer
+            key={index}
+            widgetType={childField.ui.type}
+            data={item}
+            field={childField}
+            context={context}
+            endpoint={endpoint}
+          />
+        ))}
+      </Div>
+    );
+  }
 
   return (
     <Div className={cn("flex flex-col gap-3", className)}>
@@ -285,7 +309,9 @@ export function DataListWidget<const TKey extends string>({
         >
           {globalT(
             "app.api.system.unifiedInterface.react.widgets.dataList.showMore",
-            { count: remainingCount },
+            {
+              count: remainingCount,
+            },
           )}
         </Button>
       )}

@@ -179,6 +179,7 @@ export interface ReactWidgetProps<
   className?: string;
   form?: UseFormReturn<TFieldValues>;
   onSubmit?: () => void;
+  onCancel?: () => void;
   isSubmitting?: boolean;
   endpoint: CreateApiEndpointAny;
 }

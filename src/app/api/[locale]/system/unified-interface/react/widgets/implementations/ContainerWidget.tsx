@@ -59,6 +59,7 @@ export function ContainerWidget<const TKey extends string>({
   form,
   fieldName,
   onSubmit,
+  onCancel,
   isSubmitting,
   endpoint,
 }: ReactWidgetProps<typeof WidgetTypeEnum.CONTAINER, TKey>): JSX.Element {
@@ -540,20 +541,35 @@ export function ContainerWidget<const TKey extends string>({
         )}
         {/* Auto SubmitButton when no explicit config */}
         {shouldShowAutoSubmitButton && (
-          <Button
-            type="button"
-            onClick={(): void => {
-              if (form && onSubmit) {
-                void form.handleSubmit(() => {
-                  onSubmit();
-                })();
-              }
-            }}
-            disabled={isSubmitting}
-            className="w-full"
-          >
-            {isSubmitting ? autoSubmitLoadingText : autoSubmitText}
-          </Button>
+          <Div className="flex gap-2">
+            {onCancel && (
+              <Button
+                type="button"
+                onClick={onCancel}
+                disabled={isSubmitting}
+                variant="outline"
+                className="flex-1"
+              >
+                {globalT(
+                  "app.api.system.unifiedInterface.react.widgets.endpointRenderer.cancel",
+                )}
+              </Button>
+            )}
+            <Button
+              type="button"
+              onClick={(): void => {
+                if (form && onSubmit) {
+                  void form.handleSubmit(() => {
+                    onSubmit();
+                  })();
+                }
+              }}
+              disabled={isSubmitting}
+              className={onCancel ? "flex-1" : "w-full"}
+            >
+              {isSubmitting ? autoSubmitLoadingText : autoSubmitText}
+            </Button>
+          </Div>
         )}
       </Div>
     );
@@ -717,20 +733,35 @@ export function ContainerWidget<const TKey extends string>({
       {/* Auto SubmitButton when no explicit config */}
       {shouldShowAutoSubmitButton && (
         <CardContent className="pt-0">
-          <Button
-            type="button"
-            onClick={(): void => {
-              if (form && onSubmit) {
-                void form.handleSubmit(() => {
-                  onSubmit();
-                })();
-              }
-            }}
-            disabled={isSubmitting}
-            className="w-full"
-          >
-            {isSubmitting ? autoSubmitLoadingText : autoSubmitText}
-          </Button>
+          <Div className="flex gap-2">
+            {onCancel && (
+              <Button
+                type="button"
+                onClick={onCancel}
+                disabled={isSubmitting}
+                variant="outline"
+                className="flex-1"
+              >
+                {globalT(
+                  "app.api.system.unifiedInterface.react.widgets.endpointRenderer.cancel",
+                )}
+              </Button>
+            )}
+            <Button
+              type="button"
+              onClick={(): void => {
+                if (form && onSubmit) {
+                  void form.handleSubmit(() => {
+                    onSubmit();
+                  })();
+                }
+              }}
+              disabled={isSubmitting}
+              className={onCancel ? "flex-1" : "w-full"}
+            >
+              {isSubmitting ? autoSubmitLoadingText : autoSubmitText}
+            </Button>
+          </Div>
         </CardContent>
       )}
     </Card>

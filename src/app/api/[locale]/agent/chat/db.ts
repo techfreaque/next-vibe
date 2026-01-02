@@ -79,6 +79,7 @@ export type ToolCallResult =
   | ToolCallResult[];
 
 export interface ToolCall {
+  toolCallId: string; // AI SDK tool call ID (e.g., "toolu_bdrk_01X8QxqpkW7HVqYiChTpDLzN")
   toolName: string;
   args: ToolCallResult;
   result?: ToolCallResult;
@@ -107,6 +108,7 @@ export interface ReasoningMetadata {
 }
 
 export interface ToolCallMetadata {
+  toolCallId: string; // AI SDK tool call ID (e.g., "toolu_bdrk_01X8QxqpkW7HVqYiChTpDLzN")
   toolName: string;
   args: ToolCallResult;
   result?: ToolCallResult;
@@ -136,6 +138,9 @@ export interface MessageMetadata {
 
   // Voice input metadata (for USER messages with audio input)
   isTranscribing?: boolean;
+
+  // File attachment upload state (for USER messages with file attachments in server threads)
+  isUploadingAttachments?: boolean;
 
   // Tool call metadata (for TOOL messages)
   toolCall?: ToolCall;

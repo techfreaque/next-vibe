@@ -8,17 +8,23 @@ export const translations = {
   email: {
     title: "Reset Your {{appName}} Password",
     subject: "Password Reset Request - {{appName}}",
-    previewText: "Reset your password to regain access to your {{appName}} account and continue chatting with 38 AI models.",
+    previewText:
+      "Reset your password to regain access to your {{appName}} account and continue chatting with 38 AI models.",
     greeting: "Hello,",
-    requestInfo: "We received a request to reset the password for your {{appName}} account.",
-    instructions: "Click the button below to create a new password. This link is valid for 24 hours and can only be used once.",
+    requestInfo:
+      "We received a request to reset the password for your {{appName}} account.",
+    instructions:
+      "Click the button below to create a new password. This link is valid for 24 hours and can only be used once.",
     buttonText: "Reset My Password",
     expirationInfo: "This secure link expires in 24 hours for your protection.",
-    securityInfo: "For your security, this password reset was requested from {{ipAddress}} on {{requestTime}}.",
+    securityInfo:
+      "For your security, this password reset was requested from {{ipAddress}} on {{requestTime}}.",
     didntRequest: "Didn't Request This?",
-    didntRequestInfo: "If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged, and your account is secure.",
+    didntRequestInfo:
+      "If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged, and your account is secure.",
     needHelp: "Need Help?",
-    needHelpInfo: "If you're having trouble resetting your password or accessing your account, our support team is here to help.",
+    needHelpInfo:
+      "If you're having trouble resetting your password or accessing your account, our support team is here to help.",
     supportButton: "Contact Support",
     signoff: "Stay secure,\nThe {{appName}} Team",
     footer: "This is an automated security notification from {{appName}}",

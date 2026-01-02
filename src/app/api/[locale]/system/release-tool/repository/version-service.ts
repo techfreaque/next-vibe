@@ -90,7 +90,9 @@ export class VersionService implements IVersionService {
 
       const lastGitTag = execSync(
         `git describe --tags --abbrev=0 --match="${tagPrefix}*"`,
-        { cwd: mainPackagePath },
+        {
+          cwd: mainPackagePath,
+        },
       )
         .toString()
         .trim();

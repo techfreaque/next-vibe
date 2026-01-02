@@ -7,19 +7,25 @@ export const translations: typeof enTranslations = {
   email: {
     title: "Twoje hasło {{appName}} zostało zresetowane",
     subject: "Hasło pomyślnie zresetowane - {{appName}}",
-    previewText: "Twoje hasło zostało pomyślnie zresetowane. Możesz się teraz zalogować i kontynuować rozmowy z 38 modelami AI.",
+    previewText:
+      "Twoje hasło zostało pomyślnie zresetowane. Możesz się teraz zalogować i kontynuować rozmowy z 38 modelami AI.",
     greeting: "Witaj,",
-    confirmationMessage: "Twoje hasło {{appName}} zostało pomyślnie zresetowane.",
-    successMessage: "Resetowanie hasła zakończone! Możesz teraz zalogować się do swojego konta przy użyciu nowego hasła i kontynuować odkrywanie niecenzurowanych rozmów z AI.",
-    loginInstructions: "Możesz się teraz zalogować przy użyciu nowego hasła i uzyskać dostęp do wszystkich 38 modeli AI.",
+    confirmationMessage:
+      "Twoje hasło {{appName}} zostało pomyślnie zresetowane.",
+    successMessage:
+      "Resetowanie hasła zakończone! Możesz teraz zalogować się do swojego konta przy użyciu nowego hasła i kontynuować odkrywanie niecenzurowanych rozmów z AI.",
+    loginInstructions:
+      "Możesz się teraz zalogować przy użyciu nowego hasła i uzyskać dostęp do wszystkich 38 modeli AI.",
     loginButton: "Zaloguj się do {{appName}}",
-    securityInfo: "Ta zmiana hasła została dokonana z {{ipAddress}} dnia {{resetTime}}.",
+    securityInfo:
+      "Ta zmiana hasła została dokonana z {{ipAddress}} dnia {{resetTime}}.",
     securityWarning:
       "Jeśli nie dokonałeś tej zmiany, Twoje konto może być zagrożone. Skontaktuj się natychmiast z naszym zespołem wsparcia.",
     securityTip:
       "Dla Twojego bezpieczeństwa zalecamy używanie silnego, unikalnego hasła i włączenie uwierzytelniania dwuskładnikowego.",
     didntMakeChange: "Nie dokonałeś tej zmiany?",
-    didntMakeChangeInfo: "Jeśli nie zresetowałeś swojego hasła, skontaktuj się natychmiast z naszym zespołem wsparcia pod adresem {{supportEmail}}. Bezpieczeństwo Twojego konta jest naszym priorytetem.",
+    didntMakeChangeInfo:
+      "Jeśli nie zresetowałeś swojego hasła, skontaktuj się natychmiast z naszym zespołem wsparcia pod adresem {{supportEmail}}. Bezpieczeństwo Twojego konta jest naszym priorytetem.",
     securityBestPractices: "Najlepsze praktyki bezpieczeństwa",
     bestPractice1: "Używaj unikalnego hasła dla {{appName}}",
     bestPractice2: "Włącz uwierzytelnianie dwuskładnikowe",

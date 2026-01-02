@@ -225,7 +225,9 @@ export class ConfigCreateRepository {
         } else {
           logger.warn(
             t("app.api.system.check.config.create.warnings.mcpConfigFailed"),
-            { error: mcpResult.error },
+            {
+              error: mcpResult.error,
+            },
           );
         }
       }
@@ -246,7 +248,9 @@ export class ConfigCreateRepository {
           } else {
             logger.warn(
               t("app.api.system.check.config.create.warnings.vscodeFailed"),
-              { error: vscodeResult.error },
+              {
+                error: vscodeResult.error,
+              },
             );
           }
         }
@@ -273,7 +277,9 @@ export class ConfigCreateRepository {
               t(
                 "app.api.system.check.config.create.warnings.packageJsonFailed",
               ),
-              { error: parseError(error).message },
+              {
+                error: parseError(error).message,
+              },
             );
           }
         } else {

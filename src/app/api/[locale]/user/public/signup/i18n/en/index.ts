@@ -66,8 +66,7 @@ export const translations = {
       validation: {
         required: "Password is required",
         minLength: "Password must be at least 8 characters",
-        complexity:
-          "Password must contain uppercase, lowercase, and a number",
+        complexity: "Password must contain uppercase, lowercase, and a number",
       },
     },
     confirmPassword: {
@@ -384,7 +383,8 @@ export const translations = {
   email: {
     title: "Welcome to {{appName}}, {{privateName}}!",
     subject: "Welcome to {{appName}} - Your Uncensored AI Awaits",
-    previewText: "Access 38 AI models without filters or restrictions. Start chatting now with 20 free credits!",
+    previewText:
+      "Access 38 AI models without filters or restrictions. Start chatting now with 20 free credits!",
     welcomeMessage: "You're In! Welcome to Uncensored AI",
     description:
       "Your account is ready. You have 20 free credits to start chatting with any of our 38 AI models—including Claude Sonnet 4.5, GPT-5.2 Pro, Gemini 3 Pro, Kimi K2, DeepSeek R1, and exclusive uncensored models like UncensoredLM v1.2, FreedomGPT Liberty, and Grok 4. No filters. No restrictions. Just honest AI conversations.",
@@ -397,7 +397,8 @@ export const translations = {
     feature4: "Private, Incognito, Shared, and Public chat modes",
     feature5: "Community forum with other AI enthusiasts",
     needMore: "Ready for Unlimited Conversations?",
-    needMoreDesc: "Get 40× more credits—800/month for just €8! That's unlimited access to all 38 models with no daily limits. Perfect for serious AI users. Plus, subscribe and unlock the ability to buy credit packs that never expire—ideal for power users who need extra credits on demand.",
+    needMoreDesc:
+      "Get 40× more credits—800/month for just €8! That's unlimited access to all 38 models with no daily limits. Perfect for serious AI users. Plus, subscribe and unlock the ability to buy credit packs that never expire—ideal for power users who need extra credits on demand.",
     viewPlans: "Upgrade to Unlimited Now",
     signoff: "Welcome to the future of AI conversations,\nThe {{appName}} Team",
     ps: "P.S. Your privacy matters. Choose Incognito mode to keep conversations on your device only—never sent to our servers.",

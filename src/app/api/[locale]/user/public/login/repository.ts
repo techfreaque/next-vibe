@@ -534,9 +534,7 @@ export class LoginRepository {
           options.allowPasswordAuth
             ? t("app.api.user.public.login.options.messages.tryPasswordFirst")
             : t("app.api.user.public.login.options.messages.useSocialLogin"),
-          t(
-            "app.api.user.public.login.options.messages.socialLoginFaster",
-          ),
+          t("app.api.user.public.login.options.messages.socialLoginFaster"),
         ],
       },
     });

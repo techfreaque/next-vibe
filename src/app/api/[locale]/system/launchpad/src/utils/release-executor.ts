@@ -165,7 +165,9 @@ export class ReleaseExecutor {
           name: "retryFailed",
           message: t(
             "app.api.system.launchpad.releaseExecutor.prompts.retryFailed",
-            { count: failedTargets.length },
+            {
+              count: failedTargets.length,
+            },
           ),
           default: true,
         },
@@ -196,7 +198,9 @@ export class ReleaseExecutor {
               name: "action",
               message: t(
                 "app.api.system.launchpad.releaseExecutor.prompts.targetAction",
-                { directory: target.directory },
+                {
+                  directory: target.directory,
+                },
               ),
               choices: [
                 {
@@ -476,7 +480,10 @@ export class ReleaseExecutor {
     // Find all package.json files
     const packageFiles = execSync(
       t("app.api.system.launchpad.releaseExecutor.git.findCommand"),
-      { cwd: this.rootDir, encoding: "utf8" },
+      {
+        cwd: this.rootDir,
+        encoding: "utf8",
+      },
     )
       .trim()
       .split("\n")
@@ -489,7 +496,9 @@ export class ReleaseExecutor {
         // Get package name
         const packageJson = JSON.parse(
           readFileSync(join(packageDir, "package.json"), "utf8"),
-        ) as { name?: string };
+        ) as {
+          name?: string;
+        };
         const packageName = packageJson.name || "unknown";
 
         this.logger.info(

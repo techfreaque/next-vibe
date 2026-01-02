@@ -71,7 +71,9 @@ export default function Features({
       title: t("app.story._components.home.features.contentCreation.title"),
       description: t(
         "app.story._components.home.features.contentCreation.description",
-        { modelCount },
+        {
+          modelCount,
+        },
       ),
     },
     {

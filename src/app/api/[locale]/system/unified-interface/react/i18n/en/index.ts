@@ -6,6 +6,7 @@ export const translations = {
     endpointRenderer: {
       submit: "Submit",
       submitting: "Submitting...",
+      cancel: "Cancel",
     },
     container: {
       noContent: "No content",

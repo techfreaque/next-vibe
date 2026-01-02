@@ -196,7 +196,9 @@ export function AutocompleteField<TKey extends string>({
                       <UIText className="text-sm text-primary">
                         {globalT(
                           "packages.nextVibeUi.native.ui.autocompleteField.use",
-                          { value: searchValue },
+                          {
+                            value: searchValue,
+                          },
                         )}
                       </UIText>
                     </Pressable>
@@ -243,7 +245,9 @@ export function AutocompleteField<TKey extends string>({
                       <UIText className="text-base">
                         {globalT(
                           "packages.nextVibeUi.native.ui.autocompleteField.use",
-                          { value: searchValue },
+                          {
+                            value: searchValue,
+                          },
                         )}
                       </UIText>
                     </Pressable>

@@ -12,14 +12,9 @@ module.exports.transform = (props) => {
   const { filename, src } = props;
 
   // Check if this file imports 'server-only'
-  if (
-    src.includes('import "server-only"') ||
-    src.includes("import 'server-only'")
-  ) {
+  if (src.includes('import "server-only"') || src.includes("import 'server-only'")) {
     // eslint-disable-next-line no-console -- Intentional logging for Metro build debugging
-    console.error(
-      `[Metro] Skipping server-only file: ${filename.replace(process.cwd(), "")}`,
-    );
+    console.error(`[Metro] Skipping server-only file: ${filename.replace(process.cwd(), "")}`);
 
     // Replace the entire file with a stub that throws at runtime
     const stubCode = `

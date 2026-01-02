@@ -89,7 +89,9 @@ export function useThreadOperations(
       if (thread.rootFolderId === "incognito") {
         logger.debug(
           "Thread operations: Deleting incognito thread (localStorage only)",
-          { threadId },
+          {
+            threadId,
+          },
         );
 
         const { deleteThread: deleteIncognitoThread } = await import(
@@ -106,7 +108,11 @@ export function useThreadOperations(
           const url = `${buildFolderUrl(locale, threadRootFolderId, threadSubFolderId)}/new`;
           logger.debug(
             "Thread operations: Navigating to new thread page after deletion",
-            { url, threadRootFolderId, threadSubFolderId },
+            {
+              url,
+              threadRootFolderId,
+              threadSubFolderId,
+            },
           );
           window.location.href = url;
         }
@@ -150,7 +156,11 @@ export function useThreadOperations(
           const url = `${buildFolderUrl(locale, threadRootFolderId, threadSubFolderId)}/new`;
           logger.debug(
             "Thread operations: Navigating to new thread page after deletion",
-            { url, threadRootFolderId, threadSubFolderId },
+            {
+              url,
+              threadRootFolderId,
+              threadSubFolderId,
+            },
           );
           window.location.href = url;
         }
@@ -175,7 +185,9 @@ export function useThreadOperations(
       if (thread && thread.rootFolderId === "incognito") {
         logger.debug(
           "Thread operations: Updating incognito thread (localStorage only)",
-          { threadId },
+          {
+            threadId,
+          },
         );
 
         const { updateIncognitoThread } = await import(

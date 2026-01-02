@@ -9,22 +9,28 @@ export const translations: typeof enTranslations = {
   email: {
     title: "Setzen Sie Ihr {{appName}}-Passwort zurück",
     subject: "Anfrage zur Passwortzurücksetzung - {{appName}}",
-    previewText: "Setzen Sie Ihr Passwort zurück, um wieder Zugriff auf Ihr {{appName}}-Konto zu erhalten und mit 38 KI-Modellen zu chatten.",
+    previewText:
+      "Setzen Sie Ihr Passwort zurück, um wieder Zugriff auf Ihr {{appName}}-Konto zu erhalten und mit 38 KI-Modellen zu chatten.",
     greeting: "Hallo,",
     requestInfo:
       "Wir haben eine Anfrage zur Zurücksetzung des Passworts für Ihr {{appName}}-Konto erhalten.",
     instructions:
       "Klicken Sie auf die Schaltfläche unten, um ein neues Passwort zu erstellen. Dieser Link ist 24 Stunden gültig und kann nur einmal verwendet werden.",
     buttonText: "Mein Passwort zurücksetzen",
-    expirationInfo: "Dieser sichere Link läuft in 24 Stunden zu Ihrem Schutz ab.",
-    securityInfo: "Zu Ihrer Sicherheit wurde diese Passwortzurücksetzung von {{ipAddress}} am {{requestTime}} angefordert.",
+    expirationInfo:
+      "Dieser sichere Link läuft in 24 Stunden zu Ihrem Schutz ab.",
+    securityInfo:
+      "Zu Ihrer Sicherheit wurde diese Passwortzurücksetzung von {{ipAddress}} am {{requestTime}} angefordert.",
     didntRequest: "Nicht angefordert?",
-    didntRequestInfo: "Wenn Sie keine Passwortzurücksetzung angefordert haben, können Sie diese E-Mail einfach ignorieren. Ihr Passwort bleibt unverändert und Ihr Konto ist sicher.",
+    didntRequestInfo:
+      "Wenn Sie keine Passwortzurücksetzung angefordert haben, können Sie diese E-Mail einfach ignorieren. Ihr Passwort bleibt unverändert und Ihr Konto ist sicher.",
     needHelp: "Brauchen Sie Hilfe?",
-    needHelpInfo: "Wenn Sie Probleme beim Zurücksetzen Ihres Passworts oder beim Zugriff auf Ihr Konto haben, steht Ihnen unser Support-Team zur Verfügung.",
+    needHelpInfo:
+      "Wenn Sie Probleme beim Zurücksetzen Ihres Passworts oder beim Zugriff auf Ihr Konto haben, steht Ihnen unser Support-Team zur Verfügung.",
     supportButton: "Support kontaktieren",
     signoff: "Bleiben Sie sicher,\nDas {{appName}} Team",
-    footer: "Dies ist eine automatische Sicherheitsbenachrichtigung von {{appName}}",
+    footer:
+      "Dies ist eine automatische Sicherheitsbenachrichtigung von {{appName}}",
   },
   groups: {
     emailInput: {

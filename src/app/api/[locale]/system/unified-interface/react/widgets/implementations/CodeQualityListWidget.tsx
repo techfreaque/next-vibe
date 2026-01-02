@@ -117,7 +117,9 @@ export function CodeQualityListWidget<const TKey extends string>({
               <Div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                 {t(
                   "app.api.system.unifiedInterface.react.widgets.codeQualityList.rule",
-                  { rule: item.rule },
+                  {
+                    rule: item.rule,
+                  },
                 )}
               </Div>
             )}
@@ -225,7 +227,9 @@ export function CodeQualityListWidget<const TKey extends string>({
                         <Div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                           {t(
                             "app.api.system.unifiedInterface.react.widgets.codeQualityList.rule",
-                            { rule: item.rule },
+                            {
+                              rule: item.rule,
+                            },
                           )}
                         </Div>
                       )}

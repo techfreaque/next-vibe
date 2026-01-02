@@ -29,6 +29,7 @@ const aiToolMetadataSchema = z.object({
   toolName: z.string(),
   allowedRoles: z.array(z.string()).readonly(),
   aliases: z.array(z.string()).optional(),
+  requiresConfirmation: z.boolean().optional(),
 });
 
 const { GET } = createEndpoint({

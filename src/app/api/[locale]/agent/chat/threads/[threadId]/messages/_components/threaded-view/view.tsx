@@ -261,7 +261,9 @@ export function ThreadedMessage({
                       logger.debug(
                         "ThreadedMessage",
                         "Model selection changed (no handler)",
-                        { model },
+                        {
+                          model,
+                        },
                       );
                     })
                   }
@@ -271,7 +273,9 @@ export function ThreadedMessage({
                       logger.debug(
                         "ThreadedMessage",
                         "Character selection changed (no handler)",
-                        { character },
+                        {
+                          character,
+                        },
                       );
                     })
                   }
@@ -342,7 +346,9 @@ export function ThreadedMessage({
                     logger.debug(
                       "ThreadedMessage",
                       "Model selection changed (no handler)",
-                      { model },
+                      {
+                        model,
+                      },
                     );
                   })
                 }
@@ -352,7 +358,9 @@ export function ThreadedMessage({
                     logger.debug(
                       "ThreadedMessage",
                       "Character selection changed (no handler)",
-                      { character },
+                      {
+                        character,
+                      },
                     );
                   })
                 }

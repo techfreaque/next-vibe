@@ -388,7 +388,7 @@ export function ToolCallRenderer({
                   )}
                 </Span>
               )}
-              {hasResult && !hasError && (
+              {hasResult && !hasError && !isWaitingForConfirmation && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
                   {t(
                     "app.api.system.unifiedInterface.react.widgets.toolCall.status.complete",
