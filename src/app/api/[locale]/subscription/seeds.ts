@@ -9,7 +9,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { translations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CreditRepository } from "../credits/repository";
@@ -19,6 +18,7 @@ import { subscriptions } from "./db";
 import type { SubscriptionGetResponseOutput } from "./definition";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
 import { SubscriptionRepository } from "./repository";
+import { contactClientRepository } from "../contact/repository-client";
 
 /**
  * Helper function to create local subscription record
@@ -556,7 +556,7 @@ export async function prod(
 
     // Get admin user for subscription management
     const adminUserResponse = await UserRepository.getUserByEmail(
-      translations.emails.admin,
+      contactClientRepository.getSupportEmail(locale),
       UserDetailLevel.STANDARD,
       locale,
       logger,

@@ -44,8 +44,10 @@ export const memories = pgTable("memories", {
   content: text("content").notNull(), // The fact to remember (e.g., "Profession: Software engineer specializing in Python")
   tags: jsonb("tags").$type<string[]>().default([]).notNull(), // Tags for categorization (e.g., ["profession", "skills"])
 
-  // Memory ordering and importance
-  sequenceNumber: integer("sequence_number").notNull(), // Auto-incrementing per user for stable ordering
+  // Memory number - auto-incrementing per user starting from 0
+  memoryNumber: integer("sequence_number").notNull(), // Maps to sequence_number in DB
+
+  // Memory importance
   priority: integer("priority").default(0).notNull(), // Higher priority memories appear first in prompt
 
   // Metadata

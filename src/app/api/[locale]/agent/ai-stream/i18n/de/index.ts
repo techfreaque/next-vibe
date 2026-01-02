@@ -30,6 +30,10 @@ export const translations: typeof enTranslations = {
       label: "Thread-ID",
       description: "Thread-ID (null für neuen Thread)",
     },
+    userMessageId: {
+      label: "Benutzer-Nachrichten-ID",
+      description: "Client-generierte Benutzer-Nachrichten-ID",
+    },
     parentMessageId: {
       label: "Eltern-Nachrichten-ID",
       description: "Eltern-Nachrichten-ID für Verzweigung/Threading",
@@ -131,13 +135,10 @@ export const translations: typeof enTranslations = {
     voiceMode: {
       label: "Sprachmodus",
       description: "Konfiguration für sprachbasierte Interaktion",
-      streamTTS: {
-        label: "Stream-TTS",
-        description: "Streaming-Text-zu-Sprache für Antworten aktivieren",
-      },
-      callMode: {
-        label: "Anruf-Modus",
-        description: "Echtzeit-Sprachanruf-Modus aktivieren",
+      enabled: {
+        label: "Sprachmodus aktivieren",
+        description:
+          "Sprachbasierte Interaktion mit Text-zu-Sprache aktivieren",
       },
       voice: {
         label: "Stimme",

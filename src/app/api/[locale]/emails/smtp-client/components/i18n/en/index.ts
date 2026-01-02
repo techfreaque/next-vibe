@@ -5,7 +5,7 @@ export const translations = {
       helpText: "Need help? Contact us at",
       unsubscribeText: "Don't want to receive these emails?",
       unsubscribeLink: "Unsubscribe",
-      copyright: "© {{currentYear}} {{companyName}}. All rights reserved.",
+      copyright: "© {{currentYear}} {{appName}}. All rights reserved.",
     },
   },
   post: {

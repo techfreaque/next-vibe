@@ -48,6 +48,10 @@ export const translations = {
       label: "Thread ID",
       description: "Thread ID (null to create new thread)",
     },
+    userMessageId: {
+      label: "User Message ID",
+      description: "Client-generated user message ID",
+    },
     parentMessageId: {
       label: "Parent Message ID",
       description: "Parent message ID for branching/threading",
@@ -173,13 +177,9 @@ export const translations = {
     voiceMode: {
       label: "Voice Mode",
       description: "Configuration for voice-based interaction",
-      streamTTS: {
-        label: "Stream TTS",
-        description: "Enable streaming text-to-speech for responses",
-      },
-      callMode: {
-        label: "Call Mode",
-        description: "Enable real-time voice call mode",
+      enabled: {
+        label: "Enable Voice Mode",
+        description: "Enable voice-based interaction with text-to-speech",
       },
       voice: {
         label: "Voice",

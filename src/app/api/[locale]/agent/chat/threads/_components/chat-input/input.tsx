@@ -41,7 +41,7 @@ import { ToolsButton } from "./tools-button";
 interface ChatInputProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
-  user?: JwtPayloadType;
+  user: JwtPayloadType;
   className?: string;
 }
 

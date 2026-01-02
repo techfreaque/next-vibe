@@ -133,6 +133,10 @@ export const translations: typeof enTranslations = {
       label: "Thread ID",
       description: "ID of the thread to add message to",
     },
+    id: {
+      label: "Nachrichten-ID",
+      description: "Client-generierte Nachrichten-ID",
+    },
     content: {
       label: "Content",
       description: "Message content",
@@ -149,6 +153,10 @@ export const translations: typeof enTranslations = {
     model: {
       label: "Model",
       description: "AI model to use for response",
+    },
+    metadata: {
+      label: "Metadaten",
+      description: "Nachrichtenmetadaten (Anhänge, Tokens, etc.)",
     },
     response: {
       title: "Created Message",

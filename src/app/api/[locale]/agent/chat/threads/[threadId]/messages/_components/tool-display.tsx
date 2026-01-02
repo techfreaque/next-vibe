@@ -6,6 +6,7 @@ import type { JSX } from "react";
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import { ToolCallRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/ToolCallRenderer";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 /**
  * Tool Display Props
@@ -38,6 +39,7 @@ interface ToolDisplayProps {
       currentState: boolean,
     ) => void;
   };
+  user: JwtPayloadType;
 }
 
 /**
@@ -64,6 +66,7 @@ interface ToolDisplayProps {
 export function ToolDisplay({
   toolCall,
   locale,
+  user,
   threadId,
   messageId,
   collapseState,
@@ -85,6 +88,7 @@ export function ToolDisplay({
         messageId={messageId}
         toolIndex={0}
         collapseState={collapseState}
+        user={user}
       />
     </Div>
   );

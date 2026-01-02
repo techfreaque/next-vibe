@@ -535,6 +535,17 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
+          id: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.UUID,
+              label: "app.api.agent.chat.threads.post.id.label" as const,
+              description:
+                "app.api.agent.chat.threads.post.id.description" as const,
+              columns: 12,
+            },
+            z.uuid(),
+          ),
           title: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
@@ -770,6 +781,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         thread: {
+          id: "880e8400-e29b-41d4-a716-446655440000",
           title: "New Chat",
           rootFolderId: DefaultFolderId.PRIVATE,
           subFolderId: null,

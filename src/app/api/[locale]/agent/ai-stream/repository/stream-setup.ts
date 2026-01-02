@@ -17,13 +17,17 @@ import { parseError } from "next-vibe/shared/utils";
 import type { z } from "zod";
 
 import { creditValidator } from "@/app/api/[locale]/credits/validator";
-import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
+
+import {
+  DEFAULT_TTS_VOICE,
+  type TtsVoiceValue,
+} from "../../text-to-speech/enum";
 
 import { db } from "../../../system/db";
 import type { DefaultFolderId } from "../../chat/config";
@@ -33,7 +37,6 @@ import {
   type ToolCall,
   type ToolCallResult,
 } from "../../chat/db";
-import { selectChatMessageSchema } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
 import { getModelCost } from "../../chat/model-access/costs";
 import {
@@ -74,9 +77,8 @@ export interface StreamSetupResult {
   };
   /** Voice mode settings for TTS streaming */
   voiceMode?: {
-    streamTTS: boolean;
-    callMode: boolean;
-    voice: "MALE" | "FEMALE";
+    enabled: boolean;
+    voice: typeof TtsVoiceValue;
   } | null;
   /** Voice transcription metadata (when audioInput was provided) */
   voiceTranscription?: {
@@ -87,6 +89,18 @@ export interface StreamSetupResult {
     /** Audio duration in seconds */
     durationSeconds: number | null;
   } | null;
+  /** User message metadata (including attachments) to include in MESSAGE_CREATED event */
+  userMessageMetadata?: {
+    attachments?: Array<{
+      id: string;
+      url: string;
+      filename: string;
+      mimeType: string;
+      size: number;
+      data?: string; // base64 for incognito
+    }>;
+  };
+}
 }
 
 export async function setupAiStream(params: {
@@ -124,7 +138,7 @@ export async function setupAiStream(params: {
 
     const confirmResult = await handleToolConfirmationInSetup({
       toolConfirmation: data.toolConfirmation,
-      messageHistory: data.messageHistory,
+      messageHistory: data.messageHistory ?? undefined,
       isIncognito,
       userId,
       locale,
@@ -879,7 +893,7 @@ async function handleToolConfirmationInSetup(params: {
     confirmed: boolean;
     updatedArgs?: Record<string, string | number | boolean | null>;
   };
-  messageHistory?: Array<z.infer<typeof messageHistorySchema>> | null;
+  messageHistory?: NonNullable<AiStreamPostRequestOutput["messageHistory"]>;
   isIncognito: boolean;
   userId: string | undefined;
   locale: CountryLanguage;

@@ -266,6 +266,8 @@ export interface UseChatReturn {
 
   // Search
   searchThreads: (query: string) => Array<{ id: string; title: string }>;
+
+  user: JwtPayloadType;
 }
 
 /**
@@ -289,7 +291,7 @@ export interface RootFolderPermissions {
  * @param rootFolderPermissions - Root folder permissions computed server-side
  */
 export function useChat(
-  user: JwtPayloadType | undefined,
+  user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
   activeThreadId: string | null,
@@ -665,6 +667,7 @@ export function useChat(
     isStreaming,
 
     // Current context (from URL props)
+    user, // JWT payload for authenticated user (undefined if public)
     activeThreadId,
     currentRootFolderId,
     currentSubFolderId,

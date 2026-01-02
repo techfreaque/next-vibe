@@ -780,18 +780,30 @@ export class MessagesRepository {
         depth = parentMessage.depth + 1;
       }
 
-      // Create message with safe values
+      if (!data.message?.id) {
+        return fail({
+          message:
+            "app.api.agent.chat.threads.threadId.messages.post.errors.validation.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          messageParams: {
+            message: "Message ID must be provided by client",
+          },
+        });
+      }
+
       const [message] = await db
         .insert(chatMessages)
         .values({
+          id: data.message.id,
           threadId: data.threadId,
-          role: safeRole, // Always USER
+          role: safeRole,
           content: data.message?.content || "",
           parentId: data.message?.parentId || null,
           depth,
           authorId: userIdentifier,
-          isAI: false, // Always false for user messages
-          model: user.isPublic ? null : data.message?.model || null, // No model for PUBLIC users
+          isAI: false,
+          model: user.isPublic ? null : data.message?.model || null,
+          metadata: data.message?.metadata || {},
         })
         .returning({
           id: chatMessages.id,

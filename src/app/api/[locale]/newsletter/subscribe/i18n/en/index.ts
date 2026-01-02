@@ -126,4 +126,36 @@ export const translations = {
   route: {
     sms_failed_continuing: "SMS notifications failed but continuing",
   },
+  emailTemplate: {
+    welcome: {
+      title: "Welcome to the {{appName}} Newsletter!",
+      subject: "Welcome to {{appName}} - Stay Updated on Uncensored AI",
+      preview:
+        "You're subscribed! Get the latest updates on uncensored AI, new models, and exclusive tips.",
+      greeting_with_name: "Hi {{name}}!",
+      greeting: "Hello!",
+      message:
+        "Welcome to the {{appName}} newsletter! You're now part of our community of AI enthusiasts who value honest, uncensored conversations with AI.",
+      what_to_expect: "Here's what you'll receive:",
+      benefit_1: "New AI model announcements and updates",
+      benefit_2: "Tips and tricks for getting the most out of uncensored AI",
+      benefit_3: "Exclusive offers and early access to new features",
+      benefit_4: "Community highlights and success stories",
+      frequency:
+        "We'll send you updates every few weeks—never spam, always valuable content.",
+      unsubscribe_text: "Don't want to receive these emails?",
+      unsubscribe_link: "Unsubscribe",
+    },
+    admin_notification: {
+      title: "New Newsletter Subscription",
+      subject: "New Newsletter Subscription",
+      preview: "A new user has subscribed to the newsletter",
+      message: "A new user has subscribed to the newsletter.",
+      subscriber_details: "Subscriber Details",
+      email: "Email",
+      name: "Name",
+      preferences: "Preferences",
+      view_in_admin: "View in Admin Panel",
+    },
+  },
 };

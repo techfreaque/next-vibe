@@ -23,6 +23,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { MessageMetadata } from "../../../db";
 import { selectChatMessageSchema } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
 import { ModelId } from "../../../model-access/models";
@@ -334,6 +335,17 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
+          id: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.UUID,
+              label:
+                "app.api.agent.chat.threads.threadId.messages.post.id.label" as const,
+              description:
+                "app.api.agent.chat.threads.threadId.messages.post.id.description" as const,
+            },
+            z.uuid(),
+          ),
           role: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
@@ -384,6 +396,17 @@ const { POST } = createEndpoint({
             },
             z.enum(ModelId).optional(),
           ),
+          metadata: requestDataField(
+            {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.JSON,
+              label:
+                "app.api.agent.chat.threads.threadId.messages.post.metadata.label" as const,
+              description:
+                "app.api.agent.chat.threads.threadId.messages.post.metadata.description" as const,
+            },
+            z.custom<MessageMetadata>().optional(),
+          ),
         },
       ),
 
@@ -420,6 +443,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         message: {
+          id: "770e8400-e29b-41d4-a716-446655440000",
           role: ChatMessageRole.USER,
           content: "Hello, how can you help me?",
         },

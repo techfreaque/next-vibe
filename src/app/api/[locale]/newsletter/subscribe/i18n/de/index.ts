@@ -135,4 +135,38 @@ export const translations: typeof enTranslations = {
     sms_failed_continuing:
       "SMS-Benachrichtigungen fehlgeschlagen, wird fortgesetzt",
   },
+  emailTemplate: {
+    welcome: {
+      title: "Willkommen zum {{appName}} Newsletter!",
+      subject:
+        "Willkommen bei {{appName}} - Bleib auf dem Laufenden über unzensierte KI",
+      preview:
+        "Du bist angemeldet! Erhalte die neuesten Updates über unzensierte KI, neue Modelle und exklusive Tipps.",
+      greeting_with_name: "Hallo {{name}}!",
+      greeting: "Hallo!",
+      message:
+        "Willkommen zum {{appName}} Newsletter! Du bist jetzt Teil unserer Community von KI-Enthusiasten, die ehrliche, unzensierte Gespräche mit KI schätzen.",
+      what_to_expect: "Das erwartet dich:",
+      benefit_1: "Ankündigungen und Updates zu neuen KI-Modellen",
+      benefit_2:
+        "Tipps und Tricks, um das Beste aus unzensierten KI-Modellen herauszuholen",
+      benefit_3: "Exklusive Angebote und früher Zugang zu neuen Features",
+      benefit_4: "Community-Highlights und Erfolgsgeschichten",
+      frequency:
+        "Wir senden dir alle paar Wochen Updates – nie Spam, immer wertvoller Inhalt.",
+      unsubscribe_text: "Möchtest du diese E-Mails nicht mehr erhalten?",
+      unsubscribe_link: "Abmelden",
+    },
+    admin_notification: {
+      title: "Neues Newsletter-Abonnement",
+      subject: "Neues Newsletter-Abonnement",
+      preview: "Ein neuer Benutzer hat den Newsletter abonniert",
+      message: "Ein neuer Benutzer hat den Newsletter abonniert.",
+      subscriber_details: "Abonnenten-Details",
+      email: "E-Mail",
+      name: "Name",
+      preferences: "Präferenzen",
+      view_in_admin: "Im Admin-Panel anzeigen",
+    },
+  },
 };

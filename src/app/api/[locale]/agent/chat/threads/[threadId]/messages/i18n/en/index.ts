@@ -132,6 +132,10 @@ export const translations = {
       label: "Thread ID",
       description: "ID of the thread to add message to",
     },
+    id: {
+      label: "Message ID",
+      description: "Client-generated message ID",
+    },
     content: {
       label: "Content",
       description: "Message content",
@@ -148,6 +152,10 @@ export const translations = {
     model: {
       label: "Model",
       description: "AI model to use for response",
+    },
+    metadata: {
+      label: "Metadata",
+      description: "Message metadata (attachments, tokens, etc.)",
     },
     response: {
       title: "Created Message",

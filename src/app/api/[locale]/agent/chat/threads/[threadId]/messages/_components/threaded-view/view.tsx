@@ -67,6 +67,7 @@ export function ThreadedMessage({
 }: ThreadedMessageProps): JSX.Element {
   // Get callbacks and state from context
   const {
+    user,
     ttsAutoplay,
     deductCredits,
     handleDeleteMessage: onDeleteMessage,
@@ -246,6 +247,7 @@ export function ThreadedMessage({
                   onCharacterChange={onCharacterChange}
                   locale={locale}
                   logger={logger}
+                  user={user}
                 />
               </Div>
             ) : isRetrying ? (
@@ -283,6 +285,7 @@ export function ThreadedMessage({
                   confirmLabelKey="app.chat.threadedView.retryModal.confirmLabel"
                   locale={locale}
                   logger={logger}
+                  user={user}
                 />
               </Div>
             ) : (
@@ -291,6 +294,7 @@ export function ThreadedMessage({
                 messageGroup={messageGroup}
                 depth={depth}
                 locale={locale}
+                user={user}
                 collapseState={collapseState}
                 currentUserId={currentUserId}
                 onUserIdHover={(userId, position) => {
@@ -366,6 +370,7 @@ export function ThreadedMessage({
                 confirmLabelKey="app.chat.threadedView.answerModal.confirmLabel"
                 locale={locale}
                 logger={logger}
+                user={user}
               />
             </Div>
           )}

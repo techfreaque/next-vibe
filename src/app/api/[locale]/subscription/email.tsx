@@ -5,17 +5,18 @@
 
 import { Button, Link, Section, Text as Span } from "@react-email/components";
 import type { ReactElement } from "react";
-import React from "react";
 import { z } from "zod";
 
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
-import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { contactClientRepository } from "../contact/repository-client";
 import { EmailTemplate } from "../emails/smtp-client/components/template.email";
-import { createTrackingContext } from "../emails/smtp-client/components/tracking_context.email";
+import {
+  createTrackingContext,
+  type TrackingContext,
+} from "../emails/smtp-client/components/tracking_context.email";
 import { SubscriptionPlan, SubscriptionStatus } from "./enum";
 
 // ============================================================================
@@ -35,34 +36,15 @@ function SubscriptionSuccessEmail({
   props,
   t,
   locale,
+  recipientEmail,
   tracking,
 }: {
   props: SubscriptionSuccessProps;
   t: TFunction;
   locale: CountryLanguage;
-  tracking?: {
-    userId?: string;
-    leadId?: string;
-    sessionId?: string;
-  };
+  recipientEmail: string;
+  tracking: TrackingContext;
 }): ReactElement {
-  const baseUrl = env.NEXT_PUBLIC_APP_URL;
-  const trackingContext = tracking
-    ? createTrackingContext(
-        locale,
-        tracking.leadId,
-        tracking.userId,
-        undefined,
-        baseUrl,
-      )
-    : createTrackingContext(
-        locale,
-        props.leadId,
-        props.userId,
-        undefined,
-        baseUrl,
-      );
-
   return (
     <EmailTemplate
       t={t}
@@ -75,7 +57,8 @@ function SubscriptionSuccessEmail({
         appName: t("config.appName"),
         planName: props.planName,
       })}
-      tracking={trackingContext}
+      recipientEmail={recipientEmail}
+      tracking={tracking}
     >
       {/* Welcome Message */}
       <Span
@@ -142,7 +125,7 @@ function SubscriptionSuccessEmail({
 
         <div style={{ textAlign: "center", marginBottom: "16px" }}>
           <Button
-            href={`${baseUrl}/${locale}/`}
+            href={`${tracking.baseUrl}/${locale}/`}
             style={{
               backgroundColor: "#2563eb",
               borderRadius: "8px",
@@ -191,7 +174,7 @@ function SubscriptionSuccessEmail({
           {t("app.api.subscription.email.success.support.description")}
         </Span>
         <Button
-          href={`${baseUrl}/${locale}/help`}
+          href={`${tracking.baseUrl}/${locale}/help`}
           style={{
             backgroundColor: "transparent",
             border: "2px solid #6b7280",
@@ -255,9 +238,53 @@ const subscriptionSuccessTemplate: EmailTemplateDefinition<SubscriptionSuccessPr
           appName: "",
           planName: "",
         }),
+      previewFields: {
+        firstName: {
+          type: "text",
+          label:
+            "app.admin.emails.templates.templates.subscription.success.preview.privateName.label",
+          description:
+            "app.admin.emails.templates.templates.subscription.success.preview.privateName.description",
+          defaultValue: "Max",
+          required: true,
+        },
+        userId: {
+          type: "text",
+          label:
+            "app.admin.emails.templates.templates.subscription.success.preview.userId.label",
+          description:
+            "app.admin.emails.templates.templates.subscription.success.preview.userId.description",
+          defaultValue: "example-user-id-123",
+          required: true,
+        },
+        leadId: {
+          type: "text",
+          label:
+            "app.admin.emails.templates.templates.subscription.success.preview.leadId.label",
+          description:
+            "app.admin.emails.templates.templates.subscription.success.preview.leadId.description",
+          defaultValue: "example-lead-id-456",
+          required: true,
+        },
+        planName: {
+          type: "text",
+          label:
+            "app.admin.emails.templates.templates.subscription.success.preview.planName.label",
+          description:
+            "app.admin.emails.templates.templates.subscription.success.preview.planName.description",
+          defaultValue: "Premium Plan",
+          required: true,
+        },
+      },
     },
     schema: subscriptionSuccessPropsSchema,
     component: SubscriptionSuccessEmail,
+    exampleProps: {
+      firstName: "Max",
+      userId: "example-user-id-123",
+      leadId: "example-lead-id-456",
+      planName: "Premium Plan",
+    },
   };
 
 export default subscriptionSuccessTemplate;
@@ -272,12 +299,14 @@ function AdminSubscriptionNotificationEmailContent({
   statusName,
   t,
   locale,
+  recipientEmail,
 }: {
   user: { firstName: string; lastName: string; email: string };
   planName: string;
   statusName: string;
   t: TFunction;
   locale: CountryLanguage;
+  recipientEmail: string;
 }): ReactElement {
   const tracking = createTrackingContext(locale);
 
@@ -289,6 +318,7 @@ function AdminSubscriptionNotificationEmailContent({
       previewText={t("app.api.subscription.email.admin_notification.preview", {
         appName: t("config.appName"),
       })}
+      recipientEmail={recipientEmail}
       tracking={tracking}
     >
       {/* Header Message */}
@@ -575,10 +605,8 @@ export const renderSubscriptionSuccessEmail = ({
         props: templateProps,
         t,
         locale,
-        tracking: {
-          userId: user.id,
-          leadId: user.leadId,
-        },
+        recipientEmail: user.email,
+        tracking: createTrackingContext(locale, user.leadId, user.id),
       }),
     },
   };
@@ -620,6 +648,7 @@ export const renderAdminSubscriptionNotification = ({
         statusName,
         t,
         locale,
+        recipientEmail: contactClientRepository.getSupportEmail(locale),
       }),
     },
   };

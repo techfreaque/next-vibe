@@ -220,38 +220,42 @@ export const translations = {
   // Email translations
   email: {
     success: {
-      title: "Subscription Successful!",
-      subject: "Welcome to Your Subscription!",
-      previewText: "Welcome to your new subscription",
-      welcomeMessage: "Welcome to your subscription!",
-      description: "Thank you for subscribing to {{appName}}",
+      title: "Welcome to {{planName}}, {{firstName}}!",
+      subject: "Your {{appName}} Subscription is Active - Unlimited AI Awaits",
+      previewText:
+        "Your {{planName}} subscription is now active! Enjoy unlimited access to 38 AI models.",
+      welcomeMessage: "Your {{planName}} subscription is now active!",
+      description:
+        "Thank you for upgrading to {{appName}}! You now have full access to all 38 AI models with no daily limits. Start chatting with Claude Sonnet 4.5, GPT-5.2 Pro, Gemini 3 Pro, and all our uncensored models without restrictions.",
       nextSteps: {
-        title: "Next Steps",
-        description: "Here's what you can do next",
-        cta: "Get Started",
+        title: "You're All Set!",
+        description:
+          "Your subscription is active and ready to use. Jump right in and start exploring unlimited AI conversations.",
+        cta: "Start Chatting Now",
       },
       support: {
         title: "Need Help?",
-        description: "Our support team is here to help you",
-        cta: "Contact Support",
+        description:
+          "Our support team is here to assist you with any questions about your subscription.",
+        cta: "Get Help",
       },
       footer: {
-        message: "Thank you for choosing us!",
-        signoff: "Best regards, The Team",
+        message: "Thank you for supporting uncensored AI!",
+        signoff: "Welcome to unlimited conversations,\nThe {{appName}} Team",
       },
     },
     admin_notification: {
       title: "New Subscription",
-      subject: "New Subscription - Admin Notification",
-      preview: "A new subscription has been created",
-      message: "A new subscription has been created",
+      subject: "New Subscription - {{planName}}",
+      preview: "New subscription: {{firstName}} subscribed to {{planName}}",
+      message: "A new user has subscribed to {{appName}}.",
       details: "Subscription Details",
       user_name: "User Name",
       user_email: "User Email",
       plan: "Plan",
       status: "Status",
       contact_user: "Contact User",
-      footer: "This is an automated notification",
+      footer: "This is an automated notification from {{appName}}",
     },
   },
 

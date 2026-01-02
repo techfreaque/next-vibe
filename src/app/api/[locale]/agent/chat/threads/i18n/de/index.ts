@@ -182,6 +182,10 @@ export const translations: typeof enTranslations = {
         description: "Grundlegende Thread-Informationen",
       },
     },
+    id: {
+      label: "Thread-ID",
+      description: "Client-generierte Thread-ID",
+    },
     threadTitle: {
       label: "Titel",
       description: "Thread-Titel",

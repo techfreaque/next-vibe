@@ -85,6 +85,7 @@ export function ChatArea({ locale, logger, user }: ChatAreaProps): JSX.Element {
                   locale={locale}
                   logger={logger}
                   currentUserId={user?.id}
+                  user={user}
                   showBranding={
                     viewMode === ViewMode.LINEAR && messages.length > 0
                   }

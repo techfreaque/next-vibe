@@ -14,6 +14,7 @@ import { UserRepository } from "../../user/repository";
 import type { NewEmail } from "./db";
 import { EmailProvider, EmailStatus, EmailType } from "./enum";
 import { emailRepository } from "./repository";
+import { contactClientRepository } from "../../contact/repository-client";
 
 /**
  * Helper function to create email message seed data
@@ -69,7 +70,7 @@ export async function dev(
       createEmailSeed({
         imapMessageId: `welcome-001@${translations.appName}`,
         subject: `Welcome to ${translations.appName}!`,
-        senderEmail: translations.emails.hello,
+        senderEmail: contactClientRepository.getSupportEmail(locale),
         senderName: translations.appName,
         recipientEmail: "demo@example.com",
         recipientName: "Demo User",
@@ -98,7 +99,7 @@ export async function dev(
       createEmailSeed({
         imapMessageId: `notification-002@${translations.appName}`,
         subject: "Your AI chat analytics report is ready",
-        senderEmail: translations.emails.reports,
+        senderEmail: contactClientRepository.getSupportEmail(locale),
         senderName: `${translations.appName} Reports`,
         recipientEmail: "admin@example.com",
         recipientName: "Admin User",
@@ -161,7 +162,7 @@ export async function dev(
       createEmailSeed({
         imapMessageId: `newsletter-004@${translations.appName}`,
         subject: "AI Chat Tips & Updates - Weekly Newsletter",
-        senderEmail: translations.emails.newsletter,
+        senderEmail: contactClientRepository.getSupportEmail(locale),
         senderName: `${translations.appName} Team`,
         recipientEmail: "demo@example.com",
         recipientName: "Demo User",

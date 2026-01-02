@@ -130,4 +130,37 @@ export const translations: typeof enTranslations = {
   route: {
     sms_failed_continuing: "Powiadomienia SMS nie powiodły się, kontynuowanie",
   },
+  emailTemplate: {
+    welcome: {
+      title: "Witamy w newsletterze {{appName}}!",
+      subject: "Witamy w {{appName}} - Bądź na bieżąco z niecenzurowaną AI",
+      preview:
+        "Jesteś zapisany! Otrzymuj najnowsze aktualizacje o niecenzurowanej AI, nowych modelach i ekskluzywnych wskazówkach.",
+      greeting_with_name: "Cześć {{name}}!",
+      greeting: "Witaj!",
+      message:
+        "Witamy w newsletterze {{appName}}! Jesteś teraz częścią naszej społeczności entuzjastów AI, którzy cenią szczere, niecenzurowane rozmowy z AI.",
+      what_to_expect: "Oto, co będziesz otrzymywać:",
+      benefit_1: "Ogłoszenia i aktualizacje dotyczące nowych modeli AI",
+      benefit_2:
+        "Wskazówki i triki, jak najlepiej wykorzystać niecenzurowane modele AI",
+      benefit_3: "Ekskluzywne oferty i wczesny dostęp do nowych funkcji",
+      benefit_4: "Najciekawsze momenty społeczności i historie sukcesu",
+      frequency:
+        "Będziemy wysyłać aktualizacje co kilka tygodni – nigdy spam, zawsze wartościowe treści.",
+      unsubscribe_text: "Nie chcesz otrzymywać tych wiadomości?",
+      unsubscribe_link: "Wypisz się",
+    },
+    admin_notification: {
+      title: "Nowa subskrypcja newslettera",
+      subject: "Nowa subskrypcja newslettera",
+      preview: "Nowy użytkownik zasubskrybował newsletter",
+      message: "Nowy użytkownik zasubskrybował newsletter.",
+      subscriber_details: "Szczegóły subskrybenta",
+      email: "E-mail",
+      name: "Imię",
+      preferences: "Preferencje",
+      view_in_admin: "Zobacz w Panelu Admina",
+    },
+  },
 };

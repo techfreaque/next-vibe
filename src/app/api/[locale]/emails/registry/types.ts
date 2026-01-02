@@ -7,6 +7,7 @@ import type { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import type { TrackingContext } from "../smtp-client/components/tracking_context.email";
 
 /**
  * Preview field types
@@ -54,12 +55,19 @@ export interface TemplateCachedMetadata {
   description: TranslationKey; // Translation key
   category: string;
   path: string; // File path for reference
+  exampleProps: Record<string, string | number | boolean>; // Example props for preview (serializable, required)
 }
 
 /**
  * Full template metadata (includes functions, from loaded template)
  */
-export interface TemplateMetadata extends TemplateCachedMetadata {
+export interface TemplateMetadata {
+  id: string;
+  version: string;
+  name: TranslationKey;
+  description: TranslationKey;
+  category: string;
+  path: string;
   defaultSubject: string | ((t: TFunction) => string);
   changelog?: string; // Translation key
   previewFields?: Record<string, PreviewFieldConfig>;
@@ -75,12 +83,10 @@ export interface EmailTemplateDefinition<TProps = never> {
     props: TProps;
     t: TFunction;
     locale: CountryLanguage;
-    tracking?: {
-      userId?: string;
-      leadId?: string;
-      sessionId?: string;
-    };
+    recipientEmail: string;
+    tracking: TrackingContext;
   }) => ReactElement;
+  exampleProps: TProps;
 }
 
 /**

@@ -21,7 +21,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { EmailTemplate } from "../../emails/smtp-client/components/template.email";
-import { createTrackingContext } from "../../emails/smtp-client/components/tracking_context.email";
+import {
+  createTrackingContext,
+  type TrackingContext,
+} from "../../emails/smtp-client/components/tracking_context.email";
 import type {
   SubscribePostRequestOutput as NewsletterSubscriptionType,
   SubscribePostResponseOutput as NewsletterSubscriptionResponseType,
@@ -44,27 +47,15 @@ function NewsletterWelcomeEmail({
   props,
   t,
   locale,
+  recipientEmail,
   tracking,
 }: {
   props: NewsletterWelcomeProps;
   t: TFunction;
   locale: CountryLanguage;
-  tracking?: {
-    userId?: string;
-    leadId?: string;
-    sessionId?: string;
-  };
+  recipientEmail: string;
+  tracking: TrackingContext;
 }): ReactElement {
-  const trackingContext = tracking
-    ? createTrackingContext(
-        locale,
-        tracking.leadId,
-        tracking.userId,
-        undefined,
-        undefined,
-      )
-    : createTrackingContext(locale, props.leadId, props.userId);
-
   const appName = t("config.appName");
 
   return (
@@ -73,7 +64,8 @@ function NewsletterWelcomeEmail({
       locale={locale}
       title={t("app.api.newsletter.email.welcome.title")}
       previewText={t("app.api.newsletter.email.welcome.preview")}
-      tracking={trackingContext}
+      recipientEmail={recipientEmail}
+      tracking={tracking}
     >
       {/* Greeting */}
       <div
@@ -183,9 +175,50 @@ const newsletterWelcomeTemplate: EmailTemplateDefinition<NewsletterWelcomeProps>
       category: "newsletter",
       path: "/newsletter/subscribe/email.tsx",
       defaultSubject: (t) => t("app.api.newsletter.email.welcome.subject"),
+      previewFields: {
+        email: {
+          type: "email",
+          label:
+            "app.admin.emails.templates.templates.newsletter.welcome.preview.email.label",
+          description:
+            "app.admin.emails.templates.templates.newsletter.welcome.preview.email.description",
+          defaultValue: "max@example.com",
+          required: true,
+        },
+        name: {
+          type: "text",
+          label:
+            "app.admin.emails.templates.templates.newsletter.welcome.preview.name.label",
+          description:
+            "app.admin.emails.templates.templates.newsletter.welcome.preview.name.description",
+          defaultValue: "Max Mustermann",
+        },
+        leadId: {
+          type: "text",
+          label:
+            "app.admin.emails.templates.templates.newsletter.welcome.preview.leadId.label",
+          description:
+            "app.admin.emails.templates.templates.newsletter.welcome.preview.leadId.description",
+          defaultValue: "example-lead-id-456",
+        },
+        userId: {
+          type: "text",
+          label:
+            "app.admin.emails.templates.templates.newsletter.welcome.preview.userId.label",
+          description:
+            "app.admin.emails.templates.templates.newsletter.welcome.preview.userId.description",
+          defaultValue: "example-user-id-123",
+        },
+      },
     },
     schema: newsletterWelcomePropsSchema,
     component: NewsletterWelcomeEmail,
+    exampleProps: {
+      email: "max@example.com",
+      name: "Max Mustermann",
+      leadId: "example-lead-id-456",
+      userId: "example-user-id-123",
+    },
   };
 
 export default newsletterWelcomeTemplate;
@@ -198,10 +231,12 @@ function AdminNotificationEmailContent({
   requestData,
   t,
   locale,
+  recipientEmail,
 }: {
   requestData: NewsletterSubscriptionType;
   t: TFunction;
   locale: CountryLanguage;
+  recipientEmail: string;
 }): ReactElement {
   const tracking = createTrackingContext(locale);
 
@@ -211,6 +246,7 @@ function AdminNotificationEmailContent({
       locale={locale}
       title={t("app.api.newsletter.email.admin_notification.title")}
       previewText={t("app.api.newsletter.email.admin_notification.preview")}
+      recipientEmail={recipientEmail}
       tracking={tracking}
     >
       <div
@@ -343,10 +379,12 @@ export const renderWelcomeMail: EmailFunctionType<
         props: templateProps,
         t,
         locale,
-        tracking: {
-          leadId: responseData.leadId,
-          userId: responseData.userId,
-        },
+        recipientEmail: requestData.email,
+        tracking: createTrackingContext(
+          locale,
+          responseData.leadId,
+          responseData.userId,
+        ),
       }),
     });
   } catch {
@@ -375,6 +413,7 @@ export const renderAdminNotificationMail: EmailFunctionType<
         requestData,
         t,
         locale,
+        recipientEmail: contactClientRepository.getSupportEmail(locale),
       }),
     });
   } catch {

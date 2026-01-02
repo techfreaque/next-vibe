@@ -15,7 +15,8 @@ import type {
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import { ChatMessageRole, ThreadStatus } from "../../chat/enum";
+import { ChatMessageRole } from "../../chat/enum";
+import { useChatStore } from "../../chat/hooks/store";
 import type { AiStreamPostRequestOutput } from "../definition";
 import {
   type AudioChunkEventData,
@@ -27,10 +28,10 @@ import {
   type ReasoningDeltaEventData,
   type ReasoningDoneEventData,
   StreamEventType,
-  type ThreadCreatedEventData,
   type ToolCallEventData,
   type ToolResultEventData,
   type ToolWaitingEventData,
+  type VoiceTranscribedEventData,
 } from "../events";
 import { getAudioQueue } from "./audio-queue";
 import type { StreamingMessage, StreamingThread } from "./store";
@@ -40,7 +41,6 @@ import { useAIStreamStore } from "./store";
  * SSE Stream Options
  */
 export interface StreamOptions {
-  onThreadCreated?: (data: ThreadCreatedEventData) => void;
   onMessageCreated?: (data: MessageCreatedEventData) => void;
   onContentDelta?: (data: ContentDeltaEventData) => void;
   onContentDone?: (data: ContentDoneEventData) => void;
@@ -113,6 +113,20 @@ function handleMessageCreatedEvent(params: {
         isIncognitoFromStream || chatThread?.rootFolderId === "incognito";
 
       if (isIncognito) {
+        // Check if message already exists (created client-side for incognito text mode)
+        const existingMessage =
+          useChatStore.getState().messages[eventData.messageId];
+        if (existingMessage) {
+          logger.debug(
+            "[MESSAGE_CREATED] Message already exists, skipping (client-side created)",
+            {
+              messageId: eventData.messageId,
+              role: eventData.role,
+            },
+          );
+          return; // Skip - message was created client-side
+        }
+
         logger.debug("[MESSAGE_CREATED] Saving to chat store (incognito)", {
           messageId: eventData.messageId,
           role: eventData.role,
@@ -262,6 +276,7 @@ export function useAIStream(
           operation: data.operation,
           model: data.model,
           hasAudioInput: !!data.audioInput?.file,
+          messageHistoryLength: data.messageHistory?.length ?? 0,
         });
 
         // Determine if we need FormData (when there's a file to upload)
@@ -441,77 +456,37 @@ export function useAIStream(
 
             // Handle event based on type
             switch (event.type) {
-              case StreamEventType.THREAD_CREATED: {
-                const eventData = event.data as ThreadCreatedEventData;
-
-                store.addThread({
-                  threadId: eventData.threadId,
-                  title: eventData.title,
-                  rootFolderId: eventData.rootFolderId,
-                  subFolderId: eventData.subFolderId,
-                  createdAt: new Date(),
-                });
-
-                // CRITICAL: Do NOT set active thread here
-                // The onThreadCreated callback will trigger navigation to the new thread URL
-                // The URL sync effect in chat-interface.tsx will then set the active thread
-                // based on the new URL. This prevents race conditions where store updates
-                // before URL navigation completes, causing the wrong thread to be active.
-
-                // Save to localStorage if incognito mode
-                if (eventData.rootFolderId === "incognito") {
-                  void import("../../chat/incognito/storage")
-                    .then(({ saveThread }) => {
-                      saveThread({
-                        id: eventData.threadId,
-                        userId: "incognito",
-                        leadId: null,
-                        title: eventData.title,
-                        rootFolderId: eventData.rootFolderId,
-                        folderId: eventData.subFolderId,
-                        status: ThreadStatus.ACTIVE,
-                        defaultModel: null,
-                        defaultCharacter: null,
-                        systemPrompt: null,
-                        pinned: false,
-                        archived: false,
-                        tags: [],
-                        preview: null,
-                        metadata: {},
-                        rolesView: null,
-                        rolesEdit: null,
-                        rolesPost: null,
-                        rolesModerate: null,
-                        rolesAdmin: null,
-                        published: false,
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                        searchVector: null,
-                        canPost: true,
-                        canEdit: true,
-                        canModerate: true,
-                        canDelete: true,
-                        canManagePermissions: false,
-                      });
-                      return undefined;
-                    })
-                    .catch((error: Error) => {
-                      logger.error("Failed to save incognito thread", {
-                        error,
-                      });
-                    });
-                }
-
-                options.onThreadCreated?.(eventData);
-                break;
-              }
-
               case StreamEventType.MESSAGE_CREATED: {
                 handleMessageCreatedEvent({
                   eventData: event.data as MessageCreatedEventData,
                   store,
                   logger,
                   onMessageCreated: options.onMessageCreated,
+                });
+                break;
+              }
+
+              case StreamEventType.VOICE_TRANSCRIBED: {
+                const eventData = event.data as VoiceTranscribedEventData;
+                logger.debug(
+                  "[VOICE_TRANSCRIBED] Updating message with transcription",
+                  {
+                    messageId: eventData.messageId,
+                    text: eventData.text.slice(0, 50),
+                  },
+                );
+
+                // Update the user message with transcribed text
+                // Preserve existing metadata (like attachments) while removing isTranscribing flag
+                const currentMessage =
+                  useChatStore.getState().messages[eventData.messageId];
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { isTranscribing, ...preservedMetadata } =
+                  currentMessage?.metadata ?? {};
+
+                useChatStore.getState().updateMessage(eventData.messageId, {
+                  content: eventData.text,
+                  metadata: preservedMetadata,
                 });
                 break;
               }
@@ -756,17 +731,11 @@ export function useAIStream(
               }
 
               case StreamEventType.TOOL_CALL: {
-                // NEW ARCHITECTURE: Tool calls are separate TOOL messages now
-                // TOOL_CALL event is redundant - MESSAGE_CREATED already creates the TOOL message
-                // Keep event for backward compatibility but don't process it
                 const eventData = event.data as ToolCallEventData;
-                logger.debug(
-                  "Tool call event received (ignored in new architecture)",
-                  {
-                    messageId: eventData.messageId,
-                    toolName: eventData.toolName,
-                  },
-                );
+                logger.debug("Tool call event received", {
+                  messageId: eventData.messageId,
+                  toolName: eventData.toolName,
+                });
 
                 options.onToolCall?.(eventData);
                 break;
@@ -986,7 +955,7 @@ export function useAIStream(
                   chunkIndex: eventData.chunkIndex,
                   isFinal: eventData.isFinal,
                   textLength: eventData.text.length,
-                  callModeEnabled: data.voiceMode?.callMode,
+                  callModeEnabled: data.voiceMode?.enabled,
                 });
 
                 // Only queue audio for auto-playback if call mode is enabled
@@ -994,7 +963,7 @@ export function useAIStream(
                 if (
                   eventData.audioData &&
                   !eventData.isFinal &&
-                  data.voiceMode?.callMode
+                  data.voiceMode?.enabled
                 ) {
                   const audioQueue = getAudioQueue();
                   audioQueue.enqueue(eventData.audioData, eventData.chunkIndex);

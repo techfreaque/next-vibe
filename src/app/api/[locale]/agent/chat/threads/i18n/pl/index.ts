@@ -182,6 +182,10 @@ export const translations: typeof enTranslations = {
         description: "Podstawowe informacje o wątku",
       },
     },
+    id: {
+      label: "ID wątku",
+      description: "ID wątku wygenerowane przez klienta",
+    },
     threadTitle: {
       label: "Tytuł",
       description: "Tytuł wątku",

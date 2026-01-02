@@ -14,6 +14,10 @@ import {
   loadDraft,
   saveDraft,
 } from "@/app/api/[locale]/agent/chat/hooks/use-input-autosave";
+import {
+  base64ToFile,
+  urlToFile,
+} from "@/app/api/[locale]/agent/chat/incognito/file-utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { DivRefObject } from "@/packages/next-vibe-ui/web/ui/div";
 import type {
@@ -25,7 +29,12 @@ export type EditorActionType = "branch" | null;
 
 export interface UseMessageEditorOptions {
   message: ChatMessage;
-  onBranch: (messageId: string, content: string) => Promise<void>;
+  onBranch: (
+    messageId: string,
+    content: string,
+    audioInput: { file: File } | undefined,
+    attachments: File[] | undefined,
+  ) => Promise<void>;
   onCancel: () => void;
   logger: EndpointLogger;
 }
@@ -33,6 +42,7 @@ export interface UseMessageEditorOptions {
 export interface UseMessageEditorReturn {
   // State
   content: string;
+  attachments: File[];
   isLoading: boolean;
   actionType: EditorActionType;
 
@@ -42,6 +52,7 @@ export interface UseMessageEditorReturn {
 
   // Handlers
   setContent: (content: string) => void;
+  setAttachments: (attachments: File[] | ((prev: File[]) => File[])) => void;
   handleBranch: () => Promise<void>;
   handleKeyDown: (e: TextareaKeyboardEvent) => void;
   handleCancel: () => void;
@@ -57,6 +68,7 @@ export function useMessageEditor({
   logger,
 }: UseMessageEditorOptions): UseMessageEditorReturn {
   const [content, setContent] = useState(message.content);
+  const [attachments, setAttachments] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [actionType, setActionType] = useState<EditorActionType>(null);
   const editorRef = useRef<DivRefObject>(null);
@@ -123,9 +135,17 @@ export function useMessageEditor({
     setActionType("branch");
     setIsLoading(true);
     try {
-      await onBranch(message.id, trimmedContent);
+      await onBranch(
+        message.id,
+        trimmedContent,
+        undefined,
+        attachments.length > 0 ? attachments : undefined,
+      );
       // Clear draft after successful branch
       await clearDraft(draftKey, logger);
+      setAttachments([]);
+      // Close the editor after successful branch
+      onCancel();
     } catch (error) {
       logger.error("Failed to branch message", parseError(error));
       // Error is logged, no need to throw
@@ -133,7 +153,16 @@ export function useMessageEditor({
       setIsLoading(false);
       setActionType(null);
     }
-  }, [content, isLoading, message.id, onBranch, logger, draftKey]);
+  }, [
+    content,
+    attachments,
+    isLoading,
+    message.id,
+    onBranch,
+    logger,
+    draftKey,
+    onCancel,
+  ]);
 
   const handleKeyDown = useCallback(
     (e: TextareaKeyboardEvent): void => {
@@ -159,11 +188,13 @@ export function useMessageEditor({
 
   return {
     content,
+    attachments,
     isLoading,
     actionType,
     editorRef,
     textareaRef,
     setContent: setContentAndSaveDraft,
+    setAttachments,
     handleBranch,
     handleKeyDown,
     handleCancel,

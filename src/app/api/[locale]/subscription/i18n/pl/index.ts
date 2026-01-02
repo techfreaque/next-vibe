@@ -221,38 +221,43 @@ export const translations: typeof enTranslations = {
   // Email translations
   email: {
     success: {
-      title: "Subskrypcja pomyślna!",
-      subject: "Witamy w Twojej subskrypcji!",
-      previewText: "Witamy w nowej subskrypcji",
-      welcomeMessage: "Witamy w subskrypcji!",
-      description: "Dziękujemy za subskrypcję {{appName}}",
+      title: "Witamy w {{planName}}, {{firstName}}!",
+      subject:
+        "Twoja subskrypcja {{appName}} jest aktywna - Nieograniczona AI czeka",
+      previewText:
+        "Twoja subskrypcja {{planName}} jest teraz aktywna! Ciesz się nieograniczonym dostępem do 38 modeli AI.",
+      welcomeMessage: "Twoja subskrypcja {{planName}} jest teraz aktywna!",
+      description:
+        "Dziękujemy za upgrade do {{appName}}! Masz teraz pełny dostęp do wszystkich 38 modeli AI bez dziennych limitów. Zacznij rozmawiać z Claude Sonnet 4.5, GPT-5.2 Pro, Gemini 3 Pro i wszystkimi naszymi niecenzurowanymi modelami bez ograniczeń.",
       nextSteps: {
-        title: "Następne kroki",
-        description: "Oto co możesz zrobić dalej",
-        cta: "Rozpocznij",
+        title: "Wszystko gotowe!",
+        description:
+          "Twoja subskrypcja jest aktywna i gotowa do użycia. Wskocz od razu i odkryj nieograniczone rozmowy z AI.",
+        cta: "Zacznij rozmawiać już teraz",
       },
       support: {
         title: "Potrzebujesz pomocy?",
-        description: "Nasz zespół wsparcia jest tutaj, aby Ci pomóc",
-        cta: "Skontaktuj się z pomocą techniczną",
+        description:
+          "Nasz zespół wsparcia jest tutaj, aby pomóc Ci z wszelkimi pytaniami dotyczącymi subskrypcji.",
+        cta: "Uzyskaj pomoc",
       },
       footer: {
-        message: "Dziękujemy za wybór nas!",
-        signoff: "Z poważaniem, Zespół",
+        message: "Dziękujemy za wspieranie niecenzurowanej AI!",
+        signoff: "Witamy w nieograniczonych rozmowach,\nZespół {{appName}}",
       },
     },
     admin_notification: {
       title: "Nowa subskrypcja",
-      subject: "Nowa subskrypcja - Powiadomienie administratora",
-      preview: "Utworzono nową subskrypcję",
-      message: "Utworzono nową subskrypcję",
+      subject: "Nowa subskrypcja - {{planName}}",
+      preview: "Nowa subskrypcja: {{firstName}} zasubskrybował {{planName}}",
+      message: "Nowy użytkownik zasubskrybował {{appName}}.",
       details: "Szczegóły subskrypcji",
       user_name: "Nazwa użytkownika",
       user_email: "E-mail użytkownika",
       plan: "Plan",
       status: "Status",
       contact_user: "Skontaktuj się z użytkownikiem",
-      footer: "To jest automatyczne powiadomienie",
+      footer: "To jest automatyczne powiadomienie z {{appName}}",
     },
   },
 

@@ -65,7 +65,7 @@ export function GroupedAssistantMessage({
   collapseState,
 }: GroupedAssistantMessageProps): JSX.Element {
   // Get rootFolderId from context
-  const { currentRootFolderId: rootFolderId } = useChatContext();
+  const { currentRootFolderId: rootFolderId, user } = useChatContext();
 
   const { t } = simpleT(locale);
   const { primary, continuations } = group;
@@ -158,6 +158,7 @@ export function GroupedAssistantMessage({
                   key={message.id}
                   toolCall={message.metadata.toolCall}
                   locale={locale}
+                  user={user}
                   threadId={message.threadId}
                   messageId={message.id}
                   collapseState={collapseState}

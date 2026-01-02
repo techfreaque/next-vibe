@@ -40,6 +40,7 @@ import { MessageEditor } from "../message-editor";
 import { groupMessagesBySequence } from "../message-grouping";
 import { ModelCharacterSelectorModal } from "../model-character-selector-modal";
 import { UserMessageBubble } from "../user-message-bubble";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 interface LinearMessageViewProps {
   messages: ChatMessage[];
@@ -47,6 +48,7 @@ interface LinearMessageViewProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
   currentUserId?: string;
+  user: JwtPayloadType;
 }
 
 export const LinearMessageView = React.memo(function LinearMessageView({
@@ -55,6 +57,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   locale,
   logger,
   currentUserId,
+  user,
 }: LinearMessageViewProps): JSX.Element {
   const { t } = simpleT(locale);
   const [copiedSystemPrompt, setCopiedSystemPrompt] = useState(false);
@@ -80,7 +83,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
     startRetry: onStartRetry,
     startAnswer: onStartAnswer,
     cancelEditorAction: onCancelAction,
-    handleBranchEdit: onBranchEdit,
     setAnswerContent: onSetAnswerContent,
     // Collapse state
     collapseState,
@@ -131,14 +133,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
       });
     }
   }, [systemPrompt, logger]);
-
-  // Wrap handleBranchEdit to pass branchMessage as the third parameter
-  const handleBranch = useCallback(
-    async (messageId: string, content: string) => {
-      await onBranchEdit(messageId, content, branchMessage);
-    },
-    [onBranchEdit, branchMessage],
-  );
 
   // Group messages by sequence for proper display
   const messageGroups = groupMessagesBySequence(messages);
@@ -296,12 +290,13 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                   <Div className="flex justify-end">
                     <MessageEditor
                       message={message}
-                      onBranch={handleBranch}
+                      onBranch={branchMessage}
                       onCancel={onCancelAction}
                       onModelChange={onModelChange}
                       onCharacterChange={onCharacterChange}
                       locale={locale}
                       logger={logger}
+                      user={user}
                     />
                   </Div>
                 ) : isRetrying ? (
@@ -331,6 +326,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                       confirmLabelKey="app.chat.linearMessageView.retryModal.confirmLabel"
                       locale={locale}
                       logger={logger}
+                      user={user}
                     />
                   </Div>
                 ) : (
@@ -436,7 +432,11 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                   inputPlaceholderKey="app.chat.linearMessageView.answerModal.inputPlaceholder"
                   onConfirm={async (): Promise<void> => {
                     if (onAnswerAsModel) {
-                      await onAnswerAsModel(message.id, answerContent);
+                      await onAnswerAsModel(
+                        message.id,
+                        answerContent,
+                        undefined,
+                      );
                     }
                     onCancelAction();
                   }}
@@ -444,6 +444,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                   confirmLabelKey="app.chat.linearMessageView.answerModal.confirmLabel"
                   locale={locale}
                   logger={logger}
+                  user={user}
                 />
               </Div>
             )}

@@ -3,7 +3,7 @@ import { cn } from "next-vibe/shared/utils";
 import React from "react";
 
 import type { StyleType } from "../utils/style-type";
-import type { InputGenericTarget } from "./input";
+import type { InferValueType, InputGenericTarget } from "./input";
 
 export interface TextareaChangeEvent {
   target: {
@@ -37,9 +37,16 @@ export interface TextareaFocusEvent {
   type: string;
 }
 
+export interface TextareaClipboardTarget<T = undefined> {
+  addEventListener: (type: string, listener: (event: Event) => void) => void;
+  removeEventListener: (type: string, listener: (event: Event) => void) => void;
+  dispatchEvent: (event: Event) => boolean;
+  value?: InferValueType<T>;
+}
+
 export interface TextareaClipboardEvent {
-  target: InputGenericTarget;
-  currentTarget: InputGenericTarget;
+  target: TextareaClipboardTarget;
+  currentTarget: TextareaClipboardTarget;
   preventDefault: () => void;
   stopPropagation: () => void;
   bubbles: boolean;

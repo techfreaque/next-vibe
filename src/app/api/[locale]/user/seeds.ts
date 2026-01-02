@@ -23,6 +23,7 @@ import { UserRepository } from "./repository";
 import type { StandardUserType } from "./types";
 import { UserRole } from "./user-roles/enum";
 import { UserRolesRepository } from "./user-roles/repository";
+import { contactClientRepository } from "../contact/repository-client";
 
 /**
  * Helper function to create user seed data
@@ -500,12 +501,15 @@ export async function test(logger: EndpointLogger): Promise<void> {
 /**
  * Production seed function for auth module
  */
-export async function prod(logger: EndpointLogger): Promise<void> {
+export async function prod(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding auth data for production environment");
 
   // Create admin user
   const adminUser = createUserSeed({
-    email: translations.emails.admin,
+    email: contactClientRepository.getSupportEmail(locale),
     privateName: "Admin User",
     publicName: translations.appName,
   });

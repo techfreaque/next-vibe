@@ -17,6 +17,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 interface ModelCharacterSelectorModalProps {
   titleKey: TranslationKey;
@@ -33,6 +34,7 @@ interface ModelCharacterSelectorModalProps {
   inputPlaceholderKey?: TranslationKey;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  user: JwtPayloadType;
 }
 
 export function ModelCharacterSelectorModal({
@@ -50,6 +52,7 @@ export function ModelCharacterSelectorModal({
   inputPlaceholderKey,
   locale,
   logger,
+  user,
 }: ModelCharacterSelectorModalProps): JSX.Element {
   // Get selectedModel and selectedCharacter from context
   const { selectedModel, selectedCharacter } = useChatContext();
@@ -116,6 +119,7 @@ export function ModelCharacterSelectorModal({
               locale={locale}
               logger={logger}
               buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
+              user={user}
             />
           </Div>
 

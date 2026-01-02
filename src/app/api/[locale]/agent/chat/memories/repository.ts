@@ -38,7 +38,7 @@ async function getMemoriesList(params: {
     .select()
     .from(memories)
     .where(eq(memories.userId, userId))
-    .orderBy(desc(memories.priority), memories.sequenceNumber);
+    .orderBy(desc(memories.priority), memories.id);
 
   logger.debug("Retrieved memories list", {
     userId,
@@ -78,21 +78,21 @@ export async function addMemory(params: {
   userId: string;
   priority?: number;
   logger: EndpointLogger;
-}): Promise<ResponseType<{ id: string }>> {
+}): Promise<ResponseType<{ id: number }>> {
   const { content, tags = [], userId, priority = 0, logger } = params;
 
-  // Get next sequence number
-  const sequenceNumber = await getNextSequenceNumber({ userId });
+  // Get next memory number for this user (starts at 0)
+  const nextMemoryNumber = await getNextMemoryNumber({ userId });
 
   // Create new memory
   const [memory] = await db
     .insert(memories)
     .values({
+      memoryNumber: nextMemoryNumber,
       content,
       tags,
       userId,
       priority,
-      sequenceNumber,
       metadata: {
         source: "manual",
         confidence: 1.0,
@@ -104,34 +104,35 @@ export async function addMemory(params: {
 
   logger.info("Created new memory", {
     memoryId: memory.id,
+    memoryNumber: memory.memoryNumber,
     userId,
-    sequenceNumber,
   });
 
   // Check if auto-summarization is needed
   await checkAndSummarizeIfNeeded({ userId, logger });
 
-  return success({ id: memory.id });
+  return success({ id: memory.memoryNumber });
 }
 
 /**
  * Update an existing memory
  */
 export async function updateMemory(params: {
-  memoryId: string;
+  memoryNumber: number;
   content?: string;
   tags?: string[];
   priority?: number;
   userId: string;
   logger: EndpointLogger;
 }): Promise<ResponseType<{ success: true }>> {
-  const { memoryId, content, tags, priority, userId, logger } = params;
+  const { memoryNumber, content, tags, priority, userId, logger } = params;
 
   const updateData: Partial<typeof memories.$inferInsert> = {
     updatedAt: new Date(),
   };
 
-  if (content !== undefined) {
+  // Filter out empty strings - treat as undefined
+  if (content !== undefined && content !== "") {
     updateData.content = content;
   }
   if (tags !== undefined) {
@@ -144,7 +145,9 @@ export async function updateMemory(params: {
   const [updated] = await db
     .update(memories)
     .set(updateData)
-    .where(and(eq(memories.id, memoryId), eq(memories.userId, userId)))
+    .where(
+      and(eq(memories.memoryNumber, memoryNumber), eq(memories.userId, userId)),
+    )
     .returning();
 
   if (!updated) {
@@ -154,7 +157,7 @@ export async function updateMemory(params: {
     });
   }
 
-  logger.info("Updated memory", { memoryId });
+  logger.info("Updated memory", { memoryNumber });
   return success({ success: true });
 }
 
@@ -162,15 +165,17 @@ export async function updateMemory(params: {
  * Delete a memory
  */
 export async function deleteMemory(params: {
-  memoryId: string;
+  memoryNumber: number;
   userId: string;
   logger: EndpointLogger;
 }): Promise<ResponseType<{ success: true }>> {
-  const { memoryId, userId, logger } = params;
+  const { memoryNumber, userId, logger } = params;
 
   const result = await db
     .delete(memories)
-    .where(and(eq(memories.id, memoryId), eq(memories.userId, userId)))
+    .where(
+      and(eq(memories.memoryNumber, memoryNumber), eq(memories.userId, userId)),
+    )
     .returning();
 
   if (result.length === 0) {
@@ -180,7 +185,7 @@ export async function deleteMemory(params: {
     });
   }
 
-  logger.info("Deleted memory", { memoryId });
+  logger.info("Deleted memory", { memoryNumber });
   return success({ success: true });
 }
 
@@ -206,10 +211,10 @@ export async function generateMemorySummary(params: {
   // Format as numbered list with IDs, priority, and recency
   const summary = memoriesList
     .map((memory, index) => {
-      const shortId = memory.id.slice(0, 8);
+      const memoryNum = memory.memoryNumber;
       const priority = memory.priority ?? 0;
       const age = getRelativeTime(memory.createdAt ?? new Date());
-      return `${index + 1}. [ID:${shortId} | P:${priority} | ${age}] ${memory.content}`;
+      return `${index + 1}. [ID:${memoryNum} | P:${priority} | ${age}] ${memory.content}`;
     })
     .join("\n");
 
@@ -221,14 +226,14 @@ export async function generateMemorySummary(params: {
   return `## User Memories (${memoriesList.length})
 ${summary}
 
-**Legend:** ID=8-char identifier | P=priority (0-10, higher=more important) | Age=when added
+**Legend:** ID=memory identifier (starts at 0) | P=priority (0-100, higher=more important) | Age=when added
 
 ## Memory Management (All memories already loaded above)
 **Auto-consolidate when you see >2 similar memories (>80% content overlap)**
 
 **Tools:**
 - \`memories:add\` - Store NEW facts only
-- \`memories:update\` - Merge/improve existing (use 8-char ID)
+- \`memories:update\` - Merge/improve existing (use ID number)
 - \`memories:delete\` - Remove wrong/outdated
 
 **Consolidation Examples:**
@@ -263,21 +268,22 @@ const getRelativeTime = (date: Date): string => {
 };
 
 /**
- * Get next sequence number for a user
+ * Get next memory number for a user
+ * Each user's memories start at 0 and increment
  */
-async function getNextSequenceNumber(params: {
+async function getNextMemoryNumber(params: {
   userId: string;
 }): Promise<number> {
   const { userId } = params;
 
   const [result] = await db
     .select({
-      maxSeq: sql<number>`COALESCE(MAX(${memories.sequenceNumber}), 0)`,
+      maxNum: sql<number>`COALESCE(MAX(${memories.memoryNumber}), -1)`,
     })
     .from(memories)
     .where(eq(memories.userId, userId));
 
-  return (result?.maxSeq ?? 0) + 1;
+  return (result?.maxNum ?? -1) + 1;
 }
 
 /**

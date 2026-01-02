@@ -21,7 +21,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { EmailTemplate } from "../../emails/smtp-client/components/template.email";
-import { createTrackingContext } from "../../emails/smtp-client/components/tracking_context.email";
+import {
+  createTrackingContext,
+  type TrackingContext,
+} from "../../emails/smtp-client/components/tracking_context.email";
 import type {
   UnsubscribePostRequestOutput as NewsletterUnsubscribeType,
   UnsubscribePostResponseOutput as NewsletterUnsubscribeResponseType,
@@ -43,34 +46,23 @@ function NewsletterUnsubscribeEmail({
   props,
   t,
   locale,
+  recipientEmail,
   tracking,
 }: {
   props: NewsletterUnsubscribeProps;
   t: TFunction;
   locale: CountryLanguage;
-  tracking?: {
-    userId?: string;
-    leadId?: string;
-    sessionId?: string;
-  };
+  recipientEmail: string;
+  tracking: TrackingContext;
 }): ReactElement {
-  const trackingContext = tracking
-    ? createTrackingContext(
-        locale,
-        tracking.leadId,
-        tracking.userId,
-        undefined,
-        undefined,
-      )
-    : createTrackingContext(locale);
-
   return (
     <EmailTemplate
       t={t}
       locale={locale}
       title={t("app.api.newsletter.email.unsubscribe.title")}
       previewText={t("app.api.newsletter.email.unsubscribe.preview")}
-      tracking={trackingContext}
+      recipientEmail={recipientEmail}
+      tracking={tracking}
     >
       <div
         style={{
@@ -151,9 +143,23 @@ const newsletterUnsubscribeTemplate: EmailTemplateDefinition<NewsletterUnsubscri
       category: "newsletter",
       path: "/newsletter/unsubscribe/email.tsx",
       defaultSubject: (t) => t("app.api.newsletter.email.unsubscribe.subject"),
+      previewFields: {
+        email: {
+          type: "email",
+          label:
+            "app.api.emails.templates.newsletter.unsubscribe.preview.email",
+          description:
+            "app.api.emails.templates.newsletter.unsubscribe.preview.email.description",
+          defaultValue: "max@example.com",
+          required: true,
+        },
+      },
     },
     schema: newsletterUnsubscribePropsSchema,
     component: NewsletterUnsubscribeEmail,
+    exampleProps: {
+      email: "max@example.com",
+    },
   };
 
 export default newsletterUnsubscribeTemplate;
@@ -166,10 +172,12 @@ function AdminUnsubscribeNotificationEmailContent({
   requestData,
   t,
   locale,
+  recipientEmail,
 }: {
   requestData: NewsletterUnsubscribeType;
   t: TFunction;
   locale: CountryLanguage;
+  recipientEmail: string;
 }): ReactElement {
   const tracking = createTrackingContext(locale);
 
@@ -183,6 +191,7 @@ function AdminUnsubscribeNotificationEmailContent({
       previewText={t(
         "app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.preview",
       )}
+      recipientEmail={recipientEmail}
       tracking={tracking}
     >
       <div
@@ -284,6 +293,8 @@ export const renderUnsubscribeConfirmationMail: EmailFunctionType<
         props: templateProps,
         t,
         locale,
+        recipientEmail: requestData.email,
+        tracking: createTrackingContext(locale),
       }),
     });
   } catch {
@@ -314,6 +325,7 @@ export const renderAdminUnsubscribeNotificationMail: EmailFunctionType<
         requestData,
         t,
         locale,
+        recipientEmail: contactClientRepository.getSupportEmail(locale),
       }),
     });
   } catch {

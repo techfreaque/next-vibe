@@ -114,14 +114,8 @@ export function validateHandlerRequestData<
         error: urlValidation.message,
         messageParams: urlValidation.messageParams,
       });
-      return {
-        success: false,
-        message: ErrorResponseTypes.INVALID_QUERY_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INVALID_QUERY_ERROR,
-        messageParams: {
-          error: urlValidation.message,
-        },
-      };
+      // Return the validation error directly with proper message and params
+      return urlValidation;
     }
 
     // Now validate the final merged data
@@ -135,15 +129,8 @@ export function validateHandlerRequestData<
         error: requestValidation.message,
         messageParams: requestValidation.messageParams,
       });
-      return {
-        success: false,
-        message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
-        errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-        messageParams: {
-          error: requestValidation.message,
-        },
-        cause: requestValidation,
-      };
+      // Return the validation error directly with proper message and params
+      return requestValidation;
     }
 
     return {

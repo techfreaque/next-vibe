@@ -5,8 +5,7 @@
 
 import type { MessageResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 
-import type { DefaultFolderId } from "../chat/config";
-import type { ToolCall, ToolCallResult } from "../chat/db";
+import type { MessageMetadata, ToolCall, ToolCallResult } from "../chat/db";
 import type { ChatMessageRole } from "../chat/enum";
 import type { ModelId } from "../chat/model-access/models";
 
@@ -22,7 +21,6 @@ export const SSE_EVENT_SEPARATOR = "\n\n";
  * Event type enum - single source of truth for all event types
  */
 export enum StreamEventType {
-  THREAD_CREATED = "thread-created",
   MESSAGE_CREATED = "message-created",
   CONTENT_DELTA = "content-delta",
   CONTENT_DONE = "content-done",
@@ -35,17 +33,6 @@ export enum StreamEventType {
   // Voice mode events
   VOICE_TRANSCRIBED = "voice-transcribed",
   AUDIO_CHUNK = "audio-chunk",
-  VOICE_MODE_ACTIVE = "voice-mode-active",
-}
-
-/**
- * Thread created event data
- */
-export interface ThreadCreatedEventData {
-  threadId: string;
-  title: string;
-  rootFolderId: DefaultFolderId;
-  subFolderId: string | null;
 }
 
 /**
@@ -62,6 +49,7 @@ export interface MessageCreatedEventData {
   character?: string;
   sequenceId?: string | null; // Links messages in the same AI response sequence
   toolCall?: ToolCall; // Tool call for TOOL role messages (singular - each TOOL message has exactly one tool call)
+  metadata?: MessageMetadata; // Message metadata including attachments, tokens, etc.
 }
 
 /**
@@ -141,6 +129,8 @@ export interface ErrorEventData {
  * Emitted when STT completes in voice mode (before LLM processes)
  */
 export interface VoiceTranscribedEventData {
+  /** User message ID that contains the audio */
+  messageId: string;
   /** Transcribed text from user's voice */
   text: string;
   /** Confidence score (0-1) if available */
@@ -167,23 +157,9 @@ export interface AudioChunkEventData {
 }
 
 /**
- * Voice mode active event data
- * Signals that voice mode is active for this response
- */
-export interface VoiceModeActiveEventData {
-  /** Whether voice mode is enabled */
-  enabled: boolean;
-  /** Whether auto-play TTS is enabled */
-  autoPlayTTS: boolean;
-  /** Whether call mode (short responses) is active */
-  callMode: boolean;
-}
-
-/**
  * Event type to data mapping
  */
 export interface StreamEventDataMap {
-  [StreamEventType.THREAD_CREATED]: ThreadCreatedEventData;
   [StreamEventType.MESSAGE_CREATED]: MessageCreatedEventData;
   [StreamEventType.CONTENT_DELTA]: ContentDeltaEventData;
   [StreamEventType.CONTENT_DONE]: ContentDoneEventData;
@@ -196,7 +172,6 @@ export interface StreamEventDataMap {
   // Voice mode events
   [StreamEventType.VOICE_TRANSCRIBED]: VoiceTranscribedEventData;
   [StreamEventType.AUDIO_CHUNK]: AudioChunkEventData;
-  [StreamEventType.VOICE_MODE_ACTIVE]: VoiceModeActiveEventData;
 }
 
 /**
@@ -211,13 +186,6 @@ export interface StreamEvent<T extends StreamEventType = StreamEventType> {
  * Type-safe event creator functions
  */
 export const createStreamEvent = {
-  threadCreated: (
-    data: ThreadCreatedEventData,
-  ): StreamEvent<StreamEventType.THREAD_CREATED> => ({
-    type: StreamEventType.THREAD_CREATED,
-    data,
-  }),
-
   messageCreated: (
     data: MessageCreatedEventData,
   ): StreamEvent<StreamEventType.MESSAGE_CREATED> => ({
@@ -291,13 +259,6 @@ export const createStreamEvent = {
     data: AudioChunkEventData,
   ): StreamEvent<StreamEventType.AUDIO_CHUNK> => ({
     type: StreamEventType.AUDIO_CHUNK,
-    data,
-  }),
-
-  voiceModeActive: (
-    data: VoiceModeActiveEventData,
-  ): StreamEvent<StreamEventType.VOICE_MODE_ACTIVE> => ({
-    type: StreamEventType.VOICE_MODE_ACTIVE,
     data,
   }),
 };

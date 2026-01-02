@@ -33,13 +33,7 @@ export const translations = {
     },
   },
   emails: {
-    privacy: "privacy@unbottled.ai",
-    legal: "legal@unbottled.ai",
-    support: "support@unbottled.ai",
-    hello: "hello@unbottled.ai",
-    reports: "reports@unbottled.ai",
-    newsletter: "newsletter@unbottled.ai",
-    admin: "hi@unbottled.ai",
+    support: "hi@unbottled.ai",
   },
   services: {
     supportLevel: "24/7 Support",

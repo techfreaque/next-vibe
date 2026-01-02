@@ -18,7 +18,7 @@ interface TestEmailRequest {
 interface TestEmailResponse {
   success: boolean;
   messageId?: string;
-  recipientEmail?: string;
+  recipientEmail: string;
   subject?: string;
   sentAt?: string;
 }

@@ -52,9 +52,10 @@ export interface UseIncognitoChatReturn {
     threadId: string,
     role: ChatMessageRole,
     content: string,
-    parentId?: string | null,
-    model?: ModelId | null,
-    character?: string | null,
+    parentId: string | null | undefined,
+    model: ModelId | null | undefined,
+    character: string | null | undefined,
+    userMessageId: string,
   ) => ChatMessage;
   updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void;
   deleteMessage: (messageId: string) => void;
@@ -127,11 +128,14 @@ export function useIncognitoChat(
     (title: string): ChatThread => {
       logger.debug("Incognito: Creating thread", { title });
 
+      const threadId = crypto.randomUUID();
+
       void (async (): Promise<void> => {
         const thread = await createIncognitoThread(
           title || t(CHAT_CONSTANTS.DEFAULT_THREAD_TITLE),
           currentRootFolderId,
           currentSubFolderId,
+          threadId,
         );
 
         setState((prev: IncognitoState) => ({
@@ -140,10 +144,8 @@ export function useIncognitoChat(
         }));
       })();
 
-      // Return a placeholder thread that will be updated
-      const placeholderId = `thread-${Date.now()}`;
       return {
-        id: placeholderId,
+        id: threadId,
         userId: "incognito",
         leadId: null,
         title: title || t(CHAT_CONSTANTS.DEFAULT_THREAD_TITLE),
@@ -240,17 +242,17 @@ export function useIncognitoChat(
       parentId: string | null = null,
       model: ModelId | null = null,
       character: string | null = null,
+      userMessageId: string,
     ): ChatMessage => {
       logger.debug("Incognito: Adding message", {
         threadId,
         role,
         content,
+        userMessageId,
       });
 
-      // Create placeholder message that will be updated
-      const placeholderId = `msg-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-      const placeholderMessage: ChatMessage = {
-        id: placeholderId,
+      const message: ChatMessage = {
+        id: userMessageId,
         threadId,
         role,
         content,
@@ -279,13 +281,15 @@ export function useIncognitoChat(
       };
 
       void (async (): Promise<void> => {
-        const message = await createIncognitoMessage(
+        await createIncognitoMessage(
           threadId,
           role,
           content,
           parentId,
           model,
           character,
+          {},
+          userMessageId,
         );
 
         setState((prev: IncognitoState) => ({
@@ -294,7 +298,7 @@ export function useIncognitoChat(
         }));
       })();
 
-      return placeholderMessage;
+      return message;
     },
     [logger],
   );
@@ -364,7 +368,8 @@ export function useIncognitoChat(
         model,
       });
 
-      // Create user message
+      // Create user message with client-generated ID
+      const userMessageId = crypto.randomUUID();
       const userMessage = addMessage(
         state.activeThreadId || "",
         ChatMessageRole.USER,
@@ -372,6 +377,7 @@ export function useIncognitoChat(
         null,
         model,
         null,
+        userMessageId,
       );
 
       // Incognito mode uses server-side streaming via /api/chat/ai-stream endpoint
@@ -380,6 +386,7 @@ export function useIncognitoChat(
       const placeholderMessage =
         "Incognito mode: messages are not saved. Use the chat input to send messages.";
       /* eslint-enable i18next/no-literal-string */
+      const assistantMessageId = crypto.randomUUID();
       addMessage(
         state.activeThreadId || "",
         ChatMessageRole.ASSISTANT,
@@ -387,6 +394,7 @@ export function useIncognitoChat(
         userMessage.id,
         model,
         null,
+        assistantMessageId,
       );
 
       return Promise.resolve();

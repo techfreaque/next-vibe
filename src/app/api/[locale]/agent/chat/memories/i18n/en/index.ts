@@ -13,15 +13,21 @@ export const translations = {
       title: "Memory List",
       description: "View all stored memories",
     },
+    columns: {
+      memoryNumber: "#",
+      content: "Content",
+      priority: "Priority",
+      tags: "Tags",
+      createdAt: "Created",
+    },
     response: {
       memories: {
         memory: {
           title: "Memory",
-          id: { content: "Memory ID" },
+          memoryNumber: { text: "#" },
           content: { content: "Content" },
           tags: { content: "Tags" },
-          sequenceNumber: { content: "Sequence Number" },
-          priority: { content: "Priority" },
+          priority: { text: "Priority" },
           createdAt: { content: "Created At" },
         },
       },

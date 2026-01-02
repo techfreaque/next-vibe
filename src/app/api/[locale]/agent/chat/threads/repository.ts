@@ -145,7 +145,7 @@ export async function ensureThread({
   user,
   leadId,
 }: {
-  threadId: string | null | undefined;
+  threadId: string;
   rootFolderId: DefaultFolderId;
   subFolderId: string | null | undefined;
   userId?: string;
@@ -164,8 +164,18 @@ export async function ensureThread({
     isIncognito,
   });
 
-  // If threadId provided, verify it exists and check permissions (unless incognito)
-  if (threadId) {
+  if (isIncognito) {
+    logger.debug("Thread ID provided for incognito", { threadId });
+    return { threadId, isNew: true };
+  }
+
+  const [existing] = await db
+    .select()
+    .from(chatThreads)
+    .where(eq(chatThreads.id, threadId))
+    .limit(1);
+
+  if (existing?.id) {
     const verifyResult = await verifyExistingThread({
       threadId,
       isIncognito,
@@ -182,136 +192,117 @@ export async function ensureThread({
     return { threadId: verifyResult.data, isNew: false };
   }
 
-  // Create new thread - check permissions first
-  const newThreadId = crypto.randomUUID();
   const title = generateThreadTitle(content);
+  let folder: ChatFolder | null = null;
 
-  // Only store in DB if not incognito
-  if (isIncognito) {
-    logger.debug("Generated incognito thread ID", { threadId: newThreadId });
-  } else {
-    let folder: ChatFolder | null = null;
+  if (subFolderId) {
+    const [folderResult] = await db
+      .select()
+      .from(chatFolders)
+      .where(eq(chatFolders.id, subFolderId))
+      .limit(1);
 
-    if (subFolderId) {
-      // Get parent folder to check permissions
-      const [folderResult] = await db
-        .select()
-        .from(chatFolders)
-        .where(eq(chatFolders.id, subFolderId))
-        .limit(1);
-
-      if (!folderResult) {
-        logger.error("Folder not found", { subFolderId });
-        return await Promise.reject(new Error("FOLDER_NOT_FOUND"));
-      }
-
-      folder = folderResult;
-      logger.debug("Found folder for permission check", {
-        folderId: folder.id,
-        folderName: folder.name,
-        rootFolderId: folder.rootFolderId,
-        parentId: folder.parentId,
-      });
-    } else if (!subFolderId) {
-      // Creating thread directly in a root folder (no subfolder)
-      // Check permission using DEFAULT_FOLDER_CONFIGS rolesCreateThread
-      const { getDefaultFolderConfig } = await import("../config");
-      const { hasRolePermission } = await import("../permissions/permissions");
-
-      const rootConfig = getDefaultFolderConfig(rootFolderId);
-      if (!rootConfig) {
-        logger.error("Root folder config not found", { rootFolderId });
-        return await Promise.reject(new Error("FOLDER_NOT_FOUND"));
-      }
-
-      // Any authenticated user can create threads in their private/shared root folders
-      if (rootFolderId === DefaultFolderId.PUBLIC) {
-        const hasPermission = await hasRolePermission(
-          user,
-          rootConfig.rolesCreateThread,
-          logger,
-        );
-
-        if (!hasPermission) {
-          logger.error(
-            "User does not have permission to create threads in root folder",
-            {
-              userId,
-              leadId,
-              isPublic: user.isPublic,
-              rootFolderId,
-              requiredRoles: rootConfig.rolesCreateThread,
-            },
-          );
-          return await Promise.reject(new Error("PERMISSION_DENIED"));
-        }
-
-        logger.info("User has permission to create thread in root folder", {
-          userId,
-          leadId,
-          isPublic: user.isPublic,
-          rootFolderId,
-        });
-      }
+    if (!folderResult) {
+      logger.error("Folder not found", { subFolderId });
+      return await Promise.reject(new Error("FOLDER_NOT_FOUND"));
     }
 
-    // Check if user has permission to create thread in this folder (only if folder exists)
-    if (folder) {
-      logger.debug("About to check permissions", {
-        hasFolder: !!folder,
-        folderId: folder?.id,
-        folderName: folder?.name,
-        folderParentId: folder?.parentId,
-        userId,
-        leadId,
-        rootFolderId,
-        subFolderId,
-      });
-      const hasPermission = await canCreateThreadInFolder(user, folder, logger);
+    folder = folderResult;
+    logger.debug("Found folder for permission check", {
+      folderId: folder.id,
+      folderName: folder.name,
+      rootFolderId: folder.rootFolderId,
+      parentId: folder.parentId,
+    });
+  } else if (!subFolderId) {
+    const { getDefaultFolderConfig } = await import("../config");
+    const { hasRolePermission } = await import("../permissions/permissions");
 
-      logger.debug("Permission check result", {
-        hasPermission,
-        userId,
-        leadId,
-        rootFolderId,
-        subFolderId,
-      });
+    const rootConfig = getDefaultFolderConfig(rootFolderId);
+    if (!rootConfig) {
+      logger.error("Root folder config not found", { rootFolderId });
+      return await Promise.reject(new Error("FOLDER_NOT_FOUND"));
+    }
+
+    if (rootFolderId === DefaultFolderId.PUBLIC) {
+      const hasPermission = await hasRolePermission(
+        user,
+        rootConfig.rolesCreateThread,
+        logger,
+      );
 
       if (!hasPermission) {
-        logger.error("User does not have permission to create thread", {
-          userId,
-          leadId,
-          rootFolderId,
-          subFolderId,
-        });
+        logger.error(
+          "User does not have permission to create threads in root folder",
+          {
+            userId,
+            leadId,
+            isPublic: user.isPublic,
+            rootFolderId,
+            requiredRoles: rootConfig.rolesCreateThread,
+          },
+        );
         return await Promise.reject(new Error("PERMISSION_DENIED"));
       }
+
+      logger.info("User has permission to create thread in root folder", {
+        userId,
+        leadId,
+        isPublic: user.isPublic,
+        rootFolderId,
+      });
     }
-
-    // DO NOT set permission fields - leave as empty arrays to inherit from parent folder
-    // Permission inheritance: empty array [] = inherit from parent folder
-    // Only set explicit permissions when user overrides via context menu
-
-    await db.insert(chatThreads).values({
-      id: newThreadId,
-      userId: userId ?? null,
-      leadId: leadId ?? null,
-      title,
-      rootFolderId,
-      folderId: subFolderId ?? null,
-      // rolesRead, rolesWrite, rolesModerate, rolesAdmin are NOT set
-      // They default to [] which means inherit from parent folder
-    });
-
-    logger.debug("Created new thread", {
-      threadId: newThreadId,
-      title,
-      userId,
-      leadId,
-    });
   }
 
-  return { threadId: newThreadId, isNew: true };
+  if (folder) {
+    logger.debug("About to check permissions", {
+      hasFolder: !!folder,
+      folderId: folder?.id,
+      folderName: folder?.name,
+      folderParentId: folder?.parentId,
+      userId,
+      leadId,
+      rootFolderId,
+      subFolderId,
+    });
+    const hasPermission = await canCreateThreadInFolder(user, folder, logger);
+
+    logger.debug("Permission check result", {
+      hasPermission,
+      userId,
+      leadId,
+      rootFolderId,
+      subFolderId,
+    });
+
+    if (!hasPermission) {
+      logger.error("User does not have permission to create thread", {
+        userId,
+        leadId,
+        rootFolderId,
+        subFolderId,
+      });
+      return await Promise.reject(new Error("PERMISSION_DENIED"));
+    }
+  }
+
+  await db.insert(chatThreads).values({
+    id: threadId,
+    userId: userId ?? null,
+    leadId: leadId ?? null,
+    title,
+    rootFolderId,
+    folderId: subFolderId ?? null,
+  });
+
+  logger.debug("Created new thread", {
+    threadId,
+    title,
+    userId,
+    leadId,
+  });
+
+  return { threadId, isNew: true };
 }
 
 /**
@@ -718,11 +709,20 @@ export class ThreadsRepository {
         });
       }
 
-      // DO NOT set permission fields - leave as empty arrays to inherit from parent folder
-      // Permission inheritance: empty array [] = inherit from parent folder
-      // Only set explicit permissions when user overrides via context menu
+      if (!data.thread?.id) {
+        return fail({
+          message: "app.api.agent.chat.threads.post.errors.validation.title",
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          messageParams: {
+            message: "Thread ID must be provided by client",
+          },
+        });
+      }
+
+      const threadId = data.thread.id;
 
       const threadData = {
+        id: threadId,
         userId: userIdentifier,
         title:
           data.thread?.title ||
@@ -739,8 +739,6 @@ export class ThreadsRepository {
         archived: false,
         tags: [],
         preview: null,
-        // rolesView, rolesEdit, rolesPost, rolesModerate, rolesAdmin are NOT set
-        // They default to null which means inherit from parent folder
       } satisfies typeof chatThreads.$inferInsert;
 
       const [dbThread] = await db

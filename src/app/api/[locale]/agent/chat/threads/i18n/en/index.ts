@@ -180,6 +180,10 @@ export const translations = {
         description: "Basic thread information",
       },
     },
+    id: {
+      label: "Thread ID",
+      description: "Client-generated thread ID",
+    },
     threadTitle: {
       label: "Title",
       description: "Thread title",

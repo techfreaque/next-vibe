@@ -29,6 +29,7 @@ import type { groupMessagesBySequence } from "../message-grouping";
 import { ModelCharacterSelectorModal } from "../model-character-selector-modal";
 import { ToolDisplay } from "../tool-display";
 import { countPostsByUserId, countReplies, getDirectReplies } from "./helpers";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 export interface FlatMessageProps {
   message: ChatMessage;
@@ -53,6 +54,7 @@ export interface FlatMessageProps {
   /** Collapse state management callbacks */
   collapseState?: ReturnType<typeof useCollapseState>;
   currentUserId?: string;
+  user: JwtPayloadType;
 }
 
 export function FlatMessage({
@@ -70,6 +72,7 @@ export function FlatMessage({
   onSetHoveredUserId,
   collapseState,
   currentUserId,
+  user,
 }: FlatMessageProps): JSX.Element {
   // Get callbacks and state from context
   const {
@@ -311,6 +314,7 @@ export function FlatMessage({
             onCharacterChange={onCharacterChange}
             locale={locale}
             logger={logger}
+            user={user}
           />
         </Div>
       ) : messageActions.retryingMessageId === message.id ? (
@@ -345,6 +349,7 @@ export function FlatMessage({
             confirmLabelKey="app.chat.flatView.retryModal.confirmLabel"
             locale={locale}
             logger={logger}
+            user={user}
           />
         </Div>
       ) : message.role === "error" ? (
@@ -376,6 +381,7 @@ export function FlatMessage({
             <ToolDisplay
               toolCall={message.metadata.toolCall}
               locale={locale}
+              user={user}
               threadId={message.threadId}
               messageId={message.id}
               collapseState={collapseState}
@@ -407,6 +413,7 @@ export function FlatMessage({
                   key={msg.id}
                   toolCall={msg.metadata.toolCall}
                   locale={locale}
+                  user={user}
                   threadId={msg.threadId}
                   messageId={msg.id}
                   collapseState={collapseState}
@@ -493,6 +500,7 @@ export function FlatMessage({
             confirmLabelKey="app.chat.flatView.answerModal.confirmLabel"
             locale={locale}
             logger={logger}
+            user={user}
           />
         </Div>
       )}

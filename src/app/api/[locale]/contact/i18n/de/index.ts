@@ -269,12 +269,14 @@ export const translations: typeof enTranslations = {
   },
 
   email: {
+    // Legacy keys for existing email template compatibility
     partner: {
       greeting: "Hallo",
       thankYou: "Vielen Dank für Ihre Kontaktaufnahme!",
       message: "Nachricht",
-      additionalInfo: "Zusätzliche Informationen",
-      subject: "Neue Kontaktformular-Einreichung",
+      additionalInfo:
+        "Wir haben Ihre Anfrage erhalten und werden bald antworten.",
+      subject: "Kontaktformular-Einreichung",
     },
     company: {
       contactDetails: "Kontaktdaten",
@@ -282,7 +284,56 @@ export const translations: typeof enTranslations = {
       email: "E-Mail",
       company: "Unternehmen",
       contactSubject: "Betreff",
-      viewDetails: "Details anzeigen",
+      viewDetails: "Im Admin anzeigen",
+    },
+    // User confirmation email
+    user_confirmation: {
+      title: "Wir haben Ihre Nachricht erhalten!",
+      subject: "Vielen Dank für Ihre Kontaktaufnahme mit {{appName}}",
+      previewText:
+        "Wir haben Ihre Nachricht erhalten und werden uns bald bei Ihnen melden.",
+      greeting: "Hallo {{name}},",
+      thankYou: "Vielen Dank, dass Sie sich an {{appName}} gewandt haben!",
+      confirmation:
+        "Wir haben Ihre Nachricht erhalten und unser Team wird sie in Kürze prüfen. Wir antworten in der Regel innerhalb von 24 Stunden an Werktagen.",
+      yourMessage: "Ihre Nachricht",
+      subject_label: "Betreff",
+      message_label: "Nachricht",
+      whatHappensNext: "Wie geht es weiter?",
+      step1: "Unser Team prüft Ihre Anfrage",
+      step2: "Wir antworten innerhalb von 24 Stunden",
+      step3: "Wir arbeiten gemeinsam an Ihrem Anliegen",
+      needUrgentHelp: "Dringende Hilfe benötigt?",
+      urgentHelpInfo:
+        "Wenn Ihre Anfrage dringend ist, können Sie uns auch per Live-Chat auf unserer Website erreichen oder in unserem Hilfecenter nach sofortigen Antworten suchen.",
+      helpCenterButton: "Hilfecenter besuchen",
+      signoff:
+        "Vielen Dank, dass Sie sich für {{appName}} entschieden haben,\nDas {{appName}} Support-Team",
+      footer: "Dies ist eine automatische Bestätigung von {{appName}}",
+    },
+    // Admin notification email
+    admin_notification: {
+      title: "Neue Kontaktformular-Einreichung",
+      subject: "Neuer Kontakt: {{name}} - {{subject}}",
+      previewText: "Neue Kontaktanfrage von {{name}} ({{email}})",
+      message: "Eine neue Kontaktformular-Einreichung wurde eingereicht.",
+      contactDetails: "Kontaktdaten",
+      name: "Name",
+      email: "E-Mail",
+      company: "Unternehmen",
+      subject_label: "Betreff",
+      priority: "Priorität",
+      message_label: "Nachricht",
+      submittedAt: "Eingereicht am",
+      leadInfo: "Lead-Informationen",
+      leadId: "Lead-ID",
+      status: "Status",
+      actionRequired: "Aktion erforderlich",
+      actionInfo:
+        "Bitte prüfen und beantworten Sie diese Anfrage innerhalb von 24 Stunden.",
+      viewInAdmin: "Im Admin-Panel anzeigen",
+      replyToContact: "Auf Kontakt antworten",
+      footer: "Dies ist eine automatische Benachrichtigung von {{appName}}",
     },
   },
 

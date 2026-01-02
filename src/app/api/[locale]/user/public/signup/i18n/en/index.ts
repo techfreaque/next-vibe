@@ -105,12 +105,6 @@ export const translations = {
       placeholder: "Select contact method",
       help: "Choose how you'd like us to reach you",
     },
-    signupType: {
-      label: "Signup Source",
-      description: "Where you signed up from",
-      placeholder: "Select signup source",
-      help: "How did you find us?",
-    },
     acceptTerms: {
       label: "Accept Terms",
       description: "Accept our terms and conditions",
@@ -361,12 +355,6 @@ export const translations = {
     title: "Signup Successful",
     description: "Your account has been created successfully",
   },
-  enums: {
-    signupType: {
-      meeting: "Meeting Signup",
-      pricing: "Pricing Signup",
-    },
-  },
   admin_notification: {
     title: "New User Signup",
     subject: "New User Signup - {{privateName}}",
@@ -394,14 +382,24 @@ export const translations = {
     footer: "This is an automated notification from {{appName}}",
   },
   email: {
-    title: "Welcome to {{appName}}!",
-    subject: "Welcome to {{appName}}!",
-    previewText: "Welcome to {{appName}}! Start your AI chat experience.",
-    welcomeMessage: "Welcome to {{appName}}!",
+    title: "Welcome to {{appName}}, {{privateName}}!",
+    subject: "Welcome to {{appName}} - Your Uncensored AI Awaits",
+    previewText: "Access 38 AI models without filters or restrictions. Start chatting now with 20 free credits!",
+    welcomeMessage: "You're In! Welcome to Uncensored AI",
     description:
-      "You're now ready to start chatting with AI and joining our community forum.",
-    ctaTitle: "Get Started",
-    ctaButton: "Go to Subscription",
-    signoff: "Best regards,\nThe {{appName}} Team",
+      "Your account is ready. You have 20 free credits to start chatting with any of our 38 AI models—including Claude Sonnet 4.5, GPT-5.2 Pro, Gemini 3 Pro, Kimi K2, DeepSeek R1, and exclusive uncensored models like UncensoredLM v1.2, FreedomGPT Liberty, and Grok 4. No filters. No restrictions. Just honest AI conversations.",
+    ctaTitle: "Start Chatting Now",
+    ctaButton: "Launch AI Chat",
+    whatYouGet: "What You Get (100% Free)",
+    feature1: "20 credits per month—forever",
+    feature2: "Access to all 38 AI models",
+    feature3: "Uncensored models that won't refuse to answer",
+    feature4: "Private, Incognito, Shared, and Public chat modes",
+    feature5: "Community forum with other AI enthusiasts",
+    needMore: "Ready for Unlimited Conversations?",
+    needMoreDesc: "Get 40× more credits—800/month for just €8! That's unlimited access to all 38 models with no daily limits. Perfect for serious AI users. Plus, subscribe and unlock the ability to buy credit packs that never expire—ideal for power users who need extra credits on demand.",
+    viewPlans: "Upgrade to Unlimited Now",
+    signoff: "Welcome to the future of AI conversations,\nThe {{appName}} Team",
+    ps: "P.S. Your privacy matters. Choose Incognito mode to keep conversations on your device only—never sent to our servers.",
   },
 };

@@ -16,7 +16,6 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import type { ReactElement } from "react";
-import React from "react";
 import { z } from "zod";
 
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
@@ -26,7 +25,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { EmailTemplate } from "../emails/smtp-client/components/template.email";
-import { createTrackingContext } from "../emails/smtp-client/components/tracking_context.email";
+import {
+  createTrackingContext,
+  type TrackingContext,
+} from "../emails/smtp-client/components/tracking_context.email";
 import type { ContactRequestOutput, ContactResponseOutput } from "./definition";
 import { contactClientRepository } from "./repository-client";
 
@@ -51,27 +53,15 @@ function ContactFormEmail({
   props,
   t,
   locale,
+  recipientEmail,
   tracking,
 }: {
   props: ContactFormProps;
   t: TFunction;
   locale: CountryLanguage;
-  tracking?: {
-    userId?: string;
-    leadId?: string;
-    sessionId?: string;
-  };
+  recipientEmail: string;
+  tracking: TrackingContext;
 }): ReactElement {
-  const trackingContext = tracking
-    ? createTrackingContext(
-        locale,
-        tracking.leadId,
-        tracking.userId,
-        undefined,
-        undefined,
-      )
-    : createTrackingContext(locale, props.leadId, props.userId);
-
   return (
     <EmailTemplate
       t={t}
@@ -80,7 +70,8 @@ function ContactFormEmail({
         name: props.name,
       })}
       previewText={props.subject}
-      tracking={trackingContext}
+      recipientEmail={recipientEmail}
+      tracking={tracking}
     >
       <Span
         style={{
@@ -242,9 +233,91 @@ const contactFormTemplate: EmailTemplateDefinition<ContactFormProps> = {
     path: "/contact/email.tsx",
     defaultSubject: (t) =>
       t("app.api.contact.email.partner.subject", { subject: "" }),
+    previewFields: {
+      name: {
+        type: "text",
+        label:
+          "app.admin.emails.templates.templates.contact.form.preview.name.label",
+        description:
+          "app.admin.emails.templates.templates.contact.form.preview.name.description",
+        defaultValue: "Max Mustermann",
+        required: true,
+      },
+      email: {
+        type: "email",
+        label:
+          "app.admin.emails.templates.templates.contact.form.preview.email.label",
+        description:
+          "app.admin.emails.templates.templates.contact.form.preview.email.description",
+        defaultValue: "max@example.com",
+        required: true,
+      },
+      company: {
+        type: "text",
+        label:
+          "app.admin.emails.templates.templates.contact.form.preview.company.label",
+        description:
+          "app.admin.emails.templates.templates.contact.form.preview.company.description",
+        defaultValue: "Musterfirma GmbH",
+      },
+      subject: {
+        type: "text",
+        label:
+          "app.admin.emails.templates.templates.contact.form.preview.subject.label",
+        description:
+          "app.admin.emails.templates.templates.contact.form.preview.subject.description",
+        defaultValue: "Anfrage zu Ihren Dienstleistungen",
+        required: true,
+      },
+      message: {
+        type: "textarea",
+        label:
+          "app.admin.emails.templates.templates.contact.form.preview.message.label",
+        description:
+          "app.admin.emails.templates.templates.contact.form.preview.message.description",
+        defaultValue:
+          "Ich hätte gerne weitere Informationen zu Ihren Premium-Services.",
+        required: true,
+        rows: 5,
+      },
+      isForCompany: {
+        type: "boolean",
+        label:
+          "app.admin.emails.templates.templates.contact.form.preview.isForCompany.label",
+        description:
+          "app.admin.emails.templates.templates.contact.form.preview.isForCompany.description",
+        defaultValue: true,
+      },
+      userId: {
+        type: "text",
+        label:
+          "app.admin.emails.templates.templates.contact.form.preview.userId.label",
+        description:
+          "app.admin.emails.templates.templates.contact.form.preview.userId.description",
+        defaultValue: "example-user-id-123",
+      },
+      leadId: {
+        type: "text",
+        label:
+          "app.admin.emails.templates.templates.contact.form.preview.leadId.label",
+        description:
+          "app.admin.emails.templates.templates.contact.form.preview.leadId.description",
+        defaultValue: "example-lead-id-456",
+      },
+    },
   },
   schema: contactFormPropsSchema,
   component: ContactFormEmail,
+  exampleProps: {
+    name: "Max Mustermann",
+    email: "max@example.com",
+    company: "Musterfirma GmbH",
+    subject: "Anfrage zu Ihren Dienstleistungen",
+    message: "Ich hätte gerne weitere Informationen zu Ihren Premium-Services.",
+    isForCompany: true,
+    userId: "example-user-id-123",
+    leadId: "example-lead-id-456",
+  },
 };
 
 export default contactFormTemplate;
@@ -284,6 +357,8 @@ export const renderCompanyMail: EmailFunctionType<
         props: templateProps,
         t,
         locale,
+        recipientEmail: contactClientRepository.getSupportEmail(locale),
+        tracking: createTrackingContext(locale),
       }),
     });
   } catch {
@@ -327,10 +402,8 @@ export const renderPartnerMail: EmailFunctionType<
         props: templateProps,
         t,
         locale,
-        tracking: {
-          userId: user?.id,
-          leadId: user?.leadId,
-        },
+        recipientEmail: requestData.email,
+        tracking: createTrackingContext(locale, user?.leadId, user?.id),
       }),
     });
   } catch {

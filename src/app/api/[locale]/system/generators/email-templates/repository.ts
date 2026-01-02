@@ -40,6 +40,7 @@ interface EmailTemplateResponseType {
   templatesFound: number;
   duration: number;
   outputFile?: string;
+  clientOutputFile?: string;
 }
 
 import type { TemplateCachedMetadata } from "@/app/api/[locale]/emails/registry/types";
@@ -111,17 +112,24 @@ class EmailTemplateGeneratorRepositoryImpl
 
       logger.debug(`Loaded ${templates.length} valid templates`);
 
-      // Generate content
-      const content = this.generateContent(templates);
+      // Generate server-side content (full templates with adapters)
+      const serverContent = this.generateServerContent(templates);
 
-      // Write file
-      await writeGeneratedFile(outputFile, content, data.dryRun);
+      // Generate client-safe content (components only, no server-only imports)
+      const clientContent = this.generateClientContent(templates);
+
+      // Calculate client output file path
+      const clientOutputFile = outputFile.replace(/\.ts$/, ".client.ts");
+
+      // Write both files
+      await writeGeneratedFile(outputFile, serverContent, data.dryRun);
+      await writeGeneratedFile(clientOutputFile, clientContent, data.dryRun);
 
       const duration = Date.now() - startTime;
 
       logger.info(
         formatGenerator(
-          `Generated email template registry with ${formatCount(templates.length, "template")} in ${formatDuration(duration)}`,
+          `Generated email template registry (server + client) with ${formatCount(templates.length, "template")} in ${formatDuration(duration)}`,
           "📧",
         ),
       );
@@ -132,6 +140,7 @@ class EmailTemplateGeneratorRepositoryImpl
         templatesFound: templates.length,
         duration,
         outputFile: data.dryRun ? undefined : outputFile,
+        clientOutputFile: data.dryRun ? undefined : clientOutputFile,
       });
     } catch (error) {
       const duration = Date.now() - startTime;
@@ -190,6 +199,7 @@ class EmailTemplateGeneratorRepositoryImpl
             description: templateDef.meta.description,
             category: templateDef.meta.category,
             path: file.replace(process.cwd(), ""),
+            exampleProps: templateDef.exampleProps || {},
           },
         });
       } catch (error) {
@@ -203,9 +213,9 @@ class EmailTemplateGeneratorRepositoryImpl
   }
 
   /**
-   * Generate registry content with lazy imports and metadata cache
+   * Generate server-side registry content with lazy imports and metadata cache
    */
-  private generateContent(templates: TemplateInfo[]): string {
+  private generateServerContent(templates: TemplateInfo[]): string {
     // Sort templates by ID for consistent output
     const sortedTemplates = templates.toSorted((a, b) =>
       a.id.localeCompare(b.id),
@@ -248,6 +258,7 @@ class EmailTemplateGeneratorRepositoryImpl
     description: "${t.metadata.description}",
     category: "${t.metadata.category}",
     path: "${t.metadata.path}",
+    exampleProps: ${JSON.stringify(t.metadata.exampleProps)},
   }`,
       )
       .join(",\n");
@@ -337,6 +348,81 @@ export function getTemplatesByCategory(
  */
 export function hasTemplate(id: string): boolean {
   return id in templateLoaders;
+}
+`;
+  }
+
+  /**
+   * Generate client-safe registry content without server-only imports
+   * Only includes template components and metadata for preview purposes
+   */
+  private generateClientContent(templates: TemplateInfo[]): string {
+    // Sort templates by ID for consistent output
+    const sortedTemplates = templates.toSorted((a, b) =>
+      a.id.localeCompare(b.id),
+    );
+
+    // Generate metadata map (same as server version)
+    const metadataEntries = sortedTemplates
+      .map(
+        (t) =>
+          // eslint-disable-next-line i18next/no-literal-string
+          `  "${t.id}": {
+    id: "${t.metadata.id}",
+    version: "${t.metadata.version}",
+    name: "${t.metadata.name}",
+    description: "${t.metadata.description}",
+    category: "${t.metadata.category}",
+    path: "${t.metadata.path}",
+    exampleProps: ${JSON.stringify(t.metadata.exampleProps)},
+  }`,
+      )
+      .join(",\n");
+
+    // eslint-disable-next-line i18next/no-literal-string
+    const autoGenTitle = "AUTO-GENERATED FILE - DO NOT EDIT - CLIENT-SAFE";
+    const generatorName = "generators/email-templates";
+    const header = generateFileHeader(autoGenTitle, generatorName, {
+      "Templates found": templates.length,
+      "Client-safe": "No server-only imports",
+    });
+
+    // eslint-disable-next-line i18next/no-literal-string
+    return `${header}
+
+"use client";
+
+import type { TemplateCachedMetadata } from "./types";
+
+/**
+ * Template metadata cache for fast lookups
+ * Contains only metadata (id, version, name, description, category)
+ */
+export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
+${metadataEntries}
+};
+
+/**
+ * Get template metadata without loading the component
+ */
+export function getTemplateMetadata(id: string): TemplateCachedMetadata | undefined {
+  return templateMetadataMap[id];
+}
+
+/**
+ * Get all template metadata (fast, no component loading)
+ */
+export function getAllTemplateMetadata(): TemplateCachedMetadata[] {
+  return Object.values(templateMetadataMap);
+}
+
+/**
+ * Get templates by category (metadata only)
+ */
+export function getTemplatesByCategory(
+  category: string,
+): TemplateCachedMetadata[] {
+  return getAllTemplateMetadata().filter((t) => t.category === category);
 }
 `;
   }

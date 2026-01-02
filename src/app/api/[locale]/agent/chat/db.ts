@@ -134,6 +134,9 @@ export interface MessageMetadata {
   isReasoning?: boolean;
   isStreaming?: boolean;
 
+  // Voice input metadata (for USER messages with audio input)
+  isTranscribing?: boolean;
+
   // Tool call metadata (for TOOL messages)
   toolCall?: ToolCall;
 

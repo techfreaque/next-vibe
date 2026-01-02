@@ -226,38 +226,43 @@ export const translations: typeof enTranslations = {
   // Email translations
   email: {
     success: {
-      title: "Abonnement erfolgreich!",
-      subject: "Willkommen zu Ihrem Abonnement!",
-      previewText: "Willkommen zu Ihrem neuen Abonnement",
-      welcomeMessage: "Willkommen zu Ihrem Abonnement!",
-      description: "Vielen Dank für Ihr Abonnement bei {{appName}}",
+      title: "Willkommen bei {{planName}}, {{firstName}}!",
+      subject: "Dein {{appName}} Abo ist aktiv - Unbegrenzte KI wartet",
+      previewText:
+        "Dein {{planName}} Abo ist jetzt aktiv! Genieße unbegrenzten Zugriff auf 38 KI-Modelle.",
+      welcomeMessage: "Dein {{planName}} Abo ist jetzt aktiv!",
+      description:
+        "Danke fürs Upgrade auf {{appName}}! Du hast jetzt vollen Zugriff auf alle 38 KI-Modelle ohne tägliche Limits. Starte jetzt Gespräche mit Claude Sonnet 4.5, GPT-5.2 Pro, Gemini 3 Pro und allen unseren unzensierten Modellen ohne Einschränkungen.",
       nextSteps: {
-        title: "Nächste Schritte",
-        description: "Das können Sie als Nächstes tun",
-        cta: "Jetzt starten",
+        title: "Alles bereit!",
+        description:
+          "Dein Abo ist aktiv und einsatzbereit. Spring direkt rein und entdecke unbegrenzte KI-Gespräche.",
+        cta: "Jetzt mit dem Chatten beginnen",
       },
       support: {
-        title: "Benötigen Sie Hilfe?",
-        description: "Unser Support-Team hilft Ihnen gerne weiter",
-        cta: "Support kontaktieren",
+        title: "Brauchst du Hilfe?",
+        description:
+          "Unser Support-Team steht dir bei allen Fragen zu deinem Abo zur Verfügung.",
+        cta: "Hilfe erhalten",
       },
       footer: {
-        message: "Vielen Dank, dass Sie sich für uns entschieden haben!",
-        signoff: "Mit freundlichen Grüßen, Das Team",
+        message: "Danke, dass du unzensierte KI unterstützt!",
+        signoff:
+          "Willkommen bei unbegrenzten Gesprächen,\nDas {{appName}} Team",
       },
     },
     admin_notification: {
       title: "Neues Abonnement",
-      subject: "Neues Abonnement - Admin-Benachrichtigung",
-      preview: "Ein neues Abonnement wurde erstellt",
-      message: "Ein neues Abonnement wurde erstellt",
+      subject: "Neues Abonnement - {{planName}}",
+      preview: "Neues Abo: {{firstName}} hat {{planName}} abonniert",
+      message: "Ein neuer Nutzer hat {{appName}} abonniert.",
       details: "Abonnement-Details",
       user_name: "Benutzername",
       user_email: "Benutzer-E-Mail",
       plan: "Plan",
       status: "Status",
       contact_user: "Benutzer kontaktieren",
-      footer: "Dies ist eine automatische Benachrichtigung",
+      footer: "Dies ist eine automatische Benachrichtigung von {{appName}}",
     },
   },
 

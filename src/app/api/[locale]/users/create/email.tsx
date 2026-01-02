@@ -10,7 +10,6 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
-import React from "react";
 import { z } from "zod";
 
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
@@ -20,11 +19,15 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { EmailTemplate } from "../../emails/smtp-client/components/template.email";
-import { createTrackingContext } from "../../emails/smtp-client/components/tracking_context.email";
+import {
+  createTrackingContext,
+  type TrackingContext,
+} from "../../emails/smtp-client/components/tracking_context.email";
 import type {
   UserCreateRequestOutput,
   UserCreateResponseOutput,
 } from "./definition";
+import { contactClientRepository } from "../../contact/repository-client";
 
 // ============================================================================
 // TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
@@ -44,27 +47,15 @@ function UserWelcomeEmail({
   props,
   t,
   locale,
+  recipientEmail,
   tracking,
 }: {
   props: UserWelcomeProps;
   t: TFunction;
   locale: CountryLanguage;
-  tracking?: {
-    userId?: string;
-    leadId?: string;
-    sessionId?: string;
-  };
+  recipientEmail: string;
+  tracking: TrackingContext;
 }): JSX.Element {
-  const trackingContext = tracking
-    ? createTrackingContext(
-        locale,
-        tracking.leadId,
-        tracking.userId,
-        undefined,
-        undefined,
-      )
-    : createTrackingContext(locale, props.leadId, props.userId);
-
   return (
     <EmailTemplate
       t={t}
@@ -73,7 +64,8 @@ function UserWelcomeEmail({
         name: props.privateName,
       })}
       previewText={t("app.api.users.create.email.users.welcome.preview")}
-      tracking={trackingContext}
+      recipientEmail={recipientEmail}
+      tracking={tracking}
     >
       <Text
         style={{
@@ -209,9 +201,57 @@ const userWelcomeTemplate: EmailTemplateDefinition<UserWelcomeProps> = {
     path: "/users/create/email.tsx",
     defaultSubject: (t) =>
       t("app.api.users.create.email.users.welcome.subject", { appName: "" }),
+    previewFields: {
+      userId: {
+        type: "text",
+        label: "app.api.emails.templates.users.welcome.preview.userId",
+        description:
+          "app.api.emails.templates.users.welcome.preview.userId.description",
+        defaultValue: "example-user-id-123",
+        required: true,
+      },
+      email: {
+        type: "email",
+        label: "app.api.emails.templates.users.welcome.preview.email",
+        description:
+          "app.api.emails.templates.users.welcome.preview.email.description",
+        defaultValue: "max@example.com",
+        required: true,
+      },
+      privateName: {
+        type: "text",
+        label: "app.api.emails.templates.users.welcome.preview.privateName",
+        description:
+          "app.api.emails.templates.users.welcome.preview.privateName.description",
+        defaultValue: "Max",
+        required: true,
+      },
+      publicName: {
+        type: "text",
+        label: "app.api.emails.templates.users.welcome.preview.publicName",
+        description:
+          "app.api.emails.templates.users.welcome.preview.publicName.description",
+        defaultValue: "Max Mustermann",
+        required: true,
+      },
+      leadId: {
+        type: "text",
+        label: "app.api.emails.templates.users.welcome.preview.leadId",
+        description:
+          "app.api.emails.templates.users.welcome.preview.leadId.description",
+        defaultValue: "example-lead-id-456",
+      },
+    },
   },
   schema: userWelcomePropsSchema,
   component: UserWelcomeEmail,
+  exampleProps: {
+    userId: "example-user-id-123",
+    email: "max@example.com",
+    privateName: "Max",
+    publicName: "Max Mustermann",
+    leadId: "example-lead-id-456",
+  },
 };
 
 export default userWelcomeTemplate;
@@ -228,10 +268,12 @@ function AdminNotificationEmailContent({
   userData,
   t,
   locale,
+  recipientEmail,
 }: {
   userData: UserCreateResponseOutput;
   t: TFunction;
   locale: CountryLanguage;
+  recipientEmail: string;
 }): JSX.Element {
   const tracking = createTrackingContext(
     locale,
@@ -247,6 +289,7 @@ function AdminNotificationEmailContent({
       previewText={t("app.api.users.create.email.users.admin.preview", {
         name: userData.responsePrivateName,
       })}
+      recipientEmail={recipientEmail}
       tracking={tracking}
     >
       <Text
@@ -431,10 +474,12 @@ export const renderWelcomeEmail: EmailFunctionType<
         props: templateProps,
         t,
         locale,
-        tracking: {
-          userId: responseData.responseId,
-          leadId: responseData.responseLeadId ?? undefined,
-        },
+        recipientEmail: responseData.responseEmail,
+        tracking: createTrackingContext(
+          locale,
+          responseData.responseLeadId ?? undefined,
+          responseData.responseId,
+        ),
       }),
     });
   } catch {
@@ -473,6 +518,7 @@ export const renderAdminNotificationEmail: EmailFunctionType<
         userData: responseData,
         t,
         locale,
+        recipientEmail: contactClientRepository.getSupportEmail(locale),
       }),
     });
   } catch {

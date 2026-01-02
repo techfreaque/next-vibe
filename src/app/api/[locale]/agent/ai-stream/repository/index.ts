@@ -47,7 +47,6 @@ import {
   createToolMessage,
   updateMessageContent,
 } from "../../chat/threads/[threadId]/messages/repository";
-import { generateThreadTitle } from "../../chat/threads/repository";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
@@ -196,6 +195,7 @@ class AiStreamRepository implements IAiStreamRepository {
       toolConfirmationResult,
       voiceMode,
       voiceTranscription,
+      userMessageMetadata,
     } = setupResult.data;
 
     let systemPrompt = initialSystemPrompt;
@@ -259,7 +259,7 @@ class AiStreamRepository implements IAiStreamRepository {
         async start(controller): Promise<void> {
           // Create streaming TTS handler if voice mode enabled
           let ttsHandler: StreamingTTSHandler | null = null;
-          if (voiceMode?.streamTTS) {
+          if (voiceMode?.enabled) {
             ttsHandler = createStreamingTTSHandler({
               controller,
               encoder,
@@ -273,7 +273,7 @@ class AiStreamRepository implements IAiStreamRepository {
               "[AI Stream] Voice mode enabled - streaming TTS active",
               {
                 voice: voiceMode.voice,
-                callMode: voiceMode.callMode,
+                enabled: voiceMode.enabled,
               },
             );
           }
@@ -294,6 +294,7 @@ class AiStreamRepository implements IAiStreamRepository {
               effectiveContent,
               toolConfirmationResult,
               voiceTranscription,
+              userMessageMetadata,
               controller,
               encoder,
               logger,
@@ -301,14 +302,14 @@ class AiStreamRepository implements IAiStreamRepository {
 
             // Calculate initial parent and depth for AI message
             // This will be updated if reasoning occurs
+            // IMPORTANT: Always prefer userMessageId when available (works for both incognito and server-persisted threads)
+            // For send/retry/edit: userMessageId is the user message that should be the parent
+            // For answer-as-ai: no user message, so fall back to effectiveParentMessageId
             const initialAiParentId =
-              data.operation === "answer-as-ai" || data.operation === "retry"
-                ? (effectiveParentMessageId ?? null)
-                : userMessageId;
-            const initialAiDepth =
-              data.operation === "answer-as-ai" || data.operation === "retry"
-                ? messageDepth
-                : messageDepth + 1;
+              userMessageId ?? effectiveParentMessageId ?? null;
+            const initialAiDepth = userMessageId
+              ? messageDepth + 1
+              : messageDepth;
 
             // Don't emit AI message-created event yet
             // We'll emit it when we start getting content, so we can set the correct parent
@@ -348,7 +349,7 @@ class AiStreamRepository implements IAiStreamRepository {
             // Track the current parent for chaining messages
             // This gets updated as we create reasoning messages and tool calls
             // IMPORTANT: For tool confirmation, the next ASSISTANT message should be child of the TOOL message
-            let currentParentId =
+            let currentParentId: string | null =
               toolConfirmationResult?.messageId ?? initialAiParentId;
             let currentDepth = toolConfirmationResult
               ? messageDepth + 1
@@ -764,7 +765,7 @@ class AiStreamRepository implements IAiStreamRepository {
                 encoder.encode(formatSSEEvent(errorMessageEvent)),
               );
 
-              // Also emit legacy error event for compatibility
+              // Emit error event to update UI state
               const errorEvent = createStreamEvent.error({
                 code: "TIMEOUT_ERROR",
                 message: `Stream timed out after ${maxDuration} seconds. The response may have been too long.`,
@@ -977,18 +978,22 @@ class AiStreamRepository implements IAiStreamRepository {
       confidence: number | null;
       durationSeconds: number | null;
     } | null;
+    /** User message metadata (including attachments) */
+    userMessageMetadata?: {
+      attachments?: Array<{
+        id: string;
+        url: string;
+        filename: string;
+        mimeType: string;
+        size: number;
+        data?: string;
+      }>;
+    };
   }): void {
     const {
       isNewThread,
       threadId,
-      rootFolderId,
-      subFolderId,
-      content,
-      operation,
       userMessageId,
-      effectiveRole,
-      effectiveParentMessageId,
-      messageDepth,
       effectiveContent,
       controller,
       encoder,
@@ -997,36 +1002,23 @@ class AiStreamRepository implements IAiStreamRepository {
       voiceTranscription,
     } = params;
 
-    // Emit thread-created event if new thread
-    if (isNewThread) {
-      logger.debug("Emitting THREAD_CREATED event", {
-        threadId,
-        rootFolderId,
-      });
-      const threadEvent = createStreamEvent.threadCreated({
-        threadId,
-        title: generateThreadTitle(content),
-        rootFolderId,
-        subFolderId: subFolderId || null,
-      });
-      controller.enqueue(encoder.encode(formatSSEEvent(threadEvent)));
-      logger.debug("THREAD_CREATED event emitted", {
-        threadId,
-      });
-    } else {
-      logger.debug("Thread already exists, not emitting THREAD_CREATED", {
-        threadId,
-        isNew: isNewThread,
-      });
-    }
+    // Thread is already created client-side before API call
+    // No need to emit THREAD_CREATED event (obsolete in Phase 2 architecture)
+    logger.debug("Thread handling", {
+      threadId,
+      isNew: isNewThread,
+      note: "Thread already created client-side",
+    });
 
     // Emit VOICE_TRANSCRIBED event if audio was transcribed
     if (voiceTranscription?.wasTranscribed) {
       logger.debug("Emitting VOICE_TRANSCRIBED event", {
+        messageId: userMessageId,
         textLength: effectiveContent.length,
         confidence: voiceTranscription.confidence,
       });
       const voiceTranscribedEvent = createStreamEvent.voiceTranscribed({
+        messageId: userMessageId,
         text: effectiveContent,
         confidence: voiceTranscription.confidence,
         durationSeconds: voiceTranscription.durationSeconds,
@@ -1035,36 +1027,8 @@ class AiStreamRepository implements IAiStreamRepository {
       logger.debug("VOICE_TRANSCRIBED event emitted");
     }
 
-    // For answer-as-ai, retry, or tool confirmation - skip user message event
-    // For regular operations, emit both user and AI message events
-    if (
-      operation !== "answer-as-ai" &&
-      operation !== "retry" &&
-      !toolConfirmationResult
-    ) {
-      // Emit user message-created event
-      logger.debug("Emitting USER MESSAGE_CREATED event", {
-        messageId: userMessageId,
-        threadId,
-        parentId: effectiveParentMessageId || null,
-      });
-      const userMessageEvent = createStreamEvent.messageCreated({
-        messageId: userMessageId,
-        threadId,
-        role: effectiveRole,
-        parentId: effectiveParentMessageId || null,
-        depth: messageDepth,
-        content: effectiveContent,
-      });
-      const userMessageEventString = formatSSEEvent(userMessageEvent);
-      logger.debug("USER MESSAGE_CREATED event formatted", {
-        messageId: userMessageId,
-      });
-      controller.enqueue(encoder.encode(userMessageEventString));
-      logger.debug("USER MESSAGE_CREATED event emitted", {
-        messageId: userMessageId,
-      });
-    } else if (toolConfirmationResult) {
+    // Handle tool confirmation result emission
+    if (toolConfirmationResult) {
       logger.info(
         "✅ Skipping USER MESSAGE_CREATED event for tool confirmation - emitting TOOL_RESULT instead",
         {
@@ -1086,14 +1050,6 @@ class AiStreamRepository implements IAiStreamRepository {
         messageId: toolConfirmationResult.messageId,
         hasResult: !!toolConfirmationResult.toolCall.result,
         hasError: !!toolConfirmationResult.toolCall.error,
-      });
-    } else {
-      logger.debug("Skipping USER MESSAGE_CREATED event", {
-        messageId: userMessageId,
-        reason:
-          operation === "answer-as-ai"
-            ? "answer-as-ai operation"
-            : "retry operation",
       });
     }
   }
@@ -2513,7 +2469,7 @@ class AiStreamRepository implements IAiStreamRepository {
     });
     controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
 
-    // Also emit legacy error event for compatibility
+    // Emit error event to update UI state
     const errorEvent = createStreamEvent.error({
       code: "STREAM_ERROR",
       message: errorMessage,

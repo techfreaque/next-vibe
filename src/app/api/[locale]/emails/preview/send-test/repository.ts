@@ -5,7 +5,6 @@
 
 import "server-only";
 
-import type React from "react";
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -21,6 +20,7 @@ import type { Countries, Languages } from "@/i18n/core/config";
 import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 import { simpleT } from "@/i18n/core/shared";
 
+import { createTrackingContext } from "../../smtp-client/components/tracking_context.email";
 import { getTemplate } from "../../registry/generated";
 
 // Type definitions
@@ -88,11 +88,19 @@ class EmailPreviewSendTestRepositoryImpl
       // Get translation function
       const { t } = simpleT(locale);
 
-      // Validate and render
-      let jsx: React.JSX.Element;
-      let validatedProps;
+      // Validate and render the email component
+      // TypeScript can't verify the props match because EmailTemplateDefinition uses generics
+      // But we know they match because we validate with template.schema
+      let jsx;
       try {
-        validatedProps = template.schema.parse(data.props);
+        const validatedProps = template.schema.parse(data.props);
+        jsx = template.component({
+          props: validatedProps as never,
+          t,
+          locale,
+          recipientEmail: data.recipientEmail,
+          tracking: createTrackingContext(locale),
+        });
       } catch (error) {
         const errorParsed = parseError(error);
         logger.warn("Invalid props for template", {
@@ -107,8 +115,6 @@ class EmailPreviewSendTestRepositoryImpl
           },
         });
       }
-
-      jsx = template.component({ props: validatedProps, t, locale });
 
       // Get subject
       const subjectRaw = template.meta.defaultSubject;

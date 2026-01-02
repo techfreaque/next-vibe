@@ -6,7 +6,6 @@
 import "server-only";
 
 import { render } from "@react-email/render";
-import type React from "react";
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -20,6 +19,7 @@ import type { Countries, Languages } from "@/i18n/core/config";
 import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 import { simpleT } from "@/i18n/core/shared";
 
+import { createTrackingContext } from "../../smtp-client/components/tracking_context.email";
 import { getTemplate } from "../../registry/generated";
 
 // Type definitions
@@ -84,11 +84,29 @@ class EmailPreviewRenderRepositoryImpl implements EmailPreviewRenderRepository {
       // Get translation function
       const { t } = simpleT(locale);
 
-      // Validate and render
-      let jsx: React.JSX.Element;
-      let validatedProps;
+      // Validate and render the email component
+      // TypeScript can't verify the props match because EmailTemplateDefinition uses generics
+      // But we know they match because we validate with template.schema
+      let jsx;
       try {
-        validatedProps = template.schema.parse(data.props);
+        const validatedProps = template.schema.parse(data.props);
+        // Extract email from props if available
+        const recipientEmail =
+          typeof data.props.email === "string"
+            ? data.props.email
+            : typeof data.props.recipientEmail === "string"
+              ? data.props.recipientEmail
+              : typeof data.props.toEmail === "string"
+                ? data.props.toEmail
+                : "preview@example.com";
+
+        jsx = template.component({
+          props: validatedProps as never,
+          t,
+          locale,
+          recipientEmail,
+          tracking: createTrackingContext(locale),
+        });
       } catch (error) {
         const errorParsed = parseError(error);
         logger.warn("Invalid props for template", {
@@ -103,8 +121,6 @@ class EmailPreviewRenderRepositoryImpl implements EmailPreviewRenderRepository {
           },
         });
       }
-
-      jsx = template.component({ props: validatedProps, t, locale });
 
       // Render to HTML
       const html = await render(jsx);

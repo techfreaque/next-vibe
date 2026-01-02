@@ -123,6 +123,33 @@ export async function saveMessage(message: ChatMessage): Promise<void> {
 }
 
 /**
+ * Save message with attachments to storage
+ * Converts File objects to base64 and stores in message metadata
+ */
+export async function saveMessageWithAttachments(
+  message: ChatMessage,
+  attachments: File[],
+): Promise<void> {
+  if (attachments.length === 0) {
+    return saveMessage(message);
+  }
+
+  const { convertFilesToIncognitoAttachments } = await import("./file-utils");
+  const incognitoAttachments =
+    await convertFilesToIncognitoAttachments(attachments);
+
+  const messageWithAttachments: ChatMessage = {
+    ...message,
+    metadata: {
+      ...message.metadata,
+      attachments: incognitoAttachments,
+    },
+  };
+
+  return saveMessage(messageWithAttachments);
+}
+
+/**
  * Save folder to storage
  */
 export async function saveFolder(folder: ChatFolder): Promise<void> {
@@ -293,9 +320,10 @@ export async function createIncognitoThread(
   title: string,
   rootFolderId: DefaultFolderId,
   subFolderId: string | null,
+  threadId: string,
 ): Promise<ChatThread> {
   const thread: ChatThread = {
-    id: generateIncognitoId(),
+    id: threadId,
     userId: "incognito",
     leadId: null,
     title,
@@ -341,9 +369,10 @@ export async function createIncognitoMessage(
   model: ChatMessage["model"] = null,
   character: string | null = null,
   metadata: ChatMessage["metadata"] = {},
+  userMessageId: string,
 ): Promise<ChatMessage> {
   const message: ChatMessage = {
-    id: generateIncognitoId(),
+    id: userMessageId,
     threadId,
     role,
     content,

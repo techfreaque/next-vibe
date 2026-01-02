@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
       helpText: "Brauchen Sie Hilfe? Kontaktieren Sie uns unter",
       unsubscribeText: "Möchten Sie diese E-Mails nicht mehr erhalten?",
       unsubscribeLink: "Abmelden",
-      copyright: "© {{currentYear}} {{companyName}}. Alle Rechte vorbehalten.",
+      copyright: "© {{currentYear}} {{appName}}. Alle Rechte vorbehalten.",
     },
   },
   post: {

@@ -13,6 +13,7 @@ import { getCharacterName } from "@/app/api/[locale]/agent/chat/characters/confi
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -26,6 +27,7 @@ interface ThreadedMessageContentProps {
   messageGroup?: ReturnType<typeof groupMessagesBySequence>[0];
   depth: number;
   locale: CountryLanguage;
+  user: JwtPayloadType;
   collapseState?: ReturnType<typeof useCollapseState>;
   currentUserId?: string;
   onUserIdHover?: (
@@ -39,6 +41,7 @@ export function ThreadedMessageContent({
   messageGroup,
   depth,
   locale,
+  user,
   collapseState,
   currentUserId,
   onUserIdHover,
@@ -146,6 +149,7 @@ export function ThreadedMessageContent({
                   key={msg.id}
                   toolCall={msg.metadata.toolCall}
                   locale={locale}
+                  user={user}
                   threadId={msg.threadId}
                   messageId={msg.id}
                   collapseState={collapseState}

@@ -8,21 +8,10 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 
 import { LeadsRepository } from "../repository";
 import definitions from "./definition";
-import { renderAdminNotificationMail, renderWelcomeMail } from "./email";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    email: [
-      {
-        render: renderWelcomeMail,
-        ignoreErrors: true, // Don't fail lead creation if welcome email fails
-      },
-      {
-        render: renderAdminNotificationMail,
-        ignoreErrors: true, // Don't fail lead creation if admin notification fails
-      },
-    ],
     handler: ({ data, logger }) => LeadsRepository.createLead(data, logger),
   },
 });

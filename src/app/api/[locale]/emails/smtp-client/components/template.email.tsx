@@ -2,7 +2,6 @@ import {
   Body,
   Container,
   Html,
-  Img,
   Preview,
   Section,
 } from "@react-email/components";
@@ -13,6 +12,7 @@ import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import { EmailImage } from "./email-image.email";
 import { TrackedLink } from "./tracked_link.email";
 import { TrackedPixel } from "./tracked_pixel.email";
 import type { TrackingContext } from "./tracking_context.email";
@@ -24,6 +24,7 @@ interface EmailTemplateProps {
   t: TFunction;
   locale: CountryLanguage;
   tracking: TrackingContext;
+  recipientEmail: string;
 }
 
 export function EmailTemplate({
@@ -33,6 +34,7 @@ export function EmailTemplate({
   t,
   locale,
   tracking,
+  recipientEmail,
 }: EmailTemplateProps): JSX.Element {
   const currentYear = new Date().getFullYear();
 
@@ -41,7 +43,7 @@ export function EmailTemplate({
       <Preview>{previewText}</Preview>
       <Body
         style={{
-          backgroundColor: "#f6f9fc",
+          backgroundColor: "#f8fafc",
           fontFamily:
             '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
           margin: "0",
@@ -78,11 +80,12 @@ export function EmailTemplate({
                 marginBottom: "12px",
               }}
             >
-              <Img
-                src={`${envClient.NEXT_PUBLIC_APP_URL}/unbottled-icon.png`}
+              <EmailImage
+                src="/images/unbottled-icon.png"
                 alt={t("config.appName")}
                 width="28"
                 height="28"
+                recipientEmail={recipientEmail}
                 style={{
                   display: "block",
                 }}

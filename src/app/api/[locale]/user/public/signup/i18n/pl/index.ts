@@ -102,12 +102,6 @@ export const translations: typeof enTranslations = {
       placeholder: "Wybierz metodę kontaktu",
       help: "Wybierz, jak chcesz, żebyśmy się z Tobą skontaktowali",
     },
-    signupType: {
-      label: "Źródło Rejestracji",
-      description: "Skąd się zarejestrowałeś",
-      placeholder: "Wybierz źródło rejestracji",
-      help: "Jak nas znalazłeś?",
-    },
     acceptTerms: {
       label: "Akceptuj Regulamin",
       description: "Zaakceptuj nasz regulamin i warunki",
@@ -362,12 +356,6 @@ export const translations: typeof enTranslations = {
     title: "Rejestracja zakończona pomyślnie",
     description: "Twoje konto zostało pomyślnie utworzone",
   },
-  enums: {
-    signupType: {
-      meeting: "Rejestracja na Spotkanie",
-      pricing: "Rejestracja Cenowa",
-    },
-  },
   admin_notification: {
     title: "Nowa rejestracja użytkownika",
     subject: "Nowa rejestracja użytkownika - {{privateName}}",
@@ -396,15 +384,24 @@ export const translations: typeof enTranslations = {
     footer: "To jest automatyczne powiadomienie z {{appName}}",
   },
   email: {
-    title: "Witamy w {{appName}}!",
-    subject: "Witamy w {{appName}}!",
-    previewText:
-      "Witamy w {{appName}}! Rozpocznij swoje doświadczenie z czatem AI.",
-    welcomeMessage: "Witamy w {{appName}}!",
+    title: "Witamy w {{appName}}, {{privateName}}!",
+    subject: "Witamy w {{appName}} - Twoja niecenzurowana AI czeka",
+    previewText: "Dostęp do 38 modeli AI bez filtrów i ograniczeń. Zacznij już teraz z 20 darmowymi creditami!",
+    welcomeMessage: "Jesteś w środku! Witamy w niecenzurowanych rozmowach z AI",
     description:
-      "Jesteś teraz gotowy, aby rozpocząć czat z AI i dołączyć do naszego forum społeczności.",
-    ctaTitle: "Rozpocznij",
-    ctaButton: "Przejdź do subskrypcji",
-    signoff: "Z poważaniem,\nZespół {{appName}}",
+      "Twoje konto jest gotowe. Masz 20 darmowych creditów, aby zacząć rozmawiać z dowolnym z naszych 38 modeli AI – w tym Claude Sonnet 4.5, GPT-5.2 Pro, Gemini 3 Pro, Kimi K2, DeepSeek R1 oraz ekskluzywne niecenzurowane modele jak UncensoredLM v1.2, FreedomGPT Liberty i Grok 4. Bez filtrów. Bez ograniczeń. Tylko szczere rozmowy z AI.",
+    ctaTitle: "Zacznij rozmawiać już teraz",
+    ctaButton: "Uruchom Chat AI",
+    whatYouGet: "Co otrzymujesz (100% za darmo)",
+    feature1: "20 creditów miesięcznie – na zawsze",
+    feature2: "Dostęp do wszystkich 38 modeli AI",
+    feature3: "Niecenzurowane modele, które nie odmawiają odpowiedzi",
+    feature4: "Tryby czatu: Prywatny, Incognito, Współdzielony i Publiczny",
+    feature5: "Forum społeczności z innymi entuzjastami AI",
+    needMore: "Gotowy na nieograniczone rozmowy?",
+    needMoreDesc: "Zdobądź 40× więcej creditów – 800/miesiąc za jedyne 8 €! To nieograniczony dostęp do wszystkich 38 modeli bez dziennych limitów. Idealne dla poważnych użytkowników AI. Plus: zasubskrybuj i odblokuj możliwość zakupu pakietów creditów, które nigdy nie wygasają – idealne dla power userów potrzebujących dodatkowych creditów na żądanie.",
+    viewPlans: "Przejdź na Unlimited teraz",
+    signoff: "Witamy w przyszłości rozmów z AI,\nZespół {{appName}}",
+    ps: "P.S. Twoja prywatność jest dla nas ważna. Wybierz tryb Incognito, aby przechowywać rozmowy tylko na Twoim urządzeniu – nigdy nie są wysyłane na nasze serwery.",
   },
 };

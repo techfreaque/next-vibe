@@ -57,12 +57,12 @@ const { PATCH } = createEndpoint({
       id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
+          fieldType: FieldDataType.NUMBER,
           label: "app.api.agent.chat.memories.id.patch.id.label" as const,
           description:
             "app.api.agent.chat.memories.id.patch.id.description" as const,
         },
-        z.string().uuid(),
+        z.coerce.number().int().min(0),
       ),
 
       // === REQUEST DATA ===
@@ -75,7 +75,7 @@ const { PATCH } = createEndpoint({
             "app.api.agent.chat.memories.id.patch.content.description" as const,
           columns: 12,
         },
-        z.string().min(1).max(1000).optional(),
+        z.string().max(1000).optional(),
       ),
       tags: requestDataField(
         {
@@ -189,7 +189,7 @@ const { PATCH } = createEndpoint({
       },
     },
     urlPathParams: {
-      update: { id: "550e8400-e29b-41d4-a716-446655440000" },
+      update: { id: 0 },
     },
   },
 });
@@ -224,12 +224,12 @@ const { DELETE } = createEndpoint({
       id: requestUrlPathParamsField(
         {
           type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.UUID,
+          fieldType: FieldDataType.NUMBER,
           label: "app.api.agent.chat.memories.id.delete.id.label" as const,
           description:
             "app.api.agent.chat.memories.id.delete.id.description" as const,
         },
-        z.string().uuid(),
+        z.coerce.number().int().min(0),
       ),
 
       // === RESPONSE ===
@@ -315,7 +315,7 @@ const { DELETE } = createEndpoint({
       },
     },
     urlPathParams: {
-      delete: { id: "550e8400-e29b-41d4-a716-446655440000" },
+      delete: { id: 0 },
     },
   },
 });

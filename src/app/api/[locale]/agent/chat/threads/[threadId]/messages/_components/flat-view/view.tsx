@@ -13,6 +13,7 @@ import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import type { ChatMessage, ChatThread } from "@/app/api/[locale]/agent/chat/db";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -31,6 +32,7 @@ interface FlatMessageViewProps {
   onMessageClick?: (messageId: string) => void;
   onInsertQuote?: () => void; // Only inserts '>' character
   currentUserId?: string;
+  user: JwtPayloadType;
 }
 
 export const FlatMessageView = React.memo(function FlatMessageView({
@@ -39,6 +41,7 @@ export const FlatMessageView = React.memo(function FlatMessageView({
   logger,
   onInsertQuote: _onInsertQuote,
   currentUserId,
+  user,
 }: FlatMessageViewProps): JSX.Element {
   // Get rootFolderId from context
   const { currentRootFolderId: rootFolderId } = useChatContext();
@@ -144,6 +147,7 @@ export const FlatMessageView = React.memo(function FlatMessageView({
               onInsertQuote={_onInsertQuote}
               collapseState={collapseState}
               currentUserId={currentUserId}
+              user={user}
             />
           </ErrorBoundary>
         );

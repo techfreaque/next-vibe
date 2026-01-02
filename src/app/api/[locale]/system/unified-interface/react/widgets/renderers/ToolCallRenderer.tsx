@@ -40,6 +40,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { getTranslatorFromEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -48,6 +49,7 @@ import { EndpointRenderer } from "./EndpointRenderer";
 interface ToolCallRendererProps {
   toolCall: ToolCall;
   locale: CountryLanguage;
+  user: JwtPayloadType; // JWT payload for permission checks when loading definitions
   defaultOpen?: boolean;
   threadId: string;
   messageId: string;
@@ -84,9 +86,31 @@ export function ToolCallRenderer({
   messageId,
   toolIndex = 0,
   collapseState,
+  user,
 }: ToolCallRendererProps): JSX.Element {
   const { t } = simpleT(locale);
   const { sendMessage } = useChatContext();
+
+  // Determine if tool is waiting for user confirmation
+  const isWaitingForConfirmation = Boolean(toolCall.waitingForConfirmation);
+
+  const getIsOpen = (): boolean => {
+    // Always open when waiting for confirmation
+    if (isWaitingForConfirmation) {
+      return true;
+    }
+    if (collapseState && messageId !== undefined) {
+      const key = {
+        messageId,
+        sectionType: "tool" as const,
+        sectionIndex: toolIndex,
+      };
+      const autoCollapsed = !defaultOpen;
+      return !collapseState.isCollapsed(key, autoCollapsed);
+    }
+    return defaultOpen;
+  };
+  const [isOpen, setIsOpen] = useState(getIsOpen);
 
   const [definition, setDefinition] = useState<CreateApiEndpointAny | null>(
     null,
@@ -97,6 +121,78 @@ export function ToolCallRenderer({
     defaultValues:
       toolCall.args && typeof toolCall.args === "object" ? toolCall.args : {},
   });
+
+  // Validate tool args against definition schema and show field-level errors
+  // Only run validation when the tool is expanded (not collapsed)
+  const [hasValidated, setHasValidated] = useState(false);
+
+  useEffect(() => {
+    // Only validate when the tool is open
+    if (!isOpen) {
+      return;
+    }
+
+    if (!toolCall.error || !definition || !toolCall.args) {
+      // Clear errors when no error or no definition loaded yet
+      if (hasValidated) {
+        confirmationForm.clearErrors();
+      }
+      return;
+    }
+
+    // Get the request data schema from the definition
+    const requestDataSchema = definition.fields.requestData?.schema;
+    const requestUrlParamsSchema =
+      definition.fields.requestUrlPathParams?.schema;
+
+    if (!requestDataSchema && !requestUrlParamsSchema) {
+      return;
+    }
+
+    try {
+      // Validate the args against the definition schema
+      // This will throw a ZodError if validation fails
+      if (requestDataSchema) {
+        requestDataSchema.parse(toolCall.args);
+      }
+      if (requestUrlParamsSchema && typeof toolCall.args === "object") {
+        requestUrlParamsSchema.parse(toolCall.args);
+      }
+
+      // If validation passes, clear any errors
+      confirmationForm.clearErrors();
+      setHasValidated(true);
+    } catch (error) {
+      // ZodError contains validation errors
+      if (error && typeof error === "object" && "issues" in error) {
+        const zodError = error as {
+          issues: Array<{ path: string[]; message: string; code: string }>;
+        };
+
+        // Clear existing errors first
+        confirmationForm.clearErrors();
+
+        // Set errors for each field
+        zodError.issues.forEach((issue) => {
+          if (issue.path && issue.path.length > 0) {
+            const fieldName = issue.path.join(".");
+            confirmationForm.setError(fieldName, {
+              type: issue.code || "validation",
+              message: issue.message,
+            });
+          }
+        });
+        setHasValidated(true);
+      }
+    }
+  }, [
+    isOpen,
+    toolCall.error,
+    toolCall.args,
+    definition,
+    confirmationForm,
+    hasValidated,
+  ]);
 
   useEffect(() => {
     const loadDef = async (): Promise<void> => {
@@ -111,11 +207,6 @@ export function ToolCallRenderer({
       logger.debug("[ToolCallRenderer] Loading definition", {
         toolName: toolCall.toolName,
       });
-
-      const { createPublicUser } = await import(
-        "@/app/api/[locale]/user/auth/helpers"
-      );
-      const user = createPublicUser(crypto.randomUUID());
 
       let result = await definitionLoader.load({
         identifier: toolCall.toolName,
@@ -174,31 +265,12 @@ export function ToolCallRenderer({
       }
     };
     void loadDef();
-  }, [toolCall.toolName, locale]);
+  }, [toolCall.toolName, locale, user]);
 
   const hasResult = Boolean(toolCall.result);
   const hasError = Boolean(toolCall.error);
-  const isWaitingForConfirmation = Boolean(toolCall.waitingForConfirmation);
   const isLoading = !hasResult && !hasError && !isWaitingForConfirmation;
 
-  const getIsOpen = (): boolean => {
-    // Always open when waiting for confirmation
-    if (isWaitingForConfirmation) {
-      return true;
-    }
-    if (collapseState && messageId !== undefined) {
-      const key = {
-        messageId,
-        sectionType: "tool" as const,
-        sectionIndex: toolIndex,
-      };
-      const autoCollapsed = !defaultOpen;
-      return !collapseState.isCollapsed(key, autoCollapsed);
-    }
-    return defaultOpen;
-  };
-
-  const [isOpen, setIsOpen] = useState(getIsOpen);
   const [wasWaitingForConfirmation, setWasWaitingForConfirmation] = useState(
     isWaitingForConfirmation,
   );
@@ -484,7 +556,11 @@ export function ToolCallRenderer({
                       locale={locale}
                       data={mergedData}
                       disabled={!isEditable || isDeclined}
-                      form={needsConfirmation ? confirmationForm : undefined}
+                      form={
+                        needsConfirmation || isDeclined
+                          ? confirmationForm
+                          : undefined
+                      }
                       onSubmit={needsConfirmation ? handleConfirm : undefined}
                       onCancel={needsConfirmation ? handleCancel : undefined}
                       submitButtonText={

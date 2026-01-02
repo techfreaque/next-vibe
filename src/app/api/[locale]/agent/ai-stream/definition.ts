@@ -25,12 +25,9 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { dateSchema } from "../../shared/types/common.schema";
 import { DefaultFolderId } from "../chat/config";
 import { selectChatMessageSchema } from "../chat/db";
-import {
-  ChatMessageRole,
-  ChatMessageRoleOptions,
-  NEW_MESSAGE_ID,
-} from "../chat/enum";
+import { ChatMessageRole, ChatMessageRoleOptions } from "../chat/enum";
 import { ModelId, ModelIdOptions } from "../chat/model-access/models";
+import { DEFAULT_TTS_VOICE, TtsVoice } from "../text-to-speech/enum";
 
 /**
  * AI Stream Endpoint (POST)
@@ -147,17 +144,18 @@ const { POST } = createEndpoint({
           description: "app.api.agent.chat.aiStream.post.threadId.description",
           columns: 3,
         },
-        z
-          .string()
-          .uuid()
-          .nullable()
-          .transform((val) => {
-            // Transform "new" to null - client should send null but this provides safety
-            if (val === NEW_MESSAGE_ID) {
-              return null;
-            }
-            return val;
-          }),
+        z.uuid(),
+      ),
+      userMessageId: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label: "app.api.agent.chat.aiStream.post.userMessageId.label",
+          description:
+            "app.api.agent.chat.aiStream.post.userMessageId.description",
+          columns: 3,
+        },
+        z.uuid(),
       ),
       parentMessageId: requestDataField(
         {
@@ -359,6 +357,19 @@ const { POST } = createEndpoint({
           .nullable(),
       ),
 
+      // === FILE ATTACHMENTS ===
+      attachments: requestDataArrayOptionalField(
+        {
+          type: WidgetType.DATA_LIST,
+          fieldType: FieldDataType.JSON,
+          label: "app.api.agent.chat.aiStream.post.attachments.label" as const,
+          description:
+            "app.api.agent.chat.aiStream.post.attachments.description" as const,
+          optional: true,
+        },
+        z.instanceof(File),
+      ),
+
       // === RESUMABLE STREAM SUPPORT ===
       resumeToken: requestDataField(
         {
@@ -372,7 +383,7 @@ const { POST } = createEndpoint({
         z.string().nullable().optional(),
       ),
 
-      // === VOICE MODE ===
+      // === VOICE MODE (TTS streaming) ===
       voiceMode: objectOptionalField(
         {
           type: WidgetType.CONTAINER,
@@ -383,27 +394,14 @@ const { POST } = createEndpoint({
         },
         { request: "data" },
         {
-          streamTTS: requestDataField(
+          enabled: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label:
-                "app.api.agent.chat.aiStream.post.voiceMode.streamTTS.label",
+              label: "app.api.agent.chat.aiStream.post.voiceMode.enabled.label",
               description:
-                "app.api.agent.chat.aiStream.post.voiceMode.streamTTS.description",
-              columns: 4,
-            },
-            z.boolean().default(false),
-          ),
-          callMode: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label:
-                "app.api.agent.chat.aiStream.post.voiceMode.callMode.label",
-              description:
-                "app.api.agent.chat.aiStream.post.voiceMode.callMode.description",
-              columns: 4,
+                "app.api.agent.chat.aiStream.post.voiceMode.enabled.description",
+              columns: 6,
             },
             z.boolean().default(false),
           ),
@@ -416,19 +414,19 @@ const { POST } = createEndpoint({
                 "app.api.agent.chat.aiStream.post.voiceMode.voice.description",
               options: [
                 {
-                  value: "MALE",
+                  value: TtsVoice.MALE,
                   label:
                     "app.api.agent.chat.aiStream.post.voiceMode.voice.male",
                 },
                 {
-                  value: "FEMALE",
+                  value: TtsVoice.FEMALE,
                   label:
                     "app.api.agent.chat.aiStream.post.voiceMode.voice.female",
                 },
               ],
-              columns: 4,
+              columns: 6,
             },
-            z.enum(["MALE", "FEMALE"]).default("MALE"),
+            z.enum(TtsVoice).default(DEFAULT_TTS_VOICE),
           ),
         },
       ),
@@ -570,7 +568,8 @@ const { POST } = createEndpoint({
         operation: "send",
         rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
-        threadId: null,
+        threadId: "550e8400-e29b-41d4-a716-446655440000",
+        userMessageId: "990e8400-e29b-41d4-a716-446655440000",
         parentMessageId: null,
         content: "Hello, can you help me write a professional email?",
         role: ChatMessageRole.USER,
@@ -581,6 +580,7 @@ const { POST } = createEndpoint({
         tools: null,
         toolConfirmation: null,
         messageHistory: [],
+        attachments: [],
         resumeToken: null,
         voiceMode: null,
         audioInput: { file: null },
@@ -589,7 +589,8 @@ const { POST } = createEndpoint({
         operation: "send",
         rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
-        threadId: null,
+        threadId: "550e8400-e29b-41d4-a716-446655440000",
+        userMessageId: "aa0e8400-e29b-41d4-a716-446655440000",
         parentMessageId: null,
         content: "Write a marketing email for our new product launch",
         role: ChatMessageRole.USER,
@@ -600,6 +601,7 @@ const { POST } = createEndpoint({
         tools: null,
         toolConfirmation: null,
         messageHistory: [],
+        attachments: [],
         resumeToken: null,
         voiceMode: null,
         audioInput: { file: null },
@@ -609,6 +611,7 @@ const { POST } = createEndpoint({
         rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
         threadId: "550e8400-e29b-41d4-a716-446655440000",
+        userMessageId: "msg-1234567890-abc",
         parentMessageId: "660e8400-e29b-41d4-a716-446655440001",
         content: "Can you try that again with more detail?",
         role: ChatMessageRole.USER,
@@ -619,6 +622,7 @@ const { POST } = createEndpoint({
         tools: null,
         toolConfirmation: null,
         messageHistory: [],
+        attachments: [],
         resumeToken: null,
         voiceMode: null,
         audioInput: { file: null },

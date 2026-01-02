@@ -67,6 +67,7 @@ interface JsxCapitalizationMessages {
   svgElement: string;
   imageElement: string;
   commonUiElement: string;
+  form: string;
   genericElement: string;
 }
 
@@ -140,6 +141,7 @@ const DEFAULT_MESSAGES: JsxCapitalizationMessages = {
     'Use platform-independent <Image> component instead of <{elementName}>. import { Image } from "next-vibe-ui/ui/image";',
   commonUiElement:
     'Use platform-independent <{capitalizedName}> component instead of <{elementName}>. import { {capitalizedName} } from "next-vibe-ui/ui/{elementName}";',
+  form: 'Use platform-independent <Form> component instead of <form>. import { Form } from "next-vibe-ui/ui/form/form";',
   genericElement:
     "Lowercase element <{elementName}> detected. Create platform-independent components: 1) Create next-vibe-ui/web/ui/{elementName}.tsx for web, 2) Create next-vibe-ui/native/ui/{elementName}.tsx for React Native, or 3) Use an existing component if available.",
 };
@@ -445,6 +447,11 @@ function getErrorMessage(
   // Special case: anchor tags should use Link component
   if (elementName === "a") {
     return messages.anchorTag;
+  }
+
+  // Special case: form elements should use Form component
+  if (elementName === "form") {
+    return messages.form;
   }
 
   // Typography elements from typography.tsx

@@ -35,7 +35,7 @@ const { POST } = createEndpoint({
     UserRole.MCP_OFF,
     UserRole.PRODUCTION_OFF,
   ],
-  aliases: ["generate-all", "ga"],
+  aliases: ["generate-all", "gen", "generate"],
 
   fields: objectField(
     {

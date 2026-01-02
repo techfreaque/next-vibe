@@ -27,6 +27,7 @@ import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/hooks/store
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { DivRefObject } from "@/packages/next-vibe-ui/web/ui/div";
@@ -43,6 +44,7 @@ interface ChatMessagesProps {
   locale: CountryLanguage;
   logger: EndpointLogger;
   currentUserId?: string;
+  user: JwtPayloadType;
   /** Whether to show the branding logo (sticky inside scroll container) */
   showBranding?: boolean;
 }
@@ -52,6 +54,7 @@ export function ChatMessages({
   locale,
   logger,
   currentUserId,
+  user,
   showBranding = false,
 }: ChatMessagesProps): JSX.Element {
   const chat = useChatContext();
@@ -423,6 +426,7 @@ export function ChatMessages({
                     chat.inputRef.current?.focus();
                   }}
                   currentUserId={currentUserId}
+                  user={user}
                 />
               ) : null;
             })()
@@ -481,6 +485,7 @@ export function ChatMessages({
                   locale={locale}
                   logger={logger}
                   currentUserId={currentUserId}
+                  user={user}
                 />
               );
             })()

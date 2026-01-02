@@ -102,12 +102,6 @@ export const translations: typeof enTranslations = {
       placeholder: "Kontaktmethode auswählen",
       help: "Wählen Sie, wie wir Sie erreichen sollen",
     },
-    signupType: {
-      label: "Anmeldungsquelle",
-      description: "Woher Sie sich angemeldet haben",
-      placeholder: "Anmeldungsquelle auswählen",
-      help: "Wie haben Sie uns gefunden?",
-    },
     acceptTerms: {
       label: "Nutzungsbedingungen akzeptieren",
       description: "Akzeptieren Sie unsere Nutzungsbedingungen",
@@ -364,12 +358,6 @@ export const translations: typeof enTranslations = {
     title: "Anmeldung erfolgreich",
     description: "Ihr Konto wurde erfolgreich erstellt",
   },
-  enums: {
-    signupType: {
-      meeting: "Meeting-Anmeldung",
-      pricing: "Pricing-Anmeldung",
-    },
-  },
   admin_notification: {
     title: "Neue Benutzeranmeldung",
     subject: "Neue Benutzeranmeldung - {{privateName}}",
@@ -397,15 +385,24 @@ export const translations: typeof enTranslations = {
     footer: "Dies ist eine automatische Benachrichtigung von {{appName}}",
   },
   email: {
-    title: "Willkommen bei {{appName}}!",
-    subject: "Willkommen bei {{appName}}!",
-    previewText:
-      "Willkommen bei {{appName}}! Starten Sie Ihr KI-Chat-Erlebnis.",
-    welcomeMessage: "Willkommen bei {{appName}}!",
+    title: "Willkommen bei {{appName}}, {{privateName}}!",
+    subject: "Willkommen bei {{appName}} - Deine unzensierte KI wartet",
+    previewText: "Zugriff auf 38 KI-Modelle ohne Filter oder Einschränkungen. Starte jetzt mit 20 kostenlosen Credits!",
+    welcomeMessage: "Du bist dabei! Willkommen bei unzensierten KI-Gesprächen",
     description:
-      "Sie sind jetzt bereit, mit KI zu chatten und unserem Community-Forum beizutreten.",
-    ctaTitle: "Loslegen",
-    ctaButton: "Zu Abonnement",
-    signoff: "Mit freundlichen Grüßen,\nDas {{appName}} Team",
+      "Dein Account ist bereit. Du hast 20 kostenlose Credits, um mit jedem unserer 38 KI-Modelle zu chatten – darunter Claude Sonnet 4.5, GPT-5.2 Pro, Gemini 3 Pro, Kimi K2, DeepSeek R1 und exklusive unzensierte Modelle wie UncensoredLM v1.2, FreedomGPT Liberty und Grok 4. Keine Filter. Keine Einschränkungen. Nur ehrliche KI-Gespräche.",
+    ctaTitle: "Jetzt mit dem Chatten beginnen",
+    ctaButton: "KI-Chat starten",
+    whatYouGet: "Was du bekommst (100% kostenlos)",
+    feature1: "20 Credits pro Monat – für immer",
+    feature2: "Zugriff auf alle 38 KI-Modelle",
+    feature3: "Unzensierte Modelle, die keine Antwort verweigern",
+    feature4: "Private, Inkognito-, Geteilte und Öffentliche Chat-Modi",
+    feature5: "Community-Forum mit anderen KI-Enthusiasten",
+    needMore: "Bereit für unbegrenzte Gespräche?",
+    needMoreDesc: "Hol dir 40× mehr Credits – 800/Monat für nur 8 €! Das ist unbegrenzter Zugang zu allen 38 Modellen ohne tägliche Limits. Perfekt für ernsthafte KI-Nutzer. Plus: Abonniere und schalte die Möglichkeit frei, Credit-Pakete zu kaufen, die niemals ablaufen – ideal für Power-User, die zusätzliche Credits auf Abruf brauchen.",
+    viewPlans: "Jetzt auf Unlimited upgraden",
+    signoff: "Willkommen in der Zukunft der KI-Gespräche,\nDas {{appName}} Team",
+    ps: "P.S. Deine Privatsphäre ist uns wichtig. Wähle den Inkognito-Modus, um Gespräche nur auf deinem Gerät zu speichern – sie werden niemals an unsere Server gesendet.",
   },
 };

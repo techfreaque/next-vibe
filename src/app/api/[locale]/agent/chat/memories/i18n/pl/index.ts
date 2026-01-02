@@ -14,15 +14,21 @@ export const translations: typeof enTranslations = {
       title: "Lista wspomnień",
       description: "Wyświetl wszystkie zapisane wspomnienia",
     },
+    columns: {
+      memoryNumber: "#",
+      content: "Treść",
+      priority: "Priorytet",
+      tags: "Tagi",
+      createdAt: "Utworzono",
+    },
     response: {
       memories: {
         memory: {
           title: "Wspomnienie",
-          id: { content: "ID wspomnienia" },
+          memoryNumber: { text: "#" },
           content: { content: "Treść" },
           tags: { content: "Tagi" },
-          sequenceNumber: { content: "Numer sekwencji" },
-          priority: { content: "Priorytet" },
+          priority: { text: "Priorytet" },
           createdAt: { content: "Utworzono" },
         },
       },

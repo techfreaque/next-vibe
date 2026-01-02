@@ -69,7 +69,7 @@ interface SelectorProps {
   onCharacterChange: (characterId: string) => void;
   onModelChange: (modelId: ModelId) => void;
   locale: CountryLanguage;
-  user?: JwtPayloadType;
+  user: JwtPayloadType;
   logger: EndpointLogger;
   className?: string;
   buttonClassName?: string;

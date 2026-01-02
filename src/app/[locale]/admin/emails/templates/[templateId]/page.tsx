@@ -15,6 +15,7 @@ import type React from "react";
 
 import {
   getAllTemplateIds,
+  getTemplate,
   getTemplateMetadata,
 } from "@/app/api/[locale]/emails/registry/generated";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -48,6 +49,17 @@ export default async function EmailTemplatePreviewPage({
   if (!templateMetadata) {
     notFound();
   }
+
+  // Load full template to get previewFields (server-side only)
+  const template = await getTemplate(templateId);
+
+  if (!template) {
+    notFound();
+  }
+
+  // Extract serializable data for client component
+  const previewFields = template.meta.previewFields;
+  const exampleProps = template.exampleProps;
 
   // Translate metadata fields (they contain translation keys)
   const translatedName = t(templateMetadata.name);
@@ -143,6 +155,8 @@ export default async function EmailTemplatePreviewPage({
         locale={locale}
         templateId={templateId}
         templateName={translatedName}
+        previewFields={previewFields}
+        exampleProps={exampleProps as Record<string, string | number | boolean>}
       />
     </Div>
   );

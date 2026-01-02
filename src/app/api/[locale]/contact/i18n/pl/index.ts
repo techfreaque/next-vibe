@@ -264,12 +264,13 @@ export const translations: typeof enTranslations = {
   },
 
   email: {
+    // Legacy keys for existing email template compatibility
     partner: {
       greeting: "Witaj",
       thankYou: "Dziękujemy za kontakt!",
       message: "Wiadomość",
-      additionalInfo: "Dodatkowe informacje",
-      subject: "Nowe zgłoszenie formularza kontaktowego",
+      additionalInfo: "Otrzymaliśmy Twoje zapytanie i wkrótce odpowiemy.",
+      subject: "Zgłoszenie formularza kontaktowego",
     },
     company: {
       contactDetails: "Dane kontaktowe",
@@ -277,7 +278,55 @@ export const translations: typeof enTranslations = {
       email: "E-mail",
       company: "Firma",
       contactSubject: "Temat",
-      viewDetails: "Zobacz szczegóły",
+      viewDetails: "Zobacz w panelu admina",
+    },
+    // User confirmation email
+    user_confirmation: {
+      title: "Otrzymaliśmy Twoją wiadomość!",
+      subject: "Dziękujemy za kontakt z {{appName}}",
+      previewText:
+        "Otrzymaliśmy Twoją wiadomość i wkrótce się z Tobą skontaktujemy.",
+      greeting: "Cześć {{name}},",
+      thankYou: "Dziękujemy za skontaktowanie się z {{appName}}!",
+      confirmation:
+        "Otrzymaliśmy Twoją wiadomość i nasz zespół wkrótce ją przejrzy. Zazwyczaj odpowiadamy w ciągu 24 godzin w dni robocze.",
+      yourMessage: "Twoja wiadomość",
+      subject_label: "Temat",
+      message_label: "Wiadomość",
+      whatHappensNext: "Co dalej?",
+      step1: "Nasz zespół przegląda Twoje zapytanie",
+      step2: "Odpowiemy w ciągu 24 godzin",
+      step3: "Wspólnie zajmiemy się Twoimi potrzebami",
+      needUrgentHelp: "Potrzebujesz pilnej pomocy?",
+      urgentHelpInfo:
+        "Jeśli Twoje zapytanie jest pilne, możesz również skontaktować się z nami przez czat na żywo na naszej stronie lub sprawdzić nasze centrum pomocy, aby uzyskać natychmiastowe odpowiedzi.",
+      helpCenterButton: "Odwiedź centrum pomocy",
+      signoff: "Dziękujemy za wybór {{appName}},\nZespół wsparcia {{appName}}",
+      footer: "To jest automatyczne potwierdzenie z {{appName}}",
+    },
+    // Admin notification email
+    admin_notification: {
+      title: "Nowe zgłoszenie formularza kontaktowego",
+      subject: "Nowy kontakt: {{name}} - {{subject}}",
+      previewText: "Nowe zapytanie kontaktowe od {{name}} ({{email}})",
+      message: "Otrzymano nowe zgłoszenie formularza kontaktowego.",
+      contactDetails: "Dane kontaktowe",
+      name: "Imię i nazwisko",
+      email: "E-mail",
+      company: "Firma",
+      subject_label: "Temat",
+      priority: "Priorytet",
+      message_label: "Wiadomość",
+      submittedAt: "Przesłano dnia",
+      leadInfo: "Informacje o leadzie",
+      leadId: "ID leada",
+      status: "Status",
+      actionRequired: "Wymagana akcja",
+      actionInfo:
+        "Proszę przejrzeć i odpowiedzieć na to zapytanie w ciągu 24 godzin.",
+      viewInAdmin: "Zobacz w panelu administracyjnym",
+      replyToContact: "Odpowiedz na kontakt",
+      footer: "To jest automatyczne powiadomienie z {{appName}}",
     },
   },
 

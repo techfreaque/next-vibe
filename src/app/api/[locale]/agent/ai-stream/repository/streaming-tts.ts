@@ -14,6 +14,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
+import { TtsVoice, type TtsVoiceValue } from "../../text-to-speech/enum";
 import { createStreamEvent, formatSSEEvent } from "../events";
 
 /**
@@ -51,7 +52,7 @@ export class StreamingTTSHandler {
   private readonly encoder: TextEncoder;
   private readonly logger: EndpointLogger;
   private readonly locale: CountryLanguage;
-  private readonly voice: "MALE" | "FEMALE";
+  private readonly voice: typeof TtsVoiceValue;
   private readonly userId: string | undefined;
   private isEnabled: boolean;
 
@@ -60,7 +61,7 @@ export class StreamingTTSHandler {
     encoder: TextEncoder;
     logger: EndpointLogger;
     locale: CountryLanguage;
-    voice: "MALE" | "FEMALE";
+    voice: typeof TtsVoiceValue;
     userId: string | undefined;
     enabled: boolean;
   }) {
@@ -266,7 +267,7 @@ export class StreamingTTSHandler {
     }
 
     const language = getLanguageFromLocale(this.locale);
-    const voiceOption = this.voice === "MALE" ? "MALE" : "FEMALE";
+    const voiceOption = this.voice === TtsVoice.MALE ? "MALE" : "FEMALE";
 
     this.logger.debug("[Streaming TTS] Calling Eden AI TTS API", {
       textLength: text.length,
@@ -499,7 +500,7 @@ export function createStreamingTTSHandler(params: {
   encoder: TextEncoder;
   logger: EndpointLogger;
   locale: CountryLanguage;
-  voice: "MALE" | "FEMALE";
+  voice: typeof TtsVoiceValue;
   userId: string | undefined;
   enabled: boolean;
 }): StreamingTTSHandler {

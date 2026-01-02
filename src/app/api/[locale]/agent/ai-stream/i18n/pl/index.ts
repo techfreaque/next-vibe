@@ -31,6 +31,10 @@ export const translations: typeof enTranslations = {
       label: "ID wątku",
       description: "ID wątku (null dla nowego wątku)",
     },
+    userMessageId: {
+      label: "ID wiadomości użytkownika",
+      description: "ID wiadomości użytkownika wygenerowane przez klienta",
+    },
     parentMessageId: {
       label: "ID wiadomości nadrzędnej",
       description: "ID wiadomości nadrzędnej dla rozgałęzienia/wątku",
@@ -131,13 +135,9 @@ export const translations: typeof enTranslations = {
     voiceMode: {
       label: "Tryb głosowy",
       description: "Konfiguracja interakcji głosowej",
-      streamTTS: {
-        label: "Strumieniowy TTS",
-        description: "Włącz strumieniową syntezę mowy dla odpowiedzi",
-      },
-      callMode: {
-        label: "Tryb połączenia",
-        description: "Włącz tryb połączenia głosowego w czasie rzeczywistym",
+      enabled: {
+        label: "Włącz tryb głosowy",
+        description: "Włącz interakcję głosową z syntezą mowy",
       },
       voice: {
         label: "Głos",

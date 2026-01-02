@@ -24,6 +24,7 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
 import { CallModeIndicator } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/call-mode-indicator";
+import { FileUploadButton } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/file-upload-button";
 import { useVoiceRecording } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/hooks/use-voice-recording";
 import { RecordingModal } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/recording-modal";
 import { Selector } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/selector";
@@ -33,19 +34,22 @@ import { simpleT } from "@/i18n/core/shared";
 
 import { useCallMode } from "../../../_components/chat-input/hooks/use-call-mode";
 import { useMessageEditor } from "./hooks/use-message-editor";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 interface MessageEditorProps {
   message: ChatMessage;
   onBranch: (
     messageId: string,
     content: string,
-    audioInput?: { file: File },
+    audioInput: { file: File } | undefined,
+    attachments: File[] | undefined,
   ) => Promise<void>;
   onCancel: () => void;
   onModelChange?: (model: ModelId) => void;
   onCharacterChange?: (character: string) => void;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  user: JwtPayloadType;
 }
 
 export function MessageEditor({
@@ -56,6 +60,7 @@ export function MessageEditor({
   onCharacterChange,
   locale,
   logger,
+  user,
 }: MessageEditorProps): JSX.Element {
   const { selectedModel, selectedCharacter, deductCredits } = useChatContext();
   const { t } = simpleT(locale);
@@ -69,7 +74,7 @@ export function MessageEditor({
   // Message editor logic
   const editor = useMessageEditor({
     message,
-    onBranch: (messageId, content) => onBranch(messageId, content),
+    onBranch,
     onCancel,
     logger,
   });
@@ -79,7 +84,12 @@ export function MessageEditor({
     currentValue: editor.content,
     onValueChange: editor.setContent,
     onSubmitAudio: async (file: File) => {
-      await onBranch(message.id, "", { file });
+      await onBranch(
+        message.id,
+        "",
+        { file },
+        editor.attachments.length > 0 ? editor.attachments : undefined,
+      );
     },
     deductCredits,
     logger,
@@ -167,11 +177,12 @@ export function MessageEditor({
                 locale={locale}
                 logger={logger}
                 buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
+                user={user}
               />
             )}
           </Div>
 
-          {/* Right: Call Mode + Mic + Branch/Cancel */}
+          {/* Right: Call Mode + File + Mic + Branch/Cancel */}
           <Div className="flex flex-row items-center gap-1 sm:gap-1.5 md:gap-2 shrink-0">
             {/* Call mode toggle */}
             <TooltipProvider>
@@ -198,6 +209,20 @@ export function MessageEditor({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+
+            {/* File upload button */}
+            <FileUploadButton
+              locale={locale}
+              attachments={editor.attachments}
+              onFilesSelected={editor.setAttachments}
+              onRemoveFile={(index) =>
+                editor.setAttachments((prev) =>
+                  // oxlint-disable-next-line no-unused-vars
+                  prev.filter((_file, i) => i !== index),
+                )
+              }
+              disabled={editor.isLoading}
+            />
 
             {/* Mic button */}
             {showMicButton && (

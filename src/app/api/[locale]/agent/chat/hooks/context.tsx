@@ -42,7 +42,7 @@ export interface RootFolderPermissions {
  */
 interface ChatProviderProps {
   /** JWT payload from server (undefined for unauthenticated/public users) */
-  user: JwtPayloadType | undefined;
+  user: JwtPayloadType;
   locale: CountryLanguage;
   children: ReactNode;
   /** Active thread ID from URL (null if none) */

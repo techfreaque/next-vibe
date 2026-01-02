@@ -26,7 +26,7 @@ import {
   type SignupPostRequestOutput,
   type SignupPostResponseOutput,
 } from "./definition";
-import { createTrackingContext } from "../../../emails/smtp-client/components/tracking_context.email";
+import { createTrackingContext,type TrackingContext } from "../../../emails/smtp-client/components/tracking_context.email";
 import { EmailTemplate } from "../../../emails/smtp-client/components/template.email";
 
 // ============================================================================
@@ -45,123 +45,211 @@ function SignupWelcomeEmail({
   props,
   t,
   locale,
+  recipientEmail,
   tracking,
 }: {
   props: SignupWelcomeProps;
   t: TFunction;
   locale: CountryLanguage;
-  tracking?: {
-    userId?: string;
-    leadId?: string;
-    sessionId?: string;
-  };
+  recipientEmail: string;
+  tracking: TrackingContext;
 }): ReactElement {
-  const baseUrl = env.NEXT_PUBLIC_APP_URL;
-  const trackingContext = tracking
-    ? createTrackingContext(
-        locale,
-        tracking.leadId,
-        tracking.userId,
-        undefined,
-        baseUrl,
-      )
-    : createTrackingContext(locale, props.leadId, props.userId, undefined, baseUrl);
-
   return (
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("app.api.user.public.signup.email.title", {
-        appName: t("config.appName"),
-        privateName: props.privateName,
-      })}
-      previewText={t("app.api.user.public.signup.email.previewText", {
-        appName: t("config.appName"),
-      })}
-      tracking={trackingContext}
+      title={t("app.api.user.public.signup.email.welcomeMessage")}
+      previewText={t("app.api.user.public.signup.email.previewText")}
+      recipientEmail={recipientEmail}
+      tracking={tracking}
     >
-      <Text
-        style={{
-          fontSize: "18px",
-          lineHeight: "1.6",
-          color: "#374151",
-          marginBottom: "20px",
-          textAlign: "center",
-          fontWeight: "600",
-        }}
-      >
-        {t("app.api.user.public.signup.email.welcomeMessage", {
-          appName: t("config.appName"),
-        })}
-      </Text>
-
+      {/* Description */}
       <Text
         style={{
           fontSize: "16px",
           lineHeight: "1.6",
           color: "#374151",
-          marginBottom: "24px",
+          marginBottom: "8px",
           textAlign: "center",
+          fontWeight: "500",
+        }}
+      >
+        {t("app.api.user.public.signup.email.title", {
+          appName: t("config.appName"),
+          privateName: props.privateName,
+        })}
+      </Text>
+
+      {/* Description */}
+      <Text
+        style={{
+          fontSize: "16px",
+          lineHeight: "1.6",
+          color: "#374151",
+          marginBottom: "32px",
+          textAlign: "left",
         }}
       >
         {t("app.api.user.public.signup.email.description")}
       </Text>
 
-      {/* CTA Section */}
+      {/* What You Get Section */}
       <Section
         style={{
-          backgroundColor: "#eff6ff",
-          borderRadius: "8px",
+          backgroundColor: "#f0f9ff",
+          borderRadius: "12px",
           padding: "24px",
-          marginBottom: "24px",
-          border: "2px solid #2563eb",
-          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-          textAlign: "center",
+          marginBottom: "32px",
+          border: "2px solid #3b82f6",
         }}
       >
         <Text
           style={{
-            fontSize: "20px",
-            lineHeight: "1.6",
-            color: "#1e40af",
+            fontSize: "18px",
+            lineHeight: "1.4",
+            color: "#111827",
             fontWeight: "700",
-            marginBottom: "16px",
+            marginBottom: "20px",
+            textAlign: "center",
           }}
         >
-          {t("app.api.user.public.signup.email.ctaTitle")}
+          {t("app.api.user.public.signup.email.whatYouGet")}
         </Text>
 
+        {/* Features List */}
+        {[
+          t("app.api.user.public.signup.email.feature1"),
+          t("app.api.user.public.signup.email.feature2"),
+          t("app.api.user.public.signup.email.feature3"),
+          t("app.api.user.public.signup.email.feature4"),
+          t("app.api.user.public.signup.email.feature5"),
+        ].map((feature, index) => (
+          <div
+            key={index}
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              marginBottom: "12px",
+            }}
+          >
+            <span
+              style={{
+                color: "#3b82f6",
+                fontSize: "20px",
+                marginRight: "12px",
+                lineHeight: "1",
+              }}
+            >
+              ✓
+            </span>
+            <Text
+              style={{
+                fontSize: "15px",
+                lineHeight: "1.5",
+                color: "#374151",
+                margin: "0",
+              }}
+            >
+              {feature}
+            </Text>
+          </div>
+        ))}
+      </Section>
+
+      {/* CTA Button */}
+      <Section style={{ textAlign: "center", marginBottom: "32px" }}>
         <Button
-          href={`${baseUrl}/${locale}/subscription`}
+          href={`${tracking.baseUrl}/${locale}`}
           style={{
-            backgroundColor: "#2563eb",
+            backgroundColor: "#3b82f6",
             borderRadius: "8px",
             color: "#ffffff",
             fontSize: "18px",
-            padding: "16px 32px",
+            padding: "16px 40px",
             textDecoration: "none",
             fontWeight: "700",
-            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
             display: "inline-block",
+            boxShadow: "0 4px 6px rgba(59, 130, 246, 0.4)",
           }}
         >
           {t("app.api.user.public.signup.email.ctaButton")}
         </Button>
       </Section>
 
-      {/* Footer message */}
+      {/* Need More Section */}
+      <Section
+        style={{
+          backgroundColor: "#fafafa",
+          borderRadius: "8px",
+          padding: "20px",
+          marginBottom: "32px",
+          textAlign: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: "16px",
+            fontWeight: "700",
+            color: "#111827",
+            marginBottom: "8px",
+          }}
+        >
+          {t("app.api.user.public.signup.email.needMore")}
+        </Text>
+        <Text
+          style={{
+            fontSize: "14px",
+            color: "#6b7280",
+            marginBottom: "16px",
+          }}
+        >
+          {t("app.api.user.public.signup.email.needMoreDesc")}
+        </Text>
+        <Button
+          href={`${tracking.baseUrl}/${locale}/subscription`}
+          style={{
+            backgroundColor: "#ffffff",
+            border: "2px solid #3b82f6",
+            borderRadius: "6px",
+            color: "#3b82f6",
+            fontSize: "14px",
+            padding: "10px 24px",
+            textDecoration: "none",
+            fontWeight: "600",
+            display: "inline-block",
+          }}
+        >
+          {t("app.api.user.public.signup.email.viewPlans")}
+        </Button>
+      </Section>
+
+      {/* Signoff */}
       <Text
         style={{
-          fontSize: "16px",
+          fontSize: "15px",
           lineHeight: "1.6",
           color: "#374151",
-          marginTop: "24px",
-          textAlign: "center",
+          marginBottom: "16px",
+          whiteSpace: "pre-line",
         }}
       >
         {t("app.api.user.public.signup.email.signoff", {
           appName: t("config.appName"),
         })}
+      </Text>
+
+      {/* P.S. */}
+      <Text
+        style={{
+          fontSize: "13px",
+          lineHeight: "1.6",
+          color: "#6b7280",
+          fontStyle: "italic",
+          borderTop: "1px solid #e5e7eb",
+          paddingTop: "16px",
+        }}
+      >
+        {t("app.api.user.public.signup.email.ps")}
       </Text>
     </EmailTemplate>
   );
@@ -172,15 +260,50 @@ const signupWelcomeTemplate: EmailTemplateDefinition<SignupWelcomeProps> = {
   meta: {
     id: "signup-welcome",
     version: "1.0.0",
-    name: "app.api.emails.templates.signup.welcome.meta.name",
-    description: "app.api.emails.templates.signup.welcome.meta.description",
+    name: "app.admin.emails.templates.templates.signup.welcome.meta.name",
+    description:
+      "app.admin.emails.templates.templates.signup.welcome.meta.description",
     category: "auth",
     path: "/user/public/signup/email.tsx",
     defaultSubject: (t) =>
       t("app.api.user.public.signup.email.subject", { appName: "" }),
+    previewFields: {
+      privateName: {
+        type: "text",
+        label:
+          "app.admin.emails.templates.templates.signup.welcome.preview.privateName.label",
+        description:
+          "app.admin.emails.templates.templates.signup.welcome.preview.privateName.description",
+        defaultValue: "Max",
+        required: true,
+      },
+      userId: {
+        type: "text",
+        label:
+          "app.admin.emails.templates.templates.signup.welcome.preview.userId.label",
+        description:
+          "app.admin.emails.templates.templates.signup.welcome.preview.userId.description",
+        defaultValue: "example-user-id-123",
+        required: true,
+      },
+      leadId: {
+        type: "text",
+        label:
+          "app.admin.emails.templates.templates.signup.welcome.preview.leadId.label",
+        description:
+          "app.admin.emails.templates.templates.signup.welcome.preview.leadId.description",
+        defaultValue: "example-lead-id-456",
+        required: true,
+      },
+    },
   },
   schema: signupWelcomePropsSchema,
   component: SignupWelcomeEmail,
+  exampleProps: {
+    privateName: "Max",
+    userId: "example-user-id-123",
+    leadId: "example-lead-id-456",
+  },
 };
 
 export default signupWelcomeTemplate;
@@ -234,10 +357,8 @@ export const renderRegisterMail: EmailFunctionType<
       props: templateProps,
       t,
       locale,
-      tracking: {
-        userId: user.id,
-        leadId: user.leadId,
-      },
+      recipientEmail: user.email,
+      tracking: createTrackingContext(locale, user.leadId, user.id),
     }),
   });
 };
@@ -245,6 +366,7 @@ export const renderRegisterMail: EmailFunctionType<
 function renderAdminNotificationEmailContent(
   t: TFunction,
   locale: CountryLanguage,
+  recipientEmail: string,
   user: {
     privateName: string;
     publicName: string;
@@ -253,7 +375,6 @@ function renderAdminNotificationEmailContent(
     createdAt: string | number | Date;
   },
   requestData: {
-    signupType: string[];
     subscribeToNewsletter?: boolean | null;
   },
 ): React.ReactElement {
@@ -274,6 +395,7 @@ function renderAdminNotificationEmailContent(
       previewText={t("app.api.user.public.signup.admin_notification.preview", {
         appName: t("config.appName"),
       })}
+      recipientEmail={recipientEmail}
       tracking={tracking}
     >
       {/* Header Message */}
@@ -578,9 +700,14 @@ export const renderAdminSignupNotification: EmailFunctionType<
     subject: t("app.api.user.public.signup.admin_notification.subject", {
       userName: user.privateName,
     }),
-    jsx: renderAdminNotificationEmailContent(t, locale, user, {
-      signupType: [], // signupType removed from form, defaulting to empty array
-      subscribeToNewsletter: requestData.formCard.subscribeToNewsletter,
-    }),
+    jsx: renderAdminNotificationEmailContent(
+      t,
+      locale,
+      contactClientRepository.getSupportEmail(locale),
+      user,
+      {
+        subscribeToNewsletter: requestData.formCard.subscribeToNewsletter,
+      },
+    ),
   });
 };

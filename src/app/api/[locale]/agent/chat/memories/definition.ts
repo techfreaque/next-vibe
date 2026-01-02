@@ -68,13 +68,13 @@ const { GET } = createEndpoint({
           },
           { response: true },
           {
-            id: responseField(
+            memoryNumber: responseField(
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.agent.chat.memories.get.response.memories.memory.id.content" as const,
+                  "app.api.agent.chat.memories.get.response.memories.memory.memoryNumber.content" as const,
               },
-              z.string().uuid(),
+              z.coerce.number(),
             ),
             content: responseField(
               {
@@ -91,14 +91,6 @@ const { GET } = createEndpoint({
                   "app.api.agent.chat.memories.get.response.memories.memory.tags.content" as const,
               },
               z.array(z.string()),
-            ),
-            sequenceNumber: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.memories.get.response.memories.memory.sequenceNumber.content" as const,
-              },
-              z.coerce.number(),
             ),
             priority: responseField(
               {
@@ -183,18 +175,16 @@ const { GET } = createEndpoint({
       list: {
         memories: [
           {
-            id: "550e8400-e29b-41d4-a716-446655440000",
+            memoryNumber: 0,
             content: "Profession: Software engineer specializing in Python",
             tags: ["profession", "skills"],
-            sequenceNumber: 1,
             priority: 0,
             createdAt: new Date("2025-01-01T00:00:00Z"),
           },
           {
-            id: "550e8400-e29b-41d4-a716-446655440001",
+            memoryNumber: 1,
             content: "Preferences: Dark mode, coffee over tea",
             tags: ["preferences"],
-            sequenceNumber: 2,
             priority: 0,
             createdAt: new Date("2025-01-01T00:00:00Z"),
           },
@@ -273,7 +263,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.agent.chat.memories.post.response.id.content" as const,
         },
-        z.string().uuid(),
+        z.coerce.int(),
       ),
     },
   ),
@@ -345,7 +335,7 @@ const { POST } = createEndpoint({
     },
     responses: {
       add: {
-        id: "550e8400-e29b-41d4-a716-446655440002",
+        id: 0,
       },
     },
     urlPathParams: undefined,
