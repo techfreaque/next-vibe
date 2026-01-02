@@ -4,10 +4,7 @@
  * MIGRATED TO NEW UNIFIED FORMAT
  */
 
-import {
-  CronTaskPriority,
-  TaskCategory,
-} from "../../unified-interface/tasks/enum";
+import { CronTaskPriority, TaskCategory } from "../../unified-interface/tasks/enum";
 import type { Task } from "../../unified-interface/tasks/types/repository";
 
 /**

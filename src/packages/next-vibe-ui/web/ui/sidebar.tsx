@@ -72,9 +72,7 @@ export function SidebarLayout({
             collapsed ? "-translate-x-full" : "translate-x-0",
           )}
         >
-          <Div className={cn("h-full w-full bg-background", sidebarClassName)}>
-            {sidebar}
-          </Div>
+          <Div className={cn("h-full w-full bg-background", sidebarClassName)}>{sidebar}</Div>
         </Div>
 
         {!collapsed && (
@@ -112,19 +110,13 @@ export function SidebarLayout({
               transition={{ duration: 0.4, ease: "easeInOut" }}
               className="h-full"
             >
-              <Div
-                className={cn("h-full w-full bg-background", sidebarClassName)}
-              >
-                {sidebar}
-              </Div>
+              <Div className={cn("h-full w-full bg-background", sidebarClassName)}>{sidebar}</Div>
             </MotionDiv>
           )}
         </AnimatePresence>
       </ResizableContainer>
 
-      <Div
-        className={cn("flex h-screen w-full relative z-9", contentClassName)}
-      >
+      <Div className={cn("flex h-screen w-full relative z-9", contentClassName)}>
         <ScrollArea className="h-screen w-full">{children}</ScrollArea>
       </Div>
     </Div>
@@ -141,16 +133,12 @@ function TopBar({ topBarLeft, topBarRight }: TopBarProps): JSX.Element {
     <>
       {/* Top bar left */}
       {topBarLeft && (
-        <Div className="fixed top-4 left-4 z-51 flex flex-row gap-1">
-          {topBarLeft}
-        </Div>
+        <Div className="fixed top-4 left-4 z-51 flex flex-row gap-1">{topBarLeft}</Div>
       )}
 
       {/* Top bar right */}
       {topBarRight && (
-        <Div className="fixed top-4 right-4 z-51 flex flex-row gap-1">
-          {topBarRight}
-        </Div>
+        <Div className="fixed top-4 right-4 z-51 flex flex-row gap-1">{topBarRight}</Div>
       )}
     </>
   );

@@ -6,11 +6,7 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -107,16 +103,14 @@ export class ContactRepository {
       // Send optional SMS notifications (non-blocking)
       sendAdminNotificationSms(data, user, locale, logger).catch((smsError) => {
         logger.warn(t("route.sms.admin.failed"), {
-          error:
-            smsError instanceof Error ? smsError.message : String(smsError),
+          error: smsError instanceof Error ? smsError.message : String(smsError),
           contactEmail: data.email,
         });
       });
 
       sendConfirmationSms(data, user, locale, logger).catch((smsError) => {
         logger.warn(t("route.sms.confirmation.failed"), {
-          error:
-            smsError instanceof Error ? smsError.message : String(smsError),
+          error: smsError instanceof Error ? smsError.message : String(smsError),
           contactEmail: data.email,
           userId: user?.id,
         });

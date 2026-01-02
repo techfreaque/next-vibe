@@ -10,8 +10,7 @@ export const translations = {
 
   container: {
     title: "E-Mail-Sendekonfiguration",
-    description:
-      "E-Mail- und optionale SMS-Benachrichtigungseinstellungen konfigurieren",
+    description: "E-Mail- und optionale SMS-Benachrichtigungseinstellungen konfigurieren",
   },
 
   // Field groups
@@ -172,8 +171,7 @@ export const translations = {
   errors: {
     validation: {
       title: "Validierungsfehler",
-      description:
-        "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut",
+      description: "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut",
       smsFields: "SMS-Benachrichtigungsfelder",
       smsRequired:
         "Telefonnummer und Nachricht sind erforderlich, wenn SMS-Benachrichtigung aktiviert ist",
@@ -187,8 +185,7 @@ export const translations = {
     },
     server: {
       title: "Serverfehler",
-      description:
-        "Ein interner Serverfehler ist beim Senden der E-Mail aufgetreten",
+      description: "Ein interner Serverfehler ist beim Senden der E-Mail aufgetreten",
     },
     email: {
       title: "E-Mail-Sendefehler",

@@ -12,7 +12,6 @@ import definitions from "./definition";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ data, user, logger }) =>
-      CreditRepository.getTransactionHistory(data, user, logger),
+    handler: ({ data, user, logger }) => CreditRepository.getTransactionHistory(data, user, logger),
   },
 });

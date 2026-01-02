@@ -82,10 +82,7 @@ export class FileGenerator {
    * @param language - The language code to clean up files for
    * @param logger - Logger instance for debugging
    */
-  private cleanupOldGeneratedFiles(
-    language: string,
-    logger: EndpointLogger,
-  ): void {
+  private cleanupOldGeneratedFiles(language: string, logger: EndpointLogger): void {
     try {
       const srcDir = buildPath("src");
       this.removeOldI18nFiles(srcDir, language, logger);
@@ -103,11 +100,7 @@ export class FileGenerator {
    * @param language - The language code to remove files for
    * @param logger - Logger instance for debugging
    */
-  private removeOldI18nFiles(
-    dir: string,
-    language: string,
-    logger: EndpointLogger,
-  ): void {
+  private removeOldI18nFiles(dir: string, language: string, logger: EndpointLogger): void {
     if (!fs.existsSync(dir)) {
       return;
     }
@@ -160,12 +153,7 @@ export class FileGenerator {
   ): void {
     // Step 1: Generate leaf files (actual translation files)
     for (const [location, translations] of groups) {
-      this.generateLeafTranslationFile(
-        location,
-        translations,
-        language,
-        logger,
-      );
+      this.generateLeafTranslationFile(location, translations, language, logger);
     }
 
     // Step 2: Generate parent index files that import their children
@@ -177,9 +165,7 @@ export class FileGenerator {
    * @param translations - The translation object with flat keys
    * @returns The nested translation object
    */
-  private unflattenTranslationObject(
-    translations: TranslationObject,
-  ): TranslationObject {
+  private unflattenTranslationObject(translations: TranslationObject): TranslationObject {
     const nested: TranslationObject = {};
 
     keyLoop: for (const [key, value] of Object.entries(translations)) {
@@ -248,15 +234,9 @@ export class FileGenerator {
 
     const lines = entries.map(([key, value]) => {
       // Use unquoted key if it's a valid JavaScript identifier
-      const keyStr = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
-        ? key
-        : JSON.stringify(key);
+      const keyStr = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key) ? key : JSON.stringify(key);
 
-      if (
-        typeof value === "object" &&
-        value !== null &&
-        !Array.isArray(value)
-      ) {
+      if (typeof value === "object" && value !== null && !Array.isArray(value)) {
         const valueStr = this.objectToString(value, indent + 1);
         return `${nextIndentStr}${keyStr}: ${valueStr}`;
       }
@@ -285,13 +265,7 @@ export class FileGenerator {
     try {
       // Generate co-located file path (next to the code, not in src/i18n)
       // Location is relative to src/, so prepend "src"
-      const filePath = buildPath(
-        "src",
-        location,
-        I18N_PATH,
-        language,
-        INDEX_FILE,
-      );
+      const filePath = buildPath("src", location, I18N_PATH, language, INDEX_FILE);
 
       // Create directory
       const dir = filePath.slice(0, filePath.lastIndexOf("/"));
@@ -300,11 +274,7 @@ export class FileGenerator {
       }
 
       // Generate content with nested objects (not flat keys)
-      const content = this.generateLeafFileContent(
-        translations,
-        language,
-        location,
-      );
+      const content = this.generateLeafFileContent(translations, language, location);
 
       // Write file
       fs.writeFileSync(filePath, content, "utf8");
@@ -371,8 +341,7 @@ export class FileGenerator {
     }
 
     // Convert to nested structure
-    const nestedTranslations =
-      this.unflattenTranslationObject(strippedTranslations);
+    const nestedTranslations = this.unflattenTranslationObject(strippedTranslations);
     const translationsObject = this.objectToString(nestedTranslations, 0);
     // eslint-disable-next-line i18next/no-literal-string
     const typeAnnotation = isMainLanguage ? "" : ": typeof enTranslations";
@@ -405,18 +374,15 @@ export class FileGenerator {
 
     // Convert kebab-case folder names to camelCase
     // e.g., unified-interface -> unifiedInterface, react-native -> reactNative
-    key = key.replaceAll(
-      /\/([a-z0-9-]+)/g,
-      (fullMatch: string, segment: string) => {
-        // Convert kebab-case to camelCase (use fullMatch to verify it starts with /)
-        const camelCased = segment.replaceAll(
-          /-([a-z0-9])/g,
-          (hyphenAndChar: string, letter: string) =>
-            hyphenAndChar.length > 1 ? letter.toUpperCase() : hyphenAndChar,
-        );
-        return fullMatch.startsWith("/") ? `/${camelCased}` : camelCased;
-      },
-    );
+    key = key.replaceAll(/\/([a-z0-9-]+)/g, (fullMatch: string, segment: string) => {
+      // Convert kebab-case to camelCase (use fullMatch to verify it starts with /)
+      const camelCased = segment.replaceAll(
+        /-([a-z0-9])/g,
+        (hyphenAndChar: string, letter: string) =>
+          hyphenAndChar.length > 1 ? letter.toUpperCase() : hyphenAndChar,
+      );
+      return fullMatch.startsWith("/") ? `/${camelCased}` : camelCased;
+    });
 
     // Convert to dot notation
     key = key.replaceAll("/", ".");
@@ -446,9 +412,7 @@ export class FileGenerator {
 
     // Convert kebab-case to camelCase: unified-interface -> unifiedUi
     // oxlint-disable-next-line no-unused-vars
-    sanitized = sanitized.replaceAll(/-([a-z])/g, (_, letter: string) =>
-      letter.toUpperCase(),
-    );
+    sanitized = sanitized.replaceAll(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
 
     // Replace remaining invalid characters with empty string (remove them)
     sanitized = sanitized.replaceAll(/[^a-zA-Z0-9]/g, "");
@@ -537,13 +501,7 @@ export class FileGenerator {
 
     // Pass generatedFiles so we only import from children that exist
     for (const sourcePath of sortedPaths) {
-      this.generateSourceIndexFile(
-        sourcePath,
-        groups,
-        language,
-        logger,
-        generatedFiles,
-      );
+      this.generateSourceIndexFile(sourcePath, groups, language, logger, generatedFiles);
     }
   }
 
@@ -557,13 +515,7 @@ export class FileGenerator {
     logger: EndpointLogger,
     generatedFiles: Set<string>,
   ): void {
-    const indexPath = buildPath(
-      "src",
-      sourcePath,
-      I18N_PATH,
-      language,
-      INDEX_FILE,
-    );
+    const indexPath = buildPath("src", sourcePath, I18N_PATH, language, INDEX_FILE);
 
     // Find ALL direct children (both with translations and intermediate directories)
     // Use allLocations (from all languages) to ensure we find children even if current language has no translations
@@ -658,8 +610,7 @@ export class FileGenerator {
       }
 
       try {
-        const nestedTranslations =
-          this.unflattenTranslationObject(strippedTranslations);
+        const nestedTranslations = this.unflattenTranslationObject(strippedTranslations);
 
         // Add own translations as spread entries in the exports
         // BUT exclude translations that belong to child directories
@@ -674,20 +625,15 @@ export class FileGenerator {
             typeof value === "string"
               ? JSON.stringify(value)
               : this.objectToString(value as TranslationObject, 1);
-          const exportKey = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
-            ? key
-            : `"${key}"`;
+          const exportKey = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key) ? key : `"${key}"`;
           exports.push(`  ${exportKey}: ${valueStr}`);
         }
       } catch (error) {
-        logger.error(
-          `Failed to unflatten translations for ${sourcePath} (${language})`,
-          {
-            error: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined,
-            keys: Object.keys(strippedTranslations).slice(0, 10).join(", "),
-          },
-        );
+        logger.error(`Failed to unflatten translations for ${sourcePath} (${language})`, {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          keys: Object.keys(strippedTranslations).slice(0, 10).join(", "),
+        });
         // Continue without own translations - at least generate the imports
       }
     }
@@ -713,23 +659,17 @@ export class FileGenerator {
       // Mark this file as generated
       generatedFiles.add(sourcePath);
     } catch (error) {
-      logger.error(
-        `Failed to generate source hierarchy index for ${sourcePath} (${language})`,
-        {
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : undefined,
-        },
-      );
+      logger.error(`Failed to generate source hierarchy index for ${sourcePath} (${language})`, {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
     }
   }
 
   /**
    * Generate clean main index that imports only top-level sections
    */
-  private generateCleanMainIndex(
-    groups: Map<string, TranslationObject>,
-    language: string,
-  ): void {
+  private generateCleanMainIndex(groups: Map<string, TranslationObject>, language: string): void {
     const mainIndexPath = buildPath("src", I18N_PATH, language, INDEX_FILE);
 
     // Find top-level sections (app, packages, app-native, etc.)
@@ -761,13 +701,7 @@ export class FileGenerator {
       const importName = `${sanitizedName}Translations`;
 
       // Import from source hierarchy - use relative path from main index to section
-      const sectionIndexPath = buildPath(
-        "src",
-        section,
-        I18N_PATH,
-        language,
-        INDEX_FILE,
-      );
+      const sectionIndexPath = buildPath("src", section, I18N_PATH, language, INDEX_FILE);
 
       // Check if the section index file actually exists
       if (!fs.existsSync(sectionIndexPath)) {

@@ -25,8 +25,7 @@ export function useTouchDevice(): boolean {
         "ontouchstart" in window ||
         navigator.maxTouchPoints > 0 ||
         ("msMaxTouchPoints" in navigator &&
-          (navigator as Navigator & { msMaxTouchPoints: number })
-            .msMaxTouchPoints > 0);
+          (navigator as Navigator & { msMaxTouchPoints: number }).msMaxTouchPoints > 0);
 
       setIsTouch(hasTouch);
     };
@@ -57,8 +56,7 @@ export function getTouchAwareClasses(alwaysVisibleOnTouch = true): string {
     "ontouchstart" in window ||
     navigator.maxTouchPoints > 0 ||
     ("msMaxTouchPoints" in navigator &&
-      (navigator as Navigator & { msMaxTouchPoints: number }).msMaxTouchPoints >
-        0);
+      (navigator as Navigator & { msMaxTouchPoints: number }).msMaxTouchPoints > 0);
 
   if (isTouch && alwaysVisibleOnTouch) {
     // On touch devices: always visible but slightly transparent for better UX

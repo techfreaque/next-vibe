@@ -17,11 +17,9 @@ export const translations: typeof enTranslations = {
     permissions: {
       publicUsersCannotAccess:
         "Użytkownicy publiczni nie mogą uzyskać dostępu do tego uwierzytelnionego punktu końcowego",
-      insufficientPermissions:
-        "Niewystarczające uprawnienia do dostępu do tego punktu końcowego",
+      insufficientPermissions: "Niewystarczające uprawnienia do dostępu do tego punktu końcowego",
       errors: {
-        platformAccessDenied:
-          "Odmowa dostępu dla platformy {{platform}}: {{reason}}",
+        platformAccessDenied: "Odmowa dostępu dla platformy {{platform}}: {{reason}}",
         insufficientRoles:
           "Niewystarczające role. Użytkownik ma: {{userRoles}}. Wymagane: {{requiredRoles}}",
         definitionError: "Błąd definicji punktu końcowego: {{error}}",
@@ -31,10 +29,8 @@ export const translations: typeof enTranslations = {
       definition: {
         loader: {
           errors: {
-            endpointNotFound:
-              "Punkt końcowy '{{identifier}}' nie został znaleziony",
-            loadFailed:
-              "Nie udało się załadować punktu końcowego '{{identifier}}': {{error}}",
+            endpointNotFound: "Punkt końcowy '{{identifier}}' nie został znaleziony",
+            loadFailed: "Nie udało się załadować punktu końcowego '{{identifier}}': {{error}}",
             batchLoadFailed:
               "Ładowanie wsadowe nie powiodło się: {{failedCount}} z {{totalCount}} punktów końcowych nie powiodło się",
           },

@@ -14,12 +14,7 @@ import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const duration = 1000;
 
-function Skeleton({
-  className,
-  style,
-  children,
-  ...props
-}: SkeletonProps): React.JSX.Element {
+function Skeleton({ className, style, children, ...props }: SkeletonProps): React.JSX.Element {
   const sv = useSharedValue(1);
 
   React.useEffect(() => {

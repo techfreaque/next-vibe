@@ -8,7 +8,6 @@ export const { POST, tools } = endpointsHandler({
   endpoint: createCharacterDefinition,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger }) =>
-      CharactersRepository.createCharacter(data, user, logger),
+    handler: ({ data, user, logger }) => CharactersRepository.createCharacter(data, user, logger),
   },
 });

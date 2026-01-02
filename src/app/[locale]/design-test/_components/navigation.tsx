@@ -84,17 +84,13 @@ export function NavigationPreview(): JSX.Element {
                   <NavigationMenuContent>
                     <Div className="grid gap-3 p-4 w-[400px]">
                       <NavigationMenuLink className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <Div className="text-sm font-medium leading-none">
-                          Introduction
-                        </Div>
+                        <Div className="text-sm font-medium leading-none">Introduction</Div>
                         <Small className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                           Learn the basics of our component library.
                         </Small>
                       </NavigationMenuLink>
                       <NavigationMenuLink className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <Div className="text-sm font-medium leading-none">
-                          Installation
-                        </Div>
+                        <Div className="text-sm font-medium leading-none">Installation</Div>
                         <Small className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                           How to install and set up the library.
                         </Small>
@@ -107,17 +103,13 @@ export function NavigationPreview(): JSX.Element {
                   <NavigationMenuContent>
                     <Div className="grid gap-3 p-4 w-[400px]">
                       <NavigationMenuLink className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <Div className="text-sm font-medium leading-none">
-                          Buttons
-                        </Div>
+                        <Div className="text-sm font-medium leading-none">Buttons</Div>
                         <Small className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                           Interactive button components.
                         </Small>
                       </NavigationMenuLink>
                       <NavigationMenuLink className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                        <Div className="text-sm font-medium leading-none">
-                          Forms
-                        </Div>
+                        <Div className="text-sm font-medium leading-none">Forms</Div>
                         <Small className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                           Form input components.
                         </Small>
@@ -172,16 +164,10 @@ export function NavigationPreview(): JSX.Element {
               <MenubarMenu>
                 <MenubarTrigger>View</MenubarTrigger>
                 <MenubarContent>
-                  <MenubarCheckboxItem
-                    checked={showBookmarks}
-                    onCheckedChange={setShowBookmarks}
-                  >
+                  <MenubarCheckboxItem checked={showBookmarks} onCheckedChange={setShowBookmarks}>
                     Always Show Bookmarks Bar
                   </MenubarCheckboxItem>
-                  <MenubarCheckboxItem
-                    checked={showFullUrls}
-                    onCheckedChange={setShowFullUrls}
-                  >
+                  <MenubarCheckboxItem checked={showFullUrls} onCheckedChange={setShowFullUrls}>
                     Always Show Full URLs
                   </MenubarCheckboxItem>
                   <MenubarSeparator />

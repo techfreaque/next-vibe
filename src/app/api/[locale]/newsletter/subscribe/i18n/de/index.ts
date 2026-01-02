@@ -10,8 +10,7 @@ export const translations: typeof enTranslations = {
     label: "E-Mail-Adresse",
     description: "Ihre E-Mail-Adresse für das Newsletter-Abonnement",
     placeholder: "benutzer@beispiel.de",
-    helpText:
-      "Wir verwenden diese Adresse, um Ihnen Newsletter-Updates zu senden",
+    helpText: "Wir verwenden diese Adresse, um Ihnen Newsletter-Updates zu senden",
   },
   name: {
     label: "Name",
@@ -37,8 +36,7 @@ export const translations: typeof enTranslations = {
     leadId: "Lead-Kennung",
     subscriptionId: "Abonnement-ID",
     userId: "Benutzer-ID",
-    alreadySubscribed:
-      "Diese E-Mail-Adresse ist bereits für unseren Newsletter angemeldet",
+    alreadySubscribed: "Diese E-Mail-Adresse ist bereits für unseren Newsletter angemeldet",
   },
   errors: {
     badRequest: {
@@ -47,8 +45,7 @@ export const translations: typeof enTranslations = {
     },
     internal: {
       title: "Interner Fehler",
-      description:
-        "Beim Verarbeiten Ihres Abonnements ist ein Fehler aufgetreten",
+      description: "Beim Verarbeiten Ihres Abonnements ist ein Fehler aufgetreten",
     },
   },
   post: {
@@ -73,8 +70,7 @@ export const translations: typeof enTranslations = {
       },
       internal: {
         title: "Interner Fehler",
-        description:
-          "Beim Verarbeiten Ihrer Anmeldung ist ein Fehler aufgetreten",
+        description: "Beim Verarbeiten Ihrer Anmeldung ist ein Fehler aufgetreten",
       },
       forbidden: {
         title: "Verboten",
@@ -82,8 +78,7 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Bereits abonniert",
-        description:
-          "Diese E-Mail-Adresse ist bereits für unseren Newsletter angemeldet",
+        description: "Diese E-Mail-Adresse ist bereits für unseren Newsletter angemeldet",
       },
       badRequest: {
         title: "Ungültige Anfrage",
@@ -100,8 +95,7 @@ export const translations: typeof enTranslations = {
     linking_to_lead: "Newsletter-Abonnement wird mit Lead verknüpft",
     lead_found: "Lead für Newsletter-Abonnement gefunden",
     lead_updated: "Lead mit Newsletter-Abonnementdaten aktualisiert",
-    lead_update_failed:
-      "Fehler beim Aktualisieren des Leads mit Newsletter-Daten",
+    lead_update_failed: "Fehler beim Aktualisieren des Leads mit Newsletter-Daten",
     lead_not_found: "Lead nicht gefunden oder nicht berechtigt für Update",
     lead_linking_error: "Fehler beim Verknüpfen des Leads mit Newsletter",
     missing_lead_id: "Newsletter-Abonnement ohne leadId versucht",
@@ -112,34 +106,28 @@ export const translations: typeof enTranslations = {
     subscription_failed: "Newsletter-Abonnement fehlgeschlagen",
   },
   sms: {
-    no_phone_number:
-      "Keine Telefonnummer für Newsletter-Willkommens-SMS verfügbar",
+    no_phone_number: "Keine Telefonnummer für Newsletter-Willkommens-SMS verfügbar",
     sending_welcome: "Willkommens-SMS an Newsletter-Abonnenten wird gesendet",
     welcome_error: "Fehler beim Senden der Newsletter-Willkommens-SMS",
     no_admin_phone:
       "Keine Admin-Telefonnummer konfiguriert, SMS-Benachrichtigung wird übersprungen",
     sending_admin_notification:
       "Admin-Benachrichtigungs-SMS für Newsletter-Abonnement wird gesendet",
-    admin_notification_error:
-      "Fehler beim Senden der Admin-Benachrichtigungs-SMS",
+    admin_notification_error: "Fehler beim Senden der Admin-Benachrichtigungs-SMS",
     welcome: {
-      message:
-        "Hallo {{name}}! Willkommen bei unserem Newsletter. Bleiben Sie dran für Updates!",
+      message: "Hallo {{name}}! Willkommen bei unserem Newsletter. Bleiben Sie dran für Updates!",
     },
     admin_notification: {
-      message:
-        "Neue Newsletter-Anmeldung: {{displayName}} ({{email}}) hat sich angemeldet",
+      message: "Neue Newsletter-Anmeldung: {{displayName}} ({{email}}) hat sich angemeldet",
     },
   },
   route: {
-    sms_failed_continuing:
-      "SMS-Benachrichtigungen fehlgeschlagen, wird fortgesetzt",
+    sms_failed_continuing: "SMS-Benachrichtigungen fehlgeschlagen, wird fortgesetzt",
   },
   emailTemplate: {
     welcome: {
       title: "Willkommen zum {{appName}} Newsletter!",
-      subject:
-        "Willkommen bei {{appName}} - Bleib auf dem Laufenden über unzensierte KI",
+      subject: "Willkommen bei {{appName}} - Bleib auf dem Laufenden über unzensierte KI",
       preview:
         "Du bist angemeldet! Erhalte die neuesten Updates über unzensierte KI, neue Modelle und exklusive Tipps.",
       greeting_with_name: "Hallo {{name}}!",
@@ -148,12 +136,10 @@ export const translations: typeof enTranslations = {
         "Willkommen zum {{appName}} Newsletter! Du bist jetzt Teil unserer Community von KI-Enthusiasten, die ehrliche, unzensierte Gespräche mit KI schätzen.",
       what_to_expect: "Das erwartet dich:",
       benefit_1: "Ankündigungen und Updates zu neuen KI-Modellen",
-      benefit_2:
-        "Tipps und Tricks, um das Beste aus unzensierten KI-Modellen herauszuholen",
+      benefit_2: "Tipps und Tricks, um das Beste aus unzensierten KI-Modellen herauszuholen",
       benefit_3: "Exklusive Angebote und früher Zugang zu neuen Features",
       benefit_4: "Community-Highlights und Erfolgsgeschichten",
-      frequency:
-        "Wir senden dir alle paar Wochen Updates – nie Spam, immer wertvoller Inhalt.",
+      frequency: "Wir senden dir alle paar Wochen Updates – nie Spam, immer wertvoller Inhalt.",
       unsubscribe_text: "Möchtest du diese E-Mails nicht mehr erhalten?",
       unsubscribe_link: "Abmelden",
     },

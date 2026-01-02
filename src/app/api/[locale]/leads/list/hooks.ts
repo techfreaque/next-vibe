@@ -15,9 +15,7 @@ import definitions from "./definition";
  * Uses the enhanced useEndpoint library features for clean, minimal code
  * All filtering is handled through the form - no parameters needed
  */
-export function useLeadsListEndpoint(
-  logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
+export function useLeadsListEndpoint(logger: EndpointLogger): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

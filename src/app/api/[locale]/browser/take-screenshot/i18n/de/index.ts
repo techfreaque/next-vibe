@@ -2,12 +2,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Screenshot aufnehmen",
-  description:
-    "Nimmt einen Screenshot der Seite oder eines bestimmten Elements auf",
+  description: "Nimmt einen Screenshot der Seite oder eines bestimmten Elements auf",
   form: {
     label: "Screenshot aufnehmen",
-    description:
-      "Einen Screenshot der Browser-Seite oder eines Elements aufnehmen",
+    description: "Einen Screenshot der Browser-Seite oder eines Elements aufnehmen",
     fields: {
       uid: {
         label: "Element-UID",
@@ -54,13 +52,11 @@ export const translations: typeof enTranslations = {
   errors: {
     validation: {
       title: "Validierungsfehler",
-      description:
-        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
     },
     network: {
       title: "Netzwerkfehler",
-      description:
-        "Ein Netzwerkfehler ist beim Aufnehmen des Screenshots aufgetreten",
+      description: "Ein Netzwerkfehler ist beim Aufnehmen des Screenshots aufgetreten",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -76,23 +72,19 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Serverfehler",
-      description:
-        "Ein interner Serverfehler ist beim Aufnehmen des Screenshots aufgetreten",
+      description: "Ein interner Serverfehler ist beim Aufnehmen des Screenshots aufgetreten",
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description:
-        "Ein unbekannter Fehler ist beim Aufnehmen des Screenshots aufgetreten",
+      description: "Ein unbekannter Fehler ist beim Aufnehmen des Screenshots aufgetreten",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description:
-        "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
+      description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
     },
     conflict: {
       title: "Konflikt",
-      description:
-        "Ein Konflikt ist beim Aufnehmen des Screenshots aufgetreten",
+      description: "Ein Konflikt ist beim Aufnehmen des Screenshots aufgetreten",
     },
   },
   success: {

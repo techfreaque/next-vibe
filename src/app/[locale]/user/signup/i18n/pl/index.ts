@@ -3,22 +3,19 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   meta: {
     title: "Zarejestruj się - {{appName}}",
-    description:
-      "Utwórz swoje konto {{appName}} i zacznij budować niesamowite aplikacje",
+    description: "Utwórz swoje konto {{appName}} i zacznij budować niesamowite aplikacje",
     category: "Uwierzytelnianie",
     imageAlt: "Rejestracja {{appName}}",
     keywords: "rejestracja, zarejestruj się, utwórz konto, {{appName}}",
     ogTitle: "Zarejestruj się w {{appName}}",
-    ogDescription:
-      "Dołącz do {{appName}} i zacznij budować niesamowite aplikacje już dziś",
+    ogDescription: "Dołącz do {{appName}} i zacznij budować niesamowite aplikacje już dziś",
     twitterTitle: "Zarejestruj się w {{appName}}",
     twitterDescription: "Utwórz swoje konto i zacznij budować z {{appName}}",
   },
   auth: {
     signup: {
       title: "Rozpocznij swoją podróż z {{appName}}",
-      subtitle:
-        "Dołącz do tysięcy programistów budujących niesamowite aplikacje",
+      subtitle: "Dołącz do tysięcy programistów budujących niesamowite aplikacje",
       createAccountButton: "Utwórz konto",
       creatingAccount: "Tworzenie konta...",
       alreadyHaveAccount: "Masz już konto?",
@@ -37,13 +34,11 @@ export const translations: typeof enTranslations = {
       benefits: {
         contentCreation: {
           title: "Potężne tworzenie treści",
-          description:
-            "Twórz i zarządzaj treścią za pomocą naszych intuicyjnych narzędzi",
+          description: "Twórz i zarządzaj treścią za pomocą naszych intuicyjnych narzędzi",
         },
         dataStrategy: {
           title: "Inteligentna strategia danych",
-          description:
-            "Wykorzystaj spostrzeżenia oparte na danych do lepszych decyzji",
+          description: "Wykorzystaj spostrzeżenia oparte na danych do lepszych decyzji",
         },
         saveTime: {
           title: "Oszczędzaj czas i wysiłek",

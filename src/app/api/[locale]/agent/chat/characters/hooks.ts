@@ -20,9 +20,7 @@ import definitions from "./definition";
  * - Returns user's custom characters from database
  * - Automatically merges both lists
  */
-export function useCharactersList(
-  logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
+export function useCharactersList(logger: EndpointLogger): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {
@@ -45,9 +43,7 @@ export function useCharactersList(
  * - Category and icon selection
  * - Auto-refetches character list on success
  */
-export function useCreateCharacter(
-  logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
+export function useCreateCharacter(logger: EndpointLogger): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

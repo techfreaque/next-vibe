@@ -44,8 +44,7 @@ export const translations: typeof enTranslations = {
         stubLabel: "DropdownItem (Stub)",
       },
       form: {
-        useFormFieldError:
-          "useFormField sollte innerhalb von <FormField> verwendet werden",
+        useFormFieldError: "useFormField sollte innerhalb von <FormField> verwendet werden",
         endpointFormField: {
           stubWarning: "Verwende Stub: EndpointFormField",
           stubLabel: "EndpointFormField (Stub)",

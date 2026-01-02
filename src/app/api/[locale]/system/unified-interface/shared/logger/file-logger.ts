@@ -38,10 +38,7 @@ function getDebugFilePath(): string {
  * Write debug message to file
  * This is used when MCP silent mode is enabled and console logging is disabled
  */
-export function fileLog(
-  message: string,
-  data?: Record<string, LoggerMetadata>,
-): void {
+export function fileLog(message: string, data?: Record<string, LoggerMetadata>): void {
   // Only log if DEBUG_FILE_LOGGING is enabled
   if (process.env.DEBUG_FILE_LOGGING !== "true") {
     return;

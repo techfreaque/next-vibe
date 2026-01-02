@@ -36,9 +36,7 @@ export function FolderList({
   const childFolders = useMemo(() => {
     return (
       Object.values(folders).filter(
-        (folder) =>
-          folder.rootFolderId === activeRootFolderId &&
-          folder.parentId === null,
+        (folder) => folder.rootFolderId === activeRootFolderId && folder.parentId === null,
       ) || []
     ).toSorted((a, b) => {
       // First sort by sortOrder
@@ -55,9 +53,7 @@ export function FolderList({
   const childThreads = useMemo(() => {
     return (
       Object.values(threads).filter(
-        (thread) =>
-          thread.rootFolderId === activeRootFolderId &&
-          thread.folderId === null,
+        (thread) => thread.rootFolderId === activeRootFolderId && thread.folderId === null,
       ) || []
     ).toSorted((a, b) => {
       // Pinned threads come first
@@ -70,10 +66,7 @@ export function FolderList({
   }, [threads, activeRootFolderId]);
 
   // Memoize grouped threads by time
-  const groupedThreads = useMemo(
-    () => groupThreadsByTime(childThreads),
-    [childThreads],
-  );
+  const groupedThreads = useMemo(() => groupThreadsByTime(childThreads), [childThreads]);
 
   return (
     <Div className="flex flex-col gap-1 py-2">
@@ -97,11 +90,7 @@ export function FolderList({
               <Div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
                 {t("app.chat.folderList.today")}
               </Div>
-              <ThreadList
-                threads={groupedThreads.today}
-                locale={locale}
-                logger={logger}
-              />
+              <ThreadList threads={groupedThreads.today} locale={locale} logger={logger} />
             </Div>
           )}
 
@@ -110,11 +99,7 @@ export function FolderList({
               <Div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
                 {t("app.chat.folderList.lastWeek")}
               </Div>
-              <ThreadList
-                threads={groupedThreads.lastWeek}
-                locale={locale}
-                logger={logger}
-              />
+              <ThreadList threads={groupedThreads.lastWeek} locale={locale} logger={logger} />
             </Div>
           )}
 
@@ -123,11 +108,7 @@ export function FolderList({
               <Div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
                 {t("app.chat.folderList.lastMonth")}
               </Div>
-              <ThreadList
-                threads={groupedThreads.lastMonth}
-                locale={locale}
-                logger={logger}
-              />
+              <ThreadList threads={groupedThreads.lastMonth} locale={locale} logger={logger} />
             </Div>
           )}
         </Div>

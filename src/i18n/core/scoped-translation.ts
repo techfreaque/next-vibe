@@ -5,10 +5,7 @@
 
 import { type CountryLanguage, defaultLocale, type Languages } from "./config";
 import { getLanguageFromLocale } from "./language-utils";
-import {
-  navigateTranslationObject,
-  processTranslationValue,
-} from "./shared-translation-utils";
+import { navigateTranslationObject, processTranslationValue } from "./shared-translation-utils";
 import type { TParams } from "./static-types";
 import type { DotNotation } from "./static-types";
 
@@ -63,26 +60,17 @@ export function createScopedTranslation<
 ): {
   readonly ScopedTranslationKey: DotNotation<TTranslations["en"]>;
   readonly scopedT: (locale: CountryLanguage) => {
-    t: (
-      key: DotNotation<TTranslations["en"]>,
-      params?: TParams,
-    ) => TranslatedKeyType;
+    t: (key: DotNotation<TTranslations["en"]>, params?: TParams) => TranslatedKeyType;
   };
 } {
   return {
     ScopedTranslationKey: undefined as DotNotation<TTranslations["en"]>,
 
     scopedT: function simpleT(locale: CountryLanguage): {
-      t: (
-        key: DotNotation<TTranslations["en"]>,
-        params?: TParams,
-      ) => TranslatedKeyType;
+      t: (key: DotNotation<TTranslations["en"]>, params?: TParams) => TranslatedKeyType;
     } {
       return {
-        t: (
-          key: DotNotation<TTranslations["en"]>,
-          params?: TParams,
-        ): TranslatedKeyType => {
+        t: (key: DotNotation<TTranslations["en"]>, params?: TParams): TranslatedKeyType => {
           // Extract language from locale with safety check
           if (!locale || typeof locale !== "string") {
             return key as TranslatedKeyType; // Return the key as fallback
@@ -108,11 +96,7 @@ export function createScopedTranslation<
           }
 
           // Process the translation value using shared logic (handles parameter replacement)
-          return processTranslationValue(
-            value,
-            key,
-            params as TParams,
-          ) as TranslatedKeyType;
+          return processTranslationValue(value, key, params as TParams) as TranslatedKeyType;
         },
       };
     },

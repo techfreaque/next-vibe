@@ -11,10 +11,7 @@ import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { WidgetType } from "../../../shared/types/enums";
-import type {
-  ReactWidgetProps,
-  WidgetData,
-} from "../../../shared/widgets/types";
+import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
 import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
 
 // Color palette for charts
@@ -77,10 +74,7 @@ function toChartDataPoint<TTranslationKey extends string>(
   return {
     x: String(obj.x),
     y: obj.y,
-    label:
-      obj.label !== undefined
-        ? (String(obj.label) as TTranslationKey)
-        : undefined,
+    label: obj.label !== undefined ? (String(obj.label) as TTranslationKey) : undefined,
   };
 }
 
@@ -91,9 +85,7 @@ function toChartSeries<TTranslationKey extends string>(
   const obj = item as { name: string; data: WidgetData[]; color?: string };
   return {
     name: obj.name,
-    data: obj.data
-      .filter(looksLikeChartDataPoint)
-      .map(toChartDataPoint<TTranslationKey>),
+    data: obj.data.filter(looksLikeChartDataPoint).map(toChartDataPoint<TTranslationKey>),
     color: obj.color,
   };
 }
@@ -121,9 +113,7 @@ function extractChartData<TTranslationKey extends string>(
     // Check if it's array of series: [{name: "Series1", data: [...]}, ...]
     if (value[0] && looksLikeChartSeries(value[0])) {
       // Filter and convert to ChartSeries
-      const validSeries = value
-        .filter(looksLikeChartSeries)
-        .map(toChartSeries<TTranslationKey>);
+      const validSeries = value.filter(looksLikeChartSeries).map(toChartSeries<TTranslationKey>);
       return {
         type: "series",
         data: validSeries,
@@ -204,9 +194,7 @@ export function ChartWidget<const TKey extends string>({
   } = field.ui;
 
   const title = labelKey ? t(labelKey as TranslationKey) : undefined;
-  const description = descriptionKey
-    ? t(descriptionKey as TranslationKey)
-    : undefined;
+  const description = descriptionKey ? t(descriptionKey as TranslationKey) : undefined;
 
   // Extract chart data
   const chartData = extractChartData<TKey>(value);
@@ -231,9 +219,7 @@ export function ChartWidget<const TKey extends string>({
             }}
           >
             <Span className="text-muted-foreground">
-              {globalT(
-                "app.api.system.unifiedInterface.widgets.chart.noDataAvailable",
-              )}
+              {globalT("app.api.system.unifiedInterface.widgets.chart.noDataAvailable")}
             </Span>
           </Div>
         </CardContent>
@@ -273,9 +259,7 @@ export function ChartWidget<const TKey extends string>({
             }}
           >
             <Span className="text-muted-foreground">
-              {globalT(
-                "app.api.system.unifiedInterface.widgets.chart.noDataToDisplay",
-              )}
+              {globalT("app.api.system.unifiedInterface.widgets.chart.noDataToDisplay")}
             </Span>
           </Div>
         );
@@ -386,12 +370,8 @@ export function ChartWidget<const TKey extends string>({
     <Card className={cn("h-full", className)}>
       {(title || description) && (
         <CardHeader className="pb-2">
-          {title && (
-            <CardTitle className="text-sm font-medium">{title}</CardTitle>
-          )}
-          {description && (
-            <Span className="text-xs text-muted-foreground">{description}</Span>
-          )}
+          {title && <CardTitle className="text-sm font-medium">{title}</CardTitle>}
+          {description && <Span className="text-xs text-muted-foreground">{description}</Span>}
         </CardHeader>
       )}
       <CardContent className="pt-0">
@@ -404,16 +384,13 @@ export function ChartWidget<const TKey extends string>({
               <Div key={series.name} className="flex items-center gap-2">
                 <Div
                   style={{
-                    backgroundColor:
-                      series.color || CHART_COLORS[i % CHART_COLORS.length],
+                    backgroundColor: series.color || CHART_COLORS[i % CHART_COLORS.length],
                     height: 12,
                     width: 12,
                     borderRadius: 9999,
                   }}
                 />
-                <Span className="text-xs text-muted-foreground">
-                  {series.name}
-                </Span>
+                <Span className="text-xs text-muted-foreground">{series.name}</Span>
               </Div>
             ))}
           </Div>

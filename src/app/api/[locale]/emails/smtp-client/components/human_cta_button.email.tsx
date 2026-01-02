@@ -55,11 +55,7 @@ export function HumanCTAButton({
 }: HumanCTAButtonProps): React.JSX.Element {
   return (
     <div style={{ textAlign: "left", margin: "20px 0" }}>
-      <TrackedLink
-        href={href}
-        style={BUTTON_STYLE[variant]}
-        tracking={tracking}
-      >
+      <TrackedLink href={href} style={BUTTON_STYLE[variant]} tracking={tracking}>
         {text}
       </TrackedLink>
     </div>

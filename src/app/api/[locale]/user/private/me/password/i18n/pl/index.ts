@@ -40,8 +40,7 @@ export const translations: typeof enTranslations = {
   },
   twoFactorCode: {
     label: "Kod Dwuskładnikowy",
-    description:
-      "Wprowadź kod uwierzytelniania dwuskładnikowego, jeśli jest włączony",
+    description: "Wprowadź kod uwierzytelniania dwuskładnikowego, jeśli jest włączony",
     placeholder: "Wprowadź kod 2FA",
   },
   response: {
@@ -75,8 +74,7 @@ export const translations: typeof enTranslations = {
     update_failed: "Nie udało się zaktualizować hasła",
     token_creation_failed: "Nie udało się utworzyć tokenu hasła",
     two_factor_code_required: "Wymagany kod uwierzytelniania dwuskładnikowego",
-    invalid_two_factor_code:
-      "Nieprawidłowy kod uwierzytelniania dwuskładnikowego",
+    invalid_two_factor_code: "Nieprawidłowy kod uwierzytelniania dwuskładnikowego",
     invalid_request: {
       title: "Nieprawidłowe Żądanie",
       description: "Żądanie zmiany hasła jest nieprawidłowe",
@@ -120,13 +118,10 @@ export const translations: typeof enTranslations = {
   },
   success: {
     updated: "Hasło zaktualizowane pomyślnie",
-    securityTip:
-      "Aby zwiększyć bezpieczeństwo, włącz uwierzytelnianie dwuskładnikowe",
+    securityTip: "Aby zwiększyć bezpieczeństwo, włącz uwierzytelnianie dwuskładnikowe",
     nextSteps: {
-      logoutOther:
-        "Wszystkie inne sesje zostały wylogowane ze względów bezpieczeństwa",
-      enable2fa:
-        "Rozważ włączenie uwierzytelniania dwuskładnikowego dla lepszego bezpieczeństwa",
+      logoutOther: "Wszystkie inne sesje zostały wylogowane ze względów bezpieczeństwa",
+      enable2fa: "Rozważ włączenie uwierzytelniania dwuskładnikowego dla lepszego bezpieczeństwa",
     },
     title: "Hasło Zaktualizowane",
     description: "Twoje hasło zostało pomyślnie zaktualizowane",

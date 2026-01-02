@@ -37,23 +37,15 @@ interface SuggestedPromptsProps {
 // Get first 5 characters for tabs
 const FEATURED_CHARACTERS = DEFAULT_CHARACTERS.slice(0, 5);
 
-export function SuggestedPrompts({
-  locale,
-}: SuggestedPromptsProps): JSX.Element {
+export function SuggestedPrompts({ locale }: SuggestedPromptsProps): JSX.Element {
   // Get callbacks and state from context
-  const {
-    handleFillInputWithPrompt: onSelectPrompt,
-    currentRootFolderId: rootFolderId,
-  } = useChatContext();
+  const { handleFillInputWithPrompt: onSelectPrompt, currentRootFolderId: rootFolderId } =
+    useChatContext();
 
   const { t } = simpleT(locale);
-  const [selectedCharacter, setSelectedCharacter] = useState<Character>(
-    FEATURED_CHARACTERS[0],
-  );
+  const [selectedCharacter, setSelectedCharacter] = useState<Character>(FEATURED_CHARACTERS[0]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [expandedCharacterId, setExpandedCharacterId] = useState<string | null>(
-    null,
-  );
+  const [expandedCharacterId, setExpandedCharacterId] = useState<string | null>(null);
 
   const handleCharacterSelect = (character: Character): void => {
     setSelectedCharacter(character);
@@ -61,17 +53,11 @@ export function SuggestedPrompts({
   };
 
   const handlePromptClick = (prompt: string): void => {
-    onSelectPrompt(
-      prompt,
-      selectedCharacter.id,
-      selectedCharacter.preferredModel,
-    );
+    onSelectPrompt(prompt, selectedCharacter.id, selectedCharacter.preferredModel);
   };
 
   const toggleExpanded = (characterId: string): void => {
-    setExpandedCharacterId((prev) =>
-      prev === characterId ? null : characterId,
-    );
+    setExpandedCharacterId((prev) => (prev === characterId ? null : characterId));
   };
 
   const prompts = selectedCharacter.suggestedPrompts || [];
@@ -111,9 +97,7 @@ export function SuggestedPrompts({
   return (
     <Div className="w-full flex flex-col gap-6 sm:gap-8">
       <Div className="text-center flex flex-col gap-2">
-        <H1 className="text-3xl sm:text-4xl font-semibold text-center">
-          {t(getTitleKey())}
-        </H1>
+        <H1 className="text-3xl sm:text-4xl font-semibold text-center">{t(getTitleKey())}</H1>
         <P className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto text-center">
           {t(getDescriptionKey())}
         </P>
@@ -136,9 +120,7 @@ export function SuggestedPrompts({
             {React.createElement(getIconComponent(character.icon), {
               className: "text-base sm:text-lg",
             })}
-            <Span className="font-medium hidden sm:inline">
-              {character.name}
-            </Span>
+            <Span className="font-medium hidden sm:inline">{character.name}</Span>
           </Button>
         ))}
 
@@ -158,9 +140,7 @@ export function SuggestedPrompts({
           </DialogTrigger>
           <DialogContent className="max-w-3xl max-h-[85vh]">
             <DialogHeader>
-              <DialogTitle>
-                {t("app.chat.suggestedPrompts.selectCharacter")}
-              </DialogTitle>
+              <DialogTitle>{t("app.chat.suggestedPrompts.selectCharacter")}</DialogTitle>
             </DialogHeader>
             <ScrollArea className="h-[70vh] pr-4">
               <Div className="flex flex-col gap-4">
@@ -190,16 +170,11 @@ export function SuggestedPrompts({
                         className="w-full text-left p-4 hover:bg-accent/50 rounded-lg"
                       >
                         <Div className="flex items-start gap-4 w-full">
-                          {React.createElement(
-                            getIconComponent(character.icon),
-                            {
-                              className: "text-3xl shrink-0",
-                            },
-                          )}
+                          {React.createElement(getIconComponent(character.icon), {
+                            className: "text-3xl shrink-0",
+                          })}
                           <Div className="flex-1 min-w-0">
-                            <H3 className="text-lg font-semibold mb-1">
-                              {t(character.name)}
-                            </H3>
+                            <H3 className="text-lg font-semibold mb-1">{t(character.name)}</H3>
                             <P className="text-sm text-muted-foreground">
                               {t(character.description)}
                             </P>
@@ -207,23 +182,17 @@ export function SuggestedPrompts({
                             <Div className="flex flex-wrap gap-2 mt-2">
                               {categoryConfig && (
                                 <Div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50 text-xs">
-                                  {React.createElement(
-                                    getIconComponent(categoryConfig.icon),
-                                    {
-                                      className: "text-sm",
-                                    },
-                                  )}
+                                  {React.createElement(getIconComponent(categoryConfig.icon), {
+                                    className: "text-sm",
+                                  })}
                                   <Span>{t(categoryConfig.label)}</Span>
                                 </Div>
                               )}
                               {modelConfig && (
                                 <Div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50 text-xs">
-                                  {React.createElement(
-                                    getIconComponent(modelConfig.icon),
-                                    {
-                                      className: "text-sm",
-                                    },
-                                  )}
+                                  {React.createElement(getIconComponent(modelConfig.icon), {
+                                    className: "text-sm",
+                                  })}
                                   <Span>{modelConfig.name}</Span>
                                 </Div>
                               )}
@@ -240,12 +209,9 @@ export function SuggestedPrompts({
                           size="sm"
                           className="w-full justify-start text-xs gap-2 h-8"
                         >
-                          {React.createElement(
-                            isExpanded ? ChevronUp : ChevronDown,
-                            {
-                              className: "h-3.5 w-3.5 shrink-0",
-                            },
-                          )}
+                          {React.createElement(isExpanded ? ChevronUp : ChevronDown, {
+                            className: "h-3.5 w-3.5 shrink-0",
+                          })}
                           <Span className="text-muted-foreground">
                             {isExpanded
                               ? t("app.chat.suggestedPrompts.hideDetails")
@@ -262,9 +228,7 @@ export function SuggestedPrompts({
                             {character.systemPrompt && (
                               <Div className="flex flex-col gap-2">
                                 <Span className="text-sm font-semibold">
-                                  {t(
-                                    "app.chat.suggestedPrompts.systemPromptLabel",
-                                  )}
+                                  {t("app.chat.suggestedPrompts.systemPromptLabel")}
                                 </Span>
                                 <Div className="prose prose-sm dark:prose-invert max-w-none bg-muted/30 p-3 rounded-md border border-border">
                                   <Markdown content={character.systemPrompt} />
@@ -277,27 +241,23 @@ export function SuggestedPrompts({
                               character.suggestedPrompts.length > 0 && (
                                 <Div className="flex flex-col gap-2">
                                   <Span className="text-sm font-semibold">
-                                    {t(
-                                      "app.chat.suggestedPrompts.suggestedPromptsLabel",
-                                    )}
+                                    {t("app.chat.suggestedPrompts.suggestedPromptsLabel")}
                                   </Span>
                                   <Div className="flex flex-col gap-2">
-                                    {character.suggestedPrompts.map(
-                                      (promptKey, idx) => (
-                                        <Button
-                                          key={idx}
-                                          onClick={(): void => {
-                                            handlePromptClick(t(promptKey));
-                                            setModalOpen(false);
-                                          }}
-                                          variant="ghost"
-                                          size="unset"
-                                          className="w-full text-left p-3 rounded-lg hover:bg-accent transition-all border border-border text-sm"
-                                        >
-                                          {t(promptKey)}
-                                        </Button>
-                                      ),
-                                    )}
+                                    {character.suggestedPrompts.map((promptKey, idx) => (
+                                      <Button
+                                        key={idx}
+                                        onClick={(): void => {
+                                          handlePromptClick(t(promptKey));
+                                          setModalOpen(false);
+                                        }}
+                                        variant="ghost"
+                                        size="unset"
+                                        className="w-full text-left p-3 rounded-lg hover:bg-accent transition-all border border-border text-sm"
+                                      >
+                                        {t(promptKey)}
+                                      </Button>
+                                    ))}
                                   </Div>
                                 </Div>
                               )}

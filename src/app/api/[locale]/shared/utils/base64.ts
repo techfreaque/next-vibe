@@ -29,10 +29,7 @@ export function createDataUrl(content: string, mimeType: string): string {
  * @param mimeType - The MIME type (e.g., 'image/png', 'image/jpeg')
  * @returns A data URL string
  */
-export function createDataUrlFromBase64(
-  base64Content: string,
-  mimeType: string,
-): string {
+export function createDataUrlFromBase64(base64Content: string, mimeType: string): string {
   // eslint-disable-next-line i18next/no-literal-string
   const dataPrefix = "data:";
   // eslint-disable-next-line i18next/no-literal-string

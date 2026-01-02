@@ -9,8 +9,7 @@ export const translations = {
   },
   admin: {
     title: "Email Management",
-    description:
-      "Monitor email campaigns, track performance, and analyze engagement",
+    description: "Monitor email campaigns, track performance, and analyze engagement",
     stats: {
       title: "Email Statistics",
     },

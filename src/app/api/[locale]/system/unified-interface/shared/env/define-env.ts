@@ -37,11 +37,7 @@ export function defineEnv<T extends Fields>(fields: T): { env: InferEnv<T> } {
   );
   const schema = zod.object(schemaShape);
 
-  const env = validateEnv(
-    process.env,
-    schema,
-    envValidationLogger,
-  ) as InferEnv<T>;
+  const env = validateEnv(process.env, schema, envValidationLogger) as InferEnv<T>;
 
   return { env };
 }

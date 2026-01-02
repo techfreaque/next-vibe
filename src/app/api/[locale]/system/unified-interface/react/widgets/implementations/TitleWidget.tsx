@@ -47,9 +47,7 @@ export function TitleWidget<const TKey extends string>({
         {text}
       </Title>
 
-      {subtitle && (
-        <Span className="mt-2 text-base text-muted-foreground">{subtitle}</Span>
-      )}
+      {subtitle && <Span className="mt-2 text-base text-muted-foreground">{subtitle}</Span>}
     </Div>
   );
 }

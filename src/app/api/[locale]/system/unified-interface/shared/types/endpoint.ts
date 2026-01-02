@@ -231,22 +231,14 @@ type InferVariantSchemas<
         string,
         WidgetConfig<string>
       >[]
-      ? [
-          InferSchemaFromField<Head, Usage>,
-          ...InferVariantSchemas<string, Tail, Usage>,
-        ]
+      ? [InferSchemaFromField<Head, Usage>, ...InferVariantSchemas<string, Tail, Usage>]
       : [InferSchemaFromField<Head, Usage>]
     : []
   : [];
 
 export type InferSchemaFromField<F, Usage extends FieldUsage> =
   // Handle PrimitiveField - use string for pattern matching
-  F extends PrimitiveField<
-    infer TSchemaInferred,
-    FieldUsageConfig,
-    string,
-    WidgetConfig<string>
-  >
+  F extends PrimitiveField<infer TSchemaInferred, FieldUsageConfig, string, WidgetConfig<string>>
     ? F extends { usage: infer TUsage }
       ? MatchesUsage<TUsage, Usage> extends true
         ? TSchemaInferred
@@ -290,26 +282,15 @@ export type InferSchemaFromField<F, Usage extends FieldUsage> =
                       ...z.ZodObject<z.ZodRawShape>[],
                     ]
                     ? T
-                    : readonly [
-                        z.ZodObject<z.ZodRawShape>,
-                        z.ZodObject<z.ZodRawShape>,
-                      ]
-                  : readonly [
-                      z.ZodObject<z.ZodRawShape>,
-                      z.ZodObject<z.ZodRawShape>,
-                    ],
+                    : readonly [z.ZodObject<z.ZodRawShape>, z.ZodObject<z.ZodRawShape>]
+                  : readonly [z.ZodObject<z.ZodRawShape>, z.ZodObject<z.ZodRawShape>],
                 TDiscriminator
               >
             : z.ZodNever
           : z.ZodNever
         : z.ZodNever
       : // Handle ObjectField - use string for pattern matching
-        F extends ObjectField<
-            infer TChildren,
-            FieldUsageConfig,
-            string,
-            WidgetConfig<string>
-          >
+        F extends ObjectField<infer TChildren, FieldUsageConfig, string, WidgetConfig<string>>
         ? F extends { usage: infer TUsage }
           ? MatchesUsage<TUsage, Usage> extends true
             ? z.ZodObject<{
@@ -346,12 +327,7 @@ export type InferSchemaFromField<F, Usage extends FieldUsage> =
               : z.ZodNever
             : z.ZodNever
           : // Handle ArrayField - use string for pattern matching
-            F extends ArrayField<
-                infer TChild,
-                FieldUsageConfig,
-                string,
-                WidgetConfig<string>
-              >
+            F extends ArrayField<infer TChild, FieldUsageConfig, string, WidgetConfig<string>>
             ? F extends { usage: infer TUsage }
               ? MatchesUsage<TUsage, Usage> extends true
                 ? z.ZodArray<
@@ -412,11 +388,7 @@ export type InferOutputFromField<
  * METHOD-SPECIFIC USAGE MATCHING: Check if usage matches for a specific method
  * This is the core logic that enables method-specific type inference
  */
-type MatchesUsageForMethod<
-  TUsage,
-  TMethod extends Methods,
-  TTargetUsage extends FieldUsage,
-> =
+type MatchesUsageForMethod<TUsage, TMethod extends Methods, TTargetUsage extends FieldUsage> =
   // Check if it's method-specific format first
   TMethod extends keyof TUsage
     ? TUsage[TMethod] extends infer TMethodUsage
@@ -465,17 +437,8 @@ type ComputeChildSchemas<
   Method extends Methods,
   Usage extends FieldUsage,
 > = {
-  [K in keyof TChildren]: TChildren[K] extends UnifiedField<
-    TTranslationKey,
-    z.ZodTypeAny
-  >
-    ? InferSchemaFromFieldForMethod<
-        TTranslationKey,
-        TChildren[K],
-        Method,
-        Usage,
-        z.ZodTypeAny
-      >
+  [K in keyof TChildren]: TChildren[K] extends UnifiedField<TTranslationKey, z.ZodTypeAny>
+    ? InferSchemaFromFieldForMethod<TTranslationKey, TChildren[K], Method, Usage, z.ZodTypeAny>
     : never;
 };
 
@@ -483,9 +446,7 @@ type ComputeChildSchemas<
  * Filter out never schemas from computed children
  */
 type FilterNeverSchemas<TSchemas> = {
-  [K in keyof TSchemas as TSchemas[K] extends z.ZodNever
-    ? never
-    : K]: TSchemas[K];
+  [K in keyof TSchemas as TSchemas[K] extends z.ZodNever ? never : K]: TSchemas[K];
 };
 
 export type InferSchemaFromFieldForMethod<
@@ -515,9 +476,7 @@ export type InferSchemaFromFieldForMethod<
           WidgetConfig<TTranslationKey>
         >
       ? z.ZodObject<
-          FilterNeverSchemas<
-            ComputeChildSchemas<TTranslationKey, TChildren, Method, Usage>
-          >
+          FilterNeverSchemas<ComputeChildSchemas<TTranslationKey, TChildren, Method, Usage>>
         >
       : // Handle ObjectOptionalField - process children based on their own usage
         F extends ObjectOptionalField<
@@ -529,9 +488,7 @@ export type InferSchemaFromFieldForMethod<
         ? z.ZodOptional<
             z.ZodNullable<
               z.ZodObject<
-                FilterNeverSchemas<
-                  ComputeChildSchemas<TTranslationKey, TChildren, Method, Usage>
-                >
+                FilterNeverSchemas<ComputeChildSchemas<TTranslationKey, TChildren, Method, Usage>>
               >
             >
           >
@@ -596,9 +553,7 @@ export type InferInputFromFieldForMethod<
   Method extends Methods,
   Usage extends FieldUsage,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-> = ExtractInput<
-  InferSchemaFromFieldForMethod<TTranslationKey, F, Method, Usage, TSchema>
->;
+> = ExtractInput<InferSchemaFromFieldForMethod<TTranslationKey, F, Method, Usage, TSchema>>;
 
 /**
  * METHOD-SPECIFIC OUTPUT TYPE INFERENCE
@@ -609,9 +564,7 @@ export type InferOutputFromFieldForMethod<
   Method extends Methods,
   Usage extends FieldUsage,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-> = ExtractOutput<
-  InferSchemaFromFieldForMethod<TTranslationKey, F, Method, Usage, TSchema>
->;
+> = ExtractOutput<InferSchemaFromFieldForMethod<TTranslationKey, F, Method, Usage, TSchema>>;
 
 // ============================================================================
 // BASIC TYPE UTILITIES
@@ -831,10 +784,7 @@ export interface FormActionConfig extends BaseActionConfig {
  * State action
  */
 export interface StateActionConfig extends BaseActionConfig {
-  type:
-    | ActionType.SET_STATE
-    | ActionType.TOGGLE_STATE
-    | ActionType.UPDATE_STATE;
+  type: ActionType.SET_STATE | ActionType.TOGGLE_STATE | ActionType.UPDATE_STATE;
   key: string;
   value?: FieldValue;
   updater?: (current: FieldValue) => FieldValue;
@@ -1103,10 +1053,7 @@ export interface WidgetField<
  * This ensures all widget configs in the field tree use the correct translation key type.
  *
  */
-export type UnifiedField<
-  TKey extends string,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-> =
+export type UnifiedField<TKey extends string, TSchema extends z.ZodTypeAny = z.ZodTypeAny> =
   | PrimitiveField<TSchema, FieldUsageConfig, TKey, WidgetConfig<TKey>>
   | ObjectField<
       Record<string, UnifiedField<TKey, z.ZodTypeAny>>,

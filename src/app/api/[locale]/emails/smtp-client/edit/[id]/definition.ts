@@ -20,12 +20,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import {
-  Countries,
-  CountriesOptions,
-  Languages,
-  LanguagesOptions,
-} from "@/i18n/core/config";
+import { Countries, CountriesOptions, Languages, LanguagesOptions } from "@/i18n/core/config";
 
 import {
   EmailCampaignStage,
@@ -60,8 +55,7 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.emails.smtpClient.edit.id.get.container.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.get.container.description",
+      description: "app.api.emails.smtpClient.edit.id.get.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -75,8 +69,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.smtpClient.edit.id.fields.id.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.id.description",
+          description: "app.api.emails.smtpClient.edit.id.fields.id.description",
           columns: 12,
         },
       ),
@@ -91,8 +84,7 @@ const { GET } = createEndpoint({
       description: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.smtpClient.edit.id.response.account.fields.description",
+          content: "app.api.emails.smtpClient.edit.id.response.account.fields.description",
         },
         z.string().optional(),
       ),
@@ -120,16 +112,14 @@ const { GET } = createEndpoint({
       username: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.smtpClient.edit.id.response.account.username",
+          content: "app.api.emails.smtpClient.edit.id.response.account.username",
         },
         z.string(),
       ),
       fromEmail: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.smtpClient.edit.id.response.account.fromEmail",
+          content: "app.api.emails.smtpClient.edit.id.response.account.fromEmail",
         },
         z.email(),
       ),
@@ -150,80 +140,70 @@ const { GET } = createEndpoint({
       priority: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.smtpClient.edit.id.response.account.priority",
+          content: "app.api.emails.smtpClient.edit.id.response.account.priority",
         },
         z.coerce.number().int().optional(),
       ),
       totalEmailsSent: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.smtpClient.edit.id.response.account.totalEmailsSent",
+          content: "app.api.emails.smtpClient.edit.id.response.account.totalEmailsSent",
         },
         z.coerce.number().int(),
       ),
       lastUsedAt: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.smtpClient.edit.id.response.account.lastUsedAt",
+          content: "app.api.emails.smtpClient.edit.id.response.account.lastUsedAt",
         },
         z.string().datetime().nullable(),
       ),
       createdAt: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.smtpClient.edit.id.response.account.createdAt",
+          content: "app.api.emails.smtpClient.edit.id.response.account.createdAt",
         },
         z.string().datetime(),
       ),
       updatedAt: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.smtpClient.edit.id.response.account.updatedAt",
+          content: "app.api.emails.smtpClient.edit.id.response.account.updatedAt",
         },
         z.string().datetime(),
       ),
       campaignTypes: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.smtpClient.edit.id.response.account.campaignTypes",
+          content: "app.api.emails.smtpClient.edit.id.response.account.campaignTypes",
         },
         z.array(z.enum(CampaignType)).optional(),
       ),
       emailJourneyVariants: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.smtpClient.edit.id.response.account.emailJourneyVariants",
+          content: "app.api.emails.smtpClient.edit.id.response.account.emailJourneyVariants",
         },
         z.array(z.enum(EmailJourneyVariant)).optional(),
       ),
       emailCampaignStages: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.smtpClient.edit.id.response.account.emailCampaignStages",
+          content: "app.api.emails.smtpClient.edit.id.response.account.emailCampaignStages",
         },
         z.array(z.enum(EmailCampaignStage)).optional(),
       ),
       countries: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.smtpClient.edit.id.response.account.countries",
+          content: "app.api.emails.smtpClient.edit.id.response.account.countries",
         },
         z.array(z.enum(Countries)).optional(),
       ),
       languages: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.smtpClient.edit.id.response.account.languages",
+          content: "app.api.emails.smtpClient.edit.id.response.account.languages",
         },
         z.array(z.enum(Languages)).optional(),
       ),
@@ -234,48 +214,39 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.emails.smtpClient.edit.id.errors.validation.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.validation.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.emails.smtpClient.edit.id.errors.unauthorized.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.unauthorized.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.emails.smtpClient.edit.id.errors.forbidden.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.forbidden.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.emails.smtpClient.edit.id.errors.notFound.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.notFound.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.emails.smtpClient.edit.id.errors.conflict.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.conflict.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.emails.smtpClient.edit.id.errors.server.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.server.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.emails.smtpClient.edit.id.errors.networkError.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.networkError.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.networkError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.emails.smtpClient.edit.id.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.unsavedChanges.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.smtpClient.edit.id.errors.unknown.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.unknown.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.unknown.description",
     },
   },
 
@@ -332,8 +303,7 @@ const { PUT } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.emails.smtpClient.edit.id.put.container.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.put.container.description",
+      description: "app.api.emails.smtpClient.edit.id.put.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -347,8 +317,7 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.smtpClient.edit.id.fields.id.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.id.description",
+          description: "app.api.emails.smtpClient.edit.id.fields.id.description",
           columns: 12,
         },
       ),
@@ -358,10 +327,8 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.smtpClient.edit.id.fields.name.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.name.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.name.placeholder",
+          description: "app.api.emails.smtpClient.edit.id.fields.name.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.name.placeholder",
           columns: 6,
         },
         z.string().min(1).optional(),
@@ -372,10 +339,8 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
           label: "app.api.emails.smtpClient.edit.id.fields.description.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.description.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.description.placeholder",
+          description: "app.api.emails.smtpClient.edit.id.fields.description.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.description.placeholder",
           columns: 12,
         },
         z.string().optional(),
@@ -386,10 +351,8 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.smtpClient.edit.id.fields.host.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.host.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.host.placeholder",
+          description: "app.api.emails.smtpClient.edit.id.fields.host.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.host.placeholder",
           columns: 6,
         },
         z.string().min(1).optional(),
@@ -400,10 +363,8 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.emails.smtpClient.edit.id.fields.port.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.port.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.port.placeholder",
+          description: "app.api.emails.smtpClient.edit.id.fields.port.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.port.placeholder",
           columns: 6,
         },
         z.coerce.number().min(1).max(65535).optional(),
@@ -414,10 +375,8 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.smtpClient.edit.id.fields.securityType.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.securityType.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.securityType.placeholder",
+          description: "app.api.emails.smtpClient.edit.id.fields.securityType.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.securityType.placeholder",
           columns: 6,
           options: SmtpSecurityTypeOptions,
         },
@@ -429,10 +388,8 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.smtpClient.edit.id.fields.username.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.username.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.username.placeholder",
+          description: "app.api.emails.smtpClient.edit.id.fields.username.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.username.placeholder",
           columns: 6,
         },
         z.string().min(1).optional(),
@@ -443,10 +400,8 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.PASSWORD,
           label: "app.api.emails.smtpClient.edit.id.fields.password.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.password.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.password.placeholder",
+          description: "app.api.emails.smtpClient.edit.id.fields.password.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.password.placeholder",
           columns: 6,
         },
         // Password is optional - leave empty to keep current password, or enter new one to change it
@@ -458,10 +413,8 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.EMAIL,
           label: "app.api.emails.smtpClient.edit.id.fields.fromEmail.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.fromEmail.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.fromEmail.placeholder",
+          description: "app.api.emails.smtpClient.edit.id.fields.fromEmail.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.fromEmail.placeholder",
           columns: 6,
         },
         z.email().optional(),
@@ -472,10 +425,8 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.emails.smtpClient.edit.id.fields.priority.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.priority.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.priority.placeholder",
+          description: "app.api.emails.smtpClient.edit.id.fields.priority.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.priority.placeholder",
           columns: 6,
         },
         z.coerce.number().int().min(1).max(100).optional(),
@@ -486,10 +437,8 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
           label: "app.api.emails.smtpClient.edit.id.fields.campaignTypes.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.campaignTypes.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.campaignTypes.placeholder",
+          description: "app.api.emails.smtpClient.edit.id.fields.campaignTypes.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.campaignTypes.placeholder",
           columns: 6,
           options: CampaignTypeOptions,
         },
@@ -500,12 +449,9 @@ const { PUT } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
-          label:
-            "app.api.emails.smtpClient.edit.id.fields.emailJourneyVariants.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.emailJourneyVariants.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.emailJourneyVariants.placeholder",
+          label: "app.api.emails.smtpClient.edit.id.fields.emailJourneyVariants.label",
+          description: "app.api.emails.smtpClient.edit.id.fields.emailJourneyVariants.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.emailJourneyVariants.placeholder",
           columns: 6,
           options: EmailJourneyVariantOptions,
         },
@@ -516,12 +462,9 @@ const { PUT } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
-          label:
-            "app.api.emails.smtpClient.edit.id.fields.emailCampaignStages.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.emailCampaignStages.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.emailCampaignStages.placeholder",
+          label: "app.api.emails.smtpClient.edit.id.fields.emailCampaignStages.label",
+          description: "app.api.emails.smtpClient.edit.id.fields.emailCampaignStages.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.emailCampaignStages.placeholder",
           columns: 6,
           options: EmailCampaignStageOptions,
         },
@@ -533,10 +476,8 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
           label: "app.api.emails.smtpClient.edit.id.fields.countries.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.countries.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.countries.placeholder",
+          description: "app.api.emails.smtpClient.edit.id.fields.countries.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.countries.placeholder",
           columns: 6,
           options: CountriesOptions,
         },
@@ -548,10 +489,8 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
           label: "app.api.emails.smtpClient.edit.id.fields.languages.label",
-          description:
-            "app.api.emails.smtpClient.edit.id.fields.languages.description",
-          placeholder:
-            "app.api.emails.smtpClient.edit.id.fields.languages.placeholder",
+          description: "app.api.emails.smtpClient.edit.id.fields.languages.description",
+          placeholder: "app.api.emails.smtpClient.edit.id.fields.languages.placeholder",
           columns: 6,
           options: LanguagesOptions,
         },
@@ -564,48 +503,39 @@ const { PUT } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.emails.smtpClient.edit.id.errors.validation.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.validation.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.emails.smtpClient.edit.id.errors.unauthorized.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.unauthorized.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.emails.smtpClient.edit.id.errors.forbidden.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.forbidden.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.emails.smtpClient.edit.id.errors.notFound.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.notFound.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.emails.smtpClient.edit.id.errors.conflict.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.conflict.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.emails.smtpClient.edit.id.errors.server.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.server.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.emails.smtpClient.edit.id.errors.networkError.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.networkError.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.networkError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.emails.smtpClient.edit.id.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.unsavedChanges.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.smtpClient.edit.id.errors.unknown.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.unknown.description",
+      description: "app.api.emails.smtpClient.edit.id.errors.unknown.description",
     },
   },
 

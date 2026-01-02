@@ -3,15 +3,7 @@
  * Replaces the original HumanEmailLayout
  */
 
-import {
-  Body,
-  Container,
-  Head,
-  Html,
-  Img,
-  Preview,
-  Section,
-} from "@react-email/components";
+import { Body, Container, Head, Html, Img, Preview, Section } from "@react-email/components";
 import type { JSX, ReactNode } from "react";
 
 import { envClient } from "@/config/env-client";
@@ -168,9 +160,7 @@ export function HumanEmailLayout({
                 margin: "0",
               }}
             >
-              {t(
-                "app.api.emails.smtpClient.components.email.footer.unsubscribeText",
-              )}{" "}
+              {t("app.api.emails.smtpClient.components.email.footer.unsubscribeText")}{" "}
               <TrackedLink
                 href={unsubscribeUrl}
                 tracking={tracking}
@@ -179,9 +169,7 @@ export function HumanEmailLayout({
                   textDecoration: "underline",
                 }}
               >
-                {t(
-                  "app.api.emails.smtpClient.components.email.footer.unsubscribeLink",
-                )}
+                {t("app.api.emails.smtpClient.components.email.footer.unsubscribeLink")}
               </TrackedLink>
             </div>
 
@@ -193,13 +181,10 @@ export function HumanEmailLayout({
                 margin: "8px 0 0 0",
               }}
             >
-              {t(
-                "app.api.emails.smtpClient.components.email.footer.copyright",
-                {
-                  currentYear: new Date().getFullYear(),
-                  companyName,
-                },
-              )}
+              {t("app.api.emails.smtpClient.components.email.footer.copyright", {
+                currentYear: new Date().getFullYear(),
+                companyName,
+              })}
             </div>
           </Section>
         </Container>

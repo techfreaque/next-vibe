@@ -9,11 +9,7 @@ import "server-only";
 
 import { and, eq, ne } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 
@@ -85,16 +81,10 @@ async function executeNewsletterUnsubscribeSync(
         subscriptionStatus: newsletterSubscriptions.status,
       })
       .from(leads)
-      .innerJoin(
-        newsletterSubscriptions,
-        eq(leads.email, newsletterSubscriptions.email),
-      )
+      .innerJoin(newsletterSubscriptions, eq(leads.email, newsletterSubscriptions.email))
       .where(
         and(
-          eq(
-            newsletterSubscriptions.status,
-            NewsletterSubscriptionStatus.UNSUBSCRIBED,
-          ),
+          eq(newsletterSubscriptions.status, NewsletterSubscriptionStatus.UNSUBSCRIBED),
           ne(leads.status, LeadStatus.UNSUBSCRIBED),
         ),
       )
@@ -158,17 +148,11 @@ async function executeNewsletterUnsubscribeSync(
         subscriptionStatus: newsletterSubscriptions.status,
       })
       .from(leads)
-      .innerJoin(
-        newsletterSubscriptions,
-        eq(leads.email, newsletterSubscriptions.email),
-      )
+      .innerJoin(newsletterSubscriptions, eq(leads.email, newsletterSubscriptions.email))
       .where(
         and(
           eq(leads.status, LeadStatus.UNSUBSCRIBED),
-          eq(
-            newsletterSubscriptions.status,
-            NewsletterSubscriptionStatus.SUBSCRIBED,
-          ),
+          eq(newsletterSubscriptions.status, NewsletterSubscriptionStatus.SUBSCRIBED),
         ),
       )
       .limit(config.batchSize);
@@ -181,14 +165,11 @@ async function executeNewsletterUnsubscribeSync(
     for (const lead of inconsistentLeads) {
       try {
         leadsProcessed++;
-        logger.debug(
-          "tasks.newsletter_unsubscribe_sync.processing_resubscribed",
-          {
-            leadId: lead.leadId,
-            email: lead.leadEmail,
-            currentStatus: lead.leadStatus,
-          },
-        );
+        logger.debug("tasks.newsletter_unsubscribe_sync.processing_resubscribed", {
+          leadId: lead.leadId,
+          email: lead.leadEmail,
+          currentStatus: lead.leadStatus,
+        });
 
         if (!config.dryRun) {
           // Update lead status back to newsletter subscriber
@@ -239,9 +220,7 @@ async function executeNewsletterUnsubscribeSync(
     const executionTimeMs = Date.now() - startTime;
     logger.error("tasks.newsletter_unsubscribe_sync.failed", {
       error:
-        error instanceof Error
-          ? error.message
-          : "tasks.newsletter_unsubscribe_sync.unknown_error",
+        error instanceof Error ? error.message : "tasks.newsletter_unsubscribe_sync.unknown_error",
       executionTimeMs,
     });
 
@@ -255,9 +234,7 @@ async function executeNewsletterUnsubscribeSync(
 /**
  * Validate function for the task
  */
-async function validateNewsletterUnsubscribeSync(): Promise<
-  ResponseType<boolean>
-> {
+async function validateNewsletterUnsubscribeSync(): Promise<ResponseType<boolean>> {
   try {
     // Basic validation - check if database tables are accessible
     await db.select().from(leads).limit(1);

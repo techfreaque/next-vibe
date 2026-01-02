@@ -28,10 +28,7 @@ export const translations: typeof enTranslations = {
     expiresAt: "Token Wygasa",
     nextSteps: {
       item: "Kolejne Kroki Po Walidacji",
-      steps: [
-        "Przejdź do ustawienia nowego hasła",
-        "Wybierz silne, unikalne hasło",
-      ],
+      steps: ["Przejdź do ustawienia nowego hasła", "Wybierz silne, unikalne hasło"],
     },
   },
   errors: {

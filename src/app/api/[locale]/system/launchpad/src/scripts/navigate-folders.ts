@@ -8,11 +8,7 @@ import { promisify } from "node:util";
 import chalk from "chalk";
 import inquirer from "inquirer";
 
-import type {
-  LaunchpadConfig,
-  LaunchpadFolder,
-  LaunchpadPackage,
-} from "../types/types.js";
+import type { LaunchpadConfig, LaunchpadFolder, LaunchpadPackage } from "../types/types.js";
 import { cloneRepo } from "../utils/repo-utils.js";
 
 const execAsync = promisify(exec);
@@ -23,9 +19,7 @@ const logger = {
     process.stdout.write(`${message}\n`);
   },
   error(message: string, error?: Error | string): void {
-    const errorStr = error
-      ? ` ${error instanceof Error ? error.message : String(error)}`
-      : "";
+    const errorStr = error ? ` ${error instanceof Error ? error.message : String(error)}` : "";
     process.stderr.write(`${message}${errorStr}\n`);
   },
 };
@@ -53,10 +47,7 @@ function isLaunchpadFolder(
   item: LaunchpadPackage | LaunchpadFolder | undefined,
 ): item is LaunchpadFolder {
   return (
-    item !== undefined &&
-    typeof item === "object" &&
-    !("branch" in item) &&
-    !("repoUrl" in item)
+    item !== undefined && typeof item === "object" && !("branch" in item) && !("repoUrl" in item)
   );
 }
 
@@ -71,10 +62,7 @@ async function openInVSCode(folderPath: string): Promise<void> {
     await execAsync(`code "${folderPath}"`);
     logger.log("VS Code opened successfully ✅");
   } catch (error) {
-    logger.error(
-      "Failed to open VS Code:",
-      error instanceof Error ? error : String(error),
-    );
+    logger.error("Failed to open VS Code:", error instanceof Error ? error : String(error));
     logger.error("Failed to open VS Code. Is it installed and in your PATH?");
   }
 }
@@ -131,30 +119,20 @@ function renderHeader(title: string): void {
 /**
  * Renders a section divider with title
  */
-function renderSection(
-  title: string,
-  color: "blue" | "green" | "magenta" = "blue",
-): string {
+function renderSection(title: string, color: "blue" | "green" | "magenta" = "blue"): string {
   const width = 66;
   const colorFn = chalk[color];
   const prefix = "┈┈┈┈ ";
   const suffix = " ";
   const remaining = width - prefix.length - title.length - suffix.length;
 
-  return (
-    colorFn(prefix) +
-    chalk.bold[color](title) +
-    colorFn(suffix + "┈".repeat(remaining))
-  );
+  return colorFn(prefix) + chalk.bold[color](title) + colorFn(suffix + "┈".repeat(remaining));
 }
 
 /**
  * Navigate through directories defined in the config and optionally open in VS Code
  */
-export async function navigateFolders(
-  rootDir: string,
-  config: LaunchpadConfig,
-): Promise<void> {
+export async function navigateFolders(rootDir: string, config: LaunchpadConfig): Promise<void> {
   try {
     // Use the config's directory as the root directory instead of process.cwd()
     let currentFolder: LaunchpadFolder = config.packages;
@@ -170,15 +148,11 @@ export async function navigateFolders(
 
       // Display current path with styling
       const pathString = formatPath(currentPath);
-      logger.log(
-        `\n${chalk.dim("Current location: ")}${chalk.green.bold(`📂 ${pathString}`)}`,
-      );
+      logger.log(`\n${chalk.dim("Current location: ")}${chalk.green.bold(`📂 ${pathString}`)}`);
       logger.log(`${chalk.dim("─".repeat(70))}\n`);
 
       // Prepare choices
-      const choices: Array<
-        NavigationItem | InstanceType<typeof inquirer.Separator>
-      > = [];
+      const choices: Array<NavigationItem | InstanceType<typeof inquirer.Separator>> = [];
 
       // Add actions section
       choices.push(new inquirer.Separator(renderSection("ACTIONS", "green")));
@@ -212,27 +186,17 @@ export async function navigateFolders(
       choices.push(new inquirer.Separator("\n"));
 
       // Add directories & packages section
-      choices.push(
-        new inquirer.Separator(
-          renderSection("DIRECTORIES & PACKAGES", "magenta"),
-        ),
-      );
+      choices.push(new inquirer.Separator(renderSection("DIRECTORIES & PACKAGES", "magenta")));
       choices.push(new inquirer.Separator());
 
       // Filter and sort entries - folders first, then packages
       const folderEntries = Object.entries(currentFolder)
-        .filter(
-          ([, item]) => item && typeof item === "object" && !("branch" in item),
-        )
+        .filter(([, item]) => item && typeof item === "object" && !("branch" in item))
         .toSorted(([a], [b]) => a.localeCompare(b));
 
       const packageEntries = Object.entries(currentFolder)
         .filter(
-          ([, item]) =>
-            item &&
-            typeof item === "object" &&
-            "branch" in item &&
-            "repoUrl" in item,
+          ([, item]) => item && typeof item === "object" && "branch" in item && "repoUrl" in item,
         )
         .toSorted(([a], [b]) => a.localeCompare(b));
 
@@ -253,8 +217,7 @@ export async function navigateFolders(
         packageEntries.forEach(([name, item]) => {
           if (isLaunchpadPackage(item)) {
             choices.push({
-              name:
-                chalk.magenta("📦 ") + name + chalk.dim(` [${item.branch}]`),
+              name: chalk.magenta("📦 ") + name + chalk.dim(` [${item.branch}]`),
               value: name,
               itemType: "package",
               short: name,
@@ -310,9 +273,7 @@ export async function navigateFolders(
             await openInVSCode(physicalPath);
           } else {
             logger.log("\n");
-            logger.log(
-              chalk.yellow(`⚠️  Directory does not exist: ${physicalPath}`),
-            );
+            logger.log(chalk.yellow(`⚠️  Directory does not exist: ${physicalPath}`));
             const result = await inquirer.prompt<{ createDir: boolean }>([
               {
                 type: "confirm",
@@ -341,9 +302,7 @@ export async function navigateFolders(
               await openInVSCode(packagePath);
             } else {
               logger.log("\n");
-              logger.log(
-                `⚠️  Package directory does not exist: ${packagePath}`,
-              );
+              logger.log(`⚠️  Package directory does not exist: ${packagePath}`);
               const cloneResult = await inquirer.prompt<{
                 shouldCloneRepo: boolean;
               }>([
@@ -358,12 +317,7 @@ export async function navigateFolders(
               if (cloneResult.shouldCloneRepo) {
                 try {
                   // Use the correct parameters from the selected package info
-                  await cloneRepo(
-                    selectedItem.repoUrl,
-                    packagePath,
-                    selectedItem.branch,
-                    rootDir,
-                  );
+                  await cloneRepo(selectedItem.repoUrl, packagePath, selectedItem.branch, rootDir);
                   logger.log(chalk.green(`✅ Repository cloned successfully`));
                   await openInVSCode(packagePath);
                 } catch {
@@ -388,10 +342,7 @@ export async function navigateFolders(
     // Clear screen when exiting
     clearScreen();
   } catch (error) {
-    logger.error(
-      "Error navigating folders:",
-      error instanceof Error ? error : String(error),
-    );
+    logger.error("Error navigating folders:", error instanceof Error ? error : String(error));
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
     throw error;
   }

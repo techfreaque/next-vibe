@@ -75,9 +75,7 @@ export class StdioTransport implements IMCPTransport {
     const timeoutMs = parseInt(process.env.MCP_STARTUP_TIMEOUT || "5000", 10);
     this.startupTimeout = setTimeout(() => {
       if (!this.initializationReceived) {
-        this.logger.warn(
-          "[MCP Transport] No initialization received within timeout, exiting",
-        );
+        this.logger.warn("[MCP Transport] No initialization received within timeout, exiting");
         process.exit(0);
       }
     }, timeoutMs);

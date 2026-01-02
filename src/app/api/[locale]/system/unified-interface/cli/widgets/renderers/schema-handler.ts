@@ -45,13 +45,7 @@ function hasZodDef(schema: z.ZodTypeAny): schema is z.ZodTypeAny & ZodInternal {
 /**
  * Valid form field value types
  */
-export type FormFieldValue =
-  | string
-  | number
-  | boolean
-  | string[]
-  | undefined
-  | null;
+export type FormFieldValue = string | number | boolean | string[] | undefined | null;
 
 /**
  * Schema field metadata for CLI rendering
@@ -96,10 +90,7 @@ export class SchemaUIHandler {
           fields.push(fieldMeta);
         }
       }
-    } else if (
-      schema instanceof z.ZodUndefined ||
-      schema instanceof z.ZodVoid
-    ) {
+    } else if (schema instanceof z.ZodUndefined || schema instanceof z.ZodVoid) {
       // No fields for undefined schemas
       return [];
     } else {
@@ -114,10 +105,7 @@ export class SchemaUIHandler {
   /**
    * Parse individual field schema
    */
-  private parseFieldSchema(
-    name: string,
-    schema: z.ZodTypeAny,
-  ): SchemaFieldMetadata {
+  private parseFieldSchema(name: string, schema: z.ZodTypeAny): SchemaFieldMetadata {
     let required = true;
     let defaultValue: FormFieldValue = undefined;
     let currentSchema = schema;
@@ -173,10 +161,7 @@ export class SchemaUIHandler {
               const checkValue = check.value;
               if (checkKind === "min" && typeof checkValue === "number") {
                 numberSchema = numberSchema.min(checkValue);
-              } else if (
-                checkKind === "max" &&
-                typeof checkValue === "number"
-              ) {
+              } else if (checkKind === "max" && typeof checkValue === "number") {
                 numberSchema = numberSchema.max(checkValue);
               }
             }
@@ -258,9 +243,7 @@ export class SchemaUIHandler {
   /**
    * Generate CLI form from schema
    */
-  async generateForm(
-    config: CLIFormConfig,
-  ): Promise<Record<string, FormFieldValue>> {
+  async generateForm(config: CLIFormConfig): Promise<Record<string, FormFieldValue>> {
     if (config.title) {
       // eslint-disable-next-line i18next/no-literal-string
       process.stdout.write(`\n📋 ${config.title}\n`);
@@ -326,10 +309,7 @@ export class SchemaUIHandler {
                   return "Please enter a valid number";
                 }
                 // Validate the parsed NUMBER against the schema
-                const validationResult = this.validateField(
-                  num,
-                  field.validation!,
-                );
+                const validationResult = this.validateField(num, field.validation!);
                 return validationResult;
               }
             : (inputStr): string | boolean => {
@@ -352,8 +332,7 @@ export class SchemaUIHandler {
           message,
           default: field.defaultValue?.toString(),
           validate: field.validation
-            ? (inputStr): string | boolean =>
-                this.validateField(inputStr, field.validation!)
+            ? (inputStr): string | boolean => this.validateField(inputStr, field.validation!)
             : undefined,
         });
       }
@@ -387,10 +366,7 @@ export class SchemaUIHandler {
   /**
    * Validate field input against Zod schema
    */
-  private validateField(
-    input: FormFieldValue,
-    schema: z.ZodTypeAny,
-  ): boolean | string {
+  private validateField(input: FormFieldValue, schema: z.ZodTypeAny): boolean | string {
     try {
       schema.parse(input);
       return true;
@@ -439,19 +415,13 @@ export class SchemaUIHandler {
   /**
    * Convert field value to appropriate type based on Zod schema
    */
-  private convertFieldValue(
-    value: FormFieldValue,
-    field: SchemaFieldMetadata,
-  ): FormFieldValue {
+  private convertFieldValue(value: FormFieldValue, field: SchemaFieldMetadata): FormFieldValue {
     // Use the validation schema to determine the actual type
     if (field.validation) {
       let schema = field.validation;
 
       // Unwrap optional and default schemas to get to the core type
-      while (
-        schema instanceof z.ZodOptional ||
-        schema instanceof z.ZodDefault
-      ) {
+      while (schema instanceof z.ZodOptional || schema instanceof z.ZodDefault) {
         if (hasZodDef(schema)) {
           const innerType = schema._def.innerType;
           if (innerType) {

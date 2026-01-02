@@ -20,12 +20,7 @@ export function useChatPermissions(
   locale: CountryLanguage,
 ): ChatPermissionsResult {
   const { t } = simpleT(locale);
-  const {
-    activeThread: thread,
-    currentSubFolderId,
-    folders,
-    rootFolderPermissions,
-  } = chat;
+  const { activeThread: thread, currentSubFolderId, folders, rootFolderPermissions } = chat;
 
   // Compute canPost permission reactively
   // This determines if the user can send messages in the current context
@@ -60,11 +55,7 @@ export function useChatPermissions(
       }
     }
     // Check root folder permissions (server-computed, passed as props)
-    if (
-      !thread &&
-      !currentSubFolderId &&
-      rootFolderPermissions.canCreateThread === false
-    ) {
+    if (!thread && !currentSubFolderId && rootFolderPermissions.canCreateThread === false) {
       return t("app.chat.input.noCreateThreadPermissionInRootFolder");
     }
     return undefined;

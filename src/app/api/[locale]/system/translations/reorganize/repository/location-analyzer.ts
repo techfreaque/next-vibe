@@ -2,11 +2,7 @@ import path from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import {
-  FOLDER_TRANSFORMATIONS,
-  SKIP_FOLDERS,
-  UNUSED_KEYS_LOCATION,
-} from "../constants";
+import { FOLDER_TRANSFORMATIONS, SKIP_FOLDERS, UNUSED_KEYS_LOCATION } from "../constants";
 import type { TranslationObject } from "./key-usage-analyzer";
 
 export class LocationAnalyzer {
@@ -39,9 +35,7 @@ export class LocationAnalyzer {
       const targetDir = path.dirname(filePath);
       const relativeDir = this.makeRelativePath(targetDir);
 
-      logger.debug(
-        `Key ${keyPath} used in single file, co-locating in: ${relativeDir}`,
-      );
+      logger.debug(`Key ${keyPath} used in single file, co-locating in: ${relativeDir}`);
 
       return relativeDir;
     }
@@ -79,10 +73,7 @@ export class LocationAnalyzer {
    * @param logger - Logger instance for debugging
    * @returns The most specific location path
    */
-  private findMostSpecificLocation(
-    usageFiles: string[],
-    logger: EndpointLogger,
-  ): string {
+  private findMostSpecificLocation(usageFiles: string[], logger: EndpointLogger): string {
     if (usageFiles.length === 0) {
       return path.resolve(process.cwd(), UNUSED_KEYS_LOCATION);
     }
@@ -97,15 +88,11 @@ export class LocationAnalyzer {
       .map((dir) => path.resolve(dir))
       .toSorted((a, b) => b.split(path.sep).length - a.split(path.sep).length);
 
-    logger.debug(
-      `Analyzing ${directories.length} directories for most specific location`,
-    );
+    logger.debug(`Analyzing ${directories.length} directories for most specific location`);
 
     // Prefer API-specific locations over generic app locations
     const apiDirs = directories.filter((dir) => dir.includes("/api/"));
-    const appDirs = directories.filter(
-      (dir) => dir.includes("/app/") && !dir.includes("/api/"),
-    );
+    const appDirs = directories.filter((dir) => dir.includes("/app/") && !dir.includes("/api/"));
 
     // If we have API directories, prefer the deepest API directory
     if (apiDirs.length > 0) {
@@ -144,10 +131,7 @@ export class LocationAnalyzer {
     const locationKey = this.locationToKeyPath(targetLocation);
 
     // Apply smart flattening per spec rules
-    const flattenedKey = this.applySmartFlattening(
-      originalKey,
-      keyUsageFrequency,
-    );
+    const flattenedKey = this.applySmartFlattening(originalKey, keyUsageFrequency);
 
     // Smart key optimization
     // If this is a single key usage, keep the full flattened key
@@ -169,10 +153,7 @@ export class LocationAnalyzer {
    * @param keyUsageFrequency - Map of key usage frequency
    * @returns True if this is a single key usage scenario
    */
-  private isSingleKeyUsage(
-    originalKey: string,
-    keyUsageFrequency: Map<string, number>,
-  ): boolean {
+  private isSingleKeyUsage(originalKey: string, keyUsageFrequency: Map<string, number>): boolean {
     const keyPath = originalKey.split(".").slice(0, -1).join(".");
     const siblingCount = [...keyUsageFrequency.keys()].filter(
       (key) => key.startsWith(`${keyPath}.`) && key !== originalKey,
@@ -224,10 +205,7 @@ export class LocationAnalyzer {
    * @param keyUsageFrequency - Map of key usage frequency
    * @returns The number of sibling keys
    */
-  private countSiblingKeys(
-    parentPath: string,
-    keyUsageFrequency: Map<string, number>,
-  ): number {
+  private countSiblingKeys(parentPath: string, keyUsageFrequency: Map<string, number>): number {
     const parentPrefix = `${parentPath}.`;
     let count = 0;
 
@@ -261,9 +239,7 @@ export class LocationAnalyzer {
     const transformedParts = filteredParts.map((part) => {
       // Apply folder transformations from constants
       if (part in FOLDER_TRANSFORMATIONS) {
-        return FOLDER_TRANSFORMATIONS[
-          part as keyof typeof FOLDER_TRANSFORMATIONS
-        ];
+        return FOLDER_TRANSFORMATIONS[part as keyof typeof FOLDER_TRANSFORMATIONS];
       }
       // "(site) → preserved as (site)"
       // Keep parentheses and other special characters as-is
@@ -282,9 +258,7 @@ export class LocationAnalyzer {
         transformedParts.length - 1,
         ...transformedParts
           .slice(1)
-          .filter(
-            (part, index) => part !== "app" || index + 1 === firstAppIndex,
-          ),
+          .filter((part, index) => part !== "app" || index + 1 === firstAppIndex),
       );
     }
 
@@ -347,10 +321,7 @@ export class LocationAnalyzer {
    * @param filePaths - Array of file paths being analyzed
    * @returns True if the common ancestor is too generic
    */
-  private isCommonAncestorTooGeneric(
-    commonPath: string,
-    filePaths: string[],
-  ): boolean {
+  private isCommonAncestorTooGeneric(commonPath: string, filePaths: string[]): boolean {
     // If common path doesn't include 'src', it's too generic
     if (!commonPath.includes("src")) {
       return true;
@@ -359,9 +330,7 @@ export class LocationAnalyzer {
     // If all files are in completely different domains (api vs app),
     // the common ancestor might be too high
     const hasApiFiles = filePaths.some((p) => p.includes("/api/"));
-    const hasAppFiles = filePaths.some(
-      (p) => p.includes("/app/") && !p.includes("/api/"),
-    );
+    const hasAppFiles = filePaths.some((p) => p.includes("/app/") && !p.includes("/api/"));
 
     return hasApiFiles && hasAppFiles && !commonPath.includes("/app/");
   }
@@ -371,14 +340,10 @@ export class LocationAnalyzer {
    * @param filePaths - Array of file paths to analyze
    * @returns The default location path for multiple files
    */
-  private determineDefaultLocationForMultipleFiles(
-    filePaths: string[],
-  ): string {
+  private determineDefaultLocationForMultipleFiles(filePaths: string[]): string {
     // Prefer API location if most files are API files
     const apiFiles = filePaths.filter((p) => p.includes("/api/[locale]/"));
-    const appFiles = filePaths.filter(
-      (p) => p.includes("/app/[locale]/") && !p.includes("/api/"),
-    );
+    const appFiles = filePaths.filter((p) => p.includes("/app/[locale]/") && !p.includes("/api/"));
 
     if (apiFiles.length >= appFiles.length) {
       // Most files are API files, use API common location
@@ -424,9 +389,7 @@ export class LocationAnalyzer {
    * @param translations - The translation object to analyze
    * @returns Map of key paths to their usage frequency
    */
-  analyzeKeyUsageFrequency(
-    translations: TranslationObject,
-  ): Map<string, number> {
+  analyzeKeyUsageFrequency(translations: TranslationObject): Map<string, number> {
     const frequency = new Map<string, number>();
 
     this.countKeyUsage(translations, "", frequency);
@@ -451,11 +414,7 @@ export class LocationAnalyzer {
       // Increment count for this path
       frequency.set(fullPath, (frequency.get(fullPath) || 0) + 1);
 
-      if (
-        typeof value === "object" &&
-        value !== null &&
-        !Array.isArray(value)
-      ) {
+      if (typeof value === "object" && value !== null && !Array.isArray(value)) {
         // Recursively count nested objects
         this.countKeyUsage(value, fullPath, frequency);
       }

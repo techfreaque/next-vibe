@@ -16,8 +16,7 @@ export const translations = {
     components: {
       footer: {
         copyright: "© 2024 {{appName}}. All rights reserved.",
-        helpText:
-          "If you have any questions, please contact us at {{config.emails.support}}",
+        helpText: "If you have any questions, please contact us at {{config.emails.support}}",
         unsubscribeText: "Don't want to receive these emails?",
         unsubscribeLink: "Unsubscribe",
       },

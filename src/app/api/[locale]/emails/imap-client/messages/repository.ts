@@ -7,11 +7,7 @@ import "server-only";
 
 import { and, asc, count, desc, eq, gte, ilike, lte, or } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { type Email, emails } from "@/app/api/[locale]/emails/messages/db";
@@ -246,8 +242,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         whereConditions.push(lte(emails.sentAt, endDate));
       }
 
-      const whereClause =
-        whereConditions.length > 0 ? and(...whereConditions) : undefined;
+      const whereClause = whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
       // Get total count
       const [{ count: totalCount }] = await db
@@ -262,70 +257,44 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
       let orderByClause;
       switch (sortBy) {
         case ImapMessageSortField.SUBJECT:
-          orderByClause =
-            sortOrder === SortOrder.ASC
-              ? asc(emails.subject)
-              : desc(emails.subject);
+          orderByClause = sortOrder === SortOrder.ASC ? asc(emails.subject) : desc(emails.subject);
           break;
         case ImapMessageSortField.CREATED_AT:
           orderByClause =
-            sortOrder === SortOrder.ASC
-              ? asc(emails.createdAt)
-              : desc(emails.createdAt);
+            sortOrder === SortOrder.ASC ? asc(emails.createdAt) : desc(emails.createdAt);
           break;
         case ImapMessageSortField.SENT_AT:
-          orderByClause =
-            sortOrder === SortOrder.ASC
-              ? asc(emails.sentAt)
-              : desc(emails.sentAt);
+          orderByClause = sortOrder === SortOrder.ASC ? asc(emails.sentAt) : desc(emails.sentAt);
           break;
         case ImapMessageSortField.IS_READ:
-          orderByClause =
-            sortOrder === SortOrder.ASC
-              ? asc(emails.isRead)
-              : desc(emails.isRead);
+          orderByClause = sortOrder === SortOrder.ASC ? asc(emails.isRead) : desc(emails.isRead);
           break;
         case ImapMessageSortField.IS_FLAGGED:
           orderByClause =
-            sortOrder === SortOrder.ASC
-              ? asc(emails.isFlagged)
-              : desc(emails.isFlagged);
+            sortOrder === SortOrder.ASC ? asc(emails.isFlagged) : desc(emails.isFlagged);
           break;
         case ImapMessageSortField.MESSAGE_SIZE:
           orderByClause =
-            sortOrder === SortOrder.ASC
-              ? asc(emails.messageSize)
-              : desc(emails.messageSize);
+            sortOrder === SortOrder.ASC ? asc(emails.messageSize) : desc(emails.messageSize);
           break;
         case ImapMessageSortField.RECIPIENT_NAME:
           orderByClause =
-            sortOrder === SortOrder.ASC
-              ? asc(emails.recipientName)
-              : desc(emails.recipientName);
+            sortOrder === SortOrder.ASC ? asc(emails.recipientName) : desc(emails.recipientName);
           break;
         case ImapMessageSortField.RECIPIENT_EMAIL:
           orderByClause =
-            sortOrder === SortOrder.ASC
-              ? asc(emails.recipientEmail)
-              : desc(emails.recipientEmail);
+            sortOrder === SortOrder.ASC ? asc(emails.recipientEmail) : desc(emails.recipientEmail);
           break;
         case ImapMessageSortField.SENDER_EMAIL:
           orderByClause =
-            sortOrder === SortOrder.ASC
-              ? asc(emails.senderEmail)
-              : desc(emails.senderEmail);
+            sortOrder === SortOrder.ASC ? asc(emails.senderEmail) : desc(emails.senderEmail);
           break;
         case ImapMessageSortField.SENDER_NAME:
           orderByClause =
-            sortOrder === SortOrder.ASC
-              ? asc(emails.senderName)
-              : desc(emails.senderName);
+            sortOrder === SortOrder.ASC ? asc(emails.senderName) : desc(emails.senderName);
           break;
         default: // sentAt
-          orderByClause =
-            sortOrder === SortOrder.ASC
-              ? asc(emails.sentAt)
-              : desc(emails.sentAt);
+          orderByClause = sortOrder === SortOrder.ASC ? asc(emails.sentAt) : desc(emails.sentAt);
       }
 
       // Get messages with pagination
@@ -340,9 +309,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
       const totalPages = Math.ceil(totalCount / limit);
 
       return success({
-        messages: messages.map((message) =>
-          this.formatMessageResponse(message),
-        ),
+        messages: messages.map((message) => this.formatMessageResponse(message)),
         total: totalCount,
         pageNumber: page,
         pageLimit: limit,
@@ -350,13 +317,9 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
       });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error(
-        "app.api.emails.imapClient.messages.list.error.server",
-        parsedError,
-      );
+      logger.error("app.api.emails.imapClient.messages.list.error.server", parsedError);
       return fail({
-        message:
-          "app.api.emails.imapClient.messages.list.get.errors.server.title",
+        message: "app.api.emails.imapClient.messages.list.get.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -373,16 +336,11 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     try {
       logger.debug("Getting IMAP message by ID", { id: data.id });
 
-      const [message] = await db
-        .select()
-        .from(emails)
-        .where(eq(emails.id, data.id))
-        .limit(1);
+      const [message] = await db.select().from(emails).where(eq(emails.id, data.id)).limit(1);
 
       if (!message) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.messages.get.error.not_found.title",
+          message: "app.api.emails.imapClient.imapErrors.messages.get.error.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -391,8 +349,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error getting IMAP message by ID", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
+        message: "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -420,8 +377,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!existingMessage) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.messages.get.error.not_found.title",
+          message: "app.api.emails.imapClient.imapErrors.messages.get.error.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -453,8 +409,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!updatedMessage) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
+          message: "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -463,8 +418,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error updating IMAP message", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
+        message: "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -530,33 +484,24 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
         if (account.length === 0) {
           return fail({
-            message:
-              "app.api.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
+            message: "app.api.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
 
         // Sync the specific account
-        const syncResult = await imapSyncRepository.syncAccount(
-          { account: account[0] },
-          logger,
-        );
+        const syncResult = await imapSyncRepository.syncAccount({ account: account[0] }, logger);
 
         if (syncResult.success) {
           const rawErrors = syncResult.data.result?.results?.errors ?? [];
           return success({
             success: true,
-            message:
-              "app.api.emails.imapClient.messages.sync.response.success.message",
+            message: "app.api.emails.imapClient.messages.sync.response.success.message",
             results: {
-              messagesProcessed:
-                syncResult.data.result?.results?.messagesProcessed ?? 0,
-              messagesAdded:
-                syncResult.data.result?.results?.messagesAdded ?? 0,
-              messagesUpdated:
-                syncResult.data.result?.results?.messagesUpdated ?? 0,
-              messagesDeleted:
-                syncResult.data.result?.results?.messagesDeleted ?? 0,
+              messagesProcessed: syncResult.data.result?.results?.messagesProcessed ?? 0,
+              messagesAdded: syncResult.data.result?.results?.messagesAdded ?? 0,
+              messagesUpdated: syncResult.data.result?.results?.messagesUpdated ?? 0,
+              messagesDeleted: syncResult.data.result?.results?.messagesDeleted ?? 0,
               duration: syncResult.data.result?.results?.duration ?? 0,
             },
             errors: rawErrors.map((err) => ({
@@ -577,16 +522,12 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         const rawErrors = syncResult.data.result?.results?.errors ?? [];
         return success({
           success: true,
-          message:
-            "app.api.emails.imapClient.messages.sync.response.success.message",
+          message: "app.api.emails.imapClient.messages.sync.response.success.message",
           results: {
-            messagesProcessed:
-              syncResult.data.result?.results?.messagesProcessed ?? 0,
+            messagesProcessed: syncResult.data.result?.results?.messagesProcessed ?? 0,
             messagesAdded: syncResult.data.result?.results?.messagesAdded ?? 0,
-            messagesUpdated:
-              syncResult.data.result?.results?.messagesUpdated ?? 0,
-            messagesDeleted:
-              syncResult.data.result?.results?.messagesDeleted ?? 0,
+            messagesUpdated: syncResult.data.result?.results?.messagesUpdated ?? 0,
+            messagesDeleted: syncResult.data.result?.results?.messagesDeleted ?? 0,
             duration: syncResult.data.result?.results?.duration ?? 0,
           },
           errors: rawErrors.map((err) => ({
@@ -602,8 +543,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error syncing IMAP messages", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.sync.post.error.server.title",
+        message: "app.api.emails.imapClient.imapErrors.sync.post.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -630,9 +570,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         ImapSyncStatus.ERROR,
       ];
 
-      const syncStatus = validStatuses.includes(
-        data.syncStatus as typeof ImapSyncStatus.PENDING,
-      )
+      const syncStatus = validStatuses.includes(data.syncStatus as typeof ImapSyncStatus.PENDING)
         ? (data.syncStatus as
             | typeof ImapSyncStatus.PENDING
             | typeof ImapSyncStatus.SYNCING
@@ -652,8 +590,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!updatedMessage) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.messages.get.error.not_found.title",
+          message: "app.api.emails.imapClient.imapErrors.messages.get.error.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -662,8 +599,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error updating message sync status", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
+        message: "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -693,8 +629,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!updatedMessage) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.messages.get.error.not_found.title",
+          message: "app.api.emails.imapClient.imapErrors.messages.get.error.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -703,8 +638,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error updating message read status", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
+        message: "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

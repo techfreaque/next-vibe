@@ -27,11 +27,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { CountryLanguageValues } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-export function CampaignStarterForm({
-  locale,
-}: {
-  locale: CountryLanguage;
-}): JSX.Element {
+export function CampaignStarterForm({ locale }: { locale: CountryLanguage }): JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 
@@ -50,23 +46,15 @@ export function CampaignStarterForm({
 
   return (
     <Div className="flex flex-col gap-6">
-      <Form
-        form={endpoint.create.form}
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-6"
-      >
+      <Form form={endpoint.create.form} onSubmit={handleSubmit} className="flex flex-col gap-6">
         <FormSection
           title={"app.admin.leads.leads.admin.campaignStarter.settings.title"}
-          description={
-            "app.admin.leads.leads.admin.campaignStarter.settings.description"
-          }
+          description={"app.admin.leads.leads.admin.campaignStarter.settings.description"}
         >
           <Card>
             <CardContent className="pt-6">
               <FormFieldGroup
-                title={
-                  "app.admin.leads.leads.admin.campaignStarter.form.sections.basic.title"
-                }
+                title={"app.admin.leads.leads.admin.campaignStarter.form.sections.basic.title"}
                 description={
                   "app.admin.leads.leads.admin.campaignStarter.form.sections.basic.description"
                 }
@@ -89,9 +77,7 @@ export function CampaignStarterForm({
               </FormFieldGroup>
 
               <FormFieldGroup
-                title={
-                  "app.admin.leads.leads.admin.campaignStarter.form.enabledDays.label"
-                }
+                title={"app.admin.leads.leads.admin.campaignStarter.form.enabledDays.label"}
                 description={
                   "app.admin.leads.leads.admin.campaignStarter.form.enabledDays.description"
                 }
@@ -108,30 +94,18 @@ export function CampaignStarterForm({
                       { value: 6, key: "saturday" },
                       { value: 7, key: "sunday" },
                     ].map((day) => (
-                      <Div
-                        key={day.value}
-                        className="flex items-center flex flex-row gap-2"
-                      >
+                      <Div key={day.value} className="flex items-center flex flex-row gap-2">
                         <Checkbox
                           id={`day-${day.value}`}
                           checked={
-                            endpoint.create.form
-                              .watch("enabledDays")
-                              ?.includes(day.value) || false
+                            endpoint.create.form.watch("enabledDays")?.includes(day.value) || false
                           }
                           onCheckedChange={(checked) => {
-                            const currentDays =
-                              endpoint.create.form.getValues("enabledDays") ||
-                              [];
+                            const currentDays = endpoint.create.form.getValues("enabledDays") || [];
                             const newDays = checked
                               ? [...currentDays, day.value].toSorted()
-                              : currentDays.filter(
-                                  (d: number) => d !== day.value,
-                                );
-                            endpoint.create.form.setValue(
-                              "enabledDays",
-                              newDays,
-                            );
+                              : currentDays.filter((d: number) => d !== day.value);
+                            endpoint.create.form.setValue("enabledDays", newDays);
                           }}
                         />
                         <Label
@@ -147,9 +121,7 @@ export function CampaignStarterForm({
               </FormFieldGroup>
 
               <FormFieldGroup
-                title={
-                  "app.admin.leads.leads.admin.campaignStarter.form.enabledHours.label"
-                }
+                title={"app.admin.leads.leads.admin.campaignStarter.form.enabledHours.label"}
                 description={
                   "app.admin.leads.leads.admin.campaignStarter.form.enabledHours.description"
                 }
@@ -192,9 +164,7 @@ export function CampaignStarterForm({
               </FormFieldGroup>
 
               <FormFieldGroup
-                title={
-                  "app.admin.leads.leads.admin.campaignStarter.form.leadsPerWeek.label"
-                }
+                title={"app.admin.leads.leads.admin.campaignStarter.form.leadsPerWeek.label"}
                 description={
                   "app.admin.leads.leads.admin.campaignStarter.form.leadsPerWeek.description"
                 }
@@ -202,25 +172,17 @@ export function CampaignStarterForm({
                 {/* Leads Per Week - Custom inputs for each locale */}
                 <Div className="flex flex-col gap-4">
                   {Object.values(CountryLanguageValues).map((locale) => (
-                    <Div
-                      key={locale}
-                      className="flex items-center flex flex-row gap-4"
-                    >
+                    <Div key={locale} className="flex items-center flex flex-row gap-4">
                       <Label className="w-24 font-medium">{locale}:</Label>
                       <Input
                         type="number"
                         min={1}
-                        value={
-                          endpoint.create.form.watch("leadsPerWeek")?.[
-                            locale
-                          ] || 0
-                        }
+                        value={endpoint.create.form.watch("leadsPerWeek")?.[locale] || 0}
                         onChange={(e) => {
                           const numValue = Number(e.target.value);
                           if (!Number.isNaN(numValue) && numValue >= 1) {
                             const currentLeadsPerWeek =
-                              endpoint.create.form.getValues("leadsPerWeek") ||
-                              {};
+                              endpoint.create.form.getValues("leadsPerWeek") || {};
                             endpoint.create.form.setValue("leadsPerWeek", {
                               ...currentLeadsPerWeek,
                               [locale]: numValue,
@@ -235,9 +197,7 @@ export function CampaignStarterForm({
               </FormFieldGroup>
 
               <FormFieldGroup
-                title={
-                  "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.label"
-                }
+                title={"app.admin.leads.leads.admin.campaignStarter.form.cronSettings.label"}
                 description={
                   "app.admin.leads.leads.admin.campaignStarter.form.cronSettings.description"
                 }
@@ -325,16 +285,12 @@ export function CampaignStarterForm({
                   ) : isSuccess ? (
                     <>
                       <Save className="mr-2 h-4 w-4" />
-                      {t(
-                        "app.admin.leads.leads.admin.campaignStarter.form.success",
-                      )}
+                      {t("app.admin.leads.leads.admin.campaignStarter.form.success")}
                     </>
                   ) : (
                     <>
                       <Save className="mr-2 h-4 w-4" />
-                      {t(
-                        "app.admin.leads.leads.admin.campaignStarter.form.save",
-                      )}
+                      {t("app.admin.leads.leads.admin.campaignStarter.form.save")}
                     </>
                   )}
                 </Button>

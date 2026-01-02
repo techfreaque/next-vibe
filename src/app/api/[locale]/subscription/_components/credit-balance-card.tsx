@@ -2,13 +2,7 @@
 
 import Link from "next/link";
 import { Badge } from "next-vibe-ui/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "next-vibe-ui/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { Calendar, Coins, Gift, Sparkles, Zap } from "next-vibe-ui/ui/icons";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
@@ -51,26 +45,19 @@ export function CreditBalanceCard({
   const { t } = useTranslation();
 
   // Create logger once - memoize to prevent recreating on every render
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
 
   // Fetch credits data with server-side initial data (disables initial fetch)
   // Will refetch on window focus to keep data fresh
   // Hook handles null case internally - called unconditionally per React rules
   const creditsEndpoint = useCredits(logger, initialCredits ?? null);
   const credits =
-    creditsEndpoint?.read?.response?.success &&
-    creditsEndpoint.read.response.data
+    creditsEndpoint?.read?.response?.success && creditsEndpoint.read.response.data
       ? creditsEndpoint.read.response.data
       : initialCredits;
 
   // Get subscription credits from products repository
-  const subscriptionProduct = productsRepository.getProduct(
-    ProductIds.SUBSCRIPTION,
-    locale,
-  );
+  const subscriptionProduct = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
 
   return (
     <MotionDiv
@@ -117,12 +104,9 @@ export function CreditBalanceCard({
                 {formatCredits(credits?.expiring ?? 0)}
               </Div>
               <Div className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                {t(
-                  "app.subscription.subscription.balance.expiring.description",
-                  {
-                    subCredits: subscriptionProduct.credits,
-                  },
-                )}
+                {t("app.subscription.subscription.balance.expiring.description", {
+                  subCredits: subscriptionProduct.credits,
+                })}
               </Div>
             </Div>
 
@@ -136,9 +120,7 @@ export function CreditBalanceCard({
                 {formatCredits(credits?.permanent ?? 0)}
               </Div>
               <Div className="text-xs text-green-600 dark:text-green-400 mt-1">
-                {t(
-                  "app.subscription.subscription.balance.permanent.description",
-                )}
+                {t("app.subscription.subscription.balance.permanent.description")}
               </Div>
             </Div>
 
@@ -169,9 +151,7 @@ export function CreditBalanceCard({
                   {formatCredits(credits?.earned ?? 0)}
                 </Div>
                 <Div className="text-xs text-violet-600 dark:text-violet-400 mt-1">
-                  {t(
-                    "app.subscription.subscription.balance.earned.description",
-                  )}
+                  {t("app.subscription.subscription.balance.earned.description")}
                 </Div>
               </Div>
             </Link>

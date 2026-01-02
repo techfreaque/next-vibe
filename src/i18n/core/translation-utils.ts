@@ -6,11 +6,7 @@ import { envClient } from "@/config/env-client";
 import { languageConfig } from "..";
 import type { Countries, CountryLanguage, Languages } from "./config";
 import { defaultLocaleConfig, translations } from "./config";
-import type {
-  TParams,
-  TranslationElement,
-  TranslationKey,
-} from "./static-types";
+import type { TParams, TranslationElement, TranslationKey } from "./static-types";
 
 // ================================================================================
 // TRANSLATION UTILITIES
@@ -48,9 +44,7 @@ export function logTranslationError(
       break;
     case "fallback_missing":
       if (typeof process !== "undefined" && process.stderr) {
-        process.stderr.write(
-          `${prefix}Translation key not found in fallback language: ${key}\n`,
-        );
+        process.stderr.write(`${prefix}Translation key not found in fallback language: ${key}\n`);
       }
       break;
   }
@@ -73,15 +67,8 @@ function navigateTranslationPath(
   const value = navigateTranslationObject(startValue, keys);
 
   // Handle error logging for missing keys
-  if (
-    value === undefined &&
-    (isUsingFallback || language === fallbackLanguage)
-  ) {
-    logTranslationError(
-      isUsingFallback ? "fallback_missing" : "missing",
-      fullKey,
-      context,
-    );
+  if (value === undefined && (isUsingFallback || language === fallbackLanguage)) {
+    logTranslationError(isUsingFallback ? "fallback_missing" : "missing", fullKey, context);
   }
 
   return value as TranslationElement | string | undefined;
@@ -125,23 +112,11 @@ export function getTranslationValue<K extends TranslationKey>(
   context?: string,
 ): TranslationElement | string | undefined {
   // Try with the specified language first
-  const value = tryGetTranslation(
-    key,
-    language,
-    false,
-    fallbackLanguage,
-    context,
-  );
+  const value = tryGetTranslation(key, language, false, fallbackLanguage, context);
 
   // If translation not found and not already using fallback, try fallback language
   if (value === undefined && language !== fallbackLanguage) {
-    return tryGetTranslation(
-      key,
-      fallbackLanguage,
-      true,
-      fallbackLanguage,
-      context,
-    );
+    return tryGetTranslation(key, fallbackLanguage, true, fallbackLanguage, context);
   }
 
   return value;
@@ -157,9 +132,7 @@ export function processTranslationValue<K extends TranslationKey>(
   context?: string,
 ): string {
   // Import shared processing logic
-  const {
-    processTranslationValue: sharedProcess,
-  } = require("./shared-translation-utils");
+  const { processTranslationValue: sharedProcess } = require("./shared-translation-utils");
   const result = sharedProcess(value, key, params, context);
 
   // Log error if value was not a string (only for global translations)
@@ -182,12 +155,7 @@ export function translateKey<K extends TranslationKey>(
 ): string {
   // Use hardcoded fallback to avoid circular dependency during initialization
   const actualFallbackLanguage = fallbackLanguage ?? "en";
-  const value = getTranslationValue(
-    key,
-    language,
-    actualFallbackLanguage,
-    context,
-  );
+  const value = getTranslationValue(key, language, actualFallbackLanguage, context);
   return processTranslationValue(value, key, params, context);
 }
 

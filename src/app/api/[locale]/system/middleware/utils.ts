@@ -15,8 +15,7 @@ export function shouldSkipPath(path: string): boolean {
     path.includes("/_next/") ||
     path.includes("/static/") ||
     path.includes("/images/") ||
-    path.match(/\.(ico|png|jpg|jpeg|svg|css|js|woff|woff2|ttf|eot)$/) !==
-      null ||
+    path.match(/\.(ico|png|jpg|jpeg|svg|css|js|woff|woff2|ttf|eot)$/) !== null ||
     path === "/favicon.ico" ||
     path === "/robots.txt" ||
     path === "/sitemap.xml"

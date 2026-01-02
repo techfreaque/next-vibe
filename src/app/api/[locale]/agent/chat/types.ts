@@ -129,9 +129,7 @@ interface TierDisplayConfig<T extends string> {
   description?: TranslationKey;
 }
 
-export const INTELLIGENCE_DISPLAY: TierDisplayConfig<
-  typeof IntelligenceLevelFilterValue
->[] = [
+export const INTELLIGENCE_DISPLAY: TierDisplayConfig<typeof IntelligenceLevelFilterValue>[] = [
   {
     value: IntelligenceLevelFilter.ANY,
     label: "app.chat.tiers.any",
@@ -158,37 +156,34 @@ export const INTELLIGENCE_DISPLAY: TierDisplayConfig<
   },
 ];
 
-export const PRICE_DISPLAY: TierDisplayConfig<typeof PriceLevelFilterValue>[] =
-  [
-    {
-      value: PriceLevelFilter.ANY,
-      label: "app.chat.tiers.any",
-      icon: "circle-dashed",
-      description: "app.chat.tiers.anyDesc",
-    },
-    {
-      value: PriceLevelFilter.CHEAP,
-      label: "app.chat.tiers.price.cheap",
-      icon: "coins",
-      description: "app.chat.tiers.price.cheapDesc",
-    },
-    {
-      value: PriceLevelFilter.STANDARD,
-      label: "app.chat.tiers.price.standard",
-      icon: "coins",
-      description: "app.chat.tiers.price.standardDesc",
-    },
-    {
-      value: PriceLevelFilter.PREMIUM,
-      label: "app.chat.tiers.price.premium",
-      icon: "crown",
-      description: "app.chat.tiers.price.premiumDesc",
-    },
-  ];
+export const PRICE_DISPLAY: TierDisplayConfig<typeof PriceLevelFilterValue>[] = [
+  {
+    value: PriceLevelFilter.ANY,
+    label: "app.chat.tiers.any",
+    icon: "circle-dashed",
+    description: "app.chat.tiers.anyDesc",
+  },
+  {
+    value: PriceLevelFilter.CHEAP,
+    label: "app.chat.tiers.price.cheap",
+    icon: "coins",
+    description: "app.chat.tiers.price.cheapDesc",
+  },
+  {
+    value: PriceLevelFilter.STANDARD,
+    label: "app.chat.tiers.price.standard",
+    icon: "coins",
+    description: "app.chat.tiers.price.standardDesc",
+  },
+  {
+    value: PriceLevelFilter.PREMIUM,
+    label: "app.chat.tiers.price.premium",
+    icon: "crown",
+    description: "app.chat.tiers.price.premiumDesc",
+  },
+];
 
-export const CONTENT_DISPLAY: TierDisplayConfig<
-  typeof ContentLevelFilterValue
->[] = [
+export const CONTENT_DISPLAY: TierDisplayConfig<typeof ContentLevelFilterValue>[] = [
   {
     value: ContentLevelFilter.ANY,
     label: "app.chat.tiers.any",

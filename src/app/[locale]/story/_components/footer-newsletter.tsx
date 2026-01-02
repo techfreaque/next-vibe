@@ -41,9 +41,7 @@ export function NewsletterSignupFooter({
   return (
     <Div>
       <Div className="mb-6">
-        <H3 className="font-semibold text-lg mb-4">
-          {t("app.newsletter.title")}
-        </H3>
+        <H3 className="font-semibold text-lg mb-4">{t("app.newsletter.title")}</H3>
         <P className="text-sm text-gray-500 dark:text-gray-400 mb-4">
           {t("app.newsletter.description")}
         </P>
@@ -87,9 +85,7 @@ export function NewsletterSignupFooter({
                   : "border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
                 : "bg-blue-600 bg-linear-to-r from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
             }`}
-            variant={
-              isSubscribed && !showConfirmUnsubscribe ? "outline" : "default"
-            }
+            variant={isSubscribed && !showConfirmUnsubscribe ? "outline" : "default"}
             aria-label={
               isSubscribed
                 ? showConfirmUnsubscribe
@@ -135,8 +131,7 @@ export function NewsletterSignupFooter({
 
       <Div className="mt-8">
         <H3 className="font-semibold text-lg mb-4">
-          {t("app.common.selector.country")} /{" "}
-          {t("app.common.selector.language")}
+          {t("app.common.selector.country")} / {t("app.common.selector.language")}
         </H3>
         <Div className="inline-block">
           <CountrySelector locale={locale} />

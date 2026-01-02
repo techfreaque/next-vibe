@@ -20,8 +20,7 @@ export const translations: typeof enTranslations = {
 
   form: {
     title: "Stripe CLI-Konfiguration",
-    description:
-      "Stripe CLI-Operationen und Webhook-Einstellungen konfigurieren",
+    description: "Stripe CLI-Operationen und Webhook-Einstellungen konfigurieren",
     fields: {
       operation: {
         label: "Operationstyp",
@@ -80,8 +79,7 @@ export const translations: typeof enTranslations = {
   errors: {
     validation: {
       title: "Ungültige Konfiguration",
-      description:
-        "Bitte überprüfen Sie Ihre Stripe CLI-Konfiguration und versuchen Sie es erneut",
+      description: "Bitte überprüfen Sie Ihre Stripe CLI-Konfiguration und versuchen Sie es erneut",
     },
     network: {
       title: "Netzwerkfehler",
@@ -101,8 +99,7 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Serverfehler",
-      description:
-        "Ein Fehler ist bei der Verarbeitung der Stripe-Operation aufgetreten",
+      description: "Ein Fehler ist bei der Verarbeitung der Stripe-Operation aufgetreten",
     },
     unknown: {
       title: "Unbekannter Fehler",
@@ -116,8 +113,7 @@ export const translations: typeof enTranslations = {
       title: "Operationskonflikt",
       description: "Eine andere Stripe-Operation läuft derzeit",
     },
-    execution_failed:
-      "Stripe CLI-Operation konnte nicht ordnungsgemäß ausgeführt werden",
+    execution_failed: "Stripe CLI-Operation konnte nicht ordnungsgemäß ausgeführt werden",
     userNotFound: {
       title: "Benutzer nicht gefunden",
       description: "Der angegebene Benutzer wurde nicht gefunden",

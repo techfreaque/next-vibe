@@ -2,8 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Netzwerk-Anfragen auflisten",
-  description:
-    "Alle Anfragen der aktuell ausgewählten Seite seit der letzten Navigation auflisten",
+  description: "Alle Anfragen der aktuell ausgewählten Seite seit der letzten Navigation auflisten",
   form: {
     label: "Netzwerk-Anfragen auflisten",
     description: "Alle Netzwerk-Anfragen von der Browser-Seite abrufen",
@@ -16,14 +15,12 @@ export const translations: typeof enTranslations = {
       },
       pageIdx: {
         label: "Seitenindex",
-        description:
-          "Seitennummer zum Zurückgeben (0-basiert, weglassen für erste Seite)",
+        description: "Seitennummer zum Zurückgeben (0-basiert, weglassen für erste Seite)",
         placeholder: "Seitenindex eingeben",
       },
       pageSize: {
         label: "Seitengröße",
-        description:
-          "Maximale Anzahl der zurückzugebenden Anfragen (weglassen für alle Anfragen)",
+        description: "Maximale Anzahl der zurückzugebenden Anfragen (weglassen für alle Anfragen)",
         placeholder: "Seitengröße eingeben",
       },
       resourceTypes: {
@@ -75,13 +72,11 @@ export const translations: typeof enTranslations = {
   errors: {
     validation: {
       title: "Validierungsfehler",
-      description:
-        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
     },
     network: {
       title: "Netzwerkfehler",
-      description:
-        "Ein Netzwerkfehler ist beim Auflisten der Netzwerk-Anfragen aufgetreten",
+      description: "Ein Netzwerkfehler ist beim Auflisten der Netzwerk-Anfragen aufgetreten",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -97,23 +92,19 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Serverfehler",
-      description:
-        "Ein interner Serverfehler ist beim Auflisten der Netzwerk-Anfragen aufgetreten",
+      description: "Ein interner Serverfehler ist beim Auflisten der Netzwerk-Anfragen aufgetreten",
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description:
-        "Ein unbekannter Fehler ist beim Auflisten der Netzwerk-Anfragen aufgetreten",
+      description: "Ein unbekannter Fehler ist beim Auflisten der Netzwerk-Anfragen aufgetreten",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description:
-        "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
+      description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
     },
     conflict: {
       title: "Konflikt",
-      description:
-        "Ein Konflikt ist beim Auflisten der Netzwerk-Anfragen aufgetreten",
+      description: "Ein Konflikt ist beim Auflisten der Netzwerk-Anfragen aufgetreten",
     },
   },
   success: {

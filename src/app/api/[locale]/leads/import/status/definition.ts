@@ -21,11 +21,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import {
-  CsvImportJobStatus,
-  CsvImportJobStatusDB,
-  CsvImportJobStatusOptions,
-} from "../enum";
+import { CsvImportJobStatus, CsvImportJobStatusDB, CsvImportJobStatusOptions } from "../enum";
 
 /**
  * List Import Jobs Endpoint (GET)
@@ -37,11 +33,7 @@ const { GET } = createEndpoint({
   title: "app.api.leads.import.status.get.title",
   description: "app.api.leads.import.status.get.description",
   category: "app.api.leads.category",
-  tags: [
-    "app.api.leads.tags.import",
-    "app.api.leads.tags.jobs",
-    "app.api.leads.tags.list",
-  ],
+  tags: ["app.api.leads.tags.import", "app.api.leads.tags.jobs", "app.api.leads.tags.list"],
   allowedRoles: [UserRole.ADMIN] as const,
   icon: "activity",
 
@@ -117,8 +109,7 @@ const { GET } = createEndpoint({
               type: WidgetType.GROUPED_LIST,
               groupBy: "status",
               title: "app.api.leads.import.status.get.response.items.title",
-              description:
-                "app.api.leads.import.status.get.response.items.title",
+              description: "app.api.leads.import.status.get.response.items.title",
             },
             objectField(
               {
@@ -133,16 +124,14 @@ const { GET } = createEndpoint({
                 id: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.uuid(),
                 ),
                 fileName: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.string(),
                 ),
@@ -158,40 +147,35 @@ const { GET } = createEndpoint({
                 totalRows: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.coerce.number().nullable(),
                 ),
                 processedRows: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.coerce.number(),
                 ),
                 successfulImports: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.coerce.number(),
                 ),
                 failedImports: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.coerce.number(),
                 ),
                 duplicateEmails: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.coerce.number(),
                 ),
@@ -200,16 +184,14 @@ const { GET } = createEndpoint({
                 currentBatchStart: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.coerce.number(),
                 ),
                 batchSize: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.coerce.number(),
                 ),
@@ -218,24 +200,21 @@ const { GET } = createEndpoint({
                 error: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.string().nullable(),
                 ),
                 retryCount: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.coerce.number(),
                 ),
                 maxRetries: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.coerce.number(),
                 ),
@@ -244,32 +223,28 @@ const { GET } = createEndpoint({
                 createdAt: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.string(),
                 ),
                 updatedAt: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.string(),
                 ),
                 startedAt: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.string().nullable(),
                 ),
                 completedAt: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.import.status.get.response.items.title",
+                    content: "app.api.leads.import.status.get.response.items.title",
                   },
                   z.string().nullable(),
                 ),
@@ -284,23 +259,19 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.leads.import.status.get.errors.validation.title",
-      description:
-        "app.api.leads.import.status.get.errors.validation.description",
+      description: "app.api.leads.import.status.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.leads.import.status.get.errors.unauthorized.title",
-      description:
-        "app.api.leads.import.status.get.errors.unauthorized.description",
+      description: "app.api.leads.import.status.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.leads.import.status.get.errors.forbidden.title",
-      description:
-        "app.api.leads.import.status.get.errors.forbidden.description",
+      description: "app.api.leads.import.status.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.leads.import.status.get.errors.notFound.title",
-      description:
-        "app.api.leads.import.status.get.errors.notFound.description",
+      description: "app.api.leads.import.status.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.leads.import.status.get.errors.server.title",
@@ -316,13 +287,11 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.leads.import.status.get.errors.unsavedChanges.title",
-      description:
-        "app.api.leads.import.status.get.errors.unsavedChanges.description",
+      description: "app.api.leads.import.status.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.leads.import.status.get.errors.conflict.title",
-      description:
-        "app.api.leads.import.status.get.errors.conflict.description",
+      description: "app.api.leads.import.status.get.errors.conflict.description",
     },
   },
 

@@ -47,9 +47,7 @@ export interface ProcessedCodeQualityList {
  * CODE_QUALITY_LIST widget only handles the items array
  * Summary is rendered by separate CONTAINER widget
  */
-export function extractCodeQualityListData(
-  value: WidgetData,
-): ProcessedCodeQualityList | null {
+export function extractCodeQualityListData(value: WidgetData): ProcessedCodeQualityList | null {
   // Handle array of issues directly
   if (Array.isArray(value)) {
     if (value.length === 0) {
@@ -71,12 +69,9 @@ export function extractCodeQualityListData(
 
   // Handle object with items array
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const items =
-      "items" in value && Array.isArray(value.items) ? value.items : [];
+    const items = "items" in value && Array.isArray(value.items) ? value.items : [];
     const groupBy =
-      "groupBy" in value && typeof value.groupBy === "string"
-        ? value.groupBy
-        : undefined;
+      "groupBy" in value && typeof value.groupBy === "string" ? value.groupBy : undefined;
     const showSummary =
       "showSummary" in value && typeof value.showSummary === "boolean"
         ? value.showSummary
@@ -93,9 +88,7 @@ export function extractCodeQualityListData(
     return {
       items: validItems,
       groupBy:
-        groupBy === "file" || groupBy === "severity" || groupBy === "rule"
-          ? groupBy
-          : undefined,
+        groupBy === "file" || groupBy === "severity" || groupBy === "rule" ? groupBy : undefined,
       showSummary,
     };
   }
@@ -112,34 +105,23 @@ function validateCodeQualityItem(item: WidgetData): CodeQualityItem | null {
   }
 
   const file = "file" in item && typeof item.file === "string" ? item.file : "";
-  const message =
-    "message" in item && typeof item.message === "string" ? item.message : "";
+  const message = "message" in item && typeof item.message === "string" ? item.message : "";
 
   if (!file || !message) {
     return null;
   }
 
-  const line =
-    "line" in item && typeof item.line === "number" ? item.line : undefined;
-  const column =
-    "column" in item && typeof item.column === "number"
-      ? item.column
-      : undefined;
-  const severity =
-    "severity" in item && typeof item.severity === "string"
-      ? item.severity
-      : "info";
-  const rule =
-    "rule" in item && typeof item.rule === "string" ? item.rule : undefined;
+  const line = "line" in item && typeof item.line === "number" ? item.line : undefined;
+  const column = "column" in item && typeof item.column === "number" ? item.column : undefined;
+  const severity = "severity" in item && typeof item.severity === "string" ? item.severity : "info";
+  const rule = "rule" in item && typeof item.rule === "string" ? item.rule : undefined;
 
   return {
     file,
     line,
     column,
     severity:
-      severity === "error" || severity === "warning" || severity === "info"
-        ? severity
-        : "info",
+      severity === "error" || severity === "warning" || severity === "info" ? severity : "info",
     message,
     rule,
     ...item,

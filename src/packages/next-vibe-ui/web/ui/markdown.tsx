@@ -95,10 +95,7 @@ function processChatTags(content: string): string {
   let processedContent = content;
 
   // Replace complete <Chat>...</Chat> tags with just their content
-  processedContent = processedContent.replace(
-    /<Chat>([\s\S]*?)<\/Chat>/gi,
-    "$1",
-  );
+  processedContent = processedContent.replace(/<Chat>([\s\S]*?)<\/Chat>/gi, "$1");
 
   // Handle incomplete <Chat> tag (streaming case) - keep the content
   processedContent = processedContent.replace(/<Chat>([\s\S]*)$/i, "$1");
@@ -208,8 +205,7 @@ export function Markdown({
           {allThinkingSections.map((thinking, thinkIndex) => {
             const isExpanded = isThinkingExpanded(thinkIndex);
             const isIncomplete =
-              thinkIndex === allThinkingSections.length - 1 &&
-              incompleteThinking;
+              thinkIndex === allThinkingSections.length - 1 && incompleteThinking;
             return (
               <div
                 key={thinkIndex}
@@ -251,9 +247,7 @@ export function Markdown({
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm, remarkBreaks]}
                           components={{
-                            p: ({ children }) => (
-                              <p className="mb-2 last:mb-0">{children}</p>
-                            ),
+                            p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
                           }}
                         >
                           {thinking}
@@ -321,15 +315,13 @@ export function Markdown({
           ),
           li: ({ children }) => {
             // Check if this is a task list item (contains a checkbox)
-            const isTaskListItem = React.Children.toArray(children).some(
-              (child) => {
-                if (React.isValidElement(child) && child.type === "input") {
-                  const props = child.props as { type?: string };
-                  return props.type === "checkbox";
-                }
-                return false;
-              },
-            );
+            const isTaskListItem = React.Children.toArray(children).some((child) => {
+              if (React.isValidElement(child) && child.type === "input") {
+                const props = child.props as { type?: string };
+                return props.type === "checkbox";
+              }
+              return false;
+            });
 
             if (isTaskListItem) {
               return (
@@ -368,14 +360,10 @@ export function Markdown({
           },
 
           strong: ({ children }) => (
-            <strong className="font-bold text-slate-900 dark:text-slate-50">
-              {children}
-            </strong>
+            <strong className="font-bold text-slate-900 dark:text-slate-50">{children}</strong>
           ),
           em: ({ children }) => (
-            <em className="italic text-slate-600 dark:text-slate-400 font-medium">
-              {children}
-            </em>
+            <em className="italic text-slate-600 dark:text-slate-400 font-medium">{children}</em>
           ),
 
           // Code with copy button and syntax highlighting
@@ -429,23 +417,16 @@ export function Markdown({
           ),
 
           img: ({ src, alt }) => (
-            <MarkdownImage
-              src={typeof src === "string" ? src : undefined}
-              alt={alt}
-            />
+            <MarkdownImage src={typeof src === "string" ? src : undefined} alt={alt} />
           ),
 
           table: ({ children }) => (
             <div className="overflow-x-auto mb-6 mt-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
-              <table className="min-w-full border-collapse text-sm">
-                {children}
-              </table>
+              <table className="min-w-full border-collapse text-sm">{children}</table>
             </div>
           ),
           thead: ({ children }) => (
-            <thead className="bg-slate-50 dark:bg-slate-800/50">
-              {children}
-            </thead>
+            <thead className="bg-slate-50 dark:bg-slate-800/50">{children}</thead>
           ),
           th: ({ children }) => (
             <th className="border-b-2 border-slate-200 dark:border-slate-700 px-4 py-3 text-left font-semibold text-slate-900 dark:text-slate-100 uppercase text-xs tracking-wider">
@@ -470,13 +451,7 @@ export function Markdown({
 }
 
 // Code block component with copy button
-function CodeBlock({
-  code,
-  language,
-}: {
-  code: string;
-  language: string;
-}): JSX.Element {
+function CodeBlock({ code, language }: { code: string; language: string }): JSX.Element {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
@@ -552,20 +527,12 @@ function handleImageInModalClick(e: React.MouseEvent<HTMLImageElement>): void {
   e.stopPropagation();
 }
 
-function handleImageInModalKeyDown(
-  e: React.KeyboardEvent<HTMLImageElement>,
-): void {
+function handleImageInModalKeyDown(e: React.KeyboardEvent<HTMLImageElement>): void {
   e.stopPropagation();
 }
 
 // Image component with modal
-function MarkdownImage({
-  src,
-  alt,
-}: {
-  src?: string;
-  alt?: string;
-}): JSX.Element {
+function MarkdownImage({ src, alt }: { src?: string; alt?: string }): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
 
   if (!src) {
@@ -580,9 +547,7 @@ function MarkdownImage({
     setIsOpen(false);
   };
 
-  const handleModalKeyDown = (
-    e: React.KeyboardEvent<HTMLButtonElement>,
-  ): void => {
+  const handleModalKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
     if (e.key === "Escape") {
       setIsOpen(false);
     }
@@ -591,11 +556,7 @@ function MarkdownImage({
   return (
     <>
       <div className="my-6 group">
-        <button
-          type="button"
-          onClick={handleImageClick}
-          className="block w-full text-left"
-        >
+        <button type="button" onClick={handleImageClick} className="block w-full text-left">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src}
@@ -621,12 +582,7 @@ function MarkdownImage({
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
             onClick={handleModalClose}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

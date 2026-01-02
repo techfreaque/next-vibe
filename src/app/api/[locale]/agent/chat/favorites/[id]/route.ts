@@ -19,12 +19,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   [Methods.PATCH]: {
     email: undefined,
     handler: ({ data, urlPathParams, user, logger }) =>
-      SingleFavoriteRepository.updateFavorite(
-        data,
-        urlPathParams,
-        user,
-        logger,
-      ),
+      SingleFavoriteRepository.updateFavorite(data, urlPathParams, user, logger),
   },
   [Methods.DELETE]: {
     email: undefined,

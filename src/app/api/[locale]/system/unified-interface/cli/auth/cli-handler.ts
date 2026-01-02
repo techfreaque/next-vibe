@@ -6,11 +6,7 @@ import {
   BaseAuthHandler,
   type SessionData,
 } from "../../shared/server-only/auth/base-auth-handler";
-import {
-  deleteSessionFile,
-  readSessionFile,
-  writeSessionFile,
-} from "./session-file";
+import { deleteSessionFile, readSessionFile, writeSessionFile } from "./session-file";
 
 /**
  * CLI/MCP Authentication Handler

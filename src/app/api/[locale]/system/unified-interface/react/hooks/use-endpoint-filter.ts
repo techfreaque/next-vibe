@@ -7,11 +7,7 @@ import { useMemo } from "react";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
-import type {
-  ApiQueryFormOptions,
-  ApiQueryFormReturn,
-  ApiQueryOptions,
-} from "./types";
+import type { ApiQueryFormOptions, ApiQueryFormReturn, ApiQueryOptions } from "./types";
 import { useApiQueryForm } from "./use-api-query-form";
 
 /**
@@ -60,27 +56,26 @@ export function useEndpointFilter<TEndpoint extends CreateApiEndpointAny>(
   } = options;
 
   // Merge initial filters with pagination and sorting
-  const enhancedFormOptions: ApiQueryFormOptions<
-    TEndpoint["types"]["RequestOutput"]
-  > = useMemo(() => {
-    if (!filterEndpoint) {
-      return formOptions;
-    }
+  const enhancedFormOptions: ApiQueryFormOptions<TEndpoint["types"]["RequestOutput"]> =
+    useMemo(() => {
+      if (!filterEndpoint) {
+        return formOptions;
+      }
 
-    const mergedDefaultValues: Partial<TEndpoint["types"]["RequestOutput"]> = {
-      ...formOptions,
-      defaultValues: {
-        ...formOptions.defaultValues,
-        ...initialFilters,
-      },
-      // Generate storage key for form persistence
-      persistenceKey:
-        formOptions.persistenceKey ||
-        // eslint-disable-next-line i18next/no-literal-string
-        `filter-${filterEndpoint.path.join("-")}-${filterEndpoint.method}`,
-    };
-    return mergedDefaultValues;
-  }, [formOptions, initialFilters, filterEndpoint]);
+      const mergedDefaultValues: Partial<TEndpoint["types"]["RequestOutput"]> = {
+        ...formOptions,
+        defaultValues: {
+          ...formOptions.defaultValues,
+          ...initialFilters,
+        },
+        // Generate storage key for form persistence
+        persistenceKey:
+          formOptions.persistenceKey ||
+          // eslint-disable-next-line i18next/no-literal-string
+          `filter-${filterEndpoint.path.join("-")}-${filterEndpoint.method}`,
+      };
+      return mergedDefaultValues;
+    }, [formOptions, initialFilters, filterEndpoint]);
 
   // Enhanced query options for filtering
   const enhancedQueryOptions: ApiQueryOptions<

@@ -45,13 +45,11 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description:
-        "Wystąpił wewnętrzny błąd serwera podczas pobierania żądania sieciowego",
+      description: "Wystąpił wewnętrzny błąd serwera podczas pobierania żądania sieciowego",
     },
     unknown: {
       title: "Nieznany błąd",
-      description:
-        "Wystąpił nieznany błąd podczas pobierania żądania sieciowego",
+      description: "Wystąpił nieznany błąd podczas pobierania żądania sieciowego",
     },
     unsavedChanges: {
       title: "Niezapisane zmiany",

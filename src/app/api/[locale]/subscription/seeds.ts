@@ -11,6 +11,7 @@ import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { contactClientRepository } from "../contact/repository-client";
 import { CreditRepository } from "../credits/repository";
 import { PaymentProvider } from "../payment/enum";
 import type { NewSubscription } from "./db";
@@ -18,7 +19,6 @@ import { subscriptions } from "./db";
 import type { SubscriptionGetResponseOutput } from "./definition";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
 import { SubscriptionRepository } from "./repository";
-import { contactClientRepository } from "../contact/repository-client";
 
 /**
  * Helper function to create local subscription record
@@ -58,10 +58,7 @@ const ENABLED = false;
 /**
  * Development seed function for subscription module
  */
-export async function dev(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<void> {
+export async function dev(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
   logger.debug("🌱 Seeding subscription data for development environment");
 
   if (!ENABLED) {
@@ -200,19 +197,15 @@ export async function dev(
         locale,
       );
 
-      let adminSubscriptionData: SubscriptionGetResponseOutput | undefined =
-        undefined;
+      let adminSubscriptionData: SubscriptionGetResponseOutput | undefined = undefined;
 
       if (!adminSubscription.success || !adminSubscription.data) {
         // Create premium subscription for admin user
-        const adminSubscriptionSeed = createLocalSubscriptionSeed(
-          adminUser.id,
-          {
-            planId: SubscriptionPlan.SUBSCRIPTION,
-            billingInterval: BillingInterval.YEARLY,
-            status: SubscriptionStatus.ACTIVE,
-          },
-        );
+        const adminSubscriptionSeed = createLocalSubscriptionSeed(adminUser.id, {
+          planId: SubscriptionPlan.SUBSCRIPTION,
+          billingInterval: BillingInterval.YEARLY,
+          status: SubscriptionStatus.ACTIVE,
+        });
 
         const [adminCreatedSubscription] = await db
           .insert(subscriptions)
@@ -231,20 +224,15 @@ export async function dev(
             status: adminCreatedSubscription.status,
             cancelAtPeriodEnd: adminCreatedSubscription.cancelAtPeriodEnd,
             provider: adminCreatedSubscription.provider,
-            providerSubscriptionId:
-              adminCreatedSubscription.providerSubscriptionId || undefined,
-            currentPeriodStart:
-              adminCreatedSubscription.currentPeriodStart?.toISOString() ?? "",
-            currentPeriodEnd:
-              adminCreatedSubscription.currentPeriodEnd?.toISOString() ?? "",
+            providerSubscriptionId: adminCreatedSubscription.providerSubscriptionId || undefined,
+            currentPeriodStart: adminCreatedSubscription.currentPeriodStart?.toISOString() ?? "",
+            currentPeriodEnd: adminCreatedSubscription.currentPeriodEnd?.toISOString() ?? "",
             createdAt: adminCreatedSubscription.createdAt.toISOString(),
             updatedAt: adminCreatedSubscription.updatedAt.toISOString(),
           };
         }
       } else {
-        logger.debug(
-          "Admin user already has a subscription, skipping creation",
-        );
+        logger.debug("Admin user already has a subscription, skipping creation");
         adminSubscriptionData = adminSubscription.data;
       }
 
@@ -262,8 +250,7 @@ export async function dev(
           { leadId: userLead.leadId, userId: adminUser.id },
           logger,
         );
-        const hasCredits =
-          balanceResult.success && balanceResult.data.total > 0;
+        const hasCredits = balanceResult.success && balanceResult.data.total > 0;
 
         if (!hasCredits) {
           // Convert currentPeriodEnd to Date if it's a string (from database)
@@ -272,13 +259,8 @@ export async function dev(
             : undefined;
 
           // Get subscription credits from products repository
-          const { productsRepository, ProductIds } = await import(
-            "../products/repository-client"
-          );
-          const subscription = productsRepository.getProduct(
-            ProductIds.SUBSCRIPTION,
-            locale,
-          );
+          const { productsRepository, ProductIds } = await import("../products/repository-client");
+          const subscription = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
           const subscriptionCredits = subscription.credits;
 
           const creditsResult = await CreditRepository.addUserCredits(
@@ -290,13 +272,10 @@ export async function dev(
           );
 
           if (creditsResult.success) {
-            logger.debug(
-              `Added ${subscriptionCredits} subscription credits to admin user`,
-              {
-                userId: adminUser.id,
-                credits: subscriptionCredits,
-              },
-            );
+            logger.debug(`Added ${subscriptionCredits} subscription credits to admin user`, {
+              userId: adminUser.id,
+              credits: subscriptionCredits,
+            });
           } else {
             logger.error("Failed to add subscription credits to admin user", {
               userId: adminUser.id,
@@ -304,17 +283,12 @@ export async function dev(
             });
           }
         } else {
-          logger.debug(
-            "Admin user already has credits, skipping credit creation",
-          );
+          logger.debug("Admin user already has credits, skipping credit creation");
         }
       }
     }
   } catch (error) {
-    logger.error(
-      "Error creating development subscription seeds:",
-      parseError(error),
-    );
+    logger.error("Error creating development subscription seeds:", parseError(error));
     // Don't throw error - continue with other seeds
   }
 
@@ -341,20 +315,15 @@ export async function dev(
       let subscription: SubscriptionGetResponseOutput | undefined = undefined;
 
       if (existingSubscription.success && existingSubscription.data) {
-        logger.debug(
-          "Low credits user already has a subscription, skipping creation",
-        );
+        logger.debug("Low credits user already has a subscription, skipping creation");
         subscription = existingSubscription.data;
       } else {
         // Create active subscription for low credits user
-        const lowCreditsSubscriptionData = createLocalSubscriptionSeed(
-          lowCreditsUser.id,
-          {
-            planId: SubscriptionPlan.SUBSCRIPTION,
-            billingInterval: BillingInterval.MONTHLY,
-            status: SubscriptionStatus.ACTIVE,
-          },
-        );
+        const lowCreditsSubscriptionData = createLocalSubscriptionSeed(lowCreditsUser.id, {
+          planId: SubscriptionPlan.SUBSCRIPTION,
+          billingInterval: BillingInterval.MONTHLY,
+          status: SubscriptionStatus.ACTIVE,
+        });
 
         const [createdSubscription] = await db
           .insert(subscriptions)
@@ -362,9 +331,7 @@ export async function dev(
           .returning();
 
         if (createdSubscription) {
-          logger.debug(
-            `✅ Created subscription for low credits user: ${createdSubscription.id}`,
-          );
+          logger.debug(`✅ Created subscription for low credits user: ${createdSubscription.id}`);
           subscription = {
             id: createdSubscription.id,
             userId: createdSubscription.userId,
@@ -373,12 +340,9 @@ export async function dev(
             status: createdSubscription.status,
             cancelAtPeriodEnd: createdSubscription.cancelAtPeriodEnd,
             provider: createdSubscription.provider,
-            providerSubscriptionId:
-              createdSubscription.providerSubscriptionId || undefined,
-            currentPeriodStart:
-              createdSubscription.currentPeriodStart?.toISOString() ?? "",
-            currentPeriodEnd:
-              createdSubscription.currentPeriodEnd?.toISOString() ?? "",
+            providerSubscriptionId: createdSubscription.providerSubscriptionId || undefined,
+            currentPeriodStart: createdSubscription.currentPeriodStart?.toISOString() ?? "",
+            currentPeriodEnd: createdSubscription.currentPeriodEnd?.toISOString() ?? "",
             createdAt: createdSubscription.createdAt.toISOString(),
             updatedAt: createdSubscription.updatedAt.toISOString(),
           };
@@ -401,8 +365,7 @@ export async function dev(
           { leadId: userLead.leadId, userId: lowCreditsUser.id },
           logger,
         );
-        const hasCredits =
-          balanceResult.success && balanceResult.data.total > 0;
+        const hasCredits = balanceResult.success && balanceResult.data.total > 0;
 
         if (!hasCredits) {
           // Convert currentPeriodEnd to Date if it's a string (from database)
@@ -424,18 +387,13 @@ export async function dev(
               userId: lowCreditsUser.id,
             });
           } else {
-            logger.error(
-              "Failed to add subscription credits to low credits user",
-              {
-                userId: lowCreditsUser.id,
-                error: creditsResult.message,
-              },
-            );
+            logger.error("Failed to add subscription credits to low credits user", {
+              userId: lowCreditsUser.id,
+              error: creditsResult.message,
+            });
           }
         } else {
-          logger.debug(
-            "Low credits user already has credits, skipping credit creation",
-          );
+          logger.debug("Low credits user already has credits, skipping credit creation");
         }
       }
     }
@@ -450,10 +408,7 @@ export async function dev(
 /**
  * Test seed function for subscription module
  */
-export async function test(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<void> {
+export async function test(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
   logger.debug("🌱 Seeding subscription data for test environment");
 
   try {
@@ -502,12 +457,11 @@ export async function test(
     for (const subscriptionData of testSubscriptions) {
       try {
         // Check if subscription already exists
-        const existingSubscription =
-          await SubscriptionRepository.getSubscription(
-            subscriptionData.userId,
-            logger,
-            locale,
-          );
+        const existingSubscription = await SubscriptionRepository.getSubscription(
+          subscriptionData.userId,
+          logger,
+          locale,
+        );
 
         if (!existingSubscription.success || !existingSubscription.data) {
           const [createdSubscription] = await db
@@ -521,9 +475,7 @@ export async function test(
             );
           }
         } else {
-          logger.debug(
-            `Test subscription already exists for user: ${subscriptionData.userId}`,
-          );
+          logger.debug(`Test subscription already exists for user: ${subscriptionData.userId}`);
         }
       } catch (subscriptionError) {
         logger.error(
@@ -543,10 +495,7 @@ export async function test(
 /**
  * Production seed function for subscription module
  */
-export async function prod(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<void> {
+export async function prod(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
   logger.debug("🌱 Seeding subscription data for production environment");
 
   try {
@@ -564,9 +513,7 @@ export async function prod(
 
     if (adminUserResponse.success && adminUserResponse.data) {
       const adminUser = adminUserResponse.data;
-      logger.debug(
-        `Admin user verified for subscription management: ${adminUser.id}`,
-      );
+      logger.debug(`Admin user verified for subscription management: ${adminUser.id}`);
 
       // Check if admin already has a subscription
       const adminSubscription = await SubscriptionRepository.getSubscription(
@@ -577,14 +524,11 @@ export async function prod(
 
       if (!adminSubscription.success || !adminSubscription.data) {
         // Create enterprise subscription for production admin
-        const adminSubscriptionData = createLocalSubscriptionSeed(
-          adminUser.id,
-          {
-            planId: SubscriptionPlan.SUBSCRIPTION,
-            billingInterval: BillingInterval.YEARLY,
-            status: SubscriptionStatus.ACTIVE,
-          },
-        );
+        const adminSubscriptionData = createLocalSubscriptionSeed(adminUser.id, {
+          planId: SubscriptionPlan.SUBSCRIPTION,
+          billingInterval: BillingInterval.YEARLY,
+          status: SubscriptionStatus.ACTIVE,
+        });
 
         const [createdAdminSubscription] = await db
           .insert(subscriptions)
@@ -592,9 +536,7 @@ export async function prod(
           .returning();
 
         if (createdAdminSubscription) {
-          logger.debug(
-            `✅ Created production admin subscription: ${createdAdminSubscription.id}`,
-          );
+          logger.debug(`✅ Created production admin subscription: ${createdAdminSubscription.id}`);
         }
       } else {
         logger.debug("Production admin subscription already exists");

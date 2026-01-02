@@ -22,13 +22,7 @@ export interface TestEndpointOptions<
    */
   customTests?: {
     [testName: string]: (
-      test: TestRunner<
-        TExampleKey,
-        TMethod,
-        TUserRoleValue,
-        TScopedTranslationKey,
-        TFields
-      >,
+      test: TestRunner<TExampleKey, TMethod, TUserRoleValue, TScopedTranslationKey, TFields>,
     ) => Promise<void> | void;
   };
 
@@ -84,11 +78,5 @@ export interface TestRunner<
   /**
    * The endpoint being tested
    */
-  endpoint: CreateApiEndpoint<
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TScopedTranslationKey,
-    TFields
-  >;
+  endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TScopedTranslationKey, TFields>;
 }

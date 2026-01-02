@@ -130,9 +130,7 @@ export const {
  * Map email status filter to actual status
  */
 export function mapEmailStatusFilter(
-  filter:
-    | (typeof EmailStatusFilter)[keyof typeof EmailStatusFilter]
-    | undefined,
+  filter: (typeof EmailStatusFilter)[keyof typeof EmailStatusFilter] | undefined,
 ): (typeof EmailStatus)[keyof typeof EmailStatus] | null {
   switch (filter) {
     case EmailStatusFilter.PENDING:

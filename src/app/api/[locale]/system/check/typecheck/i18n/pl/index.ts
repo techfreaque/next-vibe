@@ -3,8 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   // Main endpoint properties
   title: "Sprawdzanie typów TypeScript",
-  description:
-    "Uruchom sprawdzanie typów TypeScript dla określonych plików lub katalogów",
+  description: "Uruchom sprawdzanie typów TypeScript dla określonych plików lub katalogów",
   category: "Sprawdzenia systemowe",
   tag: "sprawdzanie-typów",
 
@@ -29,8 +28,7 @@ export const translations: typeof enTranslations = {
   // Container
   container: {
     title: "Konfiguracja sprawdzania typów TypeScript",
-    description:
-      "Skonfiguruj parametry dla uruchomienia sprawdzania typów TypeScript",
+    description: "Skonfiguruj parametry dla uruchomienia sprawdzania typów TypeScript",
   },
 
   // Request fields
@@ -142,8 +140,7 @@ export const translations: typeof enTranslations = {
     },
     invalidCommand: {
       title: "Nieprawidłowe polecenie",
-      message:
-        "Polecenie sprawdzania TypeScript jest nieprawidłowe lub brakuje",
+      message: "Polecenie sprawdzania TypeScript jest nieprawidłowe lub brakuje",
     },
   },
 

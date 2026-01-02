@@ -34,11 +34,7 @@ export interface IVersionService {
   /**
    * Bump version based on increment type
    */
-  bumpVersion(
-    currentVersion: string,
-    increment: VersionIncrement,
-    prereleaseId?: string,
-  ): string;
+  bumpVersion(currentVersion: string, increment: VersionIncrement, prereleaseId?: string): string;
 
   /**
    * Compare two version strings
@@ -79,21 +75,16 @@ export class VersionService implements IVersionService {
     logger: EndpointLogger,
   ): string {
     try {
-      const tagsExist =
-        execSync("git tag", { cwd: mainPackagePath }).toString().trim().length >
-        0;
+      const tagsExist = execSync("git tag", { cwd: mainPackagePath }).toString().trim().length > 0;
 
       if (!tagsExist) {
         logger.debug(MESSAGES.GIT_NO_TAGS);
         return "0.0.0";
       }
 
-      const lastGitTag = execSync(
-        `git describe --tags --abbrev=0 --match="${tagPrefix}*"`,
-        {
-          cwd: mainPackagePath,
-        },
-      )
+      const lastGitTag = execSync(`git describe --tags --abbrev=0 --match="${tagPrefix}*"`, {
+        cwd: mainPackagePath,
+      })
         .toString()
         .trim();
 
@@ -141,11 +132,7 @@ export class VersionService implements IVersionService {
     return va.pre.localeCompare(vb.pre);
   }
 
-  bumpVersion(
-    currentVersion: string,
-    increment: VersionIncrement,
-    prereleaseId?: string,
-  ): string {
+  bumpVersion(currentVersion: string, increment: VersionIncrement, prereleaseId?: string): string {
     // Parse current version
     const [mainPart, prePart] = currentVersion.split("-");
     const parts = (mainPart ?? "0.0.0").split(".").map(Number);
@@ -202,15 +189,10 @@ export class VersionService implements IVersionService {
     prereleaseId?: string,
   ): VersionInfo {
     const tagPrefix = releaseConfig.tagPrefix ?? "v";
-    const currentGitVersion = this.getLastVersionFromGitTag(
-      tagPrefix,
-      pkg.directory,
-      logger,
-    );
+    const currentGitVersion = this.getLastVersionFromGitTag(tagPrefix, pkg.directory, logger);
 
     // Priority: globalVersion > releaseConfig.version > package.json version
-    const currentVersion =
-      config.globalVersion ?? releaseConfig.version ?? packageJson.version;
+    const currentVersion = config.globalVersion ?? releaseConfig.version ?? packageJson.version;
 
     const lastTag = `${tagPrefix}${currentGitVersion}`;
 
@@ -266,15 +248,9 @@ export class VersionService implements IVersionService {
           `(define\\s*\\(\\s*["']${fileInfo.varName}["']\\s*,\\s*["'])([^"']*)(["'])`,
           "g",
         );
-        updatedContent = fileContent.replace(
-          phpDefineRegex,
-          `$1${newVersion}$3`,
-        );
+        updatedContent = fileContent.replace(phpDefineRegex, `$1${newVersion}$3`);
       } else if (isJsonFile) {
-        const jsonRegex = new RegExp(
-          `("${fileInfo.varName}"\\s*:\\s*")([^"]*)(")`,
-          "g",
-        );
+        const jsonRegex = new RegExp(`("${fileInfo.varName}"\\s*:\\s*")([^"]*)(")`, "g");
         updatedContent = fileContent.replace(jsonRegex, `$1${newVersion}$3`);
       } else {
         const constRegex = new RegExp(

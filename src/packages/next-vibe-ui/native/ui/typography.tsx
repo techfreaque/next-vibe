@@ -53,10 +53,7 @@ const VALID_ACCESSIBILITY_ROLES: Record<string, AccessibilityRoleValue> = {
 };
 
 // Helper to safely convert role to React Native AccessibilityRole
-function toAccessibilityRole(
-  role: string | undefined,
-  fallback?: string,
-): AccessibilityRoleValue {
+function toAccessibilityRole(role: string | undefined, fallback?: string): AccessibilityRoleValue {
   const value = role ?? fallback;
   if (value === undefined) {
     return undefined;
@@ -152,10 +149,7 @@ function H3({
       testID={testID}
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "text-2xl text-foreground font-semibold tracking-tight",
-          className,
-        ),
+        className: cn("text-2xl text-foreground font-semibold tracking-tight", className),
       })}
     >
       {children}
@@ -185,10 +179,7 @@ function H4({
       testID={testID}
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "text-xl text-foreground font-semibold tracking-tight",
-          className,
-        ),
+        className: cn("text-xl text-foreground font-semibold tracking-tight", className),
       })}
     >
       {children}
@@ -374,10 +365,7 @@ function Small({
       testID={testID}
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "text-sm text-foreground font-medium leading-none",
-          className,
-        ),
+        className: cn("text-sm text-foreground font-medium leading-none", className),
       })}
     >
       {children}

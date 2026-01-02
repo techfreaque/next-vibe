@@ -62,18 +62,15 @@ export const translations = {
     emptyConfig: "Empty configuration - no build steps defined",
   },
   warnings: {
-    outputIsDirectory:
-      "Output path should be a file, not a directory: {{path}}",
+    outputIsDirectory: "Output path should be a file, not a directory: {{path}}",
     sourceNotFound: "Source file not found: {{path}}",
   },
   suggestions: {
     checkFilePaths: "Check that all file paths are correct and files exist",
-    runFromProjectRoot:
-      "Make sure you're running from the project root directory",
+    runFromProjectRoot: "Make sure you're running from the project root directory",
     checkPermissions: "Check file permissions for input and output directories",
     checkDependencies: "Some dependencies may be missing - check imports",
-    runInstall:
-      "Try running 'bun install' to ensure all dependencies are available",
+    runInstall: "Try running 'bun install' to ensure all dependencies are available",
     increaseMemory:
       "For large builds, try increasing memory: NODE_OPTIONS=--max-old-space-size=4096",
     useExternals: "Consider marking large dependencies as external",
@@ -132,13 +129,11 @@ export const translations = {
     watchModeError: "Watch mode error: {{error}}",
     watchModeStopped: "Watch mode stopped",
     parallelCompiling: "Compiling {{count}} files in parallel...",
-    parallelComplete:
-      "Parallel compilation complete: {{count}} files in {{duration}}ms",
+    parallelComplete: "Parallel compilation complete: {{count}} files in {{duration}}ms",
     cacheHit: "Cache hit: {{file}} (skipped)",
     cacheMiss: "Cache miss: {{file}} (rebuilding)",
     cacheCleared: "Build cache cleared",
-    cacheStats:
-      "Cache: {{hits}} hits, {{misses}} misses ({{hitRate}}% hit rate)",
+    cacheStats: "Cache: {{hits}} hits, {{misses}} misses ({{hitRate}}% hit rate)",
     generatingReport: "Generating build report...",
     reportGenerated: "Build report generated: {{path}}",
     progress: "[{{current}}/{{total}}] {{step}}",
@@ -169,8 +164,7 @@ export const translations = {
       // Runtime options
       profile: {
         title: "Build Profile",
-        description:
-          "Development (fast, debug) or Production (optimized, minified)",
+        description: "Development (fast, debug) or Production (optimized, minified)",
       },
       dryRun: {
         title: "Dry Run",
@@ -182,8 +176,7 @@ export const translations = {
       },
       analyze: {
         title: "Bundle Analysis",
-        description:
-          "Analyze bundle sizes and identify optimization opportunities",
+        description: "Analyze bundle sizes and identify optimization opportunities",
       },
       watch: {
         title: "Watch Mode",
@@ -257,8 +250,7 @@ export const translations = {
       },
       dtsInclude: {
         title: "DTS Include",
-        description:
-          "Glob patterns for TypeScript files to include in declarations",
+        description: "Glob patterns for TypeScript files to include in declarations",
         placeholder: "src/**/*.ts",
       },
       dtsEntryRoot: {
@@ -290,8 +282,7 @@ export const translations = {
       },
       define: {
         title: "Define Constants",
-        description:
-          "Compile-time constants as JSON (e.g., process.env.NODE_ENV)",
+        description: "Compile-time constants as JSON (e.g., process.env.NODE_ENV)",
         placeholder: '{"process.env.NODE_ENV": "\\"production\\""}',
       },
       splitting: {
@@ -519,8 +510,7 @@ export const translations = {
       packageExports: {
         title: "Exports Map",
         description: "Package exports field as JSON",
-        placeholder:
-          '{".": {"import": "./dist/index.mjs", "require": "./dist/index.cjs"}}',
+        placeholder: '{".": {"import": "./dist/index.mjs", "require": "./dist/index.cjs"}}',
       },
       packageDependencies: {
         title: "Dependencies",
@@ -655,10 +645,8 @@ export const translations = {
     largeBundle: "WARNING: Large bundle detected ({{size}})",
     considerTreeShaking: "Consider enabling tree-shaking to reduce bundle size",
     checkLargeDeps: "Check for large dependencies that could be replaced",
-    largeSourcemaps:
-      "Large sourcemaps detected - consider disabling in production",
-    possibleDuplicates:
-      "Possible duplicate dependencies detected - consider deduplication",
+    largeSourcemaps: "Large sourcemaps detected - consider disabling in production",
+    possibleDuplicates: "Possible duplicate dependencies detected - consider deduplication",
     totalSize: "Total Size",
     largestFiles: "Largest Files",
   },

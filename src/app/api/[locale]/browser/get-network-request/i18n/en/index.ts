@@ -43,13 +43,11 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description:
-        "An internal server error occurred while getting the network request",
+      description: "An internal server error occurred while getting the network request",
     },
     unknown: {
       title: "Unknown Error",
-      description:
-        "An unknown error occurred while getting the network request",
+      description: "An unknown error occurred while getting the network request",
     },
     unsavedChanges: {
       title: "Unsaved Changes",

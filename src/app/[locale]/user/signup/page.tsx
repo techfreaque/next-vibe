@@ -62,9 +62,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * Signup Page Component
  * Fully definition-driven using EndpointsPage
  */
-export default async function SignUpPage({
-  params,
-}: Props): Promise<JSX.Element> {
+export default async function SignUpPage({ params }: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 
@@ -97,10 +95,7 @@ export default async function SignUpPage({
         <ArrowLeft className="mr-2 h-4 w-4" />
         {t("app.user.common.backToHome")}
       </Link>
-      <SignUpForm
-        locale={locale}
-        initialReferralCode={initialReferralCode ?? null}
-      />
+      <SignUpForm locale={locale} initialReferralCode={initialReferralCode ?? null} />
     </>
   );
 }

@@ -40,8 +40,7 @@ export const translations: typeof enTranslations = {
   },
   twoFactorCode: {
     label: "Zwei-Faktor-Code",
-    description:
-      "Geben Sie Ihren Zwei-Faktor-Authentifizierungscode ein, falls aktiviert",
+    description: "Geben Sie Ihren Zwei-Faktor-Authentifizierungscode ein, falls aktiviert",
     placeholder: "2FA-Code eingeben",
   },
   response: {
@@ -82,8 +81,7 @@ export const translations: typeof enTranslations = {
     },
     validation: {
       title: "Validierungsfehler",
-      description:
-        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -91,13 +89,11 @@ export const translations: typeof enTranslations = {
     },
     server: {
       title: "Serverfehler",
-      description:
-        "Passwort konnte aufgrund eines Serverfehlers nicht aktualisiert werden",
+      description: "Passwort konnte aufgrund eines Serverfehlers nicht aktualisiert werden",
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description:
-        "Ein unerwarteter Fehler ist beim Aktualisieren des Passworts aufgetreten",
+      description: "Ein unerwarteter Fehler ist beim Aktualisieren des Passworts aufgetreten",
     },
     network: {
       title: "Netzwerkfehler",
@@ -117,17 +113,14 @@ export const translations: typeof enTranslations = {
     },
     conflict: {
       title: "Datenkonflikt",
-      description:
-        "Ein Konflikt ist beim Aktualisieren des Passworts aufgetreten",
+      description: "Ein Konflikt ist beim Aktualisieren des Passworts aufgetreten",
     },
   },
   success: {
     updated: "Passwort erfolgreich aktualisiert",
-    securityTip:
-      "Aktivieren Sie für erhöhte Sicherheit die Zwei-Faktor-Authentifizierung",
+    securityTip: "Aktivieren Sie für erhöhte Sicherheit die Zwei-Faktor-Authentifizierung",
     nextSteps: {
-      logoutOther:
-        "Alle anderen Sitzungen wurden aus Sicherheitsgründen abgemeldet",
+      logoutOther: "Alle anderen Sitzungen wurden aus Sicherheitsgründen abgemeldet",
       enable2fa:
         "Erwägen Sie die Aktivierung der Zwei-Faktor-Authentifizierung für bessere Sicherheit",
     },
@@ -142,8 +135,7 @@ export const translations: typeof enTranslations = {
     errors: {
       unknown: {
         title: "Unbekannter Fehler",
-        description:
-          "Beim Aktualisieren des Passworts ist ein unerwarteter Fehler aufgetreten",
+        description: "Beim Aktualisieren des Passworts ist ein unerwarteter Fehler aufgetreten",
       },
     },
   },

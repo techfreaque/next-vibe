@@ -59,13 +59,11 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um diesen Favoriten anzuzeigen",
+        description: "Sie müssen angemeldet sein, um diesen Favoriten anzuzeigen",
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, diesen Favoriten anzuzeigen",
+        description: "Sie haben keine Berechtigung, diesen Favoriten anzuzeigen",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -81,13 +79,11 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
-        description:
-          "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
+        description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "Bei der Verarbeitung Ihrer Anfrage ist ein Konflikt aufgetreten",
+        description: "Bei der Verarbeitung Ihrer Anfrage ist ein Konflikt aufgetreten",
       },
     },
     success: {
@@ -143,8 +139,7 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Validierungsfehler",
-        description:
-          "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+        description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
       },
       network: {
         title: "Netzwerkfehler",
@@ -152,13 +147,11 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um diesen Favoriten zu aktualisieren",
+        description: "Sie müssen angemeldet sein, um diesen Favoriten zu aktualisieren",
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, diesen Favoriten zu aktualisieren",
+        description: "Sie haben keine Berechtigung, diesen Favoriten zu aktualisieren",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -174,13 +167,11 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
-        description:
-          "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
+        description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "Beim Aktualisieren des Favoriten ist ein Konflikt aufgetreten",
+        description: "Beim Aktualisieren des Favoriten ist ein Konflikt aufgetreten",
       },
     },
     success: {
@@ -213,13 +204,11 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um diesen Favoriten zu löschen",
+        description: "Sie müssen angemeldet sein, um diesen Favoriten zu löschen",
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, diesen Favoriten zu löschen",
+        description: "Sie haben keine Berechtigung, diesen Favoriten zu löschen",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -235,13 +224,11 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
-        description:
-          "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
+        description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "Favorit kann aufgrund eines Konflikts nicht gelöscht werden",
+        description: "Favorit kann aufgrund eines Konflikts nicht gelöscht werden",
       },
     },
     success: {

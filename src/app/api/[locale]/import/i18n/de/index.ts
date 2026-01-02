@@ -13,15 +13,13 @@ export const translations: typeof enTranslations = {
 
       form: {
         title: "CSV-Import Konfiguration",
-        description:
-          "Konfigurieren Sie Ihre CSV-Import Einstellungen für optimale Ergebnisse",
+        description: "Konfigurieren Sie Ihre CSV-Import Einstellungen für optimale Ergebnisse",
       },
 
       // === DATEI UPLOAD BEREICH ===
       fileSection: {
         title: "Datei Upload",
-        description:
-          "Wählen Sie Ihre CSV-Datei aus und spezifizieren Sie die Zieldomäne",
+        description: "Wählen Sie Ihre CSV-Datei aus und spezifizieren Sie die Zieldomäne",
       },
 
       file: {
@@ -47,23 +45,19 @@ export const translations: typeof enTranslations = {
       // === VERARBEITUNGSBEREICH ===
       processingSection: {
         title: "Verarbeitungsoptionen",
-        description:
-          "Konfigurieren Sie, wie Ihre Daten verarbeitet werden sollen",
+        description: "Konfigurieren Sie, wie Ihre Daten verarbeitet werden sollen",
       },
 
       skipDuplicates: {
         label: "Duplikate Überspringen",
         description: "Datensätze mit doppelten E-Mail-Adressen überspringen",
-        helpText:
-          "Empfohlen: Verhindert das doppelte Importieren desselben Kontakts",
+        helpText: "Empfohlen: Verhindert das doppelte Importieren desselben Kontakts",
       },
 
       updateExisting: {
         label: "Bestehende Aktualisieren",
-        description:
-          "Bestehende Datensätze mit neuen Daten aus CSV aktualisieren",
-        helpText:
-          "Wenn nicht aktiviert, bleiben bestehende Datensätze unverändert",
+        description: "Bestehende Datensätze mit neuen Daten aus CSV aktualisieren",
+        helpText: "Wenn nicht aktiviert, bleiben bestehende Datensätze unverändert",
       },
 
       useChunkedProcessing: {
@@ -74,18 +68,15 @@ export const translations: typeof enTranslations = {
 
       batchSize: {
         label: "Batch-Größe",
-        description:
-          "Anzahl der Datensätze, die gleichzeitig verarbeitet werden",
+        description: "Anzahl der Datensätze, die gleichzeitig verarbeitet werden",
         placeholder: "100",
-        helpText:
-          "Kleinere Batches sind stabiler, größere Batches sind schneller",
+        helpText: "Kleinere Batches sind stabiler, größere Batches sind schneller",
       },
 
       // === STANDARDWERTE BEREICH ===
       defaultsSection: {
         title: "Standardwerte (Optional)",
-        description:
-          "Setzen Sie Standardwerte für Datensätze, denen diese Information fehlt",
+        description: "Setzen Sie Standardwerte für Datensätze, denen diese Information fehlt",
       },
 
       defaultCountry: {
@@ -196,8 +187,7 @@ export const translations: typeof enTranslations = {
           emptyFileName: "Bitte geben Sie einen Namen für diesen Import an",
           invalidDomain: "Bitte wählen Sie eine gültige Import-Domäne aus",
           invalidBatchSize: "Batch-Größe muss zwischen 10 und 1000 liegen",
-          fileTooLarge:
-            "Dateigröße überschreitet 10MB Limit. Erwägen Sie Hintergrundverarbeitung.",
+          fileTooLarge: "Dateigröße überschreitet 10MB Limit. Erwägen Sie Hintergrundverarbeitung.",
         },
         unauthorized: {
           title: "Zugriff Verweigert",
@@ -271,8 +261,7 @@ export const translations: typeof enTranslations = {
 
       offset: {
         label: "Seiten-Offset",
-        description:
-          "Diese Anzahl von Ergebnissen überspringen (für Paginierung)",
+        description: "Diese Anzahl von Ergebnissen überspringen (für Paginierung)",
         placeholder: "0",
       },
 
@@ -384,8 +373,7 @@ export const translations: typeof enTranslations = {
       errors: {
         unauthorized: {
           title: "Zugriff Verweigert",
-          description:
-            "Sie haben keine Berechtigung zum Anzeigen von Import-Jobs",
+          description: "Sie haben keine Berechtigung zum Anzeigen von Import-Jobs",
         },
         server: {
           title: "Jobs Laden Fehlgeschlagen",
@@ -498,8 +486,7 @@ export const translations: typeof enTranslations = {
     errorType: {
       validation: {
         label: "Validierungsfehler",
-        description:
-          "Daten entsprechen nicht dem erforderlichen Format oder Regeln",
+        description: "Daten entsprechen nicht dem erforderlichen Format oder Regeln",
       },
       duplicate: {
         label: "Doppelte Daten",
@@ -542,22 +529,15 @@ export const translations: typeof enTranslations = {
 
   // === NÄCHSTE SCHRITTE ===
   nextSteps: {
-    reviewErrors:
-      "Überprüfen Sie die Fehlerdetails, um zu verstehen, was schiefgelaufen ist",
-    checkDuplicates:
-      "Erwägen Sie die Anpassung der Duplikat-Behandlungseinstellungen",
-    reviewLeads:
-      "Überprüfen Sie Ihre importierten Leads im Leads-Management-Bereich",
-    startCampaign:
-      "Erwägen Sie den Start einer E-Mail-Kampagne mit Ihren neuen Leads",
-    reviewContacts:
-      "Überprüfen Sie Ihre importierten Kontakte im Kontakte-Bereich",
+    reviewErrors: "Überprüfen Sie die Fehlerdetails, um zu verstehen, was schiefgelaufen ist",
+    checkDuplicates: "Erwägen Sie die Anpassung der Duplikat-Behandlungseinstellungen",
+    reviewLeads: "Überprüfen Sie Ihre importierten Leads im Leads-Management-Bereich",
+    startCampaign: "Erwägen Sie den Start einer E-Mail-Kampagne mit Ihren neuen Leads",
+    reviewContacts: "Überprüfen Sie Ihre importierten Kontakte im Kontakte-Bereich",
     organizeContacts: "Organisieren Sie Ihre Kontakte in Gruppen oder Tags",
-    reviewImported:
-      "Überprüfen Sie Ihre importierten Daten im entsprechenden Bereich",
+    reviewImported: "Überprüfen Sie Ihre importierten Daten im entsprechenden Bereich",
     monitorProgress: "Überwachen Sie den Fortschritt im Job-Verlauf",
-    checkJobsList:
-      "Überprüfen Sie die Jobs-Liste für detaillierte Status-Updates",
+    checkJobsList: "Überprüfen Sie die Jobs-Liste für detaillierte Status-Updates",
   },
 
   // === AKTIONSMELDUNGEN ===

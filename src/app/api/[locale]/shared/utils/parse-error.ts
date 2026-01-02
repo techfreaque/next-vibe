@@ -72,8 +72,7 @@ export function parseError(error: unknown): Error {
     // Extract meaningful error info from objects without console.error pollution
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Error parsing requires type assertion for object property access
     const errorObj = error as Record<string, unknown>;
-    const errorMessage =
-      errorObj.error || errorObj.message || "An unknown error occurred";
+    const errorMessage = errorObj.error || errorObj.message || "An unknown error occurred";
     return new Error(String(errorMessage));
   }
 
@@ -118,9 +117,10 @@ export function parseError(error: unknown): Error {
  * @param values - The values to insert into the strings
  * @returns The formatted strings
  */
-export function format<
-  T extends Record<string, string | number | boolean | null | undefined>,
->(strings: string[], values: T): string[] {
+export function format<T extends Record<string, string | number | boolean | null | undefined>>(
+  strings: string[],
+  values: T,
+): string[] {
   return strings.map((part) =>
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Required by replace() API
     part.replaceAll(/{(\w+)}/g, (match, key: string) => {

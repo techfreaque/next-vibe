@@ -11,8 +11,7 @@ export const translations: typeof enTranslations = {
   },
   container: {
     title: "Docker-Operationen",
-    description:
-      "Docker-Befehle mit ordnungsgemäßer Fehlerbehandlung ausführen",
+    description: "Docker-Befehle mit ordnungsgemäßer Fehlerbehandlung ausführen",
   },
   fields: {
     command: {

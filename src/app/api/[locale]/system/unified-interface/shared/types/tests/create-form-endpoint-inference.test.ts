@@ -30,10 +30,7 @@ import {
   generateResponseSchemaForMethod,
   type MethodExamples,
 } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create-form";
-import {
-  field,
-  objectField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { field, objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type {
   InferSchemaFromFieldForMethod,
   UnifiedField,
@@ -46,17 +43,12 @@ import {
   LayoutType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import {
-  UserRole,
-  type UserRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
+import { UserRole, type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 // Helper types for testing
 type Expect<T extends true> = T;
 type Equal<X, Y> =
-  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
-    ? true
-    : false;
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false;
 type NotNever<T> = T extends never ? false : true;
 
 /**
@@ -78,9 +70,7 @@ type Gradual1_URL_POST = InferSchemaFromFieldForMethod<
   Methods.POST,
   FieldUsage.RequestUrlParams
 >;
-type Gradual1_URL_POST_IsNever = Gradual1_URL_POST extends z.ZodNever
-  ? true
-  : false;
+type Gradual1_URL_POST_IsNever = Gradual1_URL_POST extends z.ZodNever ? true : false;
 type Gradual1_URL_POST_Test = Expect<Equal<Gradual1_URL_POST_IsNever, false>>;
 
 // GRADUAL TEST 2: Simple primitive field with method-specific usage
@@ -100,9 +90,7 @@ type Gradual2_Data_POST = InferSchemaFromFieldForMethod<
   Methods.POST,
   FieldUsage.RequestData
 >;
-type Gradual2_Data_POST_IsNever = Gradual2_Data_POST extends z.ZodNever
-  ? true
-  : false;
+type Gradual2_Data_POST_IsNever = Gradual2_Data_POST extends z.ZodNever ? true : false;
 type Gradual2_Data_POST_Test = Expect<Equal<Gradual2_Data_POST_IsNever, false>>;
 
 // GRADUAL TEST 3: ObjectField with 1 child (urlPathParams)
@@ -125,9 +113,7 @@ type Gradual3_Object_URL_POST = InferSchemaFromFieldForMethod<
   FieldUsage.RequestUrlParams
 >;
 type Gradual3_Object_URL_POST_Output = z.output<Gradual3_Object_URL_POST>;
-type Gradual3_Has_Id = "id" extends keyof Gradual3_Object_URL_POST_Output
-  ? true
-  : false;
+type Gradual3_Has_Id = "id" extends keyof Gradual3_Object_URL_POST_Output ? true : false;
 type Gradual3_Object_URL_POST_Test = Expect<Equal<Gradual3_Has_Id, true>>;
 
 // GRADUAL TEST 4: ObjectField with 1 child (data field)
@@ -154,9 +140,7 @@ type Gradual4_Object_Data_POST = InferSchemaFromFieldForMethod<
   FieldUsage.RequestData
 >;
 type Gradual4_Object_Data_POST_Output = z.output<Gradual4_Object_Data_POST>;
-type Gradual4_Has_Name = "name" extends keyof Gradual4_Object_Data_POST_Output
-  ? true
-  : false;
+type Gradual4_Has_Name = "name" extends keyof Gradual4_Object_Data_POST_Output ? true : false;
 type Gradual4_Object_Data_POST_Test = Expect<Equal<Gradual4_Has_Name, true>>;
 
 // GRADUAL TEST 5: ObjectField with 2 children (url + data)
@@ -188,9 +172,7 @@ type Gradual5_Object_URL_POST = InferSchemaFromFieldForMethod<
   FieldUsage.RequestUrlParams
 >;
 type Gradual5_Object_URL_POST_Output = z.output<Gradual5_Object_URL_POST>;
-type Gradual5_URL_Has_Id = "id" extends keyof Gradual5_Object_URL_POST_Output
-  ? true
-  : false;
+type Gradual5_URL_Has_Id = "id" extends keyof Gradual5_Object_URL_POST_Output ? true : false;
 type Gradual5_URL_POST_Test = Expect<Equal<Gradual5_URL_Has_Id, true>>;
 
 type Gradual5_Object_Data_POST = InferSchemaFromFieldForMethod<
@@ -200,8 +182,7 @@ type Gradual5_Object_Data_POST = InferSchemaFromFieldForMethod<
   FieldUsage.RequestData
 >;
 type Gradual5_Object_Data_POST_Output = z.output<Gradual5_Object_Data_POST>;
-type Gradual5_Data_Has_Name =
-  "name" extends keyof Gradual5_Object_Data_POST_Output ? true : false;
+type Gradual5_Data_Has_Name = "name" extends keyof Gradual5_Object_Data_POST_Output ? true : false;
 type Gradual5_Data_POST_Test = Expect<Equal<Gradual5_Data_Has_Name, true>>;
 
 // GRADUAL TEST 6: Multi-method field (same as twoMethodConfig structure)
@@ -244,9 +225,7 @@ type Debug_Id_Field_GET_Response = InferSchemaFromFieldForMethod<
   Methods.GET,
   FieldUsage.Response
 >;
-type Debug_Id_IsNever = Debug_Id_Field_GET_Response extends z.ZodNever
-  ? true
-  : false;
+type Debug_Id_IsNever = Debug_Id_Field_GET_Response extends z.ZodNever ? true : false;
 // This should be true (id should be ZodNever for Response)
 type Debug_Id_Test = Expect<Equal<Debug_Id_IsNever, true>>;
 
@@ -266,9 +245,7 @@ type Gradual6_GET_URL = InferSchemaFromFieldForMethod<
   FieldUsage.RequestUrlParams
 >;
 type Gradual6_GET_URL_Output = z.output<Gradual6_GET_URL>;
-type Gradual6_GET_URL_Has_Id = "id" extends keyof Gradual6_GET_URL_Output
-  ? true
-  : false;
+type Gradual6_GET_URL_Has_Id = "id" extends keyof Gradual6_GET_URL_Output ? true : false;
 type Gradual6_GET_URL_Test = Expect<Equal<Gradual6_GET_URL_Has_Id, true>>;
 
 // Test POST RequestData
@@ -279,9 +256,7 @@ type Gradual6_POST_Request = InferSchemaFromFieldForMethod<
   FieldUsage.RequestData
 >;
 type Gradual6_POST_Request_Output = z.output<Gradual6_POST_Request>;
-type Gradual6_POST_Has_Name = "name" extends keyof Gradual6_POST_Request_Output
-  ? true
-  : false;
+type Gradual6_POST_Has_Name = "name" extends keyof Gradual6_POST_Request_Output ? true : false;
 type Gradual6_POST_Request_Test = Expect<Equal<Gradual6_POST_Has_Name, true>>;
 
 // Test POST Response
@@ -292,11 +267,10 @@ type Gradual6_POST_Response = InferSchemaFromFieldForMethod<
   FieldUsage.Response
 >;
 type Gradual6_POST_Response_Output = z.output<Gradual6_POST_Response>;
-type Gradual6_POST_Response_Has_Name =
-  "name" extends keyof Gradual6_POST_Response_Output ? true : false;
-type Gradual6_POST_Response_Test = Expect<
-  Equal<Gradual6_POST_Response_Has_Name, true>
->;
+type Gradual6_POST_Response_Has_Name = "name" extends keyof Gradual6_POST_Response_Output
+  ? true
+  : false;
+type Gradual6_POST_Response_Test = Expect<Equal<Gradual6_POST_Response_Has_Name, true>>;
 
 // GRADUAL TEST 7: Four-method field (same as fourMethodConfig structure)
 const fourMethodFields = objectField(
@@ -345,16 +319,12 @@ type Gradual7_PATCH_Request = InferSchemaFromFieldForMethod<
   FieldUsage.RequestData
 >;
 type Gradual7_PATCH_Request_Output = z.output<Gradual7_PATCH_Request>;
-type Gradual7_PATCH_Has_ItemId =
-  "itemId" extends keyof Gradual7_PATCH_Request_Output ? true : false;
-type Gradual7_PATCH_Has_Name =
-  "name" extends keyof Gradual7_PATCH_Request_Output ? true : false;
-type Gradual7_PATCH_Request_Test1 = Expect<
-  Equal<Gradual7_PATCH_Has_ItemId, true>
->;
-type Gradual7_PATCH_Request_Test2 = Expect<
-  Equal<Gradual7_PATCH_Has_Name, true>
->;
+type Gradual7_PATCH_Has_ItemId = "itemId" extends keyof Gradual7_PATCH_Request_Output
+  ? true
+  : false;
+type Gradual7_PATCH_Has_Name = "name" extends keyof Gradual7_PATCH_Request_Output ? true : false;
+type Gradual7_PATCH_Request_Test1 = Expect<Equal<Gradual7_PATCH_Has_ItemId, true>>;
+type Gradual7_PATCH_Request_Test2 = Expect<Equal<Gradual7_PATCH_Has_Name, true>>;
 
 // Test DELETE RequestData
 type Gradual7_DELETE_Request = InferSchemaFromFieldForMethod<
@@ -364,11 +334,10 @@ type Gradual7_DELETE_Request = InferSchemaFromFieldForMethod<
   FieldUsage.RequestData
 >;
 type Gradual7_DELETE_Request_Output = z.output<Gradual7_DELETE_Request>;
-type Gradual7_DELETE_Has_ItemId =
-  "itemId" extends keyof Gradual7_DELETE_Request_Output ? true : false;
-type Gradual7_DELETE_Request_Test = Expect<
-  Equal<Gradual7_DELETE_Has_ItemId, true>
->;
+type Gradual7_DELETE_Has_ItemId = "itemId" extends keyof Gradual7_DELETE_Request_Output
+  ? true
+  : false;
+type Gradual7_DELETE_Request_Test = Expect<Equal<Gradual7_DELETE_Has_ItemId, true>>;
 
 // Test DELETE UrlParams (should have id from old format usage)
 type Gradual7_DELETE_URL = InferSchemaFromFieldForMethod<
@@ -378,9 +347,7 @@ type Gradual7_DELETE_URL = InferSchemaFromFieldForMethod<
   FieldUsage.RequestUrlParams
 >;
 type Gradual7_DELETE_URL_Output = z.output<Gradual7_DELETE_URL>;
-type Gradual7_DELETE_URL_Has_Id = "id" extends keyof Gradual7_DELETE_URL_Output
-  ? true
-  : false;
+type Gradual7_DELETE_URL_Has_Id = "id" extends keyof Gradual7_DELETE_URL_Output ? true : false;
 type Gradual7_DELETE_URL_Test = Expect<Equal<Gradual7_DELETE_URL_Has_Id, true>>;
 
 /**
@@ -425,29 +392,20 @@ const testFields = objectField(
 );
 
 // TEST 0.1: generateRequestDataSchemaForMethod for POST
-const postRequestSchema = generateRequestDataSchemaForMethod(
-  testFields,
-  Methods.POST,
-);
+const postRequestSchema = generateRequestDataSchemaForMethod(testFields, Methods.POST);
 type PostRequestSchemaType = typeof postRequestSchema;
 type PostRequestOutput = z.output<typeof postRequestSchema>;
 type PostRequestIsNever = NotNever<PostRequestOutput>;
 type Test0_Verify_POST_Request = Expect<Equal<PostRequestIsNever, true>>;
 
 // TEST 0.2: generateResponseSchemaForMethod for POST
-const postResponseSchema = generateResponseSchemaForMethod(
-  testFields,
-  Methods.POST,
-);
+const postResponseSchema = generateResponseSchemaForMethod(testFields, Methods.POST);
 type PostResponseOutput = z.output<typeof postResponseSchema>;
 type PostResponseIsNever = NotNever<PostResponseOutput>;
 type Test0_Verify_POST_Response = Expect<Equal<PostResponseIsNever, true>>;
 
 // TEST 0.3: generateRequestDataSchemaForMethod for PATCH
-const patchRequestSchema = generateRequestDataSchemaForMethod(
-  testFields,
-  Methods.PATCH,
-);
+const patchRequestSchema = generateRequestDataSchemaForMethod(testFields, Methods.PATCH);
 type PatchRequestOutput = z.output<typeof patchRequestSchema>;
 type PatchRequestIsNever = NotNever<PatchRequestOutput>;
 type Test0_Verify_PATCH_Request = Expect<Equal<PatchRequestIsNever, true>>;
@@ -538,12 +496,9 @@ const minimalEndpoint = createFormEndpoint({
     },
   },
 });
-type Test1_0_5_Minimal_GET_Request =
-  typeof minimalEndpoint.GET.types.RequestOutput;
+type Test1_0_5_Minimal_GET_Request = typeof minimalEndpoint.GET.types.RequestOutput;
 type Test1_0_5_Minimal_GET_NotNever = NotNever<Test1_0_5_Minimal_GET_Request>;
-type Test1_0_5_Verify_Minimal = Expect<
-  Equal<Test1_0_5_Minimal_GET_NotNever, true>
->;
+type Test1_0_5_Verify_Minimal = Expect<Equal<Test1_0_5_Minimal_GET_NotNever, true>>;
 
 // Create the endpoint to test if return value types work
 const twoMethodEndpoint = createFormEndpoint({
@@ -672,12 +627,9 @@ const twoMethodEndpoint = createFormEndpoint({
 });
 
 // TEST 1.0: Direct typeof on return value (should work in same file)
-type Test1_Direct_GET_Request =
-  typeof twoMethodEndpoint.GET.types.RequestOutput;
+type Test1_Direct_GET_Request = typeof twoMethodEndpoint.GET.types.RequestOutput;
 type Test1_Direct_GET_Request_NotNever = NotNever<Test1_Direct_GET_Request>;
-type Test1_Verify_Direct_GET_Request = Expect<
-  Equal<Test1_Direct_GET_Request_NotNever, true>
->;
+type Test1_Verify_Direct_GET_Request = Expect<Equal<Test1_Direct_GET_Request_NotNever, true>>;
 
 /**
  * ========================================================================
@@ -796,44 +748,24 @@ const fourMethodConfig = {
 } as const;
 
 // TEST 2.1: PATCH RequestOutput is not never
-type Test2_PATCH_Request = ExtractMethodRequestOutput<
-  typeof fourMethodConfig,
-  "PATCH"
->;
+type Test2_PATCH_Request = ExtractMethodRequestOutput<typeof fourMethodConfig, "PATCH">;
 type Test2_PATCH_Request_NotNever = NotNever<Test2_PATCH_Request>;
-type Test2_Verify_PATCH_Request = Expect<
-  Equal<Test2_PATCH_Request_NotNever, true>
->;
+type Test2_Verify_PATCH_Request = Expect<Equal<Test2_PATCH_Request_NotNever, true>>;
 
 // TEST 2.2: DELETE RequestOutput is not never
-type Test2_DELETE_Request = ExtractMethodRequestOutput<
-  typeof fourMethodConfig,
-  "DELETE"
->;
+type Test2_DELETE_Request = ExtractMethodRequestOutput<typeof fourMethodConfig, "DELETE">;
 type Test2_DELETE_Request_NotNever = NotNever<Test2_DELETE_Request>;
-type Test2_Verify_DELETE_Request = Expect<
-  Equal<Test2_DELETE_Request_NotNever, true>
->;
+type Test2_Verify_DELETE_Request = Expect<Equal<Test2_DELETE_Request_NotNever, true>>;
 
 // TEST 2.3: PATCH ResponseOutput is not never
-type Test2_PATCH_Response = ExtractMethodResponseOutput<
-  typeof fourMethodConfig,
-  "PATCH"
->;
+type Test2_PATCH_Response = ExtractMethodResponseOutput<typeof fourMethodConfig, "PATCH">;
 type Test2_PATCH_Response_NotNever = NotNever<Test2_PATCH_Response>;
-type Test2_Verify_PATCH_Response = Expect<
-  Equal<Test2_PATCH_Response_NotNever, true>
->;
+type Test2_Verify_PATCH_Response = Expect<Equal<Test2_PATCH_Response_NotNever, true>>;
 
 // TEST 2.4: DELETE UrlVariablesOutput is not never
-type Test2_DELETE_UrlVars = ExtractMethodUrlVariablesOutput<
-  typeof fourMethodConfig,
-  "DELETE"
->;
+type Test2_DELETE_UrlVars = ExtractMethodUrlVariablesOutput<typeof fourMethodConfig, "DELETE">;
 type Test2_DELETE_UrlVars_NotNever = NotNever<Test2_DELETE_UrlVars>;
-type Test2_Verify_DELETE_UrlVars = Expect<
-  Equal<Test2_DELETE_UrlVars_NotNever, true>
->;
+type Test2_Verify_DELETE_UrlVars = Expect<Equal<Test2_DELETE_UrlVars_NotNever, true>>;
 
 // Export dummy to make this a valid module
 export const __TEST_FILE__ = true;

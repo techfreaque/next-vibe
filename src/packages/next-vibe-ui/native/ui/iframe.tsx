@@ -15,8 +15,8 @@ export function Iframe({ src }: IframeProps): React.JSX.Element {
   return (
     <View>
       <Text>
-        Iframe not supported on native. If you need this feature, implement
-        using WebView from react-native-webview.
+        Iframe not supported on native. If you need this feature, implement using WebView from
+        react-native-webview.
         {src && ` Source: ${src}`}
       </Text>
     </View>

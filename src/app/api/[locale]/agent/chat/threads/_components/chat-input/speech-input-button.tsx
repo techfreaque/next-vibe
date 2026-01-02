@@ -6,12 +6,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Loader2, Mic, MicOff, X } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useEffect } from "react";
@@ -56,23 +51,16 @@ export function SpeechInputButton({
   // Calculate STT credit cost per minute for display
   const sttCreditCostPerMinute = (FEATURE_COSTS.STT * 60).toFixed(2);
 
-  const {
-    isRecording,
-    isProcessing,
-    toggleRecording,
-    error,
-    transcript,
-    stream,
-    clearError,
-  } = useEdenAISpeech({
-    onTranscript,
-    onError: (err: string) => {
-      logger.error("app.chat.speech.error", err);
-    },
-    locale,
-    logger,
-    deductCredits,
-  });
+  const { isRecording, isProcessing, toggleRecording, error, transcript, stream, clearError } =
+    useEdenAISpeech({
+      onTranscript,
+      onError: (err: string) => {
+        logger.error("app.chat.speech.error", err);
+      },
+      locale,
+      logger,
+      deductCredits,
+    });
 
   // Log transcript changes
   useEffect(() => {
@@ -158,9 +146,7 @@ export function SpeechInputButton({
         {error && !isRecording && !isProcessing && (
           <Div className="absolute bottom-full right-0 mb-2 p-3 bg-popover border-2 border-destructive rounded-md shadow-lg z-10 min-w-[200px] max-w-[300px]">
             <Div className="flex items-start gap-2">
-              <P className="text-xs text-destructive flex-1 font-medium">
-                {error}
-              </P>
+              <P className="text-xs text-destructive flex-1 font-medium">{error}</P>
               <Button
                 type="button"
                 size="icon"

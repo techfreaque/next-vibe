@@ -16,11 +16,7 @@ export function validateEnv<TSchema extends z.ZodType>(
   envSchema: TSchema,
   logger: EndpointLogger,
 ): z.infer<TSchema> {
-  const validationResult = validateData<TSchema>(
-    env as z.input<TSchema>,
-    envSchema,
-    logger,
-  );
+  const validationResult = validateData<TSchema>(env as z.input<TSchema>, envSchema, logger);
   if (!validationResult.success) {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Environment validation must throw on startup to prevent invalid configuration
     throw new Error(

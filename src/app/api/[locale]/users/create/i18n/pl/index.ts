@@ -23,13 +23,11 @@ export const translations: typeof enTranslations = {
     },
     privateName: {
       label: "Nazwa prywatna",
-      description:
-        "Pełne imię i nazwisko użytkownika (widoczne tylko dla administratorów)",
+      description: "Pełne imię i nazwisko użytkownika (widoczne tylko dla administratorów)",
     },
     publicName: {
       label: "Nazwa publiczna",
-      description:
-        "Nazwa wyświetlana użytkownika (widoczna dla wszystkich użytkowników)",
+      description: "Nazwa wyświetlana użytkownika (widoczna dla wszystkich użytkowników)",
     },
     firstName: {
       label: "Imię",
@@ -176,13 +174,11 @@ export const translations: typeof enTranslations = {
       },
       unknown: {
         title: "Nieznany błąd",
-        description:
-          "Wystąpił nieoczekiwany błąd podczas tworzenia użytkownika",
+        description: "Wystąpił nieoczekiwany błąd podczas tworzenia użytkownika",
       },
       network: {
         title: "Błąd sieci",
-        description:
-          "Połączenie sieciowe nie powiodło się podczas tworzenia użytkownika",
+        description: "Połączenie sieciowe nie powiodło się podczas tworzenia użytkownika",
       },
       forbidden: {
         title: "Dostęp zabroniony",
@@ -190,8 +186,7 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Zasób nie znaleziony",
-        description:
-          "Wymagany zasób do tworzenia użytkownika nie został znaleziony",
+        description: "Wymagany zasób do tworzenia użytkownika nie został znaleziony",
       },
       conflict: {
         title: "Użytkownik już istnieje",
@@ -214,8 +209,7 @@ export const translations: typeof enTranslations = {
         },
         verification_failed: {
           title: "SMS weryfikacyjny nie powiódł się",
-          description:
-            "Nie udało się wysłać SMS-a weryfikacyjnego do użytkownika",
+          description: "Nie udało się wysłać SMS-a weryfikacyjnego do użytkownika",
         },
       },
     },
@@ -252,16 +246,13 @@ export const translations: typeof enTranslations = {
       admin: {
         newUser: "Nowy użytkownik utworzony",
         preview: "Nowy użytkownik {{firstName}} {{lastName}} został utworzony",
-        subject:
-          "Nowe konto użytkownika utworzone - {{firstName}} {{lastName}}",
-        notification:
-          "Nowe konto użytkownika zostało utworzone w systemie. Oto szczegóły:",
+        subject: "Nowe konto użytkownika utworzone - {{firstName}} {{lastName}}",
+        notification: "Nowe konto użytkownika zostało utworzone w systemie. Oto szczegóły:",
         userDetails: "Szczegóły użytkownika",
         viewUser: "Zobacz profil użytkownika",
       },
       errors: {
-        missing_data:
-          "Brakuje wymaganych danych użytkownika dla szablonu e-mail",
+        missing_data: "Brakuje wymaganych danych użytkownika dla szablonu e-mail",
       },
       error: {
         general: {
@@ -286,8 +277,7 @@ export const translations: typeof enTranslations = {
         "Witamy {{firstName}}! Twoje konto zostało pomyślnie utworzone. Odwiedź nas pod adresem {{appUrl}}",
     },
     verification: {
-      message:
-        "{{firstName}}, Twój kod weryfikacyjny to: {{code}}. Wprowadź kod w ciągu 10 minut.",
+      message: "{{firstName}}, Twój kod weryfikacyjny to: {{code}}. Wprowadź kod w ciągu 10 minut.",
     },
     errors: {
       welcome_failed: {

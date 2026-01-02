@@ -45,10 +45,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     if (!signature) {
       logger.error("payment.webhook.nowpayments.signature.missing");
-      return NextResponse.json(
-        { error: ERROR_MISSING_SIGNATURE },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: ERROR_MISSING_SIGNATURE }, { status: 400 });
     }
 
     // Process the webhook using the payment repository
@@ -63,19 +60,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       logger.error("payment.webhook.nowpayments.processing.failed", {
         message: result.message,
       });
-      return NextResponse.json(
-        { error: ERROR_WEBHOOK_PROCESSING_FAILED },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: ERROR_WEBHOOK_PROCESSING_FAILED }, { status: 400 });
     }
 
     logger.debug("payment.webhook.nowpayments.processed.success");
     return NextResponse.json({ received: true });
   } catch (error) {
-    logger.error(
-      "payment.webhook.nowpayments.handler.error",
-      parseError(error),
-    );
+    logger.error("payment.webhook.nowpayments.handler.error", parseError(error));
     return NextResponse.json({ error: ERROR_INTERNAL_SERVER }, { status: 500 });
   }
 }
@@ -84,8 +75,5 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
  * GET handler - not allowed for webhooks
  */
 export function GET(): NextResponse {
-  return NextResponse.json(
-    { error: ERROR_METHOD_NOT_ALLOWED },
-    { status: 405 },
-  );
+  return NextResponse.json({ error: ERROR_METHOD_NOT_ALLOWED }, { status: 405 });
 }

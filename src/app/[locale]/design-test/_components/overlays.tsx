@@ -70,18 +70,10 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "next-vibe-ui/ui/dropdown-menu";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "next-vibe-ui/ui/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "next-vibe-ui/ui/hover-card";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "next-vibe-ui/ui/popover";
 import { Section } from "next-vibe-ui/ui/section";
 import {
   Sheet,
@@ -91,12 +83,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "next-vibe-ui/ui/sheet";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "next-vibe-ui/ui/tooltip";
 import { H2, H3, H4, P, Small } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
@@ -146,8 +133,8 @@ export function OverlaysPreview(): JSX.Element {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your account and remove your data from our servers.
+                    This action cannot be undone. This will permanently delete your account and
+                    remove your data from our servers.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -185,9 +172,7 @@ export function OverlaysPreview(): JSX.Element {
                 <SheetContent side="left">
                   <SheetHeader>
                     <SheetTitle>Sheet Title</SheetTitle>
-                    <SheetDescription>
-                      Sheet from the left side.
-                    </SheetDescription>
+                    <SheetDescription>Sheet from the left side.</SheetDescription>
                   </SheetHeader>
                 </SheetContent>
               </Sheet>
@@ -230,8 +215,7 @@ export function OverlaysPreview(): JSX.Element {
                 <Div className="space-y-2">
                   <H4>Popover</H4>
                   <Small className="text-muted-foreground">
-                    This is a popover component for displaying contextual
-                    content.
+                    This is a popover component for displaying contextual content.
                   </Small>
                 </Div>
               </PopoverContent>
@@ -247,9 +231,7 @@ export function OverlaysPreview(): JSX.Element {
               <HoverCardContent>
                 <Div className="space-y-1">
                   <H4>Hover Card</H4>
-                  <Small>
-                    This appears when you hover over the trigger element.
-                  </Small>
+                  <Small>This appears when you hover over the trigger element.</Small>
                 </Div>
               </HoverCardContent>
             </HoverCard>
@@ -288,9 +270,7 @@ export function OverlaysPreview(): JSX.Element {
                   Settings <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem checked>
-                  Show Status Bar
-                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem checked>Show Status Bar</DropdownMenuCheckboxItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>More Options</DropdownMenuSubTrigger>
@@ -301,12 +281,8 @@ export function OverlaysPreview(): JSX.Element {
                 </DropdownMenuSub>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup value="apple">
-                  <DropdownMenuRadioItem value="apple">
-                    Apple
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="banana">
-                    Banana
-                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="apple">Apple</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="banana">Banana</DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -329,15 +305,11 @@ export function OverlaysPreview(): JSX.Element {
                   Reload <ContextMenuShortcut>⌘R</ContextMenuShortcut>
                 </ContextMenuItem>
                 <ContextMenuSeparator />
-                <ContextMenuCheckboxItem checked>
-                  Show Bookmarks Bar
-                </ContextMenuCheckboxItem>
+                <ContextMenuCheckboxItem checked>Show Bookmarks Bar</ContextMenuCheckboxItem>
                 <ContextMenuSeparator />
                 <ContextMenuLabel>People</ContextMenuLabel>
                 <ContextMenuRadioGroup value="pedro">
-                  <ContextMenuRadioItem value="pedro">
-                    Pedro
-                  </ContextMenuRadioItem>
+                  <ContextMenuRadioItem value="pedro">Pedro</ContextMenuRadioItem>
                   <ContextMenuRadioItem value="colm">Colm</ContextMenuRadioItem>
                 </ContextMenuRadioGroup>
               </ContextMenuContent>
@@ -347,9 +319,7 @@ export function OverlaysPreview(): JSX.Element {
           <Div className="space-y-2">
             <H3>Command</H3>
             <Div className="space-y-2">
-              <Button onClick={() => setCommandOpen(true)}>
-                Open Command Dialog
-              </Button>
+              <Button onClick={() => setCommandOpen(true)}>Open Command Dialog</Button>
               <CommandDialog open={commandOpen} onOpenChange={setCommandOpen}>
                 <CommandInput placeholder="Type a command or search..." />
                 <CommandList>

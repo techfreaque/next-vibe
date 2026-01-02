@@ -8,19 +8,13 @@ import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import {
-  type WidgetEmptyStateProps,
-  type WidgetLoadingProps,
-} from "../../../shared/widgets/types";
+import { type WidgetEmptyStateProps, type WidgetLoadingProps } from "../../../shared/widgets/types";
 
 /**
  * Widget Loading Component
  * Displays a loading state for widgets
  */
-export function WidgetLoading({
-  message,
-  size = "md",
-}: WidgetLoadingProps): JSX.Element {
+export function WidgetLoading({ message, size = "md" }: WidgetLoadingProps): JSX.Element {
   const sizeClasses = {
     // eslint-disable-next-line i18next/no-literal-string
     sm: "h-4 w-4",
@@ -32,9 +26,7 @@ export function WidgetLoading({
 
   return (
     <Div className="flex flex-col items-center justify-center gap-3 py-8">
-      <Loader2
-        className={cn("animate-spin text-muted-foreground", sizeClasses[size])}
-      />
+      <Loader2 className={cn("animate-spin text-muted-foreground", sizeClasses[size])} />
       {message && <P className="text-sm text-muted-foreground">{message}</P>}
     </Div>
   );
@@ -46,11 +38,7 @@ WidgetLoading.displayName = "WidgetLoading";
  * Widget Empty State Component
  * Displays an empty state for widgets with no data
  */
-export function WidgetEmptyState({
-  message,
-  icon,
-  action,
-}: WidgetEmptyStateProps): JSX.Element {
+export function WidgetEmptyState({ message, icon, action }: WidgetEmptyStateProps): JSX.Element {
   return (
     <Div className="flex flex-col items-center justify-center gap-4 py-12">
       {icon && (
@@ -63,9 +51,7 @@ export function WidgetEmptyState({
           {icon}
         </Div>
       )}
-      <P className="max-w-md text-center text-sm text-muted-foreground">
-        {message}
-      </P>
+      <P className="max-w-md text-center text-sm text-muted-foreground">{message}</P>
       {action && (
         <Button variant="outline" size="sm" onClick={action.onClick}>
           {action.label}

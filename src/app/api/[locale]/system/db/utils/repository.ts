@@ -6,11 +6,7 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -71,10 +67,7 @@ export interface IDbUtilsRepository {
   /**
    * Reset the database by truncating all tables
    */
-  resetDatabase(
-    runMigrations: boolean,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<boolean>>;
+  resetDatabase(runMigrations: boolean, logger: EndpointLogger): Promise<ResponseType<boolean>>;
 }
 
 /**
@@ -194,10 +187,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
       logger.debug("Database statistics retrieved successfully");
       return success(stats);
     } catch (error) {
-      logger.error(
-        "Failed to retrieve database statistics:",
-        parseError(error),
-      );
+      logger.error("Failed to retrieve database statistics:", parseError(error));
       return fail({
         message: "app.api.system.db.utils.errors.stats_failed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -209,9 +199,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
   /**
    * Check if Docker is available
    */
-  async isDockerAvailable(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<boolean>> {
+  async isDockerAvailable(logger: EndpointLogger): Promise<ResponseType<boolean>> {
     try {
       const { spawn } = await import("node:child_process");
 
@@ -251,11 +239,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     try {
-      const {
-        runMigrations = false,
-        initialize = false,
-        hard = false,
-      } = options;
+      const { runMigrations = false, initialize = false, hard = false } = options;
 
       // eslint-disable-next-line i18next/no-literal-string
       const operation = initialize ? "Initialize" : "Reset";
@@ -285,9 +269,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
           return success(true);
         }
         const { t } = simpleT(locale);
-        const errorMessage = t(
-          "app.api.system.db.utils.errors.reset_operation_failed",
-        );
+        const errorMessage = t("app.api.system.db.utils.errors.reset_operation_failed");
         logger.error("Failed to reset database:", errorMessage);
         return fail({
           message: "app.api.system.db.utils.errors.reset_failed",

@@ -5,11 +5,7 @@
 
 import { sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db, rawPool } from "@/app/api/[locale]/system/db";
@@ -70,8 +66,7 @@ export class DatabasePingRepository {
     };
   }> {
     const SUCCESS_MESSAGE = "✅ Database is accessible";
-    const EMPTY_RESPONSE_MESSAGE =
-      "❌ Database is not accessible (empty response)";
+    const EMPTY_RESPONSE_MESSAGE = "❌ Database is not accessible (empty response)";
     const CONNECTION_FAILED_MESSAGE = "❌ Database connection failed";
     const PING_QUERY = sql`SELECT 1 as ping`;
 

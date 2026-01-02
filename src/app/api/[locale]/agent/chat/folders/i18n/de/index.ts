@@ -14,8 +14,7 @@ export const translations: typeof enTranslations = {
     description: "Alle Ordner für den aktuellen Benutzer abrufen",
     rootFolderId: {
       label: "Stammordner",
-      description:
-        "Nach Stammordner filtern (privat, geteilt, öffentlich, inkognito)",
+      description: "Nach Stammordner filtern (privat, geteilt, öffentlich, inkognito)",
     },
     container: {
       title: "Ordnerliste",
@@ -67,8 +66,7 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, auf diese Ordner zuzugreifen",
+        description: "Sie haben keine Berechtigung, auf diese Ordner zuzugreifen",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -92,8 +90,7 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "Bei der Verarbeitung Ihrer Anfrage ist ein Konflikt aufgetreten",
+        description: "Bei der Verarbeitung Ihrer Anfrage ist ein Konflikt aufgetreten",
       },
     },
     success: {
@@ -166,8 +163,7 @@ export const translations: typeof enTranslations = {
       forbidden: {
         title: "Verboten",
         description: "Sie haben keine Berechtigung, Ordner zu erstellen",
-        incognitoNotAllowed:
-          "Inkognito-Ordner können nicht auf dem Server erstellt werden",
+        incognitoNotAllowed: "Inkognito-Ordner können nicht auf dem Server erstellt werden",
       },
       notFound: {
         title: "Nicht gefunden",

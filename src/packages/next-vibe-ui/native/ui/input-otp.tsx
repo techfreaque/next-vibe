@@ -54,10 +54,7 @@ function InputOTP({
   return (
     <OTPContext.Provider value={{ value, onChange: onChangeValue, maxLength }}>
       <StyledView
-        className={cn(
-          "flex flex-row items-center gap-2 opacity-100",
-          containerClassName,
-        )}
+        className={cn("flex flex-row items-center gap-2 opacity-100", containerClassName)}
       >
         {children}
       </StyledView>
@@ -76,11 +73,7 @@ function InputOTP({
 }
 InputOTP.displayName = "InputOTP";
 
-function InputOTPGroup({
-  className,
-  style,
-  children,
-}: InputOTPGroupProps): React.JSX.Element {
+function InputOTPGroup({ className, style, children }: InputOTPGroupProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <StyledView
@@ -95,11 +88,7 @@ function InputOTPGroup({
 }
 InputOTPGroup.displayName = "InputOTPGroup";
 
-function InputOTPSlot({
-  index,
-  className,
-  style,
-}: InputOTPSlotProps): React.JSX.Element | null {
+function InputOTPSlot({ index, className, style }: InputOTPSlotProps): React.JSX.Element | null {
   const { value } = useOTP();
   const char = value[index] || "";
   const isActive = index === value.length;
@@ -128,10 +117,7 @@ function InputOTPSlot({
 }
 InputOTPSlot.displayName = "InputOTPSlot";
 
-function InputOTPSeparator({
-  className,
-  style,
-}: InputOTPSeparatorProps): React.JSX.Element {
+function InputOTPSeparator({ className, style }: InputOTPSeparatorProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <StyledView

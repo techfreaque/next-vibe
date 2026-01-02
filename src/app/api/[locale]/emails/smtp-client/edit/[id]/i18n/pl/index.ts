@@ -58,8 +58,7 @@ export const translations: typeof enTranslations = {
     },
     password: {
       label: "Hasło",
-      description:
-        "Pozostaw puste, aby zachować obecne hasło, lub wprowadź nowe hasło",
+      description: "Pozostaw puste, aby zachować obecne hasło, lub wprowadź nowe hasło",
       placeholder: "Wprowadź nowe hasło (opcjonalne)",
     },
     fromEmail: {

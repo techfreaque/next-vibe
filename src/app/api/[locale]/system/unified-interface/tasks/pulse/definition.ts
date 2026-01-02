@@ -28,16 +28,12 @@ const pulseExecuteEndpoint = createEndpoint({
   method: Methods.POST,
   path: ["system", "tasks", "pulse", "execute"],
   title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.title",
-  description:
-    "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.description",
+  description: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.description",
   icon: "activity",
-  category:
-    "app.api.system.unifiedInterface.tasks.pulseSystem.execute.category",
+  category: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.category",
   allowedRoles: [UserRole.ADMIN],
   aliases: ["pulse:execute"],
-  tags: [
-    "app.api.system.unifiedInterface.tasks.pulseSystem.execute.tags.execute",
-  ],
+  tags: ["app.api.system.unifiedInterface.tasks.pulseSystem.execute.tags.execute"],
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title:
@@ -46,8 +42,7 @@ const pulseExecuteEndpoint = createEndpoint({
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.network.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.network.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.network.description",
     },
@@ -64,39 +59,33 @@ const pulseExecuteEndpoint = createEndpoint({
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.notFound.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.notFound.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unknown.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unknown.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unsaved.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unsaved.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.conflict.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.conflict.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.conflict.description",
     },
   },
   successTypes: {
-    title:
-      "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.success.title",
+    title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.success.title",
     description:
       "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.success.description",
   },
@@ -105,8 +94,7 @@ const pulseExecuteEndpoint = createEndpoint({
     {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
-      label:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.container.title",
+      label: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.container.title",
       columns: 12,
     },
     { request: "data", response: true },
@@ -198,14 +186,10 @@ const pulseExecuteEndpoint = createEndpoint({
 });
 
 // Export type definitions for both endpoints
-export type PulseExecuteRequestInput =
-  typeof pulseExecuteEndpoint.POST.types.RequestInput;
-export type PulseExecuteRequestOutput =
-  typeof pulseExecuteEndpoint.POST.types.RequestOutput;
-export type PulseExecuteResponseInput =
-  typeof pulseExecuteEndpoint.POST.types.ResponseInput;
-export type PulseExecuteResponseOutput =
-  typeof pulseExecuteEndpoint.POST.types.ResponseOutput;
+export type PulseExecuteRequestInput = typeof pulseExecuteEndpoint.POST.types.RequestInput;
+export type PulseExecuteRequestOutput = typeof pulseExecuteEndpoint.POST.types.RequestOutput;
+export type PulseExecuteResponseInput = typeof pulseExecuteEndpoint.POST.types.ResponseInput;
+export type PulseExecuteResponseOutput = typeof pulseExecuteEndpoint.POST.types.ResponseOutput;
 
 const definitions = {
   POST: pulseExecuteEndpoint.POST,

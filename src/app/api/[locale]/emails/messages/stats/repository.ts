@@ -13,11 +13,7 @@ import {
   sql,
 } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import {
   ChartType,
   DateRangePreset,
@@ -44,10 +40,7 @@ import {
   mapEmailTypeFilter,
   RetryRange,
 } from "../enum";
-import type {
-  EmailStatsGetRequestTypeOutput,
-  EmailStatsGetResponseTypeOutput,
-} from "./definition";
+import type { EmailStatsGetRequestTypeOutput, EmailStatsGetResponseTypeOutput } from "./definition";
 
 // Extract types from definition schema for DRY principle
 type EmailStatsResponseType = EmailStatsGetResponseTypeOutput;
@@ -60,10 +53,8 @@ type ByEngagementType = GroupedStatsType["byEngagement"][number];
 type ByRetryCountType = GroupedStatsType["byRetryCount"][number];
 type ByUserAssociationType = GroupedStatsType["byUserAssociation"][number];
 type RecentActivityType = EmailStatsResponseType["recentActivity"][number];
-type TopPerformingTemplateType =
-  EmailStatsResponseType["topPerformingTemplates"][number];
-type TopPerformingProviderType =
-  EmailStatsResponseType["topPerformingProviders"][number];
+type TopPerformingTemplateType = EmailStatsResponseType["topPerformingTemplates"][number];
+type TopPerformingProviderType = EmailStatsResponseType["topPerformingProviders"][number];
 type HistoricalDataType = EmailStatsResponseType["historicalData"];
 
 interface EmailStatsRepository {
@@ -142,15 +133,11 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       // Search filtering
       if (search) {
         whereConditions.push(
-          or(
-            ilike(emails.subject, `%${search}%`),
-            ilike(emails.recipientEmail, `%${search}%`),
-          ),
+          or(ilike(emails.subject, `%${search}%`), ilike(emails.recipientEmail, `%${search}%`)),
         );
       }
 
-      const whereClause =
-        whereConditions.length > 0 ? and(...whereConditions) : undefined;
+      const whereClause = whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
       // Generate comprehensive email statistics
       const results = await Promise.all([
@@ -206,9 +193,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
   /**
    * Generate current period statistics
    */
-  private async generateCurrentPeriodStats(
-    whereClause: SQL | undefined,
-  ): Promise<{
+  private async generateCurrentPeriodStats(whereClause: SQL | undefined): Promise<{
     totalEmails: number;
     sentEmails: number;
     deliveredEmails: number;
@@ -291,13 +276,9 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         ? safeBasicStats.clickedEmails / safeBasicStats.openedEmails
         : 0;
     const bounceRate =
-      safeBasicStats.sentEmails > 0
-        ? safeBasicStats.bouncedEmails / safeBasicStats.sentEmails
-        : 0;
+      safeBasicStats.sentEmails > 0 ? safeBasicStats.bouncedEmails / safeBasicStats.sentEmails : 0;
     const failureRate =
-      safeBasicStats.totalEmails > 0
-        ? safeBasicStats.failedEmails / safeBasicStats.totalEmails
-        : 0;
+      safeBasicStats.totalEmails > 0 ? safeBasicStats.failedEmails / safeBasicStats.totalEmails : 0;
 
     // Get actual record-based stats from database
     const providerStatsResults = await db
@@ -337,10 +318,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       .groupBy(emails.type);
 
     const emailsByProvider = Object.fromEntries(
-      providerStatsResults.map((item) => [
-        item.provider || EmailProvider.OTHER,
-        item.count,
-      ]),
+      providerStatsResults.map((item) => [item.provider || EmailProvider.OTHER, item.count]),
     );
     const emailsByTemplate = Object.fromEntries(
       templateStatsResults
@@ -366,12 +344,9 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       emailsByStatus,
       emailsByType,
       // Add missing fields with default values
-      emailsWithoutUserId:
-        safeBasicStats.totalEmails - safeBasicStats.emailsWithUserId,
-      emailsWithoutLeadId:
-        safeBasicStats.totalEmails - safeBasicStats.emailsWithLeadId,
-      emailsWithoutErrors:
-        safeBasicStats.totalEmails - safeBasicStats.emailsWithErrors,
+      emailsWithoutUserId: safeBasicStats.totalEmails - safeBasicStats.emailsWithUserId,
+      emailsWithoutLeadId: safeBasicStats.totalEmails - safeBasicStats.emailsWithLeadId,
+      emailsWithoutErrors: safeBasicStats.totalEmails - safeBasicStats.emailsWithErrors,
     };
   }
 
@@ -446,10 +421,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       series: [
         {
           name: "app.api.emails.messages.stats.get.response.metrics.totalEmails" as const satisfies TranslationKey,
-          data: this.transformToHistoricalData(
-            historicalResults,
-            "totalEmails",
-          ),
+          data: this.transformToHistoricalData(historicalResults, "totalEmails"),
           color: "#3b82f6",
           type: ChartType.LINE,
         },
@@ -461,46 +433,31 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         },
         {
           name: "app.api.emails.messages.stats.get.response.metrics.deliveredEmails" as const satisfies TranslationKey,
-          data: this.transformToHistoricalData(
-            historicalResults,
-            "deliveredEmails",
-          ),
+          data: this.transformToHistoricalData(historicalResults, "deliveredEmails"),
           color: "#059669",
           type: ChartType.LINE,
         },
         {
           name: "app.api.emails.messages.stats.get.response.metrics.openedEmails" as const satisfies TranslationKey,
-          data: this.transformToHistoricalData(
-            historicalResults,
-            "openedEmails",
-          ),
+          data: this.transformToHistoricalData(historicalResults, "openedEmails"),
           color: "#0891b2",
           type: ChartType.LINE,
         },
         {
           name: "app.api.emails.messages.stats.get.response.metrics.clickedEmails" as const satisfies TranslationKey,
-          data: this.transformToHistoricalData(
-            historicalResults,
-            "clickedEmails",
-          ),
+          data: this.transformToHistoricalData(historicalResults, "clickedEmails"),
           color: "#7c3aed",
           type: ChartType.LINE,
         },
         {
           name: "app.api.emails.messages.stats.get.response.metrics.bouncedEmails" as const satisfies TranslationKey,
-          data: this.transformToHistoricalData(
-            historicalResults,
-            "bouncedEmails",
-          ),
+          data: this.transformToHistoricalData(historicalResults, "bouncedEmails"),
           color: "#dc2626",
           type: ChartType.LINE,
         },
         {
           name: "app.api.emails.messages.stats.get.response.metrics.failedEmails" as const satisfies TranslationKey,
-          data: this.transformToHistoricalData(
-            historicalResults,
-            "failedEmails",
-          ),
+          data: this.transformToHistoricalData(historicalResults, "failedEmails"),
           color: "#b91c1c",
           type: ChartType.LINE,
         },
@@ -509,10 +466,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
               date: item.period,
-              value:
-                item.sentEmails > 0
-                  ? item.deliveredEmails / item.sentEmails
-                  : 0,
+              value: item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
               label: undefined,
             }),
           ),
@@ -524,10 +478,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
               date: item.period,
-              value:
-                item.deliveredEmails > 0
-                  ? item.openedEmails / item.deliveredEmails
-                  : 0,
+              value: item.deliveredEmails > 0 ? item.openedEmails / item.deliveredEmails : 0,
               label: undefined,
             }),
           ),
@@ -539,10 +490,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
               date: item.period,
-              value:
-                item.openedEmails > 0
-                  ? item.clickedEmails / item.openedEmails
-                  : 0,
+              value: item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
               label: undefined,
             }),
           ),
@@ -554,8 +502,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
               date: item.period,
-              value:
-                item.sentEmails > 0 ? item.bouncedEmails / item.sentEmails : 0,
+              value: item.sentEmails > 0 ? item.bouncedEmails / item.sentEmails : 0,
               label: undefined,
             }),
           ),
@@ -567,8 +514,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
               date: item.period,
-              value:
-                item.totalEmails > 0 ? item.failedEmails / item.totalEmails : 0,
+              value: item.totalEmails > 0 ? item.failedEmails / item.totalEmails : 0,
               label: undefined,
             }),
           ),
@@ -577,37 +523,25 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         },
         {
           name: "app.api.emails.messages.stats.get.response.metrics.emails_with_errors" as const satisfies TranslationKey,
-          data: this.transformToHistoricalData(
-            historicalResults,
-            "emailsWithErrors",
-          ),
+          data: this.transformToHistoricalData(historicalResults, "emailsWithErrors"),
           color: "#ef4444",
           type: ChartType.LINE,
         },
         {
           name: "app.api.emails.messages.stats.get.response.metrics.average_retry_count" as const satisfies TranslationKey,
-          data: this.transformToHistoricalData(
-            historicalResults,
-            "averageRetryCount",
-          ),
+          data: this.transformToHistoricalData(historicalResults, "averageRetryCount"),
           color: "#f97316",
           type: ChartType.LINE,
         },
         {
           name: "app.api.emails.messages.stats.get.response.metrics.average_processing_time" as const satisfies TranslationKey,
-          data: this.transformToHistoricalData(
-            historicalResults,
-            "averageProcessingTime",
-          ),
+          data: this.transformToHistoricalData(historicalResults, "averageProcessingTime"),
           color: "#f97316",
           type: ChartType.LINE,
         },
         {
           name: "app.api.emails.messages.stats.get.response.metrics.average_delivery_time" as const satisfies TranslationKey,
-          data: this.transformToHistoricalData(
-            historicalResults,
-            "averageDeliveryTime",
-          ),
+          data: this.transformToHistoricalData(historicalResults, "averageDeliveryTime"),
           color: "#84cc16",
           type: ChartType.LINE,
         },
@@ -618,9 +552,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
   /**
    * Generate grouped statistics
    */
-  private async generateGroupedStats(
-    whereClause: SQL | undefined,
-  ): Promise<GroupedStatsType> {
+  private async generateGroupedStats(whereClause: SQL | undefined): Promise<GroupedStatsType> {
     // Get total count for percentage calculations
     const [{ totalEmails }] = await db
       .select({ totalEmails: count() })
@@ -689,12 +621,9 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       provider: item.provider || EmailProvider.OTHER,
       count: item.count,
       percentage: totalEmails > 0 ? item.count / totalEmails : 0,
-      deliveryRate:
-        item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
-      openRate:
-        item.deliveredEmails > 0 ? item.openedEmails / item.deliveredEmails : 0,
-      clickRate:
-        item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
+      deliveryRate: item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
+      openRate: item.deliveredEmails > 0 ? item.openedEmails / item.deliveredEmails : 0,
+      clickRate: item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
       historicalData: {
         name: "app.api.emails.messages.stats.get.response.metrics.provider_historical" as const satisfies TranslationKey,
         data: [{ date: new Date().toISOString(), value: item.count }],
@@ -723,12 +652,8 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         templateId: item.templateName!,
         count: item.count,
         percentage: totalEmails > 0 ? item.count / totalEmails : 0,
-        openRate:
-          item.deliveredEmails > 0
-            ? item.openedEmails / item.deliveredEmails
-            : 0,
-        clickRate:
-          item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
+        openRate: item.deliveredEmails > 0 ? item.openedEmails / item.deliveredEmails : 0,
+        clickRate: item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
         historicalData: {
           name: "app.api.emails.messages.stats.get.response.metrics.template_historical" as const satisfies TranslationKey,
           data: [{ date: new Date().toISOString(), value: item.count }],
@@ -744,23 +669,14 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       .where(
         and(
           whereClause,
-          or(
-            eq(emails.status, EmailStatus.CLICKED),
-            eq(emails.status, EmailStatus.OPENED),
-          ),
+          or(eq(emails.status, EmailStatus.CLICKED), eq(emails.status, EmailStatus.OPENED)),
         ),
       );
 
     const lowEngagementCount = await db
       .select({ count: count() })
       .from(emails)
-      .where(
-        and(
-          whereClause,
-          eq(emails.status, EmailStatus.DELIVERED),
-          isNull(emails.openedAt),
-        ),
-      );
+      .where(and(whereClause, eq(emails.status, EmailStatus.DELIVERED), isNull(emails.openedAt)));
 
     const engagementData = [
       {
@@ -852,9 +768,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       withBoth: await db
         .select({ count: count() })
         .from(emails)
-        .where(
-          and(whereClause, isNotNull(emails.userId), isNotNull(emails.leadId)),
-        )
+        .where(and(whereClause, isNotNull(emails.userId), isNotNull(emails.leadId)))
         .then((result) => result[0]?.count || 0),
       withNeither: await db
         .select({ count: count() })
@@ -894,24 +808,22 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       },
     ];
 
-    const byUserAssociation: ByUserAssociationType[] = associationData.map(
-      (item) => ({
-        associationType: item.type,
-        count: item.count,
-        percentage: totalEmails > 0 ? item.count / totalEmails : 0,
-        historicalData: {
-          name: item.translationKey,
-          data: [
-            {
-              date: new Date().toISOString(),
-              value: item.count,
-            },
-          ],
-          color: item.color,
-          type: ChartType.LINE,
-        },
-      }),
-    );
+    const byUserAssociation: ByUserAssociationType[] = associationData.map((item) => ({
+      associationType: item.type,
+      count: item.count,
+      percentage: totalEmails > 0 ? item.count / totalEmails : 0,
+      historicalData: {
+        name: item.translationKey,
+        data: [
+          {
+            date: new Date().toISOString(),
+            value: item.count,
+          },
+        ],
+        color: item.color,
+        type: ChartType.LINE,
+      },
+    }));
 
     return {
       byStatus,
@@ -985,9 +897,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       .where(whereClause)
       .groupBy(emails.templateName)
       .having(sql`count(*) > 0`)
-      .orderBy(
-        sql`count(*) filter (where ${emails.status} = ${EmailStatus.OPENED}) DESC`,
-      );
+      .orderBy(sql`count(*) filter (where ${emails.status} = ${EmailStatus.OPENED}) DESC`);
 
     return templateStats
       .filter((item) => item.templateName)
@@ -995,14 +905,9 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         templateName: item.templateName!,
         templateId: item.templateId!,
         emailsSent: item.totalEmails,
-        openRate:
-          item.deliveredEmails > 0
-            ? item.openedEmails / item.deliveredEmails
-            : 0,
-        clickRate:
-          item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
-        deliveryRate:
-          item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
+        openRate: item.deliveredEmails > 0 ? item.openedEmails / item.deliveredEmails : 0,
+        clickRate: item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
+        deliveryRate: item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
       }));
   }
 
@@ -1025,21 +930,15 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       .where(whereClause)
       .groupBy(emails.emailProvider)
       .having(sql`count(*) > 0`)
-      .orderBy(
-        sql`count(*) filter (where ${emails.status} = ${EmailStatus.DELIVERED}) DESC`,
-      );
+      .orderBy(sql`count(*) filter (where ${emails.status} = ${EmailStatus.DELIVERED}) DESC`);
 
     return providerStats.map((item) => ({
       provider: item.provider || EmailProvider.OTHER,
       emailsSent: item.totalEmails,
-      deliveryRate:
-        item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
-      openRate:
-        item.deliveredEmails > 0 ? item.openedEmails / item.deliveredEmails : 0,
-      clickRate:
-        item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
-      reliability:
-        item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
+      deliveryRate: item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
+      openRate: item.deliveredEmails > 0 ? item.openedEmails / item.deliveredEmails : 0,
+      clickRate: item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
+      reliability: item.sentEmails > 0 ? item.deliveredEmails / item.sentEmails : 0,
     }));
   }
 }

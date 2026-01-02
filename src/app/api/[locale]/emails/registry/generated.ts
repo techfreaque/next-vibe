@@ -5,16 +5,16 @@
  * Templates found: 8
  */
 
-import type { TemplateCachedMetadata } from "./types";
+import type emailTemplate0 from "@/app/api/[locale]/contact/email";
+import type emailTemplate2 from "@/app/api/[locale]/newsletter/subscribe/email";
+import type emailTemplate1 from "@/app/api/[locale]/newsletter/unsubscribe/email";
+import type emailTemplate6 from "@/app/api/[locale]/subscription/email";
+import type emailTemplate3 from "@/app/api/[locale]/user/public/reset-password/confirm/email";
+import type emailTemplate4 from "@/app/api/[locale]/user/public/reset-password/request/email";
+import type emailTemplate5 from "@/app/api/[locale]/user/public/signup/email";
+import type emailTemplate7 from "@/app/api/[locale]/users/create/email";
 
-import emailTemplate0 from "@/app/api/[locale]/contact/email";
-import emailTemplate1 from "@/app/api/[locale]/newsletter/unsubscribe/email";
-import emailTemplate2 from "@/app/api/[locale]/newsletter/subscribe/email";
-import emailTemplate3 from "@/app/api/[locale]/user/public/reset-password/confirm/email";
-import emailTemplate4 from "@/app/api/[locale]/user/public/reset-password/request/email";
-import emailTemplate5 from "@/app/api/[locale]/user/public/signup/email";
-import emailTemplate6 from "@/app/api/[locale]/subscription/email";
-import emailTemplate7 from "@/app/api/[locale]/users/create/email";
+import type { TemplateCachedMetadata } from "./types";
 
 /**
  * Union type of all email template definitions
@@ -34,30 +34,20 @@ type AnyEmailTemplate =
  * Lazy-loaded template registry with dynamic imports
  */
 const templateLoaders: Record<string, () => Promise<AnyEmailTemplate>> = {
-  "contact-form": async () =>
-    (await import("@/app/api/[locale]/contact/email")).default,
+  "contact-form": async () => (await import("@/app/api/[locale]/contact/email")).default,
   "newsletter-unsubscribe": async () =>
     (await import("@/app/api/[locale]/newsletter/unsubscribe/email")).default,
   "newsletter-welcome": async () =>
     (await import("@/app/api/[locale]/newsletter/subscribe/email")).default,
   "password-reset-confirm": async () =>
-    (
-      await import(
-        "@/app/api/[locale]/user/public/reset-password/confirm/email"
-      )
-    ).default,
+    (await import("@/app/api/[locale]/user/public/reset-password/confirm/email")).default,
   "password-reset-request": async () =>
-    (
-      await import(
-        "@/app/api/[locale]/user/public/reset-password/request/email"
-      )
-    ).default,
+    (await import("@/app/api/[locale]/user/public/reset-password/request/email")).default,
   "signup-welcome": async () =>
     (await import("@/app/api/[locale]/user/public/signup/email")).default,
   "subscription-success": async () =>
     (await import("@/app/api/[locale]/subscription/email")).default,
-  "user-welcome": async () =>
-    (await import("@/app/api/[locale]/users/create/email")).default,
+  "user-welcome": async () => (await import("@/app/api/[locale]/users/create/email")).default,
 };
 
 /**
@@ -78,8 +68,7 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
       email: "max@example.com",
       company: "Musterfirma GmbH",
       subject: "Anfrage zu Ihren Dienstleistungen",
-      message:
-        "Ich hätte gerne weitere Informationen zu Ihren Premium-Services.",
+      message: "Ich hätte gerne weitere Informationen zu Ihren Premium-Services.",
       isForCompany: true,
       userId: "example-user-id-123",
       leadId: "example-lead-id-456",
@@ -89,8 +78,7 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
     id: "newsletter-unsubscribe",
     version: "1.0.0",
     name: "app.api.emails.templates.newsletter.unsubscribe.meta.name",
-    description:
-      "app.api.emails.templates.newsletter.unsubscribe.meta.description",
+    description: "app.api.emails.templates.newsletter.unsubscribe.meta.description",
     category: "newsletter",
     path: "/src/app/api/[locale]/newsletter/unsubscribe/email.tsx",
     exampleProps: { email: "max@example.com" },
@@ -113,8 +101,7 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
     id: "password-reset-confirm",
     version: "1.0.0",
     name: "app.api.emails.templates.password.reset.confirm.meta.name",
-    description:
-      "app.api.emails.templates.password.reset.confirm.meta.description",
+    description: "app.api.emails.templates.password.reset.confirm.meta.description",
     category: "auth",
     path: "/src/app/api/[locale]/user/public/reset-password/confirm/email.tsx",
     exampleProps: {
@@ -126,8 +113,7 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
     id: "password-reset-request",
     version: "1.0.0",
     name: "app.api.emails.templates.password.reset.request.meta.name",
-    description:
-      "app.api.emails.templates.password.reset.request.meta.description",
+    description: "app.api.emails.templates.password.reset.request.meta.description",
     category: "auth",
     path: "/src/app/api/[locale]/user/public/reset-password/request/email.tsx",
     exampleProps: {
@@ -140,8 +126,7 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
     id: "signup-welcome",
     version: "1.0.0",
     name: "app.admin.emails.templates.templates.signup.welcome.meta.name",
-    description:
-      "app.admin.emails.templates.templates.signup.welcome.meta.description",
+    description: "app.admin.emails.templates.templates.signup.welcome.meta.description",
     category: "auth",
     path: "/src/app/api/[locale]/user/public/signup/email.tsx",
     exampleProps: {
@@ -154,8 +139,7 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
     id: "subscription-success",
     version: "1.0.0",
     name: "app.api.emails.templates.subscription.success.meta.name",
-    description:
-      "app.api.emails.templates.subscription.success.meta.description",
+    description: "app.api.emails.templates.subscription.success.meta.description",
     category: "subscription",
     path: "/src/app/api/[locale]/subscription/email.tsx",
     exampleProps: {
@@ -186,9 +170,7 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
  * Get template by ID (lazy loads on first access)
  * Returns the template with its specific props type
  */
-export async function getTemplate(
-  id: string,
-): Promise<AnyEmailTemplate | undefined> {
+export async function getTemplate(id: string): Promise<AnyEmailTemplate | undefined> {
   const loader = templateLoaders[id];
   if (!loader) {
     return undefined;
@@ -200,9 +182,7 @@ export async function getTemplate(
 /**
  * Get template metadata without loading the component
  */
-export function getTemplateMetadata(
-  id: string,
-): TemplateCachedMetadata | undefined {
+export function getTemplateMetadata(id: string): TemplateCachedMetadata | undefined {
   return templateMetadataMap[id];
 }
 
@@ -223,9 +203,7 @@ export function getAllTemplateMetadata(): TemplateCachedMetadata[] {
 /**
  * Get templates by category (metadata only)
  */
-export function getTemplatesByCategory(
-  category: string,
-): TemplateCachedMetadata[] {
+export function getTemplatesByCategory(category: string): TemplateCachedMetadata[] {
   return getAllTemplateMetadata().filter((t) => t.category === category);
 }
 

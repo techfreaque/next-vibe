@@ -86,8 +86,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.system.check.oxlint.fields.timeoutSeconds.label",
-          description:
-            "app.api.system.check.oxlint.fields.timeoutSeconds.description",
+          description: "app.api.system.check.oxlint.fields.timeoutSeconds.description",
           columns: 3,
         },
         z.coerce.number().min(1).max(3600).default(3600),
@@ -120,8 +119,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.system.check.oxlint.fields.maxFilesInSummary.label",
-          description:
-            "app.api.system.check.oxlint.fields.maxFilesInSummary.description",
+          description: "app.api.system.check.oxlint.fields.maxFilesInSummary.description",
           columns: 4,
         },
         z.coerce.number().min(1).default(50),
@@ -132,8 +130,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.check.oxlint.fields.skipSorting.label",
-          description:
-            "app.api.system.check.oxlint.fields.skipSorting.description",
+          description: "app.api.system.check.oxlint.fields.skipSorting.description",
           columns: 3,
         },
         z.boolean().default(false),
@@ -155,8 +152,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.system.check.oxlint.response.issues.title",
-              description:
-                "app.api.system.check.oxlint.response.issues.emptyState.description",
+              description: "app.api.system.check.oxlint.response.issues.emptyState.description",
               layoutType: LayoutType.GRID,
               columns: 12,
             },
@@ -164,8 +160,7 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.CONTAINER,
                 title: "app.api.system.check.oxlint.response.issues.title",
-                description:
-                  "app.api.system.check.oxlint.response.issues.emptyState.description",
+                description: "app.api.system.check.oxlint.response.issues.emptyState.description",
                 layoutType: LayoutType.GRID,
                 columns: 12,
               },
@@ -174,48 +169,42 @@ const { POST } = createEndpoint({
                 file: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
+                    content: "app.api.system.check.oxlint.response.issues.title",
                   },
                   z.string(),
                 ),
                 line: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
+                    content: "app.api.system.check.oxlint.response.issues.title",
                   },
                   z.coerce.number().optional(),
                 ),
                 column: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
+                    content: "app.api.system.check.oxlint.response.issues.title",
                   },
                   z.coerce.number().optional(),
                 ),
                 rule: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
+                    content: "app.api.system.check.oxlint.response.issues.title",
                   },
                   z.string().optional(),
                 ),
                 code: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
+                    content: "app.api.system.check.oxlint.response.issues.title",
                   },
                   z.string().optional(),
                 ),
                 severity: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
+                    content: "app.api.system.check.oxlint.response.issues.title",
                   },
                   z.enum(["error", "warning", "info"]),
                 ),
@@ -229,8 +218,7 @@ const { POST } = createEndpoint({
                 type: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.oxlint.response.issues.title",
+                    content: "app.api.system.check.oxlint.response.issues.title",
                   },
                   z.enum(["oxlint", "lint", "type"]),
                 ),
@@ -283,8 +271,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.check.oxlint.errors.unauthorized.title",
-      description:
-        "app.api.system.check.oxlint.errors.unauthorized.description",
+      description: "app.api.system.check.oxlint.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.check.oxlint.errors.forbidden.title",

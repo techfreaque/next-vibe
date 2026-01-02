@@ -82,16 +82,11 @@ export function DataDisplayPreview(): JSX.Element {
               <H3>Heading 3</H3>
               <H4>Heading 4</H4>
               <P>
-                This is a paragraph with{" "}
-                <Span className="font-bold">bold text</Span> and{" "}
+                This is a paragraph with <Span className="font-bold">bold text</Span> and{" "}
                 <Span className="italic">italic text</Span>.
               </P>
-              <BlockQuote>
-                This is a blockquote component for displaying quoted text.
-              </BlockQuote>
-              <Lead>
-                This is lead text that stands out from regular paragraphs.
-              </Lead>
+              <BlockQuote>This is a blockquote component for displaying quoted text.</BlockQuote>
+              <Lead>This is lead text that stands out from regular paragraphs.</Lead>
               <Large>Large text variant</Large>
               <Small>Small text variant</Small>
               <Muted>Muted text variant</Muted>
@@ -162,9 +157,7 @@ export function DataDisplayPreview(): JSX.Element {
                         <Div className="p-1">
                           <Card>
                             <CardContent className="flex aspect-square items-center justify-center p-6">
-                              <Span className="text-4xl font-semibold">
-                                {index + 1}
-                              </Span>
+                              <Span className="text-4xl font-semibold">{index + 1}</Span>
                             </CardContent>
                           </Card>
                         </Div>

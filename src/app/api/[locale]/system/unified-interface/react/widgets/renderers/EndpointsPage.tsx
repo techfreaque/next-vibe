@@ -99,23 +99,14 @@ export function EndpointsPage<
 }: EndpointsPageProps<T>): React.JSX.Element {
   // Determine which endpoint to use
   const isGetEndpoint = !!endpoint.GET;
-  const isMutationEndpoint =
-    !!(endpoint.POST ?? endpoint.PUT ?? endpoint.PATCH) && !endpoint.GET;
+  const isMutationEndpoint = !!(endpoint.POST ?? endpoint.PUT ?? endpoint.PATCH) && !endpoint.GET;
   const isDeleteEndpoint =
-    !!endpoint.DELETE &&
-    !endpoint.GET &&
-    !endpoint.POST &&
-    !endpoint.PUT &&
-    !endpoint.PATCH;
+    !!endpoint.DELETE && !endpoint.GET && !endpoint.POST && !endpoint.PUT && !endpoint.PATCH;
 
   // Get the active endpoint definition for rendering response data
   // Priority: GET (for response rendering) > POST/PUT/PATCH (for form) > DELETE
   const activeEndpoint =
-    endpoint.GET ??
-    endpoint.POST ??
-    endpoint.PUT ??
-    endpoint.PATCH ??
-    endpoint.DELETE;
+    endpoint.GET ?? endpoint.POST ?? endpoint.PUT ?? endpoint.PATCH ?? endpoint.DELETE;
 
   // Read configuration from endpoint definition with fallbacks
   const finalDebug = debug ?? activeEndpoint?.debug ?? false;

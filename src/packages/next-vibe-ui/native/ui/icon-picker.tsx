@@ -6,23 +6,12 @@
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
-import {
-  FlatList,
-  Modal,
-  Pressable,
-  ScrollView,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, Modal, Pressable, ScrollView, TextInput, View } from "react-native";
 
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { useTranslation } from "@/i18n/core/client";
 
-import {
-  type CategoryKey,
-  ICON_CATEGORIES,
-  type IconPickerProps,
-} from "../../web/ui/icon-picker";
+import { type CategoryKey, ICON_CATEGORIES, type IconPickerProps } from "../../web/ui/icon-picker";
 import { Text } from "./text";
 
 export type { CategoryKey, IconPickerProps };
@@ -30,11 +19,7 @@ export { ICON_CATEGORIES };
 /**
  * Icon Picker Component for React Native
  */
-export function IconPicker({
-  value,
-  onChange,
-  className,
-}: IconPickerProps): JSX.Element {
+export function IconPicker({ value, onChange, className }: IconPickerProps): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
@@ -51,9 +36,7 @@ export function IconPicker({
     }
 
     const query = searchQuery.toLowerCase();
-    return categoryIcons.filter((iconKey) =>
-      iconKey.toLowerCase().includes(query),
-    );
+    return categoryIcons.filter((iconKey) => iconKey.toLowerCase().includes(query));
   }, [searchQuery, activeCategory]);
 
   const categories: Array<{ key: CategoryKey; label: string }> = [
@@ -109,9 +92,7 @@ export function IconPicker({
           {/* Header */}
           <View className="p-4 border-b border-border">
             <View className="flex-row items-center justify-between mb-3">
-              <Text className="text-lg font-semibold">
-                {t("app.ui.iconPicker.title")}
-              </Text>
+              <Text className="text-lg font-semibold">{t("app.ui.iconPicker.title")}</Text>
               <Pressable onPress={(): void => setModalVisible(false)}>
                 <Text className="text-primary">{t("app.common.cancel")}</Text>
               </Pressable>
@@ -172,9 +153,7 @@ export function IconPicker({
                   }}
                   className={cn(
                     "flex-1 aspect-square items-center justify-center m-0.5 rounded-md",
-                    isSelected
-                      ? "bg-accent border-2 border-primary"
-                      : "bg-muted/30",
+                    isSelected ? "bg-accent border-2 border-primary" : "bg-muted/30",
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -193,9 +172,7 @@ export function IconPicker({
               })}
             </Text>
             {value && (
-              <Text className="text-xs text-primary text-center mt-1 font-mono">
-                {value}
-              </Text>
+              <Text className="text-xs text-primary text-center mt-1 font-mono">{value}</Text>
             )}
           </View>
         </View>

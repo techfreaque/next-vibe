@@ -6,11 +6,7 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -19,10 +15,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { smtpAccounts } from "../db";
 // SmtpAccountResponseType doesn't exist - we'll create the response directly
-import type {
-  SmtpAccountCreateRequestOutput,
-  SmtpAccountCreateResponseOutput,
-} from "./definition";
+import type { SmtpAccountCreateRequestOutput, SmtpAccountCreateResponseOutput } from "./definition";
 
 /**
  * SMTP Account Create Repository Interface
@@ -146,8 +139,7 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
           message: "app.api.emails.smtpClient.create.errors.conflict.title",
           errorType: ErrorResponseTypes.CONFLICT,
           messageParams: {
-            error:
-              "app.api.emails.smtpClient.create.errors.conflict.description",
+            error: "app.api.emails.smtpClient.create.errors.conflict.description",
           },
         });
       }
@@ -164,5 +156,4 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
 /**
  * Export singleton instance
  */
-export const smtpAccountCreateRepository =
-  new SmtpAccountCreateRepositoryImpl();
+export const smtpAccountCreateRepository = new SmtpAccountCreateRepositoryImpl();

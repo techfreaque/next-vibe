@@ -6,10 +6,7 @@
 import { z } from "zod";
 
 import { createFormEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create-form";
-import {
-  field,
-  objectField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { field, objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -31,29 +28,25 @@ const { GET, POST, PATCH, DELETE } = createFormEndpoint({
   methods: {
     GET: {
       title: "app.api.agent.chat.threads.threadId.shareLinks.get.title",
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.description",
+      description: "app.api.agent.chat.threads.threadId.shareLinks.get.description",
       icon: "share",
       tags: ["app.api.agent.chat.tags.sharing"],
     },
     POST: {
       title: "app.api.agent.chat.threads.threadId.shareLinks.post.title",
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.description",
+      description: "app.api.agent.chat.threads.threadId.shareLinks.post.description",
       icon: "plus",
       tags: ["app.api.agent.chat.tags.sharing"],
     },
     PATCH: {
       title: "app.api.agent.chat.threads.threadId.shareLinks.patch.title",
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.description",
+      description: "app.api.agent.chat.threads.threadId.shareLinks.patch.description",
       icon: "edit",
       tags: ["app.api.agent.chat.tags.sharing"],
     },
     DELETE: {
       title: "app.api.agent.chat.threads.threadId.shareLinks.delete.title",
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.description",
+      description: "app.api.agent.chat.threads.threadId.shareLinks.delete.description",
       icon: "trash",
       tags: ["app.api.agent.chat.tags.sharing"],
     },
@@ -88,8 +81,7 @@ const { GET, POST, PATCH, DELETE } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.agent.chat.threads.threadId.shareLinks.linkId.label" as const,
+          label: "app.api.agent.chat.threads.threadId.shareLinks.linkId.label" as const,
         },
       ),
 
@@ -103,12 +95,9 @@ const { GET, POST, PATCH, DELETE } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.agent.chat.threads.threadId.shareLinks.label.label" as const,
-          description:
-            "app.api.agent.chat.threads.threadId.shareLinks.label.description" as const,
-          placeholder:
-            "app.api.agent.chat.threads.threadId.shareLinks.label.placeholder" as const,
+          label: "app.api.agent.chat.threads.threadId.shareLinks.label.label" as const,
+          description: "app.api.agent.chat.threads.threadId.shareLinks.label.description" as const,
+          placeholder: "app.api.agent.chat.threads.threadId.shareLinks.label.placeholder" as const,
         },
       ),
 
@@ -122,8 +111,7 @@ const { GET, POST, PATCH, DELETE } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.agent.chat.threads.threadId.shareLinks.allowPosting.label" as const,
+          label: "app.api.agent.chat.threads.threadId.shareLinks.allowPosting.label" as const,
           description:
             "app.api.agent.chat.threads.threadId.shareLinks.allowPosting.description" as const,
         },
@@ -139,8 +127,7 @@ const { GET, POST, PATCH, DELETE } = createFormEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.agent.chat.threads.threadId.shareLinks.requireAuth.label" as const,
+          label: "app.api.agent.chat.threads.threadId.shareLinks.requireAuth.label" as const,
           description:
             "app.api.agent.chat.threads.threadId.shareLinks.requireAuth.description" as const,
         },
@@ -179,8 +166,7 @@ const { GET, POST, PATCH, DELETE } = createFormEndpoint({
               { GET: { response: true } },
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.threads.threadId.shareLinks.shareLink.label" as const,
+                content: "app.api.agent.chat.threads.threadId.shareLinks.shareLink.label" as const,
                 order: 1,
               },
             ),
@@ -199,8 +185,7 @@ const { GET, POST, PATCH, DELETE } = createFormEndpoint({
               { GET: { response: true } },
               {
                 type: WidgetType.BADGE,
-                content:
-                  "app.api.agent.chat.threads.threadId.shareLinks.shareLink.active" as const,
+                content: "app.api.agent.chat.threads.threadId.shareLinks.shareLink.active" as const,
                 variant: "default" as const,
                 order: 3,
               },
@@ -309,8 +294,7 @@ const { GET, POST, PATCH, DELETE } = createFormEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.validation.title" as const,
+      title: "app.api.agent.chat.threads.threadId.shareLinks.get.errors.validation.title" as const,
       description:
         "app.api.agent.chat.threads.threadId.shareLinks.get.errors.validation.description" as const,
     },
@@ -321,32 +305,27 @@ const { GET, POST, PATCH, DELETE } = createFormEndpoint({
         "app.api.agent.chat.threads.threadId.shareLinks.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.forbidden.title" as const,
+      title: "app.api.agent.chat.threads.threadId.shareLinks.get.errors.forbidden.title" as const,
       description:
         "app.api.agent.chat.threads.threadId.shareLinks.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.notFound.title" as const,
+      title: "app.api.agent.chat.threads.threadId.shareLinks.get.errors.notFound.title" as const,
       description:
         "app.api.agent.chat.threads.threadId.shareLinks.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.server.title" as const,
+      title: "app.api.agent.chat.threads.threadId.shareLinks.get.errors.server.title" as const,
       description:
         "app.api.agent.chat.threads.threadId.shareLinks.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.network.title" as const,
+      title: "app.api.agent.chat.threads.threadId.shareLinks.get.errors.network.title" as const,
       description:
         "app.api.agent.chat.threads.threadId.shareLinks.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.unknown.title" as const,
+      title: "app.api.agent.chat.threads.threadId.shareLinks.get.errors.unknown.title" as const,
       description:
         "app.api.agent.chat.threads.threadId.shareLinks.get.errors.unknown.description" as const,
     },
@@ -357,18 +336,15 @@ const { GET, POST, PATCH, DELETE } = createFormEndpoint({
         "app.api.agent.chat.threads.threadId.shareLinks.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.conflict.title" as const,
+      title: "app.api.agent.chat.threads.threadId.shareLinks.get.errors.conflict.title" as const,
       description:
         "app.api.agent.chat.threads.threadId.shareLinks.get.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.shareLinks.get.success.title" as const,
-    description:
-      "app.api.agent.chat.threads.threadId.shareLinks.get.success.description" as const,
+    title: "app.api.agent.chat.threads.threadId.shareLinks.get.success.title" as const,
+    description: "app.api.agent.chat.threads.threadId.shareLinks.get.success.description" as const,
   },
 
   examples: {},
@@ -379,35 +355,28 @@ export type ShareLinksGetRequestOutput = typeof GET.types.RequestOutput;
 export type ShareLinksGetResponseInput = typeof GET.types.ResponseInput;
 export type ShareLinksGetResponseOutput = typeof GET.types.ResponseOutput;
 export type ShareLinksGetUrlVariablesInput = typeof GET.types.UrlVariablesInput;
-export type ShareLinksGetUrlVariablesOutput =
-  typeof GET.types.UrlVariablesOutput;
+export type ShareLinksGetUrlVariablesOutput = typeof GET.types.UrlVariablesOutput;
 
 export type ShareLinkCreateRequestInput = typeof POST.types.RequestInput;
 export type ShareLinkCreateRequestOutput = typeof POST.types.RequestOutput;
 export type ShareLinkCreateResponseInput = typeof POST.types.ResponseInput;
 export type ShareLinkCreateResponseOutput = typeof POST.types.ResponseOutput;
-export type ShareLinkCreateUrlVariablesInput =
-  typeof POST.types.UrlVariablesInput;
-export type ShareLinkCreateUrlVariablesOutput =
-  typeof POST.types.UrlVariablesOutput;
+export type ShareLinkCreateUrlVariablesInput = typeof POST.types.UrlVariablesInput;
+export type ShareLinkCreateUrlVariablesOutput = typeof POST.types.UrlVariablesOutput;
 
 export type ShareLinkUpdateRequestInput = typeof PATCH.types.RequestInput;
 export type ShareLinkUpdateRequestOutput = typeof PATCH.types.RequestOutput;
 export type ShareLinkUpdateResponseInput = typeof PATCH.types.ResponseInput;
 export type ShareLinkUpdateResponseOutput = typeof PATCH.types.ResponseOutput;
-export type ShareLinkUpdateUrlVariablesInput =
-  typeof PATCH.types.UrlVariablesInput;
-export type ShareLinkUpdateUrlVariablesOutput =
-  typeof PATCH.types.UrlVariablesOutput;
+export type ShareLinkUpdateUrlVariablesInput = typeof PATCH.types.UrlVariablesInput;
+export type ShareLinkUpdateUrlVariablesOutput = typeof PATCH.types.UrlVariablesOutput;
 
 export type ShareLinkRevokeRequestInput = typeof DELETE.types.RequestInput;
 export type ShareLinkRevokeRequestOutput = typeof DELETE.types.RequestOutput;
 export type ShareLinkRevokeResponseInput = typeof DELETE.types.ResponseInput;
 export type ShareLinkRevokeResponseOutput = typeof DELETE.types.ResponseOutput;
-export type ShareLinkRevokeUrlVariablesInput =
-  typeof DELETE.types.UrlVariablesInput;
-export type ShareLinkRevokeUrlVariablesOutput =
-  typeof DELETE.types.UrlVariablesOutput;
+export type ShareLinkRevokeUrlVariablesInput = typeof DELETE.types.UrlVariablesInput;
+export type ShareLinkRevokeUrlVariablesOutput = typeof DELETE.types.UrlVariablesOutput;
 
 const definitions = { GET, POST, PATCH, DELETE };
 

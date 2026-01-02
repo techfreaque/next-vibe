@@ -72,8 +72,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.system.check.vibeCheck.fields.timeoutSeconds.label",
-          description:
-            "app.api.system.check.vibeCheck.fields.timeoutSeconds.description",
+          description: "app.api.system.check.vibeCheck.fields.timeoutSeconds.description",
           columns: 4,
         },
         z.coerce.number().min(1).max(36000).optional(),
@@ -84,10 +83,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TAGS,
           label: "app.api.system.check.vibeCheck.fields.paths.label",
-          description:
-            "app.api.system.check.vibeCheck.fields.paths.description",
-          placeholder:
-            "app.api.system.check.vibeCheck.fields.paths.placeholder",
+          description: "app.api.system.check.vibeCheck.fields.paths.description",
+          placeholder: "app.api.system.check.vibeCheck.fields.paths.placeholder",
           columns: 8,
           options: [
             {
@@ -96,18 +93,15 @@ const { POST } = createEndpoint({
             },
             {
               value: "src/components",
-              label:
-                "app.api.system.check.vibeCheck.fields.paths.options.components",
+              label: "app.api.system.check.vibeCheck.fields.paths.options.components",
             },
             {
               value: "src/utils",
-              label:
-                "app.api.system.check.vibeCheck.fields.paths.options.utils",
+              label: "app.api.system.check.vibeCheck.fields.paths.options.utils",
             },
             {
               value: "src/pages",
-              label:
-                "app.api.system.check.vibeCheck.fields.paths.options.pages",
+              label: "app.api.system.check.vibeCheck.fields.paths.options.pages",
             },
             {
               value: "src/app",
@@ -124,8 +118,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.system.check.vibeCheck.fields.limit.label",
-          description:
-            "app.api.system.check.vibeCheck.fields.limit.description",
+          description: "app.api.system.check.vibeCheck.fields.limit.description",
           columns: 4,
         },
         z.coerce.number().min(1).optional(),
@@ -148,10 +141,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.system.check.vibeCheck.fields.maxFilesInSummary.label",
-          description:
-            "app.api.system.check.vibeCheck.fields.maxFilesInSummary.description",
+          label: "app.api.system.check.vibeCheck.fields.maxFilesInSummary.label",
+          description: "app.api.system.check.vibeCheck.fields.maxFilesInSummary.description",
           columns: 4,
         },
         z.coerce.number().min(1).optional(),
@@ -173,8 +164,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.system.check.vibeCheck.response.issues.title",
-              description:
-                "app.api.system.check.vibeCheck.response.issues.emptyState.description",
+              description: "app.api.system.check.vibeCheck.response.issues.emptyState.description",
               layoutType: LayoutType.GRID,
               columns: 12,
             },
@@ -192,48 +182,42 @@ const { POST } = createEndpoint({
                 file: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
+                    content: "app.api.system.check.vibeCheck.response.issues.title",
                   },
                   z.string(),
                 ),
                 line: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
+                    content: "app.api.system.check.vibeCheck.response.issues.title",
                   },
                   z.coerce.number().optional(),
                 ),
                 column: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
+                    content: "app.api.system.check.vibeCheck.response.issues.title",
                   },
                   z.coerce.number().optional(),
                 ),
                 rule: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
+                    content: "app.api.system.check.vibeCheck.response.issues.title",
                   },
                   z.string().optional(),
                 ),
                 code: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
+                    content: "app.api.system.check.vibeCheck.response.issues.title",
                   },
                   z.string().optional(),
                 ),
                 severity: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
+                    content: "app.api.system.check.vibeCheck.response.issues.title",
                   },
                   z.enum(["error", "warning", "info"]),
                 ),
@@ -247,8 +231,7 @@ const { POST } = createEndpoint({
                 type: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.vibeCheck.response.issues.title",
+                    content: "app.api.system.check.vibeCheck.response.issues.title",
                   },
                   z.enum(["oxlint", "lint", "type"]),
                 ),
@@ -298,8 +281,7 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.check.vibeCheck.errors.validation.title",
-      description:
-        "app.api.system.check.vibeCheck.errors.validation.description",
+      description: "app.api.system.check.vibeCheck.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.check.vibeCheck.errors.internal.title",
@@ -307,13 +289,11 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.check.vibeCheck.errors.unauthorized.title",
-      description:
-        "app.api.system.check.vibeCheck.errors.unauthorized.description",
+      description: "app.api.system.check.vibeCheck.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.check.vibeCheck.errors.forbidden.title",
-      description:
-        "app.api.system.check.vibeCheck.errors.forbidden.description",
+      description: "app.api.system.check.vibeCheck.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.check.vibeCheck.errors.notFound.title",

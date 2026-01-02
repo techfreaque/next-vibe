@@ -83,9 +83,7 @@ export const DEVELOPMENT_CONFIG: CampaignStarterConfigType = {
  * Get configuration based on environment
  */
 export function getDefaultConfig(): CampaignStarterConfigType {
-  return env.NODE_ENV === Environment.PRODUCTION
-    ? PRODUCTION_CONFIG
-    : DEVELOPMENT_CONFIG;
+  return env.NODE_ENV === Environment.PRODUCTION ? PRODUCTION_CONFIG : DEVELOPMENT_CONFIG;
 }
 
 /**

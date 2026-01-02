@@ -18,9 +18,7 @@ import { TextClassContext } from "./text";
 const TEXT_CLASS_CONTENT = "text-sm text-base text-popover-foreground";
 /* eslint-enable i18next/no-literal-string */
 
-export function TooltipProvider({
-  children,
-}: TooltipProviderProps): React.JSX.Element {
+export function TooltipProvider({ children }: TooltipProviderProps): React.JSX.Element {
   // React Native primitive doesn't support these props directly
   return <TooltipPrimitive.Root>{children}</TooltipPrimitive.Root>;
 }
@@ -35,22 +33,11 @@ export function Tooltip({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
   delayDuration, // Intentionally extracted - not used in React Native
 }: TooltipRootProps): React.JSX.Element {
-  return (
-    <TooltipPrimitive.Root onOpenChange={onOpenChange}>
-      {children}
-    </TooltipPrimitive.Root>
-  );
+  return <TooltipPrimitive.Root onOpenChange={onOpenChange}>{children}</TooltipPrimitive.Root>;
 }
 
-export function TooltipTrigger({
-  asChild,
-  children,
-}: TooltipTriggerProps): React.JSX.Element {
-  return (
-    <TooltipPrimitive.Trigger asChild={asChild}>
-      {children}
-    </TooltipPrimitive.Trigger>
-  );
+export function TooltipTrigger({ asChild, children }: TooltipTriggerProps): React.JSX.Element {
+  return <TooltipPrimitive.Trigger asChild={asChild}>{children}</TooltipPrimitive.Trigger>;
 }
 
 export function TooltipContent({

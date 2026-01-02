@@ -1,10 +1,6 @@
 import * as MenubarPrimitive from "@rn-primitives/menubar";
 import { cn } from "next-vibe/shared/utils/utils";
-import {
-  CheckIcon,
-  ChevronRightIcon,
-  DotFilledIcon,
-} from "next-vibe-ui/ui/icons";
+import { CheckIcon, ChevronRightIcon, DotFilledIcon } from "next-vibe-ui/ui/icons";
 import * as React from "react";
 import { View } from "react-native";
 
@@ -79,15 +75,8 @@ export function Menubar({
 }
 Menubar.displayName = MenubarPrimitive.Root.displayName || "Menubar";
 
-export function MenubarMenu({
-  children,
-  value,
-}: MenubarMenuProps): React.JSX.Element {
-  return (
-    <MenubarPrimitive.Menu value={value || undefined}>
-      {children}
-    </MenubarPrimitive.Menu>
-  );
+export function MenubarMenu({ children, value }: MenubarMenuProps): React.JSX.Element {
+  return <MenubarPrimitive.Menu value={value || undefined}>{children}</MenubarPrimitive.Menu>;
 }
 MenubarMenu.displayName = MenubarPrimitive.Menu.displayName || "MenubarMenu";
 
@@ -115,9 +104,7 @@ export function MenubarTrigger({
 }
 MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName;
 
-export function MenubarGroup({
-  children,
-}: MenubarGroupProps): React.JSX.Element {
+export function MenubarGroup({ children }: MenubarGroupProps): React.JSX.Element {
   return <MenubarPrimitive.Group>{children}</MenubarPrimitive.Group>;
 }
 MenubarGroup.displayName = MenubarPrimitive.Group.displayName;
@@ -135,10 +122,7 @@ export function MenubarPortal({
 }
 MenubarPortal.displayName = "MenubarPortal";
 
-export function MenubarSub({
-  children,
-  ...props
-}: MenubarSubProps): React.JSX.Element {
+export function MenubarSub({ children, ...props }: MenubarSubProps): React.JSX.Element {
   return <MenubarPrimitive.Sub {...props}>{children}</MenubarPrimitive.Sub>;
 }
 MenubarSub.displayName = MenubarPrimitive.Sub.displayName;
@@ -152,16 +136,12 @@ export function MenubarRadioGroup({
   const handleValueChange = onValueChange || ((): void => {});
 
   return (
-    <MenubarPrimitive.RadioGroup
-      value={value || undefined}
-      onValueChange={handleValueChange}
-    >
+    <MenubarPrimitive.RadioGroup value={value || undefined} onValueChange={handleValueChange}>
       {children}
     </MenubarPrimitive.RadioGroup>
   );
 }
-MenubarRadioGroup.displayName =
-  MenubarPrimitive.RadioGroup.displayName || "MenubarRadioGroup";
+MenubarRadioGroup.displayName = MenubarPrimitive.RadioGroup.displayName || "MenubarRadioGroup";
 
 export function MenubarSubTrigger({
   className,
@@ -339,8 +319,7 @@ export function MenubarRadioItem({
     </StyledMenubarRadioItem>
   );
 }
-MenubarRadioItem.displayName =
-  MenubarPrimitive.RadioItem.displayName || "MenubarRadioItem";
+MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName || "MenubarRadioItem";
 
 export function MenubarLabel({
   className,
@@ -354,11 +333,7 @@ export function MenubarLabel({
     <StyledMenubarLabel
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "px-2 py-1.5 text-sm font-semibold",
-          inset && "pl-8",
-          className,
-        ),
+        className: cn("px-2 py-1.5 text-sm font-semibold", inset && "pl-8", className),
       })}
       {...props}
     >
@@ -393,10 +368,7 @@ export function MenubarShortcut({
 }: MenubarShortcutProps): React.JSX.Element {
   return (
     <Span
-      className={cn(
-        "ml-auto text-xs tracking-widest text-muted-foreground",
-        className,
-      )}
+      className={cn("ml-auto text-xs tracking-widest text-muted-foreground", className)}
       {...props}
     >
       {children}

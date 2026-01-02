@@ -9,12 +9,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { translations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { contactClientRepository } from "../../contact/repository-client";
 import { UserDetailLevel } from "../../user/enum";
 import { UserRepository } from "../../user/repository";
 import type { NewEmail } from "./db";
 import { EmailProvider, EmailStatus, EmailType } from "./enum";
 import { emailRepository } from "./repository";
-import { contactClientRepository } from "../../contact/repository-client";
 
 /**
  * Helper function to create email message seed data
@@ -43,10 +43,7 @@ function createEmailSeed(overrides?: Partial<NewEmail>): NewEmail {
 /**
  * Development seed function for email messages module
  */
-export async function dev(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<void> {
+export async function dev(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
   logger.debug("🌱 Seeding email messages data for development environment");
 
   try {
@@ -103,8 +100,7 @@ export async function dev(
         senderName: `${translations.appName} Reports`,
         recipientEmail: "admin@example.com",
         recipientName: "Admin User",
-        bodyText:
-          "Your weekly social media analytics report is now available for download.",
+        bodyText: "Your weekly social media analytics report is now available for download.",
         bodyHtml: `
           <h2>Weekly Analytics Report</h2>
           <p>Your social media analytics report for this week is ready!</p>
@@ -119,9 +115,7 @@ export async function dev(
         status: EmailStatus.DELIVERED,
         emailProvider: EmailProvider.SMTP,
         type: EmailType.TRANSACTIONAL,
-        userId: adminUserResponse.success
-          ? adminUserResponse.data?.id || ""
-          : "",
+        userId: adminUserResponse.success ? adminUserResponse.data?.id || "" : "",
         metadata: {
           report_type: "analytics",
           period: "weekly",
@@ -166,8 +160,7 @@ export async function dev(
         senderName: `${translations.appName} Team`,
         recipientEmail: "demo@example.com",
         recipientName: "Demo User",
-        bodyText:
-          "This week's top social media tips and trends to help grow your online presence.",
+        bodyText: "This week's top social media tips and trends to help grow your online presence.",
         bodyHtml: `
           <h1>Social Media Tips & Trends</h1>
           <h2>This Week's Highlights</h2>
@@ -182,9 +175,7 @@ export async function dev(
         status: EmailStatus.DELIVERED,
         emailProvider: EmailProvider.SMTP,
         type: EmailType.MARKETING,
-        userId: adminUserResponse.success
-          ? adminUserResponse.data?.id || ""
-          : "",
+        userId: adminUserResponse.success ? adminUserResponse.data?.id || "" : "",
         metadata: {
           newsletter: "weekly-tips",
           edition: "2024-W03",
@@ -201,35 +192,24 @@ export async function dev(
           if (result.success) {
             logger.debug(`✅ Created email message: ${email.subject}`);
           } else {
-            logger.error(
-              `Failed to create email ${email.subject}: ${result.message}`,
-            );
+            logger.error(`Failed to create email ${email.subject}: ${result.message}`);
           }
         } catch (error) {
-          logger.error(
-            `Error creating email ${email.subject}:`,
-            parseError(error).message,
-          );
+          logger.error(`Error creating email ${email.subject}:`, parseError(error).message);
         }
       }
     }
 
     logger.debug("✅ Inserted development email messages data");
   } catch (error) {
-    logger.error(
-      "Error seeding email messages data:",
-      parseError(error).message,
-    );
+    logger.error("Error seeding email messages data:", parseError(error).message);
   }
 }
 
 /**
  * Test seed function for email messages module
  */
-export async function test(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<void> {
+export async function test(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
   logger.debug("🌱 Seeding email messages data for test environment");
 
   try {
@@ -270,10 +250,7 @@ export async function test(
       }
     }
   } catch (error) {
-    logger.error(
-      "Error seeding test email messages data:",
-      parseError(error).message,
-    );
+    logger.error("Error seeding test email messages data:", parseError(error).message);
   }
 }
 
@@ -286,14 +263,9 @@ export function prod(logger: EndpointLogger): void {
   try {
     // Production doesn't need pre-seeded email messages
     // Email messages will be created when actual emails are sent/received
-    logger.debug(
-      "✅ Email messages system ready for production email handling",
-    );
+    logger.debug("✅ Email messages system ready for production email handling");
   } catch (error) {
-    logger.error(
-      "Error seeding production email messages data:",
-      parseError(error).message,
-    );
+    logger.error("Error seeding production email messages data:", parseError(error).message);
   }
 }
 

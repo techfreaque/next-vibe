@@ -14,9 +14,7 @@ import definitions from "./definition";
 /**
  * Hook for syncing IMAP folders
  */
-export function useImapFoldersSync(
-  logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
+export function useImapFoldersSync(logger: EndpointLogger): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

@@ -1,12 +1,7 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "next-vibe-ui/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Span } from "next-vibe-ui/ui/span";
@@ -52,9 +47,7 @@ export function MoveFolderDialog({
     };
 
     const excludedIds = getDescendantIds(folder.id);
-    const validFolders = Object.values(folders).filter(
-      (f) => !excludedIds.includes(f.id),
-    );
+    const validFolders = Object.values(folders).filter((f) => !excludedIds.includes(f.id));
 
     return validFolders;
   }, [folder.id, folders]);
@@ -64,18 +57,13 @@ export function MoveFolderDialog({
     onOpenChange(false);
   };
 
-  const renderFolderOption = (
-    targetFolder: ChatFolder,
-    depth = 0,
-  ): JSX.Element => {
+  const renderFolderOption = (targetFolder: ChatFolder, depth = 0): JSX.Element => {
     const Icon = getIconComponent(targetFolder.icon ?? "folder");
     const isSelected = selectedFolderId === targetFolder.id;
     const displayName = targetFolder.name;
 
     // Get children of this folder
-    const children = availableFolders.filter(
-      (f) => f.parentId === targetFolder.id,
-    );
+    const children = availableFolders.filter((f) => f.parentId === targetFolder.id);
 
     return (
       <Div key={targetFolder.id}>
@@ -92,9 +80,7 @@ export function MoveFolderDialog({
             <Span className="text-sm truncate">{displayName}</Span>
           </Button>
         </Div>
-        {children.map((childFolder) =>
-          renderFolderOption(childFolder, depth + 1),
-        )}
+        {children.map((childFolder) => renderFolderOption(childFolder, depth + 1))}
       </Div>
     );
   };
@@ -118,14 +104,10 @@ export function MoveFolderDialog({
             size="unset"
             onClick={() => setSelectedFolderId(null)}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors ${
-              selectedFolderId === null
-                ? "bg-accent border-2 border-primary"
-                : ""
+              selectedFolderId === null ? "bg-accent border-2 border-primary" : ""
             }`}
           >
-            <Span className="text-sm font-medium">
-              {t("app.chat.moveFolder.rootLevel")}
-            </Span>
+            <Span className="text-sm font-medium">{t("app.chat.moveFolder.rootLevel")}</Span>
           </Button>
 
           {/* Available folders */}
@@ -139,9 +121,7 @@ export function MoveFolderDialog({
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               {t("app.chat.moveFolder.cancel")}
             </Button>
-            <Button onClick={handleMove}>
-              {t("app.chat.moveFolder.move")}
-            </Button>
+            <Button onClick={handleMove}>{t("app.chat.moveFolder.move")}</Button>
           </Div>
         </Div>
       </DialogContent>

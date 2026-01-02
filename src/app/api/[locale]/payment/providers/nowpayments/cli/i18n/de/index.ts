@@ -18,8 +18,7 @@ export const translations: typeof enTranslations = {
     },
     form: {
       title: "NOWPayments CLI Operationen",
-      description:
-        "ngrok-Tunnel für NOWPayments Webhooks konfigurieren und verwalten",
+      description: "ngrok-Tunnel für NOWPayments Webhooks konfigurieren und verwalten",
       fields: {
         operation: {
           label: "Operation",

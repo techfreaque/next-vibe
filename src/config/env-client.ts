@@ -21,17 +21,12 @@ export function createSchema<T extends z.ZodTypeAny, U extends z.ZodTypeAny>(
   required: T,
   optional: U,
 ): RequireEnvs extends true ? T : U {
-  return (requireEnvs ? required : optional) as RequireEnvs extends true
-    ? T
-    : U;
+  return (requireEnvs ? required : optional) as RequireEnvs extends true ? T : U;
 }
 
 export const { envClient } = defineEnvClient({
   NODE_ENV: {
-    schema: createSchema(
-      z.enum(Environment),
-      z.enum(Environment).default(Environment.DEVELOPMENT),
-    ),
+    schema: createSchema(z.enum(Environment), z.enum(Environment).default(Environment.DEVELOPMENT)),
     value: process.env.NODE_ENV,
     example: "development",
   },

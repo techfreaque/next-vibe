@@ -14,11 +14,7 @@ import { parseError } from "../../../shared/utils/parse-error";
 import { ensureConfigReady } from "../config/repository";
 import { sortIssuesByLocation } from "../config/shared";
 import type { CheckConfig } from "../config/types";
-import type {
-  OxlintIssue,
-  OxlintRequestOutput,
-  OxlintResponseOutput,
-} from "./definition";
+import type { OxlintIssue, OxlintRequestOutput, OxlintResponseOutput } from "./definition";
 
 /**
  * Run Oxlint Repository Interface
@@ -42,9 +38,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   ): Promise<ApiResponseType<OxlintResponseOutput>> {
     try {
       // eslint-disable-next-line i18next/no-literal-string
-      logger.debug(
-        `Starting Oxlint execution (path: ${data.path || "./"}, fix: ${data.fix})`,
-      );
+      logger.debug(`Starting Oxlint execution (path: ${data.path || "./"}, fix: ${data.fix})`);
 
       // Use unified config management
       const configResult = await ensureConfigReady(logger, false);
@@ -109,25 +103,14 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       await fs.mkdir(cacheDir, { recursive: true });
 
       // Handle multiple paths - support files, folders, or mixed
-      const targetPaths = data.path
-        ? Array.isArray(data.path)
-          ? data.path
-          : [data.path]
-        : ["./"];
+      const targetPaths = data.path ? (Array.isArray(data.path) ? data.path : [data.path]) : ["./"];
 
       // eslint-disable-next-line i18next/no-literal-string
-      logger.debug(
-        `Running oxlint on ${targetPaths.length} path(s): ${targetPaths.join(", ")}`,
-      );
+      logger.debug(`Running oxlint on ${targetPaths.length} path(s): ${targetPaths.join(", ")}`);
 
       // Run oxlint on paths (folders and/or files)
       // Oxlint will handle file discovery based on ignore patterns in config
-      const result = await this.runOxlint(
-        targetPaths,
-        data.fix,
-        data.timeout,
-        logger,
-      );
+      const result = await this.runOxlint(targetPaths, data.fix, data.timeout, logger);
 
       // Build response with pagination
       const response = this.buildResponse(
@@ -136,9 +119,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       );
 
       // eslint-disable-next-line i18next/no-literal-string
-      logger.debug(
-        `Oxlint execution completed (${response.issues.items.length} issues found)`,
-      );
+      logger.debug(`Oxlint execution completed (${response.issues.items.length} issues found)`);
 
       return success(response);
     } catch (error) {
@@ -259,10 +240,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   /**
    * Run oxfmt on paths (files and/or folders) for formatting
    */
-  private async runOxfmt(
-    paths: string[],
-    logger: EndpointLogger,
-  ): Promise<void> {
+  private async runOxfmt(paths: string[], logger: EndpointLogger): Promise<void> {
     if (paths.length === 0) {
       return;
     }
@@ -310,10 +288,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   private buildFileStats(
     issues: OxlintIssue[],
   ): Map<string, { errors: number; warnings: number; total: number }> {
-    const fileStats = new Map<
-      string,
-      { errors: number; warnings: number; total: number }
-    >();
+    const fileStats = new Map<string, { errors: number; warnings: number; total: number }>();
 
     for (const issue of issues) {
       const stats = fileStats.get(issue.file) || {
@@ -353,15 +328,10 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   /**
    * Build response with pagination and statistics
    */
-  private buildResponse(
-    allIssues: OxlintIssue[],
-    data: OxlintRequestOutput,
-  ): OxlintResponseOutput {
+  private buildResponse(allIssues: OxlintIssue[], data: OxlintRequestOutput): OxlintResponseOutput {
     const totalIssues = allIssues.length;
     const totalFiles = new Set(allIssues.map((issue) => issue.file)).size;
-    const totalErrors = allIssues.filter(
-      (issue) => issue.severity === "error",
-    ).length;
+    const totalErrors = allIssues.filter((issue) => issue.severity === "error").length;
 
     const fileStats = this.buildFileStats(allIssues);
     const allFiles = this.formatFileStats(fileStats);
@@ -377,8 +347,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     const limitedIssues = allIssues.slice(startIndex, endIndex);
 
     const displayedIssues = limitedIssues.length;
-    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file))
-      .size;
+    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file)).size;
 
     return {
       issues: {
@@ -439,8 +408,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         // Unlike ESLint, oxlint doesn't output valid results on fatal errors
         // So we only accept 0 and 1, reject on code >= 2
         if (code !== null && code >= 2) {
-          const errorMsg =
-            stderrOutput.trim() || `Oxlint failed with exit code ${code}`;
+          const errorMsg = stderrOutput.trim() || `Oxlint failed with exit code ${code}`;
           reject(new Error(errorMsg));
         } else {
           resolve(output);
@@ -525,10 +493,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       } catch (parseError) {
         // JSON parse failed - log the error and return empty results
         logger.warn("Failed to parse oxlint JSON output", {
-          error:
-            parseError instanceof Error
-              ? parseError.message
-              : String(parseError),
+          error: parseError instanceof Error ? parseError.message : String(parseError),
           stdout,
         });
         return { issues };

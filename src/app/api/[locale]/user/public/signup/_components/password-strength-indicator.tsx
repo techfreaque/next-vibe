@@ -68,9 +68,7 @@ export function PasswordStrengthIndicator({
   return (
     <Div className="mt-2 flex flex-col gap-1">
       <Div className="flex justify-between text-xs">
-        <Span>
-          {t("app.user.components.auth.common.passwordStrength.label")}
-        </Span>
+        <Span>{t("app.user.components.auth.common.passwordStrength.label")}</Span>
         <Span
           className={
             strength <= 2

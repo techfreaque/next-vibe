@@ -11,8 +11,7 @@ export const translations: typeof enTranslations = {
     },
     internal: {
       title: "Błąd wewnętrzny",
-      description:
-        "Wystąpił błąd wewnętrzny podczas przetwarzania żądania użytkownika",
+      description: "Wystąpił błąd wewnętrzny podczas przetwarzania żądania użytkownika",
     },
   },
   id: idTranslations,

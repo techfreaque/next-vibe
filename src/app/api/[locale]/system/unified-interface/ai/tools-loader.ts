@@ -85,23 +85,17 @@ function createToolFromEndpoint(
     : z.never();
 
   const urlPathParamsSchema = endpoint.fields
-    ? (generateSchemaForUsage<
-        typeof endpoint.fields,
-        FieldUsage.RequestUrlParams
-      >(endpoint.fields, FieldUsage.RequestUrlParams) as
-        | z.ZodObject<Record<string, z.ZodTypeAny>>
-        | z.ZodNever)
+    ? (generateSchemaForUsage<typeof endpoint.fields, FieldUsage.RequestUrlParams>(
+        endpoint.fields,
+        FieldUsage.RequestUrlParams,
+      ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever)
     : z.never();
 
   // Get field names for each schema
   const requestDataFields =
-    requestDataSchema instanceof z.ZodObject
-      ? Object.keys(requestDataSchema.shape)
-      : [];
+    requestDataSchema instanceof z.ZodObject ? Object.keys(requestDataSchema.shape) : [];
   const urlPathParamsFields =
-    urlPathParamsSchema instanceof z.ZodObject
-      ? Object.keys(urlPathParamsSchema.shape)
-      : [];
+    urlPathParamsSchema instanceof z.ZodObject ? Object.keys(urlPathParamsSchema.shape) : [];
 
   return tool({
     description,
@@ -264,8 +258,7 @@ export async function loadTools(params: {
       const aiSdkToolName = endpointToToolName(endpoint);
       try {
         // Check if this tool requires confirmation from the API request config
-        const requiresConfirmation =
-          params.toolConfirmationConfig?.get(aiSdkToolName) ?? false;
+        const requiresConfirmation = params.toolConfirmationConfig?.get(aiSdkToolName) ?? false;
 
         params.logger.debug("Creating tool", {
           toolName: aiSdkToolName,

@@ -39,9 +39,7 @@ export function Checkbox({
     >
       {children ?? (
         <StyledCheckboxIndicator
-          className={cn(
-            "flex flex-row items-center justify-center text-current",
-          )}
+          className={cn("flex flex-row items-center justify-center text-current")}
         >
           <Check size={14} className="text-primary-foreground" />
         </StyledCheckboxIndicator>
@@ -61,10 +59,7 @@ export function CheckboxIndicator({
     <StyledCheckboxIndicator
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "flex flex-row items-center justify-center text-current",
-          className,
-        ),
+        className: cn("flex flex-row items-center justify-center text-current", className),
       })}
     >
       {children ?? <Check size={14} className="text-primary-foreground" />}

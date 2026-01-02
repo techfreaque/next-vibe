@@ -56,13 +56,10 @@ export const {
   options: RecorderBackendOptions,
   Value: RecorderBackendValue,
 } = createEnumOptions({
-  FFMPEG_AVFOUNDATION:
-    "app.api.agent.speechToText.hotkey.recorderBackends.ffmpegAvfoundation",
-  FFMPEG_PULSE:
-    "app.api.agent.speechToText.hotkey.recorderBackends.ffmpegPulse",
+  FFMPEG_AVFOUNDATION: "app.api.agent.speechToText.hotkey.recorderBackends.ffmpegAvfoundation",
+  FFMPEG_PULSE: "app.api.agent.speechToText.hotkey.recorderBackends.ffmpegPulse",
   FFMPEG_ALSA: "app.api.agent.speechToText.hotkey.recorderBackends.ffmpegAlsa",
-  FFMPEG_DSHOW:
-    "app.api.agent.speechToText.hotkey.recorderBackends.ffmpegDshow",
+  FFMPEG_DSHOW: "app.api.agent.speechToText.hotkey.recorderBackends.ffmpegDshow",
   WF_RECORDER: "app.api.agent.speechToText.hotkey.recorderBackends.wfRecorder",
   ARECORD: "app.api.agent.speechToText.hotkey.recorderBackends.arecord",
 } as const);
@@ -87,9 +84,7 @@ export const {
  * Type exports for type safety
  */
 export type PlatformType = (typeof Platform)[keyof typeof Platform];
-export type RecordingStatusType =
-  (typeof RecordingStatus)[keyof typeof RecordingStatus];
+export type RecordingStatusType = (typeof RecordingStatus)[keyof typeof RecordingStatus];
 export type HotkeyActionType = (typeof HotkeyAction)[keyof typeof HotkeyAction];
-export type RecorderBackendType =
-  (typeof RecorderBackend)[keyof typeof RecorderBackend];
+export type RecorderBackendType = (typeof RecorderBackend)[keyof typeof RecorderBackend];
 export type TyperBackendType = (typeof TyperBackend)[keyof typeof TyperBackend];

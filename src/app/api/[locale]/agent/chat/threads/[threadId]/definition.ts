@@ -43,8 +43,7 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.agent.chat.threads.threadId.get.container.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.get.container.description" as const,
+      description: "app.api.agent.chat.threads.threadId.get.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
@@ -55,8 +54,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.agent.chat.threads.threadId.get.id.label" as const,
-          description:
-            "app.api.agent.chat.threads.threadId.get.id.description" as const,
+          description: "app.api.agent.chat.threads.threadId.get.id.description" as const,
           columns: 12,
         },
         z.uuid(),
@@ -66,8 +64,7 @@ const { GET } = createEndpoint({
       thread: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.agent.chat.threads.threadId.get.response.thread.title" as const,
+          title: "app.api.agent.chat.threads.threadId.get.response.thread.title" as const,
           description:
             "app.api.agent.chat.threads.threadId.get.response.thread.description" as const,
           layoutType: LayoutType.GRID,
@@ -202,50 +199,39 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.chat.threads.threadId.get.errors.validation.title",
-      description:
-        "app.api.agent.chat.threads.threadId.get.errors.validation.description",
+      description: "app.api.agent.chat.threads.threadId.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.get.errors.unauthorized.title",
-      description:
-        "app.api.agent.chat.threads.threadId.get.errors.unauthorized.description",
+      title: "app.api.agent.chat.threads.threadId.get.errors.unauthorized.title",
+      description: "app.api.agent.chat.threads.threadId.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.threads.threadId.get.errors.forbidden.title",
-      description:
-        "app.api.agent.chat.threads.threadId.get.errors.forbidden.description",
+      description: "app.api.agent.chat.threads.threadId.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.threads.threadId.get.errors.notFound.title",
-      description:
-        "app.api.agent.chat.threads.threadId.get.errors.notFound.description",
+      description: "app.api.agent.chat.threads.threadId.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.threads.threadId.get.errors.server.title",
-      description:
-        "app.api.agent.chat.threads.threadId.get.errors.server.description",
+      description: "app.api.agent.chat.threads.threadId.get.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.chat.threads.threadId.get.errors.network.title",
-      description:
-        "app.api.agent.chat.threads.threadId.get.errors.network.description",
+      description: "app.api.agent.chat.threads.threadId.get.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.agent.chat.threads.threadId.get.errors.unknown.title",
-      description:
-        "app.api.agent.chat.threads.threadId.get.errors.unknown.description",
+      description: "app.api.agent.chat.threads.threadId.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.threads.threadId.get.errors.unsavedChanges.title",
-      description:
-        "app.api.agent.chat.threads.threadId.get.errors.unsavedChanges.description",
+      title: "app.api.agent.chat.threads.threadId.get.errors.unsavedChanges.title",
+      description: "app.api.agent.chat.threads.threadId.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.threads.threadId.get.errors.conflict.title",
-      description:
-        "app.api.agent.chat.threads.threadId.get.errors.conflict.description",
+      description: "app.api.agent.chat.threads.threadId.get.errors.conflict.description",
     },
   },
 
@@ -301,10 +287,8 @@ const { PATCH } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title:
-        "app.api.agent.chat.threads.threadId.patch.container.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.patch.container.description" as const,
+      title: "app.api.agent.chat.threads.threadId.patch.container.title" as const,
+      description: "app.api.agent.chat.threads.threadId.patch.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
@@ -315,8 +299,7 @@ const { PATCH } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.agent.chat.threads.threadId.patch.id.label" as const,
-          description:
-            "app.api.agent.chat.threads.threadId.patch.id.description" as const,
+          description: "app.api.agent.chat.threads.threadId.patch.id.description" as const,
           columns: 12,
         },
         z.uuid(),
@@ -326,8 +309,7 @@ const { PATCH } = createEndpoint({
       updates: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.agent.chat.threads.threadId.patch.sections.updates.title" as const,
+          title: "app.api.agent.chat.threads.threadId.patch.sections.updates.title" as const,
           description:
             "app.api.agent.chat.threads.threadId.patch.sections.updates.description" as const,
           layoutType: LayoutType.GRID,
@@ -339,8 +321,7 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.agent.chat.threads.threadId.patch.threadTitle.label" as const,
+              label: "app.api.agent.chat.threads.threadId.patch.threadTitle.label" as const,
               description:
                 "app.api.agent.chat.threads.threadId.patch.threadTitle.description" as const,
               columns: 12,
@@ -351,8 +332,7 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.UUID,
-              label:
-                "app.api.agent.chat.threads.threadId.patch.folderId.label" as const,
+              label: "app.api.agent.chat.threads.threadId.patch.folderId.label" as const,
               description:
                 "app.api.agent.chat.threads.threadId.patch.folderId.description" as const,
               columns: 6,
@@ -363,10 +343,8 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.agent.chat.threads.threadId.patch.status.label" as const,
-              description:
-                "app.api.agent.chat.threads.threadId.patch.status.description" as const,
+              label: "app.api.agent.chat.threads.threadId.patch.status.label" as const,
+              description: "app.api.agent.chat.threads.threadId.patch.status.description" as const,
               columns: 6,
               options: ThreadStatusOptions,
             },
@@ -376,8 +354,7 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.agent.chat.threads.threadId.patch.defaultModel.label" as const,
+              label: "app.api.agent.chat.threads.threadId.patch.defaultModel.label" as const,
               description:
                 "app.api.agent.chat.threads.threadId.patch.defaultModel.description" as const,
               columns: 6,
@@ -388,8 +365,7 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.agent.chat.threads.threadId.patch.defaultTone.label" as const,
+              label: "app.api.agent.chat.threads.threadId.patch.defaultTone.label" as const,
               description:
                 "app.api.agent.chat.threads.threadId.patch.defaultTone.description" as const,
               columns: 6,
@@ -400,8 +376,7 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXTAREA,
-              label:
-                "app.api.agent.chat.threads.threadId.patch.systemPrompt.label" as const,
+              label: "app.api.agent.chat.threads.threadId.patch.systemPrompt.label" as const,
               description:
                 "app.api.agent.chat.threads.threadId.patch.systemPrompt.description" as const,
               columns: 12,
@@ -412,10 +387,8 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label:
-                "app.api.agent.chat.threads.threadId.patch.pinned.label" as const,
-              description:
-                "app.api.agent.chat.threads.threadId.patch.pinned.description" as const,
+              label: "app.api.agent.chat.threads.threadId.patch.pinned.label" as const,
+              description: "app.api.agent.chat.threads.threadId.patch.pinned.description" as const,
               columns: 6,
             },
             z.boolean().optional(),
@@ -424,8 +397,7 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label:
-                "app.api.agent.chat.threads.threadId.patch.archived.label" as const,
+              label: "app.api.agent.chat.threads.threadId.patch.archived.label" as const,
               description:
                 "app.api.agent.chat.threads.threadId.patch.archived.description" as const,
               columns: 6,
@@ -436,10 +408,8 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.agent.chat.threads.threadId.patch.tags.label" as const,
-              description:
-                "app.api.agent.chat.threads.threadId.patch.tags.description" as const,
+              label: "app.api.agent.chat.threads.threadId.patch.tags.label" as const,
+              description: "app.api.agent.chat.threads.threadId.patch.tags.description" as const,
               columns: 12,
             },
             z.array(z.string()).optional(),
@@ -448,8 +418,7 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label:
-                "app.api.agent.chat.threads.threadId.patch.published.label" as const,
+              label: "app.api.agent.chat.threads.threadId.patch.published.label" as const,
               description:
                 "app.api.agent.chat.threads.threadId.patch.published.description" as const,
               columns: 6,
@@ -463,8 +432,7 @@ const { PATCH } = createEndpoint({
       thread: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.agent.chat.threads.threadId.patch.response.thread.title" as const,
+          title: "app.api.agent.chat.threads.threadId.patch.response.thread.title" as const,
           description:
             "app.api.agent.chat.threads.threadId.patch.response.thread.description" as const,
           layoutType: LayoutType.GRID,
@@ -606,59 +574,46 @@ const { PATCH } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.patch.errors.validation.title",
-      description:
-        "app.api.agent.chat.threads.threadId.patch.errors.validation.description",
+      title: "app.api.agent.chat.threads.threadId.patch.errors.validation.title",
+      description: "app.api.agent.chat.threads.threadId.patch.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.patch.errors.unauthorized.title",
-      description:
-        "app.api.agent.chat.threads.threadId.patch.errors.unauthorized.description",
+      title: "app.api.agent.chat.threads.threadId.patch.errors.unauthorized.title",
+      description: "app.api.agent.chat.threads.threadId.patch.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.threads.threadId.patch.errors.forbidden.title",
-      description:
-        "app.api.agent.chat.threads.threadId.patch.errors.forbidden.description",
+      description: "app.api.agent.chat.threads.threadId.patch.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.threads.threadId.patch.errors.notFound.title",
-      description:
-        "app.api.agent.chat.threads.threadId.patch.errors.notFound.description",
+      description: "app.api.agent.chat.threads.threadId.patch.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.threads.threadId.patch.errors.server.title",
-      description:
-        "app.api.agent.chat.threads.threadId.patch.errors.server.description",
+      description: "app.api.agent.chat.threads.threadId.patch.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.chat.threads.threadId.patch.errors.network.title",
-      description:
-        "app.api.agent.chat.threads.threadId.patch.errors.network.description",
+      description: "app.api.agent.chat.threads.threadId.patch.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.agent.chat.threads.threadId.patch.errors.unknown.title",
-      description:
-        "app.api.agent.chat.threads.threadId.patch.errors.unknown.description",
+      description: "app.api.agent.chat.threads.threadId.patch.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.threads.threadId.patch.errors.unsavedChanges.title",
-      description:
-        "app.api.agent.chat.threads.threadId.patch.errors.unsavedChanges.description",
+      title: "app.api.agent.chat.threads.threadId.patch.errors.unsavedChanges.title",
+      description: "app.api.agent.chat.threads.threadId.patch.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.threads.threadId.patch.errors.conflict.title",
-      description:
-        "app.api.agent.chat.threads.threadId.patch.errors.conflict.description",
+      description: "app.api.agent.chat.threads.threadId.patch.errors.conflict.description",
     },
   },
 
   successTypes: {
     title: "app.api.agent.chat.threads.threadId.patch.success.title",
-    description:
-      "app.api.agent.chat.threads.threadId.patch.success.description",
+    description: "app.api.agent.chat.threads.threadId.patch.success.description",
   },
 
   examples: {
@@ -708,8 +663,7 @@ const { DELETE } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "app.api.agent.chat.threads.threadId.delete.title" as const,
-  description:
-    "app.api.agent.chat.threads.threadId.delete.description" as const,
+  description: "app.api.agent.chat.threads.threadId.delete.description" as const,
   icon: "message-square",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.threads" as const],
@@ -717,10 +671,8 @@ const { DELETE } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title:
-        "app.api.agent.chat.threads.threadId.delete.container.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.delete.container.description" as const,
+      title: "app.api.agent.chat.threads.threadId.delete.container.title" as const,
+      description: "app.api.agent.chat.threads.threadId.delete.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
@@ -731,8 +683,7 @@ const { DELETE } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.agent.chat.threads.threadId.delete.id.label" as const,
-          description:
-            "app.api.agent.chat.threads.threadId.delete.id.description" as const,
+          description: "app.api.agent.chat.threads.threadId.delete.id.description" as const,
           columns: 12,
         },
         z.uuid(),
@@ -742,16 +693,14 @@ const { DELETE } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.threads.threadId.delete.response.success.content" as const,
+          content: "app.api.agent.chat.threads.threadId.delete.response.success.content" as const,
         },
         z.boolean(),
       ),
       deletedId: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.threads.threadId.delete.response.deletedId.content" as const,
+          content: "app.api.agent.chat.threads.threadId.delete.response.deletedId.content" as const,
         },
         z.uuid(),
       ),
@@ -760,60 +709,46 @@ const { DELETE } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.delete.errors.validation.title",
-      description:
-        "app.api.agent.chat.threads.threadId.delete.errors.validation.description",
+      title: "app.api.agent.chat.threads.threadId.delete.errors.validation.title",
+      description: "app.api.agent.chat.threads.threadId.delete.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.delete.errors.unauthorized.title",
-      description:
-        "app.api.agent.chat.threads.threadId.delete.errors.unauthorized.description",
+      title: "app.api.agent.chat.threads.threadId.delete.errors.unauthorized.title",
+      description: "app.api.agent.chat.threads.threadId.delete.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.threads.threadId.delete.errors.forbidden.title",
-      description:
-        "app.api.agent.chat.threads.threadId.delete.errors.forbidden.description",
+      title: "app.api.agent.chat.threads.threadId.delete.errors.forbidden.title",
+      description: "app.api.agent.chat.threads.threadId.delete.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.threads.threadId.delete.errors.notFound.title",
-      description:
-        "app.api.agent.chat.threads.threadId.delete.errors.notFound.description",
+      description: "app.api.agent.chat.threads.threadId.delete.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.threads.threadId.delete.errors.server.title",
-      description:
-        "app.api.agent.chat.threads.threadId.delete.errors.server.description",
+      description: "app.api.agent.chat.threads.threadId.delete.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.chat.threads.threadId.delete.errors.network.title",
-      description:
-        "app.api.agent.chat.threads.threadId.delete.errors.network.description",
+      description: "app.api.agent.chat.threads.threadId.delete.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.agent.chat.threads.threadId.delete.errors.unknown.title",
-      description:
-        "app.api.agent.chat.threads.threadId.delete.errors.unknown.description",
+      description: "app.api.agent.chat.threads.threadId.delete.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.threads.threadId.delete.errors.unsavedChanges.title",
-      description:
-        "app.api.agent.chat.threads.threadId.delete.errors.unsavedChanges.description",
+      title: "app.api.agent.chat.threads.threadId.delete.errors.unsavedChanges.title",
+      description: "app.api.agent.chat.threads.threadId.delete.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.threads.threadId.delete.errors.conflict.title",
-      description:
-        "app.api.agent.chat.threads.threadId.delete.errors.conflict.description",
+      description: "app.api.agent.chat.threads.threadId.delete.errors.conflict.description",
     },
   },
 
   successTypes: {
     title: "app.api.agent.chat.threads.threadId.delete.success.title",
-    description:
-      "app.api.agent.chat.threads.threadId.delete.success.description",
+    description: "app.api.agent.chat.threads.threadId.delete.success.description",
   },
 
   examples: {
@@ -841,15 +776,13 @@ export type ThreadPatchRequestInput = typeof PATCH.types.RequestInput;
 export type ThreadPatchRequestOutput = typeof PATCH.types.RequestOutput;
 export type ThreadPatchResponseInput = typeof PATCH.types.ResponseInput;
 export type ThreadPatchResponseOutput = typeof PATCH.types.ResponseOutput;
-export type ThreadPatchUrlParamsTypeOutput =
-  typeof PATCH.types.UrlVariablesOutput;
+export type ThreadPatchUrlParamsTypeOutput = typeof PATCH.types.UrlVariablesOutput;
 
 export type ThreadDeleteRequestInput = typeof DELETE.types.UrlVariablesInput;
 export type ThreadDeleteRequestOutput = typeof DELETE.types.UrlVariablesOutput;
 export type ThreadDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type ThreadDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
-export type ThreadDeleteUrlParamsTypeOutput =
-  typeof DELETE.types.UrlVariablesOutput;
+export type ThreadDeleteUrlParamsTypeOutput = typeof DELETE.types.UrlVariablesOutput;
 
 const definitions = { GET, PATCH, DELETE };
 export default definitions;

@@ -69,10 +69,7 @@ export function getAllModelCosts(): Record<string, number> {
  * @param messageCount - Number of messages
  * @returns Total credit cost
  */
-export function calculateTotalCost(
-  modelId: ModelId,
-  messageCount: number,
-): number {
+export function calculateTotalCost(modelId: ModelId, messageCount: number): number {
   return getModelCost(modelId) * messageCount;
 }
 
@@ -82,10 +79,7 @@ export function calculateTotalCost(
  * @param credits - Available credits
  * @returns Number of messages that can be sent
  */
-export function calculateMessageCount(
-  modelId: ModelId,
-  credits: number,
-): number {
+export function calculateMessageCount(modelId: ModelId, credits: number): number {
   const cost = getModelCost(modelId);
   if (cost === 0) {
     return Infinity;

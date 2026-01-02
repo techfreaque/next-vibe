@@ -14,8 +14,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: async ({ data, logger }) => {
-      const typecheckRepository = (await import("./repository"))
-        .typecheckRepository;
+      const typecheckRepository = (await import("./repository")).typecheckRepository;
       return await typecheckRepository.execute(data, logger);
     },
   },

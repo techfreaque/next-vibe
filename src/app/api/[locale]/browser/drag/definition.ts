@@ -27,10 +27,7 @@ const { POST } = createEndpoint({
   description: "app.api.browser.drag.description",
   category: "app.api.browser.category",
   icon: "move",
-  tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.inputAutomation",
-  ],
+  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.inputAutomation"],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -88,9 +85,7 @@ const { POST } = createEndpoint({
         },
         z
           .object({
-            dragged: z
-              .boolean()
-              .describe("Whether the drag operation was performed"),
+            dragged: z.boolean().describe("Whether the drag operation was performed"),
             from: z.string().describe("The source element uid"),
             to: z.string().describe("The target element uid"),
           })

@@ -12,14 +12,7 @@ import type { ReactElement } from "react";
 import * as React from "react";
 
 import type { StyleType } from "../utils/style-type";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table";
 
 export type DataTableProps<TData, TValue = string> = {
   columns: ColumnDef<TData, TValue>[];
@@ -70,10 +63,7 @@ export function DataTable<TData, TValue = string>({
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 );
               })}
@@ -121,11 +111,7 @@ export function DataTable<TData, TValue = string>({
       </Table>
       {ListFooterComponent &&
         !hasNoData &&
-        (React.isValidElement(ListFooterComponent) ? (
-          ListFooterComponent
-        ) : (
-          <ListFooterComponent />
-        ))}
+        (React.isValidElement(ListFooterComponent) ? ListFooterComponent : <ListFooterComponent />)}
     </div>
   );
 }

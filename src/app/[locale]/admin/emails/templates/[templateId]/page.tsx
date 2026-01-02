@@ -3,6 +3,7 @@
  * Server-side preview generation with client-side test email sending
  */
 
+import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
@@ -10,7 +11,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import { ArrowLeft } from "lucide-react";
 import type React from "react";
 
 import {
@@ -30,9 +30,7 @@ interface EmailTemplatePreviewPageProps {
   }>;
 }
 
-export async function generateStaticParams(): Promise<
-  Array<{ templateId: string }>
-> {
+export async function generateStaticParams(): Promise<Array<{ templateId: string }>> {
   const templateIds = getAllTemplateIds();
   return templateIds.map((id) => ({ templateId: id }));
 }
@@ -68,12 +66,9 @@ export default async function EmailTemplatePreviewPage({
   // Get all templates for navigation
   const allTemplateIds = getAllTemplateIds();
   const currentIndex = allTemplateIds.indexOf(templateId);
-  const previousTemplateId =
-    currentIndex > 0 ? allTemplateIds[currentIndex - 1] : null;
+  const previousTemplateId = currentIndex > 0 ? allTemplateIds[currentIndex - 1] : null;
   const nextTemplateId =
-    currentIndex < allTemplateIds.length - 1
-      ? allTemplateIds[currentIndex + 1]
-      : null;
+    currentIndex < allTemplateIds.length - 1 ? allTemplateIds[currentIndex + 1] : null;
 
   return (
     <Div className="flex flex-col gap-6">
@@ -89,18 +84,14 @@ export default async function EmailTemplatePreviewPage({
         <Div className="flex gap-2">
           {previousTemplateId && (
             <Button asChild variant="outline" size="sm">
-              <Link
-                href={`/${locale}/admin/emails/templates/${previousTemplateId}`}
-              >
+              <Link href={`/${locale}/admin/emails/templates/${previousTemplateId}`}>
                 {t("app.admin.emails.templates.preview.previous")}
               </Link>
             </Button>
           )}
           {nextTemplateId && (
             <Button asChild variant="outline" size="sm">
-              <Link
-                href={`/${locale}/admin/emails/templates/${nextTemplateId}`}
-              >
+              <Link href={`/${locale}/admin/emails/templates/${nextTemplateId}`}>
                 {t("app.admin.emails.templates.preview.next")}
               </Link>
             </Button>
@@ -112,9 +103,7 @@ export default async function EmailTemplatePreviewPage({
       <Card>
         <CardHeader>
           <CardTitle>{translatedName}</CardTitle>
-          <P className="text-sm text-gray-600 dark:text-gray-400">
-            {translatedDescription}
-          </P>
+          <P className="text-sm text-gray-600 dark:text-gray-400">{translatedDescription}</P>
         </CardHeader>
         <CardContent>
           <Div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -134,17 +123,13 @@ export default async function EmailTemplatePreviewPage({
               <P className="text-gray-500 dark:text-gray-400">
                 {t("app.admin.emails.templates.preview.category")}
               </P>
-              <P className="font-medium capitalize">
-                {templateMetadata.category}
-              </P>
+              <P className="font-medium capitalize">{templateMetadata.category}</P>
             </Div>
             <Div>
               <P className="text-gray-500 dark:text-gray-400">
                 {t("app.admin.emails.templates.preview.path")}
               </P>
-              <Span className="font-mono text-xs text-gray-600">
-                {templateMetadata.path}
-              </Span>
+              <Span className="font-mono text-xs text-gray-600">{templateMetadata.path}</Span>
             </Div>
           </Div>
         </CardContent>

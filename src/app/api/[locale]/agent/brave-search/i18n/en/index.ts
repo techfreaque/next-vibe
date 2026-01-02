@@ -11,8 +11,7 @@ export const translations = {
     fields: {
       query: {
         title: "Search Query",
-        description:
-          "Clear and specific search query. Use keywords rather than questions.",
+        description: "Clear and specific search query. Use keywords rather than questions.",
         placeholder: "Enter your search query...",
       },
       maxResults: {

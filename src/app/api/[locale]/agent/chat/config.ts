@@ -3,18 +3,12 @@
  * Central configuration for chat system including default folders, constants, and system settings
  */
 
-import {
-  type UserPermissionRoleValue,
-  UserRole,
-} from "@/app/api/[locale]/user/user-roles/enum";
+import { type UserPermissionRoleValue, UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { aliasToPathMap } from "../../system/generated/endpoint";
 import { SEARCH_ALIAS } from "../brave-search/definition";
-import {
-  MEMORY_DELETE_ALIAS,
-  MEMORY_UPDATE_ALIAS,
-} from "./memories/[id]/definition";
+import { MEMORY_DELETE_ALIAS, MEMORY_UPDATE_ALIAS } from "./memories/[id]/definition";
 import { MEMORY_ADD_ALIAS, MEMORY_LIST_ALIAS } from "./memories/definition";
 import type { IconValue } from "./model-access/icons";
 
@@ -144,9 +138,7 @@ export const DEFAULT_FOLDER_CONFIGS = {
  * @param folderId - Folder ID to check
  * @returns True if the folder is a default system folder
  */
-export function isDefaultFolderId(
-  folderId: string,
-): folderId is DefaultFolderId {
+export function isDefaultFolderId(folderId: string): folderId is DefaultFolderId {
   return Object.values(DefaultFolderId).includes(folderId as DefaultFolderId);
 }
 
@@ -155,9 +147,7 @@ export function isDefaultFolderId(
  * @param folderId - Default folder ID
  * @returns Default folder configuration or undefined
  */
-export function getDefaultFolderConfig(
-  folderId: string,
-): DefaultFolderConfig | undefined {
+export function getDefaultFolderConfig(folderId: string): DefaultFolderConfig | undefined {
   if (!isDefaultFolderId(folderId)) {
     return undefined;
   }
@@ -209,6 +199,4 @@ export const DEFAULT_TOOL_IDS = [
  * Default AI tools that require confirmation
  * These tools will prompt the user before execution when called by the AI
  */
-export const DEFAULT_TOOL_CONFIRMATION_IDS = [
-  aliasToPathMap[MEMORY_DELETE_ALIAS],
-] as const;
+export const DEFAULT_TOOL_CONFIRMATION_IDS = [aliasToPathMap[MEMORY_DELETE_ALIAS]] as const;

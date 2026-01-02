@@ -8,11 +8,7 @@ import type { JSX } from "react";
 import { modelOptions } from "@/app/api/[locale]/agent/chat/model-access/models";
 import type { SubscriptionPlanValue } from "@/app/api/[locale]/subscription/enum";
 import { SubscriptionPlan } from "@/app/api/[locale]/subscription/enum";
-import type {
-  Countries,
-  CountryLanguage,
-  Currencies,
-} from "@/i18n/core/config";
+import type { Countries, CountryLanguage, Currencies } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -47,10 +43,8 @@ const STANDARD_MARKUP_PERCENTAGE = 0.3; // 30% markup
  * Per character: $0.0000052 = 0.00052 credits
  */
 const TTS_BASE_COST_PER_MILLION_USD = 4.0;
-const TTS_COST_WITH_MARKUP_USD =
-  TTS_BASE_COST_PER_MILLION_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
-export const TTS_COST_PER_CHARACTER =
-  TTS_COST_WITH_MARKUP_USD / 1_000_000 / CREDIT_VALUE_USD;
+const TTS_COST_WITH_MARKUP_USD = TTS_BASE_COST_PER_MILLION_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
+export const TTS_COST_PER_CHARACTER = TTS_COST_WITH_MARKUP_USD / 1_000_000 / CREDIT_VALUE_USD;
 
 /**
  * STT Pricing (OpenAI Whisper)
@@ -59,8 +53,7 @@ export const TTS_COST_PER_CHARACTER =
  * Per second: $0.00013 = 0.013 credits
  */
 const STT_BASE_COST_PER_MINUTE_USD = 0.006;
-const STT_COST_WITH_MARKUP_USD =
-  STT_BASE_COST_PER_MINUTE_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
+const STT_COST_WITH_MARKUP_USD = STT_BASE_COST_PER_MINUTE_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
 const STT_COST_PER_SECOND_USD = STT_COST_WITH_MARKUP_USD / 60;
 export const STT_COST_PER_SECOND = STT_COST_PER_SECOND_USD / CREDIT_VALUE_USD;
 
@@ -75,12 +68,9 @@ export const STT_COST_PER_SECOND = STT_COST_PER_SECOND_USD / CREDIT_VALUE_USD;
 const BRAVE_SEARCH_BASE_COST_PER_1000_USD = 5.0;
 const BRAVE_SEARCH_COST_WITH_MARKUP_USD =
   BRAVE_SEARCH_BASE_COST_PER_1000_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
-const BRAVE_SEARCH_COST_PER_REQUEST_USD =
-  BRAVE_SEARCH_COST_WITH_MARKUP_USD / 1000;
-const BRAVE_SEARCH_COST_CALCULATED =
-  BRAVE_SEARCH_COST_PER_REQUEST_USD / CREDIT_VALUE_USD;
-export const BRAVE_SEARCH_COST_PER_REQUEST =
-  Math.round(BRAVE_SEARCH_COST_CALCULATED * 100) / 100;
+const BRAVE_SEARCH_COST_PER_REQUEST_USD = BRAVE_SEARCH_COST_WITH_MARKUP_USD / 1000;
+const BRAVE_SEARCH_COST_CALCULATED = BRAVE_SEARCH_COST_PER_REQUEST_USD / CREDIT_VALUE_USD;
+export const BRAVE_SEARCH_COST_PER_REQUEST = Math.round(BRAVE_SEARCH_COST_CALCULATED * 100) / 100;
 
 /**
  * Feature Costs Object
@@ -233,11 +223,7 @@ export interface ProductsRepository {
   /**
    * Get a specific product for a locale with optional interval
    */
-  getProduct(
-    productId: ProductIds,
-    locale: CountryLanguage,
-    interval?: PaymentInterval,
-  ): Product;
+  getProduct(productId: ProductIds, locale: CountryLanguage, interval?: PaymentInterval): Product;
 
   /**
    * Get all products for a specific locale
@@ -309,12 +295,12 @@ export class ProductsRepositoryImpl implements ProductsRepository {
       credits: definition.credits,
       country,
       status: definition.status || "active",
-      deprecatedAt: ("deprecatedAt" in definition
-        ? definition.deprecatedAt
-        : undefined) as Date | undefined,
-      replacedBy: ("replacedBy" in definition
-        ? definition.replacedBy
-        : undefined) as ProductIds | undefined,
+      deprecatedAt: ("deprecatedAt" in definition ? definition.deprecatedAt : undefined) as
+        | Date
+        | undefined,
+      replacedBy: ("replacedBy" in definition ? definition.replacedBy : undefined) as
+        | ProductIds
+        | undefined,
     };
   }
 
@@ -324,10 +310,7 @@ export class ProductsRepositoryImpl implements ProductsRepository {
   getProducts(locale: CountryLanguage): Record<ProductIds, Product> {
     return {
       [ProductIds.FREE_TIER]: this.getProduct(ProductIds.FREE_TIER, locale),
-      [ProductIds.SUBSCRIPTION]: this.getProduct(
-        ProductIds.SUBSCRIPTION,
-        locale,
-      ),
+      [ProductIds.SUBSCRIPTION]: this.getProduct(ProductIds.SUBSCRIPTION, locale),
       [ProductIds.CREDIT_PACK]: this.getProduct(ProductIds.CREDIT_PACK, locale),
     };
   }
@@ -355,9 +338,7 @@ export class ProductsRepositoryImpl implements ProductsRepository {
    */
   getReplacementProduct(productId: ProductIds): ProductIds | null {
     const definition = productDefinitions[productId];
-    return (
-      "replacedBy" in definition ? definition.replacedBy || null : null
-    ) as ProductIds | null;
+    return ("replacedBy" in definition ? definition.replacedBy || null : null) as ProductIds | null;
   }
 
   /**
@@ -387,10 +368,8 @@ export class ProductsRepositoryImpl implements ProductsRepository {
     const packPrice = creditPack.priceByCountry[country].price;
     const packCurrency = creditPack.priceByCountry[country].currency;
 
-    const subCurrencySymbol =
-      subCurrency === "EUR" ? "€" : subCurrency === "PLN" ? "zł" : "$";
-    const packCurrencySymbol =
-      packCurrency === "EUR" ? "€" : packCurrency === "PLN" ? "zł" : "$";
+    const subCurrencySymbol = subCurrency === "EUR" ? "€" : subCurrency === "PLN" ? "zł" : "$";
+    const packCurrencySymbol = packCurrency === "EUR" ? "€" : packCurrency === "PLN" ? "zł" : "$";
 
     return t("app.api.products.summary", {
       freeCredits: freeTier.credits,
@@ -448,9 +427,7 @@ export function getPlanPriceForCountry(
   country: Countries,
   isAnnual: boolean,
 ): number {
-  return isAnnual
-    ? plan.priceByCountry[country].annual
-    : plan.priceByCountry[country].monthly;
+  return isAnnual ? plan.priceByCountry[country].annual : plan.priceByCountry[country].monthly;
 }
 
 /**
@@ -475,18 +452,14 @@ export function calculateSavingsPercent(locale: CountryLanguage): number {
     }
   }
 
-  return validPlansCount === 0
-    ? 0
-    : Math.round(totalSavingsPercent / validPlansCount);
+  return validPlansCount === 0 ? 0 : Math.round(totalSavingsPercent / validPlansCount);
 }
 
 /**
  * Build pricing plans with icon components
  * Note: Icons are lazy-loaded to avoid circular dependencies
  */
-function buildPricingPlans(
-  icon?: JSX.Element,
-): Record<typeof SubscriptionPlanValue, PricingPlan> {
+function buildPricingPlans(icon?: JSX.Element): Record<typeof SubscriptionPlanValue, PricingPlan> {
   const definitions = productsRepository.getProductDefinitions();
   const subscriptionDef = definitions[ProductIds.SUBSCRIPTION];
 

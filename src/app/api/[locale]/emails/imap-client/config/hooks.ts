@@ -14,9 +14,7 @@ import definitions from "./definition";
 /**
  * Hook for fetching IMAP configuration
  */
-export function useImapConfig(
-  logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
+export function useImapConfig(logger: EndpointLogger): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

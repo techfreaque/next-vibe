@@ -5,49 +5,40 @@ export const translations = {
       "Migration-Tracking reparieren, um ordnungsgemäße Zustand für Produktions-Builds sicherzustellen",
     form: {
       title: "Migration-Reparatur Optionen",
-      description:
-        "Konfigurieren Sie die Einstellungen für die Migration-Reparatur-Operation",
+      description: "Konfigurieren Sie die Einstellungen für die Migration-Reparatur-Operation",
     },
     errors: {
       validation: {
         title: "Validierungsfehler",
-        description:
-          "Die bereitgestellten Migration-Reparatur-Parameter sind ungültig",
+        description: "Die bereitgestellten Migration-Reparatur-Parameter sind ungültig",
       },
       network: {
         title: "Netzwerkfehler",
-        description:
-          "Verbindung zur Datenbank für Migration-Reparatur fehlgeschlagen",
+        description: "Verbindung zur Datenbank für Migration-Reparatur fehlgeschlagen",
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie sind nicht berechtigt, Migration-Reparatur-Operationen durchzuführen",
+        description: "Sie sind nicht berechtigt, Migration-Reparatur-Operationen durchzuführen",
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Migration-Reparatur-Operationen sind für Ihre Rolle nicht erlaubt",
+        description: "Migration-Reparatur-Operationen sind für Ihre Rolle nicht erlaubt",
       },
       notFound: {
         title: "Nicht gefunden",
-        description:
-          "Die angeforderte Migration-Reparatur-Ressource wurde nicht gefunden",
+        description: "Die angeforderte Migration-Reparatur-Ressource wurde nicht gefunden",
       },
       server: {
         title: "Serverfehler",
-        description:
-          "Ein interner Serverfehler ist während der Migration-Reparatur aufgetreten",
+        description: "Ein interner Serverfehler ist während der Migration-Reparatur aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description:
-          "Ein unerwarteter Fehler ist während der Migration-Reparatur aufgetreten",
+        description: "Ein unerwarteter Fehler ist während der Migration-Reparatur aufgetreten",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "Ein Konflikt ist während der Migration-Reparatur-Operation aufgetreten",
+        description: "Ein Konflikt ist während der Migration-Reparatur-Operation aufgetreten",
       },
     },
     success: {
@@ -62,13 +53,11 @@ export const translations = {
     },
     dryRun: {
       title: "Probelauf",
-      description:
-        "Zeigen was getan würde, ohne tatsächlich Änderungen auszuführen",
+      description: "Zeigen was getan würde, ohne tatsächlich Änderungen auszuführen",
     },
     reset: {
       title: "Tracking zurücksetzen",
-      description:
-        "Migration-Tracking zurücksetzen (alle verfolgten Migrationen löschen)",
+      description: "Migration-Tracking zurücksetzen (alle verfolgten Migrationen löschen)",
     },
     success: {
       title: "Erfolg",
@@ -96,13 +85,11 @@ export const translations = {
     },
   },
   messages: {
-    upToDate:
-      "✅ Migration-Tracking ist auf dem neuesten Stand - keine Reparatur erforderlich",
+    upToDate: "✅ Migration-Tracking ist auf dem neuesten Stand - keine Reparatur erforderlich",
     dryRunComplete: "✅ Probelauf abgeschlossen - keine Änderungen vorgenommen",
     repairComplete:
       "✅ Migration-Reparatur erfolgreich abgeschlossen! {{count}} Migrationen als angewendet markiert",
-    success:
-      "✅ Migration-Reparatur erfolgreich abgeschlossen! 🚀 Bereit für Produktions-Builds",
+    success: "✅ Migration-Reparatur erfolgreich abgeschlossen! 🚀 Bereit für Produktions-Builds",
   },
   tag: "Datenbank",
 };

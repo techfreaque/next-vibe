@@ -40,8 +40,7 @@ export const translations: typeof enTranslations = {
       },
       moderatorIds: {
         title: "ID moderatorów",
-        description:
-          "Lista identyfikatorów użytkowników, którzy mogą moderować ten folder",
+        description: "Lista identyfikatorów użytkowników, którzy mogą moderować ten folder",
         content: "ID użytkownika",
       },
     },
@@ -56,13 +55,11 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description:
-          "Musisz być zalogowany, aby wyświetlić uprawnienia folderu",
+        description: "Musisz być zalogowany, aby wyświetlić uprawnienia folderu",
       },
       forbidden: {
         title: "Zabroniony",
-        description:
-          "Nie masz uprawnień do wyświetlania uprawnień tego folderu",
+        description: "Nie masz uprawnień do wyświetlania uprawnień tego folderu",
       },
       notFound: {
         title: "Nie znaleziono",
@@ -129,8 +126,7 @@ export const translations: typeof enTranslations = {
       title: "Aktualizacja uprawnień",
       moderatorIds: {
         label: "ID moderatorów",
-        description:
-          "Lista identyfikatorów użytkowników, którzy mogą moderować ten folder",
+        description: "Lista identyfikatorów użytkowników, którzy mogą moderować ten folder",
       },
     },
     response: {
@@ -175,18 +171,15 @@ export const translations: typeof enTranslations = {
       },
       network: {
         title: "Błąd sieci",
-        description:
-          "Wystąpił błąd sieci podczas aktualizacji uprawnień folderu",
+        description: "Wystąpił błąd sieci podczas aktualizacji uprawnień folderu",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description:
-          "Musisz być zalogowany, aby aktualizować uprawnienia folderu",
+        description: "Musisz być zalogowany, aby aktualizować uprawnienia folderu",
       },
       forbidden: {
         title: "Zabroniony",
-        description:
-          "Nie masz uprawnień do aktualizacji uprawnień tego folderu",
+        description: "Nie masz uprawnień do aktualizacji uprawnień tego folderu",
       },
       notFound: {
         title: "Nie znaleziono",

@@ -44,8 +44,7 @@ export const translations: typeof enTranslations = {
     },
     internal: {
       title: "Interner Fehler",
-      description:
-        "Testausführung aufgrund eines internen Fehlers fehlgeschlagen",
+      description: "Testausführung aufgrund eines internen Fehlers fehlgeschlagen",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -69,8 +68,7 @@ export const translations: typeof enTranslations = {
     },
     unsaved: {
       title: "Ungespeicherte Änderungen",
-      description:
-        "Es gibt ungespeicherte Änderungen, die Tests beeinflussen könnten",
+      description: "Es gibt ungespeicherte Änderungen, die Tests beeinflussen könnten",
     },
     conflict: {
       title: "Konflikt",

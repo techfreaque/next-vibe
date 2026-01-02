@@ -12,10 +12,7 @@ import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  type Character,
-  getCharacterById,
-} from "@/app/api/[locale]/agent/chat/characters/config";
+import { type Character, getCharacterById } from "@/app/api/[locale]/agent/chat/characters/config";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -44,9 +41,7 @@ const FEATURED_CHARACTER_IDS = ["thea", "hermes"] as const;
  * Get featured characters for onboarding
  */
 function getFeaturedCharacters(): Character[] {
-  return FEATURED_CHARACTER_IDS.map(getCharacterById).filter(
-    (p): p is Character => p !== null,
-  );
+  return FEATURED_CHARACTER_IDS.map(getCharacterById).filter((p): p is Character => p !== null);
 }
 
 /**
@@ -67,12 +62,7 @@ function StepIndicator({
   return (
     <Div className="flex items-center justify-between px-4 py-2 border-b shrink-0">
       {onBack ? (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 px-2 -ml-2"
-          onClick={onBack}
-        >
+        <Button variant="ghost" size="sm" className="h-8 px-2 -ml-2" onClick={onBack}>
           <ArrowLeft className="h-4 w-4 mr-1" />
           {t("app.chat.onboarding.back")}
         </Button>
@@ -131,9 +121,7 @@ function CompanionCard({
           className={cn(
             "w-16 h-16 rounded-2xl bg-linear-to-br from-primary/20 to-primary/10",
             "flex items-center justify-center ring-2 transition-all shadow-sm overflow-hidden",
-            isSelected
-              ? "ring-primary"
-              : "ring-transparent group-hover:ring-primary/40",
+            isSelected ? "ring-primary" : "ring-transparent group-hover:ring-primary/40",
           )}
         >
           {character.avatar ? (
@@ -156,9 +144,7 @@ function CompanionCard({
       </Div>
 
       {/* Name */}
-      <Span className="text-lg font-bold text-center mb-1">
-        {t(character.name)}
-      </Span>
+      <Span className="text-lg font-bold text-center mb-1">{t(character.name)}</Span>
 
       {/* Tagline */}
       <Span className="text-sm font-medium text-primary text-center mb-2">
@@ -191,9 +177,7 @@ function StoryStep({
       <Div className="text-center mb-6 shrink-0">
         {/* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */}
         <Div className="text-5xl mb-4">{"\uD83D\uDC4B"}</Div>
-        <H3 className="text-xl font-bold mb-2">
-          {t("app.chat.onboarding.story.title")}
-        </H3>
+        <H3 className="text-xl font-bold mb-2">{t("app.chat.onboarding.story.title")}</H3>
       </Div>
 
       {/* Story content */}
@@ -201,19 +185,13 @@ function StoryStep({
         <Div className="space-y-4 text-sm text-muted-foreground">
           <P>{t("app.chat.onboarding.story.line1")}</P>
           <P>{t("app.chat.onboarding.story.line2")}</P>
-          <P className="font-medium text-foreground">
-            {t("app.chat.onboarding.story.line3")}
-          </P>
+          <P className="font-medium text-foreground">{t("app.chat.onboarding.story.line3")}</P>
         </Div>
       </Div>
 
       {/* Continue button */}
       <Div className="shrink-0">
-        <Button
-          type="button"
-          className="w-full h-11 text-base gap-2"
-          onClick={onContinue}
-        >
+        <Button type="button" className="w-full h-11 text-base gap-2" onClick={onContinue}>
           {t("app.chat.onboarding.story.continue")}
           <ArrowRight className="h-4 w-4" />
         </Button>
@@ -245,12 +223,8 @@ function PickStep({
     <Div className="flex flex-col p-5 overflow-y-auto">
       {/* Header */}
       <Div className="text-center mb-5 shrink-0">
-        <H3 className="text-lg font-bold mb-1">
-          {t("app.chat.onboarding.pick.title")}
-        </H3>
-        <P className="text-sm text-muted-foreground">
-          {t("app.chat.onboarding.pick.subtitle")}
-        </P>
+        <H3 className="text-lg font-bold mb-1">{t("app.chat.onboarding.pick.title")}</H3>
+        <P className="text-sm text-muted-foreground">{t("app.chat.onboarding.pick.subtitle")}</P>
       </Div>
 
       {/* Companion cards */}
@@ -366,9 +340,7 @@ export function SelectorOnboarding({
   onSelectedIdChange,
 }: SelectorOnboardingProps): JSX.Element {
   const [step, setStep] = useState<OnboardingStep>(initialStep);
-  const [selectedId, setSelectedId] = useState<string | null>(
-    initialSelectedId,
-  );
+  const [selectedId, setSelectedId] = useState<string | null>(initialSelectedId);
   const [isSaving, setIsSaving] = useState(false);
 
   const stepIndex = step === "story" ? 0 : step === "pick" ? 1 : 2;
@@ -451,9 +423,7 @@ export function SelectorOnboarding({
         locale={locale}
       />
 
-      {step === "story" && (
-        <StoryStep onContinue={handleContinueToTeam} locale={locale} />
-      )}
+      {step === "story" && <StoryStep onContinue={handleContinueToTeam} locale={locale} />}
 
       {step === "pick" && (
         <PickStep

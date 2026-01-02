@@ -29,10 +29,7 @@ const { POST } = createEndpoint({
   description: "app.api.browser.list-network-requests.description",
   category: "app.api.browser.category",
   icon: "network",
-  tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.networkAnalysis",
-  ],
+  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.networkAnalysis"],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -56,8 +53,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.browser.list-network-requests.form.fields.includePreservedRequests.label",
+          label: "app.api.browser.list-network-requests.form.fields.includePreservedRequests.label",
           description:
             "app.api.browser.list-network-requests.form.fields.includePreservedRequests.description",
           placeholder:
@@ -68,56 +64,43 @@ const { POST } = createEndpoint({
           .boolean()
           .optional()
           .default(false)
-          .describe(
-            "Set to true to return the preserved requests over the last 3 navigations.",
-          ),
+          .describe("Set to true to return the preserved requests over the last 3 navigations."),
       ),
       pageIdx: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.browser.list-network-requests.form.fields.pageIdx.label",
-          description:
-            "app.api.browser.list-network-requests.form.fields.pageIdx.description",
-          placeholder:
-            "app.api.browser.list-network-requests.form.fields.pageIdx.placeholder",
+          label: "app.api.browser.list-network-requests.form.fields.pageIdx.label",
+          description: "app.api.browser.list-network-requests.form.fields.pageIdx.description",
+          placeholder: "app.api.browser.list-network-requests.form.fields.pageIdx.placeholder",
           columns: 4,
         },
         z
           .number()
           .min(0)
           .optional()
-          .describe(
-            "Page number to return (0-based). When omitted, returns the first page.",
-          ),
+          .describe("Page number to return (0-based). When omitted, returns the first page."),
       ),
       pageSize: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.browser.list-network-requests.form.fields.pageSize.label",
-          description:
-            "app.api.browser.list-network-requests.form.fields.pageSize.description",
-          placeholder:
-            "app.api.browser.list-network-requests.form.fields.pageSize.placeholder",
+          label: "app.api.browser.list-network-requests.form.fields.pageSize.label",
+          description: "app.api.browser.list-network-requests.form.fields.pageSize.description",
+          placeholder: "app.api.browser.list-network-requests.form.fields.pageSize.placeholder",
           columns: 4,
         },
         z
           .number()
           .min(1)
           .optional()
-          .describe(
-            "Maximum number of requests to return. When omitted, returns all requests.",
-          ),
+          .describe("Maximum number of requests to return. When omitted, returns all requests."),
       ),
       resourceTypes: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.browser.list-network-requests.form.fields.resourceTypes.label",
+          label: "app.api.browser.list-network-requests.form.fields.resourceTypes.label",
           description:
             "app.api.browser.list-network-requests.form.fields.resourceTypes.description",
           placeholder:
@@ -160,16 +143,13 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.browser.list-network-requests.response.success",
         },
-        z
-          .boolean()
-          .describe("Whether the network requests listing operation succeeded"),
+        z.boolean().describe("Whether the network requests listing operation succeeded"),
       ),
       result: objectOptionalField(
         {
           type: WidgetType.CONTAINER,
           title: "app.api.browser.list-network-requests.response.result.title",
-          description:
-            "app.api.browser.list-network-requests.response.result.description",
+          description: "app.api.browser.list-network-requests.response.result.description",
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -189,16 +169,14 @@ const { POST } = createEndpoint({
                 reqid: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-network-requests.response.result.requests.reqid",
+                    content: "app.api.browser.list-network-requests.response.result.requests.reqid",
                   },
                   z.coerce.number(),
                 ),
                 url: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-network-requests.response.result.requests.url",
+                    content: "app.api.browser.list-network-requests.response.result.requests.url",
                   },
                   z.string(),
                 ),
@@ -221,8 +199,7 @@ const { POST } = createEndpoint({
                 type: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.browser.list-network-requests.response.result.requests.type",
+                    content: "app.api.browser.list-network-requests.response.result.requests.type",
                   },
                   z.string(),
                 ),
@@ -232,8 +209,7 @@ const { POST } = createEndpoint({
           totalCount: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.browser.list-network-requests.response.result.totalCount",
+              content: "app.api.browser.list-network-requests.response.result.totalCount",
             },
             z.coerce.number().describe("Total number of requests"),
           ),
@@ -282,49 +258,39 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.browser.list-network-requests.errors.validation.title",
-      description:
-        "app.api.browser.list-network-requests.errors.validation.description",
+      description: "app.api.browser.list-network-requests.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.browser.list-network-requests.errors.network.title",
-      description:
-        "app.api.browser.list-network-requests.errors.network.description",
+      description: "app.api.browser.list-network-requests.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.browser.list-network-requests.errors.unauthorized.title",
-      description:
-        "app.api.browser.list-network-requests.errors.unauthorized.description",
+      description: "app.api.browser.list-network-requests.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.browser.list-network-requests.errors.forbidden.title",
-      description:
-        "app.api.browser.list-network-requests.errors.forbidden.description",
+      description: "app.api.browser.list-network-requests.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.browser.list-network-requests.errors.notFound.title",
-      description:
-        "app.api.browser.list-network-requests.errors.notFound.description",
+      description: "app.api.browser.list-network-requests.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.browser.list-network-requests.errors.serverError.title",
-      description:
-        "app.api.browser.list-network-requests.errors.serverError.description",
+      description: "app.api.browser.list-network-requests.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.browser.list-network-requests.errors.unknown.title",
-      description:
-        "app.api.browser.list-network-requests.errors.unknown.description",
+      description: "app.api.browser.list-network-requests.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.browser.list-network-requests.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.list-network-requests.errors.unsavedChanges.description",
+      title: "app.api.browser.list-network-requests.errors.unsavedChanges.title",
+      description: "app.api.browser.list-network-requests.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.list-network-requests.errors.conflict.title",
-      description:
-        "app.api.browser.list-network-requests.errors.conflict.description",
+      description: "app.api.browser.list-network-requests.errors.conflict.description",
     },
   },
   successTypes: {
@@ -336,8 +302,7 @@ const { POST } = createEndpoint({
 export type ListNetworkRequestsRequestInput = typeof POST.types.RequestInput;
 export type ListNetworkRequestsRequestOutput = typeof POST.types.RequestOutput;
 export type ListNetworkRequestsResponseInput = typeof POST.types.ResponseInput;
-export type ListNetworkRequestsResponseOutput =
-  typeof POST.types.ResponseOutput;
+export type ListNetworkRequestsResponseOutput = typeof POST.types.ResponseOutput;
 
 const endpoints = { POST };
 export default endpoints;

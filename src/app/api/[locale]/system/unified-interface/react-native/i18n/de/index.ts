@@ -12,8 +12,7 @@ export const translations: typeof enTranslations = {
   generate: {
     post: {
       title: "Expo Indizes Generieren",
-      description:
-        "Expo Router Kompatibilitäts-Wrapper für Next.js-Seiten generieren",
+      description: "Expo Router Kompatibilitäts-Wrapper für Next.js-Seiten generieren",
       response: {
         fields: {
           success: "Erfolg",
@@ -42,8 +41,7 @@ export const translations: typeof enTranslations = {
         },
         forbidden: {
           title: "Verboten",
-          description:
-            "Sie haben keine Berechtigung, diese Aktion durchzuführen",
+          description: "Sie haben keine Berechtigung, diese Aktion durchzuführen",
         },
         notFound: {
           title: "Nicht gefunden",

@@ -17,8 +17,7 @@ export const translations: typeof enTranslations = {
       resubscribe_info:
         "Jeśli zmienisz zdanie, zawsze możesz ponownie zapisać się odwiedzając naszą stronę",
       resubscribe_button: "Zapisz ponownie",
-      support_message:
-        "Jeśli masz jakieś pytania, skontaktuj się z naszym zespołem wsparcia",
+      support_message: "Jeśli masz jakieś pytania, skontaktuj się z naszym zespołem wsparcia",
       subject: "Potwierdzenie wypisania z newslettera",
       admin_unsubscribe_notification: {
         title: "Powiadomienie o wypisaniu z newslettera",
@@ -38,8 +37,7 @@ export const translations: typeof enTranslations = {
   errors: {
     internal: {
       title: "Błąd wewnętrzny",
-      description:
-        "Wystąpił błąd podczas przetwarzania Twojego żądania wypisania",
+      description: "Wystąpił błąd podczas przetwarzania Twojego żądania wypisania",
     },
   },
   post: {
@@ -47,8 +45,7 @@ export const translations: typeof enTranslations = {
     description: "Wypisz się z aktualizacji newslettera",
     form: {
       title: "Wypisz się z newslettera",
-      description:
-        "Wprowadź swój adres e-mail, aby wypisać się z naszego newslettera",
+      description: "Wprowadź swój adres e-mail, aby wypisać się z naszego newslettera",
     },
     response: {
       title: "Odpowiedź wypisania",
@@ -65,8 +62,7 @@ export const translations: typeof enTranslations = {
       },
       internal: {
         title: "Błąd wewnętrzny",
-        description:
-          "Wystąpił błąd podczas przetwarzania Twojego żądania wypisania",
+        description: "Wystąpił błąd podczas przetwarzania Twojego żądania wypisania",
       },
       forbidden: {
         title: "Zabronione",
@@ -97,8 +93,7 @@ export const translations: typeof enTranslations = {
       },
       admin_notification_failed: {
         title: "Nieudane powiadomienie SMS administratora",
-        description:
-          "Nie udało się wysłać SMS z powiadomieniem dla administratora",
+        description: "Nie udało się wysłać SMS z powiadomieniem dla administratora",
       },
     },
   },

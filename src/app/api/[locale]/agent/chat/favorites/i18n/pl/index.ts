@@ -196,8 +196,7 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nie znaleziono",
-        description:
-          "Element, który próbujesz dodać do ulubionych, nie istnieje",
+        description: "Element, który próbujesz dodać do ulubionych, nie istnieje",
       },
       server: {
         title: "Błąd serwera",

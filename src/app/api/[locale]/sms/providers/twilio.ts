@@ -41,10 +41,7 @@ export function getTwilioProvider(): SmsProvider {
   return {
     name: SmsProviders.TWILIO,
 
-    async sendSms(
-      params: SendSmsParams,
-      logger: EndpointLogger,
-    ): Promise<ResponseType<SmsResult>> {
+    async sendSms(params: SendSmsParams, logger: EndpointLogger): Promise<ResponseType<SmsResult>> {
       try {
         // Validate credentials
         if (!accountSid) {
@@ -97,11 +94,7 @@ export function getTwilioProvider(): SmsProvider {
           });
         }
 
-        if (
-          !params.message ||
-          typeof params.message !== "string" ||
-          params.message.trim() === ""
-        ) {
+        if (!params.message || typeof params.message !== "string" || params.message.trim() === "") {
           return fail({
             message: "app.api.sms.sms.error.empty_message",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
@@ -123,9 +116,7 @@ export function getTwilioProvider(): SmsProvider {
           optionsEntries.forEach(([key, value]) => {
             if (
               !["headers", "extraFields", "provider"].includes(key) &&
-              (typeof value === "string" ||
-                typeof value === "number" ||
-                typeof value === "boolean")
+              (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
             ) {
               formData.append(key, String(value));
             }
@@ -143,10 +134,7 @@ export function getTwilioProvider(): SmsProvider {
         };
 
         // Type-safe header merging
-        if (
-          params.options?.headers &&
-          typeof params.options.headers === "object"
-        ) {
+        if (params.options?.headers && typeof params.options.headers === "object") {
           // Type guard for headers
           const headersObj = params.options.headers;
           Object.entries(headersObj).forEach(([key, value]) => {
@@ -178,8 +166,7 @@ export function getTwilioProvider(): SmsProvider {
             // eslint-disable-next-line i18next/no-literal-string -- Technical error message from Twilio API
             "Unknown Twilio error";
 
-          const errorCode =
-            errorData.code ?? errorData.error_code ?? response.status;
+          const errorCode = errorData.code ?? errorData.error_code ?? response.status;
 
           return fail({
             message: "app.api.sms.sms.error.delivery_failed",

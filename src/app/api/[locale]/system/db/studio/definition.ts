@@ -65,8 +65,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.db.studio.fields.openBrowser.title",
-          description:
-            "app.api.system.db.studio.fields.openBrowser.description",
+          description: "app.api.system.db.studio.fields.openBrowser.description",
           columns: 6,
         },
         z.boolean().optional().default(true),
@@ -119,13 +118,11 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.db.studio.post.errors.validation.title",
-      description:
-        "app.api.system.db.studio.post.errors.validation.description",
+      description: "app.api.system.db.studio.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.db.studio.post.errors.unauthorized.title",
-      description:
-        "app.api.system.db.studio.post.errors.unauthorized.description",
+      description: "app.api.system.db.studio.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.db.studio.post.errors.server.title",
@@ -185,8 +182,7 @@ const { POST } = createEndpoint({
         success: true,
         url: "https://local.drizzle.studio/?port=5555",
         portUsed: 5555,
-        output:
-          "✅ Database Studio opened at https://local.drizzle.studio/?port=5555",
+        output: "✅ Database Studio opened at https://local.drizzle.studio/?port=5555",
         duration: 1200,
       },
       customPort: {
@@ -201,8 +197,7 @@ const { POST } = createEndpoint({
         success: true,
         url: "https://local.drizzle.studio/?port=5555",
         portUsed: 5555,
-        output:
-          "✅ Database Studio started at https://local.drizzle.studio/?port=5555",
+        output: "✅ Database Studio started at https://local.drizzle.studio/?port=5555",
         duration: 600,
       },
     },

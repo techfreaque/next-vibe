@@ -58,62 +58,48 @@ export function useBranchPersistence({
    * Validate branch indices against current message tree
    * Returns sanitized indices with invalid ones removed
    */
-  const validateIndices = useCallback(
-    (indices: Record<string, number>): Record<string, number> => {
-      const validated: Record<string, number> = {};
-      const currentMessages = messagesRef.current;
+  const validateIndices = useCallback((indices: Record<string, number>): Record<string, number> => {
+    const validated: Record<string, number> = {};
+    const currentMessages = messagesRef.current;
 
-      // Build map of parent -> children
-      const childrenMap = new Map<string, ChatMessage[]>();
-      const rootMessages = currentMessages.filter((msg) => !msg.parentId);
+    // Build map of parent -> children
+    const childrenMap = new Map<string, ChatMessage[]>();
+    const rootMessages = currentMessages.filter((msg) => !msg.parentId);
 
-      for (const msg of currentMessages) {
-        if (msg.parentId) {
-          const siblings = childrenMap.get(msg.parentId) || [];
-          siblings.push(msg);
-          childrenMap.set(msg.parentId, siblings);
+    for (const msg of currentMessages) {
+      if (msg.parentId) {
+        const siblings = childrenMap.get(msg.parentId) || [];
+        siblings.push(msg);
+        childrenMap.set(msg.parentId, siblings);
+      }
+    }
+
+    // Validate each stored index
+    for (const [parentId, index] of Object.entries(indices)) {
+      // Special case: root level branches
+      if (parentId === "__root__") {
+        if (rootMessages.length > 1 && index >= 0 && index < rootMessages.length) {
+          validated["__root__"] = index;
         }
+        continue;
       }
 
-      // Validate each stored index
-      for (const [parentId, index] of Object.entries(indices)) {
-        // Special case: root level branches
-        if (parentId === "__root__") {
-          if (
-            rootMessages.length > 1 &&
-            index >= 0 &&
-            index < rootMessages.length
-          ) {
-            validated["__root__"] = index;
-          }
-          continue;
-        }
-
-        // Check if parent exists and has children
-        const children = childrenMap.get(parentId);
-        if (
-          children &&
-          children.length > 1 &&
-          index >= 0 &&
-          index < children.length
-        ) {
-          validated[parentId] = index;
-        }
-        // If validation fails, index is simply not included (defaults to 0)
+      // Check if parent exists and has children
+      const children = childrenMap.get(parentId);
+      if (children && children.length > 1 && index >= 0 && index < children.length) {
+        validated[parentId] = index;
       }
+      // If validation fails, index is simply not included (defaults to 0)
+    }
 
-      return validated;
-    },
-    [],
-  );
+    return validated;
+  }, []);
 
   /**
    * Load persisted branch state from storage
    * Validates and sanitizes the data
    */
-  const loadPersistedState = useCallback(async (): Promise<
-    Record<string, number>
-  > => {
+  const loadPersistedState = useCallback(async (): Promise<Record<string, number>> => {
     // Don't load state if no valid thread ID
     if (!threadId || threadId.length === 0) {
       return {};
@@ -209,10 +195,7 @@ export function useBranchPersistence({
           await storage.setItem(key, JSON.stringify(state));
         } catch (error) {
           // storage might be full or unavailable
-          logger.error(
-            "[BranchPersistence] Error saving state:",
-            parseError(error),
-          );
+          logger.error("[BranchPersistence] Error saving state:", parseError(error));
         }
       })();
     },

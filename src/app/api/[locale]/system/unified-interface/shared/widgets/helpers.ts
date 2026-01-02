@@ -45,21 +45,11 @@ export interface WidgetTheme {
  * Widget factory for creating common widget patterns
  */
 export interface WidgetFactory<TKey extends string> {
-  createFormField(
-    config: Partial<FormFieldWidgetConfig<TKey>>,
-  ): FormFieldWidgetConfig<TKey>;
-  createDataTable(
-    config: Partial<DataTableWidgetConfig<TKey>>,
-  ): DataTableWidgetConfig<TKey>;
-  createMetricCard(
-    config: Partial<MetricCardWidgetConfig<TKey>>,
-  ): MetricCardWidgetConfig<TKey>;
-  createChart(
-    config: Partial<ChartWidgetConfig<TKey>>,
-  ): ChartWidgetConfig<TKey>;
-  createContainer(
-    config: Partial<ContainerWidgetConfig<TKey>>,
-  ): ContainerWidgetConfig<TKey>;
+  createFormField(config: Partial<FormFieldWidgetConfig<TKey>>): FormFieldWidgetConfig<TKey>;
+  createDataTable(config: Partial<DataTableWidgetConfig<TKey>>): DataTableWidgetConfig<TKey>;
+  createMetricCard(config: Partial<MetricCardWidgetConfig<TKey>>): MetricCardWidgetConfig<TKey>;
+  createChart(config: Partial<ChartWidgetConfig<TKey>>): ChartWidgetConfig<TKey>;
+  createContainer(config: Partial<ContainerWidgetConfig<TKey>>): ContainerWidgetConfig<TKey>;
 }
 
 /**

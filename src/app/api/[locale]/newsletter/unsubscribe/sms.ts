@@ -6,11 +6,7 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -48,9 +44,7 @@ export interface NewsletterUnsubscribeSmsService {
 /**
  * SMS Service Repository Implementation for Newsletter Unsubscriptions
  */
-export class NewsletterUnsubscribeSmsServiceImpl
-  implements NewsletterUnsubscribeSmsService
-{
+export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscribeSmsService {
   /**
    * Send confirmation SMS to user who unsubscribed from newsletter
    */
@@ -66,13 +60,10 @@ export class NewsletterUnsubscribeSmsServiceImpl
       const userPhone: string | undefined = undefined;
 
       if (!userPhone) {
-        logger.debug(
-          "No phone number available for unsubscribe confirmation SMS",
-          {
-            unsubscribeEmail: unsubscribeData.email,
-            userId: user?.id,
-          },
-        );
+        logger.debug("No phone number available for unsubscribe confirmation SMS", {
+          unsubscribeEmail: unsubscribeData.email,
+          userId: user?.id,
+        });
         return success({
           messageId: "",
           sent: false,
@@ -84,12 +75,9 @@ export class NewsletterUnsubscribeSmsServiceImpl
         userPhone,
       });
       const { t } = simpleT(locale);
-      const message = t(
-        "app.api.newsletter.unsubscribe.sms.confirmation.message",
-        {
-          email: unsubscribeData.email,
-        },
-      );
+      const message = t("app.api.newsletter.unsubscribe.sms.confirmation.message", {
+        email: unsubscribeData.email,
+      });
 
       const smsResult = await smsServiceRepository.sendSms(
         {
@@ -103,8 +91,7 @@ export class NewsletterUnsubscribeSmsServiceImpl
 
       if (!smsResult.success) {
         return fail({
-          message:
-            "app.api.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
+          message: "app.api.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: smsResult.message || t("app.common.error.sending_sms"),
@@ -117,13 +104,9 @@ export class NewsletterUnsubscribeSmsServiceImpl
         sent: true,
       });
     } catch (error) {
-      logger.error(
-        "Error sending unsubscribe confirmation SMS",
-        parseError(error),
-      );
+      logger.error("Error sending unsubscribe confirmation SMS", parseError(error));
       return fail({
-        message:
-          "app.api.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
+        message: "app.api.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -144,34 +127,25 @@ export class NewsletterUnsubscribeSmsServiceImpl
       const adminPhone = smsEnv.ADMIN_NOTIFICATION_PHONE;
 
       if (!adminPhone) {
-        logger.debug(
-          "No admin phone number configured, skipping SMS notification",
-          {
-            unsubscribeEmail: unsubscribeData.email,
-          },
-        );
+        logger.debug("No admin phone number configured, skipping SMS notification", {
+          unsubscribeEmail: unsubscribeData.email,
+        });
         return success({
           messageId: "",
           sent: false,
         });
       }
 
-      logger.debug(
-        "Sending admin notification SMS for newsletter unsubscribe",
-        {
-          unsubscribeEmail: unsubscribeData.email,
-          adminPhone,
-        },
-      );
+      logger.debug("Sending admin notification SMS for newsletter unsubscribe", {
+        unsubscribeEmail: unsubscribeData.email,
+        adminPhone,
+      });
 
       const { t } = simpleT(locale);
 
-      const message = t(
-        "app.api.newsletter.unsubscribe.sms.admin_notification.message",
-        {
-          email: unsubscribeData.email,
-        },
-      );
+      const message = t("app.api.newsletter.unsubscribe.sms.admin_notification.message", {
+        email: unsubscribeData.email,
+      });
 
       const smsResult = await smsServiceRepository.sendSms(
         {
@@ -185,8 +159,7 @@ export class NewsletterUnsubscribeSmsServiceImpl
 
       if (!smsResult.success) {
         return fail({
-          message:
-            "app.api.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
+          message: "app.api.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: t(smsResult.message) || t("app.common.error.sending_sms"),
@@ -201,8 +174,7 @@ export class NewsletterUnsubscribeSmsServiceImpl
     } catch (error) {
       logger.error("Error sending admin notification SMS", parseError(error));
       return fail({
-        message:
-          "app.api.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
+        message: "app.api.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -213,8 +185,7 @@ export class NewsletterUnsubscribeSmsServiceImpl
 /**
  * SMS Service Singleton Instance
  */
-export const newsletterUnsubscribeSmsService =
-  new NewsletterUnsubscribeSmsServiceImpl();
+export const newsletterUnsubscribeSmsService = new NewsletterUnsubscribeSmsServiceImpl();
 
 /**
  * Convenience function: Send confirmation SMS
@@ -225,12 +196,7 @@ export const sendConfirmationSms = (
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
-  return newsletterUnsubscribeSmsService.sendConfirmationSms(
-    unsubscribeData,
-    user,
-    locale,
-    logger,
-  );
+  return newsletterUnsubscribeSmsService.sendConfirmationSms(unsubscribeData, user, locale, logger);
 };
 
 /**

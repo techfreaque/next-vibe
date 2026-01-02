@@ -2,10 +2,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
+import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
 import { useCallback } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -53,10 +50,8 @@ export function useEndpointDelete<TEndpoint extends CreateApiEndpointAny>(
     return null;
   }
 
-  const {
-    mutationOptions = {},
-    urlPathParams = {} as TEndpoint["types"]["UrlVariablesOutput"],
-  } = options;
+  const { mutationOptions = {}, urlPathParams = {} as TEndpoint["types"]["UrlVariablesOutput"] } =
+    options;
 
   // Use the existing mutation hook for consistency
   const mutation = useApiMutation(deleteEndpoint, logger, mutationOptions);

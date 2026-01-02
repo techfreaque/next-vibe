@@ -52,9 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * Contact page component
  * Displays contact form and company information
  */
-export default async function ContactPage({
-  params,
-}: Props): Promise<JSX.Element> {
+export default async function ContactPage({ params }: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -70,14 +68,8 @@ export default async function ContactPage({
 
   // Get pricing data
   const freeTier = productsRepository.getProduct(ProductIds.FREE_TIER, locale);
-  const subscription = productsRepository.getProduct(
-    ProductIds.SUBSCRIPTION,
-    locale,
-  );
-  const creditPack = productsRepository.getProduct(
-    ProductIds.CREDIT_PACK,
-    locale,
-  );
+  const subscription = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
+  const creditPack = productsRepository.getProduct(ProductIds.CREDIT_PACK, locale);
 
   const formatPrice = (amount: number, currency: string): string => {
     return new Intl.NumberFormat(locale, {
@@ -138,10 +130,7 @@ export default async function ContactPage({
               </H3>
               <P className="text-gray-600 dark:text-gray-300">
                 {t("app.help.pages.help.faq.questions.q2.answer", {
-                  subPrice: formatPrice(
-                    subscription.price,
-                    subscription.currency,
-                  ),
+                  subPrice: formatPrice(subscription.price, subscription.currency),
                   subCredits: subscription.credits,
                   packPrice: formatPrice(creditPack.price, creditPack.currency),
                   packCredits: creditPack.credits,
@@ -155,10 +144,7 @@ export default async function ContactPage({
               <P className="text-gray-600 dark:text-gray-300">
                 {t("app.help.pages.help.faq.questions.q3.answer", {
                   freeCredits: freeTier.credits,
-                  subPrice: formatPrice(
-                    subscription.price,
-                    subscription.currency,
-                  ),
+                  subPrice: formatPrice(subscription.price, subscription.currency),
                   subCredits: subscription.credits,
                   packPrice: formatPrice(creditPack.price, creditPack.currency),
                   packCredits: creditPack.credits,

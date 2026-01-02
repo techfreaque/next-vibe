@@ -75,10 +75,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.smsService.send.campaignType.label",
-          description:
-            "app.api.emails.smsService.send.campaignType.description",
-          placeholder:
-            "app.api.emails.smsService.send.campaignType.placeholder",
+          description: "app.api.emails.smsService.send.campaignType.description",
+          placeholder: "app.api.emails.smsService.send.campaignType.placeholder",
           columns: 6,
           options: CampaignTypeOptions,
         },
@@ -102,10 +100,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.smsService.send.templateName.label",
-          description:
-            "app.api.emails.smsService.send.templateName.description",
-          placeholder:
-            "app.api.emails.smsService.send.templateName.placeholder",
+          description: "app.api.emails.smsService.send.templateName.description",
+          placeholder: "app.api.emails.smsService.send.templateName.placeholder",
           columns: 6,
         },
         z.string().optional(),
@@ -116,8 +112,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.emails.smsService.send.response.result.title",
-          description:
-            "app.api.emails.smsService.send.response.result.description",
+          description: "app.api.emails.smsService.send.response.result.description",
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -133,8 +128,7 @@ const { POST } = createEndpoint({
           messageId: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.smsService.send.response.result.messageId",
+              content: "app.api.emails.smsService.send.response.result.messageId",
             },
             z.string(),
           ),
@@ -148,8 +142,7 @@ const { POST } = createEndpoint({
           provider: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.smsService.send.response.result.provider",
+              content: "app.api.emails.smsService.send.response.result.provider",
             },
             z.string().optional(),
           ),
@@ -169,18 +162,15 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.emails.smsService.send.errors.validation.title",
-      description:
-        "app.api.emails.smsService.send.errors.validation.description",
+      description: "app.api.emails.smsService.send.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.emails.smsService.send.errors.unauthorized.title",
-      description:
-        "app.api.emails.smsService.send.errors.unauthorized.description",
+      description: "app.api.emails.smsService.send.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.emails.smsService.send.errors.forbidden.title",
-      description:
-        "app.api.emails.smsService.send.errors.forbidden.description",
+      description: "app.api.emails.smsService.send.errors.forbidden.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.emails.smsService.send.errors.conflict.title",
@@ -204,8 +194,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.emails.smsService.send.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.smsService.send.errors.unsavedChanges.description",
+      description: "app.api.emails.smsService.send.errors.unsavedChanges.description",
     },
   },
 

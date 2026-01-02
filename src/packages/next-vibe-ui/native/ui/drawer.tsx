@@ -45,115 +45,105 @@ export function Drawer({
   const open = controlledOpen ?? uncontrolledOpen;
   const setOpen = onOpenChange ?? setUncontrolledOpen;
 
-  return (
-    <DrawerContext.Provider value={{ open, setOpen }}>
-      {children}
-    </DrawerContext.Provider>
-  );
+  return <DrawerContext.Provider value={{ open, setOpen }}>{children}</DrawerContext.Provider>;
 }
 
 Drawer.displayName = "Drawer";
 
-export const DrawerTrigger = React.forwardRef<
-  DrawerTriggerRefObject,
-  DrawerTriggerProps
->(({ children, asChild }, ref) => {
-  const { setOpen } = useDrawer();
-  const pressableRef = React.useRef<React.ElementRef<typeof Pressable>>(null);
+export const DrawerTrigger = React.forwardRef<DrawerTriggerRefObject, DrawerTriggerProps>(
+  ({ children, asChild }, ref) => {
+    const { setOpen } = useDrawer();
+    const pressableRef = React.useRef<React.ElementRef<typeof Pressable>>(null);
 
-  React.useImperativeHandle(ref, (): DrawerTriggerRefObject => {
-    return {
-      click: (): void => {
-        setOpen(true);
-      },
-      focus: (): void => {
-        // No-op for React Native
-      },
-      blur: (): void => {
-        // No-op for React Native
-      },
-    };
-  }, [setOpen]);
+    React.useImperativeHandle(ref, (): DrawerTriggerRefObject => {
+      return {
+        click: (): void => {
+          setOpen(true);
+        },
+        focus: (): void => {
+          // No-op for React Native
+        },
+        blur: (): void => {
+          // No-op for React Native
+        },
+      };
+    }, [setOpen]);
 
-  if (asChild && React.isValidElement(children)) {
-    // Clone element with properly typed onPress handler
-    const childElement = children as React.ReactElement<{
-      onPress?: () => void;
-    }>;
-    return React.cloneElement(childElement, {
-      onPress: () => {
-        setOpen(true);
-      },
-    });
-  }
+    if (asChild && React.isValidElement(children)) {
+      // Clone element with properly typed onPress handler
+      const childElement = children as React.ReactElement<{
+        onPress?: () => void;
+      }>;
+      return React.cloneElement(childElement, {
+        onPress: () => {
+          setOpen(true);
+        },
+      });
+    }
 
-  return (
-    <Pressable
-      ref={pressableRef}
-      onPress={() => {
-        setOpen(true);
-      }}
-    >
-      {children}
-    </Pressable>
-  );
-});
+    return (
+      <Pressable
+        ref={pressableRef}
+        onPress={() => {
+          setOpen(true);
+        }}
+      >
+        {children}
+      </Pressable>
+    );
+  },
+);
 
 DrawerTrigger.displayName = "DrawerTrigger";
 
-export const DrawerClose = React.forwardRef<
-  DrawerCloseRefObject,
-  DrawerCloseProps
->(({ children, asChild }, ref) => {
-  const { setOpen } = useDrawer();
-  const pressableRef = React.useRef<React.ElementRef<typeof Pressable>>(null);
+export const DrawerClose = React.forwardRef<DrawerCloseRefObject, DrawerCloseProps>(
+  ({ children, asChild }, ref) => {
+    const { setOpen } = useDrawer();
+    const pressableRef = React.useRef<React.ElementRef<typeof Pressable>>(null);
 
-  React.useImperativeHandle(ref, (): DrawerCloseRefObject => {
-    return {
-      click: (): void => {
-        setOpen(false);
-      },
-      focus: (): void => {
-        // No-op for React Native
-      },
-      blur: (): void => {
-        // No-op for React Native
-      },
-    };
-  }, [setOpen]);
+    React.useImperativeHandle(ref, (): DrawerCloseRefObject => {
+      return {
+        click: (): void => {
+          setOpen(false);
+        },
+        focus: (): void => {
+          // No-op for React Native
+        },
+        blur: (): void => {
+          // No-op for React Native
+        },
+      };
+    }, [setOpen]);
 
-  if (asChild && React.isValidElement(children)) {
-    // Clone element with properly typed onPress handler
-    const childElement = children as React.ReactElement<{
-      onPress?: () => void;
-    }>;
-    return React.cloneElement(childElement, {
-      onPress: () => {
-        setOpen(false);
-      },
-    });
-  }
+    if (asChild && React.isValidElement(children)) {
+      // Clone element with properly typed onPress handler
+      const childElement = children as React.ReactElement<{
+        onPress?: () => void;
+      }>;
+      return React.cloneElement(childElement, {
+        onPress: () => {
+          setOpen(false);
+        },
+      });
+    }
 
-  return (
-    <Pressable
-      ref={pressableRef}
-      onPress={() => {
-        setOpen(false);
-      }}
-    >
-      {children}
-    </Pressable>
-  );
-});
+    return (
+      <Pressable
+        ref={pressableRef}
+        onPress={() => {
+          setOpen(false);
+        }}
+      >
+        {children}
+      </Pressable>
+    );
+  },
+);
 
 DrawerClose.displayName = "DrawerClose";
 
 // Portal is a no-op in native, but exported for compatibility
-export function DrawerPortal({
-  children,
-}: {
-  children?: React.ReactNode;
-}): React.JSX.Element {
+export function DrawerPortal({ children }: { children?: React.ReactNode }): React.JSX.Element {
   return <>{children}</>;
 }
 
@@ -204,18 +194,11 @@ export function DrawerContent({
         >
           <View style={convertCSSToViewStyle({ flex: 1 })} />
         </Pressable>
-        <Animated.View
-          entering={SlideInDown}
-          exiting={SlideOutDown}
-          style={containerStyle}
-        >
+        <Animated.View entering={SlideInDown} exiting={SlideOutDown} style={containerStyle}>
           <View
             {...applyStyleType({
               nativeStyle,
-              className: cn(
-                "mt-24 flex flex-col rounded-t-[10px] border bg-background",
-                className,
-              ),
+              className: cn("mt-24 flex flex-col rounded-t-[10px] border bg-background", className),
             })}
           >
             <View className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
@@ -229,11 +212,7 @@ export function DrawerContent({
 
 DrawerContent.displayName = "DrawerContent";
 
-export function DrawerHeader({
-  className,
-  style,
-  children,
-}: DrawerHeaderProps): React.JSX.Element {
+export function DrawerHeader({ className, style, children }: DrawerHeaderProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <View
@@ -249,11 +228,7 @@ export function DrawerHeader({
 
 DrawerHeader.displayName = "DrawerHeader";
 
-export function DrawerFooter({
-  className,
-  style,
-  children,
-}: DrawerFooterProps): React.JSX.Element {
+export function DrawerFooter({ className, style, children }: DrawerFooterProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <View
@@ -269,11 +244,7 @@ export function DrawerFooter({
 
 DrawerFooter.displayName = "DrawerFooter";
 
-export function DrawerTitle({
-  className,
-  style,
-  children,
-}: DrawerTitleProps): React.JSX.Element {
+export function DrawerTitle({ className, style, children }: DrawerTitleProps): React.JSX.Element {
   const nativeStyle = style
     ? convertCSSToViewStyle(style)
     : convertCSSToViewStyle({

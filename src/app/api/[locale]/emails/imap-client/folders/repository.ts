@@ -6,15 +6,8 @@
 import "server-only";
 
 import { and, count, desc, eq, ilike } from "drizzle-orm";
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -182,8 +175,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         // whereConditions.push(eq(imapFolders.specialUseType, data.specialUseType[0]));
       }
 
-      const whereClause =
-        whereConditions.length > 0 ? and(...whereConditions) : undefined;
+      const whereClause = whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
       // Get total count
       const [{ count: totalCount }] = await db
@@ -212,13 +204,9 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         },
       });
     } catch (error) {
-      logger.error(
-        "app.api.emails.imapClient.folders.list.error.server",
-        parseError(error),
-      );
+      logger.error("app.api.emails.imapClient.folders.list.error.server", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
+        message: "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -247,21 +235,16 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
       if (!folder) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.folders.get.error.not_found.title",
+          message: "app.api.emails.imapClient.imapErrors.folders.get.error.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       return success(this.formatFolderResponse(folder));
     } catch (error) {
-      logger.error(
-        "app.api.emails.imapClient.folders.get.error.server",
-        parseError(error),
-      );
+      logger.error("app.api.emails.imapClient.folders.get.error.server", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
+        message: "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -293,8 +276,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
         if (account.length === 0) {
           return fail({
-            message:
-              "app.api.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
+            message: "app.api.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
@@ -311,19 +293,10 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
           const syncResults: FoldersSyncResponseOutput = {
             foldersProcessed:
-              typeof result.foldersProcessed === "number"
-                ? result.foldersProcessed
-                : 0,
-            foldersAdded:
-              typeof result.foldersAdded === "number" ? result.foldersAdded : 0,
-            foldersUpdated:
-              typeof result.foldersUpdated === "number"
-                ? result.foldersUpdated
-                : 0,
-            foldersDeleted:
-              typeof result.foldersDeleted === "number"
-                ? result.foldersDeleted
-                : 0,
+              typeof result.foldersProcessed === "number" ? result.foldersProcessed : 0,
+            foldersAdded: typeof result.foldersAdded === "number" ? result.foldersAdded : 0,
+            foldersUpdated: typeof result.foldersUpdated === "number" ? result.foldersUpdated : 0,
+            foldersDeleted: typeof result.foldersDeleted === "number" ? result.foldersDeleted : 0,
             duration: typeof result.duration === "number" ? result.duration : 0,
             success: true,
           };
@@ -335,18 +308,13 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         });
       }
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.sync.error.missing_account.title",
+        message: "app.api.emails.imapClient.imapErrors.folders.sync.error.missing_account.title",
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     } catch (error) {
-      logger.error(
-        "app.api.emails.imapClient.folders.sync.error.server",
-        parseError(error),
-      );
+      logger.error("app.api.emails.imapClient.folders.sync.error.server", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
+        message: "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -383,13 +351,9 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         },
       });
     } catch (error) {
-      logger.error(
-        "app.api.emails.imapClient.folders.byAccount.error.server",
-        parseError(error),
-      );
+      logger.error("app.api.emails.imapClient.folders.byAccount.error.server", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
+        message: "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -407,14 +371,11 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean }>> {
     try {
-      logger.debug(
-        "app.api.emails.imapClient.folders.updateSyncStatus.info.start",
-        {
-          folderId,
-          syncStatus,
-          userId: user.id,
-        },
-      );
+      logger.debug("app.api.emails.imapClient.folders.updateSyncStatus.info.start", {
+        folderId,
+        syncStatus,
+        userId: user.id,
+      });
 
       const [updatedFolder] = await db
         .update(imapFolders)
@@ -429,8 +390,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
       if (!updatedFolder) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.folders.get.error.not_found.title",
+          message: "app.api.emails.imapClient.imapErrors.folders.get.error.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -442,8 +402,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         parseError(error),
       );
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
+        message: "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -460,14 +419,11 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean }>> {
     try {
-      logger.debug(
-        "app.api.emails.imapClient.folders.updateCounts.info.start",
-        {
-          folderId,
-          counts,
-          userId: user.id,
-        },
-      );
+      logger.debug("app.api.emails.imapClient.folders.updateCounts.info.start", {
+        folderId,
+        counts,
+        userId: user.id,
+      });
 
       const [updatedFolder] = await db
         .update(imapFolders)
@@ -481,8 +437,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
       if (!updatedFolder) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.folders.get.error.not_found.title",
+          message: "app.api.emails.imapClient.imapErrors.folders.get.error.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -494,8 +449,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         parseError(error),
       );
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
+        message: "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

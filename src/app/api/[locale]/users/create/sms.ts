@@ -68,12 +68,9 @@ export class UserCreateSmsServiceImpl implements UserCreateSmsService {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
     // SMS functionality not available - phone field not in schema
-    logger.debug(
-      "SMS functionality not available (no phone field in user schema)",
-      {
-        userId: userData.responseId,
-      },
-    );
+    logger.debug("SMS functionality not available (no phone field in user schema)", {
+      userId: userData.responseId,
+    });
     return Promise.resolve(
       success({
         messageId: "",
@@ -90,12 +87,9 @@ export class UserCreateSmsServiceImpl implements UserCreateSmsService {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
     // SMS functionality not available - phone field not in schema
-    logger.debug(
-      "SMS functionality not available (no phone field in user schema)",
-      {
-        userId: userData.responseId,
-      },
-    );
+    logger.debug("SMS functionality not available (no phone field in user schema)", {
+      userId: userData.responseId,
+    });
     return Promise.resolve(
       success({
         messageId: "",
@@ -107,10 +101,7 @@ export class UserCreateSmsServiceImpl implements UserCreateSmsService {
   /**
    * Generate welcome message for new user
    */
-  private generateWelcomeMessage(
-    userData: UserCreateResponseOutput,
-    t: TFunction,
-  ): string {
+  private generateWelcomeMessage(userData: UserCreateResponseOutput, t: TFunction): string {
     return getSmsMessage("welcome", t, {
       privateName: userData.responsePrivateName,
       appUrl: env.NEXT_PUBLIC_APP_URL,

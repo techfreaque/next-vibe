@@ -132,10 +132,7 @@ export class ChatFoldersRepository {
 
           // System folders (PUBLIC root categories) can have null userId
           // Only skip if it's not a PUBLIC folder
-          if (
-            !folder.userId &&
-            folder.rootFolderId !== DefaultFolderId.PUBLIC
-          ) {
+          if (!folder.userId && folder.rootFolderId !== DefaultFolderId.PUBLIC) {
             logger.warn("Folder has null userId in non-PUBLIC root, skipping", {
               folderId: folder.id,
               rootFolderId: folder.rootFolderId,
@@ -184,16 +181,13 @@ export class ChatFoldersRepository {
         canCreateFolder: false,
       };
       if (rootFolderId) {
-        const { RootFolderPermissionsRepository } = await import(
-          "./root-permissions/repository"
+        const { RootFolderPermissionsRepository } = await import("./root-permissions/repository");
+        const permissionsResult = await RootFolderPermissionsRepository.getRootFolderPermissions(
+          { rootFolderId },
+          user,
+          locale,
+          logger,
         );
-        const permissionsResult =
-          await RootFolderPermissionsRepository.getRootFolderPermissions(
-            { rootFolderId },
-            user,
-            locale,
-            logger,
-          );
         if (permissionsResult.success) {
           rootFolderPermissions = permissionsResult.data;
         }

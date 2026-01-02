@@ -52,8 +52,7 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.emails.imapClient.accounts.list.container.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.container.description",
+      description: "app.api.emails.imapClient.accounts.list.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -65,10 +64,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.emails.imapClient.accounts.list.fields.page.label",
-          description:
-            "app.api.emails.imapClient.accounts.list.fields.page.description",
-          placeholder:
-            "app.api.emails.imapClient.accounts.list.fields.page.placeholder",
+          description: "app.api.emails.imapClient.accounts.list.fields.page.description",
+          placeholder: "app.api.emails.imapClient.accounts.list.fields.page.placeholder",
           columns: 2,
         },
         z.coerce.number().min(1).default(1),
@@ -79,10 +76,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.emails.imapClient.accounts.list.fields.limit.label",
-          description:
-            "app.api.emails.imapClient.accounts.list.fields.limit.description",
-          placeholder:
-            "app.api.emails.imapClient.accounts.list.fields.limit.placeholder",
+          description: "app.api.emails.imapClient.accounts.list.fields.limit.description",
+          placeholder: "app.api.emails.imapClient.accounts.list.fields.limit.placeholder",
           columns: 2,
         },
         z.coerce.number().min(1).max(100).default(20),
@@ -93,10 +88,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.imapClient.accounts.list.fields.search.label",
-          description:
-            "app.api.emails.imapClient.accounts.list.fields.search.description",
-          placeholder:
-            "app.api.emails.imapClient.accounts.list.fields.search.placeholder",
+          description: "app.api.emails.imapClient.accounts.list.fields.search.description",
+          placeholder: "app.api.emails.imapClient.accounts.list.fields.search.placeholder",
           columns: 4,
         },
         z.string().optional(),
@@ -107,16 +100,12 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.imapClient.accounts.list.fields.status.label",
-          description:
-            "app.api.emails.imapClient.accounts.list.fields.status.description",
-          placeholder:
-            "app.api.emails.imapClient.accounts.list.fields.status.placeholder",
+          description: "app.api.emails.imapClient.accounts.list.fields.status.description",
+          placeholder: "app.api.emails.imapClient.accounts.list.fields.status.placeholder",
           options: ImapAccountStatusFilterOptions,
           columns: 2,
         },
-        z
-          .nativeEnum(ImapAccountStatusFilter)
-          .default(ImapAccountStatusFilter.ALL),
+        z.nativeEnum(ImapAccountStatusFilter).default(ImapAccountStatusFilter.ALL),
       ),
 
       enabled: requestDataField(
@@ -124,8 +113,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.emails.imapClient.accounts.list.fields.enabled.label",
-          description:
-            "app.api.emails.imapClient.accounts.list.fields.enabled.description",
+          description: "app.api.emails.imapClient.accounts.list.fields.enabled.description",
           columns: 2,
         },
         z.boolean().optional(),
@@ -136,28 +124,21 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.imapClient.accounts.list.fields.sortBy.label",
-          description:
-            "app.api.emails.imapClient.accounts.list.fields.sortBy.description",
-          placeholder:
-            "app.api.emails.imapClient.accounts.list.fields.sortBy.placeholder",
+          description: "app.api.emails.imapClient.accounts.list.fields.sortBy.description",
+          placeholder: "app.api.emails.imapClient.accounts.list.fields.sortBy.placeholder",
           options: ImapAccountSortFieldOptions,
           columns: 2,
         },
-        z
-          .nativeEnum(ImapAccountSortField)
-          .default(ImapAccountSortField.CREATED_AT),
+        z.nativeEnum(ImapAccountSortField).default(ImapAccountSortField.CREATED_AT),
       ),
 
       sortOrder: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.emails.imapClient.accounts.list.fields.sortOrder.label",
-          description:
-            "app.api.emails.imapClient.accounts.list.fields.sortOrder.description",
-          placeholder:
-            "app.api.emails.imapClient.accounts.list.fields.sortOrder.placeholder",
+          label: "app.api.emails.imapClient.accounts.list.fields.sortOrder.label",
+          description: "app.api.emails.imapClient.accounts.list.fields.sortOrder.description",
+          placeholder: "app.api.emails.imapClient.accounts.list.fields.sortOrder.placeholder",
           options: SortOrderOptions,
           columns: 2,
         },
@@ -182,40 +163,35 @@ const { GET } = createEndpoint({
             id: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.accounts.list.response.accounts.item.id",
+                content: "app.api.emails.imapClient.accounts.list.response.accounts.item.id",
               },
               z.uuid(),
             ),
             name: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.accounts.list.response.accounts.item.name",
+                content: "app.api.emails.imapClient.accounts.list.response.accounts.item.name",
               },
               z.string(),
             ),
             email: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.accounts.list.response.accounts.item.email",
+                content: "app.api.emails.imapClient.accounts.list.response.accounts.item.email",
               },
               z.email(),
             ),
             host: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.accounts.list.response.accounts.item.host",
+                content: "app.api.emails.imapClient.accounts.list.response.accounts.item.host",
               },
               z.string(),
             ),
             port: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.accounts.list.response.accounts.item.port",
+                content: "app.api.emails.imapClient.accounts.list.response.accounts.item.port",
               },
               z.coerce.number(),
             ),
@@ -229,8 +205,7 @@ const { GET } = createEndpoint({
             username: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.accounts.list.response.accounts.item.username",
+                content: "app.api.emails.imapClient.accounts.list.response.accounts.item.username",
               },
               z.string(),
             ),
@@ -305,8 +280,7 @@ const { GET } = createEndpoint({
             syncError: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.accounts.list.response.accounts.item.syncError",
+                content: "app.api.emails.imapClient.accounts.list.response.accounts.item.syncError",
               },
               z.string().nullable(),
             ),
@@ -320,16 +294,14 @@ const { GET } = createEndpoint({
             createdAt: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.accounts.list.response.accounts.item.createdAt",
+                content: "app.api.emails.imapClient.accounts.list.response.accounts.item.createdAt",
               },
               z.string(),
             ),
             updatedAt: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.accounts.list.response.accounts.item.updatedAt",
+                content: "app.api.emails.imapClient.accounts.list.response.accounts.item.updatedAt",
               },
               z.string(),
             ),
@@ -340,10 +312,8 @@ const { GET } = createEndpoint({
       pagination: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.emails.imapClient.accounts.list.response.pagination.title",
-          description:
-            "app.api.emails.imapClient.accounts.list.response.pagination.description",
+          title: "app.api.emails.imapClient.accounts.list.response.pagination.title",
+          description: "app.api.emails.imapClient.accounts.list.response.pagination.description",
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -352,32 +322,28 @@ const { GET } = createEndpoint({
           page: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.pagination.page",
+              content: "app.api.emails.imapClient.accounts.list.response.pagination.page",
             },
             z.coerce.number(),
           ),
           limit: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.pagination.limit",
+              content: "app.api.emails.imapClient.accounts.list.response.pagination.limit",
             },
             z.coerce.number(),
           ),
           total: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.pagination.total",
+              content: "app.api.emails.imapClient.accounts.list.response.pagination.total",
             },
             z.coerce.number(),
           ),
           totalPages: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.pagination.totalPages",
+              content: "app.api.emails.imapClient.accounts.list.response.pagination.totalPages",
             },
             z.coerce.number(),
           ),
@@ -390,49 +356,39 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.emails.imapClient.accounts.list.errors.validation.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.validation.description",
+      description: "app.api.emails.imapClient.accounts.list.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.imapClient.accounts.list.errors.unauthorized.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.unauthorized.description",
+      title: "app.api.emails.imapClient.accounts.list.errors.unauthorized.title",
+      description: "app.api.emails.imapClient.accounts.list.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.emails.imapClient.accounts.list.errors.forbidden.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.forbidden.description",
+      description: "app.api.emails.imapClient.accounts.list.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.emails.imapClient.accounts.list.errors.notFound.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.notFound.description",
+      description: "app.api.emails.imapClient.accounts.list.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.emails.imapClient.accounts.list.errors.server.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.server.description",
+      description: "app.api.emails.imapClient.accounts.list.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.imapClient.accounts.list.errors.unknown.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.unknown.description",
+      description: "app.api.emails.imapClient.accounts.list.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.emails.imapClient.accounts.list.errors.unsaved.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.unsaved.description",
+      description: "app.api.emails.imapClient.accounts.list.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.emails.imapClient.accounts.list.errors.conflict.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.conflict.description",
+      description: "app.api.emails.imapClient.accounts.list.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.emails.imapClient.accounts.list.errors.network.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.network.description",
+      description: "app.api.emails.imapClient.accounts.list.errors.network.description",
     },
   },
 

@@ -3,10 +3,7 @@
  * Utilities for preparing message content for text-to-speech
  */
 
-import type {
-  ChatMessage,
-  ToolCallResult,
-} from "@/app/api/[locale]/agent/chat/db";
+import type { ChatMessage, ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -150,12 +147,9 @@ export async function extractToolCallText(
   // Load the definition using the same loader as ToolCallRenderer
   // This ensures we get the exact same title that's displayed in the UI
   try {
-    const { createPublicUser } = await import(
-      "@/app/api/[locale]/user/auth/helpers"
-    );
-    const { createEndpointLogger } = await import(
-      "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint"
-    );
+    const { createPublicUser } = await import("@/app/api/[locale]/user/auth/helpers");
+    const { createEndpointLogger } =
+      await import("@/app/api/[locale]/system/unified-interface/shared/logger/endpoint");
 
     const user = createPublicUser(crypto.randomUUID());
     const logger = createEndpointLogger(true, Date.now(), locale);
@@ -172,13 +166,9 @@ export async function extractToolCallText(
       return t(result.data.title);
     }
   } catch (error) {
-    logger.warn(
-      "[TTS Content] Failed to load tool definition",
-      parseError(error),
-      {
-        toolName,
-      },
-    );
+    logger.warn("[TTS Content] Failed to load tool definition", parseError(error), {
+      toolName,
+    });
   }
 
   // Fallback: use the tool name (last part after the last dot)
@@ -234,9 +224,7 @@ export async function processMessageGroupForTTS(
   );
 
   // Filter out empty messages
-  const nonEmptyMessages = processedMessages.filter(
-    (text) => text.trim().length > 0,
-  );
+  const nonEmptyMessages = processedMessages.filter((text) => text.trim().length > 0);
 
   // Join with double newline for clear separation
   return nonEmptyMessages.join("\n\n");

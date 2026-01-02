@@ -3,10 +3,7 @@
 import { Button } from "next-vibe-ui/ui/button";
 import type { JSX } from "react";
 
-import {
-  getIconComponent,
-  type IconValue,
-} from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { getIconComponent, type IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
 
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
@@ -37,9 +34,7 @@ export function ButtonWidget<const TKey extends string>({
   const handleClick = async (): Promise<void> => {
     if (!actionId) {
       // eslint-disable-next-line no-console
-      console.warn(
-        "ButtonWidget: No actionId specified in button configuration",
-      );
+      console.warn("ButtonWidget: No actionId specified in button configuration");
       return;
     }
 
@@ -50,9 +45,7 @@ export function ButtonWidget<const TKey extends string>({
     if (actionId === "delete") {
       if (!context.endpointMutations?.delete) {
         // eslint-disable-next-line no-console
-        console.warn(
-          "ButtonWidget: Delete action requested but no delete endpoint available",
-        );
+        console.warn("ButtonWidget: Delete action requested but no delete endpoint available");
         return;
       }
 
@@ -65,9 +58,7 @@ export function ButtonWidget<const TKey extends string>({
     if (actionId === "edit") {
       if (!context.endpointMutations?.update) {
         // eslint-disable-next-line no-console
-        console.warn(
-          "ButtonWidget: Edit action requested but no update endpoint available",
-        );
+        console.warn("ButtonWidget: Edit action requested but no update endpoint available");
         return;
       }
 

@@ -52,7 +52,6 @@ export const translations: typeof enTranslations = {
     },
   },
   error: {
-    internal_error:
-      "Interner Fehler während der Übersetzungsreorganisation aufgetreten",
+    internal_error: "Interner Fehler während der Übersetzungsreorganisation aufgetreten",
   },
 };

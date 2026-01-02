@@ -15,11 +15,7 @@ import { useTranslation } from "@/i18n/core/client";
  */
 type OptionsRecord = Record<string, WidgetData>;
 
-import type {
-  EndpointReturn,
-  FormAlertState,
-  UseEndpointOptions,
-} from "./endpoint-types";
+import type { EndpointReturn, FormAlertState, UseEndpointOptions } from "./endpoint-types";
 import {
   mergeCreateOptions,
   mergeDeleteOptions,
@@ -47,9 +43,7 @@ import { useEndpointRead } from "./use-endpoint-read";
  * @param options - Configuration options for forms and queries
  * @returns Object with all available operations based on endpoint methods
  */
-export function useEndpoint<
-  T extends Partial<Record<Methods, CreateApiEndpointAny>>,
->(
+export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointAny>>>(
   endpoints: T,
   options: UseEndpointOptions<T> = {},
   logger: EndpointLogger,
@@ -68,21 +62,14 @@ export function useEndpoint<
       : never
     : never;
 
-  const primaryEndpoint = primaryMutationMethod
-    ? (endpoints[primaryMutationMethod] ?? null)
-    : null;
+  const primaryEndpoint = primaryMutationMethod ? (endpoints[primaryMutationMethod] ?? null) : null;
 
   const deleteEndpoint = endpoints.DELETE ?? null;
 
   // Merge endpoint options with hook options (hook options take priority)
   const mergedReadOptions = useMemo(() => {
-    const endpointReadOptions = readEndpoint?.options as
-      | OptionsRecord
-      | undefined;
-    return mergeReadOptions(
-      endpointReadOptions,
-      options.read as OptionsRecord | undefined,
-    );
+    const endpointReadOptions = readEndpoint?.options as OptionsRecord | undefined;
+    return mergeReadOptions(endpointReadOptions, options.read as OptionsRecord | undefined);
   }, [readEndpoint?.options, options.read]);
 
   // Compute read options with defaults
@@ -92,18 +79,14 @@ export function useEndpoint<
     options.queryOptions?.enabled ??
     true;
   const readUrlPathParams =
-    mergedReadOptions.urlPathParams ??
-    options.urlPathParams ??
-    options.queryOptions?.urlPathParams;
+    mergedReadOptions.urlPathParams ?? options.urlPathParams ?? options.queryOptions?.urlPathParams;
   const readStaleTime =
     (mergedReadOptions.queryOptions?.staleTime as number | undefined) ??
     options.staleTime ??
     options.queryOptions?.staleTime ??
     5 * 60 * 1000;
   const readRefetchOnWindowFocus =
-    (mergedReadOptions.queryOptions?.refetchOnWindowFocus as
-      | boolean
-      | undefined) ??
+    (mergedReadOptions.queryOptions?.refetchOnWindowFocus as boolean | undefined) ??
     options.refetchOnWindowFocus ??
     options.queryOptions?.refetchOnWindowFocus ??
     true;
@@ -112,18 +95,10 @@ export function useEndpoint<
   // Use read hook for GET endpoints
   const read = useEndpointRead(readEndpoint, logger, {
     formOptions: {
-      persistForm:
-        (mergedReadOptions.formOptions?.persistForm as boolean | undefined) ??
-        false,
-      persistenceKey: mergedReadOptions.formOptions?.persistenceKey as
-        | string
-        | undefined,
-      autoSubmit: mergedReadOptions.formOptions?.autoSubmit as
-        | boolean
-        | undefined,
-      debounceMs: mergedReadOptions.formOptions?.debounceMs as
-        | number
-        | undefined,
+      persistForm: (mergedReadOptions.formOptions?.persistForm as boolean | undefined) ?? false,
+      persistenceKey: mergedReadOptions.formOptions?.persistenceKey as string | undefined,
+      autoSubmit: mergedReadOptions.formOptions?.autoSubmit as boolean | undefined,
+      debounceMs: mergedReadOptions.formOptions?.debounceMs as number | undefined,
     },
     queryOptions: {
       enabled: readQueryEnabled,
@@ -137,8 +112,7 @@ export function useEndpoint<
       showUnsavedChangesAlert: false,
       clearStorageAfterSubmit: false,
     },
-    initialState:
-      mergedReadOptions.initialState ?? options.filterOptions?.initialFilters,
+    initialState: mergedReadOptions.initialState ?? options.filterOptions?.initialFilters,
     initialData: options.read?.initialData,
   });
 
@@ -152,29 +126,18 @@ export function useEndpoint<
 
   // Merge endpoint create options with hook options (hook options take priority)
   const mergedCreateOptions = useMemo(() => {
-    const endpointCreateOptions = primaryEndpoint?.options as
-      | OptionsRecord
-      | undefined;
-    return mergeCreateOptions(
-      endpointCreateOptions,
-      options.create as OptionsRecord | undefined,
-    );
+    const endpointCreateOptions = primaryEndpoint?.options as OptionsRecord | undefined;
+    return mergeCreateOptions(endpointCreateOptions, options.create as OptionsRecord | undefined);
   }, [primaryEndpoint?.options, options.create]);
 
   // Compute create options with defaults
   const createUrlPathParams =
-    mergedCreateOptions.urlPathParams ??
-    options.urlPathParams ??
-    readUrlPathParams;
+    mergedCreateOptions.urlPathParams ?? options.urlPathParams ?? readUrlPathParams;
 
   // Build create options - keep types flowing from original options
   const createFormOptions = {
-    persistForm:
-      (mergedCreateOptions.formOptions?.persistForm as boolean | undefined) ??
-      false,
-    persistenceKey: mergedCreateOptions.formOptions?.persistenceKey as
-      | string
-      | undefined,
+    persistForm: (mergedCreateOptions.formOptions?.persistForm as boolean | undefined) ?? false,
+    persistenceKey: mergedCreateOptions.formOptions?.persistenceKey as string | undefined,
     defaultValues:
       mergedCreateOptions.formOptions?.defaultValues ??
       options.defaultValues ??
@@ -199,22 +162,15 @@ export function useEndpoint<
       mutationOptions: mergedCreateOptions.mutationOptions,
       urlPathParams: createUrlPathParams,
       autoPrefillData:
-        autoPrefillData ??
-        mergedCreateOptions.autoPrefillData ??
-        options.create?.autoPrefillData,
+        autoPrefillData ?? mergedCreateOptions.autoPrefillData ?? options.create?.autoPrefillData,
       initialState: mergedCreateOptions.initialState,
     } as Parameters<typeof useEndpointCreate<PrimaryEndpoint>>[2],
   );
 
   // Merge endpoint delete options with hook options (hook options take priority)
   const mergedDeleteOptions = useMemo(() => {
-    const endpointDeleteOptions = deleteEndpoint?.options as
-      | OptionsRecord
-      | undefined;
-    return mergeDeleteOptions(
-      endpointDeleteOptions,
-      options.delete as OptionsRecord | undefined,
-    );
+    const endpointDeleteOptions = deleteEndpoint?.options as OptionsRecord | undefined;
+    return mergeDeleteOptions(endpointDeleteOptions, options.delete as OptionsRecord | undefined);
   }, [deleteEndpoint?.options, options.delete]);
 
   const deleteOperation = useEndpointDelete(deleteEndpoint, logger, {
@@ -223,17 +179,11 @@ export function useEndpoint<
   });
 
   const isLoading =
-    read?.isLoading ||
-    createOperation?.isSubmitting ||
-    deleteOperation?.isSubmitting ||
-    false;
+    read?.isLoading || createOperation?.isSubmitting || deleteOperation?.isSubmitting || false;
 
   // Combined error state
   const error: ErrorResponseType | null =
-    read?.error ||
-    createOperation?.submitError ||
-    deleteOperation?.error ||
-    null;
+    read?.error || createOperation?.submitError || deleteOperation?.error || null;
 
   // Return the appropriate create operation
   const createValues = createOperation?.form.watch();
@@ -247,8 +197,7 @@ export function useEndpoint<
         isSuccess: createOperation.isSubmitSuccessful,
         isDirty: createOperation.form.formState.isDirty,
         error:
-          createOperation.submitError &&
-          Object.keys(createOperation.submitError).length > 0
+          createOperation.submitError && Object.keys(createOperation.submitError).length > 0
             ? createOperation.submitError
             : null,
       }
@@ -321,27 +270,16 @@ export function useEndpoint<
 
   // Merge endpoint patch options with hook options (hook options take priority)
   const mergedPatchOptions = useMemo(() => {
-    const endpointPatchOptions = patchEndpoint?.options as
-      | OptionsRecord
-      | undefined;
-    return mergeCreateOptions(
-      endpointPatchOptions,
-      options.update as OptionsRecord | undefined,
-    );
+    const endpointPatchOptions = patchEndpoint?.options as OptionsRecord | undefined;
+    return mergeCreateOptions(endpointPatchOptions, options.update as OptionsRecord | undefined);
   }, [patchEndpoint?.options, options.update]);
 
   const patchUrlPathParams =
-    mergedPatchOptions.urlPathParams ??
-    options.urlPathParams ??
-    readUrlPathParams;
+    mergedPatchOptions.urlPathParams ?? options.urlPathParams ?? readUrlPathParams;
 
   const patchFormOptions = {
-    persistForm:
-      (mergedPatchOptions.formOptions?.persistForm as boolean | undefined) ??
-      false,
-    persistenceKey: mergedPatchOptions.formOptions?.persistenceKey as
-      | string
-      | undefined,
+    persistForm: (mergedPatchOptions.formOptions?.persistForm as boolean | undefined) ?? false,
+    persistenceKey: mergedPatchOptions.formOptions?.persistenceKey as string | undefined,
     defaultValues:
       mergedPatchOptions.formOptions?.defaultValues ??
       options.defaultValues ??
@@ -362,9 +300,7 @@ export function useEndpoint<
       mutationOptions: mergedPatchOptions.mutationOptions,
       urlPathParams: patchUrlPathParams,
       autoPrefillData:
-        autoPrefillData ??
-        mergedPatchOptions.autoPrefillData ??
-        options.update?.autoPrefillData,
+        autoPrefillData ?? mergedPatchOptions.autoPrefillData ?? options.update?.autoPrefillData,
       initialState: mergedPatchOptions.initialState,
     } as Parameters<typeof useEndpointCreate<PatchEndpoint>>[2],
   );
@@ -376,15 +312,12 @@ export function useEndpoint<
         response: updateOperation.response,
         isSuccess: updateOperation.isSubmitSuccessful,
         error:
-          updateOperation.submitError &&
-          Object.keys(updateOperation.submitError).length > 0
+          updateOperation.submitError && Object.keys(updateOperation.submitError).length > 0
             ? updateOperation.submitError
             : null,
         values: updateValues,
         setValue: updateOperation.form.setValue.bind(updateOperation.form),
-        submit: async (
-          data: PatchEndpoint["types"]["RequestOutput"],
-        ): Promise<void> => {
+        submit: async (data: PatchEndpoint["types"]["RequestOutput"]): Promise<void> => {
           updateOperation.form.reset(data);
           await updateOperation.submitForm();
         },

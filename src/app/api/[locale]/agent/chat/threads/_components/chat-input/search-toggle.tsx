@@ -27,10 +27,7 @@ interface SearchToggleProps {
  * Note: Search is treated as one of the ~130 tools, but has a quick-access toggle for convenience
  * The toggle reads/writes to the same enabledTools state as the tools modal
  */
-export function SearchToggle({
-  disabled = false,
-  locale,
-}: SearchToggleProps): JSX.Element {
+export function SearchToggle({ disabled = false, locale }: SearchToggleProps): JSX.Element {
   const { enabledTools, setEnabledTools } = useChatContext();
   const { t } = simpleT(locale);
 
@@ -50,16 +47,11 @@ export function SearchToggle({
     if (checked) {
       // Add search tool if not already present
       if (!enabledTools.some((tool) => tool.id === SEARCH_TOOL_NAME)) {
-        setEnabledTools([
-          ...enabledTools,
-          { id: SEARCH_TOOL_NAME, requiresConfirmation: false },
-        ]);
+        setEnabledTools([...enabledTools, { id: SEARCH_TOOL_NAME, requiresConfirmation: false }]);
       }
     } else {
       // Remove search tool
-      setEnabledTools(
-        enabledTools.filter((tool) => tool.id !== SEARCH_TOOL_NAME),
-      );
+      setEnabledTools(enabledTools.filter((tool) => tool.id !== SEARCH_TOOL_NAME));
     }
   };
 

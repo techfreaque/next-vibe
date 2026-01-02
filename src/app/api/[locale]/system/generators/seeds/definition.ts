@@ -173,48 +173,39 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.generators.seeds.post.errors.validation.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.validation.description",
+      description: "app.api.system.generators.seeds.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.generators.seeds.post.errors.unauthorized.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.unauthorized.description",
+      description: "app.api.system.generators.seeds.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.generators.seeds.post.errors.forbidden.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.forbidden.description",
+      description: "app.api.system.generators.seeds.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.generators.seeds.post.errors.notFound.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.notFound.description",
+      description: "app.api.system.generators.seeds.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.generators.seeds.post.errors.server.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.server.description",
+      description: "app.api.system.generators.seeds.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.generators.seeds.post.errors.unknown.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.unknown.description",
+      description: "app.api.system.generators.seeds.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.generators.seeds.post.errors.unsavedChanges.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.unsavedChanges.description",
+      description: "app.api.system.generators.seeds.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.generators.seeds.post.errors.conflict.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.conflict.description",
+      description: "app.api.system.generators.seeds.post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.generators.seeds.post.errors.network.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.network.description",
+      description: "app.api.system.generators.seeds.post.errors.network.description",
     },
   },
   successTypes: {

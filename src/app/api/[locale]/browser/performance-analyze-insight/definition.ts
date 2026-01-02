@@ -27,10 +27,7 @@ const { POST } = createEndpoint({
   description: "app.api.browser.performance-analyze-insight.description",
   category: "app.api.browser.category",
   icon: "trending-up",
-  tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.performanceAutomation",
-  ],
+  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.performanceAutomation"],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -44,8 +41,7 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.browser.performance-analyze-insight.form.label",
-      description:
-        "app.api.browser.performance-analyze-insight.form.description",
+      description: "app.api.browser.performance-analyze-insight.form.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -55,8 +51,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.browser.performance-analyze-insight.form.fields.insightSetId.label",
+          label: "app.api.browser.performance-analyze-insight.form.fields.insightSetId.label",
           description:
             "app.api.browser.performance-analyze-insight.form.fields.insightSetId.description",
           placeholder:
@@ -73,8 +68,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.browser.performance-analyze-insight.form.fields.insightName.label",
+          label: "app.api.browser.performance-analyze-insight.form.fields.insightName.label",
           description:
             "app.api.browser.performance-analyze-insight.form.fields.insightName.description",
           placeholder:
@@ -92,20 +86,14 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.browser.performance-analyze-insight.response.success",
+          content: "app.api.browser.performance-analyze-insight.response.success",
         },
-        z
-          .boolean()
-          .describe(
-            "Whether the performance insight analysis operation succeeded",
-          ),
+        z.boolean().describe("Whether the performance insight analysis operation succeeded"),
       ),
       result: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.browser.performance-analyze-insight.response.result",
+          content: "app.api.browser.performance-analyze-insight.response.result",
         },
         z
           .object({
@@ -131,8 +119,7 @@ const { POST } = createEndpoint({
       executionId: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.browser.performance-analyze-insight.response.executionId",
+          content: "app.api.browser.performance-analyze-insight.response.executionId",
         },
         z.string().optional().describe("Unique identifier for this execution"),
       ),
@@ -160,73 +147,52 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.browser.performance-analyze-insight.errors.validation.title",
-      description:
-        "app.api.browser.performance-analyze-insight.errors.validation.description",
+      title: "app.api.browser.performance-analyze-insight.errors.validation.title",
+      description: "app.api.browser.performance-analyze-insight.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.browser.performance-analyze-insight.errors.network.title",
-      description:
-        "app.api.browser.performance-analyze-insight.errors.network.description",
+      description: "app.api.browser.performance-analyze-insight.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.browser.performance-analyze-insight.errors.unauthorized.title",
-      description:
-        "app.api.browser.performance-analyze-insight.errors.unauthorized.description",
+      title: "app.api.browser.performance-analyze-insight.errors.unauthorized.title",
+      description: "app.api.browser.performance-analyze-insight.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.browser.performance-analyze-insight.errors.forbidden.title",
-      description:
-        "app.api.browser.performance-analyze-insight.errors.forbidden.description",
+      title: "app.api.browser.performance-analyze-insight.errors.forbidden.title",
+      description: "app.api.browser.performance-analyze-insight.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.browser.performance-analyze-insight.errors.notFound.title",
-      description:
-        "app.api.browser.performance-analyze-insight.errors.notFound.description",
+      title: "app.api.browser.performance-analyze-insight.errors.notFound.title",
+      description: "app.api.browser.performance-analyze-insight.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.browser.performance-analyze-insight.errors.serverError.title",
-      description:
-        "app.api.browser.performance-analyze-insight.errors.serverError.description",
+      title: "app.api.browser.performance-analyze-insight.errors.serverError.title",
+      description: "app.api.browser.performance-analyze-insight.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.browser.performance-analyze-insight.errors.unknown.title",
-      description:
-        "app.api.browser.performance-analyze-insight.errors.unknown.description",
+      description: "app.api.browser.performance-analyze-insight.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.browser.performance-analyze-insight.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.performance-analyze-insight.errors.unsavedChanges.description",
+      title: "app.api.browser.performance-analyze-insight.errors.unsavedChanges.title",
+      description: "app.api.browser.performance-analyze-insight.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.browser.performance-analyze-insight.errors.conflict.title",
-      description:
-        "app.api.browser.performance-analyze-insight.errors.conflict.description",
+      title: "app.api.browser.performance-analyze-insight.errors.conflict.title",
+      description: "app.api.browser.performance-analyze-insight.errors.conflict.description",
     },
   },
   successTypes: {
     title: "app.api.browser.performance-analyze-insight.success.title",
-    description:
-      "app.api.browser.performance-analyze-insight.success.description",
+    description: "app.api.browser.performance-analyze-insight.success.description",
   },
 });
 
-export type PerformanceAnalyzeInsightRequestInput =
-  typeof POST.types.RequestInput;
-export type PerformanceAnalyzeInsightRequestOutput =
-  typeof POST.types.RequestOutput;
-export type PerformanceAnalyzeInsightResponseInput =
-  typeof POST.types.ResponseInput;
-export type PerformanceAnalyzeInsightResponseOutput =
-  typeof POST.types.ResponseOutput;
+export type PerformanceAnalyzeInsightRequestInput = typeof POST.types.RequestInput;
+export type PerformanceAnalyzeInsightRequestOutput = typeof POST.types.RequestOutput;
+export type PerformanceAnalyzeInsightResponseInput = typeof POST.types.ResponseInput;
+export type PerformanceAnalyzeInsightResponseOutput = typeof POST.types.ResponseOutput;
 
 const endpoints = { POST };
 export default endpoints;

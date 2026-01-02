@@ -7,8 +7,7 @@ export const translations: typeof enTranslations = {
     errors: {
       userNotFound:
         "Użytkownik CLI z adresem e-mail {{email}} nie został znaleziony w bazie danych. Proszę najpierw uruchomić 'vibe seed'.",
-      databaseError:
-        "Błąd bazy danych podczas pobierania użytkownika CLI: {{error}}",
+      databaseError: "Błąd bazy danych podczas pobierania użytkownika CLI: {{error}}",
       authNotAvailable: "Uwierzytelnianie nie jest dostępne",
     },
   },
@@ -78,8 +77,7 @@ export const translations: typeof enTranslations = {
           helpHandler: {
             noDescription: "Brak dostępnego opisu",
             flagDataDesc: "Podaj dane żądania jako JSON",
-            flagUserTypeDesc:
-              "Określ typ użytkownika (admin, customer, public)",
+            flagUserTypeDesc: "Określ typ użytkownika (admin, customer, public)",
             flagLocaleDesc: "Określ locale (en-GLOBAL, de-DE, pl-PL)",
             flagOutputDesc: "Format wyjścia (pretty, json)",
             flagVerboseDesc: "Włącz szczegółowe wyjście",

@@ -311,8 +311,7 @@ void testDotsHorizontalIcon;
 
 import type * as webDragHandleDots2Icon from "../../../web/ui/icons/DragHandleDots2Icon";
 import * as DragHandleDots2Icon from "./DragHandleDots2Icon";
-const testDragHandleDots2Icon: typeof webDragHandleDots2Icon =
-  DragHandleDots2Icon;
+const testDragHandleDots2Icon: typeof webDragHandleDots2Icon = DragHandleDots2Icon;
 void testDragHandleDots2Icon;
 
 import type * as webDownload from "../../../web/ui/icons/Download";
@@ -587,8 +586,7 @@ void testMailOpen;
 
 import type * as webMagnifyingGlassIcon from "../../../web/ui/icons/MagnifyingGlassIcon";
 import * as MagnifyingGlassIcon from "./MagnifyingGlassIcon";
-const testMagnifyingGlassIcon: typeof webMagnifyingGlassIcon =
-  MagnifyingGlassIcon;
+const testMagnifyingGlassIcon: typeof webMagnifyingGlassIcon = MagnifyingGlassIcon;
 void testMagnifyingGlassIcon;
 
 import type * as webMap from "../../../web/ui/icons/Map";

@@ -71,31 +71,21 @@ export function PaginationWidget<const TKey extends string>({
   const endItem = Math.min(page * limit, total);
 
   return (
-    <Div
-      className={cn(
-        "flex items-center justify-between border-t pt-4 mt-4",
-        className,
-      )}
-    >
+    <Div className={cn("flex items-center justify-between border-t pt-4 mt-4", className)}>
       <Div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Span>
-          {t(
-            "app.api.system.unifiedInterface.react.widgets.pagination.showing",
-            {
-              start: startItem,
-              end: endItem,
-              total,
-            },
-          )}
+          {t("app.api.system.unifiedInterface.react.widgets.pagination.showing", {
+            start: startItem,
+            end: endItem,
+            total,
+          })}
         </Span>
       </Div>
 
       <Div className="flex items-center gap-4">
         <Div className="flex items-center gap-2">
           <Span className="text-sm text-muted-foreground">
-            {t(
-              "app.api.system.unifiedInterface.react.widgets.pagination.itemsPerPage",
-            )}
+            {t("app.api.system.unifiedInterface.react.widgets.pagination.itemsPerPage")}
           </Span>
           <Select value={String(limit)} onValueChange={handleLimitChange}>
             <SelectTrigger className="w-[70px]">
@@ -121,13 +111,10 @@ export function PaginationWidget<const TKey extends string>({
           </Button>
 
           <Span className="text-sm font-medium">
-            {t(
-              "app.api.system.unifiedInterface.react.widgets.pagination.page",
-              {
-                current: page,
-                total: totalPages,
-              },
-            )}
+            {t("app.api.system.unifiedInterface.react.widgets.pagination.page", {
+              current: page,
+              total: totalPages,
+            })}
           </Span>
 
           <Button

@@ -13,8 +13,7 @@ export const translations = {
     },
     search: {
       label: "Search Query",
-      description:
-        "Search term to filter leads by email, business name, or notes",
+      description: "Search term to filter leads by email, business name, or notes",
       placeholder: "Enter search term...",
     },
     limit: {

@@ -123,16 +123,10 @@ export function EmailsListPagination({
           {/* First page if not in range */}
           {currentPage > 3 && totalPages > 5 && (
             <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageJump(1)}
-              >
+              <Button variant="outline" size="sm" onClick={() => handlePageJump(1)}>
                 1
               </Button>
-              {currentPage > 4 && (
-                <Span className="px-2 text-muted-foreground">...</Span>
-              )}
+              {currentPage > 4 && <Span className="px-2 text-muted-foreground">...</Span>}
             </>
           )}
 
@@ -154,11 +148,7 @@ export function EmailsListPagination({
               {currentPage < totalPages - 3 && (
                 <Span className="px-2 text-muted-foreground">...</Span>
               )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageJump(totalPages)}
-              >
+              <Button variant="outline" size="sm" onClick={() => handlePageJump(totalPages)}>
                 {totalPages}
               </Button>
             </>

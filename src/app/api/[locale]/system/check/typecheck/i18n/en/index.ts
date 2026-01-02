@@ -33,8 +33,7 @@ export const translations = {
   fields: {
     path: {
       label: "Path",
-      description:
-        "File or directory path to check (optional, defaults to current directory)",
+      description: "File or directory path to check (optional, defaults to current directory)",
       placeholder: "src/components",
     },
     verbose: {

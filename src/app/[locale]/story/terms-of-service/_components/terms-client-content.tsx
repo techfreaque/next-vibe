@@ -21,9 +21,7 @@ const handlePrint = (): void => {
  * Client component for handling user interactions on the Terms of Service page.
  * This is separated from the main content rendering to minimize client-side JavaScript.
  */
-export function TermsClientInteraction({
-  locale,
-}: TermsClientInteractionProps): ReactElement {
+export function TermsClientInteraction({ locale }: TermsClientInteractionProps): ReactElement {
   const { t } = simpleT(locale);
 
   // This component is kept minimal since there's limited interactivity

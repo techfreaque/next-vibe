@@ -5,11 +5,7 @@
 
 import "server-only";
 
-import type {
-  EmailProvider,
-  EmailStatus,
-  EmailType,
-} from "../../messages/enum";
+import type { EmailProvider, EmailStatus, EmailType } from "../../messages/enum";
 
 /**
  * Store Email Metadata Parameters

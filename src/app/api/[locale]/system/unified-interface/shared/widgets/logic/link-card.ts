@@ -26,12 +26,9 @@ export interface ProcessedLinkCard {
 /**
  * Extract and validate link card data from WidgetData
  */
-export function extractLinkCardData(
-  value: WidgetData,
-): ProcessedLinkCard | null {
+export function extractLinkCardData(value: WidgetData): ProcessedLinkCard | null {
   // Narrow to object type first
-  const isObject =
-    typeof value === "object" && value !== null && !Array.isArray(value);
+  const isObject = typeof value === "object" && value !== null && !Array.isArray(value);
 
   if (!isObject) {
     return null;
@@ -44,18 +41,12 @@ export function extractLinkCardData(
   }
 
   // Extract optional properties
-  const title =
-    "title" in value && typeof value.title === "string" ? value.title : url;
+  const title = "title" in value && typeof value.title === "string" ? value.title : url;
   const description =
-    "description" in value && typeof value.description === "string"
-      ? value.description
-      : undefined;
-  const icon =
-    "icon" in value && typeof value.icon === "string" ? value.icon : undefined;
+    "description" in value && typeof value.description === "string" ? value.description : undefined;
+  const icon = "icon" in value && typeof value.icon === "string" ? value.icon : undefined;
   const favicon =
-    "favicon" in value && typeof value.favicon === "string"
-      ? value.favicon
-      : undefined;
+    "favicon" in value && typeof value.favicon === "string" ? value.favicon : undefined;
 
   // Extract metadata if present
   let metadata: Record<string, string> | undefined;
@@ -75,23 +66,13 @@ export function extractLinkCardData(
 
   // Extract additional optional properties
   const snippet =
-    "snippet" in value && typeof value.snippet === "string"
-      ? value.snippet
-      : undefined;
-  const age =
-    "age" in value && typeof value.age === "string" ? value.age : undefined;
-  const source =
-    "source" in value && typeof value.source === "string"
-      ? value.source
-      : undefined;
+    "snippet" in value && typeof value.snippet === "string" ? value.snippet : undefined;
+  const age = "age" in value && typeof value.age === "string" ? value.age : undefined;
+  const source = "source" in value && typeof value.source === "string" ? value.source : undefined;
   const thumbnail =
-    "thumbnail" in value && typeof value.thumbnail === "string"
-      ? value.thumbnail
-      : undefined;
+    "thumbnail" in value && typeof value.thumbnail === "string" ? value.thumbnail : undefined;
   const openInNewTab =
-    "openInNewTab" in value && typeof value.openInNewTab === "boolean"
-      ? value.openInNewTab
-      : true;
+    "openInNewTab" in value && typeof value.openInNewTab === "boolean" ? value.openInNewTab : true;
 
   return {
     url,

@@ -18,12 +18,7 @@ import {
   globalCountryInfo,
   Languages,
 } from "./config";
-import type {
-  TFunction,
-  TParams,
-  TranslationKey,
-  TranslationValue,
-} from "./static-types";
+import type { TFunction, TParams, TranslationKey, TranslationValue } from "./static-types";
 import { renderTranslation, translateKey } from "./translation-utils";
 
 // Translation context type with country support
@@ -191,10 +186,7 @@ export function TranslationProvider({
   }, [currentLocale, language]);
 
   // Type-safe translation function with parameter support
-  const t: TFunction = <K extends TranslationKey>(
-    key: K,
-    params?: TParams,
-  ): string => {
+  const t: TFunction = <K extends TranslationKey>(key: K, params?: TParams): string => {
     // Use the shared translation utility with client context
     return translateKey(
       key,
@@ -244,15 +236,10 @@ export function useTranslation(): TranslationContextType {
 // Type-safe Trans component for JSX translations
 interface TransProps<K extends TranslationKey> {
   i18nKey: K;
-  values?: TranslationValue<K> extends string
-    ? Record<string, string | number>
-    : never;
+  values?: TranslationValue<K> extends string ? Record<string, string | number> : never;
 }
 
-export function Trans<K extends TranslationKey>({
-  i18nKey,
-  values,
-}: TransProps<K>): JSX.Element {
+export function Trans<K extends TranslationKey>({ i18nKey, values }: TransProps<K>): JSX.Element {
   const { t } = useTranslation();
 
   // Use the t function which already uses the shared utility

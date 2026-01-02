@@ -4,14 +4,7 @@
  */
 
 import { relations } from "drizzle-orm";
-import {
-  boolean,
-  jsonb,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { boolean, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
@@ -66,16 +59,10 @@ export const customCharacters = pgTable("custom_characters", {
   suggestedPrompts: jsonb("suggested_prompts").$type<string[]>().default([]),
 
   // Requirements (hard filters)
-  requirements: jsonb("requirements")
-    .$type<CharacterRequirements>()
-    .notNull()
-    .default({}),
+  requirements: jsonb("requirements").$type<CharacterRequirements>().notNull().default({}),
 
   // Preferences (soft scoring)
-  preferences: jsonb("preferences")
-    .$type<CharacterPreferences>()
-    .notNull()
-    .default({}),
+  preferences: jsonb("preferences").$type<CharacterPreferences>().notNull().default({}),
 
   // Ownership
   ownership: jsonb("ownership").$type<CharacterOwnership>().notNull(),
@@ -94,15 +81,12 @@ export const customCharacters = pgTable("custom_characters", {
 /**
  * Relations
  */
-export const customCharactersRelations = relations(
-  customCharacters,
-  ({ one }) => ({
-    user: one(users, {
-      fields: [customCharacters.userId],
-      references: [users.id],
-    }),
+export const customCharactersRelations = relations(customCharacters, ({ one }) => ({
+  user: one(users, {
+    fields: [customCharacters.userId],
+    references: [users.id],
   }),
-);
+}));
 
 /**
  * Schema for selecting custom characters

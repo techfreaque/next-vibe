@@ -48,8 +48,7 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
+        description: "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -86,8 +85,7 @@ export const translations: typeof enTranslations = {
     },
     content: {
       label: "Erinnerungsinhalt",
-      description:
-        "Die zu merkende Tatsache (z.B. 'Beruf: Software-Ingenieur')",
+      description: "Die zu merkende Tatsache (z.B. 'Beruf: Software-Ingenieur')",
     },
     tags: {
       label: "Tags",

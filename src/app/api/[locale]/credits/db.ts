@@ -202,9 +202,7 @@ export const creditWallets = pgTable(
     // Free tier tracking (20 credits per month SHARED across linked leads)
     // CRITICAL: User wallets MUST have freeCreditsRemaining = 0 (enforced in repository)
     // CRITICAL: Lead wallets share a pool of max 20 credits across ALL linked leads
-    freeCreditsRemaining: numericNumber("free_credits_remaining")
-      .notNull()
-      .default(20),
+    freeCreditsRemaining: numericNumber("free_credits_remaining").notNull().default(20),
     freePeriodStart: timestamp("free_period_start").defaultNow().notNull(),
     freePeriodId: text("free_period_id")
       .notNull()
@@ -250,10 +248,7 @@ export const creditPacks = pgTable(
     source: text("source"), // 'stripe_subscription', 'stripe_purchase', 'admin_grant', etc.
 
     // Metadata (typed)
-    metadata: jsonb("metadata")
-      .$type<CreditPackMetadata>()
-      .notNull()
-      .default({}),
+    metadata: jsonb("metadata").$type<CreditPackMetadata>().notNull().default({}),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -298,10 +293,7 @@ export const creditTransactions = pgTable(
     freePeriodId: text("free_period_id"),
 
     // Rich metadata (typed per transaction type)
-    metadata: jsonb("metadata")
-      .$type<CreditTransactionMetadata>()
-      .notNull()
-      .default({}),
+    metadata: jsonb("metadata").$type<CreditTransactionMetadata>().notNull().default({}),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
@@ -316,21 +308,18 @@ export const creditTransactions = pgTable(
 /**
  * Relations
  */
-export const creditWalletsRelations = relations(
-  creditWallets,
-  ({ one, many }) => ({
-    user: one(users, {
-      fields: [creditWallets.userId],
-      references: [users.id],
-    }),
-    lead: one(leads, {
-      fields: [creditWallets.leadId],
-      references: [leads.id],
-    }),
-    packs: many(creditPacks),
-    transactions: many(creditTransactions),
+export const creditWalletsRelations = relations(creditWallets, ({ one, many }) => ({
+  user: one(users, {
+    fields: [creditWallets.userId],
+    references: [users.id],
   }),
-);
+  lead: one(leads, {
+    fields: [creditWallets.leadId],
+    references: [leads.id],
+  }),
+  packs: many(creditPacks),
+  transactions: many(creditTransactions),
+}));
 
 export const creditPacksRelations = relations(creditPacks, ({ one, many }) => ({
   wallet: one(creditWallets, {
@@ -340,19 +329,16 @@ export const creditPacksRelations = relations(creditPacks, ({ one, many }) => ({
   transactions: many(creditTransactions),
 }));
 
-export const creditTransactionsRelations = relations(
-  creditTransactions,
-  ({ one }) => ({
-    wallet: one(creditWallets, {
-      fields: [creditTransactions.walletId],
-      references: [creditWallets.id],
-    }),
-    pack: one(creditPacks, {
-      fields: [creditTransactions.packId],
-      references: [creditPacks.id],
-    }),
+export const creditTransactionsRelations = relations(creditTransactions, ({ one }) => ({
+  wallet: one(creditWallets, {
+    fields: [creditTransactions.walletId],
+    references: [creditWallets.id],
   }),
-);
+  pack: one(creditPacks, {
+    fields: [creditTransactions.packId],
+    references: [creditPacks.id],
+  }),
+}));
 
 /**
  * Zod Schemas
@@ -361,10 +347,8 @@ export const selectCreditWalletSchema = createSelectSchema(creditWallets);
 export const insertCreditWalletSchema = createInsertSchema(creditWallets);
 export const selectCreditPackSchema = createSelectSchema(creditPacks);
 export const insertCreditPackSchema = createInsertSchema(creditPacks);
-export const selectCreditTransactionSchema =
-  createSelectSchema(creditTransactions);
-export const insertCreditTransactionSchema =
-  createInsertSchema(creditTransactions);
+export const selectCreditTransactionSchema = createSelectSchema(creditTransactions);
+export const insertCreditTransactionSchema = createInsertSchema(creditTransactions);
 
 /**
  * Types
@@ -374,6 +358,4 @@ export type NewCreditWallet = z.infer<typeof insertCreditWalletSchema>;
 export type CreditPack = z.infer<typeof selectCreditPackSchema>;
 export type NewCreditPack = z.infer<typeof insertCreditPackSchema>;
 export type CreditTransaction = z.infer<typeof selectCreditTransactionSchema>;
-export type NewCreditTransaction = z.infer<
-  typeof insertCreditTransactionSchema
->;
+export type NewCreditTransaction = z.infer<typeof insertCreditTransactionSchema>;

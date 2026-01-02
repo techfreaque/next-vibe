@@ -9,8 +9,7 @@ export const translations: typeof enTranslations = {
     fields: {
       pageIdx: {
         label: "Indeks strony",
-        description:
-          "Indeks strony do wybrania (wywołaj list_pages aby wylistować strony)",
+        description: "Indeks strony do wybrania (wywołaj list_pages aby wylistować strony)",
         placeholder: "Wprowadź indeks strony",
       },
     },

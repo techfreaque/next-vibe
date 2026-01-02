@@ -71,8 +71,7 @@ export const translations = {
       },
       noActiveSubscription: {
         title: "Active Subscription Required",
-        description:
-          "You must have an active subscription to purchase credit packs",
+        description: "You must have an active subscription to purchase credit packs",
       },
     },
   },

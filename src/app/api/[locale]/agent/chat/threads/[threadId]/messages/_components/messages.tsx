@@ -3,21 +3,11 @@
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { Logo } from "@/app/[locale]/_components/logo";
-import {
-  DOM_IDS,
-  LAYOUT,
-  QUOTE_CHARACTER,
-} from "@/app/[locale]/chat/lib/config/constants";
+import { DOM_IDS, LAYOUT, QUOTE_CHARACTER } from "@/app/[locale]/chat/lib/config/constants";
 import {
   buildMessagePath,
   getDirectReplies,
@@ -78,15 +68,11 @@ export function ChatMessages({
   const scrollAnimationFrameRef = useRef<number | null>(null);
   const lastScrollTimeRef = useRef<number>(0);
   const userInteractingRef = useRef<boolean>(false);
-  const interactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  const interactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastThreadIdRef = useRef<string | null>(null);
 
   // Get streaming messages and streaming state from AI stream store
-  const streamingMessages = useAIStreamStore(
-    (state) => state.streamingMessages,
-  );
+  const streamingMessages = useAIStreamStore((state) => state.streamingMessages);
   const isStreamingActive = useAIStreamStore((state) => state.isStreaming);
 
   // Merge streaming messages with persisted messages for instant UI updates
@@ -265,8 +251,7 @@ export function ChatMessages({
     }
 
     // Check if content is actually changing (streaming)
-    const contentChanged =
-      lastMessage.content !== lastMessageContentRef.current;
+    const contentChanged = lastMessage.content !== lastMessageContentRef.current;
     const isCurrentlyStreaming = isLoading && contentChanged;
 
     // Track streaming state changes
@@ -432,10 +417,7 @@ export function ChatMessages({
             ((): JSX.Element[] => {
               // Group messages by sequence to filter out continuations
               const messageGroups = groupMessagesBySequence(mergedMessages);
-              const messageToGroupMap = new Map<
-                string,
-                (typeof messageGroups)[0]
-              >();
+              const messageToGroupMap = new Map<string, (typeof messageGroups)[0]>();
               for (const group of messageGroups) {
                 messageToGroupMap.set(group.primary.id, group);
                 for (const continuation of group.continuations) {
@@ -470,10 +452,7 @@ export function ChatMessages({
           ) : (
             // Linear view (ChatGPT style) - Build path through message tree
             ((): JSX.Element => {
-              const { path, branchInfo } = buildMessagePath(
-                mergedMessages,
-                branchIndices,
-              );
+              const { path, branchInfo } = buildMessagePath(mergedMessages, branchIndices);
 
               return (
                 <LinearMessageView

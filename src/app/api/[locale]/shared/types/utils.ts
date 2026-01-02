@@ -46,16 +46,13 @@ export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 /**
  * Makes specific keys required while keeping others optional
  */
-export type RequiredBy<T, K extends keyof T> = Omit<T, K> &
-  Required<Pick<T, K>>;
+export type RequiredBy<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
 
 /**
  * Extracts the return type of a function, handling async functions
  */
 
-export type ExtractReturnType<T> = T extends (
-  ...args: ExplicitAnyType[]
-) => infer R
+export type ExtractReturnType<T> = T extends (...args: ExplicitAnyType[]) => infer R
   ? R extends Promise<infer U>
     ? U
     : R
@@ -104,9 +101,9 @@ export type StrictSubset<T, U extends T> = U;
 /**
  * Converts union types to intersection types
  */
-export type UnionToIntersection<U> = (
-  U extends ExplicitAnyType ? (k: U) => void : never
-) extends (k: infer I) => void
+export type UnionToIntersection<U> = (U extends ExplicitAnyType ? (k: U) => void : never) extends (
+  k: infer I,
+) => void
   ? I
   : never;
 

@@ -51,9 +51,7 @@ interface CharacterBrowserProps {
 /**
  * Get default intelligence from character preferences
  */
-function getDefaultIntelligence(
-  character: Character,
-): typeof IntelligenceLevelFilterValue {
+function getDefaultIntelligence(character: Character): typeof IntelligenceLevelFilterValue {
   if (character.preferences?.preferredStrengths) {
     const { ModelUtility } = require("@/app/api/[locale]/agent/chat/types");
     if (character.preferences.preferredStrengths.includes(ModelUtility.SMART)) {
@@ -69,9 +67,7 @@ function getDefaultIntelligence(
 /**
  * Get default content from character requirements
  */
-function getDefaultContent(
-  character: Character,
-): typeof ContentLevelFilterValue {
+function getDefaultContent(character: Character): typeof ContentLevelFilterValue {
   if (character.requirements?.minContent) {
     return character.requirements.minContent;
   }
@@ -112,9 +108,7 @@ export function CharacterListItem({
         content: defaultContent,
       },
     });
-    return selectedModelId
-      ? (allModels.find((m) => m.id === selectedModelId) ?? null)
-      : null;
+    return selectedModelId ? (allModels.find((m) => m.id === selectedModelId) ?? null) : null;
   }, [allModels, character, defaultIntelligence, defaultContent]);
 
   const ModelIcon = bestModel ? getIconComponent(bestModel.icon) : null;
@@ -162,9 +156,7 @@ export function CharacterListItem({
           disabled={isAdded}
         >
           <Plus className="h-3.5 w-3.5 mr-1" />
-          {isAdded
-            ? t("app.api.agent.chat.selector.added")
-            : t("app.api.agent.chat.selector.add")}
+          {isAdded ? t("app.api.agent.chat.selector.added") : t("app.api.agent.chat.selector.add")}
         </Button>
       </Div>
 
@@ -335,8 +327,7 @@ export function CharacterBrowserCore({
     const query = searchQuery.toLowerCase();
     return [...DEFAULT_CHARACTERS].filter(
       (p) =>
-        t(p.name).toLowerCase().includes(query) ||
-        t(p.description).toLowerCase().includes(query),
+        t(p.name).toLowerCase().includes(query) || t(p.description).toLowerCase().includes(query),
     );
   }, [searchQuery, t]);
 
@@ -402,9 +393,7 @@ export function CharacterBrowserCore({
           const needsSeparatorBefore =
             item.category === CharacterCategory.ROLEPLAY ||
             (item.category === CharacterCategory.CONTROVERSIAL &&
-              !categoriesWithCharacters.some(
-                (c) => c.category === CharacterCategory.ROLEPLAY,
-              ));
+              !categoriesWithCharacters.some((c) => c.category === CharacterCategory.ROLEPLAY));
 
           return (
             <Div key={item.category} className="flex flex-col gap-5">
@@ -478,9 +467,7 @@ export function CharacterBrowser({
               className="h-9 gap-1.5 shrink-0"
             >
               <Plus className="h-4 w-4" />
-              <Span className="hidden sm:inline">
-                {t("app.chat.selector.createCustom")}
-              </Span>
+              <Span className="hidden sm:inline">{t("app.chat.selector.createCustom")}</Span>
             </Button>
           )}
         </Div>

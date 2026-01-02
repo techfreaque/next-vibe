@@ -122,10 +122,6 @@ export function ValidComponentUsage(): React.ReactElement {
   return <ValidComponent>This is valid</ValidComponent>;
 }
 
-function ValidComponent({
-  children,
-}: {
-  children: React.ReactNode;
-}): React.ReactElement {
+function ValidComponent({ children }: { children: React.ReactNode }): React.ReactElement {
   return <>{children}</>;
 }

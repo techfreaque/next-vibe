@@ -28,12 +28,7 @@ export class RootFolderPermissionsRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<RootPermissionsGetResponseOutput>> {
-    const response = await nativeEndpoint(
-      getRootPermissionsEndpoint,
-      { data },
-      logger,
-      locale,
-    );
+    const response = await nativeEndpoint(getRootPermissionsEndpoint, { data }, logger, locale);
 
     if (response.success) {
       return {
@@ -53,6 +48,5 @@ export class RootFolderPermissionsRepository {
 }
 
 // Compile-time type check: ensures native has same static methods as server
-const _typeCheck: RootFolderPermissionsRepositoryType =
-  RootFolderPermissionsRepository;
+const _typeCheck: RootFolderPermissionsRepositoryType = RootFolderPermissionsRepository;
 void _typeCheck;

@@ -29,9 +29,7 @@ export function FeedbackPreview(): JSX.Element {
 
               <Alert variant="destructive">
                 <AlertTitle>Destructive Alert</AlertTitle>
-                <AlertDescription>
-                  This is a destructive alert.
-                </AlertDescription>
+                <AlertDescription>This is a destructive alert.</AlertDescription>
               </Alert>
             </Div>
           </Div>
@@ -80,12 +78,8 @@ export function FeedbackPreview(): JSX.Element {
           <Div className="space-y-2">
             <H3>Toast</H3>
             <Div className="flex flex-row flex-wrap gap-2">
-              <Button onClick={() => toast("Default toast")}>
-                Default Toast
-              </Button>
-              <Button onClick={() => toast.success("Success!")}>
-                Success Toast
-              </Button>
+              <Button onClick={() => toast("Default toast")}>Default Toast</Button>
+              <Button onClick={() => toast.success("Success!")}>Success Toast</Button>
               <Button onClick={() => toast.error("Error!")}>Error Toast</Button>
             </Div>
           </Div>

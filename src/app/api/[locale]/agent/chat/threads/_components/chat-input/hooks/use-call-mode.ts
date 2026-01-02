@@ -28,14 +28,9 @@ export interface UseCallModeReturn {
  * Hook for managing call mode state
  * Call mode is stored per model+character combination
  */
-export function useCallMode({
-  modelId,
-  characterId,
-}: UseCallModeOptions): UseCallModeReturn {
+export function useCallMode({ modelId, characterId }: UseCallModeOptions): UseCallModeReturn {
   const callModeKey = getCallModeKey(modelId, characterId);
-  const isCallMode = useVoiceModeStore(
-    (s) => s.settings.callModeByConfig?.[callModeKey] ?? false,
-  );
+  const isCallMode = useVoiceModeStore((s) => s.settings.callModeByConfig?.[callModeKey] ?? false);
   const setCallModeStore = useVoiceModeStore((s) => s.setCallMode);
 
   const toggleCallMode = useCallback((): void => {

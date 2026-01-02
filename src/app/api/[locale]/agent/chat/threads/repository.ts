@@ -5,18 +5,7 @@
 
 import "server-only";
 
-import {
-  and,
-  count,
-  desc,
-  eq,
-  gte,
-  ilike,
-  inArray,
-  isNull,
-  lte,
-  or,
-} from "drizzle-orm";
+import { and, count, desc, eq, gte, ilike, inArray, isNull, lte, or } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -61,9 +50,7 @@ export function generateThreadTitle(content: string): string {
   const ellipsis = "...";
   const truncated = content.slice(0, maxLength);
   const lastSpace = truncated.lastIndexOf(" ");
-  return lastSpace > minLastSpace
-    ? `${truncated.slice(0, lastSpace)}${ellipsis}`
-    : truncated;
+  return lastSpace > minLastSpace ? `${truncated.slice(0, lastSpace)}${ellipsis}` : truncated;
 }
 
 /**
@@ -225,23 +212,16 @@ export async function ensureThread({
     }
 
     if (rootFolderId === DefaultFolderId.PUBLIC) {
-      const hasPermission = await hasRolePermission(
-        user,
-        rootConfig.rolesCreateThread,
-        logger,
-      );
+      const hasPermission = await hasRolePermission(user, rootConfig.rolesCreateThread, logger);
 
       if (!hasPermission) {
-        logger.error(
-          "User does not have permission to create threads in root folder",
-          {
-            userId,
-            leadId,
-            isPublic: user.isPublic,
-            rootFolderId,
-            requiredRoles: rootConfig.rolesCreateThread,
-          },
-        );
+        logger.error("User does not have permission to create threads in root folder", {
+          userId,
+          leadId,
+          isPublic: user.isPublic,
+          rootFolderId,
+          requiredRoles: rootConfig.rolesCreateThread,
+        });
         return await Promise.reject(new Error("PERMISSION_DENIED"));
       }
 
@@ -308,8 +288,7 @@ export async function ensureThread({
 /**
  * 24h cache for total conversations count
  */
-let totalConversationsCountCache: { count: number; timestamp: number } | null =
-  null;
+let totalConversationsCountCache: { count: number; timestamp: number } | null = null;
 const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
@@ -450,20 +429,14 @@ export class ThreadsRepository {
       // Search in title and preview
       if (search) {
         conditions.push(
-          or(
-            ilike(chatThreads.title, `%${search}%`),
-            ilike(chatThreads.preview, `%${search}%`),
-          )!,
+          or(ilike(chatThreads.title, `%${search}%`), ilike(chatThreads.preview, `%${search}%`))!,
         );
       }
 
       const whereClause = and(...conditions);
 
       // Get total count
-      const [{ total }] = await db
-        .select({ total: count() })
-        .from(chatThreads)
-        .where(whereClause);
+      const [{ total }] = await db.select({ total: count() }).from(chatThreads).where(whereClause);
 
       // Get paginated threads
       const offset = (page - 1) * limit;
@@ -477,9 +450,7 @@ export class ThreadsRepository {
 
       // Build folder map for permission inheritance
       // Fetch all folders that are referenced by threads
-      const folderIds = dbThreads
-        .map((t) => t.folderId)
-        .filter((id): id is string => id !== null);
+      const folderIds = dbThreads.map((t) => t.folderId).filter((id): id is string => id !== null);
 
       const allFolders: Record<string, ChatFolder> = {};
       if (folderIds.length > 0) {
@@ -493,9 +464,7 @@ export class ThreadsRepository {
         }
 
         // Also fetch parent folders for proper inheritance chain
-        const parentIds = folders
-          .map((f) => f.parentId)
-          .filter((id): id is string => id !== null);
+        const parentIds = folders.map((f) => f.parentId).filter((id): id is string => id !== null);
 
         if (parentIds.length > 0) {
           const parentFolders = await db
@@ -513,17 +482,9 @@ export class ThreadsRepository {
       const visibleThreads = [];
       for (const thread of dbThreads) {
         // Get folder if thread has one
-        const folder = thread.folderId
-          ? allFolders[thread.folderId] || null
-          : null;
+        const folder = thread.folderId ? allFolders[thread.folderId] || null : null;
 
-        const canView = await canViewThread(
-          user,
-          thread,
-          folder,
-          logger,
-          allFolders,
-        );
+        const canView = await canViewThread(user, thread, folder, logger, allFolders);
 
         if (canView) {
           visibleThreads.push(thread);
@@ -534,30 +495,17 @@ export class ThreadsRepository {
       // Compute permission flags for each thread
       const threads = await Promise.all(
         visibleThreads.map(async (thread) => {
-          const folder = thread.folderId
-            ? allFolders[thread.folderId] || null
-            : null;
+          const folder = thread.folderId ? allFolders[thread.folderId] || null : null;
 
           // Compute all permission flags server-side
-          const [
-            canEditFlag,
-            canPostFlag,
-            canModerateFlag,
-            canDeleteFlag,
-            canManagePermsFlag,
-          ] = await Promise.all([
-            canEditThread(user, thread, folder, logger, allFolders),
-            canPostInThread(user, thread, folder, logger, allFolders),
-            canHideThread(user, thread, logger, folder, allFolders),
-            canDeleteThread(user, thread, logger),
-            canManageThreadPermissions(
-              user,
-              thread,
-              folder,
-              logger,
-              allFolders,
-            ),
-          ]);
+          const [canEditFlag, canPostFlag, canModerateFlag, canDeleteFlag, canManagePermsFlag] =
+            await Promise.all([
+              canEditThread(user, thread, folder, logger, allFolders),
+              canPostInThread(user, thread, folder, logger, allFolders),
+              canHideThread(user, thread, logger, folder, allFolders),
+              canDeleteThread(user, thread, logger),
+              canManageThreadPermissions(user, thread, folder, logger, allFolders),
+            ]);
 
           return {
             id: thread.id,
@@ -726,9 +674,7 @@ export class ThreadsRepository {
         userId: userIdentifier,
         title:
           data.thread?.title ||
-          simpleT(locale).t(
-            "app.api.agent.chat.threads.post.threadTitle.default",
-          ),
+          simpleT(locale).t("app.api.agent.chat.threads.post.threadTitle.default"),
         rootFolderId: data.thread?.rootFolderId,
         folderId: data.thread?.subFolderId ?? null,
         status: ThreadStatus.ACTIVE,
@@ -741,10 +687,7 @@ export class ThreadsRepository {
         preview: null,
       } satisfies typeof chatThreads.$inferInsert;
 
-      const [dbThread] = await db
-        .insert(chatThreads)
-        .values(threadData)
-        .returning();
+      const [dbThread] = await db.insert(chatThreads).values(threadData).returning();
 
       // Map DB fields to API response format (DB has rootFolderId as DefaultFolderId, folderId as UUID)
       const thread = {
@@ -777,9 +720,7 @@ export class ThreadsRepository {
   /**
    * Get total count of conversations/threads with 24h caching
    */
-  static async getTotalConversationsCount(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<number>> {
+  static async getTotalConversationsCount(logger: EndpointLogger): Promise<ResponseType<number>> {
     try {
       const now = Date.now();
 
@@ -812,10 +753,7 @@ export class ThreadsRepository {
 
       return success(total);
     } catch (error) {
-      logger.error(
-        "Error getting total conversations count",
-        parseError(error),
-      );
+      logger.error("Error getting total conversations count", parseError(error));
       return fail({
         message: "app.api.agent.chat.threads.errors.count_failed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,

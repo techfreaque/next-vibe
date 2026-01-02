@@ -17,7 +17,6 @@ export const { GET, POST, tools } = endpointsHandler({
   },
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, user, logger }) =>
-      importRepository.listImportJobs(user.id, data, logger),
+    handler: ({ data, user, logger }) => importRepository.listImportJobs(user.id, data, logger),
   },
 });

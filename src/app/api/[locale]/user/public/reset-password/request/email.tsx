@@ -5,11 +5,7 @@
 
 import { Button, Section, Text } from "@react-email/components";
 import type { UndefinedType } from "next-vibe/shared/types/common.schema";
-import {
-  fail,
-  success,
-  ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
+import { fail, success, ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type { ReactElement } from "react";
 import React from "react";
@@ -44,9 +40,7 @@ const passwordResetRequestPropsSchema = z.object({
   passwordResetUrl: z.string().url(),
 });
 
-type PasswordResetRequestProps = z.infer<
-  typeof passwordResetRequestPropsSchema
->;
+type PasswordResetRequestProps = z.infer<typeof passwordResetRequestPropsSchema>;
 
 function PasswordResetRequestEmail({
   props,
@@ -70,12 +64,9 @@ function PasswordResetRequestEmail({
       title={t("app.api.user.public.resetPassword.request.email.title", {
         appName: translatedAppName,
       })}
-      previewText={t(
-        "app.api.user.public.resetPassword.request.email.previewText",
-        {
-          appName: translatedAppName,
-        },
-      )}
+      previewText={t("app.api.user.public.resetPassword.request.email.previewText", {
+        appName: translatedAppName,
+      })}
       recipientEmail={recipientEmail}
       tracking={tracking}
     >
@@ -147,58 +138,55 @@ function PasswordResetRequestEmail({
 }
 
 // Template Definition Export
-const passwordResetRequestTemplate: EmailTemplateDefinition<PasswordResetRequestProps> =
-  {
-    meta: {
-      id: "password-reset-request",
-      version: "1.0.0",
-      name: "app.api.emails.templates.password.reset.request.meta.name",
-      description:
-        "app.api.emails.templates.password.reset.request.meta.description",
-      category: "auth",
-      path: "/user/public/reset-password/request/email.tsx",
-      defaultSubject: (t) =>
-        t("app.api.user.public.resetPassword.request.email.subject", {
-          appName: "",
-        }),
-      previewFields: {
-        publicName: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.password.reset.request.preview.privateName.label",
-          description:
-            "app.admin.emails.templates.templates.password.reset.request.preview.privateName.description",
-          defaultValue: "Max Mustermann",
-          required: true,
-        },
-        userId: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.password.reset.request.preview.userId.label",
-          description:
-            "app.admin.emails.templates.templates.password.reset.request.preview.userId.description",
-          defaultValue: "example-user-id-123",
-          required: true,
-        },
-        passwordResetUrl: {
-          type: "url",
-          label:
-            "app.admin.emails.templates.templates.password.reset.request.preview.resetToken.label",
-          description:
-            "app.admin.emails.templates.templates.password.reset.request.preview.resetToken.description",
-          defaultValue: "https://example.com/user/reset-password/token123",
-          required: true,
-        },
+const passwordResetRequestTemplate: EmailTemplateDefinition<PasswordResetRequestProps> = {
+  meta: {
+    id: "password-reset-request",
+    version: "1.0.0",
+    name: "app.api.emails.templates.password.reset.request.meta.name",
+    description: "app.api.emails.templates.password.reset.request.meta.description",
+    category: "auth",
+    path: "/user/public/reset-password/request/email.tsx",
+    defaultSubject: (t) =>
+      t("app.api.user.public.resetPassword.request.email.subject", {
+        appName: "",
+      }),
+    previewFields: {
+      publicName: {
+        type: "text",
+        label:
+          "app.admin.emails.templates.templates.password.reset.request.preview.privateName.label",
+        description:
+          "app.admin.emails.templates.templates.password.reset.request.preview.privateName.description",
+        defaultValue: "Max Mustermann",
+        required: true,
+      },
+      userId: {
+        type: "text",
+        label: "app.admin.emails.templates.templates.password.reset.request.preview.userId.label",
+        description:
+          "app.admin.emails.templates.templates.password.reset.request.preview.userId.description",
+        defaultValue: "example-user-id-123",
+        required: true,
+      },
+      passwordResetUrl: {
+        type: "url",
+        label:
+          "app.admin.emails.templates.templates.password.reset.request.preview.resetToken.label",
+        description:
+          "app.admin.emails.templates.templates.password.reset.request.preview.resetToken.description",
+        defaultValue: "https://example.com/user/reset-password/token123",
+        required: true,
       },
     },
-    schema: passwordResetRequestPropsSchema,
-    component: PasswordResetRequestEmail,
-    exampleProps: {
-      publicName: "Max Mustermann",
-      userId: "example-user-id-123",
-      passwordResetUrl: "https://example.com/user/reset-password/token123",
-    },
-  };
+  },
+  schema: passwordResetRequestPropsSchema,
+  component: PasswordResetRequestEmail,
+  exampleProps: {
+    publicName: "Max Mustermann",
+    userId: "example-user-id-123",
+    passwordResetUrl: "https://example.com/user/reset-password/token123",
+  },
+};
 
 export default passwordResetRequestTemplate;
 

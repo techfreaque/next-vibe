@@ -19,10 +19,7 @@ interface FolderHandlersDeps {
 
 export interface FolderHandlers {
   handleReorderFolder: (folderId: string, direction: "up" | "down") => void;
-  handleMoveFolderToParent: (
-    folderId: string,
-    newParentId: string | null,
-  ) => void;
+  handleMoveFolderToParent: (folderId: string, newParentId: string | null) => void;
   handleCreateThreadInFolder: (folderId: string) => void;
 }
 
@@ -47,11 +44,7 @@ export function useFolderHandlers(
 
       // Get all sibling folders (same parent and rootFolderId)
       const allSiblings = Object.values(folders)
-        .filter(
-          (f) =>
-            f.rootFolderId === folder.rootFolderId &&
-            f.parentId === folder.parentId,
-        )
+        .filter((f) => f.rootFolderId === folder.rootFolderId && f.parentId === folder.parentId)
         .toSorted((a, b) => {
           // First sort by sortOrder
           if (a.sortOrder !== b.sortOrder) {
@@ -76,10 +69,7 @@ export function useFolderHandlers(
           void updateFolder(folderId, { sortOrder: currentIndex - 1 });
           void updateFolder(prevSibling.id, { sortOrder: currentIndex });
         }
-      } else if (
-        direction === "down" &&
-        currentIndex < allSiblings.length - 1
-      ) {
+      } else if (direction === "down" && currentIndex < allSiblings.length - 1) {
         // Move folder down by swapping positions with next sibling
         const nextSibling = allSiblings[currentIndex + 1];
         if (nextSibling) {

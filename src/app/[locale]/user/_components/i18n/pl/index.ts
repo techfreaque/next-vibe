@@ -9,8 +9,7 @@ export const translations: typeof enTranslations = {
         fair: "Średnie",
         good: "Dobre",
         strong: "Silne",
-        suggestion:
-          "Użyj kombinacji liter, cyfr i symboli, aby uzyskać silniejsze hasło",
+        suggestion: "Użyj kombinacji liter, cyfr i symboli, aby uzyskać silniejsze hasło",
       },
     },
   },

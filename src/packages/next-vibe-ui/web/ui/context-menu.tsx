@@ -2,11 +2,7 @@
 
 import * as ContextMenuPrimitive from "@radix-ui/react-context-menu";
 import { cn } from "next-vibe/shared/utils/utils";
-import {
-  CheckIcon,
-  ChevronRightIcon,
-  DotFilledIcon,
-} from "next-vibe-ui/ui/icons";
+import { CheckIcon, ChevronRightIcon, DotFilledIcon } from "next-vibe-ui/ui/icons";
 import * as React from "react";
 
 import type { StyleType } from "../utils/style-type";
@@ -93,13 +89,8 @@ export interface ContextMenuShortcutProps {
   className?: string;
 }
 
-export function ContextMenu({
-  children,
-  ...props
-}: ContextMenuRootProps): React.JSX.Element {
-  return (
-    <ContextMenuPrimitive.Root {...props}>{children}</ContextMenuPrimitive.Root>
-  );
+export function ContextMenu({ children, ...props }: ContextMenuRootProps): React.JSX.Element {
+  return <ContextMenuPrimitive.Root {...props}>{children}</ContextMenuPrimitive.Root>;
 }
 ContextMenu.displayName = ContextMenuPrimitive.Root.displayName;
 
@@ -111,21 +102,14 @@ export function ContextMenuTrigger({
   ...props
 }: ContextMenuTriggerProps): React.JSX.Element {
   return (
-    <ContextMenuPrimitive.Trigger
-      asChild={asChild}
-      className={className}
-      style={style}
-      {...props}
-    >
+    <ContextMenuPrimitive.Trigger asChild={asChild} className={className} style={style} {...props}>
       {children}
     </ContextMenuPrimitive.Trigger>
   );
 }
 ContextMenuTrigger.displayName = ContextMenuPrimitive.Trigger.displayName;
 
-export function ContextMenuGroup({
-  children,
-}: ContextMenuGroupProps): React.JSX.Element {
+export function ContextMenuGroup({ children }: ContextMenuGroupProps): React.JSX.Element {
   return <ContextMenuPrimitive.Group>{children}</ContextMenuPrimitive.Group>;
 }
 ContextMenuGroup.displayName = ContextMenuPrimitive.Group.displayName;
@@ -143,13 +127,8 @@ export function ContextMenuPortal({
 }
 ContextMenuPortal.displayName = ContextMenuPrimitive.Portal.displayName;
 
-export function ContextMenuSub({
-  children,
-  ...props
-}: ContextMenuSubProps): React.JSX.Element {
-  return (
-    <ContextMenuPrimitive.Sub {...props}>{children}</ContextMenuPrimitive.Sub>
-  );
+export function ContextMenuSub({ children, ...props }: ContextMenuSubProps): React.JSX.Element {
+  return <ContextMenuPrimitive.Sub {...props}>{children}</ContextMenuPrimitive.Sub>;
 }
 ContextMenuSub.displayName = ContextMenuPrimitive.Sub.displayName;
 
@@ -157,11 +136,7 @@ export function ContextMenuRadioGroup({
   children,
   ...props
 }: ContextMenuRadioGroupProps): React.JSX.Element {
-  return (
-    <ContextMenuPrimitive.RadioGroup {...props}>
-      {children}
-    </ContextMenuPrimitive.RadioGroup>
-  );
+  return <ContextMenuPrimitive.RadioGroup {...props}>{children}</ContextMenuPrimitive.RadioGroup>;
 }
 ContextMenuRadioGroup.displayName = ContextMenuPrimitive.RadioGroup.displayName;
 
@@ -279,8 +254,7 @@ export function ContextMenuCheckboxItem({
     </ContextMenuPrimitive.CheckboxItem>
   );
 }
-ContextMenuCheckboxItem.displayName =
-  ContextMenuPrimitive.CheckboxItem.displayName;
+ContextMenuCheckboxItem.displayName = ContextMenuPrimitive.CheckboxItem.displayName;
 
 export function ContextMenuRadioItem({
   className,
@@ -319,11 +293,7 @@ export function ContextMenuLabel({
 }: ContextMenuLabelProps): React.JSX.Element {
   return (
     <ContextMenuPrimitive.Label
-      className={cn(
-        "px-2 py-1.5 text-sm font-semibold",
-        inset && "pl-8",
-        className,
-      )}
+      className={cn("px-2 py-1.5 text-sm font-semibold", inset && "pl-8", className)}
       style={style}
       {...props}
     >
@@ -354,10 +324,7 @@ export function ContextMenuShortcut({
   ...props
 }: ContextMenuShortcutProps): React.JSX.Element {
   return (
-    <span
-      className={cn("ml-auto text-xs tracking-widest opacity-60", className)}
-      {...props}
-    >
+    <span className={cn("ml-auto text-xs tracking-widest opacity-60", className)} {...props}>
       {children}
     </span>
   );

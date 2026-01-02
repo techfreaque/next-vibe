@@ -707,9 +707,7 @@ export function isIconKey(value: string | IconComponent): value is IconKey {
 /**
  * Check if a value is an IconComponent (React component)
  */
-export function isIconComponent(
-  value: string | IconComponent,
-): value is IconComponent {
+export function isIconComponent(value: string | IconComponent): value is IconComponent {
   return typeof value === "function";
 }
 
@@ -728,9 +726,7 @@ export function getIconComponent(iconValue: IconValue): IconComponent {
     }
     // Emoji/unicode string - wrap in component
     return ({ className = "" }) => (
-      <Span className={cn("text-base leading-none", className)}>
-        {iconValue}
-      </Span>
+      <Span className={cn("text-base leading-none", className)}>{iconValue}</Span>
     );
   }
 

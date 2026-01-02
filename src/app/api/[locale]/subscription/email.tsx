@@ -223,69 +223,64 @@ function SubscriptionSuccessEmail({
 }
 
 // Template Definition Export
-const subscriptionSuccessTemplate: EmailTemplateDefinition<SubscriptionSuccessProps> =
-  {
-    meta: {
-      id: "subscription-success",
-      version: "1.0.0",
-      name: "app.api.emails.templates.subscription.success.meta.name",
-      description:
-        "app.api.emails.templates.subscription.success.meta.description",
-      category: "subscription",
-      path: "/subscription/email.tsx",
-      defaultSubject: (t) =>
-        t("app.api.subscription.email.success.subject", {
-          appName: "",
-          planName: "",
-        }),
-      previewFields: {
-        firstName: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.subscription.success.preview.privateName.label",
-          description:
-            "app.admin.emails.templates.templates.subscription.success.preview.privateName.description",
-          defaultValue: "Max",
-          required: true,
-        },
-        userId: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.subscription.success.preview.userId.label",
-          description:
-            "app.admin.emails.templates.templates.subscription.success.preview.userId.description",
-          defaultValue: "example-user-id-123",
-          required: true,
-        },
-        leadId: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.subscription.success.preview.leadId.label",
-          description:
-            "app.admin.emails.templates.templates.subscription.success.preview.leadId.description",
-          defaultValue: "example-lead-id-456",
-          required: true,
-        },
-        planName: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.subscription.success.preview.planName.label",
-          description:
-            "app.admin.emails.templates.templates.subscription.success.preview.planName.description",
-          defaultValue: "Premium Plan",
-          required: true,
-        },
+const subscriptionSuccessTemplate: EmailTemplateDefinition<SubscriptionSuccessProps> = {
+  meta: {
+    id: "subscription-success",
+    version: "1.0.0",
+    name: "app.api.emails.templates.subscription.success.meta.name",
+    description: "app.api.emails.templates.subscription.success.meta.description",
+    category: "subscription",
+    path: "/subscription/email.tsx",
+    defaultSubject: (t) =>
+      t("app.api.subscription.email.success.subject", {
+        appName: "",
+        planName: "",
+      }),
+    previewFields: {
+      firstName: {
+        type: "text",
+        label:
+          "app.admin.emails.templates.templates.subscription.success.preview.privateName.label",
+        description:
+          "app.admin.emails.templates.templates.subscription.success.preview.privateName.description",
+        defaultValue: "Max",
+        required: true,
+      },
+      userId: {
+        type: "text",
+        label: "app.admin.emails.templates.templates.subscription.success.preview.userId.label",
+        description:
+          "app.admin.emails.templates.templates.subscription.success.preview.userId.description",
+        defaultValue: "example-user-id-123",
+        required: true,
+      },
+      leadId: {
+        type: "text",
+        label: "app.admin.emails.templates.templates.subscription.success.preview.leadId.label",
+        description:
+          "app.admin.emails.templates.templates.subscription.success.preview.leadId.description",
+        defaultValue: "example-lead-id-456",
+        required: true,
+      },
+      planName: {
+        type: "text",
+        label: "app.admin.emails.templates.templates.subscription.success.preview.planName.label",
+        description:
+          "app.admin.emails.templates.templates.subscription.success.preview.planName.description",
+        defaultValue: "Premium Plan",
+        required: true,
       },
     },
-    schema: subscriptionSuccessPropsSchema,
-    component: SubscriptionSuccessEmail,
-    exampleProps: {
-      firstName: "Max",
-      userId: "example-user-id-123",
-      leadId: "example-lead-id-456",
-      planName: "Premium Plan",
-    },
-  };
+  },
+  schema: subscriptionSuccessPropsSchema,
+  component: SubscriptionSuccessEmail,
+  exampleProps: {
+    firstName: "Max",
+    userId: "example-user-id-123",
+    leadId: "example-lead-id-456",
+    planName: "Premium Plan",
+  },
+};
 
 export default subscriptionSuccessTemplate;
 

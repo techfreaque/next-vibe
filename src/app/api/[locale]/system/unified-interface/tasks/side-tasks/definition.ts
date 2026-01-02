@@ -41,8 +41,7 @@ const sideTasksPostEndpoint = createEndpoint({
   method: Methods.POST,
   path: ["system", "tasks", "side-tasks"],
   title: "app.api.system.unifiedInterface.tasks.sideTasks.get.title",
-  description:
-    "app.api.system.unifiedInterface.tasks.sideTasks.get.description",
+  description: "app.api.system.unifiedInterface.tasks.sideTasks.get.description",
   icon: "list",
   category: "app.api.system.unifiedInterface.tasks.sideTasks.category",
   tags: ["app.api.system.unifiedInterface.tasks.sideTasks.tags.sidetasks"],
@@ -52,10 +51,8 @@ const sideTasksPostEndpoint = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.container.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.container.description",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.container.title",
+      description: "app.api.system.unifiedInterface.tasks.sideTasks.get.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -66,40 +63,33 @@ const sideTasksPostEndpoint = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionLabel",
+          label: "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionLabel",
           description:
             "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionDescription",
           options: [
             {
               value: "list",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionList",
+              label: "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionList",
             },
             {
               value: "get",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionGet",
+              label: "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionGet",
             },
             {
               value: "create",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionCreate",
+              label: "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionCreate",
             },
             {
               value: "update",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionUpdate",
+              label: "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionUpdate",
             },
             {
               value: "delete",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionDelete",
+              label: "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionDelete",
             },
             {
               value: "stats",
-              label:
-                "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionStats",
+              label: "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksActionStats",
             },
             {
               value: "executions",
@@ -121,8 +111,7 @@ const sideTasksPostEndpoint = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksIdLabel",
+          label: "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksIdLabel",
           description:
             "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksIdDescription",
           columns: 3,
@@ -134,8 +123,7 @@ const sideTasksPostEndpoint = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksNameLabel",
+          label: "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksNameLabel",
           description:
             "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksNameDescription",
           columns: 3,
@@ -147,8 +135,7 @@ const sideTasksPostEndpoint = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitLabel",
+          label: "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitLabel",
           description:
             "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksLimitDescription",
           columns: 3,
@@ -160,8 +147,7 @@ const sideTasksPostEndpoint = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
-          label:
-            "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksDataLabel",
+          label: "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksDataLabel",
           description:
             "app.api.system.unifiedInterface.tasks.sideTasks.common.sideTasksDataDescription",
           columns: 12,
@@ -173,8 +159,7 @@ const sideTasksPostEndpoint = createEndpoint({
       data: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.sideTasks.tasks.side.response.data.title",
+          content: "app.api.system.unifiedInterface.tasks.sideTasks.tasks.side.response.data.title",
         },
         z.unknown().optional(),
       ),
@@ -236,56 +221,46 @@ const sideTasksPostEndpoint = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.validation.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.validation.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.network.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.network.description",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.network.title",
+      description: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.description",
     },
@@ -293,8 +268,7 @@ const sideTasksPostEndpoint = createEndpoint({
 
   successTypes: {
     title: "app.api.system.unifiedInterface.tasks.sideTasks.get.success.title",
-    description:
-      "app.api.system.unifiedInterface.tasks.sideTasks.get.success.description",
+    description: "app.api.system.unifiedInterface.tasks.sideTasks.get.success.description",
   },
 });
 
@@ -306,8 +280,7 @@ const sideTasksGetEndpoint = createEndpoint({
   method: Methods.GET,
   path: ["system", "tasks", "side-tasks"],
   title: "app.api.system.unifiedInterface.tasks.sideTasks.get.title",
-  description:
-    "app.api.system.unifiedInterface.tasks.sideTasks.get.description",
+  description: "app.api.system.unifiedInterface.tasks.sideTasks.get.description",
   icon: "list",
   category: "app.api.system.unifiedInterface.tasks.category",
   tags: ["app.api.system.unifiedInterface.tasks.sideTasks.tags.sidetasks"],
@@ -317,10 +290,8 @@ const sideTasksGetEndpoint = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.container.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.container.description",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.container.title",
+      description: "app.api.system.unifiedInterface.tasks.sideTasks.get.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -330,8 +301,7 @@ const sideTasksGetEndpoint = createEndpoint({
       totalTasks: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.sideTasks.get.response.totalTasks.title",
+          content: "app.api.system.unifiedInterface.tasks.sideTasks.get.response.totalTasks.title",
         },
         z.coerce.number(),
       ),
@@ -378,56 +348,46 @@ const sideTasksGetEndpoint = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.validation.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.validation.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.network.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.network.description",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.network.title",
+      description: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unknownError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.title",
+      title: "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.title",
       description:
         "app.api.system.unifiedInterface.tasks.sideTasks.get.errors.conflict.description",
     },
@@ -435,8 +395,7 @@ const sideTasksGetEndpoint = createEndpoint({
 
   successTypes: {
     title: "app.api.system.unifiedInterface.tasks.sideTasks.get.success.title",
-    description:
-      "app.api.system.unifiedInterface.tasks.sideTasks.get.success.description",
+    description: "app.api.system.unifiedInterface.tasks.sideTasks.get.success.description",
   },
 });
 
@@ -447,20 +406,12 @@ const endpoints = {
 export default endpoints;
 
 // Export types for repository
-export type SideTasksRequestInput =
-  typeof sideTasksPostEndpoint.POST.types.RequestInput;
-export type SideTasksRequestOutput =
-  typeof sideTasksPostEndpoint.POST.types.RequestOutput;
-export type SideTasksResponseInput =
-  typeof sideTasksPostEndpoint.POST.types.ResponseInput;
-export type SideTasksResponseOutput =
-  typeof sideTasksPostEndpoint.POST.types.ResponseOutput;
+export type SideTasksRequestInput = typeof sideTasksPostEndpoint.POST.types.RequestInput;
+export type SideTasksRequestOutput = typeof sideTasksPostEndpoint.POST.types.RequestOutput;
+export type SideTasksResponseInput = typeof sideTasksPostEndpoint.POST.types.ResponseInput;
+export type SideTasksResponseOutput = typeof sideTasksPostEndpoint.POST.types.ResponseOutput;
 
-export type SideTasksStatusRequestInput =
-  typeof sideTasksGetEndpoint.GET.types.RequestInput;
-export type SideTasksStatusRequestOutput =
-  typeof sideTasksGetEndpoint.GET.types.RequestOutput;
-export type SideTasksStatusResponseInput =
-  typeof sideTasksGetEndpoint.GET.types.ResponseInput;
-export type SideTasksStatusResponseOutput =
-  typeof sideTasksGetEndpoint.GET.types.ResponseOutput;
+export type SideTasksStatusRequestInput = typeof sideTasksGetEndpoint.GET.types.RequestInput;
+export type SideTasksStatusRequestOutput = typeof sideTasksGetEndpoint.GET.types.RequestOutput;
+export type SideTasksStatusResponseInput = typeof sideTasksGetEndpoint.GET.types.ResponseInput;
+export type SideTasksStatusResponseOutput = typeof sideTasksGetEndpoint.GET.types.ResponseOutput;

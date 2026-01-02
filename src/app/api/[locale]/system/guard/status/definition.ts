@@ -29,12 +29,7 @@ const { POST } = createEndpoint({
   category: "app.api.system.guard.category",
   tags: ["app.api.system.guard.status.post.tag"],
   icon: "eye",
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.PRODUCTION_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
   aliases: ["guard:status", "guard-status"],
 
   fields: objectField(
@@ -53,10 +48,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.system.guard.status.post.fields.projectPath.title",
-          description:
-            "app.api.system.guard.status.post.fields.projectPath.description",
-          placeholder:
-            "app.api.system.guard.status.post.fields.projectPath.placeholder",
+          description: "app.api.system.guard.status.post.fields.projectPath.description",
+          placeholder: "app.api.system.guard.status.post.fields.projectPath.placeholder",
           columns: 6,
         },
         z.string().optional(),
@@ -67,10 +60,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.system.guard.status.post.fields.guardId.title",
-          description:
-            "app.api.system.guard.status.post.fields.guardId.description",
-          placeholder:
-            "app.api.system.guard.status.post.fields.guardId.placeholder",
+          description: "app.api.system.guard.status.post.fields.guardId.description",
+          placeholder: "app.api.system.guard.status.post.fields.guardId.placeholder",
           columns: 6,
         },
         z.string().optional(),
@@ -81,8 +72,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.guard.status.post.fields.listAll.title",
-          description:
-            "app.api.system.guard.status.post.fields.listAll.description",
+          description: "app.api.system.guard.status.post.fields.listAll.description",
           columns: 12,
         },
         z.boolean().optional().default(false),
@@ -121,8 +111,7 @@ const { POST } = createEndpoint({
             guardId: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.guardId.title",
+                content: "app.api.system.guard.status.post.fields.guardId.title",
                 fieldType: FieldDataType.TEXT,
               },
               z.string(),
@@ -130,8 +119,7 @@ const { POST } = createEndpoint({
             username: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.username.title",
+                content: "app.api.system.guard.status.post.fields.username.title",
                 fieldType: FieldDataType.TEXT,
               },
               z.string(),
@@ -139,8 +127,7 @@ const { POST } = createEndpoint({
             projectPath: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.projectPath.title",
+                content: "app.api.system.guard.status.post.fields.projectPath.title",
                 fieldType: FieldDataType.TEXT,
               },
               z.string(),
@@ -156,8 +143,7 @@ const { POST } = createEndpoint({
             createdAt: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.createdAt.title",
+                content: "app.api.system.guard.status.post.fields.createdAt.title",
                 fieldType: FieldDataType.TEXT,
               },
               z.string(),
@@ -165,8 +151,7 @@ const { POST } = createEndpoint({
             securityLevel: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.securityLevel.title",
+                content: "app.api.system.guard.status.post.fields.securityLevel.title",
                 fieldType: FieldDataType.TEXT,
               },
               z.string(),
@@ -174,8 +159,7 @@ const { POST } = createEndpoint({
             isolationMethod: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.isolationMethod.title",
+                content: "app.api.system.guard.status.post.fields.isolationMethod.title",
                 fieldType: FieldDataType.TEXT,
               },
               z.string(),
@@ -183,8 +167,7 @@ const { POST } = createEndpoint({
             isRunning: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.isRunning.title",
+                content: "app.api.system.guard.status.post.fields.isRunning.title",
                 fieldType: FieldDataType.BOOLEAN,
               },
               z.boolean(),
@@ -192,8 +175,7 @@ const { POST } = createEndpoint({
             userHome: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.guard.status.post.fields.userHome.title",
+                content: "app.api.system.guard.status.post.fields.userHome.title",
                 fieldType: FieldDataType.TEXT,
               },
               z.string().optional(),
@@ -224,48 +206,39 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.guard.status.post.errors.validation.title",
-      description:
-        "app.api.system.guard.status.post.errors.validation.description",
+      description: "app.api.system.guard.status.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.guard.status.post.errors.internal.title",
-      description:
-        "app.api.system.guard.status.post.errors.internal.description",
+      description: "app.api.system.guard.status.post.errors.internal.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.guard.status.post.errors.unauthorized.title",
-      description:
-        "app.api.system.guard.status.post.errors.unauthorized.description",
+      description: "app.api.system.guard.status.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.guard.status.post.errors.unauthorized.title",
-      description:
-        "app.api.system.guard.status.post.errors.unauthorized.description",
+      description: "app.api.system.guard.status.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.guard.status.post.errors.notFound.title",
-      description:
-        "app.api.system.guard.status.post.errors.notFound.description",
+      description: "app.api.system.guard.status.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.guard.status.post.errors.internal.title",
-      description:
-        "app.api.system.guard.status.post.errors.internal.description",
+      description: "app.api.system.guard.status.post.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.guard.status.post.errors.internal.title",
-      description:
-        "app.api.system.guard.status.post.errors.internal.description",
+      description: "app.api.system.guard.status.post.errors.internal.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.guard.status.post.errors.internal.title",
-      description:
-        "app.api.system.guard.status.post.errors.internal.description",
+      description: "app.api.system.guard.status.post.errors.internal.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.guard.status.post.errors.internal.title",
-      description:
-        "app.api.system.guard.status.post.errors.internal.description",
+      description: "app.api.system.guard.status.post.errors.internal.description",
     },
   },
 
@@ -302,8 +275,7 @@ const { POST } = createEndpoint({
             securityLevel: "standard",
             isolationMethod: "rbash",
             isRunning: true,
-            userHome:
-              "/home/user/projects/my-project/.guard_home_guard_my_project",
+            userHome: "/home/user/projects/my-project/.guard_home_guard_my_project",
           },
           {
             guardId: "guard_other_project_def456",
@@ -314,8 +286,7 @@ const { POST } = createEndpoint({
             securityLevel: "strict",
             isolationMethod: "chroot",
             isRunning: false,
-            userHome:
-              "/home/user/projects/other-project/.guard_home_guard_other_project",
+            userHome: "/home/user/projects/other-project/.guard_home_guard_other_project",
           },
         ],
         totalGuards: 2,
@@ -334,8 +305,7 @@ const { POST } = createEndpoint({
             securityLevel: "standard",
             isolationMethod: "rbash",
             isRunning: true,
-            userHome:
-              "/home/user/projects/my-project/.guard_home_guard_my_project",
+            userHome: "/home/user/projects/my-project/.guard_home_guard_my_project",
           },
         ],
         totalGuards: 1,
@@ -354,8 +324,7 @@ const { POST } = createEndpoint({
             securityLevel: "standard",
             isolationMethod: "rbash",
             isRunning: true,
-            userHome:
-              "/home/user/projects/my-project/.guard_home_guard_my_project",
+            userHome: "/home/user/projects/my-project/.guard_home_guard_my_project",
           },
         ],
         totalGuards: 1,

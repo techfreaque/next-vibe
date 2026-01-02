@@ -6,11 +6,7 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -50,19 +46,11 @@ export class LogoutRepository {
       });
 
       // Clear auth token using platform-specific handler
-      const clearResult = await AuthRepository.clearAuthTokenForPlatform(
-        platform,
-        logger,
-      );
+      const clearResult = await AuthRepository.clearAuthTokenForPlatform(platform, logger);
       if (clearResult.success) {
-        logger.debug(
-          "app.api.user.private.logout.debug.authTokenClearedSuccessfully",
-          { userId },
-        );
+        logger.debug("app.api.user.private.logout.debug.authTokenClearedSuccessfully", { userId });
       } else {
-        logger.error(
-          "app.api.user.private.logout.debug.errorClearingAuthToken",
-        );
+        logger.error("app.api.user.private.logout.debug.errorClearingAuthToken");
         // Continue even if token deletion fails
       }
 
@@ -79,8 +67,7 @@ export class LogoutRepository {
         );
         // Use a specific error for session deletion failure
         return fail({
-          message:
-            "app.api.user.private.logout.errors.session_deletion_failed.title",
+          message: "app.api.user.private.logout.errors.session_deletion_failed.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             resourceType: "user.sessions",
@@ -101,10 +88,7 @@ export class LogoutRepository {
         ],
       });
     } catch (error) {
-      logger.error(
-        "app.api.user.private.logout.debug.errorDuringLogoutProcess",
-        parseError(error),
-      );
+      logger.error("app.api.user.private.logout.debug.errorDuringLogoutProcess", parseError(error));
       return fail({
         message: "app.api.user.private.logout.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

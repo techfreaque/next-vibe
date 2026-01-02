@@ -11,8 +11,7 @@ export const translations = {
     endedOn: "Ended On",
     cancellation: {
       title: "Subscription Scheduled for Cancellation",
-      description:
-        "Your subscription will end on {{date}}. You will retain access until then.",
+      description: "Your subscription will end on {{date}}. You will retain access until then.",
     },
     canceled: {
       title: "Subscription Canceled",
@@ -30,8 +29,7 @@ export const translations = {
     },
     balance: {
       title: "Credit Balance",
-      description:
-        "Your available credits for AI conversations with {{modelCount}} models",
+      description: "Your available credits for AI conversations with {{modelCount}} models",
       credit: "{{count}} credit",
       credits: "{{count}} credits",
       nextExpiration: "Next Expiration",
@@ -103,8 +101,7 @@ export const translations = {
     buy: {
       signInRequired: {
         title: "Sign In Required",
-        description:
-          "Please sign in or create an account to purchase credits or subscribe.",
+        description: "Please sign in or create an account to purchase credits or subscribe.",
       },
       provider: {
         stripe: {
@@ -136,8 +133,7 @@ export const translations = {
       },
       pack: {
         title: "Extra Credit Packs",
-        description:
-          "Additional credits that never expire. Requires active subscription.",
+        description: "Additional credits that never expire. Requires active subscription.",
         badge: "For Subscribers",
         perPack: "/pack",
         quantity: "Quantity",
@@ -200,10 +196,8 @@ export const translations = {
       },
       canceled: {
         title: "Payment Canceled",
-        subscription:
-          "Your subscription payment was canceled. You can try again anytime.",
-        credits:
-          "Your credit pack purchase was canceled. You can try again anytime.",
+        subscription: "Your subscription payment was canceled. You can try again anytime.",
+        credits: "Your credit pack purchase was canceled. You can try again anytime.",
       },
     },
   },
@@ -242,15 +236,12 @@ export const translations = {
       title: "Payment Successful",
       subscription:
         "Your monthly subscription has been activated! You now get {{subCredits}} credits per month with all {{modelCount}}+ models.",
-      credits:
-        "Your credit pack purchase was successful! Credits never expire.",
+      credits: "Your credit pack purchase was successful! Credits never expire.",
     },
     canceled: {
       title: "Payment Canceled",
-      subscription:
-        "Your subscription payment was canceled. You can try again anytime.",
-      credits:
-        "Your credit pack purchase was canceled. You can try again anytime.",
+      subscription: "Your subscription payment was canceled. You can try again anytime.",
+      credits: "Your credit pack purchase was canceled. You can try again anytime.",
     },
   },
 };

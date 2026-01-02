@@ -73,8 +73,7 @@ export const translations = {
         description: "Parameters for tool execution",
         name: {
           title: "Tool Name",
-          description:
-            "Name of the tool to execute (e.g., core:system:db:ping)",
+          description: "Name of the tool to execute (e.g., core:system:db:ping)",
           placeholder: "core:system:db:ping",
         },
         arguments: {

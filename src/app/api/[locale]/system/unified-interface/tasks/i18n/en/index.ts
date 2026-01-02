@@ -102,14 +102,12 @@ export const translations = {
     },
     patterns: {
       everyIntervalMinutes: "every {interval} minutes",
-      everyIntervalMinutesStarting:
-        "every {interval} minutes starting at minute {start}",
+      everyIntervalMinutesStarting: "every {interval} minutes starting at minute {start}",
       atMinutes: "at minutes {minutes}",
       fromMinuteToMinute: "from minute {from} to {to}",
       atMinute: "at minute {minute}",
       everyIntervalHours: "every {interval} hours",
-      everyIntervalHoursStarting:
-        "every {interval} hours starting at hour {start}",
+      everyIntervalHoursStarting: "every {interval} hours starting at hour {start}",
       atHours: "at hours {hours}",
       fromHourToHour: "from hour {from} to {to}",
       atHour: "at hour {hour}",
@@ -164,8 +162,7 @@ export const translations = {
     createSideTaskExecution: "Failed to create side task execution",
     updateSideTaskExecution: "Failed to update side task execution",
     fetchSideTaskExecutions: "Failed to fetch side task executions",
-    fetchRecentSideTaskExecutions:
-      "Failed to fetch recent side task executions",
+    fetchRecentSideTaskExecutions: "Failed to fetch recent side task executions",
     createSideTaskHealthCheck: "Failed to create side task health check",
     fetchLatestHealthCheck: "Failed to fetch latest health check",
     fetchHealthCheckHistory: "Failed to fetch health check history",
@@ -207,8 +204,7 @@ export const translations = {
     cronRepositoryExecutionCreateFailed: "Failed to create cron task execution",
     cronRepositoryExecutionUpdateFailed: "Failed to update cron task execution",
     cronRepositoryExecutionsFetchFailed: "Failed to fetch cron task executions",
-    cronRepositoryRecentExecutionsFetchFailed:
-      "Failed to fetch recent cron task executions",
+    cronRepositoryRecentExecutionsFetchFailed: "Failed to fetch recent cron task executions",
     cronRepositorySchedulesFetchFailed: "Failed to fetch cron task schedules",
     cronRepositoryScheduleUpdateFailed: "Failed to update cron task schedule",
     cronRepositoryStatisticsFetchFailed: "Failed to fetch cron task statistics",

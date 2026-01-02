@@ -146,8 +146,7 @@ export function extractSchemaDefaults<T>(
       if (!shapeFnOrObj) {
         return {} as Partial<T>;
       }
-      const shapeObj =
-        typeof shapeFnOrObj === "function" ? shapeFnOrObj() : shapeFnOrObj;
+      const shapeObj = typeof shapeFnOrObj === "function" ? shapeFnOrObj() : shapeFnOrObj;
       if (typeof shapeObj !== "object" || shapeObj === null) {
         return {} as Partial<T>;
       }
@@ -175,12 +174,7 @@ export function extractSchemaDefaults<T>(
     if (schema instanceof z.ZodOptional) {
       const innerType = getDefProperty<z.ZodTypeAny>(def, "innerType");
       if (innerType && hasZodDef(innerType)) {
-        return extractSchemaDefaults<T>(
-          innerType,
-          logger,
-          `${path}.optional`,
-          forFormInit,
-        );
+        return extractSchemaDefaults<T>(innerType, logger, `${path}.optional`, forFormInit);
       }
     }
 
@@ -188,12 +182,7 @@ export function extractSchemaDefaults<T>(
     if (schema instanceof z.ZodNullable) {
       const innerType = getDefProperty<z.ZodTypeAny>(def, "innerType");
       if (innerType && hasZodDef(innerType)) {
-        return extractSchemaDefaults<T>(
-          innerType,
-          logger,
-          `${path}.nullable`,
-          forFormInit,
-        );
+        return extractSchemaDefaults<T>(innerType, logger, `${path}.nullable`, forFormInit);
       }
     }
 
@@ -203,12 +192,7 @@ export function extractSchemaDefaults<T>(
     if (isZodEffects) {
       const innerSchema = getDefProperty<z.ZodTypeAny>(def, "schema");
       if (innerSchema && hasZodDef(innerSchema)) {
-        return extractSchemaDefaults<T>(
-          innerSchema,
-          logger,
-          `${path}.effects`,
-          forFormInit,
-        );
+        return extractSchemaDefaults<T>(innerSchema, logger, `${path}.effects`, forFormInit);
       }
     }
 
@@ -218,12 +202,7 @@ export function extractSchemaDefaults<T>(
     if (isZodPipeline) {
       const inSchema = getDefProperty<z.ZodTypeAny>(def, "in");
       if (inSchema && hasZodDef(inSchema)) {
-        return extractSchemaDefaults<T>(
-          inSchema,
-          logger,
-          `${path}.pipeline`,
-          forFormInit,
-        );
+        return extractSchemaDefaults<T>(inSchema, logger, `${path}.pipeline`, forFormInit);
       }
     }
 
@@ -233,12 +212,7 @@ export function extractSchemaDefaults<T>(
       if (typeof getter === "function") {
         const lazySchema = getter();
         if (hasZodDef(lazySchema)) {
-          return extractSchemaDefaults<T>(
-            lazySchema,
-            logger,
-            `${path}.lazy`,
-            forFormInit,
-          );
+          return extractSchemaDefaults<T>(lazySchema, logger, `${path}.lazy`, forFormInit);
         }
       }
     }
@@ -250,32 +224,16 @@ export function extractSchemaDefaults<T>(
       // Use both instanceof and def.type for Zod v4 compatibility
       // Note: Type assertions are necessary here because we're doing runtime schema introspection
       // and TypeScript can't verify at compile time that T matches the schema type
-      if (
-        schema instanceof z.ZodArray ||
-        typeName === "ZodArray" ||
-        defType === "array"
-      ) {
+      if (schema instanceof z.ZodArray || typeName === "ZodArray" || defType === "array") {
         return [] as T;
       }
-      if (
-        schema instanceof z.ZodString ||
-        typeName === "ZodString" ||
-        defType === "string"
-      ) {
+      if (schema instanceof z.ZodString || typeName === "ZodString" || defType === "string") {
         return "" as T;
       }
-      if (
-        schema instanceof z.ZodNumber ||
-        typeName === "ZodNumber" ||
-        defType === "number"
-      ) {
+      if (schema instanceof z.ZodNumber || typeName === "ZodNumber" || defType === "number") {
         return 0 as T;
       }
-      if (
-        schema instanceof z.ZodBoolean ||
-        typeName === "ZodBoolean" ||
-        defType === "boolean"
-      ) {
+      if (schema instanceof z.ZodBoolean || typeName === "ZodBoolean" || defType === "boolean") {
         return false as T;
       }
     }
@@ -332,12 +290,7 @@ export function requestResponseField<
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: false,
-): PrimitiveField<
-  TSchema,
-  { request: "data"; response: true },
-  TKey,
-  TUIConfig
->;
+): PrimitiveField<TSchema, { request: "data"; response: true }, TKey, TUIConfig>;
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<
   TKey extends string = TranslationKey,
@@ -348,12 +301,7 @@ export function requestResponseField<
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: true,
-): PrimitiveField<
-  TSchema,
-  { request: "urlPathParams"; response: true },
-  TKey,
-  TUIConfig
->;
+): PrimitiveField<TSchema, { request: "urlPathParams"; response: true }, TKey, TUIConfig>;
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<
   TKey extends string = TranslationKey,
@@ -364,12 +312,7 @@ export function requestResponseField<
   schema: TSchema,
   cache?: CacheStrategy,
   requestAsUrlParams?: boolean,
-): PrimitiveField<
-  TSchema,
-  { request: "data" | "urlPathParams"; response: true },
-  TKey,
-  TUIConfig
-> {
+): PrimitiveField<TSchema, { request: "data" | "urlPathParams"; response: true }, TKey, TUIConfig> {
   const requestType = requestAsUrlParams ? "urlPathParams" : "data";
   return {
     type: "primitive" as const,
@@ -412,12 +355,7 @@ export function requestUrlPathParamsField<
   ui: TUIConfig,
   schema: TSchema,
   cache?: CacheStrategy,
-): PrimitiveField<
-  TSchema,
-  { request: "urlPathParams"; response?: never },
-  TKey,
-  TUIConfig
-> {
+): PrimitiveField<TSchema, { request: "urlPathParams"; response?: never }, TKey, TUIConfig> {
   return {
     type: "primitive" as const,
     schema,
@@ -455,11 +393,7 @@ export function widgetField<
   TKey extends string = TranslationKey,
   TUsage extends FieldUsageConfig = FieldUsageConfig,
   const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
->(
-  ui: TUIConfig,
-  usage: TUsage,
-  cache?: CacheStrategy,
-): WidgetField<TUsage, TKey, TUIConfig> {
+>(ui: TUIConfig, usage: TUsage, cache?: CacheStrategy): WidgetField<TUsage, TKey, TUIConfig> {
   return {
     type: "widget" as const,
     usage,
@@ -523,9 +457,7 @@ export function scopedObjectField<
     UnifiedField<TScopedTranslation["ScopedTranslationKey"], z.ZodTypeAny>
   >,
   TUsage extends FieldUsageConfig,
-  const TUIConfig extends WidgetConfig<
-    TScopedTranslation["ScopedTranslationKey"]
-  >,
+  const TUIConfig extends WidgetConfig<TScopedTranslation["ScopedTranslationKey"]>,
 >(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
   _scopedTranslation: TScopedTranslation,
@@ -533,12 +465,7 @@ export function scopedObjectField<
   usage: TUsage,
   children: TChildren,
   cache?: CacheStrategy,
-): ObjectField<
-  TChildren,
-  TUsage,
-  TScopedTranslation["ScopedTranslationKey"],
-  TUIConfig
-> {
+): ObjectField<TChildren, TUsage, TScopedTranslation["ScopedTranslationKey"], TUIConfig> {
   return {
     type: "object" as const,
     children,
@@ -553,9 +480,7 @@ export function scopedObjectField<
  */
 export function scopedRequestDataField<
   TScopedTranslation extends ScopedTranslationType,
-  const TUIConfig extends WidgetConfig<
-    TScopedTranslation["ScopedTranslationKey"]
-  >,
+  const TUIConfig extends WidgetConfig<TScopedTranslation["ScopedTranslationKey"]>,
   TSchema extends z.ZodTypeAny,
 >(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
@@ -584,9 +509,7 @@ export function scopedRequestDataField<
 export function scopedResponseField<
   TScopedTranslation extends ScopedTranslationType,
   TSchema extends z.ZodTypeAny,
-  const TUIConfig extends WidgetConfig<
-    TScopedTranslation["ScopedTranslationKey"]
-  >,
+  const TUIConfig extends WidgetConfig<TScopedTranslation["ScopedTranslationKey"]>,
 >(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
   _scopedTranslation: TScopedTranslation,
@@ -614,9 +537,7 @@ export function scopedResponseField<
 export function scopedResponseArrayOptionalField<
   TScopedTranslation extends ScopedTranslationType,
   Child,
-  const TUIConfig extends WidgetConfig<
-    TScopedTranslation["ScopedTranslationKey"]
-  >,
+  const TUIConfig extends WidgetConfig<TScopedTranslation["ScopedTranslationKey"]>,
 >(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
   _scopedTranslation: TScopedTranslation,
@@ -933,9 +854,7 @@ export type InferUnionType<
         TTranslatedKey,
         WidgetConfig<TTranslatedKey>
       >[]
-      ?
-          | InferFieldType<Head, Usage, TTranslatedKey>
-          | InferUnionType<TTranslatedKey, Tail, Usage>
+      ? InferFieldType<Head, Usage, TTranslatedKey> | InferUnionType<TTranslatedKey, Tail, Usage>
       : InferFieldType<Head, Usage, TTranslatedKey>
     : never
   : never;
@@ -969,24 +888,15 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
           }
         ? Usage extends FieldUsage.Response
           ? HasResponseUsage<U> extends true
-            ? MakeOptional<
-                Array<InferFieldType<Child, Usage, TKey>>,
-                IsOptionalField<F>
-              >
+            ? MakeOptional<Array<InferFieldType<Child, Usage, TKey>>, IsOptionalField<F>>
             : never
           : Usage extends FieldUsage.RequestData
             ? HasRequestDataUsage<U> extends true
-              ? MakeOptional<
-                  Array<InferFieldType<Child, Usage, TKey>>,
-                  IsOptionalField<F>
-                >
+              ? MakeOptional<Array<InferFieldType<Child, Usage, TKey>>, IsOptionalField<F>>
               : never
             : Usage extends FieldUsage.RequestUrlParams
               ? HasRequestUrlParamsUsage<U> extends true
-                ? MakeOptional<
-                    Array<InferFieldType<Child, Usage, TKey>>,
-                    IsOptionalField<F>
-                  >
+                ? MakeOptional<Array<InferFieldType<Child, Usage, TKey>>, IsOptionalField<F>>
                 : never
               : never
         : F extends {
@@ -1021,34 +931,22 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
               }
             ? Usage extends FieldUsage.Response
               ? HasResponseUsage<U> extends true
-                ? MakeOptional<
-                    InferObjectType<C, Usage, TKey>,
-                    IsOptionalField<F>
-                  >
+                ? MakeOptional<InferObjectType<C, Usage, TKey>, IsOptionalField<F>>
                 : never
               : Usage extends FieldUsage.RequestData
                 ? HasRequestDataUsage<U> extends true
-                  ? MakeOptional<
-                      InferObjectType<C, Usage, TKey>,
-                      IsOptionalField<F>
-                    >
+                  ? MakeOptional<InferObjectType<C, Usage, TKey>, IsOptionalField<F>>
                   : never
                 : Usage extends FieldUsage.RequestUrlParams
                   ? HasRequestUrlParamsUsage<U> extends true
-                    ? MakeOptional<
-                        InferObjectType<C, Usage, TKey>,
-                        IsOptionalField<F>
-                      >
+                    ? MakeOptional<InferObjectType<C, Usage, TKey>, IsOptionalField<F>>
                     : never
                   : never
             : F extends {
                   type: "object" | "object-optional";
                   children: infer C;
                 }
-              ? MakeOptional<
-                  InferObjectType<C, Usage, TKey>,
-                  IsOptionalField<F>
-                >
+              ? MakeOptional<InferObjectType<C, Usage, TKey>, IsOptionalField<F>>
               : never
     : never;
 
@@ -1060,21 +958,13 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
 export type InferObjectType<C, Usage extends FieldUsage, TKey extends string> =
   C extends Record<string, UnifiedField<TKey, z.ZodTypeAny>>
     ? {
-        -readonly [K in keyof C as InferFieldType<
-          C[K],
-          Usage,
-          TKey
-        > extends never
+        -readonly [K in keyof C as InferFieldType<C[K], Usage, TKey> extends never
           ? never
           : IsOptionalField<C[K]> extends true
             ? never
             : K]: InferFieldType<C[K], Usage, TKey>;
       } & {
-        -readonly [K in keyof C as InferFieldType<
-          C[K],
-          Usage,
-          TKey
-        > extends never
+        -readonly [K in keyof C as InferFieldType<C[K], Usage, TKey> extends never
           ? never
           : IsOptionalField<C[K]> extends true
             ? K
@@ -1112,14 +1002,12 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         return "response" in usage && usage.response === true;
       case FieldUsage.RequestData:
         return (
-          "request" in usage &&
-          (usage.request === "data" || usage.request === "data&urlPathParams")
+          "request" in usage && (usage.request === "data" || usage.request === "data&urlPathParams")
         );
       case FieldUsage.RequestUrlParams:
         return (
           "request" in usage &&
-          (usage.request === "urlPathParams" ||
-            usage.request === "data&urlPathParams")
+          (usage.request === "urlPathParams" || usage.request === "data&urlPathParams")
         );
       default:
         return false;
@@ -1189,8 +1077,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       for (const [key, childField] of Object.entries(typedField.children)) {
         // CRITICAL: Skip widget fields completely - they should NEVER be in validation schemas
         // Widget fields (formAlert, submitButton, etc.) are UI-only and don't send/receive data
-        const isWidgetField =
-          "type" in childField && childField.type === "widget";
+        const isWidgetField = "type" in childField && childField.type === "widget";
         if (isWidgetField) {
           continue;
         }
@@ -1201,8 +1088,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
           childField.type === "object" &&
           childField.children &&
           Object.values(childField.children).every(
-            (grandchild) =>
-              "type" in grandchild && grandchild.type === "widget",
+            (grandchild) => "type" in grandchild && grandchild.type === "widget",
           );
         if (isObjectFieldWithOnlyWidgets) {
           continue;
@@ -1213,8 +1099,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         if (childField.usage) {
           const childHasUsage =
             targetUsage === FieldUsage.Response
-              ? "response" in childField.usage &&
-                childField.usage.response === true
+              ? "response" in childField.usage && childField.usage.response === true
               : targetUsage === FieldUsage.RequestData
                 ? "request" in childField.usage &&
                   (childField.usage.request === "data" ||
@@ -1254,11 +1139,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     let objectSchema = z.object(shape);
 
     // Apply optional modifier if specified in UI config
-    if (
-      typedField.ui &&
-      "optional" in typedField.ui &&
-      typedField.ui.optional
-    ) {
+    if (typedField.ui && "optional" in typedField.ui && typedField.ui.optional) {
       const optionalSchema = objectSchema.nullable().optional();
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
       return optionalSchema as unknown as InferSchemaFromField<F, Usage>;
@@ -1281,8 +1162,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     if (typedField.children) {
       for (const [key, childField] of Object.entries(typedField.children)) {
         // Skip widget fields - they're UI-only
-        const isWidgetField =
-          "type" in childField && childField.type === "widget";
+        const isWidgetField = "type" in childField && childField.type === "widget";
         if (isWidgetField) {
           continue;
         }
@@ -1325,10 +1205,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
     for (const variant of typedField.variants) {
       // Generate schema for this variant using the same target usage
-      const variantSchema = generateSchemaForUsage<typeof variant, Usage>(
-        variant,
-        targetUsage,
-      );
+      const variantSchema = generateSchemaForUsage<typeof variant, Usage>(variant, targetUsage);
 
       // Skip variants that don't match the usage
       if (variantSchema._def.type === neverType) {
@@ -1391,11 +1268,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       let arraySchema = z.array(childSchema);
 
       // Apply optional modifier if specified in UI config
-      if (
-        typedField.ui &&
-        "optional" in typedField.ui &&
-        typedField.ui.optional
-      ) {
+      if (typedField.ui && "optional" in typedField.ui && typedField.ui.optional) {
         const optionalArraySchema = arraySchema.nullable().optional();
         // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type casting: Complex Zod schema inference requires unknown as intermediate step for type safety between incompatible generic structures.
         return optionalArraySchema as unknown as InferSchemaFromField<F, Usage>;
@@ -1458,10 +1331,7 @@ export type InferFieldSchemaOutputType<F, Usage extends FieldUsage> = z.output<
 export function generateRequestDataSchema<F>(
   field: F,
 ): InferSchemaFromField<F, FieldUsage.RequestData> {
-  return generateSchemaForUsage<F, FieldUsage.RequestData>(
-    field,
-    FieldUsage.RequestData,
-  );
+  return generateSchemaForUsage<F, FieldUsage.RequestData>(field, FieldUsage.RequestData);
 }
 
 /**
@@ -1470,20 +1340,12 @@ export function generateRequestDataSchema<F>(
 export function generateRequestUrlSchema<F>(
   field: F,
 ): InferSchemaFromField<F, FieldUsage.RequestUrlParams> {
-  return generateSchemaForUsage<F, FieldUsage.RequestUrlParams>(
-    field,
-    FieldUsage.RequestUrlParams,
-  );
+  return generateSchemaForUsage<F, FieldUsage.RequestUrlParams>(field, FieldUsage.RequestUrlParams);
 }
 
 /**
  * Generate response schema with proper input/output type differentiation
  */
-export function generateResponseSchema<F>(
-  field: F,
-): InferSchemaFromField<F, FieldUsage.Response> {
-  return generateSchemaForUsage<F, FieldUsage.Response>(
-    field,
-    FieldUsage.Response,
-  );
+export function generateResponseSchema<F>(field: F): InferSchemaFromField<F, FieldUsage.Response> {
+  return generateSchemaForUsage<F, FieldUsage.Response>(field, FieldUsage.Response);
 }

@@ -120,8 +120,5 @@ export interface PaymentProvider {
     }>
   >;
 
-  cancelSubscription(
-    subscriptionId: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>>;
+  cancelSubscription(subscriptionId: string, logger: EndpointLogger): Promise<ResponseType<void>>;
 }

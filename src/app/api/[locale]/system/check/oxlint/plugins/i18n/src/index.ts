@@ -19,10 +19,7 @@ import type {
   OxlintASTNode,
   OxlintRuleContext,
 } from "../../../types";
-import type {
-  createPluginMessages,
-  loadPluginConfig,
-} from "../../shared/config-loader";
+import type { createPluginMessages, loadPluginConfig } from "../../shared/config-loader";
 
 // ============================================================
 // Types
@@ -85,10 +82,8 @@ const DEFAULT_CONFIG: I18nPluginConfig = {
 
 const DEFAULT_MESSAGES: I18nMessages = {
   jsxText: 'Literal string "{value}" should be translated using i18n.',
-  jsxExpression:
-    'Literal string "{value}" in JSX expression should be translated.',
-  jsxAttribute:
-    'Literal string "{value}" in JSX attribute should be translated.',
+  jsxExpression: 'Literal string "{value}" in JSX expression should be translated.',
+  jsxAttribute: 'Literal string "{value}" in JSX attribute should be translated.',
 };
 
 // ============================================================
@@ -134,10 +129,7 @@ function loadI18nConfig(): I18nPluginConfig {
   const loader = getConfigLoader();
 
   if (loader) {
-    const result = loader.loadPluginConfig(
-      "oxlint-plugin-i18n/no-literal-string",
-      DEFAULT_CONFIG,
-    );
+    const result = loader.loadPluginConfig("oxlint-plugin-i18n/no-literal-string", DEFAULT_CONFIG);
     cachedConfig = result.config ?? DEFAULT_CONFIG;
   } else {
     // Fallback: try direct require of check.config.ts
@@ -155,11 +147,9 @@ function loadConfigFallback(): I18nPluginConfig {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment -- Plugin fallback requires dynamic loading
     const config = require(`${process.cwd()}/check.config.ts`);
     const checkConfig = config.default ?? config;
-    const exported =
-      typeof checkConfig === "function" ? checkConfig() : checkConfig;
+    const exported = typeof checkConfig === "function" ? checkConfig() : checkConfig;
 
-    const ruleConfig =
-      exported?.oxlint?.rules?.["oxlint-plugin-i18n/no-literal-string"];
+    const ruleConfig = exported?.oxlint?.rules?.["oxlint-plugin-i18n/no-literal-string"];
     if (Array.isArray(ruleConfig) && ruleConfig[1]) {
       return ruleConfig[1] as I18nPluginConfig;
     }
@@ -226,9 +216,7 @@ const noLiteralStringRule = {
       },
     ],
   },
-  create(
-    context: I18nRuleContext,
-  ): Record<string, (node: OxlintASTNode) => void> {
+  create(context: I18nRuleContext): Record<string, (node: OxlintASTNode) => void> {
     // Load config from check.config.ts (single source of truth)
     // Falls back to rule options if config file not available
     const configFromFile = loadI18nConfig();
@@ -321,8 +309,7 @@ const noLiteralStringRule = {
         }
 
         // Get the attribute name string
-        const attrName: string =
-          (nameNode as JSXIdentifier).name ?? String(nameNode);
+        const attrName: string = (nameNode as JSXIdentifier).name ?? String(nameNode);
 
         // Skip ALL excluded attributes
         if (isExcludedAttribute(attrName)) {
@@ -337,10 +324,7 @@ const noLiteralStringRule = {
 
         if (valueNode.type === "Literal") {
           const literalValue = (valueNode as JSXLiteral).value;
-          if (
-            typeof literalValue === "string" &&
-            !shouldExcludeString(literalValue)
-          ) {
+          if (typeof literalValue === "string" && !shouldExcludeString(literalValue)) {
             context.report({
               node: valueNode,
               message: formatMessage(messages.jsxAttribute, literalValue),

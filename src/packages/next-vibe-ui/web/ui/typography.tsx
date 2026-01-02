@@ -158,18 +158,10 @@ export type MutedProps = TypographyProps & {
   testID?: string;
 };
 
-export function H1({
-  className,
-  style,
-  children,
-  ...props
-}: H1Props): JSX.Element {
+export function H1({ className, style, children, ...props }: H1Props): JSX.Element {
   return (
     <h1
-      className={cn(
-        "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
-        className,
-      )}
+      className={cn("scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl", className)}
       style={style}
       {...props}
     >
@@ -208,10 +200,7 @@ export function H3(props: H3Props): JSX.Element {
     <h3
       className={
         "className" in restProps
-          ? cn(
-              "scroll-m-20 text-2xl font-semibold tracking-tight",
-              restProps.className,
-            )
+          ? cn("scroll-m-20 text-2xl font-semibold tracking-tight", restProps.className)
           : "scroll-m-20 text-2xl font-semibold tracking-tight"
       }
       style={"style" in restProps ? restProps.style : undefined}
@@ -232,10 +221,7 @@ export function H4(props: H4Props): JSX.Element {
     <h4
       className={
         "className" in restProps
-          ? cn(
-              "scroll-m-20 text-xl font-semibold tracking-tight",
-              restProps.className,
-            )
+          ? cn("scroll-m-20 text-xl font-semibold tracking-tight", restProps.className)
           : "scroll-m-20 text-xl font-semibold tracking-tight"
       }
       style={"style" in restProps ? restProps.style : undefined}

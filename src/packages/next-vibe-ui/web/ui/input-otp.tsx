@@ -59,11 +59,7 @@ function InputOTP({
 }
 InputOTP.displayName = "InputOTP";
 
-function InputOTPGroup({
-  className,
-  style,
-  children,
-}: InputOTPGroupProps): React.JSX.Element {
+function InputOTPGroup({ className, style, children }: InputOTPGroupProps): React.JSX.Element {
   return (
     <div className={cn("flex items-center", className)} style={style}>
       {children}
@@ -72,11 +68,7 @@ function InputOTPGroup({
 }
 InputOTPGroup.displayName = "InputOTPGroup";
 
-function InputOTPSlot({
-  index,
-  className,
-  style,
-}: InputOTPSlotProps): React.JSX.Element | null {
+function InputOTPSlot({ index, className, style }: InputOTPSlotProps): React.JSX.Element | null {
   const inputOTPContext = React.useContext(OTPInputContext);
   const slotProps = inputOTPContext.slots[index];
   if (!slotProps) {
@@ -104,10 +96,7 @@ function InputOTPSlot({
 }
 InputOTPSlot.displayName = "InputOTPSlot";
 
-function InputOTPSeparator({
-  className,
-  style,
-}: InputOTPSeparatorProps): React.JSX.Element {
+function InputOTPSeparator({ className, style }: InputOTPSeparatorProps): React.JSX.Element {
   return (
     <div role="separator" className={className} style={style}>
       <DashIcon />

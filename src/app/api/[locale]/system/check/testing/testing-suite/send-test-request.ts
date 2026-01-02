@@ -37,13 +37,7 @@ export async function sendTestRequest<
   urlPathParams,
   user,
 }: {
-  endpoint: CreateApiEndpoint<
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TScopedTranslationKey,
-    TFields
-  >;
+  endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TScopedTranslationKey, TFields>;
   data: CreateApiEndpoint<
     TExampleKey,
     TMethod,

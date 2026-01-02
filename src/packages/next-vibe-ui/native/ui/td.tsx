@@ -16,12 +16,7 @@ const StyledView = styled(View);
  * Part of the table component structure
  * Supports both className (via NativeWind) and style (via React.CSSProperties)
  */
-export function Td({
-  children,
-  className,
-  style,
-  id,
-}: TdProps): React.JSX.Element {
+export function Td({ children, className, style, id }: TdProps): React.JSX.Element {
   // Convert CSS style to React Native ViewStyle if provided
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 

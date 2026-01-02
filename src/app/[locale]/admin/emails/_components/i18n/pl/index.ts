@@ -11,8 +11,7 @@ export const translations: typeof enTranslations = {
   },
   admin: {
     title: "Zarządzanie pocztą e-mail",
-    description:
-      "Monitoruj kampanie e-mailowe, śledź wydajność i analizuj zaangażowanie",
+    description: "Monitoruj kampanie e-mailowe, śledź wydajność i analizuj zaangażowanie",
     stats: {
       title: "Statystyki e-mail",
     },

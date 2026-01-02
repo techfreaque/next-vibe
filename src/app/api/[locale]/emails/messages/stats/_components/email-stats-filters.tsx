@@ -75,10 +75,7 @@ export function EmailStatsFiltersContainer({
 /**
  * Email-specific stats filters
  */
-export function EmailStatsFilters({
-  control,
-  locale,
-}: EmailStatsFiltersProps): JSX.Element {
+export function EmailStatsFilters({ control, locale }: EmailStatsFiltersProps): JSX.Element {
   return (
     <Div className="flex flex-col gap-4">
       {/* Base time and chart filters */}

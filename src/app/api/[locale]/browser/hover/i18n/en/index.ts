@@ -12,8 +12,7 @@ export const translations = {
     fields: {
       uid: {
         label: "Element UID",
-        description:
-          "The uid of an element on the page from the page content snapshot",
+        description: "The uid of an element on the page from the page content snapshot",
         placeholder: "Enter element uid",
       },
     },
@@ -49,8 +48,7 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description:
-        "An internal server error occurred during the hover operation",
+      description: "An internal server error occurred during the hover operation",
     },
     unknown: {
       title: "Unknown Error",

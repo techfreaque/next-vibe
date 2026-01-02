@@ -61,10 +61,8 @@ export const {
   options: PaymentIntentStatusOptions,
   Value: PaymentIntentStatusValue,
 } = createEnumOptions({
-  REQUIRES_PAYMENT_METHOD:
-    "app.api.payment.enums.paymentIntentStatus.requiresPaymentMethod",
-  REQUIRES_CONFIRMATION:
-    "app.api.payment.enums.paymentIntentStatus.requiresConfirmation",
+  REQUIRES_PAYMENT_METHOD: "app.api.payment.enums.paymentIntentStatus.requiresPaymentMethod",
+  REQUIRES_CONFIRMATION: "app.api.payment.enums.paymentIntentStatus.requiresConfirmation",
   REQUIRES_ACTION: "app.api.payment.enums.paymentIntentStatus.requiresAction",
   PROCESSING: "app.api.payment.enums.paymentIntentStatus.processing",
   REQUIRES_CAPTURE: "app.api.payment.enums.paymentIntentStatus.requiresCapture",
@@ -110,10 +108,8 @@ export const {
   options: DisputeStatusOptions,
   Value: DisputeStatusValue,
 } = createEnumOptions({
-  WARNING_NEEDS_RESPONSE:
-    "app.api.payment.enums.disputeStatus.warningNeedsResponse",
-  WARNING_UNDER_REVIEW:
-    "app.api.payment.enums.disputeStatus.warningUnderReview",
+  WARNING_NEEDS_RESPONSE: "app.api.payment.enums.disputeStatus.warningNeedsResponse",
+  WARNING_UNDER_REVIEW: "app.api.payment.enums.disputeStatus.warningUnderReview",
   WARNING_CLOSED: "app.api.payment.enums.disputeStatus.warningClosed",
   NEEDS_RESPONSE: "app.api.payment.enums.disputeStatus.needsResponse",
   UNDER_REVIEW: "app.api.payment.enums.disputeStatus.underReview",
@@ -152,10 +148,7 @@ export const {
 });
 
 // Create DB enum arrays for Drizzle
-export const PaymentProviderDB = [
-  PaymentProvider.STRIPE,
-  PaymentProvider.NOWPAYMENTS,
-] as const;
+export const PaymentProviderDB = [PaymentProvider.STRIPE, PaymentProvider.NOWPAYMENTS] as const;
 
 export const PaymentStatusDB = [
   PaymentStatus.PENDING,

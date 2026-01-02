@@ -9,11 +9,7 @@ import { existsSync, mkdirSync, statSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -110,10 +106,7 @@ export class BunCompiler implements IBunCompiler {
     }
 
     output.push(
-      outputFormatter.formatItem(
-        fileConfig.input,
-        `\u2192 ${fileConfig.output} (executable)`,
-      ),
+      outputFormatter.formatItem(fileConfig.input, `\u2192 ${fileConfig.output} (executable)`),
     );
     logger.info("Compiling executable with Bun", {
       input: fileConfig.input,
@@ -122,14 +115,10 @@ export class BunCompiler implements IBunCompiler {
     });
 
     if (verbose) {
-      output.push(
-        outputFormatter.formatVerbose(`Target: ${bunOptions?.target || "bun"}`),
-      );
+      output.push(outputFormatter.formatVerbose(`Target: ${bunOptions?.target || "bun"}`));
       output.push(outputFormatter.formatVerbose(`Profile: ${profile}`));
       output.push(
-        outputFormatter.formatVerbose(
-          `Minify: ${bunOptions?.minify ?? profileSettings.minify}`,
-        ),
+        outputFormatter.formatVerbose(`Minify: ${bunOptions?.minify ?? profileSettings.minify}`),
       );
       output.push(
         outputFormatter.formatVerbose(

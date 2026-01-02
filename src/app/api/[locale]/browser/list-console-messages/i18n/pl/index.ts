@@ -10,14 +10,12 @@ export const translations: typeof enTranslations = {
     fields: {
       includePreservedMessages: {
         label: "Uwzględnij zachowane wiadomości",
-        description:
-          "Ustaw na true, aby zwrócić zachowane wiadomości z ostatnich 3 nawigacji",
+        description: "Ustaw na true, aby zwrócić zachowane wiadomości z ostatnich 3 nawigacji",
         placeholder: "false",
       },
       pageIdx: {
         label: "Indeks strony",
-        description:
-          "Numer strony do zwrócenia (0-based, pomiń dla pierwszej strony)",
+        description: "Numer strony do zwrócenia (0-based, pomiń dla pierwszej strony)",
         placeholder: "Wprowadź indeks strony",
       },
       pageSize: {
@@ -95,13 +93,11 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description:
-        "Wystąpił wewnętrzny błąd serwera podczas listowania wiadomości konsoli",
+      description: "Wystąpił wewnętrzny błąd serwera podczas listowania wiadomości konsoli",
     },
     unknown: {
       title: "Nieznany błąd",
-      description:
-        "Wystąpił nieznany błąd podczas listowania wiadomości konsoli",
+      description: "Wystąpił nieznany błąd podczas listowania wiadomości konsoli",
     },
     unsavedChanges: {
       title: "Niezapisane zmiany",

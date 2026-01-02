@@ -49,8 +49,7 @@ export function createUncensoredAI(config: UncensoredAIConfig): {
   } = config;
 
   return {
-    chat: (modelId: string) =>
-      new UncensoredAILanguageModel(modelId, apiKey, baseURL, logger),
+    chat: (modelId: string) => new UncensoredAILanguageModel(modelId, apiKey, baseURL, logger),
   };
 }
 
@@ -227,10 +226,7 @@ class UncensoredAILanguageModel implements LanguageModelV2 {
               }, STALL_TIMEOUT_MS);
             });
 
-            const { done, value } = await Promise.race([
-              readPromise,
-              timeoutPromise,
-            ]);
+            const { done, value } = await Promise.race([readPromise, timeoutPromise]);
             chunkCount++;
 
             if (done) {
@@ -241,10 +237,7 @@ class UncensoredAILanguageModel implements LanguageModelV2 {
                   const message = parsed.choices?.[0]?.message;
 
                   // Handle tool calls
-                  if (
-                    message?.tool_calls &&
-                    Array.isArray(message.tool_calls)
-                  ) {
+                  if (message?.tool_calls && Array.isArray(message.tool_calls)) {
                     for (const toolCall of message.tool_calls) {
                       controller.enqueue({
                         type: "tool-call",
@@ -268,9 +261,7 @@ class UncensoredAILanguageModel implements LanguageModelV2 {
                     });
                   }
                 } catch {
-                  logger.warn(
-                    "[UncensoredAI] Failed to parse final buffer as JSON",
-                  );
+                  logger.warn("[UncensoredAI] Failed to parse final buffer as JSON");
                 }
               }
               controller.enqueue({

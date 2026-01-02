@@ -22,10 +22,7 @@ import {
   type ModelSelectionModeValue,
   type PriceLevelFilterValue,
 } from "@/app/api/[locale]/agent/chat/favorites/enum";
-import {
-  getIconComponent,
-  type IconKey,
-} from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { getIconComponent, type IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import {
   type ModelId,
   type ModelOption,
@@ -82,33 +79,22 @@ interface FavoriteDisplay {
   displayIcon: React.ComponentType<{ className?: string }>;
 }
 
-function useFavoriteDisplay(
-  favorite: FavoriteItem,
-  locale: CountryLanguage,
-): FavoriteDisplay {
+function useFavoriteDisplay(favorite: FavoriteItem, locale: CountryLanguage): FavoriteDisplay {
   const { t } = simpleT(locale);
   const allModels = useMemo(() => Object.values(modelOptions), []);
 
   const character = useMemo(
-    () =>
-      favorite.characterId ? getCharacterById(favorite.characterId) : null,
+    () => (favorite.characterId ? getCharacterById(favorite.characterId) : null),
     [favorite.characterId],
   );
 
   const resolvedModel = useMemo(() => {
     // Use new priority logic: manual > preferredModel > auto
-    const selectedModelId = selectModelForCharacter(
-      allModels,
-      character ?? null,
-      {
-        mode:
-          favorite.modelSettings.mode === ModelSelectionMode.MANUAL
-            ? "manual"
-            : "auto",
-        manualModelId: favorite.modelSettings.manualModelId,
-        filters: favorite.modelSettings.filters,
-      },
-    );
+    const selectedModelId = selectModelForCharacter(allModels, character ?? null, {
+      mode: favorite.modelSettings.mode === ModelSelectionMode.MANUAL ? "manual" : "auto",
+      manualModelId: favorite.modelSettings.manualModelId,
+      filters: favorite.modelSettings.filters,
+    });
 
     if (selectedModelId) {
       return allModels.find((m) => m.id === selectedModelId) ?? null;
@@ -124,10 +110,7 @@ function useFavoriteDisplay(
         ) {
           return false;
         }
-        if (
-          filters.content !== ContentLevelFilter.ANY &&
-          m.content !== filters.content
-        ) {
+        if (filters.content !== ContentLevelFilter.ANY && m.content !== filters.content) {
           return false;
         }
         return true;
@@ -246,9 +229,7 @@ function FavoriteRow({
       <Div
         className={cn(
           "w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-colors",
-          favorite.isActive
-            ? "bg-primary/15 text-primary"
-            : "bg-muted group-hover:bg-primary/10",
+          favorite.isActive ? "bg-primary/15 text-primary" : "bg-muted group-hover:bg-primary/10",
         )}
       >
         <Icon className="h-5 w-5" />
@@ -257,12 +238,7 @@ function FavoriteRow({
       {/* Info - Full Width */}
       <Div className="flex-1 min-w-0">
         <Div className="flex items-center gap-2 pr-20">
-          <Div
-            className={cn(
-              "font-medium text-base",
-              favorite.isActive && "text-primary",
-            )}
-          >
+          <Div className={cn("font-medium text-base", favorite.isActive && "text-primary")}>
             {displayName}
           </Div>
           {favorite.isActive && (
@@ -271,10 +247,7 @@ function FavoriteRow({
             </Badge>
           )}
           {isModelOnly && !favorite.isActive && (
-            <Badge
-              variant="outline"
-              className="text-[9px] h-4 px-1.5 shrink-0 opacity-60"
-            >
+            <Badge variant="outline" className="text-[9px] h-4 px-1.5 shrink-0 opacity-60">
               {t("app.chat.selector.modelOnly")}
             </Badge>
           )}

@@ -40,16 +40,7 @@ export function LinkCardWidget({
     );
   }
 
-  const {
-    url,
-    title,
-    description,
-    snippet,
-    age,
-    source,
-    thumbnail,
-    openInNewTab = true,
-  } = data;
+  const { url, title, description, snippet, age, source, thumbnail, openInNewTab = true } = data;
 
   const displayDescription = snippet ?? description;
   const isExternal = isExternalUrl(url);
@@ -99,9 +90,7 @@ export function LinkCardWidget({
         </CardHeader>
         {displayDescription && (
           <CardContent className="pt-0">
-            <CardDescription className="line-clamp-3 text-sm">
-              {displayDescription}
-            </CardDescription>
+            <CardDescription className="line-clamp-3 text-sm">{displayDescription}</CardDescription>
           </CardContent>
         )}
       </Link>

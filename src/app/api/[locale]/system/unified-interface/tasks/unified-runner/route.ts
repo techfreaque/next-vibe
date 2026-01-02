@@ -16,12 +16,7 @@ export const { POST, tools } = endpointsHandler({
     handler: async ({ data, user, locale, logger }) => {
       // Lazy import to avoid creating connections during route discovery
       const { unifiedTaskRunnerRepository } = await import("./repository");
-      return await unifiedTaskRunnerRepository.manageRunner(
-        data,
-        user,
-        locale,
-        logger,
-      );
+      return await unifiedTaskRunnerRepository.manageRunner(data, user, locale, logger);
     },
   },
 });

@@ -23,8 +23,7 @@ export const translations: typeof enTranslations = {
       backToLogin: "Powrót do logowania",
       emailSent: "E-mail wysłany!",
       successTitle: "Sprawdź swoją pocztę",
-      successMessage:
-        "Wysłaliśmy Ci link do resetowania hasła. Sprawdź swoją skrzynkę odbiorczą.",
+      successMessage: "Wysłaliśmy Ci link do resetowania hasła. Sprawdź swoją skrzynkę odbiorczą.",
       requestNewLink: "Poproś o nowy link",
       createNewPasswordTitle: "Utwórz nowe hasło",
       createNewPasswordSubtitle: "Wprowadź poniżej swoje nowe hasło",

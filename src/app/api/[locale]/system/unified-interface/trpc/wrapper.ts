@@ -4,15 +4,9 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import {
-  ErrorResponseTypes,
-  isStreamingResponse,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, isStreamingResponse } from "next-vibe/shared/types/response.schema";
 
-import type {
-  EndpointDefinitionsConstraint,
-  ToolsObject,
-} from "../shared/endpoints/route/multi";
+import type { EndpointDefinitionsConstraint, ToolsObject } from "../shared/endpoints/route/multi";
 import { Platform } from "../shared/types/platform";
 import { publicProcedure } from "./setup";
 
@@ -66,13 +60,10 @@ export function wrapToolsForTRPC<T extends EndpointDefinitionsConstraint>(
 
         // Handle errors with translation and chaining
         if (!result.success) {
-          const errorType =
-            result.errorType || ErrorResponseTypes.INTERNAL_ERROR;
+          const errorType = result.errorType || ErrorResponseTypes.INTERNAL_ERROR;
 
           // Build error chain
-          const errorParts: string[] = [
-            ctx.t(result.message, result.messageParams),
-          ];
+          const errorParts: string[] = [ctx.t(result.message, result.messageParams)];
           let currentCause = result.cause;
           let depth = 0;
           while (currentCause && !currentCause.success && depth < 10) {

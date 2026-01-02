@@ -55,14 +55,10 @@ export function WelcomeTour({
 
   // Tour state management
   const setTourActive = useTourState((state) => state.setTourActive);
-  const setModelSelectorOpen = useTourState(
-    (state) => state.setModelSelectorOpen,
-  );
+  const setModelSelectorOpen = useTourState((state) => state.setModelSelectorOpen);
   const setAdvanceTour = useTourState((state) => state.setAdvanceTour);
   const modelSelectorOpen = useTourState((state) => state.modelSelectorOpen);
-  const setBottomSheetExpanded = useTourState(
-    (state) => state.setBottomSheetExpanded,
-  );
+  const setBottomSheetExpanded = useTourState((state) => state.setBottomSheetExpanded);
 
   // Ref to track if we're waiting for selector to close
   const waitingForSelectorRef = useRef(false);
@@ -214,10 +210,7 @@ export function WelcomeTour({
       // Wait for collapsible animation to complete (~300ms)
       const timer = setTimeout(() => {
         setStepIndex(pendingStepIndexRef.current!);
-        localStorage.setItem(
-          TOUR_LAST_STEP_KEY,
-          pendingStepIndexRef.current!.toString(),
-        );
+        localStorage.setItem(TOUR_LAST_STEP_KEY, pendingStepIndexRef.current!.toString());
         pendingStepIndexRef.current = null;
         setWaitingForBottomSheet(false);
         setRun(true);
@@ -239,15 +232,11 @@ export function WelcomeTour({
       } else if (target === getTourSelector(TOUR_DATA_ATTRS.SHARED_FOLDER)) {
         router.push(buildFolderUrl(locale, DefaultFolderId.SHARED, null));
       } else if (target === getTourSelector(TOUR_DATA_ATTRS.NEW_CHAT_BUTTON)) {
-        const folderId = isAuthenticated
-          ? DefaultFolderId.PRIVATE
-          : DefaultFolderId.INCOGNITO;
+        const folderId = isAuthenticated ? DefaultFolderId.PRIVATE : DefaultFolderId.INCOGNITO;
         router.push(buildFolderUrl(locale, folderId, null));
       } else if (target === getTourSelector(TOUR_DATA_ATTRS.CHAT_INPUT)) {
         // Chat input requires a thread page, not folder page
-        const folderId = isAuthenticated
-          ? DefaultFolderId.PRIVATE
-          : DefaultFolderId.INCOGNITO;
+        const folderId = isAuthenticated ? DefaultFolderId.PRIVATE : DefaultFolderId.INCOGNITO;
         router.push(getNewChatUrl(locale, folderId));
       }
     },
@@ -323,9 +312,7 @@ export function WelcomeTour({
             const currentTarget = currentStepData?.target as string | undefined;
 
             // Check if we're transitioning between sidebar and non-sidebar targets
-            const currentIsSidebar = currentTarget
-              ? isSidebarTarget(currentTarget)
-              : false;
+            const currentIsSidebar = currentTarget ? isSidebarTarget(currentTarget) : false;
             const nextIsSidebar = isSidebarTarget(target);
 
             // Handle sidebar state transitions
@@ -407,9 +394,7 @@ export function WelcomeTour({
         localStorage.removeItem(TOUR_SKIPPED_KEY);
 
         // Navigate to appropriate folder with new thread
-        const targetFolder = isAuthenticated
-          ? DefaultFolderId.PRIVATE
-          : DefaultFolderId.INCOGNITO;
+        const targetFolder = isAuthenticated ? DefaultFolderId.PRIVATE : DefaultFolderId.INCOGNITO;
         const newThreadUrl = getNewChatUrl(locale, targetFolder);
         router.push(newThreadUrl);
       }
@@ -468,12 +453,9 @@ export function WelcomeTour({
 
   // Expose restart method via window for debugging
   useEffect(() => {
-    (
-      window as Window & { restartWelcomeTour?: () => void }
-    ).restartWelcomeTour = restartTour;
+    (window as Window & { restartWelcomeTour?: () => void }).restartWelcomeTour = restartTour;
     return (): void => {
-      delete (window as Window & { restartWelcomeTour?: () => void })
-        .restartWelcomeTour;
+      delete (window as Window & { restartWelcomeTour?: () => void }).restartWelcomeTour;
     };
   }, [restartTour]);
 

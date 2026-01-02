@@ -14,9 +14,7 @@ interface HelpListPageProps {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-export default async function HelpListPage({
-  params,
-}: HelpListPageProps): Promise<JSX.Element> {
+export default async function HelpListPage({ params }: HelpListPageProps): Promise<JSX.Element> {
   const { locale } = await params;
   await requireAdminUser(locale, `/${locale}/help/list`);
 

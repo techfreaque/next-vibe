@@ -32,54 +32,45 @@ const { GET } = createEndpoint({
   path: ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title:
-    "app.api.agent.chat.threads.threadId.messages.messageId.get.title" as const,
-  description:
-    "app.api.agent.chat.threads.threadId.messages.messageId.get.description" as const,
+  title: "app.api.agent.chat.threads.threadId.messages.messageId.get.title" as const,
+  description: "app.api.agent.chat.threads.threadId.messages.messageId.get.description" as const,
   icon: "message-circle",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.messages" as const],
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.validation.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.validation.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.network.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.network.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.unauthorized.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.unauthorized.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.forbidden.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.forbidden.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.notFound.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.notFound.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.server.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.server.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.unknown.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.unknown.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.unknown.description",
     },
@@ -90,8 +81,7 @@ const { GET } = createEndpoint({
         "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.conflict.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.conflict.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.conflict.description",
     },
@@ -100,8 +90,7 @@ const { GET } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.get.container.title" as const,
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.get.container.title" as const,
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.get.container.description" as const,
       layoutType: LayoutType.STACKED,
@@ -245,10 +234,8 @@ const { GET } = createEndpoint({
   ),
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.messages.messageId.get.success.title",
-    description:
-      "app.api.agent.chat.threads.threadId.messages.messageId.get.success.description",
+    title: "app.api.agent.chat.threads.threadId.messages.messageId.get.success.title",
+    description: "app.api.agent.chat.threads.threadId.messages.messageId.get.success.description",
   },
 
   examples: {
@@ -289,24 +276,20 @@ const { PATCH } = createEndpoint({
   path: ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title:
-    "app.api.agent.chat.threads.threadId.messages.messageId.patch.title" as const,
-  description:
-    "app.api.agent.chat.threads.threadId.messages.messageId.patch.description" as const,
+  title: "app.api.agent.chat.threads.threadId.messages.messageId.patch.title" as const,
+  description: "app.api.agent.chat.threads.threadId.messages.messageId.patch.description" as const,
   icon: "message-circle",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.messages" as const],
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.validation.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.validation.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.network.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.network.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.network.description",
     },
@@ -317,26 +300,22 @@ const { PATCH } = createEndpoint({
         "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.forbidden.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.forbidden.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.notFound.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.notFound.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.server.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.server.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.unknown.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.unknown.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.unknown.description",
     },
@@ -347,8 +326,7 @@ const { PATCH } = createEndpoint({
         "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.conflict.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.conflict.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.conflict.description",
     },
@@ -405,8 +383,7 @@ const { PATCH } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.agent.chat.threads.threadId.messages.messageId.patch.role.label" as const,
+          label: "app.api.agent.chat.threads.threadId.messages.messageId.patch.role.label" as const,
           description:
             "app.api.agent.chat.threads.threadId.messages.messageId.patch.role.description" as const,
           options: ChatMessageRoleOptions,
@@ -463,10 +440,8 @@ const { PATCH } = createEndpoint({
   ),
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.messages.messageId.patch.success.title",
-    description:
-      "app.api.agent.chat.threads.threadId.messages.messageId.patch.success.description",
+    title: "app.api.agent.chat.threads.threadId.messages.messageId.patch.success.title",
+    description: "app.api.agent.chat.threads.threadId.messages.messageId.patch.success.description",
   },
 
   examples: {
@@ -504,10 +479,8 @@ const { DELETE } = createEndpoint({
   path: ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title:
-    "app.api.agent.chat.threads.threadId.messages.messageId.delete.title" as const,
-  description:
-    "app.api.agent.chat.threads.threadId.messages.messageId.delete.description" as const,
+  title: "app.api.agent.chat.threads.threadId.messages.messageId.delete.title" as const,
+  description: "app.api.agent.chat.threads.threadId.messages.messageId.delete.description" as const,
   icon: "message-circle",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.messages" as const],
@@ -520,8 +493,7 @@ const { DELETE } = createEndpoint({
         "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.network.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.network.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.network.description",
     },
@@ -532,26 +504,22 @@ const { DELETE } = createEndpoint({
         "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.forbidden.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.forbidden.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.notFound.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.notFound.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.server.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.server.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.unknown.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.unknown.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.unknown.description",
     },
@@ -562,8 +530,7 @@ const { DELETE } = createEndpoint({
         "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.conflict.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.conflict.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.conflict.description",
     },
@@ -617,8 +584,7 @@ const { DELETE } = createEndpoint({
   ),
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.messages.messageId.delete.success.title",
+    title: "app.api.agent.chat.threads.threadId.messages.messageId.delete.success.title",
     description:
       "app.api.agent.chat.threads.threadId.messages.messageId.delete.success.description",
   },
@@ -648,13 +614,11 @@ export type MessageGetUrlVariablesOutput = typeof GET.types.UrlVariablesOutput;
 
 export type MessagePatchRequestOutput = typeof PATCH.types.RequestOutput;
 export type MessagePatchResponseOutput = typeof PATCH.types.ResponseOutput;
-export type MessagePatchUrlVariablesOutput =
-  typeof PATCH.types.UrlVariablesOutput;
+export type MessagePatchUrlVariablesOutput = typeof PATCH.types.UrlVariablesOutput;
 
 export type MessageDeleteRequestOutput = typeof DELETE.types.RequestOutput;
 export type MessageDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
-export type MessageDeleteUrlVariablesOutput =
-  typeof DELETE.types.UrlVariablesOutput;
+export type MessageDeleteUrlVariablesOutput = typeof DELETE.types.UrlVariablesOutput;
 
 /**
  * Export definitions

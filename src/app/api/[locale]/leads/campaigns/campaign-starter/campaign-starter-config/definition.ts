@@ -34,15 +34,11 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "rocket",
 
-  title:
-    "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.title" as const,
+  title: "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.title" as const,
   description:
     "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.description" as const,
   category: "app.api.leads.campaigns.category" as const,
-  tags: [
-    "app.api.leads.tags.leads" as const,
-    "app.api.leads.tags.campaigns" as const,
-  ],
+  tags: ["app.api.leads.tags.leads" as const, "app.api.leads.tags.campaigns" as const],
 
   fields: objectField(
     {
@@ -284,15 +280,11 @@ const { PUT } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "rocket",
 
-  title:
-    "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.title" as const,
+  title: "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.title" as const,
   description:
     "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.description" as const,
   category: "app.api.leads.campaigns.category" as const,
-  tags: [
-    "app.api.leads.tags.leads" as const,
-    "app.api.leads.tags.campaigns" as const,
-  ],
+  tags: ["app.api.leads.tags.leads" as const, "app.api.leads.tags.campaigns" as const],
 
   fields: objectField(
     {
@@ -731,27 +723,18 @@ const { PUT } = createEndpoint({
 });
 
 // Extract types using the new enhanced system
-export type CampaignStarterConfigGetRequestInput =
-  typeof GET.types.RequestInput;
-export type CampaignStarterConfigGetRequestOutput =
-  typeof GET.types.RequestOutput;
-export type CampaignStarterConfigGetResponseInput =
-  typeof GET.types.ResponseInput;
-export type CampaignStarterConfigGetResponseOutput =
-  typeof GET.types.ResponseOutput;
+export type CampaignStarterConfigGetRequestInput = typeof GET.types.RequestInput;
+export type CampaignStarterConfigGetRequestOutput = typeof GET.types.RequestOutput;
+export type CampaignStarterConfigGetResponseInput = typeof GET.types.ResponseInput;
+export type CampaignStarterConfigGetResponseOutput = typeof GET.types.ResponseOutput;
 
-export type CampaignStarterConfigPutRequestInput =
-  typeof PUT.types.RequestInput;
-export type CampaignStarterConfigPutRequestOutput =
-  typeof PUT.types.RequestOutput;
-export type CampaignStarterConfigPutResponseInput =
-  typeof PUT.types.ResponseInput;
-export type CampaignStarterConfigPutResponseOutput =
-  typeof PUT.types.ResponseOutput;
+export type CampaignStarterConfigPutRequestInput = typeof PUT.types.RequestInput;
+export type CampaignStarterConfigPutRequestOutput = typeof PUT.types.RequestOutput;
+export type CampaignStarterConfigPutResponseInput = typeof PUT.types.ResponseInput;
+export type CampaignStarterConfigPutResponseOutput = typeof PUT.types.ResponseOutput;
 
 // Legacy type alias for backwards compatibility
-export type CampaignStarterConfigType =
-  CampaignStarterConfigGetResponseOutput["response"];
+export type CampaignStarterConfigType = CampaignStarterConfigGetResponseOutput["response"];
 
 /**
  * Export definitions

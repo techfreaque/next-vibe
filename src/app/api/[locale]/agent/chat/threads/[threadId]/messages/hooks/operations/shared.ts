@@ -7,8 +7,8 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { DEFAULT_TTS_VOICE } from "../../../../../../text-to-speech/enum";
 import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
+import { DEFAULT_TTS_VOICE } from "../../../../../../text-to-speech/enum";
 import { DefaultFolderId } from "../../../../../config";
 import { createCreditUpdateCallback } from "../../../../../credit-updater";
 import type { ChatMessage } from "../../../../../db";
@@ -57,23 +57,10 @@ export async function createAndSendUserMessage(
   params: CreateMessageParams,
   deps: MessageOperationDeps,
 ): Promise<void> {
-  const {
-    logger,
-    aiStream,
-    currentRootFolderId,
-    currentSubFolderId,
-    settings,
-    deductCredits,
-  } = deps;
+  const { logger, aiStream, currentRootFolderId, currentSubFolderId, settings, deductCredits } =
+    deps;
 
-  const {
-    content,
-    parentMessageId,
-    threadId,
-    audioInput,
-    attachments,
-    operation,
-  } = params;
+  const { content, parentMessageId, threadId, audioInput, attachments, operation } = params;
 
   logger.debug(`${operation} operation`, {
     hasAudioInput: !!audioInput,
@@ -90,28 +77,19 @@ export async function createAndSendUserMessage(
     // Load thread messages
     let threadMessages: ChatMessage[];
     if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-      const { getMessagesForThread } = await import(
-        "../../../../../incognito/storage"
-      );
+      const { getMessagesForThread } = await import("../../../../../incognito/storage");
       threadMessages = await getMessagesForThread(threadId);
     } else {
       threadMessages = chatStore.getThreadMessages(threadId);
     }
 
-    const parentDepth =
-      threadMessages.find((msg) => msg.id === parentMessageId)?.depth ?? -1;
+    const parentDepth = threadMessages.find((msg) => msg.id === parentMessageId)?.depth ?? -1;
 
     // Build message history (incognito only - server fetches from DB)
     // Use provided messageHistory if available (e.g., from send operation)
     let messageHistory: ChatMessage[] | null = params.messageHistory ?? null;
-    if (
-      !messageHistory &&
-      currentRootFolderId === DefaultFolderId.INCOGNITO &&
-      parentMessageId
-    ) {
-      const parentIndex = threadMessages.findIndex(
-        (msg) => msg.id === parentMessageId,
-      );
+    if (!messageHistory && currentRootFolderId === DefaultFolderId.INCOGNITO && parentMessageId) {
+      const parentIndex = threadMessages.findIndex((msg) => msg.id === parentMessageId);
       if (parentIndex !== -1) {
         messageHistory = threadMessages.slice(0, parentIndex + 1);
       }
@@ -124,31 +102,23 @@ export async function createAndSendUserMessage(
     } else if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
       // INCOGNITO MODE: Convert File objects to base64
       if (attachments && attachments.length > 0) {
-        const { convertFilesToIncognitoAttachments } = await import(
-          "../../../../../incognito/file-utils"
-        );
-        const attachmentMetadata =
-          await convertFilesToIncognitoAttachments(attachments);
+        const { convertFilesToIncognitoAttachments } =
+          await import("../../../../../incognito/file-utils");
+        const attachmentMetadata = await convertFilesToIncognitoAttachments(attachments);
         messageMetadata = { attachments: attachmentMetadata };
 
-        logger.debug(
-          `Converted ${operation} attachments to base64 (incognito)`,
-          {
-            attachmentCount: attachmentMetadata.length,
-          },
-        );
+        logger.debug(`Converted ${operation} attachments to base64 (incognito)`, {
+          attachmentCount: attachmentMetadata.length,
+        });
       }
     } else {
       // PRIVATE MODE: Set loading state, FILES_UPLOADED event will update with URLs
       if (attachments && attachments.length > 0) {
         messageMetadata = { isUploadingAttachments: true };
 
-        logger.debug(
-          `${operation} will upload attachments via AI stream (private)`,
-          {
-            attachmentCount: attachments.length,
-          },
-        );
+        logger.debug(`${operation} will upload attachments via AI stream (private)`, {
+          attachmentCount: attachments.length,
+        });
       }
     }
 
@@ -161,8 +131,7 @@ export async function createAndSendUserMessage(
       parentId: parentMessageId,
       depth: parentDepth + 1,
       sequenceId: null,
-      authorId:
-        currentRootFolderId === DefaultFolderId.INCOGNITO ? "incognito" : null,
+      authorId: currentRootFolderId === DefaultFolderId.INCOGNITO ? "incognito" : null,
       authorName: null,
       authorAvatar: null,
       authorColor: null,
@@ -193,12 +162,8 @@ export async function createAndSendUserMessage(
 
     // Voice mode settings
     const voiceModeSettings = useVoiceModeStore.getState().settings;
-    const callModeKey = getCallModeKey(
-      settings.selectedModel,
-      settings.selectedCharacter,
-    );
-    const isCallModeEnabled =
-      voiceModeSettings.callModeByConfig?.[callModeKey] ?? false;
+    const callModeKey = getCallModeKey(settings.selectedModel, settings.selectedCharacter);
+    const isCallModeEnabled = voiceModeSettings.callModeByConfig?.[callModeKey] ?? false;
 
     const effectiveVoiceMode = isCallModeEnabled
       ? {
@@ -234,10 +199,7 @@ export async function createAndSendUserMessage(
         audioInput: audioInput ?? { file: null },
       },
       {
-        onContentDone: createCreditUpdateCallback(
-          settings.selectedModel,
-          deductCredits,
-        ),
+        onContentDone: createCreditUpdateCallback(settings.selectedModel, deductCredits),
       },
     );
   } catch (error) {

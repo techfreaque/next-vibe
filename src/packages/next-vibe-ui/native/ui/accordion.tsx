@@ -49,8 +49,7 @@ export function Accordion({
 
   // Compute values for both modes
   const singleValue = typeof value === "string" ? value : undefined;
-  const singleDefaultValue =
-    typeof defaultValue === "string" ? defaultValue : undefined;
+  const singleDefaultValue = typeof defaultValue === "string" ? defaultValue : undefined;
 
   // Hooks must be called unconditionally
   const [, setValue] = React.useState(singleDefaultValue ?? "");
@@ -66,9 +65,7 @@ export function Accordion({
 
   if (type === "multiple") {
     const multiValue = Array.isArray(value) ? value : undefined;
-    const multiDefaultValue = Array.isArray(defaultValue)
-      ? defaultValue
-      : undefined;
+    const multiDefaultValue = Array.isArray(defaultValue) ? defaultValue : undefined;
     const multiOnValueChange =
       onValueChange && typeof onValueChange === "function"
         ? (newValue: string[]): void => {
@@ -133,10 +130,7 @@ export function AccordionItem({
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
-    <StyledAnimatedView
-      className="overflow-hidden"
-      layout={LinearTransition.duration(200)}
-    >
+    <StyledAnimatedView className="overflow-hidden" layout={LinearTransition.duration(200)}>
       <AccordionPrimitive.Item value={value} disabled={disabled} asChild>
         <StyledAnimatedView
           {...applyStyleType({
@@ -161,9 +155,7 @@ export function AccordionTrigger({
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   const progress = useDerivedValue(() =>
-    isExpanded
-      ? withTiming(1, { duration: 250 })
-      : withTiming(0, { duration: 200 }),
+    isExpanded ? withTiming(1, { duration: 250 }) : withTiming(0, { duration: 200 }),
   );
   const chevronStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${progress.value * 180}deg` }],

@@ -12,8 +12,7 @@ export const translations: typeof enTranslations = {
     ogDescription:
       "Treten Sie {{appName}} bei und beginnen Sie noch heute mit dem Aufbau erstaunlicher Anwendungen",
     twitterTitle: "Registrieren Sie sich für {{appName}}",
-    twitterDescription:
-      "Erstellen Sie Ihr Konto und beginnen Sie mit {{appName}} zu bauen",
+    twitterDescription: "Erstellen Sie Ihr Konto und beginnen Sie mit {{appName}} zu bauen",
   },
   auth: {
     signup: {
@@ -38,18 +37,15 @@ export const translations: typeof enTranslations = {
       benefits: {
         contentCreation: {
           title: "Leistungsstarke Content-Erstellung",
-          description:
-            "Erstellen und verwalten Sie Inhalte mit unseren intuitiven Tools",
+          description: "Erstellen und verwalten Sie Inhalte mit unseren intuitiven Tools",
         },
         dataStrategy: {
           title: "Intelligente Datenstrategie",
-          description:
-            "Nutzen Sie datengesteuerte Erkenntnisse für bessere Entscheidungen",
+          description: "Nutzen Sie datengesteuerte Erkenntnisse für bessere Entscheidungen",
         },
         saveTime: {
           title: "Zeit & Aufwand sparen",
-          description:
-            "Automatisieren Sie Workflows und steigern Sie die Produktivität",
+          description: "Automatisieren Sie Workflows und steigern Sie die Produktivität",
         },
       },
       privateName: "Privater Name",

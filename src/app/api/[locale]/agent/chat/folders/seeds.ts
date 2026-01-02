@@ -47,11 +47,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     color: "#3b82f6", // blue
     sortOrder: 0,
     description: "Software, hardware, AI, and emerging tech",
-    rolesView: [
-      UserPermissionRole.PUBLIC,
-      UserPermissionRole.CUSTOMER,
-      UserPermissionRole.ADMIN,
-    ],
+    rolesView: [UserPermissionRole.PUBLIC, UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesManage: [UserPermissionRole.ADMIN],
     rolesCreateThread: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesPost: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
@@ -65,11 +61,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     color: "#8b5cf6", // violet
     sortOrder: 1,
     description: "Ethics, metaphysics, epistemology, and critical thinking",
-    rolesView: [
-      UserPermissionRole.PUBLIC,
-      UserPermissionRole.CUSTOMER,
-      UserPermissionRole.ADMIN,
-    ],
+    rolesView: [UserPermissionRole.PUBLIC, UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesManage: [UserPermissionRole.ADMIN],
     rolesCreateThread: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesPost: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
@@ -83,11 +75,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     color: "#10b981", // emerald
     sortOrder: 2,
     description: "Physics, biology, chemistry, mathematics, and research",
-    rolesView: [
-      UserPermissionRole.PUBLIC,
-      UserPermissionRole.CUSTOMER,
-      UserPermissionRole.ADMIN,
-    ],
+    rolesView: [UserPermissionRole.PUBLIC, UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesManage: [UserPermissionRole.ADMIN],
     rolesCreateThread: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesPost: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
@@ -101,11 +89,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     color: "#ef4444", // red
     sortOrder: 3,
     description: "Political theory, current events, and policy discussion",
-    rolesView: [
-      UserPermissionRole.PUBLIC,
-      UserPermissionRole.CUSTOMER,
-      UserPermissionRole.ADMIN,
-    ],
+    rolesView: [UserPermissionRole.PUBLIC, UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesManage: [UserPermissionRole.ADMIN],
     rolesCreateThread: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesPost: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
@@ -119,11 +103,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     color: "#f59e0b", // amber
     sortOrder: 4,
     description: "Entrepreneurship, startups, finance, and economics",
-    rolesView: [
-      UserPermissionRole.PUBLIC,
-      UserPermissionRole.CUSTOMER,
-      UserPermissionRole.ADMIN,
-    ],
+    rolesView: [UserPermissionRole.PUBLIC, UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesManage: [UserPermissionRole.ADMIN],
     rolesCreateThread: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesPost: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
@@ -137,11 +117,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     color: "#ec4899", // pink
     sortOrder: 5,
     description: "Art, music, film, literature, and cultural analysis",
-    rolesView: [
-      UserPermissionRole.PUBLIC,
-      UserPermissionRole.CUSTOMER,
-      UserPermissionRole.ADMIN,
-    ],
+    rolesView: [UserPermissionRole.PUBLIC, UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesManage: [UserPermissionRole.ADMIN],
     rolesCreateThread: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesPost: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
@@ -155,11 +131,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     color: "#06b6d4", // cyan
     sortOrder: 6,
     description: "Fitness, nutrition, mental health, and medicine",
-    rolesView: [
-      UserPermissionRole.PUBLIC,
-      UserPermissionRole.CUSTOMER,
-      UserPermissionRole.ADMIN,
-    ],
+    rolesView: [UserPermissionRole.PUBLIC, UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesManage: [UserPermissionRole.ADMIN],
     rolesCreateThread: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesPost: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
@@ -173,11 +145,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     color: "#a855f7", // purple
     sortOrder: 7,
     description: "Video games, esports, game design, and gaming culture",
-    rolesView: [
-      UserPermissionRole.PUBLIC,
-      UserPermissionRole.CUSTOMER,
-      UserPermissionRole.ADMIN,
-    ],
+    rolesView: [UserPermissionRole.PUBLIC, UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesManage: [UserPermissionRole.ADMIN],
     rolesCreateThread: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesPost: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
@@ -191,11 +159,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     color: "#0ea5e9", // sky
     sortOrder: 8,
     description: "Learning, teaching, academia, and self-improvement",
-    rolesView: [
-      UserPermissionRole.PUBLIC,
-      UserPermissionRole.CUSTOMER,
-      UserPermissionRole.ADMIN,
-    ],
+    rolesView: [UserPermissionRole.PUBLIC, UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesManage: [UserPermissionRole.ADMIN],
     rolesCreateThread: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesPost: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
@@ -209,11 +173,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     color: "#64748b", // slate
     sortOrder: 9,
     description: "Discussion about this platform, feedback, and community",
-    rolesView: [
-      UserPermissionRole.PUBLIC,
-      UserPermissionRole.CUSTOMER,
-      UserPermissionRole.ADMIN,
-    ],
+    rolesView: [UserPermissionRole.PUBLIC, UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesManage: [UserPermissionRole.ADMIN],
     rolesCreateThread: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
     rolesPost: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
@@ -266,9 +226,7 @@ async function createOrUpdateCategory(
         })
         .where(eq(chatFolders.id, category.id));
 
-      logger.debug(
-        `✅ Updated category folder "${category.name}" (${category.id})`,
-      );
+      logger.debug(`✅ Updated category folder "${category.name}" (${category.id})`);
     } else {
       // Create new category folder with fixed ID
       await db.insert(chatFolders).values({
@@ -276,9 +234,7 @@ async function createOrUpdateCategory(
         ...folderData,
       });
 
-      logger.debug(
-        `✅ Created category folder "${category.name}" (${category.id})`,
-      );
+      logger.debug(`✅ Created category folder "${category.name}" (${category.id})`);
     }
   } catch (error) {
     logger.error(`Failed to create/update category "${category.name}"`, {
@@ -290,21 +246,14 @@ async function createOrUpdateCategory(
 /**
  * Shared seed logic for all environments
  */
-async function seedCategories(
-  logger: EndpointLogger,
-  environment: string,
-): Promise<void> {
-  logger.debug(
-    `🌱 Seeding chat folder categories for ${environment} environment`,
-  );
+async function seedCategories(logger: EndpointLogger, environment: string): Promise<void> {
+  logger.debug(`🌱 Seeding chat folder categories for ${environment} environment`);
 
   for (const category of FORUM_CATEGORIES) {
     await createOrUpdateCategory(category, logger);
   }
 
-  logger.debug(
-    `✅ Finished seeding ${FORUM_CATEGORIES.length} forum categories`,
-  );
+  logger.debug(`✅ Finished seeding ${FORUM_CATEGORIES.length} forum categories`);
 }
 
 /**

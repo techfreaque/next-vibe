@@ -21,9 +21,7 @@ const handlePrint = (): void => {
  * Client component for handling user interactions on the Imprint page.
  * This is separated from the main content rendering to minimize client-side JavaScript.
  */
-export function ImprintClientInteraction({
-  locale,
-}: ImprintClientInteractionProps): ReactElement {
+export function ImprintClientInteraction({ locale }: ImprintClientInteractionProps): ReactElement {
   const { t } = simpleT(locale);
 
   return (

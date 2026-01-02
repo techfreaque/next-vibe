@@ -27,19 +27,10 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
  */
 const { POST } = createEndpoint({
   method: Methods.POST,
-  path: [
-    "agent",
-    "chat",
-    "threads",
-    "[threadId]",
-    "messages",
-    "[messageId]",
-    "vote",
-  ],
+  path: ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]", "vote"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title:
-    "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.title" as const,
+  title: "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.title" as const,
   description:
     "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.description" as const,
   icon: "thumbs-up",
@@ -78,8 +69,7 @@ const { POST } = createEndpoint({
         "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.server.title",
+      title: "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.server.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.server.description",
     },
@@ -197,8 +187,7 @@ const { POST } = createEndpoint({
   ),
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.success.title",
+    title: "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.success.title",
     description:
       "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.success.description",
   },

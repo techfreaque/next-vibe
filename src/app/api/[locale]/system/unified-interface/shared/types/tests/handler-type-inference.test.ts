@@ -31,9 +31,7 @@ import type { InferJwtPayloadTypeFromRoles } from "../../endpoints/route/handler
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;
 type Equal<X, Y> =
-  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
-    ? true
-    : false;
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false;
 
 /**
  * HANDLER TYPE INFERENCE TESTS
@@ -50,11 +48,7 @@ const testPublicOnlyEndpoint = createEndpoint({
   icon: "test-tube",
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    {},
-    {},
-  ),
+  fields: objectField({ type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED }, {}, {}),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -111,11 +105,7 @@ const testAdminOnlyEndpoint = createEndpoint({
   icon: "test-tube",
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    {},
-    {},
-  ),
+  fields: objectField({ type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED }, {}, {}),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -172,11 +162,7 @@ const testMixedRolesEndpoint = createEndpoint({
   icon: "test-tube",
   tags: [],
   allowedRoles: [UserRole.PUBLIC, UserRole.ADMIN] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    {},
-    {},
-  ),
+  fields: objectField({ type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED }, {}, {}),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -229,12 +215,8 @@ type AdminOnlyRoles = (typeof testAdminOnlyEndpoint.POST)["allowedRoles"];
 type MixedRoles = (typeof testMixedRolesEndpoint.POST)["allowedRoles"];
 
 // Verify roles are exact tuple types, not widened arrays
-type PublicOnlyRolesExact = Expect<
-  Equal<PublicOnlyRoles, readonly [typeof UserRole.PUBLIC]>
->;
-type AdminOnlyRolesExact = Expect<
-  Equal<AdminOnlyRoles, readonly [typeof UserRole.ADMIN]>
->;
+type PublicOnlyRolesExact = Expect<Equal<PublicOnlyRoles, readonly [typeof UserRole.PUBLIC]>>;
+type AdminOnlyRolesExact = Expect<Equal<AdminOnlyRoles, readonly [typeof UserRole.ADMIN]>>;
 type MixedRolesExact = Expect<
   Equal<MixedRoles, readonly [typeof UserRole.PUBLIC, typeof UserRole.ADMIN]>
 >;
@@ -245,15 +227,9 @@ type AdminOnlyUserType = InferJwtPayloadTypeFromRoles<AdminOnlyRoles>;
 type MixedRolesUserType = InferJwtPayloadTypeFromRoles<MixedRoles>;
 
 // Verify inferred user types are correct
-type PublicOnlyUserTypeCheck = Expect<
-  Equal<PublicOnlyUserType, JWTPublicPayloadType>
->;
-type AdminOnlyUserTypeCheck = Expect<
-  Equal<AdminOnlyUserType, JwtPrivatePayloadType>
->;
-type MixedRolesUserTypeCheck = Expect<
-  Equal<MixedRolesUserType, JwtPayloadType>
->;
+type PublicOnlyUserTypeCheck = Expect<Equal<PublicOnlyUserType, JWTPublicPayloadType>>;
+type AdminOnlyUserTypeCheck = Expect<Equal<AdminOnlyUserType, JwtPrivatePayloadType>>;
+type MixedRolesUserTypeCheck = Expect<Equal<MixedRolesUserType, JwtPayloadType>>;
 
 // Export a dummy value to make this a valid module
 export const HANDLER_TYPE_TESTS_PASS = true;

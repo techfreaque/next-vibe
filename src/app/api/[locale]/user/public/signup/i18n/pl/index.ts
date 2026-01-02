@@ -377,8 +377,7 @@ export const translations: typeof enTranslations = {
     user_id: "ID użytkownika",
     recommended_next_steps: "Zalecane następne kroki",
     consultation_recommendation: "Zaplanuj rozmowę konsultacyjną",
-    direct_recommendation:
-      "Przejrzyj profil użytkownika i konfigurację płatności",
+    direct_recommendation: "Przejrzyj profil użytkownika i konfigurację płatności",
     contact_user: "Skontaktuj się z użytkownikiem",
     footer: "To jest automatyczne powiadomienie z {{appName}}",
   },

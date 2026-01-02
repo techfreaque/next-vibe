@@ -29,10 +29,7 @@ const { POST } = createEndpoint({
   description: "app.api.browser.evaluate-script.description",
   category: "app.api.browser.category",
   icon: "code",
-  tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.scriptExecution",
-  ],
+  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.scriptExecution"],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -57,10 +54,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
           label: "app.api.browser.evaluate-script.form.fields.function.label",
-          description:
-            "app.api.browser.evaluate-script.form.fields.function.description",
-          placeholder:
-            "app.api.browser.evaluate-script.form.fields.function.placeholder",
+          description: "app.api.browser.evaluate-script.form.fields.function.description",
+          placeholder: "app.api.browser.evaluate-script.form.fields.function.placeholder",
           columns: 12,
         },
         z
@@ -74,10 +69,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.browser.evaluate-script.form.fields.args.label",
-          description:
-            "app.api.browser.evaluate-script.form.fields.args.description",
-          placeholder:
-            "app.api.browser.evaluate-script.form.fields.args.placeholder",
+          description: "app.api.browser.evaluate-script.form.fields.args.description",
+          placeholder: "app.api.browser.evaluate-script.form.fields.args.placeholder",
           columns: 12,
         },
         objectField(
@@ -92,17 +85,13 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label:
-                  "app.api.browser.evaluate-script.form.fields.args.uid.label",
-                description:
-                  "app.api.browser.evaluate-script.form.fields.args.uid.description",
+                label: "app.api.browser.evaluate-script.form.fields.args.uid.label",
+                description: "app.api.browser.evaluate-script.form.fields.args.uid.description",
                 columns: 12,
               },
               z
                 .string()
-                .describe(
-                  "The uid of an element on the page from the page content snapshot",
-                ),
+                .describe("The uid of an element on the page from the page content snapshot"),
             ),
           },
         ),
@@ -114,16 +103,13 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.browser.evaluate-script.response.success",
         },
-        z
-          .boolean()
-          .describe("Whether the script evaluation operation succeeded"),
+        z.boolean().describe("Whether the script evaluation operation succeeded"),
       ),
       result: objectOptionalField(
         {
           type: WidgetType.CONTAINER,
           title: "app.api.browser.evaluate-script.response.result.title",
-          description:
-            "app.api.browser.evaluate-script.response.result.description",
+          description: "app.api.browser.evaluate-script.response.result.description",
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -131,8 +117,7 @@ const { POST } = createEndpoint({
           executed: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.browser.evaluate-script.response.result.executed",
+              content: "app.api.browser.evaluate-script.response.result.executed",
             },
             z.boolean().describe("Whether the script was executed"),
           ),
@@ -189,8 +174,7 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.browser.evaluate-script.errors.validation.title",
-      description:
-        "app.api.browser.evaluate-script.errors.validation.description",
+      description: "app.api.browser.evaluate-script.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.browser.evaluate-script.errors.network.title",
@@ -198,23 +182,19 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.browser.evaluate-script.errors.unauthorized.title",
-      description:
-        "app.api.browser.evaluate-script.errors.unauthorized.description",
+      description: "app.api.browser.evaluate-script.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.browser.evaluate-script.errors.forbidden.title",
-      description:
-        "app.api.browser.evaluate-script.errors.forbidden.description",
+      description: "app.api.browser.evaluate-script.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.browser.evaluate-script.errors.notFound.title",
-      description:
-        "app.api.browser.evaluate-script.errors.notFound.description",
+      description: "app.api.browser.evaluate-script.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.browser.evaluate-script.errors.serverError.title",
-      description:
-        "app.api.browser.evaluate-script.errors.serverError.description",
+      description: "app.api.browser.evaluate-script.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.browser.evaluate-script.errors.unknown.title",
@@ -222,13 +202,11 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.evaluate-script.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.evaluate-script.errors.unsavedChanges.description",
+      description: "app.api.browser.evaluate-script.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.evaluate-script.errors.conflict.title",
-      description:
-        "app.api.browser.evaluate-script.errors.conflict.description",
+      description: "app.api.browser.evaluate-script.errors.conflict.description",
     },
   },
   successTypes: {

@@ -149,8 +149,7 @@ const { GET } = createEndpoint({
       providerSubscriptionId: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.subscription.response.providerSubscriptionId" as const,
+          content: "app.api.subscription.response.providerSubscriptionId" as const,
         },
         z.string().optional(),
       ),
@@ -174,8 +173,7 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.subscription.errors.validation.title" as const,
-      description:
-        "app.api.subscription.errors.validation.description" as const,
+      description: "app.api.subscription.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.subscription.errors.notFound.title" as const,
@@ -183,8 +181,7 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.subscription.errors.unauthorized.title" as const,
-      description:
-        "app.api.subscription.errors.unauthorized.description" as const,
+      description: "app.api.subscription.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.subscription.errors.forbidden.title" as const,
@@ -204,8 +201,7 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.subscription.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.subscription.errors.unsavedChanges.description" as const,
+      description: "app.api.subscription.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.subscription.errors.conflict.title" as const,
@@ -277,8 +273,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.subscription.form.fields.planId.label" as const,
-          description:
-            "app.api.subscription.form.fields.planId.description" as const,
+          description: "app.api.subscription.form.fields.planId.description" as const,
           options: SubscriptionPlanOptions,
           columns: 6,
         },
@@ -289,10 +284,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.subscription.form.fields.billingInterval.label" as const,
-          description:
-            "app.api.subscription.form.fields.billingInterval.description" as const,
+          label: "app.api.subscription.form.fields.billingInterval.label" as const,
+          description: "app.api.subscription.form.fields.billingInterval.description" as const,
           options: BillingIntervalOptions,
           columns: 6,
         },
@@ -303,10 +296,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.subscription.form.fields.cancelAtPeriodEnd.label" as const,
-          description:
-            "app.api.subscription.form.fields.cancelAtPeriodEnd.description" as const,
+          label: "app.api.subscription.form.fields.cancelAtPeriodEnd.label" as const,
+          description: "app.api.subscription.form.fields.cancelAtPeriodEnd.description" as const,
           columns: 12,
         },
       ),
@@ -374,8 +365,7 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.subscription.errors.validation.title" as const,
-      description:
-        "app.api.subscription.errors.validation.description" as const,
+      description: "app.api.subscription.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.subscription.errors.notFound.title" as const,
@@ -383,8 +373,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.subscription.errors.unauthorized.title" as const,
-      description:
-        "app.api.subscription.errors.unauthorized.description" as const,
+      description: "app.api.subscription.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.subscription.errors.forbidden.title" as const,
@@ -404,8 +393,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.subscription.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.subscription.errors.unsavedChanges.description" as const,
+      description: "app.api.subscription.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.subscription.errors.conflict.title" as const,
@@ -502,8 +490,7 @@ const { PUT } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.subscription.form.fields.planId.label" as const,
-          description:
-            "app.api.subscription.form.fields.planId.description" as const,
+          description: "app.api.subscription.form.fields.planId.description" as const,
           options: SubscriptionPlanOptions,
           columns: 6,
         },
@@ -513,10 +500,8 @@ const { PUT } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.subscription.form.fields.billingInterval.label" as const,
-          description:
-            "app.api.subscription.form.fields.billingInterval.description" as const,
+          label: "app.api.subscription.form.fields.billingInterval.label" as const,
+          description: "app.api.subscription.form.fields.billingInterval.description" as const,
           options: BillingIntervalOptions,
           columns: 6,
         },
@@ -526,10 +511,8 @@ const { PUT } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.subscription.form.fields.cancelAtPeriodEnd.label" as const,
-          description:
-            "app.api.subscription.form.fields.cancelAtPeriodEnd.description" as const,
+          label: "app.api.subscription.form.fields.cancelAtPeriodEnd.label" as const,
+          description: "app.api.subscription.form.fields.cancelAtPeriodEnd.description" as const,
           columns: 12,
         },
         z.boolean(),
@@ -619,8 +602,7 @@ const { PUT } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.subscription.errors.validation.title" as const,
-      description:
-        "app.api.subscription.errors.validation.description" as const,
+      description: "app.api.subscription.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.subscription.errors.notFound.title" as const,
@@ -628,8 +610,7 @@ const { PUT } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.subscription.errors.unauthorized.title" as const,
-      description:
-        "app.api.subscription.errors.unauthorized.description" as const,
+      description: "app.api.subscription.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.subscription.errors.forbidden.title" as const,
@@ -649,8 +630,7 @@ const { PUT } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.subscription.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.subscription.errors.unsavedChanges.description" as const,
+      description: "app.api.subscription.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.subscription.errors.conflict.title" as const,
@@ -727,10 +707,8 @@ const { DELETE } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.subscription.form.fields.cancelAtPeriodEnd.label" as const,
-          description:
-            "app.api.subscription.form.fields.cancelAtPeriodEnd.description" as const,
+          label: "app.api.subscription.form.fields.cancelAtPeriodEnd.label" as const,
+          description: "app.api.subscription.form.fields.cancelAtPeriodEnd.description" as const,
           columns: 12,
         },
         z.boolean(),
@@ -740,8 +718,7 @@ const { DELETE } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.subscription.form.fields.reason.label" as const,
-          description:
-            "app.api.subscription.form.fields.reason.description" as const,
+          description: "app.api.subscription.form.fields.reason.description" as const,
           columns: 12,
         },
         z.string().optional(),
@@ -768,8 +745,7 @@ const { DELETE } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.subscription.errors.validation.title" as const,
-      description:
-        "app.api.subscription.errors.validation.description" as const,
+      description: "app.api.subscription.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.subscription.errors.notFound.title" as const,
@@ -777,8 +753,7 @@ const { DELETE } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.subscription.errors.unauthorized.title" as const,
-      description:
-        "app.api.subscription.errors.unauthorized.description" as const,
+      description: "app.api.subscription.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.subscription.errors.forbidden.title" as const,
@@ -798,8 +773,7 @@ const { DELETE } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.subscription.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.subscription.errors.unsavedChanges.description" as const,
+      description: "app.api.subscription.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.subscription.errors.conflict.title" as const,
@@ -839,8 +813,7 @@ export type SubscriptionPutResponseOutput = typeof PUT.types.ResponseOutput;
 export type SubscriptionDeleteRequestInput = typeof DELETE.types.RequestInput;
 export type SubscriptionDeleteRequestOutput = typeof DELETE.types.RequestOutput;
 export type SubscriptionDeleteResponseInput = typeof DELETE.types.ResponseInput;
-export type SubscriptionDeleteResponseOutput =
-  typeof DELETE.types.ResponseOutput;
+export type SubscriptionDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 
 /**
  * Export definitions

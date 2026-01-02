@@ -8,8 +8,7 @@ export const translations = {
 
   send: {
     title: "E-Mail senden",
-    description:
-      "E-Mails über den E-Mail-Service mit erweiterten Optionen senden",
+    description: "E-Mails über den E-Mail-Service mit erweiterten Optionen senden",
 
     container: {
       title: "E-Mail-Konfiguration",
@@ -160,8 +159,7 @@ export const translations = {
     errors: {
       validation: {
         title: "Validierungsfehler",
-        description:
-          "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+        description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
       },
       unauthorized: {
         title: "Nicht autorisiert",
@@ -177,23 +175,19 @@ export const translations = {
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "Ein Konflikt ist bei der Verarbeitung der Anfrage aufgetreten",
+        description: "Ein Konflikt ist bei der Verarbeitung der Anfrage aufgetreten",
       },
       noData: {
         title: "Keine Daten",
-        description:
-          "SMTP-Service meldete Erfolg, aber keine Daten wurden bereitgestellt",
+        description: "SMTP-Service meldete Erfolg, aber keine Daten wurden bereitgestellt",
       },
       server: {
         title: "Serverfehler",
-        description:
-          "Ein interner Serverfehler ist beim Senden der E-Mail aufgetreten",
+        description: "Ein interner Serverfehler ist beim Senden der E-Mail aufgetreten",
       },
       network: {
         title: "Netzwerkfehler",
-        description:
-          "Ein Netzwerkfehler ist beim Senden der E-Mail aufgetreten",
+        description: "Ein Netzwerkfehler ist beim Senden der E-Mail aufgetreten",
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",

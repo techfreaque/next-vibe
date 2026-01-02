@@ -33,8 +33,7 @@ export const translations: typeof enTranslations = {
   },
   newsletter: {
     title: "Bleiben Sie auf dem Laufenden",
-    description:
-      "Abonnieren Sie unseren Newsletter für die neuesten Updates und Einblicke.",
+    description: "Abonnieren Sie unseren Newsletter für die neuesten Updates und Einblicke.",
     emailPlaceholder: "E-Mail eingeben",
     subscribe: "Abonnieren",
     subscription: {
@@ -82,8 +81,7 @@ export const translations: typeof enTranslations = {
       ogDescription:
         "Entdecken Sie unsere Mission, den Zugang zu unzensierter KI zu demokratisieren",
       twitterTitle: "Über {{appName}}",
-      twitterDescription:
-        "Erfahren Sie mehr über unsere Mission für unzensierte KI-Gespräche",
+      twitterDescription: "Erfahren Sie mehr über unsere Mission für unzensierte KI-Gespräche",
     },
     privacyPolicy: {
       title: "Datenschutzerklärung - {{appName}}",
@@ -91,14 +89,12 @@ export const translations: typeof enTranslations = {
       description:
         "Erfahren Sie, wie {{appName}} Ihre Privatsphäre schützt und Ihre Daten verarbeitet",
       imageAlt: "Datenschutzerklärung",
-      keywords:
-        "datenschutzerklärung, datenschutz, benutzerprivatsphäre, {{appName}} datenschutz",
+      keywords: "datenschutzerklärung, datenschutz, benutzerprivatsphäre, {{appName}} datenschutz",
     },
     termsOfService: {
       title: "Nutzungsbedingungen - {{appName}}",
       category: "Rechtliches",
-      description:
-        "Lesen Sie die Geschäftsbedingungen für die Nutzung von {{appName}}",
+      description: "Lesen Sie die Geschäftsbedingungen für die Nutzung von {{appName}}",
       imageAlt: "Nutzungsbedingungen",
       keywords:
         "nutzungsbedingungen, geschäftsbedingungen, benutzervereinbarung, {{appName}} bedingungen",
@@ -106,8 +102,7 @@ export const translations: typeof enTranslations = {
     imprint: {
       title: "Impressum - {{appName}}",
       category: "Rechtliches",
-      description:
-        "Rechtliche Informationen und Unternehmensdetails für {{appName}}",
+      description: "Rechtliche Informationen und Unternehmensdetails für {{appName}}",
       imageAlt: "Impressum",
       keywords:
         "impressum, rechtliche hinweise, unternehmensinformationen, {{appName}} rechtliches",
@@ -198,8 +193,7 @@ export const translations: typeof enTranslations = {
       },
       features: {
         title: "Plattformfunktionen",
-        description:
-          "Diese Seite funktioniert sowohl im Web als auch auf Mobilgeräten",
+        description: "Diese Seite funktioniert sowohl im Web als auch auf Mobilgeräten",
         unified: {
           title: "✅ Einheitliche Komponenten",
           description:
@@ -207,13 +201,11 @@ export const translations: typeof enTranslations = {
         },
         types: {
           title: "✅ Typsicherheit",
-          description:
-            "Vollständige TypeScript-Unterstützung mit korrekter Typinferenz",
+          description: "Vollständige TypeScript-Unterstützung mit korrekter Typinferenz",
         },
         async: {
           title: "✅ Asynchrone Serverkomponenten",
-          description:
-            "Next.js 15 asynchrone Seitkomponenten funktionieren in React Native",
+          description: "Next.js 15 asynchrone Seitkomponenten funktionieren in React Native",
         },
       },
       links: {
@@ -316,8 +308,7 @@ export const translations: typeof enTranslations = {
       notifications: {
         welcome: {
           title: "Willkommen!",
-          description:
-            "Danke, dass Sie sich uns angeschlossen haben. Lassen Sie uns beginnen!",
+          description: "Danke, dass Sie sich uns angeschlossen haben. Lassen Sie uns beginnen!",
         },
       },
     },
@@ -396,8 +387,7 @@ export const translations: typeof enTranslations = {
       notifications: {
         welcome: {
           title: "Willkommen!",
-          description:
-            "Danke, dass Sie sich uns angeschlossen haben. Lassen Sie uns beginnen!",
+          description: "Danke, dass Sie sich uns angeschlossen haben. Lassen Sie uns beginnen!",
         },
       },
     },

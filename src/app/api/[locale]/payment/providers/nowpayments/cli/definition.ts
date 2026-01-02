@@ -19,8 +19,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["payment", "providers", "nowpayments", "cli"],
   title: "app.api.payment.providers.nowpayments.cli.post.title" as const,
-  description:
-    "app.api.payment.providers.nowpayments.cli.post.description" as const,
+  description: "app.api.payment.providers.nowpayments.cli.post.description" as const,
   icon: "bitcoin" as const,
   category: "app.api.payment.providers.nowpayments.cli.post.category" as const,
   tags: [
@@ -28,12 +27,7 @@ const { POST } = createEndpoint({
     "app.api.payment.providers.nowpayments.cli.post.tags.cli" as const,
     "app.api.payment.providers.nowpayments.cli.post.tags.webhook" as const,
   ],
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.PRODUCTION_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
   aliases: ["nowpayments", "nowpayments-cli", "nowpayments-tunnel"],
 
   cli: {
@@ -68,8 +62,7 @@ const { POST } = createEndpoint({
       tunnel: {
         success: true,
         tunnelUrl: "https://abc123.ngrok.io",
-        webhookUrl:
-          "https://abc123.ngrok.io/api/en/payment/providers/nowpayments/webhook",
+        webhookUrl: "https://abc123.ngrok.io/api/en/payment/providers/nowpayments/webhook",
         instructions:
           "Set this webhook URL in NOWPayments dashboard: https://abc123.ngrok.io/api/en/payment/providers/nowpayments/webhook",
       },
@@ -80,10 +73,8 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title:
-        "app.api.payment.providers.nowpayments.cli.post.form.title" as const,
-      description:
-        "app.api.payment.providers.nowpayments.cli.post.form.description" as const,
+      title: "app.api.payment.providers.nowpayments.cli.post.form.title" as const,
+      description: "app.api.payment.providers.nowpayments.cli.post.form.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -103,23 +94,19 @@ const { POST } = createEndpoint({
           options: [
             {
               value: "check",
-              label:
-                "app.api.payment.providers.nowpayments.cli.post.operations.check" as const,
+              label: "app.api.payment.providers.nowpayments.cli.post.operations.check" as const,
             },
             {
               value: "install",
-              label:
-                "app.api.payment.providers.nowpayments.cli.post.operations.install" as const,
+              label: "app.api.payment.providers.nowpayments.cli.post.operations.install" as const,
             },
             {
               value: "tunnel",
-              label:
-                "app.api.payment.providers.nowpayments.cli.post.operations.tunnel" as const,
+              label: "app.api.payment.providers.nowpayments.cli.post.operations.tunnel" as const,
             },
             {
               value: "status",
-              label:
-                "app.api.payment.providers.nowpayments.cli.post.operations.status" as const,
+              label: "app.api.payment.providers.nowpayments.cli.post.operations.status" as const,
             },
           ],
         },
@@ -129,8 +116,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.payment.providers.nowpayments.cli.post.form.fields.port.label" as const,
+          label: "app.api.payment.providers.nowpayments.cli.post.form.fields.port.label" as const,
           description:
             "app.api.payment.providers.nowpayments.cli.post.form.fields.port.description" as const,
           placeholder:
@@ -171,8 +157,7 @@ const { POST } = createEndpoint({
       status: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.payment.providers.nowpayments.cli.post.response.fields.status" as const,
+          content: "app.api.payment.providers.nowpayments.cli.post.response.fields.status" as const,
         },
         z.string().optional(),
       ),
@@ -180,8 +165,7 @@ const { POST } = createEndpoint({
       output: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.payment.providers.nowpayments.cli.post.response.fields.output" as const,
+          content: "app.api.payment.providers.nowpayments.cli.post.response.fields.output" as const,
         },
         z.string().optional(),
       ),
@@ -223,60 +207,50 @@ const { POST } = createEndpoint({
         "app.api.payment.providers.nowpayments.cli.post.errors.validationFailed.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.payment.providers.nowpayments.cli.post.errors.networkError.title" as const,
+      title: "app.api.payment.providers.nowpayments.cli.post.errors.networkError.title" as const,
       description:
         "app.api.payment.providers.nowpayments.cli.post.errors.networkError.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.payment.providers.nowpayments.cli.post.errors.unauthorized.title" as const,
+      title: "app.api.payment.providers.nowpayments.cli.post.errors.unauthorized.title" as const,
       description:
         "app.api.payment.providers.nowpayments.cli.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.payment.providers.nowpayments.cli.post.errors.forbidden.title" as const,
+      title: "app.api.payment.providers.nowpayments.cli.post.errors.forbidden.title" as const,
       description:
         "app.api.payment.providers.nowpayments.cli.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.payment.providers.nowpayments.cli.post.errors.notFound.title" as const,
+      title: "app.api.payment.providers.nowpayments.cli.post.errors.notFound.title" as const,
       description:
         "app.api.payment.providers.nowpayments.cli.post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.payment.providers.nowpayments.cli.post.errors.serverError.title" as const,
+      title: "app.api.payment.providers.nowpayments.cli.post.errors.serverError.title" as const,
       description:
         "app.api.payment.providers.nowpayments.cli.post.errors.serverError.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.payment.providers.nowpayments.cli.post.errors.unknownError.title" as const,
+      title: "app.api.payment.providers.nowpayments.cli.post.errors.unknownError.title" as const,
       description:
         "app.api.payment.providers.nowpayments.cli.post.errors.unknownError.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.payment.providers.nowpayments.cli.post.errors.unsavedChanges.title" as const,
+      title: "app.api.payment.providers.nowpayments.cli.post.errors.unsavedChanges.title" as const,
       description:
         "app.api.payment.providers.nowpayments.cli.post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.payment.providers.nowpayments.cli.post.errors.conflict.title" as const,
+      title: "app.api.payment.providers.nowpayments.cli.post.errors.conflict.title" as const,
       description:
         "app.api.payment.providers.nowpayments.cli.post.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title:
-      "app.api.payment.providers.nowpayments.cli.post.success.title" as const,
-    description:
-      "app.api.payment.providers.nowpayments.cli.post.success.description" as const,
+    title: "app.api.payment.providers.nowpayments.cli.post.success.title" as const,
+    description: "app.api.payment.providers.nowpayments.cli.post.success.description" as const,
   },
 });
 

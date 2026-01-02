@@ -50,8 +50,7 @@ export const translations: typeof enTranslations = {
     deductCreditsFailed: "Fehler beim Abziehen von Credits",
     insufficientCredits:
       "Unzureichende Credits. Sie benötigen {{cost}} Credits, um diese Funktion zu nutzen.",
-    deductionFailed:
-      "Fehler beim Abziehen von {{cost}} Credits. Bitte versuchen Sie es erneut.",
+    deductionFailed: "Fehler beim Abziehen von {{cost}} Credits. Bitte versuchen Sie es erneut.",
     getTransactionsFailed: "Fehler beim Abrufen der Credit-Transaktionen",
     invalidIdentifier: "Ungültige Benutzer- oder Lead-Kennung",
     userNotFound: "Benutzer nicht gefunden",
@@ -61,8 +60,7 @@ export const translations: typeof enTranslations = {
     stripeCustomerFailed: "Fehler beim Erstellen des Stripe-Kunden",
     checkoutFailed: "Fehler beim Erstellen der Checkout-Sitzung",
     mergeFailed: "Fehler beim Zusammenführen der Lead-Credits",
-    mergeLeadWalletsFailed:
-      "Fehler beim Zusammenführen der Lead-Wallets mit dem Benutzerkonto",
+    mergeLeadWalletsFailed: "Fehler beim Zusammenführen der Lead-Wallets mit dem Benutzerkonto",
     cleanupOrphanedFailed: "Fehler beim Bereinigen verwaister Lead-Wallets",
     monthlyResetFailed: "Fehler beim monatlichen Zurücksetzen der Credits",
     noLeadsToMerge: "Keine Leads zum Zusammenführen vorhanden",
@@ -75,13 +73,10 @@ export const translations: typeof enTranslations = {
     walletNotFound: "Wallet nicht gefunden",
     walletCreationFailed: "Fehler beim Erstellen des Wallets",
     addEarnedCreditsFailed: "Fehler beim Hinzufügen verdienter Credits",
-    getEarnedBalanceFailed:
-      "Fehler beim Abrufen des verdienten Credit-Guthabens",
-    insufficientEarnedCredits:
-      "Unzureichende verdiente Credits für diesen Vorgang",
+    getEarnedBalanceFailed: "Fehler beim Abrufen des verdienten Credit-Guthabens",
+    insufficientEarnedCredits: "Unzureichende verdiente Credits für diesen Vorgang",
     deductEarnedCreditsFailed: "Fehler beim Abziehen verdienter Credits",
-    getReferralTransactionsFailed:
-      "Fehler beim Abrufen der Empfehlungstransaktionen",
+    getReferralTransactionsFailed: "Fehler beim Abrufen der Empfehlungstransaktionen",
   },
   get: {
     title: "Credit-Guthaben abrufen",
@@ -123,8 +118,7 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um Ihr Credit-Guthaben anzuzeigen",
+        description: "Sie müssen angemeldet sein, um Ihr Credit-Guthaben anzuzeigen",
       },
       forbidden: {
         title: "Verboten",
@@ -144,8 +138,7 @@ export const translations: typeof enTranslations = {
       },
       noActiveSubscription: {
         title: "Aktives Abonnement erforderlich",
-        description:
-          "Sie müssen ein aktives Abonnement haben, um Credit-Packs zu kaufen",
+        description: "Sie müssen ein aktives Abonnement haben, um Credit-Packs zu kaufen",
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
@@ -157,8 +150,7 @@ export const translations: typeof enTranslations = {
       },
       no_active_subscription: {
         title: "Aktives Abonnement erforderlich",
-        description:
-          "Sie müssen ein aktives Abonnement haben, um Credit-Packs zu kaufen",
+        description: "Sie müssen ein aktives Abonnement haben, um Credit-Packs zu kaufen",
       },
     },
   },
@@ -176,8 +168,7 @@ export const translations: typeof enTranslations = {
       },
       offset: {
         label: "Offset",
-        description:
-          "Anzahl der zu überspringenden Transaktionen für Paginierung",
+        description: "Anzahl der zu überspringenden Transaktionen für Paginierung",
       },
       id: "Transaktions-ID",
       amount: "Betrag",
@@ -234,8 +225,7 @@ export const translations: typeof enTranslations = {
         },
         unauthorized: {
           title: "Nicht autorisiert",
-          description:
-            "Sie müssen angemeldet sein, um Ihren Credit-Verlauf anzuzeigen",
+          description: "Sie müssen angemeldet sein, um Ihren Credit-Verlauf anzuzeigen",
         },
         forbidden: {
           title: "Verboten",

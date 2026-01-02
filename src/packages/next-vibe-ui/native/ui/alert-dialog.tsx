@@ -24,13 +24,8 @@ import { convertCSSToViewStyle } from "../utils/style-converter";
 import { buttonTextVariants, buttonVariants } from "./button";
 import { TextClassContext } from "./text";
 
-function AlertDialog({
-  children,
-  ...props
-}: AlertDialogRootProps): React.JSX.Element {
-  return (
-    <AlertDialogPrimitive.Root {...props}>{children}</AlertDialogPrimitive.Root>
-  );
+function AlertDialog({ children, ...props }: AlertDialogRootProps): React.JSX.Element {
+  return <AlertDialogPrimitive.Root {...props}>{children}</AlertDialogPrimitive.Root>;
 }
 AlertDialog.displayName = AlertDialogPrimitive.Root.displayName;
 
@@ -47,15 +42,8 @@ function AlertDialogTrigger({
 }
 AlertDialogTrigger.displayName = AlertDialogPrimitive.Trigger.displayName;
 
-function AlertDialogPortal({
-  children,
-  ...props
-}: AlertDialogPortalProps): React.JSX.Element {
-  return (
-    <AlertDialogPrimitive.Portal {...props}>
-      {children}
-    </AlertDialogPrimitive.Portal>
-  );
+function AlertDialogPortal({ children, ...props }: AlertDialogPortalProps): React.JSX.Element {
+  return <AlertDialogPrimitive.Portal {...props}>{children}</AlertDialogPrimitive.Portal>;
 }
 AlertDialogPortal.displayName = "AlertDialogPortal";
 
@@ -73,10 +61,7 @@ function AlertDialogOverlay({
       <Animated.View
         {...applyStyleType({
           nativeStyle: combinedStyle,
-          className: cn(
-            "z-50 bg-black/80 flex justify-center items-center p-2",
-            className,
-          ),
+          className: cn("z-50 bg-black/80 flex justify-center items-center p-2", className),
         })}
         entering={FadeIn.duration(150)}
         exiting={FadeOut.duration(150)}
@@ -104,9 +89,7 @@ function AlertDialogContent({
             nativeStyle,
             className: cn(
               "z-50 max-w-lg gap-4 border border-border bg-background p-6 shadow-lg shadow-foreground/10 duration-200 rounded-lg",
-              open
-                ? "animate-in fade-in-0 zoom-in-95"
-                : "animate-out fade-out-0 zoom-out-95",
+              open ? "animate-in fade-in-0 zoom-in-95" : "animate-out fade-out-0 zoom-out-95",
               className,
             ),
           })}
@@ -148,10 +131,7 @@ function AlertDialogFooter({
     <View
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "flex flex-col-reverse sm:flex-row sm:justify-end gap-2",
-          className,
-        ),
+        className: cn("flex flex-col-reverse sm:flex-row sm:justify-end gap-2", className),
       })}
     >
       {children}
@@ -170,10 +150,7 @@ function AlertDialogTitle({
     <AlertDialogPrimitive.Title
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "text-lg text-xl text-foreground font-semibold",
-          className,
-        ),
+        className: cn("text-lg text-xl text-foreground font-semibold", className),
       })}
     >
       {children}
@@ -199,8 +176,7 @@ function AlertDialogDescription({
     </AlertDialogPrimitive.Description>
   );
 }
-AlertDialogDescription.displayName =
-  AlertDialogPrimitive.Description.displayName;
+AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName;
 
 function AlertDialogAction({
   className,
@@ -233,9 +209,7 @@ function AlertDialogCancel({
 }: AlertDialogCancelProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
-    <TextClassContext.Provider
-      value={buttonTextVariants({ className, variant: "outline" })}
-    >
+    <TextClassContext.Provider value={buttonTextVariants({ className, variant: "outline" })}>
       <AlertDialogPrimitive.Cancel
         {...applyStyleType({
           nativeStyle,

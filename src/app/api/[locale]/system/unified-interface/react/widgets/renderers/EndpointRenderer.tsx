@@ -16,11 +16,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import type { JSX } from "react";
 import { useEffect } from "react";
-import type {
-  DefaultValues,
-  FieldValues,
-  UseFormReturn,
-} from "react-hook-form";
+import type { DefaultValues, FieldValues, UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
@@ -30,10 +26,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint";
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import { WidgetType } from "../../../shared/types/enums";
-import type {
-  WidgetData,
-  WidgetRenderContext,
-} from "../../../shared/widgets/types";
+import type { WidgetData, WidgetRenderContext } from "../../../shared/widgets/types";
 import { isResponseField } from "../../../shared/widgets/utils/field-helpers";
 import { WidgetRenderer } from "./WidgetRenderer";
 
@@ -50,13 +43,7 @@ export interface SubmitButtonConfig {
   /** Icon component to display in the button */
   icon?: React.ComponentType<{ className?: string }>;
   /** Button variant */
-  variant?:
-    | "default"
-    | "primary"
-    | "secondary"
-    | "destructive"
-    | "ghost"
-    | "link";
+  variant?: "default" | "primary" | "secondary" | "destructive" | "ghost" | "link";
   /** Button size */
   size?: "default" | "sm" | "lg" | "icon";
 }
@@ -154,8 +141,7 @@ function extractAllFields<const TKey extends string>(
         const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
         result.push([fullPath, fieldDef as UnifiedField<TKey>]);
       } else if (
-        (fieldDefObj.type === "object" ||
-          fieldDefObj.type === "object-optional") &&
+        (fieldDefObj.type === "object" || fieldDefObj.type === "object-optional") &&
         fieldDefObj.children &&
         fieldDefObj.ui?.type === "container"
       ) {
@@ -197,8 +183,7 @@ export function EndpointRenderer<
 }: EndpointRendererProps<TEndpoint, TFieldValues>): JSX.Element {
   // Check if endpoint.fields itself is a container widget
   const isRootContainer =
-    endpoint.fields.type === "object" &&
-    endpoint.fields.ui?.type === WidgetType.CONTAINER;
+    endpoint.fields.type === "object" && endpoint.fields.ui?.type === WidgetType.CONTAINER;
 
   // Create internal form if none provided (for display-only mode like tool calls)
   const internalForm = useForm<TFieldValues>({
@@ -229,8 +214,7 @@ export function EndpointRenderer<
   };
 
   // Check if there are any request fields
-  const hasRequest =
-    endpoint.fields.usage && "request" in endpoint.fields.usage;
+  const hasRequest = endpoint.fields.usage && "request" in endpoint.fields.usage;
 
   /**
    * NEW APPROACH: If the root field is a container widget, render it directly.

@@ -183,10 +183,7 @@ function runVibeCheck(targetPath = "./"): string {
  * Count occurrences of a pattern in output
  */
 function countOccurrences(output: string, pattern: string): number {
-  const regex = new RegExp(
-    pattern.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-    "g",
-  );
+  const regex = new RegExp(pattern.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
   return (output.match(regex) || []).length;
 }
 
@@ -371,9 +368,7 @@ describe("Vibe Check Complete Test Suite", () => {
   describe("file coverage", () => {
     it("should include all test files in output", () => {
       for (const file of TEST_FILES) {
-        expect(vibeCheckOutput, `Output should include ${file}`).toContain(
-          file,
-        );
+        expect(vibeCheckOutput, `Output should include ${file}`).toContain(file);
       }
     });
 
@@ -388,9 +383,7 @@ describe("Vibe Check Complete Test Suite", () => {
   describe("custom plugins", () => {
     describe("oxlint-plugin-jsx-capitalization", () => {
       it("should detect lowercase elements", () => {
-        expect(vibeCheckOutput).toContain(
-          "oxlint-plugin-jsx-capitalization(jsx-capitalization)",
-        );
+        expect(vibeCheckOutput).toContain("oxlint-plugin-jsx-capitalization(jsx-capitalization)");
       });
 
       it("should suggest platform-independent components", () => {
@@ -407,10 +400,7 @@ describe("Vibe Check Complete Test Suite", () => {
       });
 
       it("should have expected occurrence count", () => {
-        const count = countOccurrences(
-          vibeCheckOutput,
-          "oxlint-plugin-jsx-capitalization",
-        );
+        const count = countOccurrences(vibeCheckOutput, "oxlint-plugin-jsx-capitalization");
         expect(count).toBeGreaterThanOrEqual(
           EXPECTED_COUNTS.rules["oxlint-plugin-jsx-capitalization"],
         );
@@ -419,64 +409,43 @@ describe("Vibe Check Complete Test Suite", () => {
 
     describe("oxlint-plugin-i18n", () => {
       it("should detect literal strings", () => {
-        expect(vibeCheckOutput).toContain(
-          "oxlint-plugin-i18n(no-literal-string)",
-        );
+        expect(vibeCheckOutput).toContain("oxlint-plugin-i18n(no-literal-string)");
         expect(vibeCheckOutput).toContain("should be translated");
       });
 
       it("should detect various literal string types", () => {
         expect(vibeCheckOutput).toContain('Literal string "');
-        expect(vibeCheckOutput).toContain(
-          "in JSX attribute should be translated",
-        );
+        expect(vibeCheckOutput).toContain("in JSX attribute should be translated");
         expect(vibeCheckOutput).toContain("should be translated using i18n");
       });
 
       it("should have expected occurrence count", () => {
         const count = countOccurrences(vibeCheckOutput, "oxlint-plugin-i18n");
-        expect(count).toBeGreaterThanOrEqual(
-          EXPECTED_COUNTS.rules["oxlint-plugin-i18n"],
-        );
+        expect(count).toBeGreaterThanOrEqual(EXPECTED_COUNTS.rules["oxlint-plugin-i18n"]);
       });
     });
 
     describe("oxlint-plugin-restricted", () => {
       it("should detect unknown type usage", () => {
-        expect(vibeCheckOutput).toContain(
-          "oxlint-plugin-restricted(restricted-syntax)",
-        );
-        expect(vibeCheckOutput).toContain(
-          "Usage of the 'unknown' type isn't allowed",
-        );
+        expect(vibeCheckOutput).toContain("oxlint-plugin-restricted(restricted-syntax)");
+        expect(vibeCheckOutput).toContain("Usage of the 'unknown' type isn't allowed");
       });
 
       it("should detect object type usage", () => {
-        expect(vibeCheckOutput).toContain(
-          "Usage of the 'object' type isn't allowed",
-        );
+        expect(vibeCheckOutput).toContain("Usage of the 'object' type isn't allowed");
       });
 
       it("should detect throw statements", () => {
-        expect(vibeCheckOutput).toContain(
-          "Usage of 'throw' statements is not allowed",
-        );
+        expect(vibeCheckOutput).toContain("Usage of 'throw' statements is not allowed");
       });
 
       it("should detect JSX in object literals", () => {
-        expect(vibeCheckOutput).toContain(
-          "JSX elements inside object literals are not allowed",
-        );
+        expect(vibeCheckOutput).toContain("JSX elements inside object literals are not allowed");
       });
 
       it("should have expected occurrence count", () => {
-        const count = countOccurrences(
-          vibeCheckOutput,
-          "oxlint-plugin-restricted",
-        );
-        expect(count).toBeGreaterThanOrEqual(
-          EXPECTED_COUNTS.rules["oxlint-plugin-restricted"],
-        );
+        const count = countOccurrences(vibeCheckOutput, "oxlint-plugin-restricted");
+        expect(count).toBeGreaterThanOrEqual(EXPECTED_COUNTS.rules["oxlint-plugin-restricted"]);
       });
     });
   });
@@ -491,9 +460,7 @@ describe("Vibe Check Complete Test Suite", () => {
 
     it("should detect no-console with expected count", () => {
       const count = countOccurrences(vibeCheckOutput, "eslint(no-console)");
-      expect(count).toBeGreaterThanOrEqual(
-        EXPECTED_COUNTS.rules["eslint(no-console)"],
-      );
+      expect(count).toBeGreaterThanOrEqual(EXPECTED_COUNTS.rules["eslint(no-console)"]);
     });
 
     it("should detect curly violations", () => {
@@ -502,16 +469,12 @@ describe("Vibe Check Complete Test Suite", () => {
 
     it("should detect eqeqeq violations", () => {
       const count = countOccurrences(vibeCheckOutput, "eslint(eqeqeq)");
-      expect(count).toBeGreaterThanOrEqual(
-        EXPECTED_COUNTS.rules["eslint(eqeqeq)"],
-      );
+      expect(count).toBeGreaterThanOrEqual(EXPECTED_COUNTS.rules["eslint(eqeqeq)"]);
     });
 
     it("should detect no-unused-vars", () => {
       const count = countOccurrences(vibeCheckOutput, "eslint(no-unused-vars)");
-      expect(count).toBeGreaterThanOrEqual(
-        EXPECTED_COUNTS.rules["eslint(no-unused-vars)"],
-      );
+      expect(count).toBeGreaterThanOrEqual(EXPECTED_COUNTS.rules["eslint(no-unused-vars)"]);
     });
 
     it("should detect no-template-curly-in-string", () => {
@@ -531,9 +494,7 @@ describe("Vibe Check Complete Test Suite", () => {
     });
 
     it("should detect no-unused-private-class-members", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint(no-unused-private-class-members)",
-      );
+      expect(vibeCheckOutput).toContain("eslint(no-unused-private-class-members)");
     });
 
     it("should detect prefer-template", () => {
@@ -550,20 +511,14 @@ describe("Vibe Check Complete Test Suite", () => {
   // ============================================================
   describe("typescript-eslint rules", () => {
     it("should detect no-explicit-any", () => {
-      const count = countOccurrences(
-        vibeCheckOutput,
-        "typescript-eslint(no-explicit-any)",
-      );
+      const count = countOccurrences(vibeCheckOutput, "typescript-eslint(no-explicit-any)");
       expect(count).toBeGreaterThanOrEqual(
         EXPECTED_COUNTS.rules["typescript-eslint(no-explicit-any)"],
       );
     });
 
     it("should detect no-inferrable-types", () => {
-      const count = countOccurrences(
-        vibeCheckOutput,
-        "typescript-eslint(no-inferrable-types)",
-      );
+      const count = countOccurrences(vibeCheckOutput, "typescript-eslint(no-inferrable-types)");
       expect(count).toBeGreaterThanOrEqual(
         EXPECTED_COUNTS.rules["typescript-eslint(no-inferrable-types)"],
       );
@@ -574,15 +529,11 @@ describe("Vibe Check Complete Test Suite", () => {
     });
 
     it("should detect consistent-type-imports", () => {
-      expect(vibeCheckOutput).toContain(
-        "typescript-eslint(consistent-type-imports)",
-      );
+      expect(vibeCheckOutput).toContain("typescript-eslint(consistent-type-imports)");
     });
 
     it("should detect no-duplicate-enum-values", () => {
-      expect(vibeCheckOutput).toContain(
-        "typescript-eslint(no-duplicate-enum-values)",
-      );
+      expect(vibeCheckOutput).toContain("typescript-eslint(no-duplicate-enum-values)");
     });
 
     it("should detect no-extra-non-null-assertion", () => {
@@ -596,9 +547,7 @@ describe("Vibe Check Complete Test Suite", () => {
     });
 
     it("should detect explicit-function-return-type", () => {
-      expect(vibeCheckOutput).toContain(
-        "typescript-eslint(explicit-function-return-type)",
-      );
+      expect(vibeCheckOutput).toContain("typescript-eslint(explicit-function-return-type)");
     });
   });
 
@@ -611,43 +560,30 @@ describe("Vibe Check Complete Test Suite", () => {
     });
 
     it("should detect jsx-no-duplicate-props", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-react(jsx-no-duplicate-props)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-react(jsx-no-duplicate-props)");
     });
 
     it("should detect no-children-prop", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-react(no-children-prop)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-react(no-children-prop)");
     });
 
     it("should detect no-direct-mutation-state", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-react(no-direct-mutation-state)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-react(no-direct-mutation-state)");
     });
 
     it("should detect self-closing-comp", () => {
-      const count = countOccurrences(
-        vibeCheckOutput,
-        "eslint-plugin-react(self-closing-comp)",
-      );
+      const count = countOccurrences(vibeCheckOutput, "eslint-plugin-react(self-closing-comp)");
       expect(count).toBeGreaterThanOrEqual(
         EXPECTED_COUNTS.rules["eslint-plugin-react(self-closing-comp)"],
       );
     });
 
     it("should detect no-unknown-property", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-react(no-unknown-property)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-react(no-unknown-property)");
     });
 
     it("should detect iframe-missing-sandbox", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-react(iframe-missing-sandbox)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-react(iframe-missing-sandbox)");
     });
   });
 
@@ -656,10 +592,7 @@ describe("Vibe Check Complete Test Suite", () => {
   // ============================================================
   describe("react-hooks rules", () => {
     it("should detect exhaustive-deps violations", () => {
-      const count = countOccurrences(
-        vibeCheckOutput,
-        "eslint-plugin-react-hooks(exhaustive-deps)",
-      );
+      const count = countOccurrences(vibeCheckOutput, "eslint-plugin-react-hooks(exhaustive-deps)");
       expect(count).toBeGreaterThanOrEqual(
         EXPECTED_COUNTS.rules["eslint-plugin-react-hooks(exhaustive-deps)"],
       );
@@ -679,9 +612,7 @@ describe("Vibe Check Complete Test Suite", () => {
     });
 
     it("should detect anchor-has-content", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-jsx-a11y(anchor-has-content)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-jsx-a11y(anchor-has-content)");
     });
 
     it("should detect click-events-have-key-events", () => {
@@ -690,9 +621,7 @@ describe("Vibe Check Complete Test Suite", () => {
         "eslint-plugin-jsx-a11y(click-events-have-key-events)",
       );
       expect(count).toBeGreaterThanOrEqual(
-        EXPECTED_COUNTS.rules[
-          "eslint-plugin-jsx-a11y(click-events-have-key-events)"
-        ],
+        EXPECTED_COUNTS.rules["eslint-plugin-jsx-a11y(click-events-have-key-events)"],
       );
     });
 
@@ -707,25 +636,18 @@ describe("Vibe Check Complete Test Suite", () => {
     });
 
     it("should detect iframe-has-title", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-jsx-a11y(iframe-has-title)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-jsx-a11y(iframe-has-title)");
     });
 
     it("should detect img-redundant-alt", () => {
-      const count = countOccurrences(
-        vibeCheckOutput,
-        "eslint-plugin-jsx-a11y(img-redundant-alt)",
-      );
+      const count = countOccurrences(vibeCheckOutput, "eslint-plugin-jsx-a11y(img-redundant-alt)");
       expect(count).toBeGreaterThanOrEqual(
         EXPECTED_COUNTS.rules["eslint-plugin-jsx-a11y(img-redundant-alt)"],
       );
     });
 
     it("should detect no-access-key", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-jsx-a11y(no-access-key)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-jsx-a11y(no-access-key)");
     });
 
     it("should detect no-autofocus", () => {
@@ -733,16 +655,11 @@ describe("Vibe Check Complete Test Suite", () => {
     });
 
     it("should detect no-distracting-elements", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-jsx-a11y(no-distracting-elements)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-jsx-a11y(no-distracting-elements)");
     });
 
     it("should detect no-redundant-roles", () => {
-      const count = countOccurrences(
-        vibeCheckOutput,
-        "eslint-plugin-jsx-a11y(no-redundant-roles)",
-      );
+      const count = countOccurrences(vibeCheckOutput, "eslint-plugin-jsx-a11y(no-redundant-roles)");
       expect(count).toBeGreaterThanOrEqual(
         EXPECTED_COUNTS.rules["eslint-plugin-jsx-a11y(no-redundant-roles)"],
       );
@@ -754,16 +671,12 @@ describe("Vibe Check Complete Test Suite", () => {
         "eslint-plugin-jsx-a11y(role-has-required-aria-props)",
       );
       expect(count).toBeGreaterThanOrEqual(
-        EXPECTED_COUNTS.rules[
-          "eslint-plugin-jsx-a11y(role-has-required-aria-props)"
-        ],
+        EXPECTED_COUNTS.rules["eslint-plugin-jsx-a11y(role-has-required-aria-props)"],
       );
     });
 
     it("should detect tabindex-no-positive", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-jsx-a11y(tabindex-no-positive)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-jsx-a11y(tabindex-no-positive)");
     });
 
     it("should detect aria-props violations", () => {
@@ -775,31 +688,22 @@ describe("Vibe Check Complete Test Suite", () => {
     });
 
     it("should detect label-has-associated-control", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-jsx-a11y(label-has-associated-control)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-jsx-a11y(label-has-associated-control)");
     });
 
     it("should detect html-has-lang", () => {
-      const count = countOccurrences(
-        vibeCheckOutput,
-        "eslint-plugin-jsx-a11y(html-has-lang)",
-      );
+      const count = countOccurrences(vibeCheckOutput, "eslint-plugin-jsx-a11y(html-has-lang)");
       expect(count).toBeGreaterThanOrEqual(
         EXPECTED_COUNTS.rules["eslint-plugin-jsx-a11y(html-has-lang)"],
       );
     });
 
     it("should detect prefer-tag-over-role", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-jsx-a11y(prefer-tag-over-role)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-jsx-a11y(prefer-tag-over-role)");
     });
 
     it("should detect anchor-is-valid", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-jsx-a11y(anchor-is-valid)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-jsx-a11y(anchor-is-valid)");
     });
   });
 
@@ -808,20 +712,14 @@ describe("Vibe Check Complete Test Suite", () => {
   // ============================================================
   describe("nextjs rules", () => {
     it("should detect no-img-element (warning)", () => {
-      const count = countOccurrences(
-        vibeCheckOutput,
-        "eslint-plugin-next(no-img-element)",
-      );
+      const count = countOccurrences(vibeCheckOutput, "eslint-plugin-next(no-img-element)");
       expect(count).toBeGreaterThanOrEqual(
         EXPECTED_COUNTS.rules["eslint-plugin-next(no-img-element)"],
       );
     });
 
     it("should detect no-html-link-for-pages", () => {
-      const count = countOccurrences(
-        vibeCheckOutput,
-        "eslint-plugin-next(no-html-link-for-pages)",
-      );
+      const count = countOccurrences(vibeCheckOutput, "eslint-plugin-next(no-html-link-for-pages)");
       expect(count).toBeGreaterThanOrEqual(
         EXPECTED_COUNTS.rules["eslint-plugin-next(no-html-link-for-pages)"],
       );
@@ -836,16 +734,11 @@ describe("Vibe Check Complete Test Suite", () => {
     });
 
     it("should detect google-font-display", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-next(google-font-display)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-next(google-font-display)");
     });
 
     it("should detect no-page-custom-font", () => {
-      const count = countOccurrences(
-        vibeCheckOutput,
-        "eslint-plugin-next(no-page-custom-font)",
-      );
+      const count = countOccurrences(vibeCheckOutput, "eslint-plugin-next(no-page-custom-font)");
       expect(count).toBeGreaterThanOrEqual(
         EXPECTED_COUNTS.rules["eslint-plugin-next(no-page-custom-font)"],
       );
@@ -859,30 +752,21 @@ describe("Vibe Check Complete Test Suite", () => {
   // ============================================================
   describe("promise rules", () => {
     it("should detect param-names", () => {
-      const count = countOccurrences(
-        vibeCheckOutput,
-        "eslint-plugin-promise(param-names)",
-      );
+      const count = countOccurrences(vibeCheckOutput, "eslint-plugin-promise(param-names)");
       expect(count).toBeGreaterThanOrEqual(
         EXPECTED_COUNTS.rules["eslint-plugin-promise(param-names)"],
       );
     });
 
     it("should detect always-return", () => {
-      const count = countOccurrences(
-        vibeCheckOutput,
-        "eslint-plugin-promise(always-return)",
-      );
+      const count = countOccurrences(vibeCheckOutput, "eslint-plugin-promise(always-return)");
       expect(count).toBeGreaterThanOrEqual(
         EXPECTED_COUNTS.rules["eslint-plugin-promise(always-return)"],
       );
     });
 
     it("should detect catch-or-return", () => {
-      const count = countOccurrences(
-        vibeCheckOutput,
-        "eslint-plugin-promise(catch-or-return)",
-      );
+      const count = countOccurrences(vibeCheckOutput, "eslint-plugin-promise(catch-or-return)");
       expect(count).toBeGreaterThanOrEqual(
         EXPECTED_COUNTS.rules["eslint-plugin-promise(catch-or-return)"],
       );
@@ -902,15 +786,11 @@ describe("Vibe Check Complete Test Suite", () => {
     });
 
     it("should detect prefer-array-flat", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-unicorn(prefer-array-flat)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-unicorn(prefer-array-flat)");
     });
 
     it("should detect prefer-includes", () => {
-      expect(vibeCheckOutput).toContain(
-        "eslint-plugin-unicorn(prefer-includes)",
-      );
+      expect(vibeCheckOutput).toContain("eslint-plugin-unicorn(prefer-includes)");
     });
 
     it("should detect no-await-in-promise-methods", () => {
@@ -919,9 +799,7 @@ describe("Vibe Check Complete Test Suite", () => {
         "eslint-plugin-unicorn(no-await-in-promise-methods)",
       );
       expect(count).toBeGreaterThanOrEqual(
-        EXPECTED_COUNTS.rules[
-          "eslint-plugin-unicorn(no-await-in-promise-methods)"
-        ],
+        EXPECTED_COUNTS.rules["eslint-plugin-unicorn(no-await-in-promise-methods)"],
       );
     });
 
@@ -970,9 +848,7 @@ describe("Vibe Check Complete Test Suite", () => {
     });
 
     it("should detect condition always true errors", () => {
-      expect(vibeCheckOutput).toContain(
-        "This condition will always return true",
-      );
+      expect(vibeCheckOutput).toContain("This condition will always return true");
     });
   });
 
@@ -1009,8 +885,7 @@ describe("Compiled Runtime Tests", () => {
 
   beforeAll(() => {
     if (!existsSync(COMPILED_RUNTIME)) {
-      compiledOutput =
-        "SKIP: Compiled runtime not found - run 'bun vibe builder' first";
+      compiledOutput = "SKIP: Compiled runtime not found - run 'bun vibe builder' first";
       return;
     }
 
@@ -1056,9 +931,7 @@ describe("Compiled Runtime Tests", () => {
     // Allow some variance - compiled runtime may detect fewer TypeScript errors
     // Bun runtime: 319 issues, compiled runtime: ~309 issues (10 fewer due to tsc differences)
     expect(summary.files).toBe(EXPECTED_COUNTS.totalFiles);
-    expect(summary.issues).toBeGreaterThanOrEqual(
-      EXPECTED_COUNTS.totalIssues - 15,
-    );
+    expect(summary.issues).toBeGreaterThanOrEqual(EXPECTED_COUNTS.totalIssues - 15);
     expect(summary.issues).toBeLessThanOrEqual(EXPECTED_COUNTS.totalIssues + 5);
   });
 });
@@ -1078,15 +951,12 @@ describe("Multi-Directory Tests", () => {
         );
       } catch (error) {
         const execError = error as { stdout?: string; stderr?: string };
-        fromTestProjectOutput =
-          (execError.stdout || "") + (execError.stderr || "");
+        fromTestProjectOutput = (execError.stdout || "") + (execError.stderr || "");
       }
     });
 
     it("should find all plugin errors when running from test-project", () => {
-      expect(fromTestProjectOutput).toContain(
-        "oxlint-plugin-jsx-capitalization",
-      );
+      expect(fromTestProjectOutput).toContain("oxlint-plugin-jsx-capitalization");
       expect(fromTestProjectOutput).toContain("oxlint-plugin-i18n");
       expect(fromTestProjectOutput).toContain("oxlint-plugin-restricted");
     });
@@ -1096,9 +966,7 @@ describe("Multi-Directory Tests", () => {
     });
 
     it("should detect TypeScript compiler errors when running from test-project", () => {
-      expect(fromTestProjectOutput).toContain(
-        "Property 'marquee' does not exist",
-      );
+      expect(fromTestProjectOutput).toContain("Property 'marquee' does not exist");
     });
 
     it("should find all test files when running from test-project", () => {

@@ -29,12 +29,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["system", "translations", "stats"],
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.PRODUCTION_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
 
   title: "app.api.system.translations.stats.get.title",
   description: "app.api.system.translations.stats.get.description",
@@ -53,8 +48,7 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.system.translations.stats.get.container.title" as const,
-      description:
-        "app.api.system.translations.stats.get.container.description" as const,
+      description: "app.api.system.translations.stats.get.container.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -73,8 +67,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.system.translations.stats.get.response.title",
-          description:
-            "app.api.system.translations.stats.get.response.description",
+          description: "app.api.system.translations.stats.get.response.description",
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -137,48 +130,39 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.translations.stats.get.errors.validation.title",
-      description:
-        "app.api.system.translations.stats.get.errors.validation.description",
+      description: "app.api.system.translations.stats.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.translations.stats.get.errors.validation.title",
-      description:
-        "app.api.system.translations.stats.get.errors.validation.description",
+      description: "app.api.system.translations.stats.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.translations.stats.get.errors.unauthorized.title",
-      description:
-        "app.api.system.translations.stats.get.errors.unauthorized.description",
+      description: "app.api.system.translations.stats.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.translations.stats.get.errors.forbidden.title",
-      description:
-        "app.api.system.translations.stats.get.errors.forbidden.description",
+      description: "app.api.system.translations.stats.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.translations.stats.get.errors.validation.title",
-      description:
-        "app.api.system.translations.stats.get.errors.validation.description",
+      description: "app.api.system.translations.stats.get.errors.validation.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.translations.stats.get.errors.validation.title",
-      description:
-        "app.api.system.translations.stats.get.errors.validation.description",
+      description: "app.api.system.translations.stats.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.translations.stats.get.errors.validation.title",
-      description:
-        "app.api.system.translations.stats.get.errors.validation.description",
+      description: "app.api.system.translations.stats.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.translations.stats.get.errors.validation.title",
-      description:
-        "app.api.system.translations.stats.get.errors.validation.description",
+      description: "app.api.system.translations.stats.get.errors.validation.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.translations.stats.get.errors.validation.title",
-      description:
-        "app.api.system.translations.stats.get.errors.validation.description",
+      description: "app.api.system.translations.stats.get.errors.validation.description",
     },
   },
 

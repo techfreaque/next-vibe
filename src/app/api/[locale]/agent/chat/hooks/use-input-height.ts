@@ -11,12 +11,8 @@ import { platform } from "@/config/env-client";
  * @param inputContainerRef - Ref to the input container element
  * @returns Current height of the input container
  */
-export function useInputHeight(
-  inputContainerRef: React.RefObject<DivRefObject | null>,
-): number {
-  const [inputHeight, setInputHeight] = useState<number>(
-    LAYOUT.DEFAULT_INPUT_HEIGHT,
-  );
+export function useInputHeight(inputContainerRef: React.RefObject<DivRefObject | null>): number {
+  const [inputHeight, setInputHeight] = useState<number>(LAYOUT.DEFAULT_INPUT_HEIGHT);
 
   useEffect(() => {
     if (platform.isReactNative) {

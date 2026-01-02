@@ -26,9 +26,7 @@ export interface SettingsOperations {
   setTTSVoice: (voice: typeof TtsVoiceValue) => void;
   setTheme: (theme: "light" | "dark") => void;
   setViewMode: (mode: ChatSettings["viewMode"]) => void;
-  setEnabledTools: (
-    tools: Array<{ id: string; requiresConfirmation: boolean }>,
-  ) => void;
+  setEnabledTools: (tools: Array<{ id: string; requiresConfirmation: boolean }>) => void;
 }
 
 /**

@@ -164,151 +164,92 @@ function renderWidget<const TKey extends string>(
   switch (widgetType) {
     // Text widgets
     case WidgetType.TEXT:
-      return (
-        <TextWidget
-          {...(baseProps as ReactWidgetProps<typeof WidgetType.TEXT, TKey>)}
-        />
-      );
+      return <TextWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.TEXT, TKey>)} />;
 
     case WidgetType.BADGE:
-      return (
-        <BadgeWidget
-          {...(baseProps as ReactWidgetProps<typeof WidgetType.BADGE, TKey>)}
-        />
-      );
+      return <BadgeWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.BADGE, TKey>)} />;
 
     case WidgetType.MARKDOWN:
       return (
-        <MarkdownWidget
-          {...(baseProps as ReactWidgetProps<typeof WidgetType.MARKDOWN, TKey>)}
-        />
+        <MarkdownWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.MARKDOWN, TKey>)} />
       );
 
     case WidgetType.MARKDOWN_EDITOR:
       return (
         <EditableTextWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.MARKDOWN_EDITOR,
-            TKey
-          >)}
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.MARKDOWN_EDITOR, TKey>)}
         />
       );
 
     case WidgetType.TITLE:
-      return (
-        <TitleWidget
-          {...(baseProps as ReactWidgetProps<typeof WidgetType.TITLE, TKey>)}
-        />
-      );
+      return <TitleWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.TITLE, TKey>)} />;
 
     // Form field widget (renders as editable form input in both request and response modes)
     case WidgetType.FORM_FIELD:
       return (
-        <FormFieldWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.FORM_FIELD,
-            TKey
-          >)}
-        />
+        <FormFieldWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.FORM_FIELD, TKey>)} />
       );
 
     // Link widgets
     case WidgetType.LINK:
-      return (
-        <LinkWidget
-          {...(baseProps as ReactWidgetProps<typeof WidgetType.LINK, TKey>)}
-        />
-      );
+      return <LinkWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.LINK, TKey>)} />;
 
     // Code widgets
     case WidgetType.CODE_OUTPUT:
       return (
         <CodeOutputWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.CODE_OUTPUT,
-            TKey
-          >)}
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.CODE_OUTPUT, TKey>)}
         />
       );
 
     case WidgetType.CODE_QUALITY_LIST:
       return (
         <CodeQualityListWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.CODE_QUALITY_LIST,
-            TKey
-          >)}
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.CODE_QUALITY_LIST, TKey>)}
         />
       );
 
     case WidgetType.CREDIT_TRANSACTION_CARD:
       return (
         <CreditTransactionCardWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.CREDIT_TRANSACTION_CARD,
-            TKey
-          >)}
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.CREDIT_TRANSACTION_CARD, TKey>)}
         />
       );
 
     case WidgetType.CREDIT_TRANSACTION_LIST:
       return (
         <CreditTransactionListWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.CREDIT_TRANSACTION_LIST,
-            TKey
-          >)}
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.CREDIT_TRANSACTION_LIST, TKey>)}
         />
       );
 
     case WidgetType.PAGINATION:
       return (
         <PaginationWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.PAGINATION,
-            TKey
-          >)}
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.PAGINATION, TKey>)}
         />
       );
 
     // Data display widgets
     case WidgetType.DATA_TABLE:
       return (
-        <DataTableWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.DATA_TABLE,
-            TKey
-          >)}
-        />
+        <DataTableWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.DATA_TABLE, TKey>)} />
       );
 
     case WidgetType.DATA_CARDS:
       return (
-        <DataCardsWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.DATA_CARDS,
-            TKey
-          >)}
-        />
+        <DataCardsWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.DATA_CARDS, TKey>)} />
       );
 
     case WidgetType.DATA_LIST:
       return (
-        <DataListWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.DATA_LIST,
-            TKey
-          >)}
-        />
+        <DataListWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.DATA_LIST, TKey>)} />
       );
 
     case WidgetType.GROUPED_LIST:
       return (
         <GroupedListWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.GROUPED_LIST,
-            TKey
-          >)}
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.GROUPED_LIST, TKey>)}
         />
       );
 
@@ -316,131 +257,75 @@ function renderWidget<const TKey extends string>(
     case WidgetType.METRIC_CARD:
       return (
         <MetricCardWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.METRIC_CARD,
-            TKey
-          >)}
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.METRIC_CARD, TKey>)}
         />
       );
 
     case WidgetType.STAT:
-      return (
-        <StatWidget
-          {...(baseProps as ReactWidgetProps<typeof WidgetType.STAT, TKey>)}
-        />
-      );
+      return <StatWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.STAT, TKey>)} />;
 
     case WidgetType.STATS_GRID:
       return (
-        <StatsGridWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.STATS_GRID,
-            TKey
-          >)}
-        />
+        <StatsGridWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.STATS_GRID, TKey>)} />
       );
 
     // Chart widgets
     case WidgetType.CHART:
-      return (
-        <ChartWidget
-          {...(baseProps as ReactWidgetProps<typeof WidgetType.CHART, TKey>)}
-        />
-      );
+      return <ChartWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.CHART, TKey>)} />;
 
     // Layout widgets
     case WidgetType.CONTAINER:
       return (
-        <ContainerWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.CONTAINER,
-            TKey
-          >)}
-        />
+        <ContainerWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.CONTAINER, TKey>)} />
       );
 
     case WidgetType.SECTION:
       return (
-        <SectionWidget
-          {...(baseProps as ReactWidgetProps<typeof WidgetType.SECTION, TKey>)}
-        />
+        <SectionWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.SECTION, TKey>)} />
       );
 
     // Link display widgets
     case WidgetType.LINK_CARD:
       return (
-        <LinkCardWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.LINK_CARD,
-            TKey
-          >)}
-        />
+        <LinkCardWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.LINK_CARD, TKey>)} />
       );
 
     case WidgetType.LINK_LIST:
       return (
-        <LinkListWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.LINK_LIST,
-            TKey
-          >)}
-        />
+        <LinkListWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.LINK_LIST, TKey>)} />
       );
 
     // Interactive widgets
     case WidgetType.BUTTON:
-      return (
-        <ButtonWidget
-          {...(baseProps as ReactWidgetProps<typeof WidgetType.BUTTON, TKey>)}
-        />
-      );
+      return <ButtonWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.BUTTON, TKey>)} />;
 
     case WidgetType.SUBMIT_BUTTON:
       return (
         <SubmitButtonWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.SUBMIT_BUTTON,
-            TKey
-          >)}
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.SUBMIT_BUTTON, TKey>)}
         />
       );
 
     // Status widgets
     case WidgetType.ALERT:
-      return (
-        <AlertWidget
-          {...(baseProps as ReactWidgetProps<typeof WidgetType.ALERT, TKey>)}
-        />
-      );
+      return <AlertWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.ALERT, TKey>)} />;
 
     case WidgetType.FORM_ALERT:
       return (
-        <FormAlertWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.FORM_ALERT,
-            TKey
-          >)}
-        />
+        <FormAlertWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.FORM_ALERT, TKey>)} />
       );
 
     // Form feedback widgets
     case WidgetType.PASSWORD_STRENGTH:
       return (
         <PasswordStrengthWidget
-          {...(baseProps as ReactWidgetProps<
-            typeof WidgetType.PASSWORD_STRENGTH,
-            TKey
-          >)}
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.PASSWORD_STRENGTH, TKey>)}
         />
       );
 
     // Fallback to text widget
     default:
-      return (
-        <TextWidget
-          {...(baseProps as ReactWidgetProps<typeof WidgetType.TEXT, TKey>)}
-        />
-      );
+      return <TextWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.TEXT, TKey>)} />;
   }
 }
 

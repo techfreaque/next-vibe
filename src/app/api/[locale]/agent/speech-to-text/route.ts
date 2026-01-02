@@ -15,11 +15,6 @@ export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, user, locale, logger }) =>
-      SpeechToTextRepository.transcribeAudio(
-        data.fileUpload.file,
-        user,
-        locale,
-        logger,
-      ),
+      SpeechToTextRepository.transcribeAudio(data.fileUpload.file, user, locale, logger),
   },
 });

@@ -6,11 +6,7 @@
 import "server-only";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { EmailSendingRepository } from "@/app/api/[locale]/emails/smtp-client/email-sending/repository";
@@ -20,8 +16,8 @@ import type { Countries, Languages } from "@/i18n/core/config";
 import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 import { simpleT } from "@/i18n/core/shared";
 
-import { createTrackingContext } from "../../smtp-client/components/tracking_context.email";
 import { getTemplate } from "../../registry/generated";
+import { createTrackingContext } from "../../smtp-client/components/tracking_context.email";
 
 // Type definitions
 export interface SendTestRequestType {
@@ -50,9 +46,7 @@ interface EmailPreviewSendTestRepository {
 /**
  * Email Preview Send Test Repository Implementation
  */
-class EmailPreviewSendTestRepositoryImpl
-  implements EmailPreviewSendTestRepository
-{
+class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestRepository {
   async sendTest(
     data: SendTestRequestType,
     logger: EndpointLogger,
@@ -80,10 +74,7 @@ class EmailPreviewSendTestRepositoryImpl
       }
 
       // Construct locale from language + country
-      const locale = getLocaleFromLanguageAndCountry(
-        data.language,
-        data.country,
-      );
+      const locale = getLocaleFromLanguageAndCountry(data.language, data.country);
 
       // Get translation function
       const { t } = simpleT(locale);
@@ -118,8 +109,7 @@ class EmailPreviewSendTestRepositoryImpl
 
       // Get subject
       const subjectRaw = template.meta.defaultSubject;
-      const subject =
-        typeof subjectRaw === "function" ? subjectRaw(t) : subjectRaw;
+      const subject = typeof subjectRaw === "function" ? subjectRaw(t) : subjectRaw;
 
       // Send email using existing email sending infrastructure
       const sendResult = await EmailSendingRepository.sendEmail(
@@ -182,5 +172,4 @@ class EmailPreviewSendTestRepositoryImpl
   }
 }
 
-export const emailPreviewSendTestRepository =
-  new EmailPreviewSendTestRepositoryImpl();
+export const emailPreviewSendTestRepository = new EmailPreviewSendTestRepositoryImpl();

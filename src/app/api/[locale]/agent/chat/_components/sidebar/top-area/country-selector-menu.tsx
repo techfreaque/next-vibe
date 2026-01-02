@@ -41,9 +41,7 @@ const CountrySelectorMenu: FC = () => {
           >
             <Span className="mr-2">{country.flag}</Span>
             <Span className="flex-1">{country.name}</Span>
-            {currentCountry.code === country.code && (
-              <Check className="h-4 w-4 ml-2" />
-            )}
+            {currentCountry.code === country.code && <Check className="h-4 w-4 ml-2" />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuSubContent>

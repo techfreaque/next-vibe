@@ -4,8 +4,7 @@ export const translations = {
       title: "Lead Management",
       abTesting: {
         title: "A/B Testing Configuration",
-        subtitle:
-          "Monitor and configure A/B testing for email journey variants",
+        subtitle: "Monitor and configure A/B testing for email journey variants",
         status: {
           active: "Active",
           inactive: "Inactive",
@@ -93,8 +92,7 @@ export const translations = {
         confirm_update: "Confirm Update",
         confirm_delete: "Confirm Delete",
         success_message: "Successfully updated {{updated}} of {{total}} leads",
-        delete_success_message:
-          "Successfully deleted {{deleted}} of {{total}} leads",
+        delete_success_message: "Successfully deleted {{deleted}} of {{total}} leads",
         error_message: "Failed to update leads. Please try again.",
         errors_title: "Errors ({{count}})",
         processing: "Processing...",
@@ -137,8 +135,7 @@ export const translations = {
         emails_this_month: "Emails This Month",
       },
       campaignStarter: {
-        description:
-          "Configure automated campaign starter settings and scheduling",
+        description: "Configure automated campaign starter settings and scheduling",
         form: {
           cronSettings: {
             label: "Cron Task Settings",
@@ -181,8 +178,7 @@ export const translations = {
           },
           enabledDays: {
             label: "Enabled Days",
-            description:
-              "Select which days of the week the campaign starter should run",
+            description: "Select which days of the week the campaign starter should run",
             options: {
               monday: "Monday",
               tuesday: "Tuesday",
@@ -195,8 +191,7 @@ export const translations = {
           },
           enabledHours: {
             label: "Enabled Hours",
-            description:
-              "Set the time range when the campaign starter should run",
+            description: "Set the time range when the campaign starter should run",
             startHour: {
               label: "Start Hour",
               placeholder: "Start hour (0-23)",
@@ -208,8 +203,7 @@ export const translations = {
           },
           leadsPerWeek: {
             label: "Leads Per Week",
-            description:
-              "Set the weekly quota of leads to process for each locale",
+            description: "Set the weekly quota of leads to process for each locale",
           },
           minAgeHours: {
             label: "Minimum Age (Hours)",
@@ -264,8 +258,7 @@ export const translations = {
             email: {
               label: "Test Email Address",
               placeholder: "Enter email address to receive the test",
-              description:
-                "The email address where the test email will be sent",
+              description: "The email address where the test email will be sent",
             },
           },
           leadData: {
@@ -468,8 +461,7 @@ export const translations = {
         },
         defaults: {
           title: "Default Values",
-          description:
-            "Set default values for leads that don't specify these fields",
+          description: "Set default values for leads that don't specify these fields",
           country: "Default Country",
           countryDescription: "Country to use when not specified in CSV",
           countryPlaceholder: "Select default country",
@@ -480,8 +472,7 @@ export const translations = {
           statusDescription: "Status to use when not specified in CSV",
           statusPlaceholder: "Select default status",
           campaignStage: "Default Campaign Stage",
-          campaignStageDescription:
-            "Campaign stage to use when not specified in CSV",
+          campaignStageDescription: "Campaign stage to use when not specified in CSV",
           campaignStagePlaceholder: "Select default campaign stage",
           source: "Default Source",
           sourceDescription: "Source to use when not specified in CSV",
@@ -499,8 +490,7 @@ export const translations = {
           failed: "Failed",
           unknown: "Unknown",
           rows: "rows",
-          summary:
-            "{{successful}} successful, {{failed}} failed, {{duplicates}} duplicates",
+          summary: "{{successful}} successful, {{failed}} failed, {{duplicates}} duplicates",
           andMore: "and {{count}} more",
           importing: "Importing",
           loading: "Loading import status...",
@@ -518,8 +508,7 @@ export const translations = {
         importing: "Importing...",
         start: "Start Import",
         error: {
-          generic:
-            "Import failed. Please check your file format and try again.",
+          generic: "Import failed. Please check your file format and try again.",
           invalid_email_format: "Invalid email format",
           email_required: "Email is required",
         },
@@ -749,8 +738,7 @@ export const translations = {
             leads: "{{count}} lead_one ({{percentage}}%)",
             leads_one: "{{count}} lead ({{percentage}}%)",
             leads_other: "{{count}} leads ({{percentage}}%)",
-            summary:
-              "{{visible}} of {{total}} sources visible ({{percentage}}%)",
+            summary: "{{visible}} of {{total}} sources visible ({{percentage}}%)",
           },
         },
       },
@@ -792,8 +780,7 @@ export const translations = {
         source: "Source",
         notes: "Notes",
         actions: "Actions",
-        scroll_hint:
-          "💡 Scroll horizontally to see all lead details and columns",
+        scroll_hint: "💡 Scroll horizontally to see all lead details and columns",
         select_all: "Select all leads",
         select_lead: "Select {{business}}",
         description: {
@@ -813,8 +800,7 @@ export const translations = {
         emails: "Email Previews",
         emails_description: "Preview and manage email templates",
         abTesting: "A/B Testing",
-        abTesting_description:
-          "Configure and monitor A/B testing for email campaigns",
+        abTesting_description: "Configure and monitor A/B testing for email campaigns",
         campaignStarter: "Campaign Starter",
         campaignStarter_description: "Configure campaign starter settings",
         import: "Import",
@@ -995,8 +981,7 @@ export const translations = {
         case_study_title: "Real Results from Similar Businesses",
         case_study_content:
           "Just last month, a company similar to yours increased their social media engagement by 340% and generated 50+ new leads directly from social media using our platform.",
-        social_proof:
-          "Over 1,000+ businesses trust us to manage their social media growth.",
+        social_proof: "Over 1,000+ businesses trust us to manage their social media growth.",
         cta: "View Case Studies",
         closing:
           "I'd be happy to show you exactly how we achieved these results and how it could work for your business.",
@@ -1022,8 +1007,7 @@ export const translations = {
       create: {
         conflict: {
           title: "Lead Already Exists",
-          description:
-            "A lead with this email address already exists in the system.",
+          description: "A lead with this email address already exists in the system.",
         },
         validation: {
           title: "Invalid Lead Data",
@@ -1140,8 +1124,7 @@ export const translations = {
     list: {
       title: "Leads List",
       titleWithCount: "Leads List ({{count}})",
-      description:
-        "Browse and manage all leads with advanced filtering and sorting",
+      description: "Browse and manage all leads with advanced filtering and sorting",
       loading: "Loading...",
       no_results: "No leads found matching your criteria",
       noResults: "No leads found matching your criteria",
@@ -1302,13 +1285,11 @@ export const translations = {
           },
           unknown: {
             title: "Campaign operation failed",
-            description:
-              "An unexpected error occurred during campaign operation",
+            description: "An unexpected error occurred during campaign operation",
           },
           forbidden: {
             title: "Campaign access forbidden",
-            description:
-              "You don't have permission to perform this campaign operation",
+            description: "You don't have permission to perform this campaign operation",
           },
           notFound: {
             title: "Campaign not found",
@@ -1344,8 +1325,7 @@ export const translations = {
           },
           unknown: {
             title: "Campaign management operation failed",
-            description:
-              "An unexpected error occurred during campaign management",
+            description: "An unexpected error occurred during campaign management",
           },
           forbidden: {
             title: "Campaign management access forbidden",
@@ -1355,8 +1335,7 @@ export const translations = {
             title: "Campaign not found",
             description: "The requested campaign could not be found",
           },
-          campaignActive:
-            "Cannot delete active campaign. Please disable it first.",
+          campaignActive: "Cannot delete active campaign. Please disable it first.",
         },
         post: {
           success: {
@@ -1393,13 +1372,11 @@ export const translations = {
         error: {
           validation: {
             title: "Campaign statistics validation failed",
-            description:
-              "Please check your statistics parameters and try again",
+            description: "Please check your statistics parameters and try again",
           },
           unauthorized: {
             title: "Campaign statistics access denied",
-            description:
-              "You don't have permission to view campaign statistics",
+            description: "You don't have permission to view campaign statistics",
           },
           server: {
             title: "Campaign statistics server error",
@@ -1407,13 +1384,11 @@ export const translations = {
           },
           unknown: {
             title: "Campaign statistics operation failed",
-            description:
-              "An unexpected error occurred while retrieving statistics",
+            description: "An unexpected error occurred while retrieving statistics",
           },
           forbidden: {
             title: "Campaign statistics access forbidden",
-            description:
-              "You don't have permission to view campaign statistics",
+            description: "You don't have permission to view campaign statistics",
           },
           notFound: {
             title: "Campaign statistics not found",
@@ -1544,13 +1519,11 @@ export const translations = {
           },
           duplicate: {
             title: "Lead already exists",
-            description:
-              "A lead with this email address already exists in the system",
+            description: "A lead with this email address already exists in the system",
           },
           conflict: {
             title: "Lead already exists",
-            description:
-              "A lead with this email address already exists in the system",
+            description: "A lead with this email address already exists in the system",
           },
         },
         success: {
@@ -1572,13 +1545,11 @@ export const translations = {
           },
           server: {
             title: "Lead engagement server error",
-            description:
-              "Unable to record lead engagement due to a server error",
+            description: "Unable to record lead engagement due to a server error",
           },
           unknown: {
             title: "Lead engagement failed",
-            description:
-              "An unexpected error occurred while recording lead engagement",
+            description: "An unexpected error occurred while recording lead engagement",
           },
           forbidden: {
             title: "Lead engagement forbidden",
@@ -1638,8 +1609,7 @@ export const translations = {
           },
           server: {
             title: "Import job deletion server error",
-            description:
-              "Import job could not be deleted due to a server error",
+            description: "Import job could not be deleted due to a server error",
           },
         },
       },
@@ -1663,8 +1633,7 @@ export const translations = {
           },
           unknown: {
             title: "Import jobs retrieval failed",
-            description:
-              "An unexpected error occurred while retrieving import jobs",
+            description: "An unexpected error occurred while retrieving import jobs",
           },
         },
       },
@@ -1762,13 +1731,11 @@ export const translations = {
           },
           validation: {
             title: "Cannot retry import job",
-            description:
-              "This import job cannot be retried in its current state",
+            description: "This import job cannot be retried in its current state",
           },
           server: {
             title: "Import job retry server error",
-            description:
-              "Import job could not be retried due to a server error",
+            description: "Import job could not be retried due to a server error",
           },
         },
       },
@@ -1792,13 +1759,11 @@ export const translations = {
           },
           validation: {
             title: "Cannot stop import job",
-            description:
-              "This import job cannot be stopped in its current state",
+            description: "This import job cannot be stopped in its current state",
           },
           server: {
             title: "Import job stop server error",
-            description:
-              "Import job could not be stopped due to a server error",
+            description: "Import job could not be stopped due to a server error",
           },
         },
       },
@@ -1820,8 +1785,7 @@ export const translations = {
           },
           unknown: {
             title: "Lead statistics access failed",
-            description:
-              "An unexpected error occurred while loading lead statistics",
+            description: "An unexpected error occurred while loading lead statistics",
           },
           forbidden: {
             title: "Lead statistics access forbidden",
@@ -1885,8 +1849,7 @@ export const translations = {
           },
           unknown: {
             title: "Lead unsubscribe failed",
-            description:
-              "An unexpected error occurred while unsubscribing lead",
+            description: "An unexpected error occurred while unsubscribing lead",
           },
           forbidden: {
             title: "Lead unsubscribe forbidden",
@@ -1938,8 +1901,7 @@ export const translations = {
           description: "Select the email campaign stage to test",
         },
         testEmail: {
-          description:
-            "Enter the email address where the test email will be sent",
+          description: "Enter the email address where the test email will be sent",
         },
         leadData: {
           email: {
@@ -1958,12 +1920,10 @@ export const translations = {
             description: "Website URL that will appear in the email template",
           },
           country: {
-            description:
-              "Country that will be used for localization in the email template",
+            description: "Country that will be used for localization in the email template",
           },
           language: {
-            description:
-              "Language that will be used for localization in the email template",
+            description: "Language that will be used for localization in the email template",
           },
           status: {
             description: "Lead status that will be used in the email template",

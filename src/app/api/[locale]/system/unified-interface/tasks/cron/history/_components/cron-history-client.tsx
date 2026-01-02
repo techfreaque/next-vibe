@@ -17,9 +17,7 @@ interface CronHistoryClientProps {
   locale: CountryLanguage;
 }
 
-export function CronHistoryClient({
-  locale,
-}: CronHistoryClientProps): React.JSX.Element {
+export function CronHistoryClient({ locale }: CronHistoryClientProps): React.JSX.Element {
   const historyEndpoint = useTaskHistory();
   return (
     <Div className="flex flex-col gap-6">

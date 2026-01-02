@@ -32,11 +32,7 @@ const { POST } = createEndpoint({
     "app.api.system.help.interactive.post.tags.help",
   ],
   icon: "book",
-  allowedRoles: [
-    UserRole.PRODUCTION_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.CLI_AUTH_BYPASS,
-  ],
+  allowedRoles: [UserRole.PRODUCTION_OFF, UserRole.AI_TOOL_OFF, UserRole.CLI_AUTH_BYPASS],
   aliases: [INTERACTIVE_MODE_ALIAS, "i"],
 
   fields: objectField(
@@ -62,8 +58,7 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.help.interactive.errors.unauthorized.title",
-      description:
-        "app.api.system.help.interactive.errors.unauthorized.description",
+      description: "app.api.system.help.interactive.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.help.interactive.errors.server.title",
@@ -71,13 +66,11 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.help.interactive.errors.unauthorized.title",
-      description:
-        "app.api.system.help.interactive.errors.unauthorized.description",
+      description: "app.api.system.help.interactive.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.help.interactive.errors.unauthorized.title",
-      description:
-        "app.api.system.help.interactive.errors.unauthorized.description",
+      description: "app.api.system.help.interactive.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.help.interactive.errors.server.title",

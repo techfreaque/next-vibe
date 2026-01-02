@@ -76,8 +76,7 @@ export const translations: typeof enTranslations = {
     },
     force: {
       title: "Wymuś reset",
-      description:
-        "Pomiń kontrole bezpieczeństwa (wymagane dla destrukcyjnych operacji)",
+      description: "Pomiń kontrole bezpieczeństwa (wymagane dla destrukcyjnych operacji)",
     },
     skipMigrations: {
       title: "Pomiń migracje",
@@ -144,13 +143,11 @@ export const translations: typeof enTranslations = {
   taskManagement: taskManagementTranslations,
   messages: {
     dryRun: "PRÓBA: Nie wprowadzono faktycznych zmian",
-    truncateRequiresForce:
-      "Operacja czyszczenia wymaga flagi --force dla bezpieczeństwa",
+    truncateRequiresForce: "Operacja czyszczenia wymaga flagi --force dla bezpieczeństwa",
     noTablesToTruncate: "Nie znaleziono tabel do wyczyszczenia",
     truncatedTables: "Wyczyszczono {{count}} tabel pomyślnie",
     failedToTruncate: "Nie udało się wyczyścić tabel: {{error}}",
-    dropRequiresForce:
-      "Operacja usuwania wymaga flagi --force dla bezpieczeństwa",
+    dropRequiresForce: "Operacja usuwania wymaga flagi --force dla bezpieczeństwa",
     droppedSchema: "Usunięto i odtworzono schemat (usunięto {{count}} tabel)",
     failedToDrop: "Nie udało się usunąć i odtworzyć: {{error}}",
     databaseInitialized: "Baza danych zainicjalizowana pomyślnie {{output}}",

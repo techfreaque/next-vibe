@@ -10,11 +10,7 @@ import { HumanEmailLayout } from "@/app/api/[locale]/emails/smtp-client/componen
 import { HumanText } from "@/app/api/[locale]/emails/smtp-client/components/human_text.email";
 
 import { EmailCampaignStage } from "../../../enum";
-import type {
-  EmailRenderContext,
-  EmailTemplateFunction,
-  JourneyTemplateMap,
-} from "../types";
+import type { EmailRenderContext, EmailTemplateFunction, JourneyTemplateMap } from "../types";
 
 /**
  * Personal Journey - Initial Contact Email

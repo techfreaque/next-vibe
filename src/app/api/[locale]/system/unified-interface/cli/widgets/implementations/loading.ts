@@ -12,9 +12,7 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class LoadingWidgetRenderer extends BaseWidgetRenderer<
-  typeof WidgetType.LOADING
-> {
+export class LoadingWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.LOADING> {
   readonly widgetType = WidgetType.LOADING;
 
   render(props: CLIWidgetProps<typeof WidgetType.LOADING, string>): string {
@@ -32,9 +30,7 @@ export class LoadingWidgetRenderer extends BaseWidgetRenderer<
     if (data.indeterminate) {
       // Indeterminate loading (spinner)
       const spinner = context.options.useEmojis ? "⏳ " : "... ";
-      lines.push(
-        `${indent}${spinner}${this.styleText(message, "blue", context)}`,
-      );
+      lines.push(`${indent}${spinner}${this.styleText(message, "blue", context)}`);
     } else if (data.progress !== undefined) {
       // Progress bar
       const progressBar = formatProgressBar(data.progress, 30);

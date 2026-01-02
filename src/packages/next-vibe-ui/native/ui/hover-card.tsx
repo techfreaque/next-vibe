@@ -18,13 +18,8 @@ import { TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });
 
-function HoverCard({
-  children,
-  ...props
-}: HoverCardRootProps): React.JSX.Element {
-  return (
-    <HoverCardPrimitive.Root {...props}>{children}</HoverCardPrimitive.Root>
-  );
+function HoverCard({ children, ...props }: HoverCardRootProps): React.JSX.Element {
+  return <HoverCardPrimitive.Root {...props}>{children}</HoverCardPrimitive.Root>;
 }
 HoverCard.displayName = HoverCardPrimitive.Root.displayName;
 
@@ -41,9 +36,7 @@ function HoverCardTrigger({
 }
 HoverCardTrigger.displayName = HoverCardPrimitive.Trigger.displayName;
 
-function HoverCardPortal({
-  children,
-}: HoverCardPortalProps): React.JSX.Element {
+function HoverCardPortal({ children }: HoverCardPortalProps): React.JSX.Element {
   return <HoverCardPrimitive.Portal>{children}</HoverCardPrimitive.Portal>;
 }
 HoverCardPortal.displayName = "HoverCardPortal";
@@ -78,10 +71,7 @@ function HoverCardContent({
   return (
     <HoverCardPrimitive.Portal>
       <HoverCardPrimitive.Overlay>
-        <Animated.View
-          entering={FadeIn}
-          style={convertCSSToViewStyle({ zIndex: 50 })}
-        >
+        <Animated.View entering={FadeIn} style={convertCSSToViewStyle({ zIndex: 50 })}>
           <TextClassContext.Provider
             value={
               "text-popover-foreground" // eslint-disable-line i18next/no-literal-string -- CSS class
@@ -103,9 +93,7 @@ function HoverCardContent({
                   nativeStyle,
                   className: cn(
                     "z-50 w-64 rounded-md border border-border bg-popover p-4 shadow-md shadow-foreground/5 outline-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-                    open
-                      ? "animate-in fade-in-0 zoom-in-95"
-                      : "animate-out fade-out-0 zoom-out-95",
+                    open ? "animate-in fade-in-0 zoom-in-95" : "animate-out fade-out-0 zoom-out-95",
                     className,
                   ),
                 })}

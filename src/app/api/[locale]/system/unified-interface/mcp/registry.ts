@@ -5,10 +5,7 @@
 
 import "server-only";
 
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
+import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -21,11 +18,7 @@ import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
 import { routeExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint";
 import { Platform } from "../shared/types/platform";
-import type {
-  MCPExecutionContext,
-  MCPToolCallResult,
-  MCPToolMetadata,
-} from "./types";
+import type { MCPExecutionContext, MCPToolCallResult, MCPToolMetadata } from "./types";
 import { MCPErrorCode } from "./types";
 
 /**
@@ -35,10 +28,7 @@ export interface IMCPRegistry {
   initialize(logger: EndpointLogger, locale: CountryLanguage): Promise<void>;
   getTools(user: JwtPayloadType, logger: EndpointLogger): MCPToolMetadata[];
   getToolByName(name: string, logger: EndpointLogger): MCPToolMetadata | null;
-  executeTool(
-    context: MCPExecutionContext,
-    logger: EndpointLogger,
-  ): Promise<MCPToolCallResult>;
+  executeTool(context: MCPExecutionContext, logger: EndpointLogger): Promise<MCPToolCallResult>;
   isInitialized(): boolean;
   refresh(logger: EndpointLogger, locale: CountryLanguage): Promise<void>;
 }
@@ -54,10 +44,7 @@ export class MCPRegistry implements IMCPRegistry {
   /**
    * Initialize the registry
    */
-  async initialize(
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<void> {
+  async initialize(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
     if (this.initialized) {
       return;
     }
@@ -83,9 +70,7 @@ export class MCPRegistry implements IMCPRegistry {
    */
   private ensureInitialized(logger: EndpointLogger): void {
     if (!this.initialized) {
-      logger.warn(
-        "[MCP Registry] Registry not initialized, initializing now...",
-      );
+      logger.warn("[MCP Registry] Registry not initialized, initializing now...");
     }
   }
 
@@ -125,10 +110,7 @@ export class MCPRegistry implements IMCPRegistry {
    * Get full endpoints for a specific user (filtered by permissions)
    * Returns endpoints with field information for schema generation
    */
-  getEndpoints(
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): CreateApiEndpointAny[] {
+  getEndpoints(user: JwtPayloadType, logger: EndpointLogger): CreateApiEndpointAny[] {
     this.ensureInitialized(logger);
 
     // Get filtered endpoints from shared registry
@@ -175,8 +157,7 @@ export class MCPRegistry implements IMCPRegistry {
     // Get tool metadata (this checks if tool exists and user has permission)
     const userTools = this.getTools(context.user, logger);
     const toolMeta = userTools.find(
-      (t) =>
-        t.name === context.toolName || t.aliases?.includes(context.toolName),
+      (t) => t.name === context.toolName || t.aliases?.includes(context.toolName),
     );
 
     if (!toolMeta) {
@@ -223,9 +204,7 @@ export class MCPRegistry implements IMCPRegistry {
       });
 
       return this.fail({
-        error: t(
-          "app.api.system.unifiedInterface.mcp.registry.toolExecutionFailed",
-        ),
+        error: t("app.api.system.unifiedInterface.mcp.registry.toolExecutionFailed"),
         code: MCPErrorCode.TOOL_EXECUTION_FAILED,
         details: {
           toolName: context.toolName,
@@ -316,10 +295,7 @@ export class MCPRegistry implements IMCPRegistry {
   /**
    * Refresh the registry
    */
-  async refresh(
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<void> {
+  async refresh(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
     logger.info("[MCP Registry] Refreshing...");
     this.initialized = false;
     await this.initialize(logger, locale);

@@ -126,10 +126,7 @@ export interface FormActionConfig extends BaseActionConfig {
  * State action
  */
 export interface StateActionConfig extends BaseActionConfig {
-  type:
-    | ActionType.SET_STATE
-    | ActionType.TOGGLE_STATE
-    | ActionType.UPDATE_STATE;
+  type: ActionType.SET_STATE | ActionType.TOGGLE_STATE | ActionType.UPDATE_STATE;
   key: string;
   value?: string | number | boolean;
   updater?: (current: string | number | boolean) => string | number | boolean;

@@ -7,11 +7,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -66,9 +62,7 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
         for (const [key, value] of Object.entries(data.params.metadata)) {
           if (
             value !== undefined &&
-            (typeof value === "string" ||
-              typeof value === "number" ||
-              typeof value === "boolean")
+            (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
           ) {
             cleanMetadata[key] = value;
           }
@@ -192,10 +186,7 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
         updateData.status = data.params.engagement.status;
       }
 
-      await db
-        .update(emails)
-        .set(updateData)
-        .where(eq(emails.id, data.params.emailId));
+      await db.update(emails).set(updateData).where(eq(emails.id, data.params.emailId));
 
       logger.debug("Email engagement updated successfully", {
         emailId: data.params.emailId,

@@ -38,28 +38,23 @@ function getColorClasses(color: string | null, isActive: boolean): string {
   // Map color names to Tailwind classes (softer colors)
   const colorMap: Record<string, { active: string; hover: string }> = {
     sky: {
-      active:
-        "bg-sky-500/15 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20",
+      active: "bg-sky-500/15 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20",
       hover: "hover:bg-sky-500/10 hover:text-sky-600",
     },
     teal: {
-      active:
-        "bg-teal-500/15 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20",
+      active: "bg-teal-500/15 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20",
       hover: "hover:bg-teal-500/10 hover:text-teal-600",
     },
     amber: {
-      active:
-        "bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20",
+      active: "bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20",
       hover: "hover:bg-amber-500/10 hover:text-amber-600",
     },
     purple: {
-      active:
-        "bg-purple-500/15 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20",
+      active: "bg-purple-500/15 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20",
       hover: "hover:bg-purple-500/10 hover:text-purple-600",
     },
     zinc: {
-      active:
-        "bg-zinc-500/15 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-500/20",
+      active: "bg-zinc-500/15 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-500/20",
       hover: "hover:bg-zinc-500/10 hover:text-zinc-600",
     },
   };
@@ -82,9 +77,7 @@ export function RootFolderBar({
 }: RootFolderBarProps): JSX.Element {
   // Get root folders from DEFAULT_FOLDER_CONFIGS (convert object to array, sorted by order)
   // Show all folders to all users, but disable PRIVATE and SHARED for public users
-  const rootFolders = Object.values(DEFAULT_FOLDER_CONFIGS).toSorted(
-    (a, b) => a.order - b.order,
-  );
+  const rootFolders = Object.values(DEFAULT_FOLDER_CONFIGS).toSorted((a, b) => a.order - b.order);
 
   // State for modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -97,10 +90,7 @@ export function RootFolderBar({
         return true; // Authenticated users can access all folders
       }
       // Public users can only access PUBLIC and INCOGNITO folders
-      return (
-        folderId === DefaultFolderId.PUBLIC ||
-        folderId === DefaultFolderId.INCOGNITO
-      );
+      return folderId === DefaultFolderId.PUBLIC || folderId === DefaultFolderId.INCOGNITO;
     },
     [isAuthenticated],
   );

@@ -24,7 +24,5 @@ export default async function AdminUsersLayout({
   // Require admin user authentication
   await requireAdminUser(locale, `/${locale}/admin/users`);
 
-  return (
-    <AdminUsersLayoutClient locale={locale}>{children}</AdminUsersLayoutClient>
-  );
+  return <AdminUsersLayoutClient locale={locale}>{children}</AdminUsersLayoutClient>;
 }

@@ -53,8 +53,7 @@ const { POST } = createEndpoint({
       fileUpload: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.private.me.avatar.upload.groups.fileUpload.title" as const,
+          title: "app.api.user.private.me.avatar.upload.groups.fileUpload.title" as const,
           description:
             "app.api.user.private.me.avatar.upload.groups.fileUpload.description" as const,
           layoutType: LayoutType.GRID,
@@ -66,34 +65,23 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.FILE,
-              label:
-                "app.api.user.private.me.avatar.upload.fields.file.label" as const,
-              description:
-                "app.api.user.private.me.avatar.upload.fields.file.description" as const,
-              placeholder:
-                "app.api.user.private.me.avatar.upload.fields.file.placeholder" as const,
+              label: "app.api.user.private.me.avatar.upload.fields.file.label" as const,
+              description: "app.api.user.private.me.avatar.upload.fields.file.description" as const,
+              placeholder: "app.api.user.private.me.avatar.upload.fields.file.placeholder" as const,
               columns: 12,
-              helpText:
-                "app.api.user.private.me.avatar.upload.fields.file.help" as const,
+              helpText: "app.api.user.private.me.avatar.upload.fields.file.help" as const,
             },
             z
               .instanceof(File)
               .refine((file) => file.size <= 5 * 1024 * 1024, {
-                message:
-                  "app.api.user.private.me.avatar.upload.fields.file.validation.maxSize",
+                message: "app.api.user.private.me.avatar.upload.fields.file.validation.maxSize",
               })
               .refine((file) => file.type.startsWith("image/"), {
-                message:
-                  "app.api.user.private.me.avatar.upload.fields.file.validation.imageOnly",
+                message: "app.api.user.private.me.avatar.upload.fields.file.validation.imageOnly",
               })
               .refine(
                 (file) => {
-                  const allowedTypes = [
-                    "image/jpeg",
-                    "image/png",
-                    "image/webp",
-                    "image/gif",
-                  ];
+                  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
                   return allowedTypes.includes(file.type);
                 },
                 {
@@ -109,10 +97,8 @@ const { POST } = createEndpoint({
       response: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.private.me.avatar.upload.response.title" as const,
-          description:
-            "app.api.user.private.me.avatar.upload.response.description" as const,
+          title: "app.api.user.private.me.avatar.upload.response.title" as const,
+          description: "app.api.user.private.me.avatar.upload.response.description" as const,
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -121,40 +107,35 @@ const { POST } = createEndpoint({
           success: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.avatar.upload.response.success" as const,
+              content: "app.api.user.private.me.avatar.upload.response.success" as const,
             },
             z.boolean(),
           ),
           message: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.avatar.upload.response.message" as const,
+              content: "app.api.user.private.me.avatar.upload.response.message" as const,
             },
             z.string(),
           ),
           avatarUrl: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.avatar.upload.response.avatarUrl" as const,
+              content: "app.api.user.private.me.avatar.upload.response.avatarUrl" as const,
             },
             z.string().url().optional(),
           ),
           uploadTime: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.avatar.upload.response.uploadTime" as const,
+              content: "app.api.user.private.me.avatar.upload.response.uploadTime" as const,
             },
             z.string().optional(),
           ),
           nextSteps: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.user.private.me.avatar.upload.response.nextSteps.item" as const,
+              content: "app.api.user.private.me.avatar.upload.response.nextSteps.item" as const,
             },
             z.array(z.string()),
           ),
@@ -166,66 +147,47 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.validation.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.validation.description" as const,
+      title: "app.api.user.private.me.avatar.upload.errors.validation.title" as const,
+      description: "app.api.user.private.me.avatar.upload.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.unauthorized.description" as const,
+      title: "app.api.user.private.me.avatar.upload.errors.unauthorized.title" as const,
+      description: "app.api.user.private.me.avatar.upload.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.internal.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.internal.description" as const,
+      title: "app.api.user.private.me.avatar.upload.errors.internal.title" as const,
+      description: "app.api.user.private.me.avatar.upload.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.unknown.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.unknown.description" as const,
+      title: "app.api.user.private.me.avatar.upload.errors.unknown.title" as const,
+      description: "app.api.user.private.me.avatar.upload.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.network.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.network.description" as const,
+      title: "app.api.user.private.me.avatar.upload.errors.network.title" as const,
+      description: "app.api.user.private.me.avatar.upload.errors.network.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.forbidden.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.forbidden.description" as const,
+      title: "app.api.user.private.me.avatar.upload.errors.forbidden.title" as const,
+      description: "app.api.user.private.me.avatar.upload.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.notFound.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.notFound.description" as const,
+      title: "app.api.user.private.me.avatar.upload.errors.notFound.title" as const,
+      description: "app.api.user.private.me.avatar.upload.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.unsaved.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.unsaved.description" as const,
+      title: "app.api.user.private.me.avatar.upload.errors.unsaved.title" as const,
+      description: "app.api.user.private.me.avatar.upload.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.conflict.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.conflict.description" as const,
+      title: "app.api.user.private.me.avatar.upload.errors.conflict.title" as const,
+      description: "app.api.user.private.me.avatar.upload.errors.conflict.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
     title: "app.api.user.private.me.avatar.upload.success.title" as const,
-    description:
-      "app.api.user.private.me.avatar.upload.success.description" as const,
+    description: "app.api.user.private.me.avatar.upload.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -265,8 +227,7 @@ const { POST } = createEndpoint({
       fileTooLarge: {
         response: {
           success: false,
-          message:
-            "File size exceeds 5MB limit. Please choose a smaller image.",
+          message: "File size exceeds 5MB limit. Please choose a smaller image.",
           nextSteps: [
             "Compress your image using online tools",
             "Try a different image with smaller file size",
@@ -277,8 +238,7 @@ const { POST } = createEndpoint({
       invalidFormat: {
         response: {
           success: false,
-          message:
-            "Unsupported file format. Please use JPEG, PNG, WebP, or GIF.",
+          message: "Unsupported file format. Please use JPEG, PNG, WebP, or GIF.",
           nextSteps: [
             "Convert your image to a supported format",
             "Use image editing software to save in the correct format",
@@ -311,8 +271,7 @@ const { DELETE } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.user.private.me.avatar.delete.response.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.response.description" as const,
+      description: "app.api.user.private.me.avatar.delete.response.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -321,24 +280,21 @@ const { DELETE } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.user.private.me.avatar.delete.response.success" as const,
+          content: "app.api.user.private.me.avatar.delete.response.success" as const,
         },
         z.boolean(),
       ),
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.user.private.me.avatar.delete.response.message" as const,
+          content: "app.api.user.private.me.avatar.delete.response.message" as const,
         },
         z.string(),
       ),
       nextSteps: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.user.private.me.avatar.delete.response.nextSteps.item" as const,
+          content: "app.api.user.private.me.avatar.delete.response.nextSteps.item" as const,
         },
         z.array(z.string()),
       ),
@@ -348,66 +304,47 @@ const { DELETE } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.validation.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.validation.description" as const,
+      title: "app.api.user.private.me.avatar.delete.errors.validation.title" as const,
+      description: "app.api.user.private.me.avatar.delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.unauthorized.description" as const,
+      title: "app.api.user.private.me.avatar.delete.errors.unauthorized.title" as const,
+      description: "app.api.user.private.me.avatar.delete.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.internal.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.internal.description" as const,
+      title: "app.api.user.private.me.avatar.delete.errors.internal.title" as const,
+      description: "app.api.user.private.me.avatar.delete.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.unknown.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.unknown.description" as const,
+      title: "app.api.user.private.me.avatar.delete.errors.unknown.title" as const,
+      description: "app.api.user.private.me.avatar.delete.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.network.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.network.description" as const,
+      title: "app.api.user.private.me.avatar.delete.errors.network.title" as const,
+      description: "app.api.user.private.me.avatar.delete.errors.network.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.forbidden.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.forbidden.description" as const,
+      title: "app.api.user.private.me.avatar.delete.errors.forbidden.title" as const,
+      description: "app.api.user.private.me.avatar.delete.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.notFound.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.notFound.description" as const,
+      title: "app.api.user.private.me.avatar.delete.errors.notFound.title" as const,
+      description: "app.api.user.private.me.avatar.delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.unsaved.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.unsaved.description" as const,
+      title: "app.api.user.private.me.avatar.delete.errors.unsaved.title" as const,
+      description: "app.api.user.private.me.avatar.delete.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.conflict.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.conflict.description" as const,
+      title: "app.api.user.private.me.avatar.delete.errors.conflict.title" as const,
+      description: "app.api.user.private.me.avatar.delete.errors.conflict.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
     title: "app.api.user.private.me.avatar.delete.success.title" as const,
-    description:
-      "app.api.user.private.me.avatar.delete.success.description" as const,
+    description: "app.api.user.private.me.avatar.delete.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -424,10 +361,7 @@ const { DELETE } = createEndpoint({
       failed: {
         success: false,
         message: "Failed to delete avatar. Please try again.",
-        nextSteps: [
-          "Refresh the page and try again",
-          "Contact support if the problem persists",
-        ],
+        nextSteps: ["Refresh the page and try again", "Contact support if the problem persists"],
       },
     },
   },

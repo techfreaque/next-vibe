@@ -18,12 +18,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import {
-  Countries,
-  CountriesOptions,
-  Languages,
-  LanguagesOptions,
-} from "@/i18n/core/config";
+import { Countries, CountriesOptions, Languages, LanguagesOptions } from "@/i18n/core/config";
 
 import { UserRole } from "../../user/user-roles/enum";
 import { LeadSource, LeadSourceOptions, LeadStatus } from "../enum";
@@ -121,8 +116,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.SECTION,
           title: "app.api.leads.create.post.locationPreferences.title",
-          description:
-            "app.api.leads.create.post.locationPreferences.description",
+          description: "app.api.leads.create.post.locationPreferences.description",
           layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { request: "data" },
@@ -221,8 +215,7 @@ const { POST } = createEndpoint({
               businessName: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.summary.businessName",
+                  content: "app.api.leads.create.post.response.summary.businessName",
                 },
                 z.string(),
               ),
@@ -255,32 +248,28 @@ const { POST } = createEndpoint({
               phone: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.contactDetails.phone",
+                  content: "app.api.leads.create.post.response.contactDetails.phone",
                 },
                 z.string().nullable(),
               ),
               website: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.contactDetails.website",
+                  content: "app.api.leads.create.post.response.contactDetails.website",
                 },
                 z.string().nullable(),
               ),
               country: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.contactDetails.country",
+                  content: "app.api.leads.create.post.response.contactDetails.country",
                 },
                 z.string(),
               ),
               language: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.contactDetails.language",
+                  content: "app.api.leads.create.post.response.contactDetails.language",
                 },
                 z.string(),
               ),
@@ -306,16 +295,14 @@ const { POST } = createEndpoint({
               emailsSent: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.trackingInfo.emailsSent",
+                  content: "app.api.leads.create.post.response.trackingInfo.emailsSent",
                 },
                 z.coerce.number(),
               ),
               currentCampaignStage: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.trackingInfo.currentCampaignStage",
+                  content: "app.api.leads.create.post.response.trackingInfo.currentCampaignStage",
                 },
                 z.string().nullable(),
               ),
@@ -341,16 +328,14 @@ const { POST } = createEndpoint({
               createdAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.metadata.createdAt",
+                  content: "app.api.leads.create.post.response.metadata.createdAt",
                 },
                 z.string().datetime(),
               ),
               updatedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.create.post.response.metadata.updatedAt",
+                  content: "app.api.leads.create.post.response.metadata.updatedAt",
                 },
                 z.string().datetime(),
               ),
@@ -397,8 +382,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.leads.create.post.errors.unsavedChanges.title",
-      description:
-        "app.api.leads.create.post.errors.unsavedChanges.description",
+      description: "app.api.leads.create.post.errors.unsavedChanges.description",
     },
   },
 

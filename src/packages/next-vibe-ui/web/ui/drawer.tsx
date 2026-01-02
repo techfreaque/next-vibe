@@ -73,45 +73,38 @@ export interface DrawerContextValue {
   setOpen: (open: boolean) => void;
 }
 
-const Drawer = ({
-  shouldScaleBackground = true,
-  ...props
-}: DrawerRootProps): React.JSX.Element => (
-  <DrawerPrimitive.Root
-    shouldScaleBackground={shouldScaleBackground}
-    {...props}
-  />
+const Drawer = ({ shouldScaleBackground = true, ...props }: DrawerRootProps): React.JSX.Element => (
+  <DrawerPrimitive.Root shouldScaleBackground={shouldScaleBackground} {...props} />
 );
 Drawer.displayName = "Drawer";
 
-const DrawerTrigger = React.forwardRef<
-  DrawerTriggerRefObject,
-  DrawerTriggerProps
->(({ asChild, children }, ref) => {
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
+const DrawerTrigger = React.forwardRef<DrawerTriggerRefObject, DrawerTriggerProps>(
+  ({ asChild, children }, ref) => {
+    const buttonRef = React.useRef<HTMLButtonElement>(null);
 
-  React.useImperativeHandle(ref, (): DrawerTriggerRefObject => {
-    const element = buttonRef.current;
-    if (!element) {
+    React.useImperativeHandle(ref, (): DrawerTriggerRefObject => {
+      const element = buttonRef.current;
+      if (!element) {
+        return {
+          click: (): void => undefined,
+          focus: (): void => undefined,
+          blur: (): void => undefined,
+        };
+      }
       return {
-        click: (): void => undefined,
-        focus: (): void => undefined,
-        blur: (): void => undefined,
+        click: (): void => element.click(),
+        focus: (): void => element.focus(),
+        blur: (): void => element.blur(),
       };
-    }
-    return {
-      click: (): void => element.click(),
-      focus: (): void => element.focus(),
-      blur: (): void => element.blur(),
-    };
-  }, []);
+    }, []);
 
-  return (
-    <DrawerPrimitive.Trigger ref={buttonRef} asChild={asChild}>
-      {children}
-    </DrawerPrimitive.Trigger>
-  );
-});
+    return (
+      <DrawerPrimitive.Trigger ref={buttonRef} asChild={asChild}>
+        {children}
+      </DrawerPrimitive.Trigger>
+    );
+  },
+);
 DrawerTrigger.displayName = "DrawerTrigger";
 
 const DrawerPortal = DrawerPrimitive.Portal;
@@ -145,11 +138,7 @@ const DrawerClose = React.forwardRef<DrawerCloseRefObject, DrawerCloseProps>(
 );
 DrawerClose.displayName = "DrawerClose";
 
-function DrawerOverlay({
-  className,
-  style,
-  ...props
-}: DrawerOverlayProps): React.JSX.Element {
+function DrawerOverlay({ className, style, ...props }: DrawerOverlayProps): React.JSX.Element {
   return (
     <DrawerPrimitive.Overlay
       className={cn("fixed inset-0 z-50 bg-black/80", className)}
@@ -185,45 +174,24 @@ function DrawerContent({
 }
 DrawerContent.displayName = "DrawerContent";
 
-const DrawerHeader = ({
-  className,
-  style,
-  children,
-}: DrawerHeaderProps): React.JSX.Element => (
-  <div
-    className={cn("grid gap-1.5 p-4 text-center sm:text-left", className)}
-    style={style}
-  >
+const DrawerHeader = ({ className, style, children }: DrawerHeaderProps): React.JSX.Element => (
+  <div className={cn("grid gap-1.5 p-4 text-center sm:text-left", className)} style={style}>
     {children}
   </div>
 );
 DrawerHeader.displayName = "DrawerHeader";
 
-const DrawerFooter = ({
-  className,
-  style,
-  children,
-}: DrawerFooterProps): React.JSX.Element => (
-  <div
-    className={cn("mt-auto flex flex-col gap-2 p-4", className)}
-    style={style}
-  >
+const DrawerFooter = ({ className, style, children }: DrawerFooterProps): React.JSX.Element => (
+  <div className={cn("mt-auto flex flex-col gap-2 p-4", className)} style={style}>
     {children}
   </div>
 );
 DrawerFooter.displayName = "DrawerFooter";
 
-function DrawerTitle({
-  className,
-  style,
-  ...props
-}: DrawerTitleProps): React.JSX.Element {
+function DrawerTitle({ className, style, ...props }: DrawerTitleProps): React.JSX.Element {
   return (
     <DrawerPrimitive.Title
-      className={cn(
-        "text-lg font-semibold leading-none tracking-tight",
-        className,
-      )}
+      className={cn("text-lg font-semibold leading-none tracking-tight", className)}
       style={style}
       {...props}
     />

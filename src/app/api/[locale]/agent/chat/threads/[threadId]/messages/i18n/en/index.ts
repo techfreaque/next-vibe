@@ -86,8 +86,7 @@ export const translations = {
       forbidden: {
         title: "Forbidden",
         description: "You don't have permission to view these messages",
-        incognitoNotAllowed:
-          "Incognito threads cannot be accessed on the server",
+        incognitoNotAllowed: "Incognito threads cannot be accessed on the server",
       },
       notFound: {
         title: "Not Found",
@@ -204,8 +203,7 @@ export const translations = {
       forbidden: {
         title: "Forbidden",
         description: "You don't have permission to create messages",
-        incognitoNotAllowed:
-          "Incognito threads cannot be accessed on the server",
+        incognitoNotAllowed: "Incognito threads cannot be accessed on the server",
       },
       notFound: {
         title: "Not Found",

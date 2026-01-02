@@ -75,10 +75,7 @@ export function useEdenAISpeech({
   // Cleanup function
   const cleanup = useCallback((): void => {
     // Stop media recorder if active
-    if (
-      mediaRecorderRef.current &&
-      mediaRecorderRef.current.state !== "inactive"
-    ) {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
       mediaRecorderRef.current.stop();
     }
     mediaRecorderRef.current = null;
@@ -182,9 +179,7 @@ export function useEdenAISpeech({
       });
     } catch (err) {
       const errorMsg =
-        err instanceof Error
-          ? err.message
-          : t("app.chat.hooks.stt.transcription-failed");
+        err instanceof Error ? err.message : t("app.chat.hooks.stt.transcription-failed");
       logger.error("STT: Exception during transcription", parseError(err));
       setError(errorMsg);
       onError?.(errorMsg);
@@ -226,9 +221,7 @@ export function useEdenAISpeech({
       logger.debug("STT: Recording started");
     } catch (err) {
       const errorMsg =
-        err instanceof Error
-          ? err.message
-          : t("app.chat.hooks.stt.permission-denied");
+        err instanceof Error ? err.message : t("app.chat.hooks.stt.permission-denied");
       logger.error("STT: Failed to start recording", parseError(err));
       setError(errorMsg);
       onError?.(errorMsg);
@@ -249,63 +242,62 @@ export function useEdenAISpeech({
    * Stop recording and return raw audio blob without transcribing
    * Used for direct audio submission to ai-stream
    */
-  const stopRecordingAndGetBlob =
-    useCallback(async (): Promise<File | null> => {
-      logger.debug("STT: Stop recording and get blob called");
+  const stopRecordingAndGetBlob = useCallback(async (): Promise<File | null> => {
+    logger.debug("STT: Stop recording and get blob called");
 
-      if (!mediaRecorderRef.current || !isRecording) {
-        logger.warn("STT: Cannot get blob - not recording");
-        return null;
+    if (!mediaRecorderRef.current || !isRecording) {
+      logger.warn("STT: Cannot get blob - not recording");
+      return null;
+    }
+
+    return new Promise((resolve) => {
+      const mediaRecorder = mediaRecorderRef.current;
+      if (!mediaRecorder) {
+        resolve(null);
+        return;
       }
 
-      return new Promise((resolve) => {
-        const mediaRecorder = mediaRecorderRef.current;
-        if (!mediaRecorder) {
-          resolve(null);
-          return;
+      // Override the onstop handler for blob extraction
+      mediaRecorder.onstop = (): void => {
+        logger.debug("STT: Recording stopped for blob extraction", {
+          chunksCount: audioChunksRef.current.length,
+        });
+
+        // Create audio blob from chunks
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: mediaRecorder.mimeType || "audio/webm",
+        });
+
+        // Create File object
+        const audioFile = new File([audioBlob], "recording.webm", {
+          type: audioBlob.type,
+        });
+
+        logger.debug("STT: Audio file created", {
+          size: audioFile.size,
+          type: audioFile.type,
+        });
+
+        // Cleanup without processing
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
         }
+        audioChunksRef.current = [];
+        mediaRecorderRef.current = null;
 
-        // Override the onstop handler for blob extraction
-        mediaRecorder.onstop = (): void => {
-          logger.debug("STT: Recording stopped for blob extraction", {
-            chunksCount: audioChunksRef.current.length,
-          });
+        setIsRecording(false);
+        setIsPaused(false);
 
-          // Create audio blob from chunks
-          const audioBlob = new Blob(audioChunksRef.current, {
-            type: mediaRecorder.mimeType || "audio/webm",
-          });
+        // Note: Don't restore handler since we nullified mediaRecorderRef
 
-          // Create File object
-          const audioFile = new File([audioBlob], "recording.webm", {
-            type: audioBlob.type,
-          });
+        resolve(audioFile);
+      };
 
-          logger.debug("STT: Audio file created", {
-            size: audioFile.size,
-            type: audioFile.type,
-          });
-
-          // Cleanup without processing
-          if (streamRef.current) {
-            streamRef.current.getTracks().forEach((track) => track.stop());
-            streamRef.current = null;
-          }
-          audioChunksRef.current = [];
-          mediaRecorderRef.current = null;
-
-          setIsRecording(false);
-          setIsPaused(false);
-
-          // Note: Don't restore handler since we nullified mediaRecorderRef
-
-          resolve(audioFile);
-        };
-
-        // Stop recording to trigger onstop
-        mediaRecorder.stop();
-      });
-    }, [isRecording, logger]);
+      // Stop recording to trigger onstop
+      mediaRecorder.stop();
+    });
+  }, [isRecording, logger]);
 
   const pauseRecording = useCallback((): void => {
     logger.debug("STT: Pause recording called");

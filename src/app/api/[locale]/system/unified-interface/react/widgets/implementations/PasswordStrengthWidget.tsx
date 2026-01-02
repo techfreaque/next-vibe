@@ -19,10 +19,7 @@ export function PasswordStrengthWidget<const TKey extends string>({
   context,
   className,
   form,
-}: ReactWidgetProps<
-  typeof WidgetType.PASSWORD_STRENGTH,
-  TKey
->): JSX.Element | null {
+}: ReactWidgetProps<typeof WidgetType.PASSWORD_STRENGTH, TKey>): JSX.Element | null {
   const { t } = simpleT(context.locale);
   const { watchField = "password" } = field.ui;
 
@@ -72,9 +69,7 @@ export function PasswordStrengthWidget<const TKey extends string>({
   return (
     <Div className={`flex flex-col gap-1 ${className ?? ""}`}>
       <Div className="flex justify-between text-xs">
-        <Span>
-          {t("app.user.components.auth.common.passwordStrength.label")}
-        </Span>
+        <Span>{t("app.user.components.auth.common.passwordStrength.label")}</Span>
         <Span
           className={
             strength <= 2

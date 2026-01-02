@@ -15,8 +15,7 @@ export const translations = {
     fields: {
       removeUnused: {
         title: "Remove Unused Keys",
-        description:
-          "Remove translation keys that are not used in the codebase",
+        description: "Remove translation keys that are not used in the codebase",
       },
       dryRun: {
         title: "Dry Run",
@@ -71,8 +70,7 @@ export const translations = {
       completed: "Completed",
       noKeysInUse: "No keys in use",
       writingFilteredTranslations: "Writing filtered translations",
-      removeUnusedRequiresRegenerate:
-        "removeUnused requires regenerateStructure to be enabled",
+      removeUnusedRequiresRegenerate: "removeUnused requires regenerateStructure to be enabled",
     },
     response: {
       title: "Reorganization Result",

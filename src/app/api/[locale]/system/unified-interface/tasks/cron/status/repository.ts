@@ -4,21 +4,14 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { CronTaskStatus } from "../../enum";
-import type {
-  CronStatusRequestOutput,
-  CronStatusResponseOutput,
-} from "./definition";
+import type { CronStatusRequestOutput, CronStatusResponseOutput } from "./definition";
 
 /**
  * Cron Status Repository Interface
@@ -99,9 +92,7 @@ class CronStatusRepositoryImpl implements ICronStatusRepository {
 
       // Filter by taskId if specified
       const filteredTasks =
-        taskId && mockTasks
-          ? mockTasks.filter((task) => task.id === taskId)
-          : mockTasks;
+        taskId && mockTasks ? mockTasks.filter((task) => task.id === taskId) : mockTasks;
 
       const response: CronStatusResponseOutput = {
         success: true,
@@ -127,8 +118,7 @@ class CronStatusRepositoryImpl implements ICronStatusRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.cronSystem.status.errors.server.title",
+        message: "app.api.system.unifiedInterface.tasks.cronSystem.status.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

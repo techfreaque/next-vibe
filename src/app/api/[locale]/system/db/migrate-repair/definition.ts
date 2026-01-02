@@ -48,8 +48,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.db.migrateRepair.fields.force.title",
-          description:
-            "app.api.system.db.migrateRepair.fields.force.description",
+          description: "app.api.system.db.migrateRepair.fields.force.description",
           columns: 4,
         },
         z.boolean().optional().default(false),
@@ -60,8 +59,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.db.migrateRepair.fields.dryRun.title",
-          description:
-            "app.api.system.db.migrateRepair.fields.dryRun.description",
+          description: "app.api.system.db.migrateRepair.fields.dryRun.description",
           columns: 4,
         },
         z.boolean().optional().default(false),
@@ -72,8 +70,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.db.migrateRepair.fields.reset.title",
-          description:
-            "app.api.system.db.migrateRepair.fields.reset.description",
+          description: "app.api.system.db.migrateRepair.fields.reset.description",
           columns: 4,
         },
         z.boolean().optional().default(false),
@@ -123,8 +120,7 @@ const { POST } = createEndpoint({
       trackedMigrations: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateRepair.fields.trackedMigrations.title",
+          content: "app.api.system.db.migrateRepair.fields.trackedMigrations.title",
         },
         z.coerce.number(),
       ),
@@ -132,8 +128,7 @@ const { POST } = createEndpoint({
       migrationFiles: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateRepair.fields.migrationFiles.title",
+          content: "app.api.system.db.migrateRepair.fields.migrationFiles.title",
         },
         z.coerce.number(),
       ),
@@ -152,48 +147,39 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.db.migrateRepair.post.errors.validation.title",
-      description:
-        "app.api.system.db.migrateRepair.post.errors.validation.description",
+      description: "app.api.system.db.migrateRepair.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.db.migrateRepair.post.errors.network.title",
-      description:
-        "app.api.system.db.migrateRepair.post.errors.network.description",
+      description: "app.api.system.db.migrateRepair.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.db.migrateRepair.post.errors.unauthorized.title",
-      description:
-        "app.api.system.db.migrateRepair.post.errors.unauthorized.description",
+      description: "app.api.system.db.migrateRepair.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.db.migrateRepair.post.errors.forbidden.title",
-      description:
-        "app.api.system.db.migrateRepair.post.errors.forbidden.description",
+      description: "app.api.system.db.migrateRepair.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.db.migrateRepair.post.errors.notFound.title",
-      description:
-        "app.api.system.db.migrateRepair.post.errors.notFound.description",
+      description: "app.api.system.db.migrateRepair.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.db.migrateRepair.post.errors.server.title",
-      description:
-        "app.api.system.db.migrateRepair.post.errors.server.description",
+      description: "app.api.system.db.migrateRepair.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.db.migrateRepair.post.errors.unknown.title",
-      description:
-        "app.api.system.db.migrateRepair.post.errors.unknown.description",
+      description: "app.api.system.db.migrateRepair.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.db.migrateRepair.post.errors.server.title",
-      description:
-        "app.api.system.db.migrateRepair.post.errors.server.description",
+      description: "app.api.system.db.migrateRepair.post.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.db.migrateRepair.post.errors.conflict.title",
-      description:
-        "app.api.system.db.migrateRepair.post.errors.conflict.description",
+      description: "app.api.system.db.migrateRepair.post.errors.conflict.description",
     },
   },
 
@@ -241,8 +227,7 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        output:
-          "✅ Migration repair completed successfully! 🚀 Ready for production builds",
+        output: "✅ Migration repair completed successfully! 🚀 Ready for production builds",
         hasTable: true,
         schema: "drizzle",
         tableName: "__drizzle_migrations__",
@@ -262,8 +247,7 @@ const { POST } = createEndpoint({
       },
       repaired: {
         success: true,
-        output:
-          "✅ Migration repair completed successfully! Marked 2 migrations as applied",
+        output: "✅ Migration repair completed successfully! Marked 2 migrations as applied",
         hasTable: true,
         schema: "drizzle",
         tableName: "__drizzle_migrations__",

@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
 import type { JSX } from "react";
 
-import {
-  type CreditBalance,
-  CreditRepository,
-} from "@/app/api/[locale]/credits/repository";
-import {
-  ProductIds,
-  productsRepository,
-} from "@/app/api/[locale]/products/repository-client";
+import { type CreditBalance, CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { ProductIds, productsRepository } from "@/app/api/[locale]/products/repository-client";
 import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -28,9 +22,7 @@ interface BuyCreditsPageProps {
 /**
  * Generate metadata for the buy credits page
  */
-export async function generateMetadata({
-  params,
-}: BuyCreditsPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: BuyCreditsPageProps): Promise<Metadata> {
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "subscription/buy-credits",
@@ -96,9 +88,7 @@ export default async function BuyCreditsPage({
       logger,
       locale,
     );
-    subscription = subscriptionResponse.success
-      ? subscriptionResponse.data
-      : null;
+    subscription = subscriptionResponse.success ? subscriptionResponse.data : null;
   }
 
   // Get pricing
@@ -110,11 +100,7 @@ export default async function BuyCreditsPage({
   const FREE_CREDITS = products[ProductIds.FREE_TIER].credits;
 
   // Get yearly subscription price
-  const yearlySubscription = productsRepository.getProduct(
-    ProductIds.SUBSCRIPTION,
-    locale,
-    "year",
-  );
+  const yearlySubscription = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale, "year");
   const YEARLY_SUBSCRIPTION_PRICE = yearlySubscription.price;
 
   return (

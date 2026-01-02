@@ -1,7 +1,4 @@
-import type {
-  ChatFolder,
-  ChatThread,
-} from "@/app/api/[locale]/agent/chat/hooks/store";
+import type { ChatFolder, ChatThread } from "@/app/api/[locale]/agent/chat/hooks/store";
 
 // Time grouping constants
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -12,10 +9,7 @@ const MONTH_MS = 30 * DAY_MS;
  * Get the ancestry chain of a folder (all parent folders up to root)
  * Returns an array of folder IDs from root to the given folder
  */
-export function getFolderAncestry(
-  folderId: string,
-  folders: Record<string, ChatFolder>,
-): string[] {
+export function getFolderAncestry(folderId: string, folders: Record<string, ChatFolder>): string[] {
   const ancestry: string[] = [];
   let currentId: string | null = folderId;
 

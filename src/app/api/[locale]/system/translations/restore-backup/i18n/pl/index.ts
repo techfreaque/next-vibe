@@ -11,8 +11,7 @@ export const translations: typeof enTranslations = {
     fields: {
       backupPath: {
         title: "Ścieżka kopii zapasowej",
-        description:
-          "Ścieżka do katalogu kopii zapasowej, z którego ma zostać przywrócona",
+        description: "Ścieżka do katalogu kopii zapasowej, z którego ma zostać przywrócona",
       },
       validateOnly: {
         title: "Tylko walidacja",
@@ -20,8 +19,7 @@ export const translations: typeof enTranslations = {
       },
       createBackupBeforeRestore: {
         title: "Utwórz kopię zapasową przed przywróceniem",
-        description:
-          "Utwórz kopię zapasową bieżącego stanu przed przywróceniem",
+        description: "Utwórz kopię zapasową bieżącego stanu przed przywróceniem",
       },
     },
     messages: {

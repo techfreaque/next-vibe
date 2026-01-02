@@ -3,18 +3,8 @@
  * Refactored to separate template from business logic
  */
 
-import {
-  Button,
-  Hr,
-  Link,
-  Section,
-  Text as Span,
-} from "@react-email/components";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { Button, Hr, Link, Section, Text as Span } from "@react-email/components";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
@@ -111,9 +101,7 @@ function ContactFormEmail({
             color: "#4b5563",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
-            {t("app.api.contact.email.company.name")}:
-          </Span>{" "}
+          <Span style={{ fontWeight: "700" }}>{t("app.api.contact.email.company.name")}:</Span>{" "}
           {props.name}
         </Span>
 
@@ -124,9 +112,7 @@ function ContactFormEmail({
             color: "#4b5563",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
-            {t("app.api.contact.email.company.email")}:
-          </Span>{" "}
+          <Span style={{ fontWeight: "700" }}>{t("app.api.contact.email.company.email")}:</Span>{" "}
           <Link href={`mailto:${props.email}`} style={{ color: "#4f46e5" }}>
             {props.email}
           </Link>
@@ -140,9 +126,7 @@ function ContactFormEmail({
               color: "#4b5563",
             }}
           >
-            <Span style={{ fontWeight: "700" }}>
-              {t("app.api.contact.email.company.company")}:
-            </Span>{" "}
+            <Span style={{ fontWeight: "700" }}>{t("app.api.contact.email.company.company")}:</Span>{" "}
             {props.company}
           </Span>
         )}
@@ -231,39 +215,32 @@ const contactFormTemplate: EmailTemplateDefinition<ContactFormProps> = {
     description: "app.api.emails.templates.contact.form.meta.description",
     category: "contact",
     path: "/contact/email.tsx",
-    defaultSubject: (t) =>
-      t("app.api.contact.email.partner.subject", { subject: "" }),
+    defaultSubject: (t) => t("app.api.contact.email.partner.subject", { subject: "" }),
     previewFields: {
       name: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.name.label",
-        description:
-          "app.admin.emails.templates.templates.contact.form.preview.name.description",
+        label: "app.admin.emails.templates.templates.contact.form.preview.name.label",
+        description: "app.admin.emails.templates.templates.contact.form.preview.name.description",
         defaultValue: "Max Mustermann",
         required: true,
       },
       email: {
         type: "email",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.email.label",
-        description:
-          "app.admin.emails.templates.templates.contact.form.preview.email.description",
+        label: "app.admin.emails.templates.templates.contact.form.preview.email.label",
+        description: "app.admin.emails.templates.templates.contact.form.preview.email.description",
         defaultValue: "max@example.com",
         required: true,
       },
       company: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.company.label",
+        label: "app.admin.emails.templates.templates.contact.form.preview.company.label",
         description:
           "app.admin.emails.templates.templates.contact.form.preview.company.description",
         defaultValue: "Musterfirma GmbH",
       },
       subject: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.subject.label",
+        label: "app.admin.emails.templates.templates.contact.form.preview.subject.label",
         description:
           "app.admin.emails.templates.templates.contact.form.preview.subject.description",
         defaultValue: "Anfrage zu Ihren Dienstleistungen",
@@ -271,37 +248,30 @@ const contactFormTemplate: EmailTemplateDefinition<ContactFormProps> = {
       },
       message: {
         type: "textarea",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.message.label",
+        label: "app.admin.emails.templates.templates.contact.form.preview.message.label",
         description:
           "app.admin.emails.templates.templates.contact.form.preview.message.description",
-        defaultValue:
-          "Ich hätte gerne weitere Informationen zu Ihren Premium-Services.",
+        defaultValue: "Ich hätte gerne weitere Informationen zu Ihren Premium-Services.",
         required: true,
         rows: 5,
       },
       isForCompany: {
         type: "boolean",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.isForCompany.label",
+        label: "app.admin.emails.templates.templates.contact.form.preview.isForCompany.label",
         description:
           "app.admin.emails.templates.templates.contact.form.preview.isForCompany.description",
         defaultValue: true,
       },
       userId: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.userId.label",
-        description:
-          "app.admin.emails.templates.templates.contact.form.preview.userId.description",
+        label: "app.admin.emails.templates.templates.contact.form.preview.userId.label",
+        description: "app.admin.emails.templates.templates.contact.form.preview.userId.description",
         defaultValue: "example-user-id-123",
       },
       leadId: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.leadId.label",
-        description:
-          "app.admin.emails.templates.templates.contact.form.preview.leadId.description",
+        label: "app.admin.emails.templates.templates.contact.form.preview.leadId.label",
+        description: "app.admin.emails.templates.templates.contact.form.preview.leadId.description",
         defaultValue: "example-lead-id-456",
       },
     },

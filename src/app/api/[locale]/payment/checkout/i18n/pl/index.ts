@@ -116,8 +116,7 @@ export const translations: typeof enTranslations = {
         title: "Błąd walidacji",
         description: "Nieprawidłowe parametry płatności",
         reason: {
-          enterpriseCustomPricing:
-            "Plan ENTERPRISE wymaga indywidualnej wyceny",
+          enterpriseCustomPricing: "Plan ENTERPRISE wymaga indywidualnej wyceny",
         },
       },
       network: {

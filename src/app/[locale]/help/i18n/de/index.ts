@@ -16,8 +16,7 @@ export const translations: typeof enTranslations = {
       imageAlt: "{{appName}} Support",
       keywords: "kontakt, support, hilfe, {{appName}}, ki chat, unterstützung",
       ogTitle: "{{appName}} Support kontaktieren",
-      ogDescription:
-        "Erhalten Sie Hilfe für Ihre unzensierte KI-Chat-Erfahrung",
+      ogDescription: "Erhalten Sie Hilfe für Ihre unzensierte KI-Chat-Erfahrung",
       twitterTitle: "{{appName}} kontaktieren",
       twitterDescription: "Wenden Sie sich an unser Support-Team",
     },

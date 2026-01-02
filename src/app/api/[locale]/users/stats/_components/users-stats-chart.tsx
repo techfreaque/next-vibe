@@ -49,21 +49,13 @@ interface LegendProps {
   locale: CountryLanguage;
 }
 
-function ChartLegend({
-  series,
-  onToggle,
-  onShowAll,
-  onHideAll,
-  locale,
-}: LegendProps): JSX.Element {
+function ChartLegend({ series, onToggle, onShowAll, onHideAll, locale }: LegendProps): JSX.Element {
   const { t } = simpleT(locale);
 
   return (
     <Div className="border-t">
       <Div className="flex items-center justify-between p-4 border-b">
-        <H4 className="text-sm font-medium">
-          {t("app.admin.users.stats.legend.title")}
-        </H4>
+        <H4 className="text-sm font-medium">{t("app.admin.users.stats.legend.title")}</H4>
         <Div className="flex gap-2">
           <Button
             variant="ghost"
@@ -123,15 +115,13 @@ export function UsersStatsChart({
   const language = getLanguageFromLocale(locale);
 
   // State for managing which series are visible
-  const [visibleSeries, setVisibleSeries] = useState<Record<string, boolean>>(
-    () => {
-      const initial: Record<string, boolean> = {};
-      data?.series?.forEach((series) => {
-        initial[series.name] = true;
-      });
-      return initial;
-    },
-  );
+  const [visibleSeries, setVisibleSeries] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    data?.series?.forEach((series) => {
+      initial[series.name] = true;
+    });
+    return initial;
+  });
 
   const toggleSeries = (name: string): void => {
     setVisibleSeries((prev) => ({
@@ -192,8 +182,7 @@ export function UsersStatsChart({
 
   // Filter visible series
   const visibleSeriesData =
-    data?.series?.filter((series) => visibleSeries[series.name] !== false) ||
-    [];
+    data?.series?.filter((series) => visibleSeries[series.name] !== false) || [];
 
   // Prepare legend data
   const legendData =
@@ -202,9 +191,7 @@ export function UsersStatsChart({
       nameParams: series.nameParams,
       color:
         series.color ||
-        CHART_CONSTANTS.DEFAULT_COLORS[
-          index % CHART_CONSTANTS.DEFAULT_COLORS.length
-        ],
+        CHART_CONSTANTS.DEFAULT_COLORS[index % CHART_CONSTANTS.DEFAULT_COLORS.length],
       visible: visibleSeries[series.name] || false,
     })) || [];
 
@@ -213,8 +200,7 @@ export function UsersStatsChart({
     data.series[0]?.data.map((point, index) => {
       const dataPoint: Record<string, number | string> = {
         date: new Date(point.date).toLocaleDateString(language),
-        dateValue:
-          typeof point.date === "string" ? point.date : point.date.toString(),
+        dateValue: typeof point.date === "string" ? point.date : point.date.toString(),
       };
 
       // Add all series data for this date point
@@ -240,9 +226,7 @@ export function UsersStatsChart({
     const chartComponents = visibleSeriesData.map((series, index) => {
       const color =
         series.color ||
-        CHART_CONSTANTS.DEFAULT_COLORS[
-          index % CHART_CONSTANTS.DEFAULT_COLORS.length
-        ];
+        CHART_CONSTANTS.DEFAULT_COLORS[index % CHART_CONSTANTS.DEFAULT_COLORS.length];
 
       switch (chartType) {
         case ChartType.BAR:
@@ -293,8 +277,7 @@ export function UsersStatsChart({
         <Axis
           dependentAxis
           tickFormat={(value: number | string) => {
-            const val =
-              typeof value === "string" ? Number.parseFloat(value) : value;
+            const val = typeof value === "string" ? Number.parseFloat(value) : value;
             if (val >= 1000) {
               return `${(val / 1000).toFixed(1)}K`;
             }
@@ -309,17 +292,11 @@ export function UsersStatsChart({
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle>
-          {data.title || t("app.admin.users.stats.chart.title")}
-        </CardTitle>
-        {data.subtitle && (
-          <P className="text-sm text-muted-foreground">{data.subtitle}</P>
-        )}
+        <CardTitle>{data.title || t("app.admin.users.stats.chart.title")}</CardTitle>
+        {data.subtitle && <P className="text-sm text-muted-foreground">{data.subtitle}</P>}
       </CardHeader>
       <CardContent>
-        <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>
-          {renderChart()}
-        </Div>
+        <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>{renderChart()}</Div>
         {legendData.length > 0 && (
           <ChartLegend
             series={legendData}

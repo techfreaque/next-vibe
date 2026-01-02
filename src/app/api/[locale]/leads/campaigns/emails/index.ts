@@ -15,10 +15,8 @@ import { emailRendererService } from "./services/renderer";
 import { campaignSchedulerService } from "./services/scheduler";
 import type { EmailTemplateResult } from "./types";
 
-type EmailJourneyVariantValues =
-  (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
-type EmailCampaignStageValues =
-  (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+type EmailJourneyVariantValues = (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
+type EmailCampaignStageValues = (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
 
 /**
  * Main Email Service Class
@@ -123,11 +121,7 @@ export class EmailService {
       companyEmail: string;
     },
   ): Promise<EmailTemplateResult | null> {
-    return await emailRendererService.generatePreview(
-      journeyVariant,
-      stage,
-      context,
-    );
+    return await emailRendererService.generatePreview(journeyVariant, stage, context);
   }
 
   /**
@@ -153,19 +147,14 @@ export class EmailService {
   /**
    * Check if template exists for journey and stage
    */
-  hasTemplate(
-    journeyVariant: EmailJourneyVariantValues,
-    stage: EmailCampaignStageValues,
-  ): boolean {
+  hasTemplate(journeyVariant: EmailJourneyVariantValues, stage: EmailCampaignStageValues): boolean {
     return emailRendererService.hasTemplate(journeyVariant, stage);
   }
 
   /**
    * Get available stages for a journey
    */
-  getAvailableStages(
-    journeyVariant: EmailJourneyVariantValues,
-  ): EmailCampaignStageValues[] {
+  getAvailableStages(journeyVariant: EmailJourneyVariantValues): EmailCampaignStageValues[] {
     return emailRendererService.getAvailableStages(journeyVariant);
   }
 }

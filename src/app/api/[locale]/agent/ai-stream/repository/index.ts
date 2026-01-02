@@ -30,36 +30,22 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import { parseError } from "../../../shared/utils";
 import type { DefaultFolderId } from "../../chat/config";
-import {
-  chatMessages,
-  type ToolCall,
-  type ToolCallResult,
-} from "../../chat/db";
+import { chatMessages, type ToolCall, type ToolCallResult } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
-import {
-  ApiProvider,
-  getModelById,
-  type ModelId,
-} from "../../chat/model-access/models";
+import { ApiProvider, getModelById, type ModelId } from "../../chat/model-access/models";
 import {
   createErrorMessage,
   createTextMessage,
   createToolMessage,
   updateMessageContent,
 } from "../../chat/threads/[threadId]/messages/repository";
-import type {
-  AiStreamPostRequestOutput,
-  AiStreamPostResponseOutput,
-} from "../definition";
+import type { AiStreamPostRequestOutput, AiStreamPostResponseOutput } from "../definition";
 import { createStreamEvent, formatSSEEvent } from "../events";
 import { createFreedomGPT } from "../providers/freedomgpt";
 import { createGabAI } from "../providers/gab-ai";
 import { createUncensoredAI } from "../providers/uncensored-ai";
 import { setupAiStream } from "./stream-setup";
-import {
-  createStreamingTTSHandler,
-  type StreamingTTSHandler,
-} from "./streaming-tts";
+import { createStreamingTTSHandler, type StreamingTTSHandler } from "./streaming-tts";
 
 /**
  * Maximum duration for streaming responses (in seconds)
@@ -127,14 +113,9 @@ function extractUserIdentifiers(
   ipAddress?: string;
 } {
   const userId = !user.isPublic && "id" in user ? user.id : undefined;
-  const leadId =
-    "leadId" in user && typeof user.leadId === "string"
-      ? user.leadId
-      : undefined;
+  const leadId = "leadId" in user && typeof user.leadId === "string" ? user.leadId : undefined;
   const ipAddress = request
-    ? request.headers.get("x-forwarded-for") ||
-      request.headers.get("x-real-ip") ||
-      undefined
+    ? request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || undefined
     : "cli";
 
   return { userId, leadId, ipAddress };
@@ -271,13 +252,10 @@ class AiStreamRepository implements IAiStreamRepository {
               userId,
               enabled: true,
             });
-            logger.info(
-              "[AI Stream] Voice mode enabled - streaming TTS active",
-              {
-                voice: voiceMode.voice,
-                enabled: voiceMode.enabled,
-              },
-            );
+            logger.info("[AI Stream] Voice mode enabled - streaming TTS active", {
+              voice: voiceMode.voice,
+              enabled: voiceMode.enabled,
+            });
           }
 
           try {
@@ -323,44 +301,30 @@ class AiStreamRepository implements IAiStreamRepository {
                     });
 
                     try {
-                      controller.enqueue(
-                        encoder.encode(formatSSEEvent(filesUploadedEvent)),
-                      );
-                      logger.info(
-                        "[File Processing] FILES_UPLOADED event emitted",
-                        {
-                          messageId: result.userMessageId,
-                          attachmentCount: result.attachments.length,
-                        },
-                      );
+                      controller.enqueue(encoder.encode(formatSSEEvent(filesUploadedEvent)));
+                      logger.info("[File Processing] FILES_UPLOADED event emitted", {
+                        messageId: result.userMessageId,
+                        attachmentCount: result.attachments.length,
+                      });
                     } catch (error) {
-                      logger.error(
-                        "[File Processing] Failed to emit FILES_UPLOADED event",
-                        {
-                          error: parseError(error),
-                          messageId: result.userMessageId,
-                        },
-                      );
+                      logger.error("[File Processing] Failed to emit FILES_UPLOADED event", {
+                        error: parseError(error),
+                        messageId: result.userMessageId,
+                      });
                     }
                   } else {
-                    logger.warn(
-                      "[File Processing] File upload failed - no event emitted",
-                      {
-                        messageId: result.userMessageId,
-                        success: result.success,
-                      },
-                    );
+                    logger.warn("[File Processing] File upload failed - no event emitted", {
+                      messageId: result.userMessageId,
+                      success: result.success,
+                    });
                   }
                   return undefined;
                 })
                 .catch((error) => {
-                  logger.error(
-                    "[File Processing] File upload promise rejected",
-                    {
-                      error: parseError(error),
-                      messageId: userMessageId,
-                    },
-                  );
+                  logger.error("[File Processing] File upload promise rejected", {
+                    error: parseError(error),
+                    messageId: userMessageId,
+                  });
                 });
             }
 
@@ -369,11 +333,8 @@ class AiStreamRepository implements IAiStreamRepository {
             // IMPORTANT: Always prefer userMessageId when available (works for both incognito and server-persisted threads)
             // For send/retry/edit: userMessageId is the user message that should be the parent
             // For answer-as-ai: no user message, so fall back to effectiveParentMessageId
-            const initialAiParentId =
-              userMessageId ?? effectiveParentMessageId ?? null;
-            const initialAiDepth = userMessageId
-              ? messageDepth + 1
-              : messageDepth;
+            const initialAiParentId = userMessageId ?? effectiveParentMessageId ?? null;
+            const initialAiDepth = userMessageId ? messageDepth + 1 : messageDepth;
 
             // Don't emit AI message-created event yet
             // We'll emit it when we start getting content, so we can set the correct parent
@@ -402,8 +363,7 @@ class AiStreamRepository implements IAiStreamRepository {
             // Track message sequencing - all messages in this response share the same sequenceId
             // CRITICAL: When continuing after tool confirmation, reuse the original sequenceId
             // so all messages (tool + response) are grouped together in the UI
-            const sequenceId =
-              toolConfirmationResult?.sequenceId ?? crypto.randomUUID();
+            const sequenceId = toolConfirmationResult?.sequenceId ?? crypto.randomUUID();
             logger.info("[AI Stream] Sequence ID initialized", {
               sequenceId,
               isToolContinuation: !!toolConfirmationResult,
@@ -415,9 +375,7 @@ class AiStreamRepository implements IAiStreamRepository {
             // IMPORTANT: For tool confirmation, the next ASSISTANT message should be child of the TOOL message
             let currentParentId: string | null =
               toolConfirmationResult?.messageId ?? initialAiParentId;
-            let currentDepth = toolConfirmationResult
-              ? messageDepth + 1
-              : initialAiDepth;
+            let currentDepth = toolConfirmationResult ? messageDepth + 1 : initialAiDepth;
 
             // Update last known values for error handling
             lastSequenceId = sequenceId;
@@ -466,15 +424,12 @@ class AiStreamRepository implements IAiStreamRepository {
 
                 // After a step finishes, update currentParentId/currentDepth to point to the last message
                 // The next ASSISTANT message should be a CHILD of the last tool message, so increment depth
-                logger.info(
-                  "[AI Stream] Step finished - updating parent chain",
-                  {
-                    oldParentId: currentParentId,
-                    newParentId: lastParentId,
-                    oldDepth: currentDepth,
-                    newDepth: lastDepth + 1,
-                  },
-                );
+                logger.info("[AI Stream] Step finished - updating parent chain", {
+                  oldParentId: currentParentId,
+                  newParentId: lastParentId,
+                  oldDepth: currentDepth,
+                  newDepth: lastDepth + 1,
+                });
                 currentParentId = lastParentId;
                 currentDepth = lastDepth + 1;
 
@@ -539,25 +494,23 @@ class AiStreamRepository implements IAiStreamRepository {
                 }
               } else if (part.type === "reasoning-delta") {
                 const reasoningText = "text" in part ? part.text : "";
-                currentAssistantContent =
-                  AiStreamRepository.processReasoningDelta({
-                    reasoningText,
+                currentAssistantContent = AiStreamRepository.processReasoningDelta({
+                  reasoningText,
+                  currentAssistantMessageId,
+                  currentAssistantContent,
+                  controller,
+                  encoder,
+                  logger,
+                });
+              } else if (part.type === "reasoning-end") {
+                if (isInReasoningBlock) {
+                  currentAssistantContent = AiStreamRepository.processReasoningEnd({
                     currentAssistantMessageId,
                     currentAssistantContent,
                     controller,
                     encoder,
                     logger,
                   });
-              } else if (part.type === "reasoning-end") {
-                if (isInReasoningBlock) {
-                  currentAssistantContent =
-                    AiStreamRepository.processReasoningEnd({
-                      currentAssistantMessageId,
-                      currentAssistantContent,
-                      controller,
-                      encoder,
-                      logger,
-                    });
                   isInReasoningBlock = false;
                 }
               } else if (part.type === "tool-call") {
@@ -572,8 +525,7 @@ class AiStreamRepository implements IAiStreamRepository {
                       type: "tool-call",
                       toolCallId: part.toolCallId,
                       toolName: part.toolName,
-                      input:
-                        "input" in part ? (part.input as JSONValue) : undefined,
+                      input: "input" in part ? (part.input as JSONValue) : undefined,
                     },
                     currentAssistantMessageId,
                     currentAssistantContent,
@@ -606,10 +558,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   lastParentId = result.pendingToolMessage.messageId;
                   lastDepth = result.pendingToolMessage.toolCallData.depth;
 
-                  pendingToolMessages.set(
-                    part.toolCallId,
-                    result.pendingToolMessage,
-                  );
+                  pendingToolMessages.set(part.toolCallId, result.pendingToolMessage);
                 }
               } else if (part.type === "tool-error") {
                 if (
@@ -624,8 +573,7 @@ class AiStreamRepository implements IAiStreamRepository {
                       type: "tool-error",
                       toolCallId: part.toolCallId,
                       toolName: part.toolName,
-                      error:
-                        "error" in part ? (part.error as JSONValue) : undefined,
+                      error: "error" in part ? (part.error as JSONValue) : undefined,
                     },
                     pendingToolMessage: pending,
                     threadId: threadResultThreadId,
@@ -659,8 +607,7 @@ class AiStreamRepository implements IAiStreamRepository {
                     type: "tool-result",
                     toolCallId: part.toolCallId,
                     toolName: part.toolName,
-                    output:
-                      "output" in part ? (part.output as JSONValue) : undefined,
+                    output: "output" in part ? (part.output as JSONValue) : undefined,
                     isError: "isError" in part ? Boolean(part.isError) : false,
                   },
                   pendingToolMessage: pending,
@@ -695,10 +642,7 @@ class AiStreamRepository implements IAiStreamRepository {
               currentAssistantMessageId,
               hasCurrentAssistantContent: !!currentAssistantContent,
               currentAssistantContentLength: currentAssistantContent.length,
-              currentAssistantContentPreview: currentAssistantContent.slice(
-                0,
-                100,
-              ),
+              currentAssistantContentPreview: currentAssistantContent.slice(0, 100),
             });
 
             // Finalize current ASSISTANT message if exists
@@ -773,9 +717,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   totalTokens: null,
                   finishReason: "stop",
                 });
-                controller.enqueue(
-                  encoder.encode(formatSSEEvent(stoppedEvent)),
-                );
+                controller.enqueue(encoder.encode(formatSSEEvent(stoppedEvent)));
                 controller.close();
               }
               return;
@@ -825,9 +767,7 @@ class AiStreamRepository implements IAiStreamRepository {
                 depth: lastDepth,
                 sequenceId: lastSequenceId,
               });
-              controller.enqueue(
-                encoder.encode(formatSSEEvent(errorMessageEvent)),
-              );
+              controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
 
               // Emit error event to update UI state
               const errorEvent = createStreamEvent.error({
@@ -875,8 +815,7 @@ class AiStreamRepository implements IAiStreamRepository {
         }),
       );
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error("Failed to create AI stream", {
         error: errorMessage,
         model: data.model,
@@ -884,8 +823,7 @@ class AiStreamRepository implements IAiStreamRepository {
 
       return {
         success: false,
-        message:
-          "app.api.agent.chat.aiStream.route.errors.streamCreationFailed",
+        message: "app.api.agent.chat.aiStream.route.errors.streamCreationFailed",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: {
           error: errorMessage,
@@ -950,10 +888,7 @@ class AiStreamRepository implements IAiStreamRepository {
    */
   private async setupStreamingTools(params: {
     model: ModelId;
-    requestedTools:
-      | Array<{ toolId: string; requiresConfirmation: boolean }>
-      | null
-      | undefined;
+    requestedTools: Array<{ toolId: string; requiresConfirmation: boolean }> | null | undefined;
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
@@ -1580,13 +1515,8 @@ class AiStreamRepository implements IAiStreamRepository {
     encoder: TextEncoder;
     logger: EndpointLogger;
   }): string {
-    const {
-      currentAssistantMessageId,
-      currentAssistantContent,
-      controller,
-      encoder,
-      logger,
-    } = params;
+    const { currentAssistantMessageId, currentAssistantContent, controller, encoder, logger } =
+      params;
 
     if (currentAssistantMessageId) {
       const thinkCloseTag = "</think>";
@@ -1721,12 +1651,9 @@ class AiStreamRepository implements IAiStreamRepository {
 
         _newIsInReasoningBlock = false;
 
-        logger.info(
-          "[AI Stream] ⏱️ Reasoning interrupted by tool call → </think>",
-          {
-            messageId: currentAssistantMessageId,
-          },
-        );
+        logger.info("[AI Stream] ⏱️ Reasoning interrupted by tool call → </think>", {
+          messageId: currentAssistantMessageId,
+        });
       }
 
       // Update ASSISTANT message in database with accumulated content
@@ -1849,14 +1776,11 @@ class AiStreamRepository implements IAiStreamRepository {
 
     // If tool requires confirmation, send waiting event and abort stream
     if (requiresConfirmation) {
-      logger.info(
-        "[AI Stream] Tool requires confirmation - pausing stream for user confirmation",
-        {
-          messageId: toolMessageId,
-          toolName: part.toolName,
-          isIncognito,
-        },
-      );
+      logger.info("[AI Stream] Tool requires confirmation - pausing stream for user confirmation", {
+        messageId: toolMessageId,
+        toolName: part.toolName,
+        isIncognito,
+      });
 
       // Tool message already saved to DB above (for both confirmation and non-confirmation tools)
       // No need to save again here
@@ -1870,22 +1794,16 @@ class AiStreamRepository implements IAiStreamRepository {
       });
       controller.enqueue(encoder.encode(formatSSEEvent(waitingEvent)));
 
-      logger.info(
-        "[AI Stream] Emitted TOOL_WAITING event - frontend should show confirmation UI",
-        {
-          messageId: toolMessageId,
-          isIncognito,
-        },
-      );
+      logger.info("[AI Stream] Emitted TOOL_WAITING event - frontend should show confirmation UI", {
+        messageId: toolMessageId,
+        isIncognito,
+      });
 
       // Abort the AI SDK stream to prevent it from continuing
       // The stream will be resumed when user confirms/rejects the tool
-      logger.info(
-        "[AI Stream] Aborting AI SDK stream - waiting for user confirmation",
-        {
-          messageId: toolMessageId,
-        },
-      );
+      logger.info("[AI Stream] Aborting AI SDK stream - waiting for user confirmation", {
+        messageId: toolMessageId,
+      });
 
       // Abort the stream to stop the AI SDK from processing further
       streamAbortController.abort(new Error("Tool requires user confirmation"));
@@ -2015,8 +1933,7 @@ class AiStreamRepository implements IAiStreamRepository {
               typeof part.error.message === "string"
             ? (part.error as MessageResponseType)
             : ({
-                message:
-                  "app.api.agent.chat.aiStream.errors.toolExecutionError",
+                message: "app.api.agent.chat.aiStream.errors.toolExecutionError",
                 messageParams: { error: String(part.error) },
               } satisfies MessageResponseType)
         : ({
@@ -2051,15 +1968,12 @@ class AiStreamRepository implements IAiStreamRepository {
         .returning({ id: chatMessages.id });
 
       if (updateResult.length === 0) {
-        logger.error(
-          "[AI Stream] CRITICAL: Tool message update failed - message not found in DB",
-          {
-            messageId: toolMessageId,
-            toolCallId: part.toolCallId,
-            toolName: part.toolName,
-            threadId,
-          },
-        );
+        logger.error("[AI Stream] CRITICAL: Tool message update failed - message not found in DB", {
+          messageId: toolMessageId,
+          toolCallId: part.toolCallId,
+          toolName: part.toolName,
+          threadId,
+        });
         // Fallback: create message if update failed
         await createToolMessage({
           messageId: toolMessageId,
@@ -2183,13 +2097,10 @@ class AiStreamRepository implements IAiStreamRepository {
     } = params;
 
     if (!pendingToolMessage) {
-      logger.error(
-        "[AI Stream] Tool result received but no pending message found",
-        {
-          toolCallId: part.toolCallId,
-          toolName: part.toolName,
-        },
-      );
+      logger.error("[AI Stream] Tool result received but no pending message found", {
+        toolCallId: part.toolCallId,
+        toolName: part.toolName,
+      });
       return null;
     }
 
@@ -2207,13 +2118,10 @@ class AiStreamRepository implements IAiStreamRepository {
     // The tool result will be processed in the next stream after confirmation
     try {
       if (controller.desiredSize === null) {
-        logger.info(
-          "[AI Stream] Controller closed - skipping tool result processing",
-          {
-            toolCallId: part.toolCallId,
-            toolName: part.toolName,
-          },
-        );
+        logger.info("[AI Stream] Controller closed - skipping tool result processing", {
+          toolCallId: part.toolCallId,
+          toolName: part.toolName,
+        });
         return null;
       }
     } catch (e) {
@@ -2256,14 +2164,10 @@ class AiStreamRepository implements IAiStreamRepository {
     // Clean output by removing undefined values (they break validation)
     // Check for both undefined and null to avoid "Cannot convert null to object" error
     const cleanedOutput =
-      output !== null && output !== undefined
-        ? JSON.parse(JSON.stringify(output))
-        : undefined;
+      output !== null && output !== undefined ? JSON.parse(JSON.stringify(output)) : undefined;
 
     // Validate and type the output using type guard
-    const validatedOutput: ToolCallResult | undefined = isValidToolResult(
-      cleanedOutput,
-    )
+    const validatedOutput: ToolCallResult | undefined = isValidToolResult(cleanedOutput)
       ? cleanedOutput
       : undefined;
 
@@ -2293,22 +2197,13 @@ class AiStreamRepository implements IAiStreamRepository {
       try {
         controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
       } catch (e) {
-        if (
-          e instanceof TypeError &&
-          e.message.includes("Controller is already closed")
-        ) {
-          logger.info(
-            "[AI Stream] Controller closed - skipping message event",
-            {
-              toolCallId: part.toolCallId,
-            },
-          );
+        if (e instanceof TypeError && e.message.includes("Controller is already closed")) {
+          logger.info("[AI Stream] Controller closed - skipping message event", {
+            toolCallId: part.toolCallId,
+          });
           return null;
         }
-        logger.error(
-          "[AI Stream] Failed to enqueue tool message event",
-          parseError(e),
-        );
+        logger.error("[AI Stream] Failed to enqueue tool message event", parseError(e));
         return null;
       }
 
@@ -2334,13 +2229,10 @@ class AiStreamRepository implements IAiStreamRepository {
         });
         controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
 
-        logger.info(
-          "[AI Stream] ERROR MESSAGE_CREATED event sent (incognito)",
-          {
-            errorMessageId,
-            toolError,
-          },
-        );
+        logger.info("[AI Stream] ERROR MESSAGE_CREATED event sent (incognito)", {
+          errorMessageId,
+          toolError,
+        });
       }
     } else {
       // DB mode: Create ERROR message first if error (proper timestamp order)
@@ -2377,15 +2269,12 @@ class AiStreamRepository implements IAiStreamRepository {
         .returning({ id: chatMessages.id });
 
       if (updateResult.length === 0) {
-        logger.error(
-          "[AI Stream] CRITICAL: Tool message update failed - message not found in DB",
-          {
-            messageId: toolMessageId,
-            toolCallId: part.toolCallId,
-            toolName: part.toolName,
-            threadId,
-          },
-        );
+        logger.error("[AI Stream] CRITICAL: Tool message update failed - message not found in DB", {
+          messageId: toolMessageId,
+          toolCallId: part.toolCallId,
+          toolName: part.toolName,
+          threadId,
+        });
         // Message doesn't exist - this shouldn't happen since we created it in processToolCall
         // But if it does, we need to create it now
         await createToolMessage({
@@ -2435,23 +2324,14 @@ class AiStreamRepository implements IAiStreamRepository {
     try {
       controller.enqueue(encoder.encode(formatSSEEvent(toolResultEvent)));
     } catch (e) {
-      if (
-        e instanceof TypeError &&
-        e.message.includes("Controller is already closed")
-      ) {
-        logger.info(
-          "[AI Stream] Controller closed - skipping tool result event",
-          {
-            toolCallId: part.toolCallId,
-            toolName: part.toolName,
-          },
-        );
+      if (e instanceof TypeError && e.message.includes("Controller is already closed")) {
+        logger.info("[AI Stream] Controller closed - skipping tool result event", {
+          toolCallId: part.toolCallId,
+          toolName: part.toolName,
+        });
         return null;
       }
-      logger.error(
-        "[AI Stream] Failed to enqueue tool result event",
-        parseError(e),
-      );
+      logger.error("[AI Stream] Failed to enqueue tool result event", parseError(e));
       return null;
     }
 

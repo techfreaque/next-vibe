@@ -8,11 +8,7 @@ import "server-only";
 import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -180,11 +176,7 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       for (const filePath of clientEnvFilePaths) {
         const result = validateEnvFileExports(filePath, true);
         if (result.isValid && result.module && result.exportName) {
-          const outputFile = join(
-            process.cwd(),
-            data.outputDir,
-            "env-client.ts",
-          );
+          const outputFile = join(process.cwd(), data.outputDir, "env-client.ts");
           validClientModules.push({
             filePath,
             relativePath: getRelativeImportPath(filePath, outputFile),
@@ -239,33 +231,21 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
           validServerModules,
           join(process.cwd(), serverOutputPath),
         );
-        await writeGeneratedFile(
-          join(process.cwd(), serverOutputPath),
-          serverContent,
-          false,
-        );
+        await writeGeneratedFile(join(process.cwd(), serverOutputPath), serverContent, false);
 
         // Generate client env file
         const clientContent = this.generateClientEnvContent(
           validClientModules,
           join(process.cwd(), clientOutputPath),
         );
-        await writeGeneratedFile(
-          join(process.cwd(), clientOutputPath),
-          clientContent,
-          false,
-        );
+        await writeGeneratedFile(join(process.cwd(), clientOutputPath), clientContent, false);
 
         // Generate .env.example file
         const envExampleContent = this.generateEnvExampleContent([
           ...validServerModules,
           ...validClientModules,
         ]);
-        await writeGeneratedFile(
-          join(process.cwd(), envExamplePath),
-          envExampleContent,
-          false,
-        );
+        await writeGeneratedFile(join(process.cwd(), envExamplePath), envExampleContent, false);
       }
 
       const duration = Date.now() - startTime;
@@ -312,17 +292,10 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
   /**
    * Generate server env file content
    */
-  private generateServerEnvContent(
-    modules: EnvFileInfo[],
-    outputFile: string,
-  ): string {
-    const header = generateFileHeader(
-      "AUTO-GENERATED FILE - DO NOT EDIT",
-      "Env Generator",
-      {
-        command: "vibe generate:env",
-      },
-    );
+  private generateServerEnvContent(modules: EnvFileInfo[], outputFile: string): string {
+    const header = generateFileHeader("AUTO-GENERATED FILE - DO NOT EDIT", "Env Generator", {
+      command: "vibe generate:env",
+    });
 
     // Generate imports
     const imports: string[] = [];
@@ -332,15 +305,11 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
     }
 
     // Generate module names for registry
-    const moduleEntries = modules
-      .map((m) => `  "${m.moduleName}": ${m.exportName},`)
-      .join("\n");
+    const moduleEntries = modules.map((m) => `  "${m.moduleName}": ${m.exportName},`).join("\n");
 
     // Generate schema merge chain
     const schemaChain = modules
-      .map((m, i) =>
-        i === 0 ? `${m.exportName}.schema` : `.merge(${m.exportName}.schema)`,
-      )
+      .map((m, i) => (i === 0 ? `${m.exportName}.schema` : `.merge(${m.exportName}.schema)`))
       .join("\n  ");
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -414,17 +383,10 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
   /**
    * Generate client env file content
    */
-  private generateClientEnvContent(
-    modules: EnvFileInfo[],
-    outputFile: string,
-  ): string {
-    const header = generateFileHeader(
-      "AUTO-GENERATED FILE - DO NOT EDIT",
-      "Env Generator",
-      {
-        command: "vibe generate:env",
-      },
-    );
+  private generateClientEnvContent(modules: EnvFileInfo[], outputFile: string): string {
+    const header = generateFileHeader("AUTO-GENERATED FILE - DO NOT EDIT", "Env Generator", {
+      command: "vibe generate:env",
+    });
 
     // Generate imports
     const imports: string[] = [];
@@ -434,15 +396,11 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
     }
 
     // Generate module names for registry
-    const moduleEntries = modules
-      .map((m) => `  "${m.moduleName}": ${m.exportName},`)
-      .join("\n");
+    const moduleEntries = modules.map((m) => `  "${m.moduleName}": ${m.exportName},`).join("\n");
 
     // Generate schema merge chain
     const schemaChain = modules
-      .map((m, i) =>
-        i === 0 ? `${m.exportName}.schema` : `.merge(${m.exportName}.schema)`,
-      )
+      .map((m, i) => (i === 0 ? `${m.exportName}.schema` : `.merge(${m.exportName}.schema)`))
       .join("\n  ");
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -521,13 +479,9 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
 
     for (const mod of modulesWithEntries) {
       // Add section header with description
-      lines.push(
-        `# ============================================================================`,
-      );
+      lines.push(`# ============================================================================`);
       lines.push(`# ${mod.description || mod.moduleName}`);
-      lines.push(
-        `# ============================================================================`,
-      );
+      lines.push(`# ============================================================================`);
 
       // Add each entry
       for (const entry of mod.envExampleEntries || []) {

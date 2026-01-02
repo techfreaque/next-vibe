@@ -59,8 +59,7 @@ export const translations: typeof enTranslations = {
     },
     unauthorized: {
       title: "Nicht autorisiert",
-      description:
-        "Authentifizierung erforderlich für Zugriff auf diesen Endpunkt",
+      description: "Authentifizierung erforderlich für Zugriff auf diesen Endpunkt",
     },
     forbidden: {
       title: "Zugriff verweigert",

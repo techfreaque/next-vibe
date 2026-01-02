@@ -96,33 +96,23 @@ export default async function LeadsEmailsPage({
                       className="hover:shadow-lg transition-shadow"
                     >
                       <CardHeader className="pb-3">
-                        <CardTitle className="text-lg">
-                          {getStageDisplayName(stage)}
-                        </CardTitle>
+                        <CardTitle className="text-lg">{getStageDisplayName(stage)}</CardTitle>
                       </CardHeader>
                       <CardContent className="flex flex-col gap-3">
                         <Div className="text-sm text-gray-600 dark:text-gray-400">
                           <P>
-                            <Strong>
-                              {t("app.admin.leads.leads.admin.emails.journey")}:
-                            </Strong>{" "}
+                            <Strong>{t("app.admin.leads.leads.admin.emails.journey")}:</Strong>{" "}
                             {journey.info.name}
                           </P>
                           <P>
-                            <Strong>
-                              {t("app.admin.leads.leads.admin.emails.stage")}:
-                            </Strong>{" "}
+                            <Strong>{t("app.admin.leads.leads.admin.emails.stage")}:</Strong>{" "}
                             {getStageDisplayName(stage)}
                           </P>
                         </Div>
 
                         <Button asChild className="w-full">
-                          <Link
-                            href={`/${locale}/admin/leads/emails/${journey.variant}/${stage}`}
-                          >
-                            {t(
-                              "app.admin.leads.leads.admin.emails.view_preview",
-                            )}
+                          <Link href={`/${locale}/admin/leads/emails/${journey.variant}/${stage}`}>
+                            {t("app.admin.leads.leads.admin.emails.view_preview")}
                           </Link>
                         </Button>
                       </CardContent>
@@ -137,8 +127,7 @@ export default async function LeadsEmailsPage({
                       {t("app.admin.leads.leads.admin.emails.total_templates")}:
                     </Span>
                     <Span className="font-medium">
-                      {journey.stages.length}{" "}
-                      {t("app.admin.leads.leads.admin.emails.templates")}
+                      {journey.stages.length} {t("app.admin.leads.leads.admin.emails.templates")}
                     </Span>
                   </Div>
                 </Div>

@@ -155,11 +155,7 @@ export function ToastAction({
 }
 ToastAction.displayName = "ToastAction";
 
-export function ToastClose({
-  className,
-  style,
-  children,
-}: ToastCloseProps): React.JSX.Element {
+export function ToastClose({ className, style, children }: ToastCloseProps): React.JSX.Element {
   const { t } = useTranslation();
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
@@ -187,11 +183,7 @@ export function ToastTitle({
   children,
 }: ToastTitleProps): React.JSX.Element {
   // Native uses className for styling via NativeWind (either style OR className, not both)
-  return (
-    <Span className={cn("text-sm font-semibold text-foreground", className)}>
-      {children}
-    </Span>
-  );
+  return <Span className={cn("text-sm font-semibold text-foreground", className)}>{children}</Span>;
 }
 ToastTitle.displayName = "ToastTitle";
 
@@ -202,11 +194,7 @@ export function ToastDescription({
   children,
 }: ToastDescriptionProps): React.JSX.Element {
   // Native uses className for styling via NativeWind (either style OR className, not both)
-  return (
-    <Span className={cn("text-sm opacity-90 text-foreground", className)}>
-      {children}
-    </Span>
-  );
+  return <Span className={cn("text-sm opacity-90 text-foreground", className)}>{children}</Span>;
 }
 ToastDescription.displayName = "ToastDescription";
 

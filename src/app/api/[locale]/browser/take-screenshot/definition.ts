@@ -27,10 +27,7 @@ const { POST } = createEndpoint({
   description: "app.api.browser.take-screenshot.description",
   category: "app.api.browser.category",
   icon: "camera",
-  tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.captureAutomation",
-  ],
+  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.captureAutomation"],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -55,10 +52,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.browser.take-screenshot.form.fields.uid.label",
-          description:
-            "app.api.browser.take-screenshot.form.fields.uid.description",
-          placeholder:
-            "app.api.browser.take-screenshot.form.fields.uid.placeholder",
+          description: "app.api.browser.take-screenshot.form.fields.uid.description",
+          placeholder: "app.api.browser.take-screenshot.form.fields.uid.placeholder",
           columns: 4,
         },
         z
@@ -73,10 +68,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.browser.take-screenshot.form.fields.fullPage.label",
-          description:
-            "app.api.browser.take-screenshot.form.fields.fullPage.description",
-          placeholder:
-            "app.api.browser.take-screenshot.form.fields.fullPage.placeholder",
+          description: "app.api.browser.take-screenshot.form.fields.fullPage.description",
+          placeholder: "app.api.browser.take-screenshot.form.fields.fullPage.placeholder",
           columns: 4,
         },
         z
@@ -91,26 +84,21 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.browser.take-screenshot.form.fields.format.label",
-          description:
-            "app.api.browser.take-screenshot.form.fields.format.description",
-          placeholder:
-            "app.api.browser.take-screenshot.form.fields.format.placeholder",
+          description: "app.api.browser.take-screenshot.form.fields.format.description",
+          placeholder: "app.api.browser.take-screenshot.form.fields.format.placeholder",
           columns: 4,
           options: [
             {
               value: "png",
-              label:
-                "app.api.browser.take-screenshot.form.fields.format.options.png" as const,
+              label: "app.api.browser.take-screenshot.form.fields.format.options.png" as const,
             },
             {
               value: "jpeg",
-              label:
-                "app.api.browser.take-screenshot.form.fields.format.options.jpeg" as const,
+              label: "app.api.browser.take-screenshot.form.fields.format.options.jpeg" as const,
             },
             {
               value: "webp",
-              label:
-                "app.api.browser.take-screenshot.form.fields.format.options.webp" as const,
+              label: "app.api.browser.take-screenshot.form.fields.format.options.webp" as const,
             },
           ],
         },
@@ -118,19 +106,15 @@ const { POST } = createEndpoint({
           .enum(["png", "jpeg", "webp"])
           .optional()
           .default("png")
-          .describe(
-            'Type of format to save the screenshot as. Default is "png"',
-          ),
+          .describe('Type of format to save the screenshot as. Default is "png"'),
       ),
       quality: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.browser.take-screenshot.form.fields.quality.label",
-          description:
-            "app.api.browser.take-screenshot.form.fields.quality.description",
-          placeholder:
-            "app.api.browser.take-screenshot.form.fields.quality.placeholder",
+          description: "app.api.browser.take-screenshot.form.fields.quality.description",
+          placeholder: "app.api.browser.take-screenshot.form.fields.quality.placeholder",
           columns: 4,
         },
         z
@@ -147,10 +131,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.browser.take-screenshot.form.fields.filePath.label",
-          description:
-            "app.api.browser.take-screenshot.form.fields.filePath.description",
-          placeholder:
-            "app.api.browser.take-screenshot.form.fields.filePath.placeholder",
+          description: "app.api.browser.take-screenshot.form.fields.filePath.description",
+          placeholder: "app.api.browser.take-screenshot.form.fields.filePath.placeholder",
           columns: 8,
         },
         z
@@ -167,9 +149,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.browser.take-screenshot.response.success",
         },
-        z
-          .boolean()
-          .describe("Whether the screenshot capture operation succeeded"),
+        z.boolean().describe("Whether the screenshot capture operation succeeded"),
       ),
       result: responseField(
         {
@@ -178,18 +158,10 @@ const { POST } = createEndpoint({
         },
         z
           .object({
-            captured: z
-              .boolean()
-              .describe("Whether the screenshot was captured"),
+            captured: z.boolean().describe("Whether the screenshot was captured"),
             format: z.string().describe("Format of the screenshot"),
-            filePath: z
-              .string()
-              .optional()
-              .describe("Path where screenshot was saved"),
-            data: z
-              .string()
-              .optional()
-              .describe("Base64 encoded screenshot data"),
+            filePath: z.string().optional().describe("Path where screenshot was saved"),
+            data: z.string().optional().describe("Base64 encoded screenshot data"),
           })
           .optional()
           .describe("Result of screenshot capture"),
@@ -230,8 +202,7 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.browser.take-screenshot.errors.validation.title",
-      description:
-        "app.api.browser.take-screenshot.errors.validation.description",
+      description: "app.api.browser.take-screenshot.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.browser.take-screenshot.errors.network.title",
@@ -239,23 +210,19 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.browser.take-screenshot.errors.unauthorized.title",
-      description:
-        "app.api.browser.take-screenshot.errors.unauthorized.description",
+      description: "app.api.browser.take-screenshot.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.browser.take-screenshot.errors.forbidden.title",
-      description:
-        "app.api.browser.take-screenshot.errors.forbidden.description",
+      description: "app.api.browser.take-screenshot.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.browser.take-screenshot.errors.notFound.title",
-      description:
-        "app.api.browser.take-screenshot.errors.notFound.description",
+      description: "app.api.browser.take-screenshot.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.browser.take-screenshot.errors.serverError.title",
-      description:
-        "app.api.browser.take-screenshot.errors.serverError.description",
+      description: "app.api.browser.take-screenshot.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.browser.take-screenshot.errors.unknown.title",
@@ -263,13 +230,11 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.take-screenshot.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.take-screenshot.errors.unsavedChanges.description",
+      description: "app.api.browser.take-screenshot.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.take-screenshot.errors.conflict.title",
-      description:
-        "app.api.browser.take-screenshot.errors.conflict.description",
+      description: "app.api.browser.take-screenshot.errors.conflict.description",
     },
   },
   successTypes: {

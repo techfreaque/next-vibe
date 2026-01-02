@@ -114,21 +114,17 @@ export const translations = {
     safetyCheckSkippedNotProduction: "Safety check skipped (not in production)",
     safetyCheckFailed: "Database reset safety check failed",
     autoResetSkippedNotDevelopment: "Auto reset skipped (not in development)",
-    operationOnlyAllowedInDevelopment:
-      "Operation only allowed in development environment",
+    operationOnlyAllowedInDevelopment: "Operation only allowed in development environment",
     autoResetTaskNotFound: "Auto-reset task not found",
     taskConfigurationMissing: "Task configuration missing",
-    autoResetStartedSuccessfully:
-      "Development database auto-reset task started successfully",
+    autoResetStartedSuccessfully: "Development database auto-reset task started successfully",
     failedToStartAutoReset: "Failed to start auto-reset task",
     backupVerificationTaskNotFound: "Backup verification task not found",
-    backupVerificationStartedSuccessfully:
-      "Database backup verification started successfully",
+    backupVerificationStartedSuccessfully: "Database backup verification started successfully",
     failedToStartBackupVerification: "Failed to start backup verification",
     autoResetStoppedSuccessfully: "Auto-reset task stopped successfully",
     failedToStopAutoReset: "Failed to stop auto-reset task",
-    backupVerificationStoppedSuccessfully:
-      "Backup verification task stopped successfully",
+    backupVerificationStoppedSuccessfully: "Backup verification task stopped successfully",
     failedToStopBackupVerification: "Failed to stop backup verification task",
     taskNotFound: "Task not found",
     taskDoesNotExist: "Task '{taskName}' does not exist",

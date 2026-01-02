@@ -12,21 +12,14 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { JwtPayloadType } from "../../../../../user/auth/types";
-import type {
-  UninstallRequestOutput,
-  UninstallResponseOutput,
-} from "./definition";
+import type { UninstallRequestOutput, UninstallResponseOutput } from "./definition";
 
 /**
  * Setup Uninstall Repository Interface
@@ -72,9 +65,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
         return success({
           success: true,
           installed: false,
-          message: t(
-            "app.api.system.unifiedInterface.cli.setup.uninstall.post.description",
-          ),
+          message: t("app.api.system.unifiedInterface.cli.setup.uninstall.post.description"),
         });
       }
 
@@ -92,19 +83,14 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
         success: !newStatus.installed,
         installed: newStatus.installed,
         message: newStatus.installed
-          ? t(
-              "app.api.system.unifiedInterface.cli.setup.uninstall.post.errors.server.description",
-            )
-          : t(
-              "app.api.system.unifiedInterface.cli.setup.uninstall.post.success.description",
-            ),
+          ? t("app.api.system.unifiedInterface.cli.setup.uninstall.post.errors.server.description")
+          : t("app.api.system.unifiedInterface.cli.setup.uninstall.post.success.description"),
         output: data.verbose ? output : undefined,
       });
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message:
-          "app.api.system.unifiedInterface.cli.setup.uninstall.post.errors.server.title",
+        message: "app.api.system.unifiedInterface.cli.setup.uninstall.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,
@@ -132,9 +118,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
         try {
           const packageJsonPath = path.join(process.cwd(), "package.json");
           if (existsSync(packageJsonPath)) {
-            const packageJson = JSON.parse(
-              await readFile(packageJsonPath, "utf8"),
-            ) as {
+            const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8")) as {
               version?: string;
             };
             version = packageJson.version;

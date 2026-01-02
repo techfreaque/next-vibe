@@ -6,11 +6,7 @@
 /* eslint-disable i18next/no-literal-string */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -116,20 +112,11 @@ export interface MigrationTaskManagementRepository {
     options?: TaskOptions,
   ): Promise<MigrationTaskResult>;
 
-  stopAutoMigration(
-    logger: EndpointLogger,
-    taskName?: string,
-  ): Promise<MigrationTaskResult>;
+  stopAutoMigration(logger: EndpointLogger, taskName?: string): Promise<MigrationTaskResult>;
 
-  stopBackupMonitor(
-    logger: EndpointLogger,
-    taskName?: string,
-  ): Promise<MigrationTaskResult>;
+  stopBackupMonitor(logger: EndpointLogger, taskName?: string): Promise<MigrationTaskResult>;
 
-  getMigrationStatus(
-    taskName: string,
-    logger: EndpointLogger,
-  ): Promise<MigrationTaskResult>;
+  getMigrationStatus(taskName: string, logger: EndpointLogger): Promise<MigrationTaskResult>;
 
   listMigrationTasks(logger: EndpointLogger): Promise<MigrationTaskResult>;
 }
@@ -137,9 +124,7 @@ export interface MigrationTaskManagementRepository {
 /**
  * Database Migration Task Management Repository Implementation
  */
-export class MigrationTaskManagementRepositoryImpl
-  implements MigrationTaskManagementRepository
-{
+export class MigrationTaskManagementRepositoryImpl implements MigrationTaskManagementRepository {
   private migrationTasks: Map<string, MigrationTask> = new Map();
   private runningTasks: Map<string, AbortController> = new Map();
 
@@ -161,9 +146,7 @@ export class MigrationTaskManagementRepositoryImpl
       });
 
       // For multi-select operations, execute the first one (in real implementation, might execute all)
-      const operation = Array.isArray(data.operation)
-        ? data.operation[0]
-        : data.operation;
+      const operation = Array.isArray(data.operation) ? data.operation[0] : data.operation;
       const taskName = data.taskName;
       const options = data.options || {};
 
@@ -193,8 +176,7 @@ export class MigrationTaskManagementRepositoryImpl
           break;
         default:
           return fail({
-            message:
-              "app.api.system.db.migrate.taskManagement.errors.validation.title",
+            message: "app.api.system.db.migrate.taskManagement.errors.validation.title",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { operation },
           });
@@ -226,8 +208,7 @@ export class MigrationTaskManagementRepositoryImpl
       logger.error("Migration task operation execution failed", parsedError);
 
       return fail({
-        message:
-          "app.api.system.db.migrate.taskManagement.errors.internal.title",
+        message: "app.api.system.db.migrate.taskManagement.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -415,10 +396,7 @@ export class MigrationTaskManagementRepositoryImpl
   /**
    * Stop auto migration task
    */
-  async stopAutoMigration(
-    logger: EndpointLogger,
-    taskName?: string,
-  ): Promise<MigrationTaskResult> {
+  async stopAutoMigration(logger: EndpointLogger, taskName?: string): Promise<MigrationTaskResult> {
     logger.info("Stopping auto migration", { taskName });
     await new Promise<void>((resolve) => {
       setTimeout(() => resolve(), 10);
@@ -449,10 +427,7 @@ export class MigrationTaskManagementRepositoryImpl
   /**
    * Stop backup monitor task
    */
-  async stopBackupMonitor(
-    logger: EndpointLogger,
-    taskName?: string,
-  ): Promise<MigrationTaskResult> {
+  async stopBackupMonitor(logger: EndpointLogger, taskName?: string): Promise<MigrationTaskResult> {
     logger.info("Stopping backup monitor", { taskName });
     await new Promise<void>((resolve) => {
       setTimeout(() => resolve(), 10);
@@ -489,10 +464,7 @@ export class MigrationTaskManagementRepositoryImpl
   /**
    * Get status of a specific migration task
    */
-  async getMigrationStatus(
-    taskName: string,
-    logger: EndpointLogger,
-  ): Promise<MigrationTaskResult> {
+  async getMigrationStatus(taskName: string, logger: EndpointLogger): Promise<MigrationTaskResult> {
     logger.info("Getting migration status", { taskName });
     await new Promise<void>((resolve) => {
       setTimeout(() => resolve(), 10);
@@ -535,9 +507,7 @@ export class MigrationTaskManagementRepositoryImpl
   /**
    * List all available migration tasks
    */
-  async listMigrationTasks(
-    logger: EndpointLogger,
-  ): Promise<MigrationTaskResult> {
+  async listMigrationTasks(logger: EndpointLogger): Promise<MigrationTaskResult> {
     logger.info("Listing migration tasks");
     await new Promise<void>((resolve) => {
       setTimeout(() => resolve(), 10);
@@ -652,5 +622,4 @@ export class MigrationTaskManagementRepositoryImpl
 /**
  * Database Migration Task Management Repository Instance
  */
-export const migrationTaskManagementRepository =
-  new MigrationTaskManagementRepositoryImpl();
+export const migrationTaskManagementRepository = new MigrationTaskManagementRepositoryImpl();

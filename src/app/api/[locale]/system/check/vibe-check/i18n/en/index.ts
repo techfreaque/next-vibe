@@ -79,8 +79,7 @@ export const translations = {
     },
     maxFilesInSummary: {
       label: "Max Files in Summary",
-      description:
-        "Maximum number of files to show in the affected files list (1-1000)",
+      description: "Maximum number of files to show in the affected files list (1-1000)",
     },
   },
 

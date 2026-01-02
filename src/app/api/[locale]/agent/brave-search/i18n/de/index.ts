@@ -23,8 +23,7 @@ export const translations: typeof enTranslations = {
       },
       includeNews: {
         title: "Nachrichten einbeziehen",
-        description:
-          "Nachrichtenergebnisse für aktuelle Ereignisse einbeziehen",
+        description: "Nachrichtenergebnisse für aktuelle Ereignisse einbeziehen",
       },
       freshness: {
         title: "Aktualität",

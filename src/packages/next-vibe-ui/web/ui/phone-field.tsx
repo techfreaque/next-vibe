@@ -96,9 +96,7 @@ export function PhoneField({
   const [open, setOpen] = useState(false);
 
   // Parse the current value to extract country and number
-  const parsePhoneValue = (
-    phoneValue: string,
-  ): { country: string; number: string } => {
+  const parsePhoneValue = (phoneValue: string): { country: string; number: string } => {
     if (!phoneValue) {
       return {
         country: defaultCountry || "US",
@@ -107,9 +105,7 @@ export function PhoneField({
     }
 
     // Find matching country by prefix
-    const matchingCountry = COUNTRIES.find((country) =>
-      phoneValue.startsWith(country.prefix),
-    );
+    const matchingCountry = COUNTRIES.find((country) => phoneValue.startsWith(country.prefix));
 
     if (matchingCountry) {
       return {
@@ -121,28 +117,20 @@ export function PhoneField({
     return { country: defaultCountry || "US", number: phoneValue };
   };
 
-  const { country: selectedCountry, number: phoneNumber } =
-    parsePhoneValue(value);
-  const currentCountry =
-    COUNTRIES.find((c) => c.code === selectedCountry) || COUNTRIES[0];
+  const { country: selectedCountry, number: phoneNumber } = parsePhoneValue(value);
+  const currentCountry = COUNTRIES.find((c) => c.code === selectedCountry) || COUNTRIES[0];
 
   // Organize countries with preferred ones first
   const organizedCountries = useMemo(() => {
-    const preferred = COUNTRIES.filter((country) =>
-      preferredCountries.includes(country.code),
-    );
-    const others = COUNTRIES.filter(
-      (country) => !preferredCountries.includes(country.code),
-    );
+    const preferred = COUNTRIES.filter((country) => preferredCountries.includes(country.code));
+    const others = COUNTRIES.filter((country) => !preferredCountries.includes(country.code));
     return { preferred, others };
   }, [preferredCountries]);
 
   const handleCountrySelect = (countryCode: string): void => {
     const newCountry = COUNTRIES.find((c) => c.code === countryCode);
     if (newCountry) {
-      const newValue = phoneNumber
-        ? `${newCountry.prefix} ${phoneNumber}`
-        : newCountry.prefix;
+      const newValue = phoneNumber ? `${newCountry.prefix} ${phoneNumber}` : newCountry.prefix;
       onChange(newValue);
     }
     setOpen(false);
@@ -151,9 +139,7 @@ export function PhoneField({
   const handleNumberChange = (newNumber: string): void => {
     // Remove any non-digit characters except spaces and dashes
     const cleanNumber = newNumber.replaceAll(/[^\d\s-]/g, "");
-    const newValue = cleanNumber
-      ? `${currentCountry.prefix} ${cleanNumber}`
-      : "";
+    const newValue = cleanNumber ? `${currentCountry.prefix} ${cleanNumber}` : "";
     onChange(newValue);
   };
 
@@ -182,18 +168,12 @@ export function PhoneField({
         </PopoverTrigger>
         <PopoverContent className="w-[300px] p-0" align="start">
           <Command id="country-listbox">
-            <CommandInput
-              placeholder={_t("packages.nextVibeUi.web.common.searchCountries")}
-            />
+            <CommandInput placeholder={_t("packages.nextVibeUi.web.common.searchCountries")} />
             <CommandList className="max-h-[200px]">
-              <CommandEmpty>
-                {_t("packages.nextVibeUi.web.common.noCountryFound")}
-              </CommandEmpty>
+              <CommandEmpty>{_t("packages.nextVibeUi.web.common.noCountryFound")}</CommandEmpty>
 
               {organizedCountries.preferred.length > 0 && (
-                <CommandGroup
-                  heading={_t("packages.nextVibeUi.web.common.preferred")}
-                >
+                <CommandGroup heading={_t("packages.nextVibeUi.web.common.preferred")}>
                   {organizedCountries.preferred.map((country) => (
                     <CommandItem
                       key={country.code}
@@ -205,17 +185,13 @@ export function PhoneField({
                         <span className="text-lg">{country.flag}</span>
                         <span>{country.name}</span>
                       </div>
-                      <span className="text-sm text-muted-foreground">
-                        {country.prefix}
-                      </span>
+                      <span className="text-sm text-muted-foreground">{country.prefix}</span>
                     </CommandItem>
                   ))}
                 </CommandGroup>
               )}
 
-              <CommandGroup
-                heading={_t("packages.nextVibeUi.web.common.allCountries")}
-              >
+              <CommandGroup heading={_t("packages.nextVibeUi.web.common.allCountries")}>
                 {organizedCountries.others.map((country) => (
                   <CommandItem
                     key={country.code}
@@ -227,9 +203,7 @@ export function PhoneField({
                       <span className="text-lg">{country.flag}</span>
                       <span>{country.name}</span>
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      {country.prefix}
-                    </span>
+                    <span className="text-sm text-muted-foreground">{country.prefix}</span>
                   </CommandItem>
                 ))}
               </CommandGroup>

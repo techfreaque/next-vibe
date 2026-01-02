@@ -15,8 +15,7 @@ export const translations: typeof enTranslations = {
     fields: {
       dryRun: {
         label: "Próbny przebieg",
-        description:
-          "Wykonaj próbny przebieg bez wprowadzania rzeczywistych zmian",
+        description: "Wykonaj próbny przebieg bez wprowadzania rzeczywistych zmian",
       },
       taskNames: {
         label: "Nazwy zadań",

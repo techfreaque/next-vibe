@@ -66,9 +66,7 @@ export enum ChartType {
 export const baseStatsFilterSchema = z.object({
   // Time-based filtering
   timePeriod: z.enum(TimePeriod).default(TimePeriod.DAY),
-  dateRangePreset: z
-    .nativeEnum(DateRangePreset)
-    .default(DateRangePreset.LAST_30_DAYS),
+  dateRangePreset: z.nativeEnum(DateRangePreset).default(DateRangePreset.LAST_30_DAYS),
   dateFrom: dateSchema.optional(),
   dateTo: dateSchema.optional(),
 
@@ -90,12 +88,8 @@ export const historicalDataPointSchema = z.object({
   date: dateSchema,
   value: z.coerce.number(),
   label: z.string().optional() as z.ZodType<TranslationKey | undefined>,
-  labelParams: z
-    .record(z.string(), z.union([z.string(), z.coerce.number()]))
-    .optional(),
-  metadata: z
-    .record(z.string(), z.union([z.string(), z.coerce.number(), z.boolean()]))
-    .optional(),
+  labelParams: z.record(z.string(), z.union([z.string(), z.coerce.number()])).optional(),
+  metadata: z.record(z.string(), z.union([z.string(), z.coerce.number(), z.boolean()])).optional(),
 });
 
 export type HistoricalDataPointType = z.infer<typeof historicalDataPointSchema>;
@@ -106,17 +100,13 @@ export type HistoricalDataPointType = z.infer<typeof historicalDataPointSchema>;
  */
 export const historicalDataSeriesSchema = z.object({
   name: z.string() as z.ZodType<TranslationKey>,
-  nameParams: z
-    .record(z.string(), z.union([z.string(), z.coerce.number()]))
-    .optional(),
+  nameParams: z.record(z.string(), z.union([z.string(), z.coerce.number()])).optional(),
   data: z.array(historicalDataPointSchema),
   color: z.string().optional(),
   type: z.enum(ChartType).optional(),
 });
 
-export type HistoricalDataSeriesType = z.infer<
-  typeof historicalDataSeriesSchema
->;
+export type HistoricalDataSeriesType = z.infer<typeof historicalDataSeriesSchema>;
 
 /**
  * Chart Data Schema
@@ -147,54 +137,27 @@ export const currentPeriodStatsSchema = z.object({
   totalOpened: z.coerce.number().optional().describe("Total emails opened"),
   totalClicked: z.coerce.number().optional().describe("Total emails clicked"),
   totalBounced: z.coerce.number().optional().describe("Total emails bounced"),
-  totalUnsubscribed: z.coerce
-    .number()
-    .optional()
-    .describe("Total unsubscribed"),
+  totalUnsubscribed: z.coerce.number().optional().describe("Total unsubscribed"),
 
   // Conversion metrics (for leads)
   totalSignedUp: z.coerce.number().optional().describe("Total leads signed up"),
-  totalConsultationBooked: z
-    .number()
-    .optional()
-    .describe("Total consultations booked"),
-  totalConverted: z.coerce
-    .number()
-    .optional()
-    .describe("Total converted leads"),
+  totalConsultationBooked: z.number().optional().describe("Total consultations booked"),
+  totalConverted: z.coerce.number().optional().describe("Total converted leads"),
 
   // Rate calculations
   openRate: z.coerce.number().optional().describe("Email open rate (0-1)"),
   clickRate: z.coerce.number().optional().describe("Email click rate (0-1)"),
   bounceRate: z.coerce.number().optional().describe("Email bounce rate (0-1)"),
-  unsubscribeRate: z
-    .number()
-    .optional()
-    .describe("Email unsubscribe rate (0-1)"),
-  conversionRate: z.coerce
-    .number()
-    .optional()
-    .describe("Lead conversion rate (0-1)"),
+  unsubscribeRate: z.number().optional().describe("Email unsubscribe rate (0-1)"),
+  conversionRate: z.coerce.number().optional().describe("Lead conversion rate (0-1)"),
   signupRate: z.coerce.number().optional().describe("Lead signup rate (0-1)"),
-  consultationBookingRate: z
-    .number()
-    .optional()
-    .describe("Consultation booking rate (0-1)"),
+  consultationBookingRate: z.number().optional().describe("Consultation booking rate (0-1)"),
 
   // Distribution data
   // Generic string keys - specific implementations should override with proper enum types
-  byType: z
-    .record(z.string(), z.coerce.number())
-    .optional()
-    .describe("Distribution by type"),
-  byStatus: z
-    .record(z.string(), z.coerce.number())
-    .optional()
-    .describe("Distribution by status"),
-  bySource: z
-    .record(z.string(), z.coerce.number())
-    .optional()
-    .describe("Distribution by source"),
+  byType: z.record(z.string(), z.coerce.number()).optional().describe("Distribution by type"),
+  byStatus: z.record(z.string(), z.coerce.number()).optional().describe("Distribution by status"),
+  bySource: z.record(z.string(), z.coerce.number()).optional().describe("Distribution by source"),
   // Proper enum types for country and language
   byCountry: z
     .record(z.custom<Countries>(), z.coerce.number())
@@ -216,10 +179,7 @@ export const currentPeriodStatsSchema = z.object({
     .array(z.record(z.string(), z.unknown()))
     .optional()
     .describe("Top performing items"),
-  recentActivity: z
-    .array(z.record(z.string(), z.unknown()))
-    .optional()
-    .describe("Recent activity"),
+  recentActivity: z.array(z.record(z.string(), z.unknown())).optional().describe("Recent activity"),
 });
 
 export type CurrentPeriodStatsType = z.infer<typeof currentPeriodStatsSchema>;
@@ -289,30 +249,18 @@ export function getDateRangeFromPreset(preset: DateRangePreset): {
       return { from: startOfMonth, to: now };
     }
     case DateRangePreset.LAST_MONTH: {
-      const lastMonthStart = new Date(
-        today.getFullYear(),
-        today.getMonth() - 1,
-        1,
-      );
+      const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
       const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
       lastMonthEnd.setHours(23, 59, 59, 999);
       return { from: lastMonthStart, to: lastMonthEnd };
     }
     case DateRangePreset.THIS_QUARTER: {
-      const quarterStart = new Date(
-        today.getFullYear(),
-        Math.floor(today.getMonth() / 3) * 3,
-        1,
-      );
+      const quarterStart = new Date(today.getFullYear(), Math.floor(today.getMonth() / 3) * 3, 1);
       return { from: quarterStart, to: now };
     }
     case DateRangePreset.LAST_QUARTER: {
       const lastQuarterMonth = Math.floor(today.getMonth() / 3) * 3 - 3;
-      const lastQuarterStart = new Date(
-        today.getFullYear(),
-        lastQuarterMonth,
-        1,
-      );
+      const lastQuarterStart = new Date(today.getFullYear(), lastQuarterMonth, 1);
       if (lastQuarterMonth < 0) {
         lastQuarterStart.setFullYear(today.getFullYear() - 1);
         lastQuarterStart.setMonth(9);
@@ -333,15 +281,7 @@ export function getDateRangeFromPreset(preset: DateRangePreset): {
 
     case DateRangePreset.LAST_YEAR: {
       const lastYearStart = new Date(today.getFullYear() - 1, 0, 1);
-      const lastYearEnd = new Date(
-        today.getFullYear() - 1,
-        11,
-        31,
-        23,
-        59,
-        59,
-        999,
-      );
+      const lastYearEnd = new Date(today.getFullYear() - 1, 11, 31, 23, 59, 59, 999);
       return { from: lastYearStart, to: lastYearEnd };
     }
     default:

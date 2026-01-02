@@ -13,9 +13,7 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class DataListWidgetRenderer extends BaseWidgetRenderer<
-  typeof WidgetType.DATA_LIST
-> {
+export class DataListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_LIST> {
   readonly widgetType = WidgetType.DATA_LIST;
 
   render(props: CLIWidgetProps<typeof WidgetType.DATA_LIST, string>): string {
@@ -33,10 +31,7 @@ export class DataListWidgetRenderer extends BaseWidgetRenderer<
     return this.renderDataList(data, context);
   }
 
-  private renderDataList(
-    data: ProcessedDataList,
-    context: WidgetRenderContext,
-  ): string {
+  private renderDataList(data: ProcessedDataList, context: WidgetRenderContext): string {
     const result: string[] = [];
 
     for (const item of data.items) {

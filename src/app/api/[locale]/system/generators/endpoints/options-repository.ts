@@ -7,11 +7,7 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -105,8 +101,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
     // Validate user permissions
     if (!user?.id) {
       return fail({
-        message:
-          "app.api.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
+        message: "app.api.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: {
           error: t(
@@ -125,17 +120,13 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
 
       switch (data.operation) {
         case "list": {
-          const category =
-            typeof data.category === "string" ? data.category : undefined;
+          const category = typeof data.category === "string" ? data.category : undefined;
           response.options = Object.keys(this.listOptions(category));
           break;
         }
         case "validate":
           if (data.optionName && data.optionValue !== undefined) {
-            const validation = this.validateOptionValue(
-              String(data.optionName),
-              data.optionValue,
-            );
+            const validation = this.validateOptionValue(String(data.optionName), data.optionValue);
             response.validation = {
               isValid: validation.valid,
               errors: validation.errors,
@@ -144,9 +135,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
             response.validation = {
               isValid: false,
               errors: [
-                t(
-                  "app.api.system.unifiedInterface.cli.setup.install.post.errors.validation.title",
-                ),
+                t("app.api.system.unifiedInterface.cli.setup.install.post.errors.validation.title"),
               ],
             };
           }
@@ -154,28 +143,21 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
         case "define":
           // Define new option (implementation would go here)
           response.options = [
-            t(
-              "app.api.system.unifiedInterface.cli.setup.install.post.success.title",
-            ),
+            t("app.api.system.unifiedInterface.cli.setup.install.post.success.title"),
           ];
           break;
         case "parse":
           // Parse option values (implementation would go here)
           response.options = [
-            t(
-              "app.api.system.unifiedInterface.cli.setup.install.post.success.title",
-            ),
+            t("app.api.system.unifiedInterface.cli.setup.install.post.success.title"),
           ];
           break;
         default:
           return fail({
-            message:
-              "app.api.system.generators.endpoints.post.errors.server.title",
+            message: "app.api.system.generators.endpoints.post.errors.server.title",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
-              error: t(
-                "app.api.system.generators.endpoints.post.errors.server.description",
-              ),
+              error: t("app.api.system.generators.endpoints.post.errors.server.description"),
             },
           });
       }
@@ -287,8 +269,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic utility type for runtime object handling
   ): Record<string, string | number | boolean | null | object> {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Generic utility type for runtime object handling
-    const options: Record<string, string | number | boolean | null | object> =
-      {};
+    const options: Record<string, string | number | boolean | null | object> = {};
 
     for (const [name, definition] of this.optionDefinitions) {
       if (!category || definition.category === category) {
@@ -329,11 +310,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
     // Type validation
     switch (definition.type) {
       case "boolean":
-        if (
-          typeof value !== "boolean" &&
-          value !== "true" &&
-          value !== "false"
-        ) {
+        if (typeof value !== "boolean" && value !== "true" && value !== "false") {
           errors.push(`Option ${name} must be a boolean value`);
         }
         break;
@@ -392,9 +369,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
       for (const option of categories[category]) {
         const aliasText = option.alias ? `, -${option.alias}` : "";
         const defaultText =
-          option.default !== undefined
-            ? ` [default: ${String(option.default)}]`
-            : "";
+          option.default !== undefined ? ` [default: ${String(option.default)}]` : "";
         const requiredText = option.required ? " [required]" : "";
 
         helpText += `  --${option.name}${aliasText}\t${option.description}${defaultText}${requiredText}\n`;
@@ -414,10 +389,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
   /**
    * Apply default values to options object and map CLI option names to property names
    */
-  applyOptionDefaults<T>(
-    options: Partial<T>,
-    definitions: OptionDefinitionsMap<T>,
-  ): T {
+  applyOptionDefaults<T>(options: Partial<T>, definitions: OptionDefinitionsMap<T>): T {
     const result = { ...options } as T;
 
     for (const key in definitions) {
@@ -425,26 +397,17 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
       const cliOptionName = definition.name;
 
       // Check if the CLI option name exists in the options (kebab-case)
-      if (
-        cliOptionName in options &&
-        options[cliOptionName as keyof T] !== undefined
-      ) {
+      if (cliOptionName in options && options[cliOptionName as keyof T] !== undefined) {
         // Map the CLI option name to the property name (camelCase) with type conversion
         const value = options[cliOptionName as keyof T];
 
         // Convert string values to proper types for boolean options
         if (definition.type === "boolean" && typeof value === "string") {
-          result[key] = (value.toLowerCase() === "true") as T[Extract<
-            keyof T,
-            string
-          >];
+          result[key] = (value.toLowerCase() === "true") as T[Extract<keyof T, string>];
         } else {
           result[key] = value as T[Extract<keyof T, string>];
         }
-      } else if (
-        definitions[key].default !== undefined &&
-        options[key] === undefined
-      ) {
+      } else if (definitions[key].default !== undefined && options[key] === undefined) {
         // Apply default value if the option is not set
         result[key] = definitions[key].default as T[Extract<keyof T, string>];
       }
@@ -457,7 +420,6 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
 export const cliOptionsRepository = new CliOptionsRepositoryImpl();
 
 // Export utility functions for backward compatibility
-export const defineOptions =
-  cliOptionsRepository.defineOptions.bind(cliOptionsRepository);
+export const defineOptions = cliOptionsRepository.defineOptions.bind(cliOptionsRepository);
 export const applyOptionDefaults =
   cliOptionsRepository.applyOptionDefaults.bind(cliOptionsRepository);

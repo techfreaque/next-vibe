@@ -17,12 +17,7 @@ import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 
 // Re-export all types from web
-export type {
-  SliderRangeProps,
-  SliderRootProps,
-  SliderThumbProps,
-  SliderTrackProps,
-};
+export type { SliderRangeProps, SliderRootProps, SliderThumbProps, SliderTrackProps };
 
 export function Slider({
   value,
@@ -87,11 +82,7 @@ export function SliderTrack({
 }
 SliderTrack.displayName = SliderPrimitive.Track.displayName;
 
-export function SliderRange({
-  className,
-  style,
-  ...props
-}: SliderRangeProps): React.JSX.Element {
+export function SliderRange({ className, style, ...props }: SliderRangeProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
@@ -106,11 +97,7 @@ export function SliderRange({
 }
 SliderRange.displayName = SliderPrimitive.Range.displayName;
 
-export function SliderThumb({
-  className,
-  style,
-  ...props
-}: SliderThumbProps): React.JSX.Element {
+export function SliderThumb({ className, style, ...props }: SliderThumbProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (

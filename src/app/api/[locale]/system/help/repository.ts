@@ -6,11 +6,7 @@
 
 /* eslint-disable i18next/no-literal-string */
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -44,20 +40,13 @@ class HelpRepository {
 
     try {
       // Discover commands (filtered by user permissions from JWT)
-      const commands = definitionsRegistry.getEndpointsForUser(
-        platform,
-        user,
-        logger,
-      );
+      const commands = definitionsRegistry.getEndpointsForUser(platform, user, logger);
 
       if (data.command) {
         // Show help for specific command
         const command = commands.find((cmd) => {
           const toolName = endpointToToolName(cmd);
-          return (
-            toolName === data.command ||
-            cmd.aliases?.includes(data.command || "")
-          );
+          return toolName === data.command || cmd.aliases?.includes(data.command || "");
         });
 
         if (!command) {
@@ -109,9 +98,7 @@ class HelpRepository {
         path: command.path.join("/"),
         method: command.method,
         aliases:
-          command.aliases && command.aliases.length > 0
-            ? command.aliases.join(", ")
-            : undefined,
+          command.aliases && command.aliases.length > 0 ? command.aliases.join(", ") : undefined,
       },
       options: {
         items: [
@@ -157,9 +144,7 @@ class HelpRepository {
   ): HelpResponseOutput {
     // Helper to get display name (first alias or tool name)
     const getDisplayName = (cmd: CreateApiEndpointAny): string =>
-      cmd.aliases && cmd.aliases.length > 0
-        ? cmd.aliases[0]
-        : endpointToToolName(cmd);
+      cmd.aliases && cmd.aliases.length > 0 ? cmd.aliases[0] : endpointToToolName(cmd);
 
     // Prioritize important commands
     const priorityCommands = ["check", "list", "help", "builder"];
@@ -190,9 +175,7 @@ class HelpRepository {
       const { t } = getTranslatorFromEndpoint(cmd)(locale);
       return {
         command: getDisplayName(cmd),
-        description: cmd.description
-          ? t(cmd.description)
-          : "No description available",
+        description: cmd.description ? t(cmd.description) : "No description available",
       };
     });
 
@@ -202,9 +185,7 @@ class HelpRepository {
       const displayName = getDisplayName(cmd);
       return {
         command: `vibe ${displayName}`,
-        description: cmd.description
-          ? t(cmd.description)
-          : `Run ${displayName}`,
+        description: cmd.description ? t(cmd.description) : `Run ${displayName}`,
       };
     });
 

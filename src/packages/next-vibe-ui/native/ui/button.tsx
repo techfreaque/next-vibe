@@ -2,14 +2,8 @@ import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { Pressable, Text as RNText } from "react-native";
 
-import type {
-  ButtonMouseEvent,
-  ButtonProps,
-} from "@/packages/next-vibe-ui/web/ui/button";
-import {
-  buttonTextVariants,
-  buttonVariants,
-} from "@/packages/next-vibe-ui/web/ui/button";
+import type { ButtonMouseEvent, ButtonProps } from "@/packages/next-vibe-ui/web/ui/button";
+import { buttonTextVariants, buttonVariants } from "@/packages/next-vibe-ui/web/ui/button";
 
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
@@ -37,8 +31,7 @@ function Button({
   ...props
 }: ButtonProps): React.JSX.Element {
   // Map web-only props to native equivalents where applicable
-  const accessibilityRole =
-    role === "button" ? "button" : role === "link" ? "link" : "button";
+  const accessibilityRole = role === "button" ? "button" : role === "link" ? "link" : "button";
   const accessible = tabIndex === undefined ? true : tabIndex >= 0;
   // type affects form submission behavior, provide hint for submit buttons
   const accessibilityHint = type === "submit" ? "Submit form" : undefined;
@@ -60,11 +53,7 @@ function Button({
 
   const renderChildren = (content: React.ReactNode): React.ReactNode => {
     if (typeof content === "string") {
-      return (
-        <StyledText className={buttonTextVariants({ variant, size })}>
-          {content}
-        </StyledText>
-      );
+      return <StyledText className={buttonTextVariants({ variant, size })}>{content}</StyledText>;
     }
 
     if (Array.isArray(content)) {
@@ -73,10 +62,7 @@ function Button({
         // Leave React elements (like icons) as-is
         if (typeof child === "string") {
           return (
-            <StyledText
-              key={index}
-              className={buttonTextVariants({ variant, size })}
-            >
+            <StyledText key={index} className={buttonTextVariants({ variant, size })}>
               {child}
             </StyledText>
           );
@@ -101,10 +87,7 @@ function Button({
       accessibilityHint={accessibilityHint}
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          disabled && "opacity-50",
-          buttonVariants({ variant, size, className }),
-        ),
+        className: cn(disabled && "opacity-50", buttonVariants({ variant, size, className })),
       })}
       {...props}
     >

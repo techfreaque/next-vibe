@@ -77,9 +77,7 @@ export function LeadsStatsChart({
   const { t } = simpleT(locale);
 
   // State for managing which series are visible
-  const [visibleSeries, setVisibleSeries] = useState<Record<string, boolean>>(
-    {},
-  );
+  const [visibleSeries, setVisibleSeries] = useState<Record<string, boolean>>({});
   const [visibleSources, setVisibleSources] = useState<
     Partial<Record<typeof LeadSourceValues, boolean>>
   >({});
@@ -99,11 +97,9 @@ export function LeadsStatsChart({
   useEffect(() => {
     if (data?.sourceData) {
       const initial: Partial<Record<typeof LeadSourceValues, boolean>> = {};
-      (Object.keys(data.sourceData) as Array<typeof LeadSourceValues>).forEach(
-        (source) => {
-          initial[source] = true;
-        },
-      );
+      (Object.keys(data.sourceData) as Array<typeof LeadSourceValues>).forEach((source) => {
+        initial[source] = true;
+      });
       setVisibleSources(initial);
     }
   }, [data?.sourceData]);
@@ -141,9 +137,7 @@ export function LeadsStatsChart({
 
   const toggleSource = (sourceTranslationKey: TranslationKey): void => {
     // Find the option that has this translation key as its label
-    const option = LeadSourceOptions.find(
-      (opt) => opt.label === sourceTranslationKey,
-    );
+    const option = LeadSourceOptions.find((opt) => opt.label === sourceTranslationKey);
 
     if (option) {
       // option.value is the enum key (e.g., "WEBSITE")
@@ -195,11 +189,8 @@ export function LeadsStatsChart({
   };
 
   const toggleAllSources = (): void => {
-    const visibleValues = Object.values(visibleSources).filter(
-      (v) => v !== undefined,
-    );
-    const allVisible =
-      visibleValues.length > 0 && visibleValues.every((visible) => visible);
+    const visibleValues = Object.values(visibleSources).filter((v) => v !== undefined);
+    const allVisible = visibleValues.length > 0 && visibleValues.every((visible) => visible);
     if (allVisible) {
       hideAllSources();
     } else {
@@ -224,9 +215,7 @@ export function LeadsStatsChart({
     return (
       <Card className={className}>
         <CardHeader>
-          <CardTitle>
-            {t("app.admin.leads.leads.admin.stats.chart.title")}
-          </CardTitle>
+          <CardTitle>{t("app.admin.leads.leads.admin.stats.chart.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Div style={{ height: `${height}px` }}>
@@ -242,8 +231,7 @@ export function LeadsStatsChart({
   const language = getLanguageFromLocale(locale);
 
   // Filter visible series
-  const activeSeries =
-    data?.series?.filter((series) => visibleSeries[series.name]) || [];
+  const activeSeries = data?.series?.filter((series) => visibleSeries[series.name]) || [];
 
   // Create a map to store original values for tooltip display
   const originalValuesMap = new Map<string, Record<string, number>>();
@@ -253,10 +241,7 @@ export function LeadsStatsChart({
     data?.series?.[0]?.data.map((point, index) => {
       const dataPoint: Record<string, number | string> = {
         date: new Date(point.date).toLocaleDateString(language),
-        dateValue:
-          typeof point.date === "string"
-            ? point.date
-            : new Date(point.date).toISOString(),
+        dateValue: typeof point.date === "string" ? point.date : new Date(point.date).toISOString(),
       };
 
       const originalValues: Record<string, number> = {};
@@ -278,9 +263,7 @@ export function LeadsStatsChart({
 
       // Store original values with date as key
       const dateKey =
-        typeof point.date === "string"
-          ? point.date
-          : new Date(point.date).toISOString();
+        typeof point.date === "string" ? point.date : new Date(point.date).toISOString();
       originalValuesMap.set(dateKey, originalValues);
 
       return dataPoint;
@@ -292,33 +275,26 @@ export function LeadsStatsChart({
       name: series.name,
       color:
         series.color ||
-        CHART_CONSTANTS.DEFAULT_COLORS[
-          index % CHART_CONSTANTS.DEFAULT_COLORS.length
-        ],
+        CHART_CONSTANTS.DEFAULT_COLORS[index % CHART_CONSTANTS.DEFAULT_COLORS.length],
       visible: visibleSeries[series.name] || false,
     })) || [];
 
   // Prepare source legend data
   const sourceLegendData = data?.sourceData
-    ? (
-        Object.entries(data.sourceData) as Array<
-          [typeof LeadSourceValues, number]
-        >
-      ).map(([source, count]) => {
-        const total = Object.values(data.sourceData || {}).reduce(
-          (sum, val) => sum + val,
-          0,
-        );
+    ? (Object.entries(data.sourceData) as Array<[typeof LeadSourceValues, number]>).map(
+        ([source, count]) => {
+          const total = Object.values(data.sourceData || {}).reduce((sum, val) => sum + val, 0);
 
-        return {
-          source: source,
-          name: t(source),
-          color: CHART_CONSTANTS.SOURCE_COLORS[source] || "#6b7280",
-          visible: visibleSources[source] || false,
-          count,
-          percentage: total > 0 ? (count / total) * 100 : 0,
-        };
-      })
+          return {
+            source: source,
+            name: t(source),
+            color: CHART_CONSTANTS.SOURCE_COLORS[source] || "#6b7280",
+            visible: visibleSources[source] || false,
+            count,
+            percentage: total > 0 ? (count / total) * 100 : 0,
+          };
+        },
+      )
     : [];
 
   // Determine chart type
@@ -334,9 +310,7 @@ export function LeadsStatsChart({
     const chartComponents = activeSeries.map((series, index) => {
       const color =
         series.color ||
-        CHART_CONSTANTS.DEFAULT_COLORS[
-          index % CHART_CONSTANTS.DEFAULT_COLORS.length
-        ];
+        CHART_CONSTANTS.DEFAULT_COLORS[index % CHART_CONSTANTS.DEFAULT_COLORS.length];
 
       switch (chartType) {
         case ChartType.BAR:
@@ -395,17 +369,11 @@ export function LeadsStatsChart({
       {/* Main Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            {data.title || t("app.admin.leads.leads.admin.stats.chart.title")}
-          </CardTitle>
-          {data.subtitle && (
-            <P className="text-sm text-muted-foreground">{data.subtitle}</P>
-          )}
+          <CardTitle>{data.title || t("app.admin.leads.leads.admin.stats.chart.title")}</CardTitle>
+          {data.subtitle && <P className="text-sm text-muted-foreground">{data.subtitle}</P>}
         </CardHeader>
         <CardContent>
-          <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>
-            {renderChart()}
-          </Div>
+          <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>{renderChart()}</Div>
           {legendData.length > 0 && (
             <Div className="border-t">
               <Div className="flex items-center justify-between p-4 border-b">
@@ -440,20 +408,12 @@ export function LeadsStatsChart({
                     className={`flex items-center gap-2 text-sm transition-opacity hover:opacity-80 ${
                       item.visible ? "opacity-100" : "opacity-50"
                     }`}
-                    title={t(
-                      "app.admin.leads.leads.admin.stats.legend.clickToToggle",
-                    )}
+                    title={t("app.admin.leads.leads.admin.stats.legend.clickToToggle")}
                   >
                     <Div style={{ backgroundColor: item.color }}>
                       <Div className="w-3 h-3 rounded-full" />
                     </Div>
-                    <Span
-                      className={
-                        item.visible
-                          ? "text-foreground"
-                          : "text-muted-foreground"
-                      }
-                    >
+                    <Span className={item.visible ? "text-foreground" : "text-muted-foreground"}>
                       {t(item.name)}
                     </Span>
                   </Button>

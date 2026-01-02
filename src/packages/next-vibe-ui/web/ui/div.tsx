@@ -104,11 +104,7 @@ export interface DivRefObject {
     block?: "start" | "center" | "end" | "nearest";
     inline?: "start" | "center" | "end" | "nearest";
   }) => void;
-  scrollTo: (options: {
-    top?: number;
-    left?: number;
-    behavior?: "auto" | "smooth";
-  }) => void;
+  scrollTo: (options: { top?: number; left?: number; behavior?: "auto" | "smooth" }) => void;
   scrollTop: number;
   scrollHeight: number;
   clientHeight: number;

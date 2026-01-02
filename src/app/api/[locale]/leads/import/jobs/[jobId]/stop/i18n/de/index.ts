@@ -57,8 +57,7 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Stoppkonflikt",
-        description:
-          "Job kann nicht gestoppt werden, wenn er nicht verarbeitet wird",
+        description: "Job kann nicht gestoppt werden, wenn er nicht verarbeitet wird",
       },
     },
     success: {

@@ -198,15 +198,11 @@ const TextareaInner = (
     const maxHeight = lineHeight * maxRows + paddingTop + paddingBottom;
 
     // Set new height within bounds
-    const newHeight = Math.min(
-      Math.max(textarea.scrollHeight, minHeight),
-      maxHeight,
-    );
+    const newHeight = Math.min(Math.max(textarea.scrollHeight, minHeight), maxHeight);
     textarea.style.height = `${newHeight}px`;
 
     // Enable scrolling if content exceeds maxHeight
-    textarea.style.overflowY =
-      textarea.scrollHeight > maxHeight ? "auto" : "hidden";
+    textarea.style.overflowY = textarea.scrollHeight > maxHeight ? "auto" : "hidden";
   }, [minRows, maxRows]);
 
   React.useEffect(() => {
@@ -280,11 +276,7 @@ const TextareaInner = (
 
   // Ghost variant needs wrapper for border styling
   if (variant === "ghost") {
-    return (
-      <div className="overflow-hidden rounded-t-md border-transparent">
-        {content}
-      </div>
-    );
+    return <div className="overflow-hidden rounded-t-md border-transparent">{content}</div>;
   }
 
   return content;

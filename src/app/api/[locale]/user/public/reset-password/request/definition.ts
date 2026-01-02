@@ -37,8 +37,7 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.user.public.resetPassword.request.title" as const,
-      description:
-        "app.api.user.public.resetPassword.request.description" as const,
+      description: "app.api.user.public.resetPassword.request.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -48,8 +47,7 @@ const { POST } = createEndpoint({
       emailInput: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.public.resetPassword.request.groups.emailInput.title" as const,
+          title: "app.api.user.public.resetPassword.request.groups.emailInput.title" as const,
           description:
             "app.api.user.public.resetPassword.request.groups.emailInput.description" as const,
           layoutType: LayoutType.VERTICAL,
@@ -60,14 +58,12 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.EMAIL,
-              label:
-                "app.api.user.public.resetPassword.request.fields.email.label" as const,
+              label: "app.api.user.public.resetPassword.request.fields.email.label" as const,
               description:
                 "app.api.user.public.resetPassword.request.fields.email.description" as const,
               placeholder:
                 "app.api.user.public.resetPassword.request.fields.email.placeholder" as const,
-              helpText:
-                "app.api.user.public.resetPassword.request.fields.email.help" as const,
+              helpText: "app.api.user.public.resetPassword.request.fields.email.help" as const,
             },
             z
               .string()
@@ -84,10 +80,8 @@ const { POST } = createEndpoint({
       response: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.public.resetPassword.request.response.title" as const,
-          description:
-            "app.api.user.public.resetPassword.request.response.description" as const,
+          title: "app.api.user.public.resetPassword.request.response.title" as const,
+          description: "app.api.user.public.resetPassword.request.response.description" as const,
           layoutType: LayoutType.VERTICAL,
         },
         { response: true },
@@ -97,9 +91,7 @@ const { POST } = createEndpoint({
               type: WidgetType.BADGE,
               text: "app.api.user.public.resetPassword.request.success.title" as const,
             },
-            z
-              .boolean()
-              .describe("Whether the reset request was processed successfully"),
+            z.boolean().describe("Whether the reset request was processed successfully"),
           ),
           message: responseField(
             {
@@ -107,17 +99,13 @@ const { POST } = createEndpoint({
               content:
                 "app.api.user.public.resetPassword.request.response.success.message" as const,
             },
-            z
-              .string()
-              .describe("Human-readable status message explaining the result"),
+            z.string().describe("Human-readable status message explaining the result"),
           ),
           nextSteps: responseField(
             {
               type: WidgetType.LINK_LIST,
             },
-            z
-              .array(z.string())
-              .describe("Step-by-step instructions for the user to follow"),
+            z.array(z.string()).describe("Step-by-step instructions for the user to follow"),
           ),
         },
       ),
@@ -127,66 +115,50 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.user.public.resetPassword.request.errors.validation.title" as const,
+      title: "app.api.user.public.resetPassword.request.errors.validation.title" as const,
       description:
         "app.api.user.public.resetPassword.request.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.user.public.resetPassword.request.errors.unauthorized.title" as const,
+      title: "app.api.user.public.resetPassword.request.errors.unauthorized.title" as const,
       description:
         "app.api.user.public.resetPassword.request.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.user.public.resetPassword.request.errors.internal.title" as const,
-      description:
-        "app.api.user.public.resetPassword.request.errors.internal.description" as const,
+      title: "app.api.user.public.resetPassword.request.errors.internal.title" as const,
+      description: "app.api.user.public.resetPassword.request.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.user.public.resetPassword.request.errors.unknown.title" as const,
-      description:
-        "app.api.user.public.resetPassword.request.errors.unknown.description" as const,
+      title: "app.api.user.public.resetPassword.request.errors.unknown.title" as const,
+      description: "app.api.user.public.resetPassword.request.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.user.public.resetPassword.request.errors.network.title" as const,
-      description:
-        "app.api.user.public.resetPassword.request.errors.network.description" as const,
+      title: "app.api.user.public.resetPassword.request.errors.network.title" as const,
+      description: "app.api.user.public.resetPassword.request.errors.network.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.user.public.resetPassword.request.errors.forbidden.title" as const,
+      title: "app.api.user.public.resetPassword.request.errors.forbidden.title" as const,
       description:
         "app.api.user.public.resetPassword.request.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.user.public.resetPassword.request.errors.notFound.title" as const,
-      description:
-        "app.api.user.public.resetPassword.request.errors.notFound.description" as const,
+      title: "app.api.user.public.resetPassword.request.errors.notFound.title" as const,
+      description: "app.api.user.public.resetPassword.request.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.public.resetPassword.request.errors.unsaved.title" as const,
-      description:
-        "app.api.user.public.resetPassword.request.errors.unsaved.description" as const,
+      title: "app.api.user.public.resetPassword.request.errors.unsaved.title" as const,
+      description: "app.api.user.public.resetPassword.request.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.user.public.resetPassword.request.errors.conflict.title" as const,
-      description:
-        "app.api.user.public.resetPassword.request.errors.conflict.description" as const,
+      title: "app.api.user.public.resetPassword.request.errors.conflict.title" as const,
+      description: "app.api.user.public.resetPassword.request.errors.conflict.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
     title: "app.api.user.public.resetPassword.request.success.title" as const,
-    description:
-      "app.api.user.public.resetPassword.request.success.description" as const,
+    description: "app.api.user.public.resetPassword.request.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -258,11 +230,7 @@ export { POST };
 export default resetPasswordRequestEndpoints;
 
 // Export types as required by migration guide
-export type ResetPasswordRequestPostRequestInput =
-  typeof POST.types.RequestInput;
-export type ResetPasswordRequestPostRequestOutput =
-  typeof POST.types.RequestOutput;
-export type ResetPasswordRequestPostResponseInput =
-  typeof POST.types.ResponseInput;
-export type ResetPasswordRequestPostResponseOutput =
-  typeof POST.types.ResponseOutput;
+export type ResetPasswordRequestPostRequestInput = typeof POST.types.RequestInput;
+export type ResetPasswordRequestPostRequestOutput = typeof POST.types.RequestOutput;
+export type ResetPasswordRequestPostResponseInput = typeof POST.types.ResponseInput;
+export type ResetPasswordRequestPostResponseOutput = typeof POST.types.ResponseOutput;

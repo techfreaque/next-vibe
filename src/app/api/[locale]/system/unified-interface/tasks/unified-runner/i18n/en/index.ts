@@ -19,8 +19,7 @@ export const translations = {
     description: "Manage unified task runner for cron tasks and side tasks",
     container: {
       title: "Unified Task Runner Management",
-      description:
-        "Control the unified task runner that manages both cron tasks and side tasks",
+      description: "Control the unified task runner that manages both cron tasks and side tasks",
     },
     fields: {
       action: {

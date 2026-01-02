@@ -17,8 +17,7 @@ export const translations: typeof enTranslations = {
   // Subscription product
   subscription: {
     name: "Subskrypcja miesięczna",
-    description:
-      "{{subCredits}} kredytów miesięcznie ze wszystkimi {{modelCount}} modelami AI",
+    description: "{{subCredits}} kredytów miesięcznie ze wszystkimi {{modelCount}} modelami AI",
     longDescription:
       "Miesięczna subskrypcja z {{subCredits}} kredytów dla wszystkich {{modelCount}} niecenzurowanych modeli AI",
     price: "Ceny subskrypcji miesięcznej",

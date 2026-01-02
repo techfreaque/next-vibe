@@ -132,14 +132,7 @@ export const ICON_CATEGORIES = {
     "flame",
     "sun",
   ] as IconKey[],
-  security: [
-    "lock",
-    "key",
-    "eye-off",
-    "shield",
-    "shield-plus",
-    "locked",
-  ] as IconKey[],
+  security: ["lock", "key", "eye-off", "shield", "shield-plus", "locked"] as IconKey[],
   programming: [
     "si-javascript",
     "si-typescript",
@@ -174,13 +167,7 @@ export const ICON_CATEGORIES = {
     "gab-ai-logo",
   ] as IconKey[],
   media: ["newspaper", "globe", "scale", "file-text"] as IconKey[],
-  special: [
-    "1a",
-    "sparkle",
-    "fire",
-    "glowing-star",
-    "high-voltage",
-  ] as IconKey[],
+  special: ["1a", "sparkle", "fire", "glowing-star", "high-voltage"] as IconKey[],
 } as const;
 
 export type CategoryKey = keyof typeof ICON_CATEGORIES;
@@ -222,9 +209,7 @@ export function IconPicker({
     }
 
     const query = searchQuery.toLowerCase();
-    return categoryIcons.filter((iconKey) =>
-      iconKey.toLowerCase().includes(query),
-    );
+    return categoryIcons.filter((iconKey) => iconKey.toLowerCase().includes(query));
   }, [searchQuery, activeCategory]);
 
   // Button size classes
@@ -260,9 +245,7 @@ export function IconPicker({
         <Div className="flex flex-col h-[600px]">
           {/* Header with search */}
           <Div className="flex flex-col gap-3 p-4 border-b bg-card">
-            <Span className="font-semibold text-sm">
-              {t("app.ui.iconPicker.title")}
-            </Span>
+            <Span className="font-semibold text-sm">{t("app.ui.iconPicker.title")}</Span>
             <Input
               placeholder={t("app.ui.iconPicker.searchPlaceholder")}
               value={searchQuery}
@@ -327,10 +310,7 @@ export function IconPicker({
             </TabsList>
 
             {/* Icon grid */}
-            <TabsContent
-              value={activeCategory}
-              className="flex-1 overflow-hidden mt-0 border-0"
-            >
+            <TabsContent value={activeCategory} className="flex-1 overflow-hidden mt-0 border-0">
               <ScrollArea className="h-full">
                 <Div className="grid grid-cols-8 gap-1 p-3">
                   {filteredIcons.map((iconKey) => {

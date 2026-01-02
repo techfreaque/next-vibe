@@ -14,9 +14,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import type { FolderListResponseOutput } from "../folders/definition";
 import { GET as foldersGetEndpoint } from "../folders/definition";
-import threadsDefinition, {
-  type ThreadListResponseOutput,
-} from "../threads/definition";
+import threadsDefinition, { type ThreadListResponseOutput } from "../threads/definition";
 
 /**
  * Load incognito data from localStorage
@@ -92,11 +90,7 @@ async function loadIncognitoData(
       folderCount: Object.keys(incognitoState.folders).length,
     });
   } catch (error) {
-    logger.error(
-      "useDataLoader",
-      "Failed to load incognito data",
-      parseError(error),
-    );
+    logger.error("useDataLoader", "Failed to load incognito data", parseError(error));
   }
 }
 

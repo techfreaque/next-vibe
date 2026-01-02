@@ -6,11 +6,7 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -70,10 +66,7 @@ function shouldProcessStage(config: EmailCampaignConfigType): boolean {
   const now = new Date();
   const currentHour = now.getHours();
 
-  if (
-    currentHour < config.enabledHours.start ||
-    currentHour > config.enabledHours.end
-  ) {
+  if (currentHour < config.enabledHours.start || currentHour > config.enabledHours.end) {
     return false;
   }
 
@@ -101,8 +94,7 @@ function mergeCampaignResults(
 
   // Merge stage transitions
   Object.entries(stageResult.stageTransitions).forEach(([stage, count]) => {
-    globalResult.stageTransitions[stage] =
-      (globalResult.stageTransitions[stage] ?? 0) + count;
+    globalResult.stageTransitions[stage] = (globalResult.stageTransitions[stage] ?? 0) + count;
   });
 }
 
@@ -118,8 +110,7 @@ async function processEmailCampaignStage(
   try {
     logger.debug("Processing email campaign stage", { stage });
 
-    const remainingEmailQuota =
-      config.maxEmailsPerRun - globalResult.emailsSent;
+    const remainingEmailQuota = config.maxEmailsPerRun - globalResult.emailsSent;
     if (remainingEmailQuota <= 0) {
       logger.debug("No remaining email quota for stage", { stage });
       return success(createEmptyEmailCampaignResult());
@@ -140,8 +131,7 @@ async function processEmailCampaignStage(
         error: stageResult.message,
       });
       return fail({
-        message:
-          "app.api.leads.campaigns.emailCampaigns.post.errors.server.title",
+        message: "app.api.leads.campaigns.emailCampaigns.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { stage, error: stageResult.message },
       });
@@ -153,8 +143,7 @@ async function processEmailCampaignStage(
     logger.error("Error processing stage", { stage, message: errorMessage });
 
     return fail({
-      message:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.server.title",
+      message: "app.api.leads.campaigns.emailCampaigns.post.errors.server.title",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: { stage, error: errorMessage },
     });
@@ -164,9 +153,7 @@ async function processEmailCampaignStage(
 /**
  * Validate email campaign task execution
  */
-function validateEmailCampaignTask(
-  context: CronTaskExecutionContext,
-): ResponseType<boolean> {
+function validateEmailCampaignTask(context: CronTaskExecutionContext): ResponseType<boolean> {
   const { config, logger } = context;
 
   try {
@@ -188,10 +175,7 @@ function validateEmailCampaignTask(
     const currentHour = now.getHours();
     const currentDay = now.getDay();
 
-    if (
-      currentHour < config.enabledHours.start ||
-      currentHour > config.enabledHours.end
-    ) {
+    if (currentHour < config.enabledHours.start || currentHour > config.enabledHours.end) {
       logger.debug("Outside enabled hours", {
         currentHour,
         enabledHours: config.enabledHours,
@@ -216,8 +200,7 @@ function validateEmailCampaignTask(
     });
 
     return fail({
-      message:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.validation.title",
+      message: "app.api.leads.campaigns.emailCampaigns.post.errors.validation.title",
       errorType: ErrorResponseTypes.VALIDATION_ERROR,
       messageParams: { error: errorMessage },
     });
@@ -268,12 +251,7 @@ export async function execute(
 
       logger.debug("Processing stage", { stage });
 
-      const stageResult = await processEmailCampaignStage(
-        stage,
-        config,
-        result,
-        logger,
-      );
+      const stageResult = await processEmailCampaignStage(stage, config, result, logger);
 
       if (!stageResult.success) {
         logger.error("Stage processing failed", {
@@ -318,8 +296,7 @@ export async function execute(
     });
 
     return fail({
-      message:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.server.title",
+      message: "app.api.leads.campaigns.emailCampaigns.post.errors.server.title",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: { error: errorMessage, executionTimeMs },
     });
@@ -330,9 +307,7 @@ export async function execute(
  * Email Campaign Task Validation Function
  * Validates that the email campaign task can run safely
  */
-export function validate(
-  context: CronTaskExecutionContext,
-): ResponseType<boolean> {
+export function validate(context: CronTaskExecutionContext): ResponseType<boolean> {
   return validateEmailCampaignTask(context);
 }
 
@@ -340,15 +315,11 @@ export function validate(
  * Email Campaign Task Rollback Function
  * Defines rollback behavior for email campaigns (not applicable)
  */
-export function rollback(
-  context: CronTaskExecutionContext,
-): ResponseType<boolean> {
+export function rollback(context: CronTaskExecutionContext): ResponseType<boolean> {
   const { logger } = context;
 
   // Email campaigns cannot be rolled back once sent
   // This is by design - emails are tracked in the database
-  logger.info(
-    "Rollback not applicable for email campaigns - emails are tracked in database",
-  );
+  logger.info("Rollback not applicable for email campaigns - emails are tracked in database");
   return success(true);
 }

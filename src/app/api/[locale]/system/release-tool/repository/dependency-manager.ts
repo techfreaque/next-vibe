@@ -6,11 +6,7 @@
 import { execSync } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
@@ -97,20 +93,12 @@ export interface IDependencyManager {
   /**
    * Deduplicate dependencies
    */
-  deduplicate(
-    cwd: string,
-    packageManager: string,
-    logger: EndpointLogger,
-  ): ResponseType<void>;
+  deduplicate(cwd: string, packageManager: string, logger: EndpointLogger): ResponseType<void>;
 
   /**
    * Prune unused dependencies
    */
-  prune(
-    cwd: string,
-    packageManager: string,
-    logger: EndpointLogger,
-  ): ResponseType<void>;
+  prune(cwd: string, packageManager: string, logger: EndpointLogger): ResponseType<void>;
 
   /**
    * Check if npm-check-updates is available
@@ -280,9 +268,7 @@ export class DependencyManager implements IDependencyManager {
           timeout: TIMEOUTS.DEFAULT,
         });
       } catch (err) {
-        const error = toCatchError(
-          err as Error | { stdout?: string | Buffer; status?: number },
-        );
+        const error = toCatchError(err as Error | { stdout?: string | Buffer; status?: number });
         if ("stdout" in error && error.stdout) {
           output = error.stdout.toString();
         } else {
@@ -310,11 +296,7 @@ export class DependencyManager implements IDependencyManager {
       const packages: OutdatedResult["packages"] = [];
 
       // ncu --jsonUpgraded returns { "package-name": "new-version" }
-      if (
-        typeof parsed === "object" &&
-        parsed !== null &&
-        !Array.isArray(parsed)
-      ) {
+      if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
         for (const [name, newVersion] of Object.entries(parsed)) {
           if (typeof newVersion === "string") {
             packages.push({
@@ -376,18 +358,13 @@ export class DependencyManager implements IDependencyManager {
         });
       } catch (err) {
         // Audit commands exit with non-zero if vulnerabilities found
-        const error = toCatchError(
-          err as Error | { stdout?: string | Buffer; status?: number },
-        );
+        const error = toCatchError(err as Error | { stdout?: string | Buffer; status?: number });
         if ("stdout" in error && error.stdout) {
           output = error.stdout.toString();
         } else {
           output = "{}";
         }
-        exitCode =
-          "status" in error && typeof error.status === "number"
-            ? error.status
-            : 1;
+        exitCode = "status" in error && typeof error.status === "number" ? error.status : 1;
       }
 
       // Parse the audit results
@@ -440,11 +417,7 @@ export class DependencyManager implements IDependencyManager {
     }
   }
 
-  deduplicate(
-    cwd: string,
-    packageManager: string,
-    logger: EndpointLogger,
-  ): ResponseType<void> {
+  deduplicate(cwd: string, packageManager: string, logger: EndpointLogger): ResponseType<void> {
     logger.info("Deduplicating dependencies...");
 
     try {
@@ -482,11 +455,7 @@ export class DependencyManager implements IDependencyManager {
     }
   }
 
-  prune(
-    cwd: string,
-    packageManager: string,
-    logger: EndpointLogger,
-  ): ResponseType<void> {
+  prune(cwd: string, packageManager: string, logger: EndpointLogger): ResponseType<void> {
     logger.info("Pruning unused dependencies...");
 
     try {

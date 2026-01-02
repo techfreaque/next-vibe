@@ -17,9 +17,7 @@ export const { env: cliEnv } = defineEnv({
     comment: "CLI user email",
   },
   VIBE_CLI_LOCALE: {
-    schema: (z.string() as z.Schema<CountryLanguage>)
-      .optional()
-      .default(defaultLocale),
+    schema: (z.string() as z.Schema<CountryLanguage>).optional().default(defaultLocale),
     example: "en-GLOBAL",
     comment: "CLI locale setting",
   },

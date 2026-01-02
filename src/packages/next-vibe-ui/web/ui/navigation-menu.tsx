@@ -12,9 +12,7 @@ const navigationMenuTriggerStyle = cva(
   "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50",
 );
 
-export type NavigationMenuTriggerStyleProps = VariantProps<
-  typeof navigationMenuTriggerStyle
->;
+export type NavigationMenuTriggerStyleProps = VariantProps<typeof navigationMenuTriggerStyle>;
 
 // NavigationMenu
 export type NavigationMenuProps = {
@@ -36,10 +34,7 @@ export function NavigationMenu({
 }: NavigationMenuProps): React.JSX.Element {
   return (
     <NavigationMenuPrimitive.Root
-      className={cn(
-        "relative z-10 flex max-w-max flex-1 items-center justify-center",
-        className,
-      )}
+      className={cn("relative z-10 flex max-w-max flex-1 items-center justify-center", className)}
       style={style}
       {...props}
     >
@@ -63,10 +58,7 @@ export function NavigationMenuList({
 }: NavigationMenuListProps): React.JSX.Element {
   return (
     <NavigationMenuPrimitive.List
-      className={cn(
-        "group flex flex-1 list-none items-center justify-center space-x-1",
-        className,
-      )}
+      className={cn("group flex flex-1 list-none items-center justify-center space-x-1", className)}
       style={style}
       {...props}
     >
@@ -89,11 +81,7 @@ export function NavigationMenuItem({
   children,
 }: NavigationMenuItemProps): React.JSX.Element {
   return (
-    <NavigationMenuPrimitive.Item
-      value={value}
-      className={className}
-      style={style}
-    >
+    <NavigationMenuPrimitive.Item value={value} className={className} style={style}>
       {children}
     </NavigationMenuPrimitive.Item>
   );
@@ -167,11 +155,7 @@ export function NavigationMenuLink({
   ...props
 }: NavigationMenuLinkProps): React.JSX.Element {
   return (
-    <NavigationMenuPrimitive.Link
-      className={className}
-      style={style}
-      {...props}
-    >
+    <NavigationMenuPrimitive.Link className={className} style={style} {...props}>
       {children}
     </NavigationMenuPrimitive.Link>
   );
@@ -198,8 +182,7 @@ export function NavigationMenuViewport({
     </div>
   );
 }
-NavigationMenuViewport.displayName =
-  NavigationMenuPrimitive.Viewport.displayName;
+NavigationMenuViewport.displayName = NavigationMenuPrimitive.Viewport.displayName;
 
 export type NavigationMenuIndicatorProps = StyleType;
 
@@ -221,7 +204,6 @@ export function NavigationMenuIndicator({
     </NavigationMenuPrimitive.Indicator>
   );
 }
-NavigationMenuIndicator.displayName =
-  NavigationMenuPrimitive.Indicator.displayName;
+NavigationMenuIndicator.displayName = NavigationMenuPrimitive.Indicator.displayName;
 
 export { navigationMenuTriggerStyle };

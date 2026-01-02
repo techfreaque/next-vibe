@@ -66,13 +66,11 @@ export const translations: typeof enTranslations = {
     },
     unauthorized: {
       title: "Unberechtigt",
-      description:
-        "Authentifizierung für Migrationsaufgaben-Operationen erforderlich",
+      description: "Authentifizierung für Migrationsaufgaben-Operationen erforderlich",
     },
     forbidden: {
       title: "Verboten",
-      description:
-        "Unzureichende Berechtigungen für Migrationsaufgaben-Operationen",
+      description: "Unzureichende Berechtigungen für Migrationsaufgaben-Operationen",
     },
     internal: {
       title: "Task-Fehler",
@@ -97,8 +95,7 @@ export const translations: typeof enTranslations = {
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description:
-        "Es gibt nicht gespeicherte Änderungen in der Migrationsaufgabe",
+      description: "Es gibt nicht gespeicherte Änderungen in der Migrationsaufgabe",
     },
   },
   priority: {
@@ -120,26 +117,19 @@ export const translations: typeof enTranslations = {
       "Diese Operation ist nur in der Entwicklungsumgebung erlaubt",
     autoMigrationTaskNotFound: "Automatische Migrationsaufgabe nicht gefunden",
     taskConfigurationMissing: "Task-Konfiguration fehlt",
-    autoMigrationStartedSuccessfully:
-      "Automatische Migration erfolgreich gestartet",
-    failedToStartAutoMigration:
-      "Fehler beim Starten der automatischen Migration",
+    autoMigrationStartedSuccessfully: "Automatische Migration erfolgreich gestartet",
+    failedToStartAutoMigration: "Fehler beim Starten der automatischen Migration",
     backupMonitorTaskNotFound: "Backup-Monitor-Aufgabe nicht gefunden",
     backupMonitorStartedSuccessfully: "Backup-Monitor erfolgreich gestartet",
     failedToStartBackupMonitor: "Fehler beim Starten des Backup-Monitors",
-    autoMigrationStoppedSuccessfully:
-      "Automatische Migration erfolgreich gestoppt",
-    failedToStopAutoMigrationTask:
-      "Fehler beim Stoppen der automatischen Migrationsaufgabe",
+    autoMigrationStoppedSuccessfully: "Automatische Migration erfolgreich gestoppt",
+    failedToStopAutoMigrationTask: "Fehler beim Stoppen der automatischen Migrationsaufgabe",
     backupMonitorStoppedSuccessfully: "Backup-Monitor erfolgreich gestoppt",
-    failedToStopBackupMonitorTask:
-      "Fehler beim Stoppen der Backup-Monitor-Aufgabe",
+    failedToStopBackupMonitorTask: "Fehler beim Stoppen der Backup-Monitor-Aufgabe",
     migrationTaskNotFound: "Migrationsaufgabe nicht gefunden",
     migrationTaskDoesNotExist: "Migrationsaufgabe '{taskName}' existiert nicht",
-    migrationTaskStatusRetrieved:
-      "Status der Migrationsaufgabe '{taskName}' erfolgreich abgerufen",
-    failedToGetMigrationTaskStatus:
-      "Fehler beim Abrufen des Migrationsaufgaben-Status",
+    migrationTaskStatusRetrieved: "Status der Migrationsaufgabe '{taskName}' erfolgreich abgerufen",
+    failedToGetMigrationTaskStatus: "Fehler beim Abrufen des Migrationsaufgaben-Status",
     foundMigrationTasks: "{count} Migrationsaufgaben gefunden",
     failedToListMigrationTasks: "Fehler beim Auflisten der Migrationsaufgaben",
   },

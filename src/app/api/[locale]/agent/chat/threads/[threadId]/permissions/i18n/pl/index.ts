@@ -36,8 +36,7 @@ export const translations: typeof enTranslations = {
       },
       moderatorIds: {
         title: "ID moderatorów",
-        description:
-          "Lista identyfikatorów użytkowników, którzy mogą moderować ten wątek",
+        description: "Lista identyfikatorów użytkowników, którzy mogą moderować ten wątek",
         content: "ID użytkownika",
       },
     },
@@ -119,8 +118,7 @@ export const translations: typeof enTranslations = {
       title: "Aktualizacja uprawnień",
       moderatorIds: {
         label: "ID moderatorów",
-        description:
-          "Lista identyfikatorów użytkowników, którzy mogą moderować ten wątek",
+        description: "Lista identyfikatorów użytkowników, którzy mogą moderować ten wątek",
       },
     },
     response: {
@@ -165,8 +163,7 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description:
-          "Musisz być zalogowany, aby aktualizować uprawnienia wątku",
+        description: "Musisz być zalogowany, aby aktualizować uprawnienia wątku",
       },
       forbidden: {
         title: "Zabroniony",

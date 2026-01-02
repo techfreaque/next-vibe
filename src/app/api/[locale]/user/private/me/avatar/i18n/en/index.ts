@@ -20,8 +20,7 @@ export const translations = {
       visible: "Your avatar is now visible on your profile",
       update: "You can update it anytime from your profile settings",
       default: "Your profile now shows the default avatar",
-      uploadNew:
-        "You can upload a new avatar anytime from your profile settings",
+      uploadNew: "You can upload a new avatar anytime from your profile settings",
     },
   },
   upload: {

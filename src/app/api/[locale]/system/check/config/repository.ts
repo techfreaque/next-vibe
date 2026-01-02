@@ -42,10 +42,7 @@ export type EnsureConfigResult = ConfigReadyResult | ConfigErrorResult;
 // ============================================================
 
 export interface ConfigRepositoryInterface {
-  ensureConfigReady(
-    logger: EndpointLogger,
-    createConfig?: boolean,
-  ): Promise<EnsureConfigResult>;
+  ensureConfigReady(logger: EndpointLogger, createConfig?: boolean): Promise<EnsureConfigResult>;
 
   generateAllConfigs(
     logger: EndpointLogger,
@@ -88,9 +85,7 @@ export class ConfigRepositoryImpl implements ConfigRepositoryInterface {
   private static resolveJsPluginPath(pluginPath: string): string {
     // Pattern: @next-vibe/checker/oxlint-plugins/restricted-syntax.ts or .js
     if (pluginPath.startsWith("@next-vibe/checker/oxlint-plugins/")) {
-      const fileName = pluginPath.slice(
-        "@next-vibe/checker/oxlint-plugins/".length,
-      );
+      const fileName = pluginPath.slice("@next-vibe/checker/oxlint-plugins/".length);
       const baseName = fileName.replace(/\.(ts|js)$/, "");
       const extension = fileName.endsWith(".ts") ? "ts" : "js";
 
@@ -165,9 +160,7 @@ export class ConfigRepositoryImpl implements ConfigRepositoryInterface {
     return existsSync(absolutePath) ? absolutePath : pluginPath;
   }
 
-  private static resolveJsPlugins(
-    jsPlugins: (string | OxlintJsPlugin)[] | undefined,
-  ): string[] {
+  private static resolveJsPlugins(jsPlugins: (string | OxlintJsPlugin)[] | undefined): string[] {
     if (!jsPlugins || jsPlugins.length === 0) {
       return [];
     }
@@ -184,9 +177,7 @@ export class ConfigRepositoryImpl implements ConfigRepositoryInterface {
   // Static Private Helpers - Package Discovery
   // --------------------------------------------------------
 
-  private static async findPackageRoot(
-    startDir: string,
-  ): Promise<string | null> {
+  private static async findPackageRoot(startDir: string): Promise<string | null> {
     let currentDir = startDir;
     const root = resolve("/");
 
@@ -269,9 +260,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
   private static applyOxcSettings(
     settings: JsonObject,
-    oxc: NonNullable<
-      NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]
-    >["oxc"],
+    oxc: NonNullable<NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]>["oxc"],
   ): void {
     if (!oxc) {
       return;
@@ -335,8 +324,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       settings["typescript.suggest.autoImports"] = ts.suggestAutoImports;
     }
     if (ts.preferTypeOnlyAutoImports !== undefined) {
-      settings["typescript.preferences.preferTypeOnlyAutoImports"] =
-        ts.preferTypeOnlyAutoImports;
+      settings["typescript.preferences.preferTypeOnlyAutoImports"] = ts.preferTypeOnlyAutoImports;
     }
     if (ts.experimentalUseTsgo !== undefined) {
       settings["typescript.experimental.useTsgo"] = ts.experimentalUseTsgo;
@@ -346,9 +334,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   private static applyFileSettings(
     settings: JsonObject,
     existing: JsonObject,
-    files: NonNullable<
-      NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]
-    >["files"],
+    files: NonNullable<NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"]>["files"],
   ): void {
     if (!files) {
       return;
@@ -383,21 +369,14 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   private static applyLanguageFormatterSettings(
     settings: JsonObject,
     existing: JsonObject,
-    vscodeSettings: NonNullable<
-      CheckConfig["vscode"] & { enabled: true }
-    >["settings"],
+    vscodeSettings: NonNullable<CheckConfig["vscode"] & { enabled: true }>["settings"],
   ): void {
     const formatter = vscodeSettings?.editor?.defaultFormatter;
     if (!formatter) {
       return;
     }
 
-    for (const lang of [
-      "typescript",
-      "typescriptreact",
-      "javascript",
-      "javascriptreact",
-    ]) {
+    for (const lang of ["typescript", "typescriptreact", "javascript", "javascriptreact"]) {
       const langKey = `[${lang}]`;
       const existingLang = existing[langKey] as JsonObject | undefined;
       settings[langKey] = {
@@ -511,26 +490,17 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
       // Generate oxlint config if enabled
       if (config.oxlint.enabled) {
-        oxlintConfigPath = await this.generateOxlintConfig(
-          logger,
-          config.oxlint,
-        );
+        oxlintConfigPath = await this.generateOxlintConfig(logger, config.oxlint);
       }
 
       // Generate prettier/oxfmt config if enabled
       if (config.prettier.enabled) {
-        oxfmtConfigPath = await this.generatePrettierConfig(
-          logger,
-          config.prettier,
-        );
+        oxfmtConfigPath = await this.generatePrettierConfig(logger, config.prettier);
       }
 
       // Generate ESLint config if enabled
       if (config.eslint.enabled) {
-        eslintConfigPath = await this.generateEslintConfig(
-          logger,
-          config.eslint,
-        );
+        eslintConfigPath = await this.generateEslintConfig(logger, config.eslint);
       }
 
       return {
@@ -571,18 +541,9 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       const newSettings: JsonObject = { ...existingSettings };
 
       // Apply all settings using static helpers
-      ConfigRepositoryImpl.applyOxcSettings(
-        newSettings,
-        vscodeConfig.settings?.oxc,
-      );
-      ConfigRepositoryImpl.applyEditorSettings(
-        newSettings,
-        vscodeConfig.settings?.editor,
-      );
-      ConfigRepositoryImpl.applyTypescriptSettings(
-        newSettings,
-        vscodeConfig.settings?.typescript,
-      );
+      ConfigRepositoryImpl.applyOxcSettings(newSettings, vscodeConfig.settings?.oxc);
+      ConfigRepositoryImpl.applyEditorSettings(newSettings, vscodeConfig.settings?.editor);
+      ConfigRepositoryImpl.applyTypescriptSettings(newSettings, vscodeConfig.settings?.typescript);
       ConfigRepositoryImpl.applyFileSettings(
         newSettings,
         existingSettings,
@@ -599,11 +560,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         vscodeConfig.settings,
       );
 
-      await fs.writeFile(
-        settingsPath,
-        JSON.stringify(newSettings, null, 2),
-        "utf8",
-      );
+      await fs.writeFile(settingsPath, JSON.stringify(newSettings, null, 2), "utf8");
       logger.debug("Generated VSCode settings", { path: settingsPath });
 
       return { success: true, settingsPath };
@@ -623,8 +580,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
     try {
       const currentDir = dirname(fileURLToPath(import.meta.url));
-      const packageRoot =
-        await ConfigRepositoryImpl.findPackageRoot(currentDir);
+      const packageRoot = await ConfigRepositoryImpl.findPackageRoot(currentDir);
 
       if (!packageRoot) {
         return {
@@ -688,11 +644,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         },
       };
 
-      await fs.writeFile(
-        mcpConfigPath,
-        JSON.stringify(mcpConfig, null, 2),
-        "utf8",
-      );
+      await fs.writeFile(mcpConfigPath, JSON.stringify(mcpConfig, null, 2), "utf8");
 
       return { success: true, mcpConfigPath };
     } catch (error) {
@@ -706,9 +658,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   // Private Methods
   // --------------------------------------------------------
 
-  private async loadCheckConfig(
-    logger: EndpointLogger,
-  ): Promise<CheckConfig | null> {
+  private async loadCheckConfig(logger: EndpointLogger): Promise<CheckConfig | null> {
     try {
       const configPath = ConfigRepositoryImpl.getConfigFilePath();
 
@@ -719,9 +669,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
       // Use indirect import to prevent Turbopack static analysis
       // eslint-disable-next-line -- dynamic import required for runtime config loading
-      const dynamicImport = new Function("p", "return import(p)") as (
-        p: string,
-      ) => Promise<{
+      const dynamicImport = new Function("p", "return import(p)") as (p: string) => Promise<{
         default?: CheckConfig | (() => CheckConfig);
         config?: CheckConfig | (() => CheckConfig);
       }>;
@@ -734,8 +682,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       }
 
       // Support both direct object exports and factory functions
-      const config =
-        typeof exportedValue === "function" ? exportedValue() : exportedValue;
+      const config = typeof exportedValue === "function" ? exportedValue() : exportedValue;
 
       logger.debug("Loaded check.config.ts", { path: configPath });
       return config;
@@ -754,11 +701,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     const configPath = ConfigRepositoryImpl.getConfigFilePath();
 
     // If no tools are enabled, no regeneration needed
-    if (
-      !config.oxlint.enabled &&
-      !config.prettier.enabled &&
-      !config.eslint.enabled
-    ) {
+    if (!config.oxlint.enabled && !config.prettier.enabled && !config.eslint.enabled) {
       return { needsRegeneration: false };
     }
 
@@ -768,10 +711,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
       // Check oxlint config if enabled
       if (config.oxlint.enabled) {
-        const oxlintConfigPath = resolve(
-          process.cwd(),
-          config.oxlint.configPath,
-        );
+        const oxlintConfigPath = resolve(process.cwd(), config.oxlint.configPath);
         if (!existsSync(oxlintConfigPath)) {
           return { needsRegeneration: true };
         }
@@ -790,9 +730,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     }
   }
 
-  private async loadExistingSettings(
-    settingsPath: string,
-  ): Promise<JsonObject> {
+  private async loadExistingSettings(settingsPath: string): Promise<JsonObject> {
     if (!existsSync(settingsPath)) {
       return {};
     }
@@ -817,9 +755,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
     // Convert jsPlugins to array of paths for .oxlintrc.json
     // Options are not yet supported by oxlint natively, used via direct import workaround
-    const resolvedJsPlugins = ConfigRepositoryImpl.resolveJsPlugins(
-      oxlintConfig.jsPlugins,
-    );
+    const resolvedJsPlugins = ConfigRepositoryImpl.resolveJsPlugins(oxlintConfig.jsPlugins);
 
     // Only include valid oxlint schema fields (not CheckConfig metadata like enabled, configPath, cachePath, lintableExtensions)
     const oxlintConfigForFile: {
@@ -868,11 +804,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       });
     }
 
-    await fs.writeFile(
-      configPath,
-      JSON.stringify(oxlintConfigForFile, null, 2),
-      "utf8",
-    );
+    await fs.writeFile(configPath, JSON.stringify(oxlintConfigForFile, null, 2), "utf8");
     logger.debug("Generated .oxlintrc.json", { path: configPath });
 
     return configPath;
@@ -886,11 +818,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     await fs.mkdir(dirname(configPath), { recursive: true });
 
     const oxfmtConfig = ConfigRepositoryImpl.buildOxfmtConfig(prettierConfig);
-    await fs.writeFile(
-      configPath,
-      JSON.stringify(oxfmtConfig, null, 2),
-      "utf8",
-    );
+    await fs.writeFile(configPath, JSON.stringify(oxfmtConfig, null, 2), "utf8");
     logger.debug("Generated .oxfmtrc.json", { path: configPath });
 
     return configPath;
@@ -903,11 +831,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     const configPath = resolve(process.cwd(), eslintConfig.configPath);
     await fs.mkdir(dirname(configPath), { recursive: true });
 
-    await fs.writeFile(
-      configPath,
-      ConfigRepositoryImpl.generateEslintConfigContent(),
-      "utf8",
-    );
+    await fs.writeFile(configPath, ConfigRepositoryImpl.generateEslintConfigContent(), "utf8");
     logger.debug("Generated eslint.config.mjs", { path: configPath });
 
     return configPath;
@@ -921,5 +845,4 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 export const configRepository = new ConfigRepositoryImpl();
 
 // Legacy export for backwards compatibility
-export const ensureConfigReady =
-  configRepository.ensureConfigReady.bind(configRepository);
+export const ensureConfigReady = configRepository.ensureConfigReady.bind(configRepository);

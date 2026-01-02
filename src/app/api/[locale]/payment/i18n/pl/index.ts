@@ -223,8 +223,7 @@ export const translations: typeof enTranslations = {
     },
     notImplemented: {
       title: "Nie zaimplementowano",
-      description:
-        "Ta funkcja dostawcy płatności nie została jeszcze zaimplementowana",
+      description: "Ta funkcja dostawcy płatności nie została jeszcze zaimplementowana",
     },
     customerCreationFailed: "Nie udało się utworzyć klienta Stripe",
     customerNotFound: "Nie znaleziono klienta Stripe",

@@ -433,9 +433,7 @@ const { GET } = createEndpoint({
           options: EmailCampaignStageFilterOptions,
           columns: 4,
         },
-        z
-          .nativeEnum(EmailCampaignStageFilter)
-          .default(EmailCampaignStageFilter.ALL),
+        z.nativeEnum(EmailCampaignStageFilter).default(EmailCampaignStageFilter.ALL),
       ),
 
       // Engagement filters
@@ -511,8 +509,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.leads.stats.hasConfirmedSubscription.label",
-          description:
-            "app.api.leads.stats.hasConfirmedSubscription.description",
+          description: "app.api.leads.stats.hasConfirmedSubscription.description",
           columns: 3,
         },
         z.coerce.boolean().optional(),

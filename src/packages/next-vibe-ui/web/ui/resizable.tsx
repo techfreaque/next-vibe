@@ -106,9 +106,7 @@ export function ResizableContainer({
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
   return (
-    <div
-      className={`relative h-full shrink-0 ${collapsed ? "overflow-hidden" : ""}`}
-    >
+    <div className={`relative h-full shrink-0 ${collapsed ? "overflow-hidden" : ""}`}>
       <motion.div
         ref={containerRef}
         className={cn("relative h-full shrink-0", className)}

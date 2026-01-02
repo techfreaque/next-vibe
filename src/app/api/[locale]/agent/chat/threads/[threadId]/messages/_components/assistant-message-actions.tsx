@@ -48,44 +48,29 @@ export function AssistantMessageActions({
   const isTouch = useTouchDevice();
 
   // Get ttsAutoplay, ttsVoice, deductCredits, and character info from context
-  const {
-    ttsAutoplay,
-    ttsVoice,
-    deductCredits,
-    selectedCharacter,
-    characters,
-  } = useChatContext();
+  const { ttsAutoplay, ttsVoice, deductCredits, selectedCharacter, characters } = useChatContext();
 
   // Get voice from current character (if available), fallback to chat settings
   const currentCharacter = characters[selectedCharacter];
   const characterVoice = currentCharacter?.voice ?? ttsVoice;
 
   // Check if this message is currently streaming
-  const streamingMessage = useAIStreamStore(
-    (state) => state.streamingMessages[messageId],
-  );
+  const streamingMessage = useAIStreamStore((state) => state.streamingMessages[messageId]);
   const isMessageStreaming = streamingMessage?.isStreaming ?? false;
 
   // Prepare content for TTS (strip think tags, markdown, convert line breaks)
   const ttsText = prepareTextForTTS(stripThinkTags(content));
 
-  const {
-    isLoading,
-    isPlaying,
-    playAudio,
-    stopAudio,
-    cancelLoading,
-    currentChunk,
-    totalChunks,
-  } = useTTSAudio({
-    text: ttsText,
-    enabled: ttsAutoplay,
-    isStreaming: isMessageStreaming,
-    voice: characterVoice,
-    locale,
-    logger,
-    deductCredits,
-  });
+  const { isLoading, isPlaying, playAudio, stopAudio, cancelLoading, currentChunk, totalChunks } =
+    useTTSAudio({
+      text: ttsText,
+      enabled: ttsAutoplay,
+      isStreaming: isMessageStreaming,
+      voice: characterVoice,
+      locale,
+      logger,
+      deductCredits,
+    });
 
   // Calculate TTS credit cost based on text length
   const ttsCreditCost = ttsText.length * FEATURE_COSTS.TTS;

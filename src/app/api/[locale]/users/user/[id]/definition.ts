@@ -41,8 +41,7 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.users.user.id.id.get.container.title" as const,
-      description:
-        "app.api.users.user.id.id.get.container.description" as const,
+      description: "app.api.users.user.id.id.get.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
@@ -64,10 +63,8 @@ const { GET } = createEndpoint({
       userProfile: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.users.user.id.id.get.response.userProfile.title" as const,
-          description:
-            "app.api.users.user.id.id.get.response.userProfile.description" as const,
+          title: "app.api.users.user.id.id.get.response.userProfile.title" as const,
+          description: "app.api.users.user.id.id.get.response.userProfile.description" as const,
           layoutType: LayoutType.GRID,
           columns: 2,
         },
@@ -76,8 +73,7 @@ const { GET } = createEndpoint({
           basicInfo: objectField(
             {
               type: WidgetType.CONTAINER,
-              title:
-                "app.api.users.user.id.id.get.response.userProfile.basicInfo.title" as const,
+              title: "app.api.users.user.id.id.get.response.userProfile.basicInfo.title" as const,
               description:
                 "app.api.users.user.id.id.get.response.userProfile.basicInfo.description" as const,
               layoutType: LayoutType.VERTICAL,
@@ -125,10 +121,8 @@ const { GET } = createEndpoint({
       accountStatus: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.users.user.id.id.get.response.accountStatus.title" as const,
-          description:
-            "app.api.users.user.id.id.get.response.accountStatus.description" as const,
+          title: "app.api.users.user.id.id.get.response.accountStatus.title" as const,
+          description: "app.api.users.user.id.id.get.response.accountStatus.description" as const,
           layoutType: LayoutType.GRID,
           columns: 2,
         },
@@ -192,10 +186,8 @@ const { GET } = createEndpoint({
       timestamps: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.users.user.id.id.get.response.timestamps.title" as const,
-          description:
-            "app.api.users.user.id.id.get.response.timestamps.description" as const,
+          title: "app.api.users.user.id.id.get.response.timestamps.title" as const,
+          description: "app.api.users.user.id.id.get.response.timestamps.description" as const,
           layoutType: LayoutType.GRID,
           columns: 2,
         },
@@ -223,32 +215,28 @@ const { GET } = createEndpoint({
       leadId: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.leadId.content" as const,
+          content: "app.api.users.user.id.id.get.response.leadId.content" as const,
         },
         z.uuid().nullable(),
       ),
       email: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.email.content" as const,
+          content: "app.api.users.user.id.id.get.response.email.content" as const,
         },
         z.email(),
       ),
       privateName: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.privateName.content" as const,
+          content: "app.api.users.user.id.id.get.response.privateName.content" as const,
         },
         z.string(),
       ),
       publicName: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.publicName.content" as const,
+          content: "app.api.users.user.id.id.get.response.publicName.content" as const,
         },
         z.string(),
       ),
@@ -269,8 +257,7 @@ const { GET } = createEndpoint({
       stripeCustomerId: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.stripeCustomerId.content" as const,
+          content: "app.api.users.user.id.id.get.response.stripeCustomerId.content" as const,
         },
         z.string().nullable(),
       ),
@@ -288,8 +275,7 @@ const { GET } = createEndpoint({
             id: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.users.user.id.id.get.response.userRoles.content" as const,
+                content: "app.api.users.user.id.id.get.response.userRoles.content" as const,
               },
               z.uuid(),
             ),
@@ -306,16 +292,14 @@ const { GET } = createEndpoint({
       createdAt: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.createdAt.content" as const,
+          content: "app.api.users.user.id.id.get.response.createdAt.content" as const,
         },
         z.string().datetime(),
       ),
       updatedAt: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.get.response.updatedAt.content" as const,
+          content: "app.api.users.user.id.id.get.response.updatedAt.content" as const,
         },
         z.string().datetime(),
       ),
@@ -325,49 +309,39 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.users.user.id.id.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.unauthorized.description" as const,
+      description: "app.api.users.user.id.id.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.users.user.id.id.get.errors.validation.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.validation.description" as const,
+      description: "app.api.users.user.id.id.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.users.user.id.id.get.errors.forbidden.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.forbidden.description" as const,
+      description: "app.api.users.user.id.id.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.users.user.id.id.get.errors.notFound.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.notFound.description" as const,
+      description: "app.api.users.user.id.id.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.users.user.id.id.get.errors.conflict.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.conflict.description" as const,
+      description: "app.api.users.user.id.id.get.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.users.user.id.id.get.errors.network.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.network.description" as const,
+      description: "app.api.users.user.id.id.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.users.user.id.id.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.unsavedChanges.description" as const,
+      title: "app.api.users.user.id.id.get.errors.unsavedChanges.title" as const,
+      description: "app.api.users.user.id.id.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.users.user.id.id.get.errors.server.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.server.description" as const,
+      description: "app.api.users.user.id.id.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.users.user.id.id.get.errors.unknown.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.unknown.description" as const,
+      description: "app.api.users.user.id.id.get.errors.unknown.description" as const,
     },
   },
   successTypes: {
@@ -444,8 +418,7 @@ const { PUT } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.users.user.id.id.put.container.title" as const,
-      description:
-        "app.api.users.user.id.id.put.container.description" as const,
+      description: "app.api.users.user.id.id.put.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
@@ -469,10 +442,8 @@ const { PUT } = createEndpoint({
       basicInfo: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.users.user.id.id.put.sections.basicInfo.title" as const,
-          description:
-            "app.api.users.user.id.id.put.sections.basicInfo.description" as const,
+          title: "app.api.users.user.id.id.put.sections.basicInfo.title" as const,
+          description: "app.api.users.user.id.id.put.sections.basicInfo.description" as const,
           layoutType: LayoutType.GRID,
           columns: 2,
         },
@@ -483,10 +454,8 @@ const { PUT } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.EMAIL,
               label: "app.api.users.user.id.id.put.email.label" as const,
-              description:
-                "app.api.users.user.id.id.put.email.description" as const,
-              placeholder:
-                "app.api.users.user.id.id.put.email.placeholder" as const,
+              description: "app.api.users.user.id.id.put.email.description" as const,
+              placeholder: "app.api.users.user.id.id.put.email.placeholder" as const,
               columns: 12,
             },
             z
@@ -500,8 +469,7 @@ const { PUT } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.users.user.id.id.put.privateName.label" as const,
-              description:
-                "app.api.users.user.id.id.put.privateName.description" as const,
+              description: "app.api.users.user.id.id.put.privateName.description" as const,
               columns: 6,
             },
             z
@@ -516,8 +484,7 @@ const { PUT } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.users.user.id.id.put.publicName.label" as const,
-              description:
-                "app.api.users.user.id.id.put.publicName.description" as const,
+              description: "app.api.users.user.id.id.put.publicName.description" as const,
               columns: 6,
             },
             z
@@ -534,10 +501,8 @@ const { PUT } = createEndpoint({
       adminSettings: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.users.user.id.id.put.sections.adminSettings.title" as const,
-          description:
-            "app.api.users.user.id.id.put.sections.adminSettings.description" as const,
+          title: "app.api.users.user.id.id.put.sections.adminSettings.title" as const,
+          description: "app.api.users.user.id.id.put.sections.adminSettings.description" as const,
           layoutType: LayoutType.GRID,
           columns: 2,
         },
@@ -547,10 +512,8 @@ const { PUT } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label:
-                "app.api.users.user.id.id.put.emailVerified.label" as const,
-              description:
-                "app.api.users.user.id.id.put.emailVerified.description" as const,
+              label: "app.api.users.user.id.id.put.emailVerified.label" as const,
+              description: "app.api.users.user.id.id.put.emailVerified.description" as const,
               columns: 6,
             },
             z.boolean().optional(),
@@ -560,8 +523,7 @@ const { PUT } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "app.api.users.user.id.id.put.isActive.label" as const,
-              description:
-                "app.api.users.user.id.id.put.isActive.description" as const,
+              description: "app.api.users.user.id.id.put.isActive.description" as const,
               columns: 6,
             },
             z.boolean().optional(),
@@ -571,8 +533,7 @@ const { PUT } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.UUID,
               label: "app.api.users.user.id.id.put.leadId.label" as const,
-              description:
-                "app.api.users.user.id.id.put.leadId.description" as const,
+              description: "app.api.users.user.id.id.put.leadId.description" as const,
               columns: 6,
             },
             z.uuid().nullable().optional(),
@@ -584,32 +545,28 @@ const { PUT } = createEndpoint({
       leadId: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.leadId.content" as const,
+          content: "app.api.users.user.id.id.put.response.leadId.content" as const,
         },
         z.uuid().nullable(),
       ),
       email: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.email.content" as const,
+          content: "app.api.users.user.id.id.put.response.email.content" as const,
         },
         z.email(),
       ),
       privateName: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.privateName.content" as const,
+          content: "app.api.users.user.id.id.put.response.privateName.content" as const,
         },
         z.string(),
       ),
       publicName: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.publicName.content" as const,
+          content: "app.api.users.user.id.id.put.response.publicName.content" as const,
         },
         z.string(),
       ),
@@ -630,8 +587,7 @@ const { PUT } = createEndpoint({
       stripeCustomerId: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.stripeCustomerId.content" as const,
+          content: "app.api.users.user.id.id.put.response.stripeCustomerId.content" as const,
         },
         z.string().nullable(),
       ),
@@ -649,8 +605,7 @@ const { PUT } = createEndpoint({
             id: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.users.user.id.id.put.response.userRoles.content" as const,
+                content: "app.api.users.user.id.id.put.response.userRoles.content" as const,
               },
               z.uuid(),
             ),
@@ -667,16 +622,14 @@ const { PUT } = createEndpoint({
       createdAt: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.createdAt.content" as const,
+          content: "app.api.users.user.id.id.put.response.createdAt.content" as const,
         },
         z.string().datetime(),
       ),
       updatedAt: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.users.user.id.id.put.response.updatedAt.content" as const,
+          content: "app.api.users.user.id.id.put.response.updatedAt.content" as const,
         },
         z.string().datetime(),
       ),
@@ -686,49 +639,39 @@ const { PUT } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.users.user.id.id.put.errors.unauthorized.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.unauthorized.description" as const,
+      description: "app.api.users.user.id.id.put.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.users.user.id.id.put.errors.validation.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.validation.description" as const,
+      description: "app.api.users.user.id.id.put.errors.validation.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.users.user.id.id.put.errors.forbidden.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.forbidden.description" as const,
+      description: "app.api.users.user.id.id.put.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.users.user.id.id.put.errors.notFound.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.notFound.description" as const,
+      description: "app.api.users.user.id.id.put.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.users.user.id.id.put.errors.conflict.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.conflict.description" as const,
+      description: "app.api.users.user.id.id.put.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.users.user.id.id.put.errors.server.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.server.description" as const,
+      description: "app.api.users.user.id.id.put.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.users.user.id.id.put.errors.network.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.network.description" as const,
+      description: "app.api.users.user.id.id.put.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.users.user.id.id.put.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.unsavedChanges.description" as const,
+      title: "app.api.users.user.id.id.put.errors.unsavedChanges.title" as const,
+      description: "app.api.users.user.id.id.put.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.users.user.id.id.put.errors.unknown.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.unknown.description" as const,
+      description: "app.api.users.user.id.id.put.errors.unknown.description" as const,
     },
   },
 
@@ -793,8 +736,7 @@ const { DELETE } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.users.user.id.id.delete.container.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.container.description" as const,
+      description: "app.api.users.user.id.id.delete.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
@@ -805,10 +747,8 @@ const { DELETE } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.users.user.id.id.delete.id.label" as const,
-          description:
-            "app.api.users.user.id.id.delete.id.description" as const,
-          placeholder:
-            "app.api.users.user.id.id.delete.id.placeholder" as const,
+          description: "app.api.users.user.id.id.delete.id.description" as const,
+          placeholder: "app.api.users.user.id.id.delete.id.placeholder" as const,
           helpText: "app.api.users.user.id.id.delete.id.helpText" as const,
           columns: 12,
         },
@@ -844,51 +784,40 @@ const { DELETE } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.users.user.id.id.delete.errors.unauthorized.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.unauthorized.description" as const,
+      title: "app.api.users.user.id.id.delete.errors.unauthorized.title" as const,
+      description: "app.api.users.user.id.id.delete.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.users.user.id.id.delete.errors.validation.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.validation.description" as const,
+      description: "app.api.users.user.id.id.delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.users.user.id.id.delete.errors.forbidden.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.forbidden.description" as const,
+      description: "app.api.users.user.id.id.delete.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.users.user.id.id.delete.errors.notFound.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.notFound.description" as const,
+      description: "app.api.users.user.id.id.delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.users.user.id.id.delete.errors.conflict.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.conflict.description" as const,
+      description: "app.api.users.user.id.id.delete.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.users.user.id.id.delete.errors.server.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.server.description" as const,
+      description: "app.api.users.user.id.id.delete.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.users.user.id.id.delete.errors.network.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.network.description" as const,
+      description: "app.api.users.user.id.id.delete.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.users.user.id.id.delete.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.unsavedChanges.description" as const,
+      title: "app.api.users.user.id.id.delete.errors.unsavedChanges.title" as const,
+      description: "app.api.users.user.id.id.delete.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.users.user.id.id.delete.errors.unknown.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.unknown.description" as const,
+      description: "app.api.users.user.id.id.delete.errors.unknown.description" as const,
     },
   },
 
@@ -932,10 +861,8 @@ export type UserDeleteRequestInput = typeof DELETE.types.RequestInput;
 export type UserDeleteRequestOutput = typeof DELETE.types.UrlVariablesOutput;
 export type UserDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type UserDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
-export type UserDeleteUrlParamsTypeInput =
-  typeof DELETE.types.UrlVariablesInput;
-export type UserDeleteUrlParamsTypeOutput =
-  typeof DELETE.types.UrlVariablesOutput;
+export type UserDeleteUrlParamsTypeInput = typeof DELETE.types.UrlVariablesInput;
+export type UserDeleteUrlParamsTypeOutput = typeof DELETE.types.UrlVariablesOutput;
 
 /**
  * Export definitions

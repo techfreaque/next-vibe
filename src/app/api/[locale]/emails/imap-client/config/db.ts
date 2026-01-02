@@ -3,14 +3,7 @@
  * Database tables for IMAP configuration
  */
 
-import {
-  boolean,
-  integer,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 import { ImapLoggingLevel, ImapLoggingLevelDB } from "./enum";
@@ -51,17 +44,11 @@ export const imapConfigurations = pgTable("imap_configurations", {
   // Resilience settings
   maxRetries: integer("max_retries").notNull().default(3),
   retryDelay: integer("retry_delay").notNull().default(1000),
-  circuitBreakerThreshold: integer("circuit_breaker_threshold")
-    .notNull()
-    .default(5),
-  circuitBreakerTimeout: integer("circuit_breaker_timeout")
-    .notNull()
-    .default(60000),
+  circuitBreakerThreshold: integer("circuit_breaker_threshold").notNull().default(5),
+  circuitBreakerTimeout: integer("circuit_breaker_timeout").notNull().default(60000),
 
   // Monitoring settings
-  healthCheckInterval: integer("health_check_interval")
-    .notNull()
-    .default(60000),
+  healthCheckInterval: integer("health_check_interval").notNull().default(60000),
   metricsEnabled: boolean("metrics_enabled").notNull().default(true),
   loggingLevel: text("logging_level", { enum: ImapLoggingLevelDB })
     .notNull()
@@ -84,10 +71,8 @@ export const imapConfigurations = pgTable("imap_configurations", {
 /**
  * Zod Schemas
  */
-export const selectImapConfigurationSchema =
-  createSelectSchema(imapConfigurations);
-export const insertImapConfigurationSchema =
-  createInsertSchema(imapConfigurations);
+export const selectImapConfigurationSchema = createSelectSchema(imapConfigurations);
+export const insertImapConfigurationSchema = createInsertSchema(imapConfigurations);
 
 /**
  * Type Exports

@@ -103,8 +103,7 @@ const { POST } = createEndpoint({
             responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.fields.usage.patterns.item" as const,
+                content: "app.api.system.help.fields.usage.patterns.item" as const,
               },
               z.string(),
             ),
@@ -142,8 +141,7 @@ const { POST } = createEndpoint({
                 description: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.help.fields.options.description" as const,
+                    content: "app.api.system.help.fields.options.description" as const,
                   },
                   z.string(),
                 ),
@@ -176,16 +174,14 @@ const { POST } = createEndpoint({
                 command: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.help.fields.examples.command" as const,
+                    content: "app.api.system.help.fields.examples.command" as const,
                   },
                   z.string(),
                 ),
                 description: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.help.fields.examples.description" as const,
+                    content: "app.api.system.help.fields.examples.description" as const,
                   },
                   z.string().optional(),
                 ),
@@ -218,16 +214,14 @@ const { POST } = createEndpoint({
                 command: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.help.fields.examples.command" as const,
+                    content: "app.api.system.help.fields.examples.command" as const,
                   },
                   z.string(),
                 ),
                 description: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.help.fields.options.description" as const,
+                    content: "app.api.system.help.fields.options.description" as const,
                   },
                   z.string(),
                 ),
@@ -249,8 +243,7 @@ const { POST } = createEndpoint({
           category: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.help.fields.details.category.content" as const,
+              content: "app.api.system.help.fields.details.category.content" as const,
               label: "app.api.system.help.fields.details.category.content",
             },
             z.string().optional(),
@@ -258,8 +251,7 @@ const { POST } = createEndpoint({
           path: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.help.fields.details.path.content" as const,
+              content: "app.api.system.help.fields.details.path.content" as const,
               label: "app.api.system.help.fields.details.path.content",
             },
             z.string().optional(),
@@ -267,8 +259,7 @@ const { POST } = createEndpoint({
           method: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.help.fields.details.method.content" as const,
+              content: "app.api.system.help.fields.details.method.content" as const,
               label: "app.api.system.help.fields.details.method.content",
             },
             z.string().optional(),
@@ -276,8 +267,7 @@ const { POST } = createEndpoint({
           aliases: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.help.fields.details.aliases.content" as const,
+              content: "app.api.system.help.fields.details.aliases.content" as const,
               label: "app.api.system.help.fields.details.aliases.content",
             },
             z.string().optional(),
@@ -348,8 +338,7 @@ const { POST } = createEndpoint({
       default: {
         header: {
           title: "Vibe CLI - Next-generation API execution tool",
-          description:
-            "Command-line interface for Next-Vibe API with real-time execution",
+          description: "Command-line interface for Next-Vibe API with real-time execution",
         },
         usage: {
           patterns: ["vibe <command> [options]", "vibe <command> --help"],
@@ -395,8 +384,7 @@ const { POST } = createEndpoint({
       specificCommand: {
         header: {
           title: "check - Run comprehensive code quality checks",
-          description:
-            "Runs linting, type checking, and other code quality tools",
+          description: "Runs linting, type checking, and other code quality tools",
         },
         usage: {
           patterns: ["vibe check [paths] [options]"],

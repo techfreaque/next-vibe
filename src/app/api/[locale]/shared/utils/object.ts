@@ -32,9 +32,7 @@ export function objectEntries<K extends string | number | symbol, V>(
 export function objectEntries<K extends string | number | symbol, V>(
   obj: Record<K, V> | Partial<Record<K, V>>,
 ): Array<[K, V]> {
-  return Object.entries(obj).filter(
-    ([, value]) => value !== undefined,
-  ) as Array<[K, V]>;
+  return Object.entries(obj).filter(([, value]) => value !== undefined) as Array<[K, V]>;
 }
 
 /**

@@ -93,8 +93,7 @@ function isFieldRequired(fieldSchema: z.ZodTypeAny): boolean {
     if (fieldSchema instanceof z.ZodUnion) {
       const options = fieldSchema._def.options as z.ZodTypeAny[];
       const hasUndefined = options.some(
-        (option: z.ZodTypeAny) =>
-          option instanceof z.ZodUndefined || option instanceof z.ZodNull,
+        (option: z.ZodTypeAny) => option instanceof z.ZodUndefined || option instanceof z.ZodNull,
       );
       return !hasUndefined;
     }

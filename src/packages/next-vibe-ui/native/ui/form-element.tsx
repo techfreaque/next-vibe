@@ -10,10 +10,7 @@ import { forwardRef, useImperativeHandle, useRef } from "react";
 import { View } from "react-native";
 
 // Import all types from web version (web is source of truth)
-import type {
-  FormElementProps,
-  FormElementRefObject,
-} from "../../web/ui/form-element";
+import type { FormElementProps, FormElementRefObject } from "../../web/ui/form-element";
 
 const StyledView = styled(View, { className: "style" });
 

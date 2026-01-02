@@ -215,8 +215,7 @@ export const translations: typeof enTranslations = {
       walletRequired: "Wallet-Adresse für Krypto-Auszahlungen erforderlich",
       insufficientBalance: "Unzureichendes Guthaben für Auszahlung",
       notFound: "Auszahlungsanfrage nicht gefunden",
-      invalidStatus:
-        "Ungültiger Status der Auszahlungsanfrage für diesen Vorgang",
+      invalidStatus: "Ungültiger Status der Auszahlungsanfrage für diesen Vorgang",
     },
   },
 
@@ -266,8 +265,7 @@ export const translations: typeof enTranslations = {
     code_exists: "Dieser Empfehlungscode existiert bereits",
     code_expired: "Dieser Empfehlungscode ist abgelaufen",
     code_inactive: "Dieser Empfehlungscode ist nicht aktiv",
-    max_uses_reached:
-      "Dieser Empfehlungscode hat seine maximale Verwendung erreicht",
+    max_uses_reached: "Dieser Empfehlungscode hat seine maximale Verwendung erreicht",
     invalid_code: "Ungültiger Empfehlungscode",
   },
 

@@ -52,9 +52,7 @@ export function CronTaskEditClient({
       {/* Header with back button */}
       <Div className="flex items-center justify-between">
         <Div>
-          <H2 className="text-xl font-semibold">
-            {t("app.admin.cron.taskDetails.edit")}
-          </H2>
+          <H2 className="text-xl font-semibold">{t("app.admin.cron.taskDetails.edit")}</H2>
           <P className="text-sm text-muted-foreground">
             {initialData.name} • {initialData.schedule}
           </P>
@@ -65,11 +63,7 @@ export function CronTaskEditClient({
       </Div>
 
       {/* Edit form */}
-      <CronTaskEditForm
-        task={initialData}
-        endpoint={endpoint}
-        locale={locale}
-      />
+      <CronTaskEditForm task={initialData} endpoint={endpoint} locale={locale} />
     </Div>
   );
 }

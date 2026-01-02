@@ -7,11 +7,7 @@
 import "server-only";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -45,64 +41,59 @@ export interface FunctionalGeneratorsRepository {
     logger: EndpointLogger,
   ): Promise<BaseResponseType<ResponseOutputType>>;
 
-  validateOptions(
-    options: FunctionalGeneratorOptions,
-  ): Promise<BaseResponseType<boolean>>;
+  validateOptions(options: FunctionalGeneratorOptions): Promise<BaseResponseType<boolean>>;
 }
 
 /**
  * Functional Generators Repository Implementation
  */
-export class FunctionalGeneratorsRepositoryImpl
-  implements FunctionalGeneratorsRepository
-{
-  private readonly optionDefinitions =
-    defineOptions<FunctionalGeneratorOptions>({
-      skipEndpoints: {
-        name: "skip-endpoints",
-        type: "boolean",
-        default: false,
-        description: "Skip generating API endpoints",
-        category: "Generation",
-      },
-      skipSeeds: {
-        name: "skip-seeds",
-        type: "boolean",
-        default: false,
-        description: "Skip generating seeds",
-        category: "Generation",
-      },
-      skipCronTasks: {
-        name: "skip-cron-tasks",
-        type: "boolean",
-        default: false,
-        description: "Skip generating cron tasks",
-        category: "Generation",
-      },
-      skipTRPCRouter: {
-        name: "skip-trpc-router",
-        type: "boolean",
-        default: false,
-        description: "Skip generating tRPC router",
-        category: "Generation",
-      },
-      rootDir: {
-        name: "root-dir",
-        alias: "r",
-        type: "string",
-        default: "src",
-        description: "Root directory to scan for generating artifacts",
-        category: "Generation",
-      },
-      verbose: {
-        name: "verbose",
-        alias: "v",
-        type: "boolean",
-        default: false,
-        description: "Enable verbose output",
-        category: "General",
-      },
-    });
+export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsRepository {
+  private readonly optionDefinitions = defineOptions<FunctionalGeneratorOptions>({
+    skipEndpoints: {
+      name: "skip-endpoints",
+      type: "boolean",
+      default: false,
+      description: "Skip generating API endpoints",
+      category: "Generation",
+    },
+    skipSeeds: {
+      name: "skip-seeds",
+      type: "boolean",
+      default: false,
+      description: "Skip generating seeds",
+      category: "Generation",
+    },
+    skipCronTasks: {
+      name: "skip-cron-tasks",
+      type: "boolean",
+      default: false,
+      description: "Skip generating cron tasks",
+      category: "Generation",
+    },
+    skipTRPCRouter: {
+      name: "skip-trpc-router",
+      type: "boolean",
+      default: false,
+      description: "Skip generating tRPC router",
+      category: "Generation",
+    },
+    rootDir: {
+      name: "root-dir",
+      alias: "r",
+      type: "string",
+      default: "src",
+      description: "Root directory to scan for generating artifacts",
+      category: "Generation",
+    },
+    verbose: {
+      name: "verbose",
+      alias: "v",
+      type: "boolean",
+      default: false,
+      description: "Enable verbose output",
+      category: "General",
+    },
+  });
 
   /**
    * Run functional generators
@@ -219,15 +210,12 @@ export class FunctionalGeneratorsRepositoryImpl
   /**
    * Validate generator options
    */
-  async validateOptions(
-    options: FunctionalGeneratorOptions,
-  ): Promise<BaseResponseType<boolean>> {
+  async validateOptions(options: FunctionalGeneratorOptions): Promise<BaseResponseType<boolean>> {
     try {
       // Basic validation - could be expanded
       if (options.rootDir && !options.rootDir.trim()) {
         return fail({
-          message:
-            "app.api.system.generators.endpoints.post.errors.validation.title",
+          message: "app.api.system.generators.endpoints.post.errors.validation.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { error: "Root directory cannot be empty" },
         });
@@ -254,9 +242,7 @@ export class FunctionalGeneratorsRepositoryImpl
 
       // Note: Endpoint generation is now handled by the tRPC router generator
       // This is a no-op to maintain compatibility with the generator interface
-      logger.debug(
-        "✅ Endpoints generated successfully (handled by tRPC router generator)",
-      );
+      logger.debug("✅ Endpoints generated successfully (handled by tRPC router generator)");
     } catch (error) {
       logger.error("❌ Error generating endpoints:", parseError(error));
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
@@ -273,9 +259,7 @@ export class FunctionalGeneratorsRepositoryImpl
 
       // Note: Seeds generation is now handled by the dedicated seeds generator
       // This is a no-op to maintain compatibility with the generator interface
-      logger.debug(
-        "✅ Seeds generated successfully (handled by dedicated seeds generator)",
-      );
+      logger.debug("✅ Seeds generated successfully (handled by dedicated seeds generator)");
     } catch (error) {
       logger.error("❌ Error generating seeds:", parseError(error));
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
@@ -322,8 +306,7 @@ export class FunctionalGeneratorsRepositoryImpl
   }
 }
 
-export const functionalGeneratorsRepository =
-  new FunctionalGeneratorsRepositoryImpl();
+export const functionalGeneratorsRepository = new FunctionalGeneratorsRepositoryImpl();
 
 // Export with the expected name for generate-all
 // Note: This export is deprecated and should not be used directly

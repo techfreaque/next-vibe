@@ -33,18 +33,7 @@
  * All transactions are immutable audit logs
  */
 
-import {
-  and,
-  desc,
-  eq,
-  gte,
-  inArray,
-  isNull,
-  lt,
-  not,
-  or,
-  sql,
-} from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNull, lt, not, or, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -52,11 +41,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import {
-  leadLeadLinks,
-  leads,
-  userLeadLinks,
-} from "@/app/api/[locale]/leads/db";
+import { leadLeadLinks, leads, userLeadLinks } from "@/app/api/[locale]/leads/db";
 import { LeadSource, LeadStatus } from "@/app/api/[locale]/leads/enum";
 import type { CreditPackCheckoutSession } from "@/app/api/[locale]/payment/providers/types";
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
@@ -72,12 +57,7 @@ import { ProductIds, productsRepository } from "../products/repository-client";
 import { payoutRequests } from "../referral/db";
 import { PayoutStatus } from "../referral/enum";
 import { withTransaction } from "../system/db/utils/repository-helpers";
-import {
-  creditPacks,
-  creditTransactions,
-  type CreditWallet,
-  creditWallets,
-} from "./db";
+import { creditPacks, creditTransactions, type CreditWallet, creditWallets } from "./db";
 import {
   CreditPackType,
   type CreditPackTypeValue,
@@ -148,8 +128,7 @@ export class CreditRepository {
    * Uses the FREE_TIER product definition as single source of truth
    */
   private static getInitialFreeCredits(): number {
-    return productsRepository.getProduct(ProductIds.FREE_TIER, "en-GLOBAL")
-      .credits;
+    return productsRepository.getProduct(ProductIds.FREE_TIER, "en-GLOBAL").credits;
   }
 
   /**
@@ -161,10 +140,7 @@ export class CreditRepository {
   ): Promise<ResponseType<CreditPool>> {
     try {
       // Get user wallet
-      const userWalletResult = await CreditRepository.getOrCreateUserWallet(
-        userId,
-        logger,
-      );
+      const userWalletResult = await CreditRepository.getOrCreateUserWallet(userId, logger);
       if (!userWalletResult.success) {
         return userWalletResult;
       }
@@ -208,8 +184,7 @@ export class CreditRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditPool>> {
     try {
-      const connectedLeadIds =
-        await CreditRepository.findConnectedLeads(leadId);
+      const connectedLeadIds = await CreditRepository.findConnectedLeads(leadId);
 
       let leadWallets = await db
         .select()
@@ -217,10 +192,7 @@ export class CreditRepository {
         .where(inArray(creditWallets.leadId, connectedLeadIds));
 
       if (leadWallets.length === 0) {
-        const walletResult = await CreditRepository.getOrCreateLeadWallet(
-          leadId,
-          logger,
-        );
+        const walletResult = await CreditRepository.getOrCreateLeadWallet(leadId, logger);
         if (!walletResult.success) {
           return walletResult;
         }
@@ -266,8 +238,7 @@ export class CreditRepository {
       }
 
       // Lead is not linked to user -> find lead-to-lead pool
-      const connectedLeadIds =
-        await CreditRepository.findConnectedLeads(leadId);
+      const connectedLeadIds = await CreditRepository.findConnectedLeads(leadId);
 
       // Get EXISTING wallets for all connected leads
       let leadWallets = await db
@@ -277,10 +248,7 @@ export class CreditRepository {
 
       // If no wallets exist, create wallet for the PRIMARY lead only
       if (leadWallets.length === 0) {
-        const walletResult = await CreditRepository.getOrCreateLeadWallet(
-          leadId,
-          logger,
-        );
+        const walletResult = await CreditRepository.getOrCreateLeadWallet(leadId, logger);
         if (!walletResult.success) {
           return walletResult;
         }
@@ -313,9 +281,7 @@ export class CreditRepository {
   /**
    * Find all leads connected via lead_lead_links table using graph traversal
    */
-  private static async findConnectedLeads(
-    startLeadId: string,
-  ): Promise<string[]> {
+  private static async findConnectedLeads(startLeadId: string): Promise<string[]> {
     const visited = new Set<string>();
     const queue = [startLeadId];
 
@@ -332,16 +298,12 @@ export class CreditRepository {
         .select()
         .from(leadLeadLinks)
         .where(
-          or(
-            eq(leadLeadLinks.leadId1, currentLeadId),
-            eq(leadLeadLinks.leadId2, currentLeadId),
-          ),
+          or(eq(leadLeadLinks.leadId1, currentLeadId), eq(leadLeadLinks.leadId2, currentLeadId)),
         );
 
       for (const link of links) {
         // Get the other lead in the link
-        const otherLeadId =
-          link.leadId1 === currentLeadId ? link.leadId2 : link.leadId1;
+        const otherLeadId = link.leadId1 === currentLeadId ? link.leadId2 : link.leadId1;
         if (!visited.has(otherLeadId)) {
           queue.push(otherLeadId);
         }
@@ -474,20 +436,16 @@ export class CreditRepository {
     logger: EndpointLogger,
   ): Promise<CreditBalance> {
     // Refetch all wallets to get current balances
-    const walletIds = [
-      pool.userWallet?.id,
-      ...pool.leadWallets.map((w) => w.id),
-    ].filter((id): id is string => id !== undefined);
+    const walletIds = [pool.userWallet?.id, ...pool.leadWallets.map((w) => w.id)].filter(
+      (id): id is string => id !== undefined,
+    );
 
     // AUTOMATIC EXPIRATION: Expire old credits before calculating balance
     await CreditRepository.expireExpiredCreditsForWallets(walletIds, logger);
 
     const currentWallets =
       walletIds.length > 0
-        ? await db
-            .select()
-            .from(creditWallets)
-            .where(inArray(creditWallets.id, walletIds))
+        ? await db.select().from(creditWallets).where(inArray(creditWallets.id, walletIds))
         : [];
 
     let totalFreeInWallets = 0;
@@ -566,9 +524,7 @@ export class CreditRepository {
             inArray(creditTransactions.walletId, leadWalletIds),
             eq(creditTransactions.freePeriodId, activePeriodId),
             eq(creditTransactions.type, CreditTransactionType.USAGE),
-            latestGrant
-              ? gte(creditTransactions.createdAt, latestGrant.createdAt)
-              : sql`true`,
+            latestGrant ? gte(creditTransactions.createdAt, latestGrant.createdAt) : sql`true`,
           ),
         );
 
@@ -582,10 +538,7 @@ export class CreditRepository {
     const maxFreeCreditsPerPool = 20;
     const freeCreditsAvailable = Math.max(
       0,
-      Math.min(
-        totalFreeInWallets,
-        maxFreeCreditsPerPool - freeCreditsSpentThisPeriod,
-      ),
+      Math.min(totalFreeInWallets, maxFreeCreditsPerPool - freeCreditsSpentThisPeriod),
     );
 
     const activePeriodId =
@@ -710,13 +663,10 @@ export class CreditRepository {
         return success(newWallet);
       }
     } catch (error) {
-      logger.warn(
-        "Wallet creation transaction failed, checking for race condition",
-        {
-          userId,
-          error: parseError(error),
-        },
-      );
+      logger.warn("Wallet creation transaction failed, checking for race condition", {
+        userId,
+        error: parseError(error),
+      });
     }
 
     // Race condition: another process created it, fetch it
@@ -827,13 +777,10 @@ export class CreditRepository {
         return success(newWallet);
       }
     } catch (error) {
-      logger.warn(
-        "Wallet creation transaction failed, checking for race condition",
-        {
-          leadId,
-          error: parseError(error),
-        },
-      );
+      logger.warn("Wallet creation transaction failed, checking for race condition", {
+        leadId,
+        error: parseError(error),
+      });
     }
 
     // Race condition: another process created it, fetch it
@@ -929,10 +876,7 @@ export class CreditRepository {
       resetTime: now.toISOString(),
     });
 
-    const totalFreeCreditsInPool = leadWallets.reduce(
-      (sum, w) => sum + w.freeCreditsRemaining,
-      0,
-    );
+    const totalFreeCreditsInPool = leadWallets.reduce((sum, w) => sum + w.freeCreditsRemaining, 0);
 
     const maxFreeCreditsPerPool = productsRepository.getProduct(
       ProductIds.FREE_TIER,
@@ -968,10 +912,7 @@ export class CreditRepository {
         .where(eq(creditWallets.id, oldestLeadWallet.id));
 
       // Calculate total pool balance (paid credits from all wallets + new free credits)
-      const totalPaidBalance = allWallets.reduce(
-        (sum, w) => sum + w.balance,
-        0,
-      );
+      const totalPaidBalance = allWallets.reduce((sum, w) => sum + w.balance, 0);
       const totalBalanceAfterGrant = totalPaidBalance + maxFreeCreditsPerPool;
 
       // Create FREE_GRANT transaction
@@ -1022,15 +963,9 @@ export class CreditRepository {
       let poolResult: ResponseType<CreditPool>;
 
       if (identifier.userId) {
-        poolResult = await CreditRepository.getUserPool(
-          identifier.userId,
-          logger,
-        );
+        poolResult = await CreditRepository.getUserPool(identifier.userId, logger);
       } else if (identifier.leadId) {
-        poolResult = await CreditRepository.getLeadPool(
-          identifier.leadId,
-          logger,
-        );
+        poolResult = await CreditRepository.getLeadPool(identifier.leadId, logger);
       } else {
         return fail({
           message: "app.api.credits.errors.invalidIdentifier",
@@ -1042,10 +977,7 @@ export class CreditRepository {
         return poolResult;
       }
 
-      const balance = await CreditRepository.calculatePoolBalance(
-        poolResult.data,
-        logger,
-      );
+      const balance = await CreditRepository.calculatePoolBalance(poolResult.data, logger);
       return success(balance);
     } catch (error) {
       logger.error("Failed to get balance", parseError(error), {
@@ -1102,10 +1034,7 @@ export class CreditRepository {
       logger.debug("Getting credit balance", { userId: user.id, locale });
       let poolResult: ResponseType<CreditPool>;
       if (user.isPublic) {
-        poolResult = await CreditRepository.getLeadPoolOnly(
-          user.leadId,
-          logger,
-        );
+        poolResult = await CreditRepository.getLeadPoolOnly(user.leadId, logger);
       } else {
         poolResult = await CreditRepository.getUserPool(user.id, logger);
       }
@@ -1169,25 +1098,16 @@ export class CreditRepository {
 
       if (existingLead) {
         // Get pool for this lead
-        const poolResult = await CreditRepository.getLeadPool(
-          existingLead.id,
-          logger,
-        );
+        const poolResult = await CreditRepository.getLeadPool(existingLead.id, logger);
         if (!poolResult.success) {
           return poolResult;
         }
 
         // Ensure monthly credits are current for pool
-        await CreditRepository.ensureMonthlyFreeCreditsForPool(
-          poolResult.data,
-          logger,
-        );
+        await CreditRepository.ensureMonthlyFreeCreditsForPool(poolResult.data, logger);
 
         // Calculate total credits across pool
-        const balance = await CreditRepository.calculatePoolBalance(
-          poolResult.data,
-          logger,
-        );
+        const balance = await CreditRepository.calculatePoolBalance(poolResult.data, logger);
 
         return success({
           leadId: existingLead.id,
@@ -1211,17 +1131,13 @@ export class CreditRepository {
         .returning();
 
       // Create wallet for new lead
-      const walletResult = await CreditRepository.getOrCreateLeadWallet(
-        newLead.id,
-        logger,
-      );
+      const walletResult = await CreditRepository.getOrCreateLeadWallet(newLead.id, logger);
       if (!walletResult.success) {
         return walletResult;
       }
 
       // New lead has just one wallet, so credits = wallet balance
-      const credits =
-        walletResult.data.freeCreditsRemaining + walletResult.data.balance;
+      const credits = walletResult.data.freeCreditsRemaining + walletResult.data.balance;
 
       logger.debug("Created new lead with wallet", {
         leadId: newLead.id,
@@ -1274,10 +1190,7 @@ export class CreditRepository {
 
       if (identifier.userId) {
         // Add to user wallet (credits are pooled across user + linked leads)
-        walletResult = await CreditRepository.getOrCreateUserWallet(
-          identifier.userId,
-          logger,
-        );
+        walletResult = await CreditRepository.getOrCreateUserWallet(identifier.userId, logger);
       } else {
         // Check if this lead is linked to a user
         const [leadLink] = await db
@@ -1292,16 +1205,10 @@ export class CreditRepository {
             leadId: identifier.leadId,
             userId: leadLink.userId,
           });
-          walletResult = await CreditRepository.getOrCreateUserWallet(
-            leadLink.userId,
-            logger,
-          );
+          walletResult = await CreditRepository.getOrCreateUserWallet(leadLink.userId, logger);
         } else {
           // Lead is not linked - use lead wallet
-          walletResult = await CreditRepository.getOrCreateLeadWallet(
-            identifier.leadId!,
-            logger,
-          );
+          walletResult = await CreditRepository.getOrCreateLeadWallet(identifier.leadId!, logger);
         }
       }
 
@@ -1405,10 +1312,7 @@ export class CreditRepository {
   ): Promise<ResponseType<void>> {
     try {
       // Add to user wallet (credits are pooled across user + linked leads)
-      const walletResult = await CreditRepository.getOrCreateUserWallet(
-        userId,
-        logger,
-      );
+      const walletResult = await CreditRepository.getOrCreateUserWallet(userId, logger);
       if (!walletResult.success) {
         return walletResult;
       }
@@ -1420,8 +1324,7 @@ export class CreditRepository {
 
       if (type === "subscription") {
         packType = CreditPackType.SUBSCRIPTION;
-        finalExpiresAt =
-          expiresAt ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+        finalExpiresAt = expiresAt ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
       } else if (type === "permanent") {
         packType = CreditPackType.PERMANENT;
       } else {
@@ -1516,10 +1419,7 @@ export class CreditRepository {
       let currentLeadId: string | undefined;
 
       if (identifier.userId) {
-        poolResult = await CreditRepository.getUserPool(
-          identifier.userId,
-          logger,
-        );
+        poolResult = await CreditRepository.getUserPool(identifier.userId, logger);
         // For authenticated users, we need to know which lead is current
         // Get the leadId from identifier or fetch primary lead
         currentLeadId = identifier.leadId;
@@ -1532,10 +1432,7 @@ export class CreditRepository {
           currentLeadId = userLeadLink?.leadId;
         }
       } else {
-        poolResult = await CreditRepository.getLeadPool(
-          identifier.leadId!,
-          logger,
-        );
+        poolResult = await CreditRepository.getLeadPool(identifier.leadId!, logger);
         currentLeadId = identifier.leadId;
       }
 
@@ -1546,10 +1443,9 @@ export class CreditRepository {
       const pool = poolResult.data;
 
       // AUTOMATIC EXPIRATION: Expire old credits before deducting
-      const walletIds = [
-        pool.userWallet?.id,
-        ...pool.leadWallets.map((w) => w.id),
-      ].filter((id): id is string => id !== undefined);
+      const walletIds = [pool.userWallet?.id, ...pool.leadWallets.map((w) => w.id)].filter(
+        (id): id is string => id !== undefined,
+      );
       await CreditRepository.expireExpiredCreditsForWallets(walletIds, logger);
 
       // Ensure monthly credits are current for ENTIRE pool (pool-aware reset)
@@ -1587,15 +1483,12 @@ export class CreditRepository {
               ),
             );
 
-          const freeCreditsSpentThisPeriod = usageTransactions.reduce(
-            (sum, t) => {
-              const metadata = t.metadata as {
-                freeCreditsUsed?: number;
-              } | null;
-              return sum + (metadata?.freeCreditsUsed || 0);
-            },
-            0,
-          );
+          const freeCreditsSpentThisPeriod = usageTransactions.reduce((sum, t) => {
+            const metadata = t.metadata as {
+              freeCreditsUsed?: number;
+            } | null;
+            return sum + (metadata?.freeCreditsUsed || 0);
+          }, 0);
 
           const maxFreeCreditsPerPool = 20;
           const freeCreditsAvailableInPool = Math.max(
@@ -1611,10 +1504,7 @@ export class CreditRepository {
             requestedAmount: amount,
           });
 
-          let freeCreditsToDeduct = Math.min(
-            remaining,
-            freeCreditsAvailableInPool,
-          );
+          let freeCreditsToDeduct = Math.min(remaining, freeCreditsAvailableInPool);
 
           for (const wallet of walletsForDeduction) {
             if (freeCreditsToDeduct <= 0) {
@@ -1636,15 +1526,11 @@ export class CreditRepository {
               continue;
             }
 
-            const deduction = Math.min(
-              lockedWallet.freeCreditsRemaining,
-              freeCreditsToDeduct,
-            );
+            const deduction = Math.min(lockedWallet.freeCreditsRemaining, freeCreditsToDeduct);
             await tx
               .update(creditWallets)
               .set({
-                freeCreditsRemaining:
-                  lockedWallet.freeCreditsRemaining - deduction,
+                freeCreditsRemaining: lockedWallet.freeCreditsRemaining - deduction,
                 updatedAt: new Date(),
               })
               .where(eq(creditWallets.id, lockedWallet.id));
@@ -1756,12 +1642,7 @@ export class CreditRepository {
           const permanentPacks = await tx
             .select()
             .from(creditPacks)
-            .where(
-              and(
-                inArray(creditPacks.walletId, walletIds),
-                isNull(creditPacks.expiresAt),
-              ),
-            )
+            .where(and(inArray(creditPacks.walletId, walletIds), isNull(creditPacks.expiresAt)))
             .orderBy(desc(creditPacks.createdAt));
 
           for (const pack of permanentPacks) {
@@ -1982,10 +1863,7 @@ export class CreditRepository {
       await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
 
       // Refetch pool to get updated period IDs after potential reset
-      const updatedPoolResult = await CreditRepository.getUserPool(
-        userId,
-        logger,
-      );
+      const updatedPoolResult = await CreditRepository.getUserPool(userId, logger);
       if (!updatedPoolResult.success) {
         return updatedPoolResult;
       }
@@ -1999,9 +1877,7 @@ export class CreditRepository {
       }
 
       // Find current lead's wallet (may not exist if user has no lead on this device)
-      const currentLeadWallet = updatedPool.leadWallets.find(
-        (w) => w.leadId === leadId,
-      );
+      const currentLeadWallet = updatedPool.leadWallets.find((w) => w.leadId === leadId);
 
       // Use the wallet's actual freePeriodId for consistency
       const currentPeriodId = updatedPool.userWallet.freePeriodId;
@@ -2039,23 +1915,17 @@ export class CreditRepository {
               eq(creditTransactions.walletId, leadWallet.id),
               eq(creditTransactions.freePeriodId, currentPeriodId),
               eq(creditTransactions.type, CreditTransactionType.USAGE),
-              latestGrant
-                ? gte(creditTransactions.createdAt, latestGrant.createdAt)
-                : sql`true`,
+              latestGrant ? gte(creditTransactions.createdAt, latestGrant.createdAt) : sql`true`,
             ),
           );
 
-        const leadSpending = leadTransactions.reduce(
-          (sum, t) => sum + Math.abs(t.amount),
-          0,
-        );
+        const leadSpending = leadTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
         otherLeadsSpending += leadSpending;
       }
 
       // Adjust offset and limit to account for synthetic summary entry on page 1
       const hasSummaryEntry = otherLeadsSpending > 0;
-      const adjustedOffset =
-        hasSummaryEntry && offset > 0 ? offset - 1 : offset;
+      const adjustedOffset = hasSummaryEntry && offset > 0 ? offset - 1 : offset;
       const adjustedLimit = hasSummaryEntry && offset === 0 ? limit - 1 : limit;
 
       // Fetch transactions from current lead wallet (if exists) AND user wallet
@@ -2127,19 +1997,8 @@ export class CreditRepository {
     const offset = (page - 1) * limit;
 
     const result = user.id
-      ? await CreditRepository.getTransactions(
-          user.id,
-          user.leadId,
-          limit,
-          offset,
-          logger,
-        )
-      : await CreditRepository.getTransactionsByLeadId(
-          user.leadId,
-          limit,
-          offset,
-          logger,
-        );
+      ? await CreditRepository.getTransactions(user.id, user.leadId, limit, offset, logger)
+      : await CreditRepository.getTransactionsByLeadId(user.leadId, limit, offset, logger);
 
     if (!result.success) {
       return result;
@@ -2190,19 +2049,15 @@ export class CreditRepository {
       await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
 
       // Refetch pool to get updated period IDs after potential reset
-      const updatedPoolResult = await CreditRepository.getLeadPoolOnly(
-        leadId,
-        logger,
-      );
+      const updatedPoolResult = await CreditRepository.getLeadPoolOnly(leadId, logger);
       if (!updatedPoolResult.success) {
         return updatedPoolResult;
       }
 
       const updatedPool = updatedPoolResult.data;
-      const allWallets = [
-        updatedPool.userWallet,
-        ...updatedPool.leadWallets,
-      ].filter((w): w is CreditWallet => w !== null);
+      const allWallets = [updatedPool.userWallet, ...updatedPool.leadWallets].filter(
+        (w): w is CreditWallet => w !== null,
+      );
 
       // Find current lead's wallet
       const currentWallet = allWallets.find((w) => w.leadId === leadId);
@@ -2217,9 +2072,7 @@ export class CreditRepository {
       const currentPeriodId = currentWallet.freePeriodId;
 
       // Find the most recent FREE_GRANT for this period to get the reset cutoff time
-      const leadWalletIds = allWallets
-        .filter((w) => w.leadId !== null)
-        .map((w) => w.id);
+      const leadWalletIds = allWallets.filter((w) => w.leadId !== null).map((w) => w.id);
       const [latestGrant] = leadWalletIds.length
         ? await db
             .select()
@@ -2250,22 +2103,16 @@ export class CreditRepository {
               inArray(creditTransactions.walletId, otherWalletIds),
               eq(creditTransactions.freePeriodId, currentPeriodId),
               eq(creditTransactions.type, CreditTransactionType.USAGE),
-              latestGrant
-                ? gte(creditTransactions.createdAt, latestGrant.createdAt)
-                : sql`true`,
+              latestGrant ? gte(creditTransactions.createdAt, latestGrant.createdAt) : sql`true`,
             ),
           );
 
-        otherDevicesSpending = otherTransactions.reduce(
-          (sum, t) => sum + Math.abs(t.amount),
-          0,
-        );
+        otherDevicesSpending = otherTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
       }
 
       // Adjust offset and limit to account for synthetic summary entry on page 1
       const hasSummaryEntry = otherDevicesSpending > 0;
-      const adjustedOffset =
-        hasSummaryEntry && offset > 0 ? offset - 1 : offset;
+      const adjustedOffset = hasSummaryEntry && offset > 0 ? offset - 1 : offset;
       const adjustedLimit = hasSummaryEntry && offset === 0 ? limit - 1 : limit;
 
       // Fetch transactions from ONLY current wallet
@@ -2385,10 +2232,7 @@ export class CreditRepository {
             ),
           );
 
-        linkedLeadsSpending = leadTransactions.reduce(
-          (sum, t) => sum + Math.abs(t.amount),
-          0,
-        );
+        linkedLeadsSpending = leadTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
       }
 
       const result: CreditTransactionOutput[] = transactions.map((t) => ({
@@ -2432,9 +2276,7 @@ export class CreditRepository {
    * Creates EXPIRY transaction before deleting packs
    * Each pack expiration is wrapped in a transaction for atomicity
    */
-  static async expireCredits(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<number>> {
+  static async expireCredits(logger: EndpointLogger): Promise<ResponseType<number>> {
     try {
       const expiredPacks = await db
         .select()
@@ -2498,14 +2340,10 @@ export class CreditRepository {
           expiredCount++;
         } catch (packError) {
           // Log individual pack failure but continue with other packs
-          logger.error(
-            "Failed to expire individual pack",
-            parseError(packError),
-            {
-              packId: pack.id,
-              walletId: pack.walletId,
-            },
-          );
+          logger.error("Failed to expire individual pack", parseError(packError), {
+            packId: pack.id,
+            walletId: pack.walletId,
+          });
         }
       }
 
@@ -2744,14 +2582,10 @@ export class CreditRepository {
 
       return success();
     } catch (error) {
-      logger.error(
-        "Failed to link lead wallets during signup",
-        parseError(error),
-        {
-          userId,
-          leadIds,
-        },
-      );
+      logger.error("Failed to link lead wallets during signup", parseError(error), {
+        userId,
+        leadIds,
+      });
       return fail({
         message: "app.api.credits.errors.mergeLeadWalletsFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -2797,11 +2631,7 @@ export class CreditRepository {
       };
     }
 
-    const hasSufficient = await CreditRepository.hasSufficientCredits(
-      identifier,
-      amount,
-      logger,
-    );
+    const hasSufficient = await CreditRepository.hasSufficientCredits(identifier, amount, logger);
     if (!hasSufficient) {
       return {
         success: false,
@@ -2850,10 +2680,7 @@ export class CreditRepository {
   ): Promise<ResponseType<{ packId: string; transactionId: string }>> {
     try {
       // Get or create user wallet
-      const walletResult = await CreditRepository.getOrCreateUserWallet(
-        userId,
-        logger,
-      );
+      const walletResult = await CreditRepository.getOrCreateUserWallet(userId, logger);
       if (!walletResult.success) {
         return walletResult;
       }
@@ -2944,10 +2771,7 @@ export class CreditRepository {
     }>
   > {
     try {
-      const walletResult = await CreditRepository.getOrCreateUserWallet(
-        userId,
-        logger,
-      );
+      const walletResult = await CreditRepository.getOrCreateUserWallet(userId, logger);
       if (!walletResult.success) {
         return walletResult;
       }
@@ -2959,10 +2783,7 @@ export class CreditRepository {
         .select()
         .from(creditPacks)
         .where(
-          and(
-            eq(creditPacks.walletId, wallet.id),
-            eq(creditPacks.type, CreditPackType.EARNED),
-          ),
+          and(eq(creditPacks.walletId, wallet.id), eq(creditPacks.type, CreditPackType.EARNED)),
         );
 
       const total = earnedPacks.reduce((sum, pack) => sum + pack.remaining, 0);
@@ -3013,10 +2834,7 @@ export class CreditRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
-      const walletResult = await CreditRepository.getOrCreateUserWallet(
-        userId,
-        logger,
-      );
+      const walletResult = await CreditRepository.getOrCreateUserWallet(userId, logger);
       if (!walletResult.success) {
         return walletResult;
       }
@@ -3028,10 +2846,7 @@ export class CreditRepository {
         .select()
         .from(creditPacks)
         .where(
-          and(
-            eq(creditPacks.walletId, wallet.id),
-            eq(creditPacks.type, CreditPackType.EARNED),
-          ),
+          and(eq(creditPacks.walletId, wallet.id), eq(creditPacks.type, CreditPackType.EARNED)),
         )
         .orderBy(creditPacks.createdAt);
 
@@ -3123,10 +2938,7 @@ export class CreditRepository {
     }>
   > {
     try {
-      const walletResult = await CreditRepository.getOrCreateUserWallet(
-        userId,
-        logger,
-      );
+      const walletResult = await CreditRepository.getOrCreateUserWallet(userId, logger);
       if (!walletResult.success) {
         return walletResult;
       }
@@ -3190,7 +3002,4 @@ export class CreditRepository {
 }
 
 // Type for native repository type checking
-export type CreditRepositoryType = Pick<
-  typeof CreditRepository,
-  keyof typeof CreditRepository
->;
+export type CreditRepositoryType = Pick<typeof CreditRepository, keyof typeof CreditRepository>;

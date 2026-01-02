@@ -1,9 +1,6 @@
 import { parseError } from "next-vibe/shared/utils";
 
-import {
-  getAllSeedModuleNames,
-  getSeedModule,
-} from "@/app/api/[locale]/system/generated/seeds";
+import { getAllSeedModuleNames, getSeedModule } from "@/app/api/[locale]/system/generated/seeds";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatDatabase,
@@ -11,10 +8,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-export type SeedFn = (
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-) => Promise<void> | void;
+export type SeedFn = (logger: EndpointLogger, locale: CountryLanguage) => Promise<void> | void;
 export interface EnvironmentSeeds {
   dev?: SeedFn;
   test?: SeedFn;
@@ -43,17 +37,12 @@ async function loadSeedModules(logger: EndpointLogger): Promise<void> {
       if (seedModule) {
         // Register the seed module
         seedRegistry[moduleName] = seedModule;
-        logger.debug(
-          `✅ Loaded: ${moduleName} (priority: ${seedModule.priority ?? 0})`,
-        );
+        logger.debug(`✅ Loaded: ${moduleName} (priority: ${seedModule.priority ?? 0})`);
       } else {
         logger.warn(`⚠️  Seed module ${moduleName} returned null`);
       }
     } catch (error) {
-      logger.error(
-        `❌ Error loading seed module ${moduleName}:`,
-        parseError(error),
-      );
+      logger.error(`❌ Error loading seed module ${moduleName}:`, parseError(error));
     }
   }
 
@@ -74,9 +63,7 @@ export async function runSeeds(
   logger.debug("🔍 Loading seed modules...");
   await loadSeedModules(logger);
 
-  logger.debug(
-    `📦 Seed registry has ${Object.keys(seedRegistry).length} modules`,
-  );
+  logger.debug(`📦 Seed registry has ${Object.keys(seedRegistry).length} modules`);
   logger.debug(`🌱 Running ${environment} seeds`);
 
   // Sort modules by priority (higher priority runs first)
@@ -87,9 +74,7 @@ export async function runSeeds(
   for (const [moduleId, seeds] of sortedModules) {
     const seedFn = seeds[environment];
     if (seedFn) {
-      logger.debug(
-        `🌱 Seeding ${moduleId} (priority: ${seeds.priority ?? 0})...`,
-      );
+      logger.debug(`🌱 Seeding ${moduleId} (priority: ${seeds.priority ?? 0})...`);
       if (typeof seedFn === "function") {
         try {
           await seedFn(logger, locale);

@@ -25,10 +25,9 @@ function generateInputSchema(
 
   try {
     // Combine request data and URL params
-    const requestDataSchema = generateSchemaForUsage(
-      endpoint.fields,
-      FieldUsage.RequestData,
-    ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
+    const requestDataSchema = generateSchemaForUsage(endpoint.fields, FieldUsage.RequestData) as
+      | z.ZodObject<Record<string, z.ZodTypeAny>>
+      | z.ZodNever;
 
     const urlPathParamsSchema = generateSchemaForUsage(
       endpoint.fields,
@@ -86,11 +85,7 @@ function addFieldDescriptions(
 
     // Get description from field UI config
     let description: string | undefined;
-    if (
-      fieldDef.ui &&
-      "description" in fieldDef.ui &&
-      fieldDef.ui.description
-    ) {
+    if (fieldDef.ui && "description" in fieldDef.ui && fieldDef.ui.description) {
       const descKey = fieldDef.ui.description as string;
       const { t } = endpoint.scopedTranslation.scopedT(locale);
 

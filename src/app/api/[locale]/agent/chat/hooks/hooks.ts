@@ -6,14 +6,7 @@
 
 "use client";
 
-import {
-  type RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -116,9 +109,7 @@ export interface UseChatReturn {
   setTTSVoice: (voice: typeof TtsVoiceValue) => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   setViewMode: (mode: ChatSettings["viewMode"]) => void;
-  setEnabledTools: (
-    tools: Array<{ id: string; requiresConfirmation: boolean }>,
-  ) => void;
+  setEnabledTools: (tools: Array<{ id: string; requiresConfirmation: boolean }>) => void;
 
   // Credits
   initialCredits: CreditsGetResponseOutput;
@@ -146,10 +137,7 @@ export interface UseChatReturn {
       subFolderId: string | null,
     ) => void,
   ) => Promise<void>;
-  retryMessage: (
-    messageId: string,
-    attachments: File[] | undefined,
-  ) => Promise<void>;
+  retryMessage: (messageId: string, attachments: File[] | undefined) => Promise<void>;
   branchMessage: (
     messageId: string,
     newContent: string,
@@ -181,10 +169,7 @@ export interface UseChatReturn {
 
   // Folder handlers (UI operations)
   handleReorderFolder: (folderId: string, direction: "up" | "down") => void;
-  handleMoveFolderToParent: (
-    folderId: string,
-    newParentId: string | null,
-  ) => void;
+  handleMoveFolderToParent: (folderId: string, newParentId: string | null) => void;
   handleCreateThreadInFolder: (folderId: string) => void;
 
   // Collapse state (UI state for thinking/tool sections)
@@ -192,14 +177,8 @@ export interface UseChatReturn {
 
   // Navigation operations (use router.push instead of store state)
   navigateToThread: (threadId: string) => void;
-  navigateToFolder: (
-    rootFolderId: DefaultFolderId,
-    subFolderId: string | null,
-  ) => void;
-  navigateToNewThread: (
-    rootFolderId: DefaultFolderId,
-    subFolderId: string | null,
-  ) => void;
+  navigateToFolder: (rootFolderId: DefaultFolderId, subFolderId: string | null) => void;
+  navigateToNewThread: (rootFolderId: DefaultFolderId, subFolderId: string | null) => void;
 
   // Refs
   inputRef: RefObject<TextareaRefObject | null>;
@@ -231,9 +210,7 @@ export interface UseChatReturn {
   startAnswer: (messageId: string) => void;
   cancelEditorAction: () => void;
   setAnswerContent: (content: string) => void;
-  setEditorAttachments: (
-    attachments: File[] | ((prev: File[]) => File[]),
-  ) => void;
+  setEditorAttachments: (attachments: File[] | ((prev: File[]) => File[])) => void;
   handleBranchEdit: (
     messageId: string,
     content: string,
@@ -254,11 +231,7 @@ export interface UseChatReturn {
   handleSubmit: () => Promise<void>;
   handleKeyDown: (e: TextareaKeyboardEvent) => void;
   handleModelChange: (modelId: ModelId) => void;
-  handleFillInputWithPrompt: (
-    prompt: string,
-    characterId: string,
-    modelId?: ModelId,
-  ) => void;
+  handleFillInputWithPrompt: (prompt: string, characterId: string, modelId?: ModelId) => void;
   handleScreenshot: () => Promise<void>;
 
   // UI State
@@ -329,9 +302,7 @@ export function useChat(
   const hydrateSettings = useChatStore((state) => state.hydrateSettings);
 
   // Get stream store methods
-  const streamingMessages = useAIStreamStore(
-    (state) => state.streamingMessages,
-  );
+  const streamingMessages = useAIStreamStore((state) => state.streamingMessages);
   const streamThreads = useAIStreamStore((state) => state.threads);
   const isStreaming = useAIStreamStore((state) => state.isStreaming);
   const streamError = useAIStreamStore((state) => state.error);
@@ -358,11 +329,7 @@ export function useChat(
   const inputRef = useRef<TextareaRefObject>(null);
 
   // Generate draft key for current context
-  const draftKey = getDraftKey(
-    activeThreadId,
-    currentRootFolderId,
-    currentSubFolderId,
-  );
+  const draftKey = getDraftKey(activeThreadId, currentRootFolderId, currentSubFolderId);
 
   // Load draft when navigation context changes
   // Only reload when draftKey changes (navigation), not when logger changes
@@ -411,9 +378,7 @@ export function useChat(
     (newAttachments: File[] | ((prev: File[]) => File[])) => {
       setAttachments((prev) => {
         const updated =
-          typeof newAttachments === "function"
-            ? newAttachments(prev)
-            : newAttachments;
+          typeof newAttachments === "function" ? newAttachments(prev) : newAttachments;
         void saveDraftAttachments(draftKey, updated, logger);
         return updated;
       });
@@ -422,30 +387,13 @@ export function useChat(
   );
 
   // Use modular hooks
-  useDataLoader(
-    user,
-    locale,
-    logger,
-    addThread,
-    addMessage,
-    addFolder,
-    setDataLoaded,
-  );
+  useDataLoader(user, locale, logger, addThread, addMessage, addFolder, setDataLoaded);
 
-  useMessageLoader(
-    locale,
-    logger,
-    activeThreadId,
-    threads,
-    addMessage,
-    isDataLoaded,
-  );
+  useMessageLoader(locale, logger, activeThreadId, threads, addMessage, isDataLoaded);
 
   // Compute characters map
   const characters = useMemo(() => {
-    const response = charactersEndpoint.read?.response as
-      | CharacterListResponseOutput
-      | undefined;
+    const response = charactersEndpoint.read?.response as CharacterListResponseOutput | undefined;
     const charactersList = response?.characters;
     const charactersMap: Record<
       string,
@@ -555,13 +503,9 @@ export function useChat(
       return [];
     }
 
-    const filtered = Object.values(messages).filter(
-      (msg) => msg.threadId === activeThreadId,
-    );
+    const filtered = Object.values(messages).filter((msg) => msg.threadId === activeThreadId);
 
-    return filtered.toSorted(
-      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-    );
+    return filtered.toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
   }, [activeThreadId, messages]);
 
   // Branch management
@@ -591,8 +535,7 @@ export function useChat(
     folders,
     navigateToThread: navigationOps.navigateToThread,
     navigateToNewThread: navigationOps.navigateToNewThread,
-    deleteThread: (threadId: string) =>
-      threadOps.deleteThread(threadId, activeThreadId),
+    deleteThread: (threadId: string) => threadOps.deleteThread(threadId, activeThreadId),
     logger,
   });
 
@@ -716,8 +659,7 @@ export function useChat(
     refetchCredits: creditsHook.refetchCredits,
 
     // Thread operations
-    deleteThread: (threadId: string) =>
-      threadOps.deleteThread(threadId, activeThreadId),
+    deleteThread: (threadId: string) => threadOps.deleteThread(threadId, activeThreadId),
     updateThread: threadOps.updateThread,
 
     // Folder operations

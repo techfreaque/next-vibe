@@ -8,11 +8,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { GitInfo, ReleaseConfig } from "../definition";
@@ -44,11 +40,7 @@ export interface IValidationService {
   /**
    * Verify lockfile integrity
    */
-  verifyLockfile(
-    cwd: string,
-    packageManager: string,
-    logger: EndpointLogger,
-  ): ResponseType<void>;
+  verifyLockfile(cwd: string, packageManager: string, logger: EndpointLogger): ResponseType<void>;
 
   /**
    * Run all validations
@@ -100,8 +92,7 @@ export class ValidationService implements IValidationService {
 
     const mainBranch = branchConfig.main ?? "main";
     const isOnMain = currentBranch === mainBranch;
-    const isOnDevelop =
-      branchConfig.develop && currentBranch === branchConfig.develop;
+    const isOnDevelop = branchConfig.develop && currentBranch === branchConfig.develop;
 
     // Check if current branch is allowed
     if (!isOnMain && !isOnDevelop && !branchConfig.allowNonMain) {
@@ -150,11 +141,7 @@ export class ValidationService implements IValidationService {
   /**
    * Verify lockfile integrity
    */
-  verifyLockfile(
-    cwd: string,
-    packageManager: string,
-    logger: EndpointLogger,
-  ): ResponseType<void> {
+  verifyLockfile(cwd: string, packageManager: string, logger: EndpointLogger): ResponseType<void> {
     logger.info(MESSAGES.LOCKFILE_CHECKING);
 
     const lockfileMap: Record<string, string> = {
@@ -188,24 +175,18 @@ export class ValidationService implements IValidationService {
           });
           break;
         case "yarn":
-          execSync(
-            "yarn install --frozen-lockfile --check-files 2>/dev/null || true",
-            {
-              cwd,
-              stdio: "pipe",
-              timeout: 60000,
-            },
-          );
+          execSync("yarn install --frozen-lockfile --check-files 2>/dev/null || true", {
+            cwd,
+            stdio: "pipe",
+            timeout: 60000,
+          });
           break;
         case "pnpm":
-          execSync(
-            "pnpm install --frozen-lockfile --dry-run 2>/dev/null || true",
-            {
-              cwd,
-              stdio: "pipe",
-              timeout: 60000,
-            },
-          );
+          execSync("pnpm install --frozen-lockfile --dry-run 2>/dev/null || true", {
+            cwd,
+            stdio: "pipe",
+            timeout: 60000,
+          });
           break;
         case "bun":
           // Bun doesn't have a direct frozen lockfile check, just verify file exists
@@ -241,11 +222,7 @@ export class ValidationService implements IValidationService {
     }
 
     // Validate working directory
-    const workingDirResult = this.validateWorkingDirectory(
-      config,
-      gitInfo,
-      logger,
-    );
+    const workingDirResult = this.validateWorkingDirectory(config, gitInfo, logger);
     if (!workingDirResult.success) {
       return workingDirResult;
     }

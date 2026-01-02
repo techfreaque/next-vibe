@@ -6,8 +6,7 @@ export const translations: typeof enTranslations = {
     description: "Einen neuen Lead im System erstellen",
     form: {
       title: "Neues Lead-Formular",
-      description:
-        "Lead-Informationen eingeben um einen neuen Lead zu erstellen",
+      description: "Lead-Informationen eingeben um einen neuen Lead zu erstellen",
     },
     contactInfo: {
       title: "Kontaktinformationen",
@@ -149,8 +148,7 @@ export const translations: typeof enTranslations = {
         step1Number: "1.",
         step1: "Unser Team wird Ihr Geschäftsprofil und Ihre Ziele überprüfen",
         step2Number: "2.",
-        step2:
-          "Sie erhalten innerhalb von 24 Stunden einen personalisierten Beratungsvorschlag",
+        step2: "Sie erhalten innerhalb von 24 Stunden einen personalisierten Beratungsvorschlag",
         step3Number: "3.",
         step3:
           "Wir vereinbaren einen Termin, um Ihre spezifischen Bedürfnisse und Ziele zu besprechen",
@@ -161,8 +159,7 @@ export const translations: typeof enTranslations = {
       support:
         "Haben Sie Fragen? Antworten Sie auf diese E-Mail oder kontaktieren Sie uns unter {{supportEmail}}",
       error: {
-        noEmail:
-          "Willkommens-E-Mail kann nicht gesendet werden - keine E-Mail-Adresse angegeben",
+        noEmail: "Willkommens-E-Mail kann nicht gesendet werden - keine E-Mail-Adresse angegeben",
       },
     },
     admin: {
@@ -184,8 +181,7 @@ export const translations: typeof enTranslations = {
         viewLead: "Lead-Details ansehen",
         viewAllLeads: "Alle Leads ansehen",
         error: {
-          noData:
-            "Admin-Benachrichtigung kann nicht gesendet werden - keine Lead-Daten angegeben",
+          noData: "Admin-Benachrichtigung kann nicht gesendet werden - keine Lead-Daten angegeben",
         },
         defaultName: "Neuer Lead",
       },

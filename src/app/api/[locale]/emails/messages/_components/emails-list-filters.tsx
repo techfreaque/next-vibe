@@ -28,10 +28,7 @@ interface EmailsListFiltersProps {
   locale: CountryLanguage;
 }
 
-export function EmailsListFilters({
-  form,
-  locale,
-}: EmailsListFiltersProps): JSX.Element {
+export function EmailsListFilters({ form, locale }: EmailsListFiltersProps): JSX.Element {
   const { t } = simpleT(locale);
 
   const handleClearFilters = (): void => {
@@ -118,12 +115,7 @@ export function EmailsListFilters({
 
         {/* Clear Filters Button */}
         <Div className="flex items-end">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleClearFilters}
-          >
+          <Button type="button" variant="outline" size="sm" onClick={handleClearFilters}>
             {t("app.admin.emails.list.admin.filters.clear")}
           </Button>
         </Div>

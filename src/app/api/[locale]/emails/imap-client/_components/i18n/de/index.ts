@@ -420,8 +420,7 @@ export const translations: typeof enTranslations = {
     viewHealthStatus: "Gesundheitsstatus anzeigen",
     viewHealthStatusDescription: "Server-Gesundheit und Status prüfen",
     manageAccounts: "Konten verwalten",
-    manageAccountsDescription:
-      "IMAP-Konten hinzufügen, bearbeiten oder entfernen",
+    manageAccountsDescription: "IMAP-Konten hinzufügen, bearbeiten oder entfernen",
   },
   folder: {
     name: "Ordnername",
@@ -514,8 +513,7 @@ export const translations: typeof enTranslations = {
     recipient: "Empfänger",
     sentAt: "Gesendet am",
     attachments: "Anhänge",
-    searchPlaceholder:
-      "Nachrichten nach Betreff, Absender oder Inhalt durchsuchen...",
+    searchPlaceholder: "Nachrichten nach Betreff, Absender oder Inhalt durchsuchen...",
     detail: {
       title: "Nachrichtendetails",
     },

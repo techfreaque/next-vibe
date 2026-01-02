@@ -14,8 +14,7 @@ export const translations: typeof enTranslations = {
     description: "Pobierz wszystkie foldery dla bieżącego użytkownika",
     rootFolderId: {
       label: "Folder główny",
-      description:
-        "Filtruj według folderu głównego (private, shared, public, incognito)",
+      description: "Filtruj według folderu głównego (private, shared, public, incognito)",
     },
     container: {
       title: "Lista folderów",
@@ -164,8 +163,7 @@ export const translations: typeof enTranslations = {
       forbidden: {
         title: "Zabronione",
         description: "Nie masz uprawnień do tworzenia folderów",
-        incognitoNotAllowed:
-          "Foldery incognito nie mogą być tworzone na serwerze",
+        incognitoNotAllowed: "Foldery incognito nie mogą być tworzone na serwerze",
       },
       notFound: {
         title: "Nie znaleziono",

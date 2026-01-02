@@ -9,10 +9,7 @@ import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
 import { getCharacterById } from "@/app/api/[locale]/agent/chat/characters/config";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import {
-  getModelById,
-  type ModelId,
-} from "@/app/api/[locale]/agent/chat/model-access/models";
+import { getModelById, type ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -64,9 +61,7 @@ export function MessageAuthorInfo({
   } else {
     // No author info - show "Anonymous" for public/shared, "User" for private/incognito
     displayName =
-      rootFolderId === "private" ||
-      rootFolderId === "shared" ||
-      rootFolderId === "public"
+      rootFolderId === "private" || rootFolderId === "shared" || rootFolderId === "public"
         ? t("app.chat.messages.anonymous")
         : t("app.chat.messages.user");
   }
@@ -92,11 +87,7 @@ export function MessageAuthorInfo({
             ((): JSX.Element | null => {
               const modelData = getModelById(model);
               const ModelIcon = getIconComponent(modelData.icon);
-              return (
-                <ModelIcon
-                  className={cn(compact ? "h-3 w-3" : "h-3.5 w-3.5")}
-                />
-              );
+              return <ModelIcon className={cn(compact ? "h-3 w-3" : "h-3.5 w-3.5")} />;
             })()}
           {displayName}
         </Span>

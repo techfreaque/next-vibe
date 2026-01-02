@@ -2,11 +2,7 @@ import { promises as fs } from "node:fs";
 import { join } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
@@ -54,9 +50,7 @@ function getSessionFilePath(): string {
 /**
  * Read session data from .vibe.session file
  */
-export async function readSessionFile(
-  logger: EndpointLogger,
-): Promise<ResponseType<SessionData>> {
+export async function readSessionFile(logger: EndpointLogger): Promise<ResponseType<SessionData>> {
   try {
     const sessionPath = getSessionFilePath();
     const projectRoot = getProjectRoot();
@@ -94,8 +88,7 @@ export async function readSessionFile(
       !sessionData.expiresAt
     ) {
       return fail({
-        message:
-          "app.api.system.unifiedInterface.cli.vibe.errors.invalidFormat",
+        message: "app.api.system.unifiedInterface.cli.vibe.errors.invalidFormat",
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: { path: sessionPath },
       });
@@ -106,8 +99,7 @@ export async function readSessionFile(
     if (expiresAt < new Date()) {
       logger.debug("Session expired", { expiresAt: sessionData.expiresAt });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.cli.vibe.errors.sessionExpired",
+        message: "app.api.system.unifiedInterface.cli.vibe.errors.sessionExpired",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: { expiresAt: sessionData.expiresAt },
       });
@@ -135,10 +127,7 @@ export async function readSessionFile(
         vibeProjectRoot: process.env.VIBE_PROJECT_ROOT,
         errorMessage: parsedError.message,
       };
-      logger.debug(
-        "Session file not found - user not authenticated",
-        debugData,
-      );
+      logger.debug("Session file not found - user not authenticated", debugData);
       return fail({
         message: "app.api.system.unifiedInterface.cli.vibe.errors.notFound",
         errorType: ErrorResponseTypes.NOT_FOUND,
@@ -210,9 +199,7 @@ export async function writeSessionFile(
 /**
  * Delete session file
  */
-export async function deleteSessionFile(
-  logger: EndpointLogger,
-): Promise<ResponseType<void>> {
+export async function deleteSessionFile(logger: EndpointLogger): Promise<ResponseType<void>> {
   try {
     const sessionPath = getSessionFilePath();
     logger.debug("Deleting session file", { path: sessionPath });

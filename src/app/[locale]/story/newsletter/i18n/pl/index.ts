@@ -10,20 +10,17 @@ export const translations: typeof enTranslations = {
       "Dołącz do naszego newslettera, aby otrzymywać aktualizacje o nowych modelach AI, funkcjach i wskazówkach, jak najlepiej wykorzystać niecenzurowany czat AI.",
     invalidEmail: {
       title: "Nieprawidłowy e-mail",
-      description:
-        "Podany adres e-mail jest nieprawidłowy. Sprawdź i spróbuj ponownie.",
+      description: "Podany adres e-mail jest nieprawidłowy. Sprawdź i spróbuj ponownie.",
     },
     emailProvided: {
       title: "Zarządzaj swoją subskrypcją",
-      description:
-        "Zaktualizuj swoje preferencje newslettera lub wypisz się w dowolnym momencie.",
+      description: "Zaktualizuj swoje preferencje newslettera lub wypisz się w dowolnym momencie.",
     },
     unsubscribeText: "Chcesz się wypisać?",
     unsubscribeLink: "Kliknij tutaj",
     cta: {
       title: "Gotowy, aby być na bieżąco?",
-      description:
-        "Dołącz do tysięcy entuzjastów AI otrzymujących najnowsze aktualizacje",
+      description: "Dołącz do tysięcy entuzjastów AI otrzymujących najnowsze aktualizacje",
       subscribeButton: "Subskrybuj",
     },
     benefits: {
@@ -31,8 +28,7 @@ export const translations: typeof enTranslations = {
       subtitle: "Bądź na bieżąco z ekskluzywnymi informacjami o AI",
       benefit1: {
         title: "Ogłoszenia nowych modeli AI",
-        description:
-          "Bądź pierwszym, który dowie się, kiedy dodamy nowe modele AI do platformy.",
+        description: "Bądź pierwszym, który dowie się, kiedy dodamy nowe modele AI do platformy.",
       },
       benefit2: {
         title: "Aktualizacje funkcji",
@@ -46,14 +42,12 @@ export const translations: typeof enTranslations = {
       },
       benefit4: {
         title: "Ekskluzywne oferty",
-        description:
-          "Otrzymuj specjalne zniżki i wczesny dostęp do nowych funkcji.",
+        description: "Otrzymuj specjalne zniżki i wczesny dostęp do nowych funkcji.",
       },
     },
     frequency: {
       title: "Częstotliwość e-maili",
-      description:
-        "Wysyłamy newslettery co tydzień. Możesz wypisać się w dowolnym momencie.",
+      description: "Wysyłamy newslettery co tydzień. Możesz wypisać się w dowolnym momencie.",
     },
   },
   subscription: {
@@ -81,13 +75,11 @@ export const translations: typeof enTranslations = {
         description: "Oto, co musisz wiedzieć o wypisywaniu się:",
         immediate: {
           title: "Natychmiastowy efekt",
-          description:
-            "Przestaniesz otrzymywać nasze e-maile z newsletterem natychmiast.",
+          description: "Przestaniesz otrzymywać nasze e-maile z newsletterem natychmiast.",
         },
         resubscribe: {
           title: "Łatwo ponownie subskrybować",
-          description:
-            "Zawsze możesz ponownie subskrybować, jeśli zmienisz zdanie.",
+          description: "Zawsze możesz ponownie subskrybować, jeśli zmienisz zdanie.",
         },
       },
       alternatives: {

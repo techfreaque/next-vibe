@@ -22,14 +22,7 @@ import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import type { DataTableProps } from "@/packages/next-vibe-ui/web/ui/data-table";
 
 import { styledNative } from "../utils/style-converter";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table";
 
 // Re-export types for consistency
 export type { DataTableProps };
@@ -74,11 +67,7 @@ export function DataTable<TData, TValue = string>({
   const hasNoData = rows.length === 0;
 
   const HeaderComponent = (): React.ReactElement => (
-    <ScrollView
-      horizontal
-      bounces={false}
-      showsHorizontalScrollIndicator={false}
-    >
+    <ScrollView horizontal bounces={false} showsHorizontalScrollIndicator={false}>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -94,10 +83,7 @@ export function DataTable<TData, TValue = string>({
                     {header.isPlaceholder
                       ? null
                       : wrapInTextIfNeeded(
-                          flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          ),
+                          flexRender(header.column.columnDef.header, header.getContext()),
                         )}
                   </TableHead>
                 );
@@ -110,11 +96,7 @@ export function DataTable<TData, TValue = string>({
   );
 
   const EmptyComponent = (): React.ReactElement => (
-    <ScrollView
-      horizontal
-      bounces={false}
-      showsHorizontalScrollIndicator={false}
-    >
+    <ScrollView horizontal bounces={false} showsHorizontalScrollIndicator={false}>
       <Table>
         <TableBody>
           <TableRow>
@@ -148,25 +130,16 @@ export function DataTable<TData, TValue = string>({
     );
   };
 
-  const renderItem = (
-    info: ListRenderItemInfo<Row<TData>>,
-  ): React.ReactElement => {
+  const renderItem = (info: ListRenderItemInfo<Row<TData>>): React.ReactElement => {
     const { item: row, index } = info;
-    const rowClassName = cn(
-      "active:opacity-70",
-      index % 2 && "bg-zinc-100/50 dark:bg-zinc-900/50",
-    );
+    const rowClassName = cn("active:opacity-70", index % 2 && "bg-zinc-100/50 dark:bg-zinc-900/50");
     const handlePress = onRowPress
       ? (): void => {
           onRowPress(row);
         }
       : undefined;
     return (
-      <ScrollView
-        horizontal
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-      >
+      <ScrollView horizontal bounces={false} showsHorizontalScrollIndicator={false}>
         <Table>
           <TableBody>
             <TableRow className={rowClassName} onClick={handlePress}>
@@ -175,15 +148,10 @@ export function DataTable<TData, TValue = string>({
                   <TableCell
                     key={cell.id}
                     style={{
-                      width: getColumnWidth(
-                        cell.column.getSize(),
-                        columns.length,
-                      ),
+                      width: getColumnWidth(cell.column.getSize(), columns.length),
                     }}
                   >
-                    {wrapInTextIfNeeded(
-                      flexRender(cell.column.columnDef.cell, cell.getContext()),
-                    )}
+                    {wrapInTextIfNeeded(flexRender(cell.column.columnDef.cell, cell.getContext()))}
                   </TableCell>
                 ),
               )}
@@ -195,11 +163,7 @@ export function DataTable<TData, TValue = string>({
   };
 
   const refreshControlElement = (
-    <RefreshControl
-      refreshing={isRefreshing}
-      onRefresh={onRefresh}
-      style={{ opacity: 0 }}
-    />
+    <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} style={{ opacity: 0 }} />
   );
 
   const flashListProps: FlashListProps<Row<TData>> = {

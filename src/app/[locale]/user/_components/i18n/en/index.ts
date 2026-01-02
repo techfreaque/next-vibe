@@ -7,8 +7,7 @@ export const translations = {
         fair: "Fair",
         good: "Good",
         strong: "Strong",
-        suggestion:
-          "Use a mix of letters, numbers, and symbols for a stronger password",
+        suggestion: "Use a mix of letters, numbers, and symbols for a stronger password",
       },
     },
   },

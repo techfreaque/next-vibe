@@ -47,8 +47,7 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.newsletter.unsubscribe.post.form.title" as const,
-      description:
-        "app.api.newsletter.unsubscribe.post.form.description" as const,
+      description: "app.api.newsletter.unsubscribe.post.form.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -60,10 +59,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.EMAIL,
           label: "app.api.newsletter.unsubscribe.email.label" as const,
-          description:
-            "app.api.newsletter.unsubscribe.email.description" as const,
-          placeholder:
-            "app.api.newsletter.unsubscribe.email.placeholder" as const,
+          description: "app.api.newsletter.unsubscribe.email.description" as const,
+          placeholder: "app.api.newsletter.unsubscribe.email.placeholder" as const,
           columns: 12,
         },
         z.string().email(),
@@ -88,65 +85,46 @@ const { POST } = createEndpoint({
   ),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.newsletter.unsubscribe.post.errors.validation.title" as const,
-      description:
-        "app.api.newsletter.unsubscribe.post.errors.validation.description" as const,
+      title: "app.api.newsletter.unsubscribe.post.errors.validation.title" as const,
+      description: "app.api.newsletter.unsubscribe.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.newsletter.unsubscribe.post.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.unsubscribe.post.errors.internal.description" as const,
+      title: "app.api.newsletter.unsubscribe.post.errors.internal.title" as const,
+      description: "app.api.newsletter.unsubscribe.post.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.newsletter.unsubscribe.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.newsletter.unsubscribe.post.errors.unauthorized.description" as const,
+      title: "app.api.newsletter.unsubscribe.post.errors.unauthorized.title" as const,
+      description: "app.api.newsletter.unsubscribe.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.newsletter.unsubscribe.post.errors.forbidden.title" as const,
-      description:
-        "app.api.newsletter.unsubscribe.post.errors.forbidden.description" as const,
+      title: "app.api.newsletter.unsubscribe.post.errors.forbidden.title" as const,
+      description: "app.api.newsletter.unsubscribe.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.newsletter.unsubscribe.post.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.unsubscribe.post.errors.internal.description" as const,
+      title: "app.api.newsletter.unsubscribe.post.errors.internal.title" as const,
+      description: "app.api.newsletter.unsubscribe.post.errors.internal.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.newsletter.unsubscribe.post.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.unsubscribe.post.errors.internal.description" as const,
+      title: "app.api.newsletter.unsubscribe.post.errors.internal.title" as const,
+      description: "app.api.newsletter.unsubscribe.post.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.newsletter.unsubscribe.post.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.unsubscribe.post.errors.internal.description" as const,
+      title: "app.api.newsletter.unsubscribe.post.errors.internal.title" as const,
+      description: "app.api.newsletter.unsubscribe.post.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.newsletter.unsubscribe.post.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.unsubscribe.post.errors.internal.description" as const,
+      title: "app.api.newsletter.unsubscribe.post.errors.internal.title" as const,
+      description: "app.api.newsletter.unsubscribe.post.errors.internal.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.newsletter.unsubscribe.post.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.unsubscribe.post.errors.internal.description" as const,
+      title: "app.api.newsletter.unsubscribe.post.errors.internal.title" as const,
+      description: "app.api.newsletter.unsubscribe.post.errors.internal.description" as const,
     },
   },
 
   successTypes: {
     title: "app.api.newsletter.unsubscribe.post.success.title" as const,
-    description:
-      "app.api.newsletter.unsubscribe.post.success.description" as const,
+    description: "app.api.newsletter.unsubscribe.post.success.description" as const,
   },
   examples: {
     requests: {

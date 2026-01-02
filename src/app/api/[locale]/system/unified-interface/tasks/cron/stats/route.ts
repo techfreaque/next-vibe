@@ -9,10 +9,7 @@ import type { ApiHandlerProps } from "@/app/api/[locale]/system/unified-interfac
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import type {
-  CronStatsGetRequestOutput,
-  CronStatsGetResponseOutput,
-} from "./definition";
+import type { CronStatsGetRequestOutput, CronStatsGetResponseOutput } from "./definition";
 import definitions from "./definition";
 import { cronStatsRepository } from "./repository";
 
@@ -26,11 +23,7 @@ export const { GET, tools } = endpointsHandler({
         typeof definitions.GET.allowedRoles
       >,
     ): Promise<ResponseType<CronStatsGetResponseOutput>> => {
-      return await cronStatsRepository.getStats(
-        props.data,
-        props.user,
-        props.logger,
-      );
+      return await cronStatsRepository.getStats(props.data, props.user, props.logger);
     },
   },
 });

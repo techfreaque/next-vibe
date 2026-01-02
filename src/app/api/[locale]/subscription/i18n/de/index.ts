@@ -66,8 +66,7 @@ export const translations: typeof enTranslations = {
     description: "Vorhandenes Abonnement aktualisieren",
     form: {
       title: "Abonnement-Update",
-      description:
-        "Ihren Abonnement-Plan oder das Abrechnungsintervall aktualisieren",
+      description: "Ihren Abonnement-Plan oder das Abrechnungsintervall aktualisieren",
     },
   },
 
@@ -156,8 +155,7 @@ export const translations: typeof enTranslations = {
       description: "Abonnement nicht gefunden",
     },
     not_found: "Abonnement nicht gefunden",
-    not_found_description:
-      "Das angeforderte Abonnement konnte nicht gefunden werden",
+    not_found_description: "Das angeforderte Abonnement konnte nicht gefunden werden",
     server: {
       title: "Serverfehler",
       description: "Interner Serverfehler aufgetreten",
@@ -178,18 +176,15 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Datenkonflikt aufgetreten",
     },
-    use_checkout_flow:
-      "Bitte verwenden Sie den Checkout-Ablauf, um Abonnements zu kaufen",
+    use_checkout_flow: "Bitte verwenden Sie den Checkout-Ablauf, um Abonnements zu kaufen",
     use_checkout_flow_description:
       "Die direkte Erstellung von Abonnements ist nicht erlaubt. Bitte nutzen Sie den Checkout-Prozess.",
-    sync_failed:
-      "Synchronisierung des Abonnements mit Datenbank fehlgeschlagen",
+    sync_failed: "Synchronisierung des Abonnements mit Datenbank fehlgeschlagen",
     database_error: "Datenbankfehler aufgetreten",
     create_crashed: "Erstellung des Abonnements fehlgeschlagen",
     cancel_failed: "Kündigung des Abonnements fehlgeschlagen",
     user_not_found: "Benutzer nicht gefunden",
-    stripe_customer_creation_failed:
-      "Stripe-Kunde konnte nicht erstellt werden",
+    stripe_customer_creation_failed: "Stripe-Kunde konnte nicht erstellt werden",
     not_implemented_on_native:
       "{{method}} ist auf der nativen Plattform nicht implementiert. Bitte verwenden Sie die Web-Version für diesen Vorgang.",
     no_provider_id: "Keine Zahlungsanbieter-ID gefunden",
@@ -241,14 +236,12 @@ export const translations: typeof enTranslations = {
       },
       support: {
         title: "Brauchst du Hilfe?",
-        description:
-          "Unser Support-Team steht dir bei allen Fragen zu deinem Abo zur Verfügung.",
+        description: "Unser Support-Team steht dir bei allen Fragen zu deinem Abo zur Verfügung.",
         cta: "Hilfe erhalten",
       },
       footer: {
         message: "Danke, dass du unzensierte KI unterstützt!",
-        signoff:
-          "Willkommen bei unbegrenzten Gesprächen,\nDas {{appName}} Team",
+        signoff: "Willkommen bei unbegrenzten Gesprächen,\nDas {{appName}} Team",
       },
     },
     admin_notification: {

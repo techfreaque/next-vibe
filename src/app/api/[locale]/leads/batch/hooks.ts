@@ -97,9 +97,7 @@ interface BatchOperationsReturn {
     email: string | null;
     businessName: string;
     currentStatus: (typeof LeadStatus)[keyof typeof LeadStatus];
-    currentCampaignStage:
-      | (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]
-      | null;
+    currentCampaignStage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage] | null;
   }>;
 
   // Handlers
@@ -112,9 +110,7 @@ interface BatchOperationsReturn {
       notes?: string;
     },
   ) => Promise<void>;
-  handleDeletePreview: (
-    currentFilters: LeadListGetRequestTypeOutput,
-  ) => Promise<void>;
+  handleDeletePreview: (currentFilters: LeadListGetRequestTypeOutput) => Promise<void>;
   handleBatchUpdate: (
     updates: {
       status?: (typeof LeadStatus)[keyof typeof LeadStatus];
@@ -155,9 +151,7 @@ interface BatchOperationsReturn {
  * Batch operations state and logic hook
  * Manages selection state and batch operations workflow
  */
-export function useBatchOperations(
-  onOperationComplete?: () => void,
-): BatchOperationsReturn {
+export function useBatchOperations(onOperationComplete?: () => void): BatchOperationsReturn {
   // Initialize client logger
   const { locale } = useTranslation();
   const isDevelopment = envClient.NODE_ENV === Environment.DEVELOPMENT;
@@ -165,12 +159,10 @@ export function useBatchOperations(
 
   // Dialog state
   const [batchDialogOpen, setBatchDialogOpen] = useState(false);
-  const [batchDialogMode, setBatchDialogMode] = useState<
-    "preview" | "confirm" | "result"
-  >("preview");
-  const [operationType, setOperationType] = useState<"update" | "delete">(
-    "update",
+  const [batchDialogMode, setBatchDialogMode] = useState<"preview" | "confirm" | "result">(
+    "preview",
   );
+  const [operationType, setOperationType] = useState<"update" | "delete">("update");
   const [pendingUpdates, setPendingUpdates] = useState<{
     status?: (typeof LeadStatus)[keyof typeof LeadStatus];
     currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
@@ -183,9 +175,7 @@ export function useBatchOperations(
       email: string | null;
       businessName: string;
       currentStatus: (typeof LeadStatus)[keyof typeof LeadStatus];
-      currentCampaignStage:
-        | (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]
-        | null;
+      currentCampaignStage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage] | null;
     }>
   >([]);
 
@@ -202,21 +192,13 @@ export function useBatchOperations(
       !batchDialogOpen
     ) {
       logger.debug("app.api.leads.batch.delete.preview.modal.auto.open", {
-        previewCount:
-          batchDeleteEndpoint.create.response.data.response.preview.length,
+        previewCount: batchDeleteEndpoint.create.response.data.response.preview.length,
       });
-      setPreviewLeads(
-        batchDeleteEndpoint.create.response.data.response.preview,
-      );
+      setPreviewLeads(batchDeleteEndpoint.create.response.data.response.preview);
       setBatchDialogMode("preview");
       setBatchDialogOpen(true);
     }
-  }, [
-    operationType,
-    batchDeleteEndpoint.create?.response,
-    batchDialogOpen,
-    logger,
-  ]);
+  }, [operationType, batchDeleteEndpoint.create?.response, batchDialogOpen, logger]);
 
   useEffect(() => {
     if (
@@ -226,21 +208,13 @@ export function useBatchOperations(
       !batchDialogOpen
     ) {
       logger.debug("app.api.leads.batch.update.preview.modal.auto.open", {
-        previewCount:
-          batchUpdateEndpoint.create.response.data.response.preview.length,
+        previewCount: batchUpdateEndpoint.create.response.data.response.preview.length,
       });
-      setPreviewLeads(
-        batchUpdateEndpoint.create.response.data.response.preview,
-      );
+      setPreviewLeads(batchUpdateEndpoint.create.response.data.response.preview);
       setBatchDialogMode("preview");
       setBatchDialogOpen(true);
     }
-  }, [
-    operationType,
-    batchUpdateEndpoint.create?.response,
-    batchDialogOpen,
-    logger,
-  ]);
+  }, [operationType, batchUpdateEndpoint.create?.response, batchDialogOpen, logger]);
 
   // Preview handlers
 
@@ -271,10 +245,7 @@ export function useBatchOperations(
 
         // Response will be handled by useEffect
       } catch (error) {
-        logger.error(
-          "app.api.leads.batch.preview.failed",
-          parseError(error).message,
-        );
+        logger.error("app.api.leads.batch.preview.failed", parseError(error).message);
       }
     },
     [batchUpdateEndpoint.create, logger],
@@ -319,17 +290,12 @@ export function useBatchOperations(
           batchUpdateEndpoint.create?.response?.success &&
           batchUpdateEndpoint.create?.response?.data?.response?.preview
         ) {
-          setPreviewLeads(
-            batchUpdateEndpoint.create.response.data.response.preview,
-          );
+          setPreviewLeads(batchUpdateEndpoint.create.response.data.response.preview);
           setBatchDialogMode("preview");
           setBatchDialogOpen(true);
         }
       } catch (error) {
-        logger.error(
-          "app.api.leads.batch.update.failed",
-          parseError(error).message,
-        );
+        logger.error("app.api.leads.batch.update.failed", parseError(error).message);
       }
     },
     [batchUpdateEndpoint.create, logger],
@@ -337,10 +303,7 @@ export function useBatchOperations(
 
   // Confirm batch update handler
   const handleConfirmBatchUpdate = useCallback(
-    async (
-      currentFilters: LeadListGetRequestTypeOutput,
-      onSuccess?: () => void,
-    ) => {
+    async (currentFilters: LeadListGetRequestTypeOutput, onSuccess?: () => void) => {
       try {
         setBatchDialogMode("result");
 
@@ -361,10 +324,7 @@ export function useBatchOperations(
           onOperationComplete?.();
         }
       } catch (error) {
-        logger.error(
-          "app.api.leads.batch.update.failed",
-          parseError(error).message,
-        );
+        logger.error("app.api.leads.batch.update.failed", parseError(error).message);
       }
     },
     [batchUpdateEndpoint.create, pendingUpdates, onOperationComplete, logger],
@@ -392,17 +352,12 @@ export function useBatchOperations(
           batchDeleteEndpoint.create?.response?.success &&
           batchDeleteEndpoint.create?.response?.data?.response?.preview
         ) {
-          setPreviewLeads(
-            batchDeleteEndpoint.create.response.data.response.preview,
-          );
+          setPreviewLeads(batchDeleteEndpoint.create.response.data.response.preview);
           setBatchDialogMode("preview");
           setBatchDialogOpen(true);
         }
       } catch (error) {
-        logger.error(
-          "app.api.leads.batch.delete.preview.failed",
-          parseError(error).message,
-        );
+        logger.error("app.api.leads.batch.delete.preview.failed", parseError(error).message);
       }
     },
     [batchDeleteEndpoint.create, logger],
@@ -445,14 +400,9 @@ export function useBatchOperations(
         await batchDeleteEndpoint.create.submitForm();
 
         // Response will be handled by useEffect
-        logger.debug(
-          "app.api.leads.batch.delete.form.submitted.waiting.response",
-        );
+        logger.debug("app.api.leads.batch.delete.form.submitted.waiting.response");
       } catch (error) {
-        logger.error(
-          "app.api.leads.batch.delete.preview.failed",
-          parseError(error).message,
-        );
+        logger.error("app.api.leads.batch.delete.preview.failed", parseError(error).message);
       }
     },
     [batchDeleteEndpoint.create, logger],
@@ -460,10 +410,7 @@ export function useBatchOperations(
 
   // Confirm batch delete handler
   const handleConfirmBatchDelete = useCallback(
-    async (
-      currentFilters: LeadListGetRequestTypeOutput,
-      onSuccess?: () => void,
-    ) => {
+    async (currentFilters: LeadListGetRequestTypeOutput, onSuccess?: () => void) => {
       try {
         setBatchDialogMode("result");
 
@@ -484,10 +431,7 @@ export function useBatchOperations(
           onOperationComplete?.();
         }
       } catch (error) {
-        logger.error(
-          "app.api.leads.batch.delete.failed",
-          parseError(error).message,
-        );
+        logger.error("app.api.leads.batch.delete.failed", parseError(error).message);
       }
     },
     [batchDeleteEndpoint.create, onOperationComplete, logger],

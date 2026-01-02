@@ -58,10 +58,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.system.check.testing.test.fields.path.label",
-          description:
-            "app.api.system.check.testing.test.fields.path.description",
-          placeholder:
-            "app.api.system.check.testing.test.fields.path.placeholder",
+          description: "app.api.system.check.testing.test.fields.path.description",
+          placeholder: "app.api.system.check.testing.test.fields.path.placeholder",
           columns: 6,
         },
         z.string().optional().default("src/"),
@@ -72,8 +70,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.check.testing.test.fields.verbose.label",
-          description:
-            "app.api.system.check.testing.test.fields.verbose.description",
+          description: "app.api.system.check.testing.test.fields.verbose.description",
           columns: 3,
         },
         z.boolean().default(false),
@@ -84,8 +81,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.check.testing.test.fields.watch.label",
-          description:
-            "app.api.system.check.testing.test.fields.watch.description",
+          description: "app.api.system.check.testing.test.fields.watch.description",
           columns: 3,
         },
         z.boolean().default(false),
@@ -96,8 +92,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.check.testing.test.fields.coverage.label",
-          description:
-            "app.api.system.check.testing.test.fields.coverage.description",
+          description: "app.api.system.check.testing.test.fields.coverage.description",
           columns: 3,
         },
         z.boolean().default(false),
@@ -133,48 +128,39 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.check.testing.test.errors.validation.title",
-      description:
-        "app.api.system.check.testing.test.errors.validation.description",
+      description: "app.api.system.check.testing.test.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.check.testing.test.errors.internal.title",
-      description:
-        "app.api.system.check.testing.test.errors.internal.description",
+      description: "app.api.system.check.testing.test.errors.internal.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.check.testing.test.errors.unauthorized.title",
-      description:
-        "app.api.system.check.testing.test.errors.unauthorized.description",
+      description: "app.api.system.check.testing.test.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.check.testing.test.errors.forbidden.title",
-      description:
-        "app.api.system.check.testing.test.errors.forbidden.description",
+      description: "app.api.system.check.testing.test.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.check.testing.test.errors.notFound.title",
-      description:
-        "app.api.system.check.testing.test.errors.notFound.description",
+      description: "app.api.system.check.testing.test.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.check.testing.test.errors.server.title",
-      description:
-        "app.api.system.check.testing.test.errors.server.description",
+      description: "app.api.system.check.testing.test.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.check.testing.test.errors.unknown.title",
-      description:
-        "app.api.system.check.testing.test.errors.unknown.description",
+      description: "app.api.system.check.testing.test.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.check.testing.test.errors.unsaved.title",
-      description:
-        "app.api.system.check.testing.test.errors.unsaved.description",
+      description: "app.api.system.check.testing.test.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.check.testing.test.errors.conflict.title",
-      description:
-        "app.api.system.check.testing.test.errors.conflict.description",
+      description: "app.api.system.check.testing.test.errors.conflict.description",
     },
   },
 

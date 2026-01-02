@@ -14,7 +14,6 @@ import type { ChatMessage, ChatThread } from "../../../../../db";
 import { ThreadStatus } from "../../../../../enum";
 import { useChatStore } from "../../../../../hooks/store";
 import type { ModelId } from "../../../../../model-access/models";
-
 import { createAndSendUserMessage } from "./shared";
 
 export interface SendMessageParams {
@@ -109,9 +108,7 @@ export async function sendMessage(
     if (threadIdToUse) {
       let threadMessages: ChatMessage[];
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-        const { getMessagesForThread } = await import(
-          "../../../../../incognito/storage"
-        );
+        const { getMessagesForThread } = await import("../../../../../incognito/storage");
         threadMessages = await getMessagesForThread(threadIdToUse);
       } else {
         threadMessages = chatStore.getThreadMessages(threadIdToUse);
@@ -121,10 +118,7 @@ export async function sendMessage(
         parentMessageId = params.parentId;
       } else if (threadMessages.length > 0) {
         const branchIndices = chatStore.getBranchIndices(threadIdToUse);
-        const lastMessage = getLastMessageInBranch(
-          threadMessages,
-          branchIndices,
-        );
+        const lastMessage = getLastMessageInBranch(threadMessages, branchIndices);
 
         if (lastMessage) {
           parentMessageId = lastMessage.id;
@@ -134,10 +128,7 @@ export async function sendMessage(
         }
       }
 
-      messageHistory =
-        currentRootFolderId === DefaultFolderId.INCOGNITO
-          ? threadMessages
-          : null;
+      messageHistory = currentRootFolderId === DefaultFolderId.INCOGNITO ? threadMessages : null;
     }
 
     let createdThreadIdForNewThread: string | null = null;
@@ -175,9 +166,7 @@ export async function sendMessage(
       useChatStore.getState().addThread(newThread);
 
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-        const { createIncognitoThread } = await import(
-          "../../../../../incognito/storage"
-        );
+        const { createIncognitoThread } = await import("../../../../../incognito/storage");
         await createIncognitoThread(
           content.slice(0, 50) || "New Chat",
           currentRootFolderId,
@@ -222,9 +211,7 @@ export async function sendMessage(
     );
 
     // Clear input on success
-    const { useAIStreamStore } = await import(
-      "../../../../../../ai-stream/hooks/store"
-    );
+    const { useAIStreamStore } = await import("../../../../../../ai-stream/hooks/store");
     const streamError = useAIStreamStore.getState().error;
     if (!streamError) {
       setInput("");

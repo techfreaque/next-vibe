@@ -16,11 +16,7 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: async ({ data, locale, logger }) => {
-      return translationReorganizeRepository.restoreFromBackupEndpoint(
-        data,
-        locale,
-        logger,
-      );
+      return translationReorganizeRepository.restoreFromBackupEndpoint(data, locale, logger);
     },
   },
 });

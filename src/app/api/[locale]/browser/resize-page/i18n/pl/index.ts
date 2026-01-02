@@ -48,8 +48,7 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description:
-        "Wystąpił wewnętrzny błąd serwera podczas zmiany rozmiaru strony",
+      description: "Wystąpił wewnętrzny błąd serwera podczas zmiany rozmiaru strony",
     },
     unknown: {
       title: "Nieznany błąd",

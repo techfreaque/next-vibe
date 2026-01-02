@@ -23,8 +23,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "generators", "email-templates"],
   title: "app.api.system.generators.emailTemplates.post.title" as const,
-  description:
-    "app.api.system.generators.emailTemplates.post.description" as const,
+  description: "app.api.system.generators.emailTemplates.post.description" as const,
   category: "app.api.system.generators.category" as const,
   tags: ["app.api.system.generators.emailTemplates.post.title" as const],
   icon: "mail",
@@ -40,8 +39,7 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
-      label:
-        "app.api.system.generators.emailTemplates.post.container.title" as const,
+      label: "app.api.system.generators.emailTemplates.post.container.title" as const,
       columns: 12,
     },
     { request: "data", response: true },
@@ -51,8 +49,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.generators.emailTemplates.post.fields.outputFile.label" as const,
+          label: "app.api.system.generators.emailTemplates.post.fields.outputFile.label" as const,
           description:
             "app.api.system.generators.emailTemplates.post.fields.outputFile.description" as const,
           columns: 12,
@@ -64,8 +61,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.generators.emailTemplates.post.fields.dryRun.label" as const,
+          label: "app.api.system.generators.emailTemplates.post.fields.dryRun.label" as const,
           description:
             "app.api.system.generators.emailTemplates.post.fields.dryRun.description" as const,
           columns: 6,
@@ -77,16 +73,14 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.emailTemplates.post.fields.success.title" as const,
+          content: "app.api.system.generators.emailTemplates.post.fields.success.title" as const,
         },
         z.boolean(),
       ),
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.emailTemplates.post.fields.message.title" as const,
+          content: "app.api.system.generators.emailTemplates.post.fields.message.title" as const,
         },
         z.string(),
       ),
@@ -101,8 +95,7 @@ const { POST } = createEndpoint({
       duration: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.emailTemplates.post.fields.duration.title" as const,
+          content: "app.api.system.generators.emailTemplates.post.fields.duration.title" as const,
         },
         z.coerce.number(),
       ),
@@ -127,64 +120,53 @@ const { POST } = createEndpoint({
   },
 
   successTypes: {
-    title:
-      "app.api.system.generators.emailTemplates.post.success.title" as const,
-    description:
-      "app.api.system.generators.emailTemplates.post.success.description" as const,
+    title: "app.api.system.generators.emailTemplates.post.success.title" as const,
+    description: "app.api.system.generators.emailTemplates.post.success.description" as const,
   },
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.generators.emailTemplates.post.errors.validation.title" as const,
+      title: "app.api.system.generators.emailTemplates.post.errors.validation.title" as const,
       description:
         "app.api.system.generators.emailTemplates.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.generators.emailTemplates.post.errors.network.title" as const,
+      title: "app.api.system.generators.emailTemplates.post.errors.network.title" as const,
       description:
         "app.api.system.generators.emailTemplates.post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.generators.emailTemplates.post.errors.unauthorized.title" as const,
+      title: "app.api.system.generators.emailTemplates.post.errors.unauthorized.title" as const,
       description:
         "app.api.system.generators.emailTemplates.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.generators.emailTemplates.post.errors.forbidden.title" as const,
+      title: "app.api.system.generators.emailTemplates.post.errors.forbidden.title" as const,
       description:
         "app.api.system.generators.emailTemplates.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.generators.emailTemplates.post.errors.notFound.title" as const,
+      title: "app.api.system.generators.emailTemplates.post.errors.notFound.title" as const,
       description:
         "app.api.system.generators.emailTemplates.post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.generators.emailTemplates.post.errors.server.title" as const,
+      title: "app.api.system.generators.emailTemplates.post.errors.server.title" as const,
       description:
         "app.api.system.generators.emailTemplates.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.generators.emailTemplates.post.errors.unknown.title" as const,
+      title: "app.api.system.generators.emailTemplates.post.errors.unknown.title" as const,
       description:
         "app.api.system.generators.emailTemplates.post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.generators.emailTemplates.post.errors.unsavedChanges.title" as const,
+      title: "app.api.system.generators.emailTemplates.post.errors.unsavedChanges.title" as const,
       description:
         "app.api.system.generators.emailTemplates.post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.generators.emailTemplates.post.errors.conflict.title" as const,
+      title: "app.api.system.generators.emailTemplates.post.errors.conflict.title" as const,
       description:
         "app.api.system.generators.emailTemplates.post.errors.conflict.description" as const,
     },

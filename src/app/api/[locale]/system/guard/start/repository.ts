@@ -7,19 +7,12 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type {
-  GuardStartRequestOutput,
-  GuardStartResponseOutput,
-} from "./definition";
+import type { GuardStartRequestOutput, GuardStartResponseOutput } from "./definition";
 
 interface GuardJailConfig {
   project: {
@@ -104,15 +97,7 @@ function createDefaultGuardConfig(projectName: string): GuardJailConfig {
         "/usr/bin/tree",
         "~/.local/bin/vibe",
       ],
-      directories: [
-        "src",
-        "public",
-        ".tmp",
-        ".next",
-        "node_modules",
-        ".git",
-        ".vscode",
-      ],
+      directories: ["src", "public", ".tmp", ".next", "node_modules", ".git", ".vscode"],
       fileExtensions: [
         ".ts",
         ".tsx",
@@ -253,10 +238,7 @@ function setupGuardJailEnvironment(
 
     // Create whitelist file for binaries
     const whitelistPath = path.join(jailRoot, "whitelist.txt");
-    fs.writeFileSync(
-      whitelistPath,
-      `${config.whitelist.binaries.join("\n")}\n`,
-    );
+    fs.writeFileSync(whitelistPath, `${config.whitelist.binaries.join("\n")}\n`);
     logger.info(`📋 Created binary whitelist: ${whitelistPath}`);
 
     return {
@@ -309,8 +291,7 @@ function setupVSCodeIntegration(
     }
 
     // Merge guard settings with existing settings
-    const existingProfiles =
-      existingSettings["terminal.integrated.profiles.linux"] || {};
+    const existingProfiles = existingSettings["terminal.integrated.profiles.linux"] || {};
     const guardSettings: VSCodeSettings = {
       "terminal.integrated.profiles.linux": {
         ...existingProfiles,
@@ -328,9 +309,7 @@ function setupVSCodeIntegration(
     };
 
     fs.writeFileSync(settingsPath, JSON.stringify(mergedSettings, null, 2));
-    logger.info(
-      `⚙️ Updated VSCode settings with guard integration: ${settingsPath}`,
-    );
+    logger.info(`⚙️ Updated VSCode settings with guard integration: ${settingsPath}`);
 
     // Create guard script in .vibe-guard-instance
     const guardInstancePath = path.join(projectPath, ".vibe-guard-instance");
@@ -509,14 +488,11 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
 
       // Default to current project if no parameters specified
       const currentProjectPath = process.cwd();
-      logger.info(
-        `No parameters specified, defaulting to current project: ${currentProjectPath}`,
-      );
+      logger.info(`No parameters specified, defaulting to current project: ${currentProjectPath}`);
       return await this.startByProject(currentProjectPath, logger);
     } catch (error) {
       logger.error("Guard start failed", parseError(error));
-      const parsedError =
-        error instanceof Error ? error : new Error(String(error));
+      const parsedError = error instanceof Error ? error : new Error(String(error));
 
       return fail({
         message: "app.api.system.guard.start.errors.internal.title",
@@ -565,9 +541,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     // Create default guard jail configuration
     const config = createDefaultGuardConfig(projectName);
 
-    logger.info(
-      `🛡️ Guard jail configuration loaded for ${config.project.name}`,
-    );
+    logger.info(`🛡️ Guard jail configuration loaded for ${config.project.name}`);
 
     // Setup guard jail environment
     const setupResult = setupGuardJailEnvironment(config, projectPath, logger);
@@ -655,9 +629,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     return success(response);
   }
 
-  private startAllGuards(
-    logger: EndpointLogger,
-  ): ResponseType<GuardStartResponseOutput> {
+  private startAllGuards(logger: EndpointLogger): ResponseType<GuardStartResponseOutput> {
     logger.debug("Starting all guards");
 
     // Mock implementation - in real system would find and start all guards

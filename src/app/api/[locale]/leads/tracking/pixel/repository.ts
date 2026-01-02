@@ -18,9 +18,7 @@ const pixelTrackingRequestSchema = z.object({
   t: z.string().optional(), // Timestamp parameter to prevent caching
 });
 
-export type PixelTrackingRequestType = z.infer<
-  typeof pixelTrackingRequestSchema
->;
+export type PixelTrackingRequestType = z.infer<typeof pixelTrackingRequestSchema>;
 
 /**
  * Repository for handling tracking pixel requests
@@ -30,26 +28,19 @@ export class PixelTrackingRepository {
    * Handle pixel tracking request
    * Returns a 1x1 transparent GIF and records engagement asynchronously
    */
-  static handlePixelRequest(
-    request: NextRequest,
-    logger: EndpointLogger,
-  ): Response {
+  static handlePixelRequest(request: NextRequest, logger: EndpointLogger): Response {
     try {
       const { searchParams } = new URL(request.url);
 
       // Validate tracking parameters
-      const validationResult =
-        PixelTrackingRepository.validateTrackingParams(searchParams);
+      const validationResult = PixelTrackingRepository.validateTrackingParams(searchParams);
 
       // Always return pixel first to avoid broken images, even on errors
-      const pixelResponse =
-        LeadTrackingRepository.createTrackingPixelResponse();
+      const pixelResponse = LeadTrackingRepository.createTrackingPixelResponse();
 
       if (!validationResult.success || !validationResult.data?.leadId) {
         logger.warn("tracking.pixel.request.invalid", {
-          error: validationResult.success
-            ? "Missing leadId"
-            : validationResult.error,
+          error: validationResult.success ? "Missing leadId" : validationResult.error,
           searchParams: Object.fromEntries(searchParams),
           ip: PixelTrackingRepository.getClientIp(request),
         });
@@ -166,10 +157,6 @@ export class PixelTrackingRepository {
    * Extract client IP address from request headers
    */
   private static getClientIp(request: NextRequest): string {
-    return (
-      request.headers.get("x-forwarded-for") ||
-      request.headers.get("x-real-ip") ||
-      "unknown"
-    );
+    return request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
   }
 }

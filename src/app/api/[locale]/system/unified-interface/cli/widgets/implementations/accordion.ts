@@ -9,9 +9,7 @@ import { extractAccordionData } from "@/app/api/[locale]/system/unified-interfac
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class AccordionWidgetRenderer extends BaseWidgetRenderer<
-  typeof WidgetType.ACCORDION
-> {
+export class AccordionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.ACCORDION> {
   readonly widgetType = WidgetType.ACCORDION;
 
   render(props: CLIWidgetProps<typeof WidgetType.ACCORDION, string>): string {
@@ -45,9 +43,7 @@ export class AccordionWidgetRenderer extends BaseWidgetRenderer<
       // Item content (only if expanded)
       if (item.expanded && item.content !== null) {
         const contentStr =
-          typeof item.content === "string"
-            ? item.content
-            : JSON.stringify(item.content, null, 2);
+          typeof item.content === "string" ? item.content : JSON.stringify(item.content, null, 2);
 
         // Indent content
         const contentLines = contentStr.split("\n");

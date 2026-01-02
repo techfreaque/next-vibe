@@ -10,8 +10,7 @@ export const translations = {
     },
     internal: {
       title: "Internal Error",
-      description:
-        "An internal error occurred while processing the user request",
+      description: "An internal error occurred while processing the user request",
     },
   },
   id: idTranslations,

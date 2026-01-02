@@ -49,14 +49,12 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
   }, [onChange, value]);
 
   const handleDecrement = (): void => {
-    const newValue =
-      min === undefined ? value - step : Math.max(min, value - step);
+    const newValue = min === undefined ? value - step : Math.max(min, value - step);
     onChange?.(newValue);
   };
 
   const handleIncrement = (): void => {
-    const newValue =
-      max === undefined ? value + step : Math.min(max, value + step);
+    const newValue = max === undefined ? value + step : Math.min(max, value + step);
     onChange?.(newValue);
   };
 
@@ -82,12 +80,7 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
   };
 
   return (
-    <Div
-      className={cn(
-        "flex justify-between gap-3 border-input rounded",
-        className,
-      )}
-    >
+    <Div className={cn("flex justify-between gap-3 border-input rounded", className)}>
       <Button
         type="button"
         variant="ghost"

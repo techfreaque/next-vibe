@@ -5,11 +5,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "next-vibe-ui/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { H4 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
@@ -120,16 +116,7 @@ export function IconSelector({
       "briefcase",
       "home",
     ],
-    "AI & Tech": [
-      "brain",
-      "bot",
-      "cpu",
-      "si-openai",
-      "terminal",
-      "laptop",
-      "monitor",
-      "database",
-    ],
+    "AI & Tech": ["brain", "bot", "cpu", "si-openai", "terminal", "laptop", "monitor", "database"],
     Security: ["lock", "shield", "shield-plus", "eye-off"],
     Social: ["users", "globe", "message-square", "heart"],
     Development: [
@@ -153,33 +140,19 @@ export function IconSelector({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className={cn("h-8 w-8 p-0", className)}
-        >
+        <Button variant="outline" size="sm" className={cn("h-8 w-8 p-0", className)}>
           <CurrentIcon className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-96 p-0" align="start">
-        <Tabs
-          value={activeTab}
-          onValueChange={(v) => setActiveTab(v as typeof activeTab)}
-        >
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
           <TabsList className="w-full grid grid-cols-2 rounded-none border-b">
-            <TabsTrigger value="library">
-              {t("app.chat.iconSelector.tabs.library")}
-            </TabsTrigger>
-            <TabsTrigger value="emoji">
-              {t("app.chat.iconSelector.tabs.emoji")}
-            </TabsTrigger>
+            <TabsTrigger value="library">{t("app.chat.iconSelector.tabs.library")}</TabsTrigger>
+            <TabsTrigger value="emoji">{t("app.chat.iconSelector.tabs.emoji")}</TabsTrigger>
           </TabsList>
 
           {/* Icon Library Tab */}
-          <TabsContent
-            value="library"
-            className="max-h-96 overflow-y-auto p-2 m-0"
-          >
+          <TabsContent value="library" className="max-h-96 overflow-y-auto p-2 m-0">
             <Div className="flex flex-col gap-4">
               {Object.entries(iconCategories).map(([category, icons]) => (
                 <Div key={category}>
@@ -190,8 +163,7 @@ export function IconSelector({
                     {icons.map((iconKey) => {
                       const Icon = ICON_REGISTRY[iconKey];
                       const isSelected =
-                        isIconKey(currentValueString) &&
-                        currentValueString === iconKey;
+                        isIconKey(currentValueString) && currentValueString === iconKey;
 
                       return (
                         <Button
@@ -226,9 +198,7 @@ export function IconSelector({
                   <Input
                     value={emojiInput}
                     onChange={handleEmojiChange}
-                    placeholder={t(
-                      "app.chat.iconSelector.emojiTab.placeholder",
-                    )}
+                    placeholder={t("app.chat.iconSelector.emojiTab.placeholder")}
                     className="flex-1"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
@@ -236,10 +206,7 @@ export function IconSelector({
                       }
                     }}
                   />
-                  <Button
-                    onClick={handleEmojiSubmit}
-                    disabled={!emojiInput.trim()}
-                  >
+                  <Button onClick={handleEmojiSubmit} disabled={!emojiInput.trim()}>
                     {t("app.chat.iconSelector.emojiTab.apply")}
                   </Button>
                 </Div>
@@ -274,8 +241,7 @@ export function IconSelector({
                         }}
                         className={cn(
                           "flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent transition-colors text-xl",
-                          currentValueString === iconKey &&
-                            "bg-accent border-2 border-primary",
+                          currentValueString === iconKey && "bg-accent border-2 border-primary",
                         )}
                       >
                         <Icon className="h-4 w-4" />

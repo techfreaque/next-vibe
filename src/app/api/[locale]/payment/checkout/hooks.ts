@@ -5,14 +5,8 @@
 
 "use client";
 
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useCallback } from "react";
@@ -22,16 +16,10 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
-import type {
-  BillingIntervalValue,
-  SubscriptionPlanValue,
-} from "../../subscription/enum";
+import type { BillingIntervalValue, SubscriptionPlanValue } from "../../subscription/enum";
 import { BillingInterval, SubscriptionPlan } from "../../subscription/enum";
 import { handleCheckoutRedirect } from "../utils/redirect";
-import type {
-  CheckoutRequestOutput,
-  CheckoutResponseOutput,
-} from "./definition";
+import type { CheckoutRequestOutput, CheckoutResponseOutput } from "./definition";
 import checkoutEndpoints from "./definition";
 
 /**
@@ -73,10 +61,7 @@ export function useSubscriptionCheckout(
           logger.error("app.api.payment.checkout.redirect.failed");
         }
       } catch (error) {
-        logger.error(
-          "app.api.payment.checkout.process.failed",
-          parseError(error),
-        );
+        logger.error("app.api.payment.checkout.process.failed", parseError(error));
         toast({
           title: t("app.common.error.title"),
           description: t("app.common.error.description"),
@@ -205,6 +190,4 @@ export function useCheckout(logger: EndpointLogger): {
   };
 }
 
-export type SubscriptionCheckoutEndpointReturn = EndpointReturn<
-  typeof checkoutEndpoints
->;
+export type SubscriptionCheckoutEndpointReturn = EndpointReturn<typeof checkoutEndpoints>;

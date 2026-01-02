@@ -29,8 +29,7 @@ export const translations: typeof enTranslations = {
     namePlaceholder: "Aufgabenname eingeben",
     description: "Beschreibung",
     descriptionPlaceholder: "Aufgabenbeschreibung eingeben",
-    schedulingDescription:
-      "Konfigurieren Sie wann und wie oft die Aufgabe läuft",
+    schedulingDescription: "Konfigurieren Sie wann und wie oft die Aufgabe läuft",
     schedulePlaceholder: "Cron-Zeitplan auswählen oder eingeben",
     searchSchedule: "Zeitpläne durchsuchen...",
     configuration: "Konfiguration",
@@ -42,13 +41,11 @@ export const translations: typeof enTranslations = {
   },
   nav: {
     stats: "Statistiken",
-    stats_description:
-      "Zeigen Sie Statistiken und Leistungsmetriken für Cron-Aufgaben an",
+    stats_description: "Zeigen Sie Statistiken und Leistungsmetriken für Cron-Aufgaben an",
     tasks: "Aufgaben",
     tasks_description: "Verwalten und konfigurieren Sie Cron-Aufgaben",
     history: "Verlauf",
-    history_description:
-      "Zeigen Sie den Ausführungsverlauf von Cron-Aufgaben an",
+    history_description: "Zeigen Sie den Ausführungsverlauf von Cron-Aufgaben an",
   },
   buttons: {
     previous: "Zurück",
@@ -109,8 +106,7 @@ export const translations: typeof enTranslations = {
     description: "Konfigurieren Sie eine neue geplante Aufgabe",
     form: {
       taskName: "Aufgabenname",
-      taskNameDescription:
-        "Geben Sie einen beschreibenden Namen für diese Aufgabe ein",
+      taskNameDescription: "Geben Sie einen beschreibenden Namen für diese Aufgabe ein",
       taskNamePlaceholder: "Wert eingeben...",
       priority: "Priorität",
       description: "Beschreibung",

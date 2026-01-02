@@ -89,8 +89,7 @@ export const translations: typeof enTranslations = {
     errors: {
       server: {
         title: "Błąd Serwera",
-        description:
-          "Wystąpił wewnętrzny błąd serwera podczas pobierania statystyk",
+        description: "Wystąpił wewnętrzny błąd serwera podczas pobierania statystyk",
       },
       validation: {
         title: "Błąd Walidacji",

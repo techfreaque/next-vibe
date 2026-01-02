@@ -20,8 +20,7 @@ export const translations = {
     },
     vote: {
       label: "Bewertung",
-      description:
-        "Ihre Bewertung: Hochbewerten, Runterbewerten oder Entfernen",
+      description: "Ihre Bewertung: Hochbewerten, Runterbewerten oder Entfernen",
       placeholder: "Bewertungstyp auswählen...",
       options: {
         upvote: "Hochbewerten",
@@ -57,10 +56,8 @@ export const translations = {
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, diese Nachricht zu bewerten",
-        incognitoNotAllowed:
-          "Inkognito-Threads können nicht auf dem Server aufgerufen werden",
+        description: "Sie haben keine Berechtigung, diese Nachricht zu bewerten",
+        incognitoNotAllowed: "Inkognito-Threads können nicht auf dem Server aufgerufen werden",
       },
       notFound: {
         title: "Nicht gefunden",

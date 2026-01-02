@@ -46,8 +46,7 @@ export function CopyButton({
   const { t } = simpleT(locale);
 
   // Check if we have dual format support
-  const hasDualFormat =
-    contentMarkdown !== undefined && contentText !== undefined;
+  const hasDualFormat = contentMarkdown !== undefined && contentText !== undefined;
 
   const handleCopy = async (format: "markdown" | "text"): Promise<void> => {
     try {

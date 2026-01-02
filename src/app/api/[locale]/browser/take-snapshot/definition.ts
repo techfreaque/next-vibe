@@ -27,10 +27,7 @@ const { POST } = createEndpoint({
   description: "app.api.browser.take-snapshot.description",
   category: "app.api.browser.category",
   icon: "file-text",
-  tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.captureAutomation",
-  ],
+  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.captureAutomation"],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -55,10 +52,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.browser.take-snapshot.form.fields.verbose.label",
-          description:
-            "app.api.browser.take-snapshot.form.fields.verbose.description",
-          placeholder:
-            "app.api.browser.take-snapshot.form.fields.verbose.placeholder",
+          description: "app.api.browser.take-snapshot.form.fields.verbose.description",
+          placeholder: "app.api.browser.take-snapshot.form.fields.verbose.placeholder",
           columns: 6,
         },
         z
@@ -73,10 +68,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.browser.take-snapshot.form.fields.filePath.label",
-          description:
-            "app.api.browser.take-snapshot.form.fields.filePath.description",
-          placeholder:
-            "app.api.browser.take-snapshot.form.fields.filePath.placeholder",
+          description: "app.api.browser.take-snapshot.form.fields.filePath.description",
+          placeholder: "app.api.browser.take-snapshot.form.fields.filePath.placeholder",
           columns: 6,
         },
         z
@@ -93,9 +86,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.browser.take-snapshot.response.success",
         },
-        z
-          .boolean()
-          .describe("Whether the snapshot capture operation succeeded"),
+        z.boolean().describe("Whether the snapshot capture operation succeeded"),
       ),
       result: responseField(
         {
@@ -105,14 +96,8 @@ const { POST } = createEndpoint({
         z
           .object({
             captured: z.boolean().describe("Whether the snapshot was captured"),
-            elementCount: z
-              .number()
-              .optional()
-              .describe("Number of elements in the snapshot"),
-            filePath: z
-              .string()
-              .optional()
-              .describe("Path where snapshot was saved"),
+            elementCount: z.number().optional().describe("Number of elements in the snapshot"),
+            filePath: z.string().optional().describe("Path where snapshot was saved"),
             data: z.string().optional().describe("The snapshot data"),
           })
           .optional()
@@ -155,8 +140,7 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.browser.take-snapshot.errors.validation.title",
-      description:
-        "app.api.browser.take-snapshot.errors.validation.description",
+      description: "app.api.browser.take-snapshot.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.browser.take-snapshot.errors.network.title",
@@ -164,8 +148,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.browser.take-snapshot.errors.unauthorized.title",
-      description:
-        "app.api.browser.take-snapshot.errors.unauthorized.description",
+      description: "app.api.browser.take-snapshot.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.browser.take-snapshot.errors.forbidden.title",
@@ -177,8 +160,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.browser.take-snapshot.errors.serverError.title",
-      description:
-        "app.api.browser.take-snapshot.errors.serverError.description",
+      description: "app.api.browser.take-snapshot.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.browser.take-snapshot.errors.unknown.title",
@@ -186,8 +168,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.take-snapshot.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.take-snapshot.errors.unsavedChanges.description",
+      description: "app.api.browser.take-snapshot.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.take-snapshot.errors.conflict.title",

@@ -117,8 +117,7 @@ export const translations: typeof enTranslations = {
         help: "Ihr öffentlicher Name wird für andere Benutzer sichtbar sein",
         validation: {
           minLength: "Der öffentliche Name muss mindestens 2 Zeichen lang sein",
-          maxLength:
-            "Der öffentliche Name darf nicht länger als 50 Zeichen sein",
+          maxLength: "Der öffentliche Name darf nicht länger als 50 Zeichen sein",
         },
       },
       imageUrl: {
@@ -136,8 +135,7 @@ export const translations: typeof enTranslations = {
         placeholder: "Geben Sie Ihr Unternehmen ein",
         help: "Ihr Unternehmensname wird in Ihrem Profil angezeigt",
         validation: {
-          maxLength:
-            "Der Unternehmensname darf nicht länger als 100 Zeichen sein",
+          maxLength: "Der Unternehmensname darf nicht länger als 100 Zeichen sein",
         },
       },
       visibility: {
@@ -234,8 +232,7 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Erfolg",
       description: "Profil erfolgreich aktualisiert",
-      nextSteps:
-        "Empfohlene nächste Schritte nach der Aktualisierung Ihres Profils",
+      nextSteps: "Empfohlene nächste Schritte nach der Aktualisierung Ihres Profils",
     },
   },
   delete: {

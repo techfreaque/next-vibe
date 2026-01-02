@@ -11,11 +11,7 @@ import { clearFormsAfterSuccessInDev } from "@/config/debug";
 import { envClient } from "@/config/env-client";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
-import type {
-  AutoPrefillConfig,
-  FormDataPriority,
-  FormDataSources,
-} from "./endpoint-types";
+import type { AutoPrefillConfig, FormDataPriority, FormDataSources } from "./endpoint-types";
 import type {
   ApiFormOptions,
   ApiMutationOptions,
@@ -26,9 +22,9 @@ import type {
 /**
  * Utility to detect available HTTP methods from endpoints object
  */
-export function useAvailableMethods<
-  T extends Partial<Record<Methods, CreateApiEndpointAny>>,
->(endpoints: T): Methods[] {
+export function useAvailableMethods<T extends Partial<Record<Methods, CreateApiEndpointAny>>>(
+  endpoints: T,
+): Methods[] {
   return useMemo(() => {
     return Object.keys(endpoints).filter((method) =>
       ALL_METHODS.includes(method as Methods),
@@ -39,9 +35,7 @@ export function useAvailableMethods<
 /**
  * Utility to determine primary mutation method (prefer POST, then PUT, then PATCH, then DELETE)
  */
-export function usePrimaryMutationMethod(
-  availableMethods: Methods[],
-): Methods | null {
+export function usePrimaryMutationMethod(availableMethods: Methods[]): Methods | null {
   return useMemo(() => {
     if (availableMethods.includes(Methods.POST)) {
       return Methods.POST;
@@ -95,9 +89,7 @@ function isPlainObject(
  * Deep merge objects, with later sources taking priority
  * Handles nested objects recursively
  */
-function deepMerge<T>(
-  ...sources: (DeepPartial<T> | null | undefined)[]
-): DeepPartial<T> {
+function deepMerge<T>(...sources: (DeepPartial<T> | null | undefined)[]): DeepPartial<T> {
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Deep merge requires dynamic object building
   const result: Record<string, DeepPartial<never>> = {};
 
@@ -204,11 +196,7 @@ function mergeOptions<T extends FieldValues>(
  * Merge endpoint read options with hook-provided read options
  * Hook options take priority over endpoint options
  */
-export function mergeReadOptions<
-  TRequest extends FieldValues,
-  TResponse,
-  TUrlVariables,
->(
+export function mergeReadOptions<TRequest extends FieldValues, TResponse, TUrlVariables>(
   endpointOptions:
     | {
         formOptions?: ApiQueryFormOptions<TRequest>;
@@ -232,19 +220,10 @@ export function mergeReadOptions<
   initialState?: Partial<TRequest>;
 } {
   return {
-    formOptions: mergeOptions(
-      endpointOptions?.formOptions,
-      hookOptions?.formOptions,
-    ),
-    queryOptions: mergeOptions(
-      endpointOptions?.queryOptions,
-      hookOptions?.queryOptions,
-    ),
+    formOptions: mergeOptions(endpointOptions?.formOptions, hookOptions?.formOptions),
+    queryOptions: mergeOptions(endpointOptions?.queryOptions, hookOptions?.queryOptions),
     urlPathParams: hookOptions?.urlPathParams ?? endpointOptions?.urlPathParams,
-    initialState: mergeOptions(
-      endpointOptions?.initialState,
-      hookOptions?.initialState,
-    ),
+    initialState: mergeOptions(endpointOptions?.initialState, hookOptions?.initialState),
   };
 }
 
@@ -252,19 +231,11 @@ export function mergeReadOptions<
  * Merge endpoint create options with hook-provided create options
  * Hook options take priority over endpoint options
  */
-export function mergeCreateOptions<
-  TRequest extends FieldValues,
-  TResponse,
-  TUrlVariables,
->(
+export function mergeCreateOptions<TRequest extends FieldValues, TResponse, TUrlVariables>(
   endpointOptions:
     | {
         formOptions?: ApiFormOptions<TRequest>;
-        mutationOptions?: ApiMutationOptions<
-          TRequest,
-          TResponse,
-          TUrlVariables
-        >;
+        mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
         urlPathParams?: TUrlVariables;
         autoPrefillData?: Partial<TRequest>;
         initialState?: Partial<TRequest>;
@@ -273,11 +244,7 @@ export function mergeCreateOptions<
   hookOptions:
     | {
         formOptions?: ApiFormOptions<TRequest>;
-        mutationOptions?: ApiMutationOptions<
-          TRequest,
-          TResponse,
-          TUrlVariables
-        >;
+        mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
         urlPathParams?: TUrlVariables;
         autoPrefillData?: Partial<TRequest>;
         initialState?: Partial<TRequest>;
@@ -291,23 +258,11 @@ export function mergeCreateOptions<
   initialState?: Partial<TRequest>;
 } {
   return {
-    formOptions: mergeOptions(
-      endpointOptions?.formOptions,
-      hookOptions?.formOptions,
-    ),
-    mutationOptions: mergeOptions(
-      endpointOptions?.mutationOptions,
-      hookOptions?.mutationOptions,
-    ),
+    formOptions: mergeOptions(endpointOptions?.formOptions, hookOptions?.formOptions),
+    mutationOptions: mergeOptions(endpointOptions?.mutationOptions, hookOptions?.mutationOptions),
     urlPathParams: hookOptions?.urlPathParams ?? endpointOptions?.urlPathParams,
-    autoPrefillData: mergeOptions(
-      endpointOptions?.autoPrefillData,
-      hookOptions?.autoPrefillData,
-    ),
-    initialState: mergeOptions(
-      endpointOptions?.initialState,
-      hookOptions?.initialState,
-    ),
+    autoPrefillData: mergeOptions(endpointOptions?.autoPrefillData, hookOptions?.autoPrefillData),
+    initialState: mergeOptions(endpointOptions?.initialState, hookOptions?.initialState),
   };
 }
 
@@ -318,21 +273,13 @@ export function mergeCreateOptions<
 export function mergeDeleteOptions<TRequest, TResponse, TUrlVariables>(
   endpointOptions:
     | {
-        mutationOptions?: ApiMutationOptions<
-          TRequest,
-          TResponse,
-          TUrlVariables
-        >;
+        mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
         urlPathParams?: TUrlVariables;
       }
     | undefined,
   hookOptions:
     | {
-        mutationOptions?: ApiMutationOptions<
-          TRequest,
-          TResponse,
-          TUrlVariables
-        >;
+        mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
         urlPathParams?: TUrlVariables;
       }
     | undefined,
@@ -341,10 +288,7 @@ export function mergeDeleteOptions<TRequest, TResponse, TUrlVariables>(
   urlPathParams?: TUrlVariables;
 } {
   return {
-    mutationOptions: mergeOptions(
-      endpointOptions?.mutationOptions,
-      hookOptions?.mutationOptions,
-    ),
+    mutationOptions: mergeOptions(endpointOptions?.mutationOptions, hookOptions?.mutationOptions),
     urlPathParams: hookOptions?.urlPathParams ?? endpointOptions?.urlPathParams,
   };
 }

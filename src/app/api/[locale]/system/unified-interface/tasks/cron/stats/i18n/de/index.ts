@@ -7,8 +7,7 @@ export const translations: typeof enTranslations = {
     tag: "Cron-Statistiken",
     form: {
       title: "Cron-Statistiken-Anfrage",
-      description:
-        "Parameter für das Abrufen von Cron-Task-Statistiken konfigurieren",
+      description: "Parameter für das Abrufen von Cron-Task-Statistiken konfigurieren",
     },
     fields: {
       period: {
@@ -21,8 +20,7 @@ export const translations: typeof enTranslations = {
       },
       taskId: {
         title: "Task-ID",
-        description:
-          "Optionale spezifische Task-ID zum Filtern der Statistiken",
+        description: "Optionale spezifische Task-ID zum Filtern der Statistiken",
       },
       limit: {
         title: "Ergebnis-Limit",
@@ -91,8 +89,7 @@ export const translations: typeof enTranslations = {
     errors: {
       server: {
         title: "Server-Fehler",
-        description:
-          "Ein interner Server-Fehler ist beim Abrufen der Statistiken aufgetreten",
+        description: "Ein interner Server-Fehler ist beim Abrufen der Statistiken aufgetreten",
       },
       validation: {
         title: "Validierungsfehler",
@@ -100,28 +97,23 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Authentifizierung erforderlich für den Zugriff auf Statistiken",
+        description: "Authentifizierung erforderlich für den Zugriff auf Statistiken",
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Unzureichende Berechtigungen für den Zugriff auf Statistiken",
+        description: "Unzureichende Berechtigungen für den Zugriff auf Statistiken",
       },
       notFound: {
         title: "Nicht gefunden",
-        description:
-          "Die angeforderten Statistiken konnten nicht gefunden werden",
+        description: "Die angeforderten Statistiken konnten nicht gefunden werden",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "Ein Konflikt ist bei der Verarbeitung der Anfrage aufgetreten",
+        description: "Ein Konflikt ist bei der Verarbeitung der Anfrage aufgetreten",
       },
       network: {
         title: "Netzwerk-Fehler",
-        description:
-          "Ein Netzwerk-Fehler ist beim Abrufen der Statistiken aufgetreten",
+        description: "Ein Netzwerk-Fehler ist beim Abrufen der Statistiken aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -129,8 +121,7 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
-        description:
-          "Es gibt nicht gespeicherte Änderungen, die bearbeitet werden müssen",
+        description: "Es gibt nicht gespeicherte Änderungen, die bearbeitet werden müssen",
       },
     },
     success: {

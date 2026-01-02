@@ -48,10 +48,7 @@ export function ImapSyncOperations(): JSX.Element {
   const { t, locale } = useTranslation();
   const [isSyncing, setIsSyncing] = useState(false);
 
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
 
   // Use accounts endpoint to get sync status information
   const accountsEndpoint = useEndpoint(
@@ -78,9 +75,7 @@ export function ImapSyncOperations(): JSX.Element {
     accounts = accountsResponse.data.accounts;
   }
 
-  const syncingAccounts = accounts.filter(
-    (acc) => acc.syncStatus === ImapSyncStatus.SYNCING,
-  );
+  const syncingAccounts = accounts.filter((acc) => acc.syncStatus === ImapSyncStatus.SYNCING);
   const lastSyncTimes = accounts
     .map((acc) => acc.lastSyncAt)
     .filter((time): time is string => time !== null)
@@ -95,10 +90,7 @@ export function ImapSyncOperations(): JSX.Element {
     progress: isSyncing ? 50 : 0, // Progress will be calculated from actual sync data
     startTime: null,
     estimatedCompletion: null,
-    lastSync:
-      lastSyncTimes.length > 0
-        ? lastSyncTimes[0]
-        : t("app.admin.emails.imap.common.never"),
+    lastSync: lastSyncTimes.length > 0 ? lastSyncTimes[0] : t("app.admin.emails.imap.common.never"),
     nextSync: t("app.admin.emails.imap.sync.nextSync"),
   };
 
@@ -233,9 +225,7 @@ export function ImapSyncOperations(): JSX.Element {
                 </Div>
               </Div>
               <Div className="text-center">
-                <Div className="text-2xl font-bold">
-                  {syncStatus.currentOperation}
-                </Div>
+                <Div className="text-2xl font-bold">{syncStatus.currentOperation}</Div>
                 <Div className="text-sm text-gray-600">
                   {t("app.admin.emails.imap.sync.currentOperation")}
                 </Div>
@@ -281,9 +271,7 @@ export function ImapSyncOperations(): JSX.Element {
                 <Square className="h-4 w-4" />
                 <Span>{t("app.admin.emails.imap.sync.stop")}</Span>
               </Button>
-              <Button variant="outline">
-                {t("app.admin.emails.imap.sync.manual")}
-              </Button>
+              <Button variant="outline">{t("app.admin.emails.imap.sync.manual")}</Button>
             </Div>
           </Div>
         </CardContent>
@@ -340,9 +328,7 @@ export function ImapSyncOperations(): JSX.Element {
                 <P className="text-sm font-medium text-gray-600">
                   {t("app.admin.emails.imap.sync.statistics.avgDuration")}
                 </P>
-                <P className="text-2xl font-bold">
-                  {t("app.admin.emails.imap.common.never")}
-                </P>
+                <P className="text-2xl font-bold">{t("app.admin.emails.imap.common.never")}</P>
               </Div>
               <Clock className="h-8 w-8 text-gray-600" />
             </Div>
@@ -359,35 +345,19 @@ export function ImapSyncOperations(): JSX.Element {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>
-                  {t("app.admin.emails.imap.sync.history.startTime")}
-                </TableHead>
-                <TableHead>
-                  {t("app.admin.emails.imap.sync.history.status")}
-                </TableHead>
-                <TableHead>
-                  {t("app.admin.emails.imap.sync.history.duration")}
-                </TableHead>
-                <TableHead>
-                  {t("app.admin.emails.imap.sync.history.accounts")}
-                </TableHead>
-                <TableHead>
-                  {t("app.admin.emails.imap.sync.history.folders")}
-                </TableHead>
-                <TableHead>
-                  {t("app.admin.emails.imap.sync.history.messages")}
-                </TableHead>
-                <TableHead>
-                  {t("app.admin.emails.imap.sync.history.errors")}
-                </TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.startTime")}</TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.status")}</TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.duration")}</TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.accounts")}</TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.folders")}</TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.messages")}</TableHead>
+                <TableHead>{t("app.admin.emails.imap.sync.history.errors")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {syncHistory.map((sync) => (
                 <TableRow key={sync.id}>
-                  <TableCell>
-                    {new Date(sync.startTime).toLocaleString()}
-                  </TableCell>
+                  <TableCell>{new Date(sync.startTime).toLocaleString()}</TableCell>
                   <TableCell>
                     <Div className="flex items-center flex flex-row gap-2">
                       {getStatusIcon(sync.status)}

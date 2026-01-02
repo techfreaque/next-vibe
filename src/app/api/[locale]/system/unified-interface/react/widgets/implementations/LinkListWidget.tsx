@@ -30,11 +30,7 @@ export function LinkListWidget<const TKey extends string>({
   if (!data) {
     return (
       <Div className={cn("py-8 text-center text-muted-foreground", className)}>
-        <P>
-          {t(
-            "app.api.system.unifiedInterface.react.widgets.linkList.noResults",
-          )}
-        </P>
+        <P>{t("app.api.system.unifiedInterface.react.widgets.linkList.noResults")}</P>
       </Div>
     );
   }
@@ -48,17 +44,10 @@ export function LinkListWidget<const TKey extends string>({
       {title && (
         <Div className="flex flex-col gap-1">
           <H3 className="text-lg font-semibold">{title}</H3>
-          {description && (
-            <P className="text-sm text-muted-foreground">{description}</P>
-          )}
+          {description && <P className="text-sm text-muted-foreground">{description}</P>}
         </Div>
       )}
-      <Div
-        className={cn(
-          "grid gap-4",
-          layout === "grid" ? gridClass : "grid-cols-1",
-        )}
-      >
+      <Div className={cn("grid gap-4", layout === "grid" ? gridClass : "grid-cols-1")}>
         {items.map((item, index) => {
           return (
             <LinkCardWidget

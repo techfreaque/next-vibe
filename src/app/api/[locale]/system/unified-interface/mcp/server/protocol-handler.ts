@@ -39,11 +39,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   private locale: CountryLanguage;
   private user: JwtPayloadType;
 
-  constructor(
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-    user: JwtPayloadType,
-  ) {
+  constructor(logger: EndpointLogger, locale: CountryLanguage, user: JwtPayloadType) {
     this.logger = logger;
     this.locale = locale;
     this.user = user;
@@ -78,9 +74,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
 
       switch (request.method) {
         case MCPMethod.INITIALIZE:
-          result = await this.handleInitialize(
-            request.params as MCPInitializeParams,
-          );
+          result = await this.handleInitialize(request.params as MCPInitializeParams);
           this.initialized = true;
           break;
 
@@ -97,9 +91,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
               "Server not initialized. Call initialize first.",
             );
           }
-          result = await this.handleToolsList(
-            request.params as MCPToolsListParams,
-          );
+          result = await this.handleToolsList(request.params as MCPToolsListParams);
           break;
 
         case MCPMethod.TOOLS_CALL:
@@ -111,9 +103,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
               "Server not initialized. Call initialize first.",
             );
           }
-          result = await this.handleToolCall(
-            request.params as MCPToolCallParams,
-          );
+          result = await this.handleToolCall(request.params as MCPToolCallParams);
           break;
 
         default:
@@ -133,20 +123,14 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
         error: parsedError.message,
       });
 
-      return this.fail(
-        request.id ?? null,
-        MCPErrorCode.INTERNAL_ERROR,
-        parsedError.message,
-      );
+      return this.fail(request.id ?? null, MCPErrorCode.INTERNAL_ERROR, parsedError.message);
     }
   }
 
   /**
    * Handle initialize request
    */
-  async handleInitialize(
-    params: MCPInitializeParams,
-  ): Promise<MCPInitializeResult> {
+  async handleInitialize(params: MCPInitializeParams): Promise<MCPInitializeResult> {
     this.logger.info("[MCP Protocol] Initializing", {
       clientName: params.clientInfo.name,
       clientVersion: params.clientInfo.version,
@@ -190,9 +174,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     const endpoints = mcpRegistry.getEndpoints(this.user, this.logger);
 
     // Convert to MCP tool format with proper JSON Schema and translated descriptions
-    const tools = endpoints.map((endpoint) =>
-      endpointToMCPTool(endpoint, this.locale),
-    );
+    const tools = endpoints.map((endpoint) => endpointToMCPTool(endpoint, this.locale));
 
     this.logger.info("[MCP Protocol] Tools listed", {
       count: tools.length,

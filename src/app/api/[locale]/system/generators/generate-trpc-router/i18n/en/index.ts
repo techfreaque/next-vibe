@@ -14,19 +14,13 @@ export const translations = {
     definitionImportFromTs: "./definition.ts",
     enhancedApiHandlerCall: "enhancedApiHandler(",
     exportConstTrpc: "export const trpc",
-    routerNotFound:
-      "tRPC router file not found. Run 'vibe generate-trpc' to create it.",
-    routeHasDefinitionNoHandler:
-      "Route has definition but not using enhancedApiHandler",
-    routeHasHandlerNoTrpc:
-      "Route uses enhancedApiHandler but missing tRPC export",
-    routeMissingNextExports:
-      "Route missing Next.js exports (needed for React Native support)",
+    routerNotFound: "tRPC router file not found. Run 'vibe generate-trpc' to create it.",
+    routeHasDefinitionNoHandler: "Route has definition but not using enhancedApiHandler",
+    routeHasHandlerNoTrpc: "Route uses enhancedApiHandler but missing tRPC export",
+    routeMissingNextExports: "Route missing Next.js exports (needed for React Native support)",
     apiHandlerOld: "apiHandler(",
-    routeUsesOldHandler:
-      "Route still uses old apiHandler, should migrate to enhancedApiHandler",
-    autoFixNotImplemented:
-      "Auto-fix not implemented yet. Run migration script manually.",
+    routeUsesOldHandler: "Route still uses old apiHandler, should migrate to enhancedApiHandler",
+    autoFixNotImplemented: "Auto-fix not implemented yet. Run migration script manually.",
     failedToReadRoute: "Failed to read route file: {{message}}",
     reportTitle: "# tRPC Integration Validation Report",
     reportStatus: "**Status:** {{status}}",

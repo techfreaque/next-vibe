@@ -23,10 +23,7 @@ interface BottomSheetViewProps {
   className?: string;
 }
 
-export function BottomSheetView({
-  children,
-  className,
-}: BottomSheetViewProps): React.JSX.Element {
+export function BottomSheetView({ children, className }: BottomSheetViewProps): React.JSX.Element {
   return <StyledView className={className}>{children}</StyledView>;
 }
 

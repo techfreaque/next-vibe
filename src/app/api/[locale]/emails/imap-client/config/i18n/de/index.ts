@@ -67,8 +67,7 @@ export const translations: typeof enTranslations = {
   },
   batchSize: {
     label: "Batch-Größe",
-    description:
-      "Anzahl der Nachrichten, die in jedem Batch verarbeitet werden",
+    description: "Anzahl der Nachrichten, die in jedem Batch verarbeitet werden",
   },
   loggingLevel: {
     label: "Logging-Level",
@@ -115,8 +114,7 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie sind nicht berechtigt, diese Konfiguration zu aktualisieren",
+        description: "Sie sind nicht berechtigt, diese Konfiguration zu aktualisieren",
       },
     },
   },

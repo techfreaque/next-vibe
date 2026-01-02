@@ -71,10 +71,7 @@ function saveLocalFavorites(favorites: FavoriteItem[]): void {
   if (typeof window === "undefined") {
     return;
   }
-  localStorage.setItem(
-    STORAGE_KEYS.FAVORITE_CHARACTERS,
-    JSON.stringify(favorites),
-  );
+  localStorage.setItem(STORAGE_KEYS.FAVORITE_CHARACTERS, JSON.stringify(favorites));
 }
 
 interface UseChatFavoritesOptions {
@@ -103,10 +100,7 @@ export function useChatFavorites({
   user,
   logger,
 }: UseChatFavoritesOptions): UseChatFavoritesReturn {
-  const isAuthenticated = useMemo(
-    () => user !== undefined && !user.isPublic,
-    [user],
-  );
+  const isAuthenticated = useMemo(() => user !== undefined && !user.isPublic, [user]);
 
   // Use server storage only for authenticated users
   const useServerStorage = isAuthenticated;
@@ -193,10 +187,7 @@ export function useChatFavorites({
     async (favorite: Omit<FavoriteItem, "id">): Promise<FavoriteItem> => {
       if (useServerStorage && endpoint.create) {
         // Set form values for server creation
-        endpoint.create.form.setValue(
-          "characterId",
-          favorite.characterId ?? "",
-        );
+        endpoint.create.form.setValue("characterId", favorite.characterId ?? "");
         if (favorite.customName) {
           endpoint.create.form.setValue("customName", favorite.customName);
         }
@@ -204,23 +195,11 @@ export function useChatFavorites({
           endpoint.create.form.setValue("voice", favorite.voice);
         }
         endpoint.create.form.setValue("mode", favorite.modelSettings.mode);
-        endpoint.create.form.setValue(
-          "intelligence",
-          favorite.modelSettings.filters.intelligence,
-        );
-        endpoint.create.form.setValue(
-          "maxPrice",
-          favorite.modelSettings.filters.maxPrice,
-        );
-        endpoint.create.form.setValue(
-          "content",
-          favorite.modelSettings.filters.content,
-        );
+        endpoint.create.form.setValue("intelligence", favorite.modelSettings.filters.intelligence);
+        endpoint.create.form.setValue("maxPrice", favorite.modelSettings.filters.maxPrice);
+        endpoint.create.form.setValue("content", favorite.modelSettings.filters.content);
         if (favorite.modelSettings.manualModelId) {
-          endpoint.create.form.setValue(
-            "manualModelId",
-            favorite.modelSettings.manualModelId,
-          );
+          endpoint.create.form.setValue("manualModelId", favorite.modelSettings.manualModelId);
         }
 
         // Use submitForm with onSuccess callback to get the response
@@ -262,9 +241,7 @@ export function useChatFavorites({
   const updateFavorite = useCallback(
     async (id: string, updates: Partial<FavoriteItem>): Promise<void> => {
       // Update local state immediately for responsiveness
-      const newFavorites = favorites.map((f) =>
-        f.id === id ? { ...f, ...updates } : f,
-      );
+      const newFavorites = favorites.map((f) => (f.id === id ? { ...f, ...updates } : f));
       setFavoritesState(newFavorites);
 
       if (useServerStorage && !id.startsWith("local-")) {
@@ -288,8 +265,7 @@ export function useChatFavorites({
           requestData.maxPrice = updates.modelSettings.filters.maxPrice;
           requestData.content = updates.modelSettings.filters.content;
           if (updates.modelSettings.manualModelId !== undefined) {
-            requestData.manualModelId =
-              updates.modelSettings.manualModelId ?? null;
+            requestData.manualModelId = updates.modelSettings.manualModelId ?? null;
           }
         }
 

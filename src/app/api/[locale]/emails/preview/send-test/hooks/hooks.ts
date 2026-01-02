@@ -38,6 +38,4 @@ export function useEmailPreviewSendTest(
   );
 }
 
-export type EmailPreviewSendTestEndpointReturn = EndpointReturn<
-  typeof definitions
->;
+export type EmailPreviewSendTestEndpointReturn = EndpointReturn<typeof definitions>;

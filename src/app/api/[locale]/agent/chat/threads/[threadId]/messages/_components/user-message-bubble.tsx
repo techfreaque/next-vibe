@@ -4,11 +4,7 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import {
-  chatColors,
-  chatShadows,
-  chatTransitions,
-} from "@/app/[locale]/chat/lib/design-tokens";
+import { chatColors, chatShadows, chatTransitions } from "@/app/[locale]/chat/lib/design-tokens";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -42,9 +38,7 @@ export function UserMessageBubble({
   currentUserId,
 }: UserMessageBubbleProps): JSX.Element {
   const character =
-    message.role === "user" || message.role === "assistant"
-      ? message.character
-      : undefined;
+    message.role === "user" || message.role === "assistant" ? message.character : undefined;
 
   return (
     <Div className="flex justify-end">
@@ -81,10 +75,9 @@ export function UserMessageBubble({
           </Div>
 
           {/* File Attachments */}
-          {message.metadata?.attachments &&
-            message.metadata.attachments.length > 0 && (
-              <FileAttachments attachments={message.metadata.attachments} />
-            )}
+          {message.metadata?.attachments && message.metadata.attachments.length > 0 && (
+            <FileAttachments attachments={message.metadata.attachments} />
+          )}
         </Div>
 
         {/* Actions - Fixed height container to maintain consistent spacing */}

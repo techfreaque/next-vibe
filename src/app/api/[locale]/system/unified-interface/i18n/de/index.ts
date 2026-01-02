@@ -17,11 +17,9 @@ export const translations: typeof enTranslations = {
     permissions: {
       publicUsersCannotAccess:
         "Öffentliche Benutzer können nicht auf diesen authentifizierten Endpunkt zugreifen",
-      insufficientPermissions:
-        "Unzureichende Berechtigungen für den Zugriff auf diesen Endpunkt",
+      insufficientPermissions: "Unzureichende Berechtigungen für den Zugriff auf diesen Endpunkt",
       errors: {
-        platformAccessDenied:
-          "Zugriff verweigert für {{platform}} Plattform: {{reason}}",
+        platformAccessDenied: "Zugriff verweigert für {{platform}} Plattform: {{reason}}",
         insufficientRoles:
           "Unzureichende Rollen. Benutzer hat: {{userRoles}}. Erforderlich: {{requiredRoles}}",
         definitionError: "Endpunkt-Definitionsfehler: {{error}}",
@@ -32,8 +30,7 @@ export const translations: typeof enTranslations = {
         loader: {
           errors: {
             endpointNotFound: "Endpunkt '{{identifier}}' nicht gefunden",
-            loadFailed:
-              "Fehler beim Laden des Endpunkts '{{identifier}}': {{error}}",
+            loadFailed: "Fehler beim Laden des Endpunkts '{{identifier}}': {{error}}",
             batchLoadFailed:
               "Batch-Laden fehlgeschlagen: {{failedCount}} von {{totalCount}} Endpunkten fehlgeschlagen",
           },

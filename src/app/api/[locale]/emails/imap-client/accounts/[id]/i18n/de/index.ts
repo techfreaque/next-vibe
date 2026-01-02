@@ -42,8 +42,7 @@ export const translations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie haben keine Berechtigung, auf dieses Konto zuzugreifen",
+        description: "Sie haben keine Berechtigung, auf dieses Konto zuzugreifen",
       },
       notFound: {
         title: "Konto nicht gefunden",
@@ -59,8 +58,7 @@ export const translations = {
       },
       conflict: {
         title: "Konfliktfehler",
-        description:
-          "Ein Konflikt ist bei der Verarbeitung der Anfrage aufgetreten",
+        description: "Ein Konflikt ist bei der Verarbeitung der Anfrage aufgetreten",
       },
       forbidden: {
         title: "Verboten",
@@ -232,8 +230,7 @@ export const translations = {
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "Konto mit aktiven Verbindungen kann nicht gelöscht werden",
+        description: "Konto mit aktiven Verbindungen kann nicht gelöscht werden",
       },
       network: {
         title: "Netzwerkfehler",
@@ -245,8 +242,7 @@ export const translations = {
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
-        description:
-          "Konto mit nicht gespeicherten Änderungen kann nicht gelöscht werden",
+        description: "Konto mit nicht gespeicherten Änderungen kann nicht gelöscht werden",
       },
       validation: {
         title: "Validierungsfehler",

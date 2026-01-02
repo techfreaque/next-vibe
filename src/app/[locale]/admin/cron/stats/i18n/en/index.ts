@@ -141,8 +141,7 @@ export const translations = {
   pageDescription: "View and analyze cron task statistics",
   pageTitle: "Cron Statistics",
   performanceMetrics: "Performance Metrics",
-  priorityAndHealth:
-    "{{priorityLabel}}: {{priority}}, {{healthLabel}}: {{health}}",
+  priorityAndHealth: "{{priorityLabel}}: {{priority}}, {{healthLabel}}: {{health}}",
   priority: {
     low: "Low",
     high: "High",

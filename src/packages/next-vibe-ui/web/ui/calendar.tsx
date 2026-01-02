@@ -46,10 +46,7 @@ type CalendarPropsMultiple = CalendarPropsBase & {
 } & StyleType;
 
 // Union of all possible prop combinations
-export type CalendarProps =
-  | CalendarPropsSingle
-  | CalendarPropsRange
-  | CalendarPropsMultiple;
+export type CalendarProps = CalendarPropsSingle | CalendarPropsRange | CalendarPropsMultiple;
 
 // Shared className configuration
 const getClassNames = (
@@ -82,8 +79,7 @@ const getClassNames = (
   day_outside:
     "day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
   day_disabled: "text-muted-foreground opacity-50",
-  day_range_middle:
-    "aria-selected:bg-accent aria-selected:text-accent-foreground",
+  day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
   day_hidden: "invisible",
   ...classNames,
 });
@@ -98,8 +94,7 @@ const getComponents = (
     disabled?: boolean;
     orientation?: "left" | "right" | "up" | "down";
   }): JSX.Element => {
-    const Icon =
-      props.orientation === "left" ? ChevronLeftIcon : ChevronRightIcon;
+    const Icon = props.orientation === "left" ? ChevronLeftIcon : ChevronRightIcon;
     return <Icon className="h-4 w-4" />;
   },
   ...components,
@@ -110,14 +105,7 @@ function Calendar(props: CalendarPropsSingle): JSX.Element;
 function Calendar(props: CalendarPropsRange): JSX.Element;
 function Calendar(props: CalendarPropsMultiple): JSX.Element;
 function Calendar(props: CalendarProps): JSX.Element {
-  const {
-    className,
-    style,
-    classNames,
-    showOutsideDays = true,
-    disabled,
-    components,
-  } = props;
+  const { className, style, classNames, showOutsideDays = true, disabled, components } = props;
 
   const sharedProps = {
     disabled,

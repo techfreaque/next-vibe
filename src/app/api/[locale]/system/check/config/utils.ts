@@ -97,10 +97,7 @@ export function calculateMemoryPerWorker(totalMemoryBytes: number): number {
  * @param totalMemoryBytes - Total system memory in bytes
  * @returns Maximum number of workers to spawn
  */
-export function calculateMaxWorkerCap(
-  cpuCores: number,
-  totalMemoryBytes: number,
-): number {
+export function calculateMaxWorkerCap(cpuCores: number, totalMemoryBytes: number): number {
   const totalMemoryGB = totalMemoryBytes / (1024 * 1024 * 1024);
 
   // Base cap on CPU cores, but consider memory constraints
@@ -109,14 +106,7 @@ export function calculateMaxWorkerCap(
 
   // Use the minimum, but cap at reasonable limits
   const dynamicCap = Math.min(cpuBasedCap, memoryBasedCap);
-  return Math.max(
-    1,
-    Math.min(
-      dynamicCap,
-      WORKER_MEMORY_CONFIG.MAX_WORKER_HARD_CAP,
-      cpuCores * 2,
-    ),
-  );
+  return Math.max(1, Math.min(dynamicCap, WORKER_MEMORY_CONFIG.MAX_WORKER_HARD_CAP, cpuCores * 2));
 }
 
 /**
@@ -150,18 +140,12 @@ export function getSystemResources(): SystemResources {
   const memoryPerWorkerBytes = calculateMemoryPerWorker(totalMemoryBytes);
 
   // Calculate optimal worker count based on CPU cores and memory
-  const memoryBasedWorkers = Math.floor(
-    availableMemoryBytes / memoryPerWorkerBytes,
-  );
+  const memoryBasedWorkers = Math.floor(availableMemoryBytes / memoryPerWorkerBytes);
   const cpuBasedWorkers = Math.max(1, cpuCores - 1); // Leave one core for main process
 
   // Dynamic worker cap based on system capabilities
   const maxWorkerCap = calculateMaxWorkerCap(cpuCores, totalMemoryBytes);
-  const maxWorkers = Math.min(
-    memoryBasedWorkers,
-    cpuBasedWorkers,
-    maxWorkerCap,
-  );
+  const maxWorkers = Math.min(memoryBasedWorkers, cpuBasedWorkers, maxWorkerCap);
 
   return {
     cpuCores,

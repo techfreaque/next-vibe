@@ -23,9 +23,7 @@ interface LeadsImportClientProps {
   locale: CountryLanguage;
 }
 
-export function LeadsImportClient({
-  locale,
-}: LeadsImportClientProps): React.JSX.Element {
+export function LeadsImportClient({ locale }: LeadsImportClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 
@@ -83,9 +81,7 @@ export function LeadsImportClient({
             onSubmit={handleStatusRefresh}
             locale={locale}
             data={
-              statusEndpoint.read.response?.success
-                ? statusEndpoint.read.response.data
-                : undefined
+              statusEndpoint.read.response?.success ? statusEndpoint.read.response.data : undefined
             }
             submitButtonText="app.admin.common.actions.reset"
           />

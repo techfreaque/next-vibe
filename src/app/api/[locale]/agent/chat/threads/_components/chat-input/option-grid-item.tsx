@@ -50,9 +50,7 @@ export function OptionGridItem<T extends string = string>({
       title={tooltip || name}
       className={cn(
         "relative flex flex-col items-center gap-2 p-3 sm:p-2.5 rounded-lg border-2 hover:border-primary active:scale-98 transition-all text-center group min-h-[80px] sm:min-h-[72px] touch-manipulation cursor-pointer",
-        isSelected
-          ? "border-primary bg-accent"
-          : "border-transparent bg-accent/50",
+        isSelected ? "border-primary bg-accent" : "border-transparent bg-accent/50",
       )}
     >
       <Div
@@ -81,9 +79,7 @@ export function OptionGridItem<T extends string = string>({
         <Star
           className={cn(
             "h-4 w-4 sm:h-3.5 sm:w-3.5",
-            isFavorite
-              ? "fill-yellow-400 text-yellow-400"
-              : "text-muted-foreground",
+            isFavorite ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground",
           )}
         />
       </Div>

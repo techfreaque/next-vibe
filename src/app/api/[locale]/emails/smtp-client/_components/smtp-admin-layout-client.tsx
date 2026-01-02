@@ -60,9 +60,7 @@ export function SmtpAdminLayoutClient({
     },
   ];
 
-  const currentSubSection = subNavigationItems.find((item) =>
-    item.pattern.test(pathname),
-  );
+  const currentSubSection = subNavigationItems.find((item) => item.pattern.test(pathname));
 
   return (
     <Div className="flex flex-col gap-6">

@@ -31,10 +31,7 @@ export function PaymentStatusAlert({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Alert
-        variant={alertType === "success" ? "success" : "destructive"}
-        className="relative"
-      >
+      <Alert variant={alertType === "success" ? "success" : "destructive"} className="relative">
         {alertType === "success" ? (
           <CheckCircle className="h-4 w-4" />
         ) : (

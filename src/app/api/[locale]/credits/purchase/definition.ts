@@ -20,11 +20,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import {
-  PaymentProvider,
-  PaymentProviderDB,
-  PaymentProviderOptions,
-} from "../../payment/enum";
+import { PaymentProvider, PaymentProviderDB, PaymentProviderOptions } from "../../payment/enum";
 
 /**
  * Purchase Credits Endpoint (POST)
@@ -121,8 +117,7 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.credits.purchase.post.errors.validation.title",
-      description:
-        "app.api.credits.purchase.post.errors.validation.description",
+      description: "app.api.credits.purchase.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.credits.purchase.post.errors.network.title",
@@ -130,8 +125,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.credits.purchase.post.errors.unauthorized.title",
-      description:
-        "app.api.credits.purchase.post.errors.unauthorized.description",
+      description: "app.api.credits.purchase.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.credits.purchase.post.errors.forbidden.title",
@@ -151,8 +145,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.credits.purchase.post.errors.unsavedChanges.title",
-      description:
-        "app.api.credits.purchase.post.errors.unsavedChanges.description",
+      description: "app.api.credits.purchase.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.credits.purchase.post.errors.conflict.title",
@@ -181,5 +174,4 @@ const { POST } = createEndpoint({
 export default { POST } as const;
 
 export type CreditsPurchasePostRequestOutput = typeof POST.types.RequestOutput;
-export type CreditsPurchasePostResponseOutput =
-  typeof POST.types.ResponseOutput;
+export type CreditsPurchasePostResponseOutput = typeof POST.types.ResponseOutput;

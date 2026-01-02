@@ -89,8 +89,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.help.list.fields.showAliases.label",
-          description:
-            "app.api.system.help.list.fields.showAliases.description",
+          description: "app.api.system.help.list.fields.showAliases.description",
           columns: 6,
         },
         z.boolean().optional().default(true),
@@ -101,8 +100,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.help.list.fields.showDescriptions.label",
-          description:
-            "app.api.system.help.list.fields.showDescriptions.description",
+          description: "app.api.system.help.list.fields.showDescriptions.description",
           columns: 6,
         },
         z.boolean().optional().default(true),
@@ -129,48 +127,42 @@ const { POST } = createEndpoint({
             alias: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.list.fields.commands.alias" as const,
+                content: "app.api.system.help.list.fields.commands.alias" as const,
               },
               z.string(),
             ),
             message: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.list.fields.commands.message" as const,
+                content: "app.api.system.help.list.fields.commands.message" as const,
               },
               z.string(),
             ),
             description: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.list.fields.commands.description" as const,
+                content: "app.api.system.help.list.fields.commands.description" as const,
               },
               z.string().optional(),
             ),
             category: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.list.fields.commands.category" as const,
+                content: "app.api.system.help.list.fields.commands.category" as const,
               },
               z.string(),
             ),
             aliases: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.list.fields.commands.aliases" as const,
+                content: "app.api.system.help.list.fields.commands.aliases" as const,
               },
               z.string().optional(),
             ),
             rule: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.help.list.fields.commands.rule" as const,
+                content: "app.api.system.help.list.fields.commands.rule" as const,
               },
               z.string(),
             ),
@@ -184,8 +176,7 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.help.list.post.errors.validation.title",
-      description:
-        "app.api.system.help.list.post.errors.validation.description",
+      description: "app.api.system.help.list.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.help.list.post.errors.network.title",
@@ -193,8 +184,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.help.list.post.errors.unauthorized.title",
-      description:
-        "app.api.system.help.list.post.errors.unauthorized.description",
+      description: "app.api.system.help.list.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.help.list.post.errors.forbidden.title",

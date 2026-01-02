@@ -18,11 +18,7 @@ import {
 import { Div } from "next-vibe-ui/ui/div";
 import { Check, ChevronDown, Search, X } from "next-vibe-ui/ui/icons";
 import { Input } from "next-vibe-ui/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
@@ -140,9 +136,7 @@ export function ScheduleAutocomplete({
                   {t("app.admin.cron.taskDetails.customBadge")}
                 </Badge>
               )}
-              <Span className="truncate">
-                {value ? displayValue : placeholder}
-              </Span>
+              <Span className="truncate">{value ? displayValue : placeholder}</Span>
             </Div>
             <Div className="flex items-center gap-1">
               {value && !disabled && (
@@ -201,9 +195,7 @@ export function ScheduleAutocomplete({
               </CommandEmpty>
 
               {filteredOptions.length > 0 && (
-                <CommandGroup
-                  heading={t("app.admin.cron.taskDetails.commonSchedules")}
-                >
+                <CommandGroup heading={t("app.admin.cron.taskDetails.commonSchedules")}>
                   {filteredOptions.map((option) => (
                     <CommandItem
                       key={option.value}

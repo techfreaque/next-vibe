@@ -5,19 +5,16 @@ export const translations = {
       "Synchronisieren Sie den Migration-Status, indem Sie Drizzle das Tracking ordnungsgemäß handhaben lassen und Konflikte vermeiden",
     form: {
       title: "Migration-Synchronisation Optionen",
-      description:
-        "Konfigurieren Sie die Einstellungen für Migration-Synchronisation-Operationen",
+      description: "Konfigurieren Sie die Einstellungen für Migration-Synchronisation-Operationen",
     },
     errors: {
       validation: {
         title: "Validierungsfehler",
-        description:
-          "Die bereitgestellten Migration-Synchronisation-Parameter sind ungültig",
+        description: "Die bereitgestellten Migration-Synchronisation-Parameter sind ungültig",
       },
       network: {
         title: "Netzwerkfehler",
-        description:
-          "Verbindung zur Datenbank für Migration-Synchronisation fehlgeschlagen",
+        description: "Verbindung zur Datenbank für Migration-Synchronisation fehlgeschlagen",
       },
       unauthorized: {
         title: "Nicht autorisiert",
@@ -26,13 +23,11 @@ export const translations = {
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Migration-Synchronisation-Operationen sind für Ihre Rolle nicht erlaubt",
+        description: "Migration-Synchronisation-Operationen sind für Ihre Rolle nicht erlaubt",
       },
       notFound: {
         title: "Nicht gefunden",
-        description:
-          "Die angeforderte Migration-Synchronisation-Ressource wurde nicht gefunden",
+        description: "Die angeforderte Migration-Synchronisation-Ressource wurde nicht gefunden",
       },
       server: {
         title: "Serverfehler",
@@ -46,8 +41,7 @@ export const translations = {
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "Ein Konflikt ist während der Migration-Synchronisation-Operation aufgetreten",
+        description: "Ein Konflikt ist während der Migration-Synchronisation-Operation aufgetreten",
       },
     },
     success: {
@@ -62,8 +56,7 @@ export const translations = {
     },
     dryRun: {
       title: "Probelauf",
-      description:
-        "Zeigen was getan würde, ohne tatsächlich Änderungen auszuführen",
+      description: "Zeigen was getan würde, ohne tatsächlich Änderungen auszuführen",
     },
     success: {
       title: "Erfolg",

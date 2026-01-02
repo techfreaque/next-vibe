@@ -7,11 +7,7 @@ import "server-only";
 
 import { and, eq, gte, inArray, isNotNull, isNull, lt, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -22,15 +18,8 @@ import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import { SmtpRepository } from "../../../emails/smtp-client/repository";
 import { leads } from "../../db";
-import {
-  EmailCampaignStage,
-  isStatusTransitionAllowed,
-  LeadStatus,
-} from "../../enum";
-import type {
-  CampaignStarterConfigType,
-  CampaignStarterResultType,
-} from "./types";
+import { EmailCampaignStage, isStatusTransitionAllowed, LeadStatus } from "../../enum";
+import type { CampaignStarterConfigType, CampaignStarterResultType } from "./types";
 
 const INVALID_TRANSITION_ERROR = "Invalid status transition for campaign start";
 
@@ -101,25 +90,18 @@ export class CampaignStarterRepository {
       const [globalPendingCount] = await db
         .select({ count: sql<number>`COUNT(*)::int` })
         .from(leads)
-        .where(
-          and(eq(leads.status, LeadStatus.PENDING), isNotNull(leads.email)),
-        );
+        .where(and(eq(leads.status, LeadStatus.PENDING), isNotNull(leads.email)));
 
       const existingGlobalPending = globalPendingCount?.count || 0;
 
       // Calculate intelligent queue size based on SMTP capacity
       // Queue should be 2-3x the hourly sending capacity to ensure smooth processing
       const optimalQueueSize = Math.max(totalRemainingCapacity * 2, 100); // At least 100 for small setups
-      const globalAvailableSlots = Math.max(
-        0,
-        optimalQueueSize - existingGlobalPending,
-      );
+      const globalAvailableSlots = Math.max(0, optimalQueueSize - existingGlobalPending);
 
       // Calculate this locale's fair share of available slots
       // This ensures fair distribution across locales while respecting global capacity
-      const totalConfiguredLocales = Object.keys(
-        config.leadsPerWeek || {},
-      ).length;
+      const totalConfiguredLocales = Object.keys(config.leadsPerWeek || {}).length;
       const localeShare =
         totalConfiguredLocales > 0
           ? Math.ceil(globalAvailableSlots / totalConfiguredLocales)
@@ -142,19 +124,13 @@ export class CampaignStarterRepository {
       });
 
       if (adjustedLeadsPerRun <= 0) {
-        logger.debug(
-          "Skipping locale due to intelligent queue capacity management",
-          {
-            locale,
-            reason:
-              totalRemainingCapacity === 0
-                ? "SMTP_CAPACITY_EXHAUSTED"
-                : "QUEUE_FULL",
-            existingGlobalPending,
-            optimalQueueSize,
-            totalRemainingCapacity,
-          },
-        );
+        logger.debug("Skipping locale due to intelligent queue capacity management", {
+          locale,
+          reason: totalRemainingCapacity === 0 ? "SMTP_CAPACITY_EXHAUSTED" : "QUEUE_FULL",
+          existingGlobalPending,
+          optimalQueueSize,
+          totalRemainingCapacity,
+        });
         return success();
       }
 
@@ -187,12 +163,7 @@ export class CampaignStarterRepository {
             result.leadsStarted++;
           } else {
             // Validate status transition before updating
-            if (
-              !isStatusTransitionAllowed(
-                lead.status,
-                LeadStatus.CAMPAIGN_RUNNING,
-              )
-            ) {
+            if (!isStatusTransitionAllowed(lead.status, LeadStatus.CAMPAIGN_RUNNING)) {
               result.errors.push({
                 leadId: lead.id,
                 email: lead.email!,
@@ -241,8 +212,7 @@ export class CampaignStarterRepository {
         locale,
       });
       return fail({
-        message:
-          "app.api.leads.leadsErrors.campaigns.common.error.server.title",
+        message: "app.api.leads.leadsErrors.campaigns.common.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -307,8 +277,7 @@ export class CampaignStarterRepository {
         locale,
       });
       return fail({
-        message:
-          "app.api.leads.leadsErrors.campaigns.common.error.server.title",
+        message: "app.api.leads.leadsErrors.campaigns.common.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -327,11 +296,7 @@ export class CampaignStarterRepository {
       const languageCode = getLanguageFromLocale(locale);
 
       // Define failed states that should trigger rebalancing
-      const failedStates = [
-        LeadStatus.BOUNCED,
-        LeadStatus.INVALID,
-        LeadStatus.UNSUBSCRIBED,
-      ];
+      const failedStates = [LeadStatus.BOUNCED, LeadStatus.INVALID, LeadStatus.UNSUBSCRIBED];
 
       // Get the start of current week (Monday 00:00 UTC)
       const now = new Date();
@@ -372,8 +337,7 @@ export class CampaignStarterRepository {
         locale,
       });
       return fail({
-        message:
-          "app.api.leads.leadsErrors.campaigns.common.error.server.title",
+        message: "app.api.leads.leadsErrors.campaigns.common.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

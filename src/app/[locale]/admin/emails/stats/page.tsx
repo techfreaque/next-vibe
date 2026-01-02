@@ -19,9 +19,7 @@ interface EmailsStatsPageProps {
   }>;
 }
 
-export async function generateMetadata({
-  params,
-}: EmailsStatsPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: EmailsStatsPageProps): Promise<Metadata> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 

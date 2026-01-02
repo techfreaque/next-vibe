@@ -14,13 +14,10 @@ export const translations = {
   tasks: tasksTranslations,
   shared: {
     permissions: {
-      publicUsersCannotAccess:
-        "Public users cannot access this authenticated endpoint",
-      insufficientPermissions:
-        "Insufficient permissions to access this endpoint",
+      publicUsersCannotAccess: "Public users cannot access this authenticated endpoint",
+      insufficientPermissions: "Insufficient permissions to access this endpoint",
       errors: {
-        platformAccessDenied:
-          "Access denied for {{platform}} platform: {{reason}}",
+        platformAccessDenied: "Access denied for {{platform}} platform: {{reason}}",
         insufficientRoles:
           "Insufficient roles. User has: {{userRoles}}. Required: {{requiredRoles}}",
         definitionError: "Endpoint definition error: {{error}}",

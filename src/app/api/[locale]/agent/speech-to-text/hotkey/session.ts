@@ -86,19 +86,11 @@ export class SpeechHotkeySession {
   async start(): Promise<void> {
     if (this.isRecording) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Session state error
-      throw new SessionError(
-        "Recording already in progress",
-        "ALREADY_RECORDING",
-        this.state,
-      );
+      throw new SessionError("Recording already in progress", "ALREADY_RECORDING", this.state);
     }
 
     // Generate temp file path
-    const audioPath = generateTempFilePath(
-      "stt_recording",
-      "wav",
-      this.config.tmpDir,
-    );
+    const audioPath = generateTempFilePath("stt_recording", "wav", this.config.tmpDir);
 
     try {
       // Start recording
@@ -147,21 +139,13 @@ export class SpeechHotkeySession {
   async stop(): Promise<string> {
     if (!this.isRecording) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Session state error
-      throw new SessionError(
-        "No recording in progress",
-        "NOT_RECORDING",
-        this.state,
-      );
+      throw new SessionError("No recording in progress", "NOT_RECORDING", this.state);
     }
 
     const audioPath = this.state.currentRecordingPath;
     if (!audioPath) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Session state error
-      throw new SessionError(
-        "Recording path not found",
-        "INVALID_STATE",
-        this.state,
-      );
+      throw new SessionError("Recording path not found", "INVALID_STATE", this.state);
     }
 
     try {
@@ -252,8 +236,7 @@ export class SpeechHotkeySession {
       return finalText;
     } catch (error) {
       // Enhanced error details for debugging
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
       const errorName = error instanceof Error ? error.name : "UnknownError";
 
@@ -314,10 +297,7 @@ export class SpeechHotkeySession {
       }
 
       // Emit specific events based on status
-      if (
-        currentStatus === RecordingStatus.RECORDING &&
-        this.state.recordingStartedAt
-      ) {
+      if (currentStatus === RecordingStatus.RECORDING && this.state.recordingStartedAt) {
         yield {
           type: "recording_started",
           status: currentStatus,
@@ -328,10 +308,7 @@ export class SpeechHotkeySession {
         };
       }
 
-      if (
-        currentStatus === RecordingStatus.COMPLETED &&
-        this.state.lastTranscription
-      ) {
+      if (currentStatus === RecordingStatus.COMPLETED && this.state.lastTranscription) {
         yield {
           type: "text_inserted",
           status: currentStatus,
@@ -381,9 +358,7 @@ export class SpeechHotkeySession {
    * Cleanup all temp files
    */
   async cleanup(): Promise<void> {
-    const cleanupPromises = [...this.tempFiles].map((path) =>
-      this.cleanupTempFile(path),
-    );
+    const cleanupPromises = [...this.tempFiles].map((path) => this.cleanupTempFile(path));
     await Promise.all(cleanupPromises);
     this.tempFiles.clear();
   }

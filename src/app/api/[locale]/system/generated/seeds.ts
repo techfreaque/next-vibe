@@ -13,14 +13,10 @@ import type { EnvironmentSeeds } from "@/app/api/[locale]/system/db/seed/seed-ma
  * @param moduleName - The seed module name (e.g., "user", "leads")
  * @returns The seed module or null if not found
  */
-export async function getSeedModule(
-  moduleName: string,
-): Promise<EnvironmentSeeds | null> {
+export async function getSeedModule(moduleName: string): Promise<EnvironmentSeeds | null> {
   switch (moduleName) {
     case "folders":
-      return (await import(
-        "../../agent/chat/folders/seeds"
-      )) as EnvironmentSeeds;
+      return (await import("../../agent/chat/folders/seeds")) as EnvironmentSeeds;
     case "leads":
       return (await import("../../leads/seeds")) as EnvironmentSeeds;
     case "users":
@@ -32,15 +28,11 @@ export async function getSeedModule(
     case "contact":
       return (await import("../../contact/seeds")) as EnvironmentSeeds;
     case "smtp-client":
-      return (await import(
-        "../../emails/smtp-client/seeds"
-      )) as EnvironmentSeeds;
+      return (await import("../../emails/smtp-client/seeds")) as EnvironmentSeeds;
     case "messages":
       return (await import("../../emails/messages/seeds")) as EnvironmentSeeds;
     case "imap-client":
-      return (await import(
-        "../../emails/imap-client/seeds"
-      )) as EnvironmentSeeds;
+      return (await import("../../emails/imap-client/seeds")) as EnvironmentSeeds;
     case "newsletter":
       return (await import("../../newsletter/seeds")) as EnvironmentSeeds;
     default:

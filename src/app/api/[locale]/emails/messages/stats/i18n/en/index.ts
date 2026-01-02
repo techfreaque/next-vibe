@@ -191,8 +191,7 @@ export const translations = {
       },
       server: {
         title: "Server Error",
-        description:
-          "Internal server error occurred while retrieving statistics",
+        description: "Internal server error occurred while retrieving statistics",
       },
       unknown: {
         title: "Unknown Error",

@@ -90,18 +90,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function JobPostingPage({
-  params,
-}: Props): Promise<JSX.Element> {
+export default async function JobPostingPage({ params }: Props): Promise<JSX.Element> {
   const { locale, jobId } = await params;
   const { t } = simpleT(locale);
 
   // Mock job data - in a real app, this would come from an API or database
   const jobs = {
     socialMediaManager: {
-      title: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.title",
-      ),
+      title: t("app.story._components.home.careers.jobs.socialMediaManager.title"),
       shortDescription: t(
         "app.story._components.home.careers.jobs.socialMediaManager.shortDescription",
       ),
@@ -126,21 +122,11 @@ export default async function JobPostingPage({
         ),
       },
       requirements: {
-        item1: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item1",
-        ),
-        item2: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item2",
-        ),
-        item3: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item3",
-        ),
-        item4: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item4",
-        ),
-        item5: t(
-          "app.story._components.home.careers.jobs.socialMediaManager.requirements.item5",
-        ),
+        item1: t("app.story._components.home.careers.jobs.socialMediaManager.requirements.item1"),
+        item2: t("app.story._components.home.careers.jobs.socialMediaManager.requirements.item2"),
+        item3: t("app.story._components.home.careers.jobs.socialMediaManager.requirements.item3"),
+        item4: t("app.story._components.home.careers.jobs.socialMediaManager.requirements.item4"),
+        item5: t("app.story._components.home.careers.jobs.socialMediaManager.requirements.item5"),
       },
       qualifications: {
         required: {
@@ -166,68 +152,38 @@ export default async function JobPostingPage({
           ),
         },
       },
-      location: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.location",
-      ),
-      department: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.department",
-      ),
-      type: t(
-        "app.story._components.home.careers.jobs.socialMediaManager.type",
-      ),
+      location: t("app.story._components.home.careers.jobs.socialMediaManager.location"),
+      department: t("app.story._components.home.careers.jobs.socialMediaManager.department"),
+      type: t("app.story._components.home.careers.jobs.socialMediaManager.type"),
       experienceLevel: t(
         "app.story._components.home.careers.jobs.socialMediaManager.experienceLevel",
       ),
       // current date - 2.5 weeks
-      postedDate: new Date(
-        Date.now() - 2.5 * 7 * 24 * 60 * 60 * 1000,
-      ).toLocaleDateString(locale),
+      postedDate: new Date(Date.now() - 2.5 * 7 * 24 * 60 * 60 * 1000).toLocaleDateString(locale),
       // current date + 1 month
-      applicationDeadline: new Date(
-        Date.now() + 30 * 24 * 60 * 60 * 1000,
-      ).toLocaleDateString(locale),
+      applicationDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(
+        locale,
+      ),
     },
     contentCreator: {
       title: t("app.story._components.home.careers.jobs.contentCreator.title"),
       shortDescription: t(
         "app.story._components.home.careers.jobs.contentCreator.shortDescription",
       ),
-      longDescription: t(
-        "app.story._components.home.careers.jobs.contentCreator.longDescription",
-      ),
+      longDescription: t("app.story._components.home.careers.jobs.contentCreator.longDescription"),
       responsibilities: {
-        item1: t(
-          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item1",
-        ),
-        item2: t(
-          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item2",
-        ),
-        item3: t(
-          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item3",
-        ),
-        item4: t(
-          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item4",
-        ),
-        item5: t(
-          "app.story._components.home.careers.jobs.contentCreator.responsibilities.item5",
-        ),
+        item1: t("app.story._components.home.careers.jobs.contentCreator.responsibilities.item1"),
+        item2: t("app.story._components.home.careers.jobs.contentCreator.responsibilities.item2"),
+        item3: t("app.story._components.home.careers.jobs.contentCreator.responsibilities.item3"),
+        item4: t("app.story._components.home.careers.jobs.contentCreator.responsibilities.item4"),
+        item5: t("app.story._components.home.careers.jobs.contentCreator.responsibilities.item5"),
       },
       requirements: {
-        item1: t(
-          "app.story._components.home.careers.jobs.contentCreator.requirements.item1",
-        ),
-        item2: t(
-          "app.story._components.home.careers.jobs.contentCreator.requirements.item2",
-        ),
-        item3: t(
-          "app.story._components.home.careers.jobs.contentCreator.requirements.item3",
-        ),
-        item4: t(
-          "app.story._components.home.careers.jobs.contentCreator.requirements.item4",
-        ),
-        item5: t(
-          "app.story._components.home.careers.jobs.contentCreator.requirements.item5",
-        ),
+        item1: t("app.story._components.home.careers.jobs.contentCreator.requirements.item1"),
+        item2: t("app.story._components.home.careers.jobs.contentCreator.requirements.item2"),
+        item3: t("app.story._components.home.careers.jobs.contentCreator.requirements.item3"),
+        item4: t("app.story._components.home.careers.jobs.contentCreator.requirements.item4"),
+        item5: t("app.story._components.home.careers.jobs.contentCreator.requirements.item5"),
       },
       qualifications: {
         required: {
@@ -253,19 +209,11 @@ export default async function JobPostingPage({
           ),
         },
       },
-      location: t(
-        "app.story._components.home.careers.jobs.contentCreator.location",
-      ),
-      department: t(
-        "app.story._components.home.careers.jobs.contentCreator.department",
-      ),
+      location: t("app.story._components.home.careers.jobs.contentCreator.location"),
+      department: t("app.story._components.home.careers.jobs.contentCreator.department"),
       type: t("app.story._components.home.careers.jobs.contentCreator.type"),
-      experienceLevel: t(
-        "app.story._components.home.careers.jobs.contentCreator.experienceLevel",
-      ),
-      postedDate: t(
-        "app.story._components.home.careers.jobs.contentCreator.postedDate",
-      ),
+      experienceLevel: t("app.story._components.home.careers.jobs.contentCreator.experienceLevel"),
+      postedDate: t("app.story._components.home.careers.jobs.contentCreator.postedDate"),
       applicationDeadline: t(
         "app.story._components.home.careers.jobs.contentCreator.applicationDeadline",
       ),
@@ -282,17 +230,10 @@ export default async function JobPostingPage({
     <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
       <Div className="container max-w-6xl mx-auto py-8 px-4">
         <Div className="mb-8">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-1"
-            asChild
-          >
+          <Button variant="ghost" size="sm" className="flex items-center gap-1" asChild>
             <Link href={`/${locale}/story/careers`}>
               <ArrowLeft className="h-4 w-4" />
-              <Span>
-                {t("app.story._components.home.careers.openPositions")}
-              </Span>
+              <Span>{t("app.story._components.home.careers.openPositions")}</Span>
             </Link>
           </Button>
         </Div>
@@ -301,36 +242,25 @@ export default async function JobPostingPage({
           <H1 className="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600">
             {job.title}
           </H1>
-          <P className="text-xl text-gray-700 dark:text-gray-300 mb-8">
-            {job.shortDescription}
-          </P>
+          <P className="text-xl text-gray-700 dark:text-gray-300 mb-8">{job.shortDescription}</P>
           <Div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             <Div className="lg:col-span-3">
               <Div className="flex flex-col gap-8">
                 <Section>
                   <H2 className="text-2xl font-bold mb-4">
-                    {t(
-                      "app.story._components.home.careers.jobDetail.jobOverview",
-                    )}
+                    {t("app.story._components.home.careers.jobDetail.jobOverview")}
                   </H2>
-                  <P className="text-gray-700 dark:text-gray-300">
-                    {job.longDescription}
-                  </P>
+                  <P className="text-gray-700 dark:text-gray-300">{job.longDescription}</P>
                 </Section>
 
                 <Section>
                   <H2 className="text-2xl font-bold mb-4">
-                    {t(
-                      "app.story._components.home.careers.jobDetail.responsibilities",
-                    )}
+                    {t("app.story._components.home.careers.jobDetail.responsibilities")}
                   </H2>
                   <Ul className="list-disc pl-6 flex flex-col gap-2">
                     {Object.values(job.responsibilities).map(
                       (responsibility: string, index: number) => (
-                        <Li
-                          key={index}
-                          className="text-gray-700 dark:text-gray-300"
-                        >
+                        <Li key={index} className="text-gray-700 dark:text-gray-300">
                           {responsibility}
                         </Li>
                       ),
@@ -340,43 +270,29 @@ export default async function JobPostingPage({
 
                 <Section>
                   <H2 className="text-2xl font-bold mb-4">
-                    {t(
-                      "app.story._components.home.careers.jobDetail.requirements",
-                    )}
+                    {t("app.story._components.home.careers.jobDetail.requirements")}
                   </H2>
                   <Ul className="list-disc pl-6 flex flex-col gap-2">
-                    {Object.values(job.requirements).map(
-                      (requirement: string, index: number) => (
-                        <Li
-                          key={index}
-                          className="text-gray-700 dark:text-gray-300"
-                        >
-                          {requirement}
-                        </Li>
-                      ),
-                    )}
+                    {Object.values(job.requirements).map((requirement: string, index: number) => (
+                      <Li key={index} className="text-gray-700 dark:text-gray-300">
+                        {requirement}
+                      </Li>
+                    ))}
                   </Ul>
                 </Section>
 
                 <Section>
                   <H2 className="text-2xl font-bold mb-4">
-                    {t(
-                      "app.story._components.home.careers.jobDetail.qualifications",
-                    )}
+                    {t("app.story._components.home.careers.jobDetail.qualifications")}
                   </H2>
 
                   <H3 className="text-xl font-semibold mb-2">
-                    {t(
-                      "app.story._components.home.careers.jobDetail.qualificationsRequired",
-                    )}
+                    {t("app.story._components.home.careers.jobDetail.qualificationsRequired")}
                   </H3>
                   <Ul className="list-disc pl-6 flex flex-col gap-2 mb-4">
                     {Object.values(job.qualifications.required).map(
                       (qualification: string, index: number) => (
-                        <Li
-                          key={index}
-                          className="text-gray-700 dark:text-gray-300"
-                        >
+                        <Li key={index} className="text-gray-700 dark:text-gray-300">
                           {qualification}
                         </Li>
                       ),
@@ -384,17 +300,12 @@ export default async function JobPostingPage({
                   </Ul>
 
                   <H3 className="text-xl font-semibold mb-2">
-                    {t(
-                      "app.story._components.home.careers.jobDetail.qualificationsPreferred",
-                    )}
+                    {t("app.story._components.home.careers.jobDetail.qualificationsPreferred")}
                   </H3>
                   <Ul className="list-disc pl-6 flex flex-col gap-2">
                     {Object.values(job.qualifications.preferred).map(
                       (qualification: string, index: number) => (
-                        <Li
-                          key={index}
-                          className="text-gray-700 dark:text-gray-300"
-                        >
+                        <Li key={index} className="text-gray-700 dark:text-gray-300">
                           {qualification}
                         </Li>
                       ),
@@ -410,56 +321,40 @@ export default async function JobPostingPage({
                     <Card>
                       <CardContent className="p-4">
                         <H3 className="font-semibold mb-2">
-                          {t(
-                            "app.story._components.home.careers.benefits.growthTitle",
-                          )}
+                          {t("app.story._components.home.careers.benefits.growthTitle")}
                         </H3>
                         <P className="text-sm text-gray-700 dark:text-gray-300">
-                          {t(
-                            "app.story._components.home.careers.benefits.growthDesc",
-                          )}
+                          {t("app.story._components.home.careers.benefits.growthDesc")}
                         </P>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
                         <H3 className="font-semibold mb-2">
-                          {t(
-                            "app.story._components.home.careers.benefits.meaningfulTitle",
-                          )}
+                          {t("app.story._components.home.careers.benefits.meaningfulTitle")}
                         </H3>
                         <P className="text-sm text-gray-700 dark:text-gray-300">
-                          {t(
-                            "app.story._components.home.careers.benefits.meaningfulDesc",
-                          )}
+                          {t("app.story._components.home.careers.benefits.meaningfulDesc")}
                         </P>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
                         <H3 className="font-semibold mb-2">
-                          {t(
-                            "app.story._components.home.careers.benefits.balanceTitle",
-                          )}
+                          {t("app.story._components.home.careers.benefits.balanceTitle")}
                         </H3>
                         <P className="text-sm text-gray-700 dark:text-gray-300">
-                          {t(
-                            "app.story._components.home.careers.benefits.balanceDesc",
-                          )}
+                          {t("app.story._components.home.careers.benefits.balanceDesc")}
                         </P>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4">
                         <H3 className="font-semibold mb-2">
-                          {t(
-                            "app.story._components.home.careers.benefits.compensationTitle",
-                          )}
+                          {t("app.story._components.home.careers.benefits.compensationTitle")}
                         </H3>
                         <P className="text-sm text-gray-700 dark:text-gray-300">
-                          {t(
-                            "app.story._components.home.careers.benefits.compensationDesc",
-                          )}
+                          {t("app.story._components.home.careers.benefits.compensationDesc")}
                         </P>
                       </CardContent>
                     </Card>
@@ -473,61 +368,39 @@ export default async function JobPostingPage({
                 <Card>
                   <CardContent className="p-6">
                     <H3 className="text-xl font-bold mb-4">
-                      {t(
-                        "app.story._components.home.careers.jobDetail.applyNow",
-                      )}
+                      {t("app.story._components.home.careers.jobDetail.applyNow")}
                     </H3>
                     <Div className="flex flex-col gap-4">
                       <Div className="grid grid-cols-2 gap-2 text-sm">
                         <Div className="text-gray-500 dark:text-gray-400">
-                          {t(
-                            "app.story._components.home.careers.jobDetail.location",
-                          )}
-                          :
+                          {t("app.story._components.home.careers.jobDetail.location")}:
                         </Div>
                         <Div className="font-medium">{job.location}</Div>
 
                         <Div className="text-gray-500 dark:text-gray-400">
-                          {t(
-                            "app.story._components.home.careers.jobDetail.department",
-                          )}
-                          :
+                          {t("app.story._components.home.careers.jobDetail.department")}:
                         </Div>
                         <Div className="font-medium">{job.department}</Div>
 
                         <Div className="text-gray-500 dark:text-gray-400">
-                          {t(
-                            "app.story._components.home.careers.jobDetail.employmentType",
-                          )}
-                          :
+                          {t("app.story._components.home.careers.jobDetail.employmentType")}:
                         </Div>
                         <Div className="font-medium">{job.type}</Div>
 
                         <Div className="text-gray-500 dark:text-gray-400">
-                          {t(
-                            "app.story._components.home.careers.jobDetail.experienceLevel",
-                          )}
-                          :
+                          {t("app.story._components.home.careers.jobDetail.experienceLevel")}:
                         </Div>
                         <Div className="font-medium">{job.experienceLevel}</Div>
 
                         <Div className="text-gray-500 dark:text-gray-400">
-                          {t(
-                            "app.story._components.home.careers.jobDetail.postedDate",
-                          )}
-                          :
+                          {t("app.story._components.home.careers.jobDetail.postedDate")}:
                         </Div>
                         <Div className="font-medium">{job.postedDate}</Div>
 
                         <Div className="text-gray-500 dark:text-gray-400">
-                          {t(
-                            "app.story._components.home.careers.jobDetail.applicationDeadline",
-                          )}
-                          :
+                          {t("app.story._components.home.careers.jobDetail.applicationDeadline")}:
                         </Div>
-                        <Div className="font-medium">
-                          {job.applicationDeadline}
-                        </Div>
+                        <Div className="font-medium">{job.applicationDeadline}</Div>
                       </Div>
 
                       <Separator />
@@ -546,9 +419,7 @@ export default async function JobPostingPage({
                 <Card>
                   <CardContent className="p-6">
                     <H3 className="text-lg font-bold mb-4">
-                      {t(
-                        "app.story._components.home.careers.jobDetail.relatedPositions",
-                      )}
+                      {t("app.story._components.home.careers.jobDetail.relatedPositions")}
                     </H3>
                     <Div className="flex flex-col gap-3">
                       {Object.entries(jobs)

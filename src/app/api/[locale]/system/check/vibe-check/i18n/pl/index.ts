@@ -39,8 +39,7 @@ export const translations: typeof enTranslations = {
 
   container: {
     title: "Konfiguracja Vibe Check",
-    description:
-      "Skonfiguruj parametry dla kompleksowego sprawdzania jakości kodu",
+    description: "Skonfiguruj parametry dla kompleksowego sprawdzania jakości kodu",
   },
 
   fields: {
@@ -82,8 +81,7 @@ export const translations: typeof enTranslations = {
     },
     maxFilesInSummary: {
       label: "Maks. Plików w Podsumowaniu",
-      description:
-        "Maksymalna liczba plików na liście dotkniętych plików (1-1000)",
+      description: "Maksymalna liczba plików na liście dotkniętych plików (1-1000)",
     },
   },
 

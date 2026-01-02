@@ -6,11 +6,7 @@
 import type { SQL } from "drizzle-orm";
 import { and, count, desc, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -30,13 +26,7 @@ import type { TFunction } from "@/i18n/core/static-types";
 import { newsletterSubscriptions } from "../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../newsletter/enum";
 import type { LeadCreateRequestTypeOutput } from "./create/definition";
-import {
-  emailCampaigns,
-  type Lead,
-  leadEngagements,
-  leads,
-  userLeadLinks,
-} from "./db";
+import { emailCampaigns, type Lead, leadEngagements, leads, userLeadLinks } from "./db";
 import type {
   BatchOperationScopeValues,
   EmailCampaignStageFilterValues,
@@ -98,9 +88,7 @@ const INVALID_STATUS_TRANSITION_ERROR = "Invalid status transition";
  * Returns the lead if it has an email, otherwise returns null
  * @deprecated Use leadHasEmail type guard instead and handle null case
  */
-export function ensureLeadHasEmail(
-  lead: LeadResponseType,
-): LeadWithEmailType | null {
+export function ensureLeadHasEmail(lead: LeadResponseType): LeadWithEmailType | null {
   if (!leadHasEmail(lead)) {
     return null;
   }
@@ -110,9 +98,7 @@ export function ensureLeadHasEmail(
 /**
  * Type guard to check if a lead has an email
  */
-export function leadHasEmail(
-  lead: LeadResponseType,
-): lead is LeadWithEmailType {
+export function leadHasEmail(lead: LeadResponseType): lead is LeadWithEmailType {
   return Boolean(lead.email);
 }
 
@@ -120,9 +106,7 @@ export function leadHasEmail(
  * Filter leads to only include those with email addresses
  * Returns an array of LeadWithEmailType
  */
-export function filterLeadsWithEmail(
-  leads: LeadResponseType[],
-): LeadWithEmailType[] {
+export function filterLeadsWithEmail(leads: LeadResponseType[]): LeadWithEmailType[] {
   return leads.filter(leadHasEmail);
 }
 
@@ -180,8 +164,7 @@ export class LeadsRepository {
 
         if (existingLead.length > 0) {
           return fail({
-            message:
-              "app.api.leads.leadsErrors.leads.post.error.duplicate.title",
+            message: "app.api.leads.leadsErrors.leads.post.error.duplicate.title",
             errorType: ErrorResponseTypes.CONFLICT,
           });
         }
@@ -281,11 +264,7 @@ export class LeadsRepository {
     try {
       logger.debug("Fetching lead by tracking ID", { leadId });
 
-      const [lead] = await db
-        .select()
-        .from(leads)
-        .where(eq(leads.id, leadId))
-        .limit(1);
+      const [lead] = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
 
       if (!lead) {
         return fail({
@@ -314,11 +293,7 @@ export class LeadsRepository {
     try {
       logger.debug("Fetching lead by email", { email });
 
-      const [lead] = await db
-        .select()
-        .from(leads)
-        .where(eq(leads.email, email))
-        .limit(1);
+      const [lead] = await db.select().from(leads).where(eq(leads.email, email)).limit(1);
 
       if (!lead) {
         return fail({
@@ -378,12 +353,7 @@ export class LeadsRepository {
       });
 
       // Flatten nested update structure to match internal repository format
-      const {
-        basicInfo,
-        contactDetails,
-        campaignManagement,
-        additionalDetails,
-      } = data.updates;
+      const { basicInfo, contactDetails, campaignManagement, additionalDetails } = data.updates;
       const flattenedData: Partial<LeadUpdateType> = {
         email: basicInfo.email,
         businessName: basicInfo.businessName,
@@ -404,14 +374,10 @@ export class LeadsRepository {
       // If status is being updated, validate the transition
       if (flattenedData.status) {
         // Get current lead to check current status
-        const currentLeadResult = await LeadsRepository.getLeadByIdInternal(
-          id,
-          logger,
-        );
+        const currentLeadResult = await LeadsRepository.getLeadByIdInternal(id, logger);
         if (!currentLeadResult.success) {
           return fail({
-            message:
-              "app.api.leads.leadsErrors.leads.patch.error.not_found.title",
+            message: "app.api.leads.leadsErrors.leads.patch.error.not_found.title",
             errorType: ErrorResponseTypes.NOT_FOUND,
             cause: currentLeadResult,
           });
@@ -441,11 +407,7 @@ export class LeadsRepository {
       }
 
       // Delegate to internal method
-      return await LeadsRepository.updateLeadInternal(
-        id,
-        flattenedData,
-        logger,
-      );
+      return await LeadsRepository.updateLeadInternal(id, flattenedData, logger);
     } catch (error) {
       logger.error("Error updating lead", parseError(error));
       return fail({
@@ -472,8 +434,7 @@ export class LeadsRepository {
       const sourceFilters = query.statusFilters?.source;
       const countryFilters = query.locationFilters?.country;
       const languageFilters = query.locationFilters?.language;
-      const sortByField =
-        query.sortingOptions?.sortBy ?? LeadSortField.CREATED_AT;
+      const sortByField = query.sortingOptions?.sortBy ?? LeadSortField.CREATED_AT;
       const sortDirection = query.sortingOptions?.sortOrder ?? SortOrder.DESC;
 
       const offset = (page - 1) * limit;
@@ -485,13 +446,9 @@ export class LeadsRepository {
       if (statusFilters && statusFilters.length > 0) {
         const mappedStatuses = statusFilters
           .map((filter) => mapStatusFilter(filter))
-          .filter(
-            (status): status is typeof LeadStatusValues => status !== null,
-          );
+          .filter((status): status is typeof LeadStatusValues => status !== null);
         if (mappedStatuses.length > 0) {
-          conditions.push(
-            or(...mappedStatuses.map((status) => eq(leads.status, status)))!,
-          );
+          conditions.push(or(...mappedStatuses.map((status) => eq(leads.status, status)))!);
         }
       }
 
@@ -499,16 +456,10 @@ export class LeadsRepository {
       if (campaignStageFilters && campaignStageFilters.length > 0) {
         const mappedStages = campaignStageFilters
           .map((filter) => mapCampaignStageFilter(filter))
-          .filter(
-            (stage): stage is typeof EmailCampaignStageValues => stage !== null,
-          );
+          .filter((stage): stage is typeof EmailCampaignStageValues => stage !== null);
         if (mappedStages.length > 0) {
           conditions.push(
-            or(
-              ...mappedStages.map((stage) =>
-                eq(leads.currentCampaignStage, stage),
-              ),
-            )!,
+            or(...mappedStages.map((stage) => eq(leads.currentCampaignStage, stage)))!,
           );
         }
       }
@@ -517,13 +468,9 @@ export class LeadsRepository {
       if (sourceFilters && sourceFilters.length > 0) {
         const mappedSources = sourceFilters
           .map((filter) => mapSourceFilter(filter))
-          .filter(
-            (source): source is typeof LeadSourceValues => source !== null,
-          );
+          .filter((source): source is typeof LeadSourceValues => source !== null);
         if (mappedSources.length > 0) {
-          conditions.push(
-            or(...mappedSources.map((source) => eq(leads.source, source)))!,
-          );
+          conditions.push(or(...mappedSources.map((source) => eq(leads.source, source)))!);
         }
       }
 
@@ -532,11 +479,7 @@ export class LeadsRepository {
         const convertedCountries = countryFilters
           .map((filter) => convertCountryFilter(filter))
           .filter((country): country is Countries => country !== null);
-        conditions.push(
-          or(
-            ...convertedCountries.map((country) => eq(leads.country, country)),
-          )!,
-        );
+        conditions.push(or(...convertedCountries.map((country) => eq(leads.country, country)))!);
       }
 
       // Handle language filters (array of languages)
@@ -544,64 +487,40 @@ export class LeadsRepository {
         const convertedLanguages = languageFilters
           .map((filter) => convertLanguageFilter(filter))
           .filter((language): language is Languages => language !== null);
-        conditions.push(
-          or(
-            ...convertedLanguages.map((language) =>
-              eq(leads.language, language),
-            ),
-          )!,
-        );
+        conditions.push(or(...convertedLanguages.map((language) => eq(leads.language, language)))!);
       }
 
       // Handle search filter
       if (search) {
         conditions.push(
-          or(
-            ilike(leads.email, `%${search}%`),
-            ilike(leads.businessName, `%${search}%`),
-          )!,
+          or(ilike(leads.email, `%${search}%`), ilike(leads.businessName, `%${search}%`))!,
         );
       }
 
-      const whereClause =
-        conditions.length > 0 ? and(...conditions) : undefined;
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
       // Get total count
-      const [{ total }] = await db
-        .select({ total: count() })
-        .from(leads)
-        .where(whereClause);
+      const [{ total }] = await db.select({ total: count() }).from(leads).where(whereClause);
 
       // Get leads with sorting
       let orderClause;
       switch (sortByField) {
         case LeadSortField.EMAIL:
-          orderClause =
-            sortDirection === SortOrder.ASC ? leads.email : desc(leads.email);
+          orderClause = sortDirection === SortOrder.ASC ? leads.email : desc(leads.email);
           break;
         case LeadSortField.BUSINESS_NAME:
           orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.businessName
-              : desc(leads.businessName);
+            sortDirection === SortOrder.ASC ? leads.businessName : desc(leads.businessName);
           break;
         case LeadSortField.UPDATED_AT:
-          orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.updatedAt
-              : desc(leads.updatedAt);
+          orderClause = sortDirection === SortOrder.ASC ? leads.updatedAt : desc(leads.updatedAt);
           break;
         case LeadSortField.LAST_ENGAGEMENT_AT:
           orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.lastEngagementAt
-              : desc(leads.lastEngagementAt);
+            sortDirection === SortOrder.ASC ? leads.lastEngagementAt : desc(leads.lastEngagementAt);
           break;
         default:
-          orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.createdAt
-              : desc(leads.createdAt);
+          orderClause = sortDirection === SortOrder.ASC ? leads.createdAt : desc(leads.createdAt);
       }
 
       const leadsList = await db
@@ -624,9 +543,7 @@ export class LeadsRepository {
 
       return success({
         response: {
-          leads: leadsList.map((lead) =>
-            LeadsRepository.formatLeadResponse(lead),
-          ),
+          leads: leadsList.map((lead) => LeadsRepository.formatLeadResponse(lead)),
         },
         paginationInfo: {
           page,
@@ -752,9 +669,7 @@ export class LeadsRepository {
   static async unsubscribeLead(
     data: UnsubscribeType,
     logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{ success: boolean; message?: string; unsubscribedAt?: Date }>
-  > {
+  ): Promise<ResponseType<{ success: boolean; message?: string; unsubscribedAt?: Date }>> {
     try {
       logger.debug("Unsubscribing lead and newsletter", {
         leadId: data.leadId,
@@ -778,8 +693,7 @@ export class LeadsRepository {
         email = data.email;
       } else {
         return fail({
-          message:
-            "app.api.leads.leadsErrors.leadsUnsubscribe.post.error.validation.title",
+          message: "app.api.leads.leadsErrors.leadsUnsubscribe.post.error.validation.title",
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -819,18 +733,13 @@ export class LeadsRepository {
 
       return success({
         success: true,
-        message:
-          "app.api.leads.leadsErrors.leadsUnsubscribe.post.success.description",
+        message: "app.api.leads.leadsErrors.leadsUnsubscribe.post.success.description",
         unsubscribedAt: updatedLead.unsubscribedAt || undefined,
       });
     } catch (error) {
-      logger.error(
-        "Error unsubscribing lead and newsletter",
-        parseError(error),
-      );
+      logger.error("Error unsubscribing lead and newsletter", parseError(error));
       return fail({
-        message:
-          "app.api.leads.leadsErrors.leadsUnsubscribe.post.error.server.title",
+        message: "app.api.leads.leadsErrors.leadsUnsubscribe.post.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -871,9 +780,7 @@ export class LeadsRepository {
           createdAt: new Date(),
           updatedAt: new Date(),
         });
-      } else if (
-        subscription.status !== NewsletterSubscriptionStatus.UNSUBSCRIBED
-      ) {
+      } else if (subscription.status !== NewsletterSubscriptionStatus.UNSUBSCRIBED) {
         // Update existing subscription status
         await db
           .update(newsletterSubscriptions)
@@ -888,10 +795,7 @@ export class LeadsRepository {
 
       logger.debug("Newsletter opt-out completed", { email });
     } catch (error) {
-      logger.error(
-        "Error unsubscribing from newsletter (internal)",
-        parseError(error),
-      );
+      logger.error("Error unsubscribing from newsletter (internal)", parseError(error));
       // Don't re-throw - we want lead opt-out to succeed even if newsletter fails
     }
   }
@@ -973,11 +877,7 @@ export class LeadsRepository {
     try {
       logger.debug("Fetching lead by ID (internal)", { id });
 
-      const [lead] = await db
-        .select()
-        .from(leads)
-        .where(eq(leads.id, id))
-        .limit(1);
+      const [lead] = await db.select().from(leads).where(eq(leads.id, id)).limit(1);
 
       if (!lead) {
         return fail({
@@ -1015,12 +915,7 @@ export class LeadsRepository {
       // Filter out null values and prepare update data
       const updateData: Record<
         string,
-        | string
-        | number
-        | boolean
-        | Date
-        | null
-        | Record<string, string | number | boolean | null>
+        string | number | boolean | Date | null | Record<string, string | number | boolean | null>
       > = {
         updatedAt: new Date(),
       };
@@ -1040,8 +935,7 @@ export class LeadsRepository {
 
       if (!updatedLead) {
         return fail({
-          message:
-            "app.api.leads.leadsErrors.leads.patch.error.not_found.title",
+          message: "app.api.leads.leadsErrors.leads.patch.error.not_found.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -1085,143 +979,131 @@ export class LeadsRepository {
       });
 
       // Use transaction to ensure data consistency
-      const result = await withTransaction<ResponseType<LeadResponseType>>(
-        logger,
-        async (tx) => {
-          // Find the lead
-          const [existingLead] = await tx
+      const result = await withTransaction<ResponseType<LeadResponseType>>(logger, async (tx) => {
+        // Find the lead
+        const [existingLead] = await tx.select().from(leads).where(eq(leads.id, leadId)).limit(1);
+
+        if (!existingLead) {
+          return fail({
+            message: "app.api.leads.leadsErrors.leads.patch.error.not_found.title",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+
+        // Check if lead is already converted to a user
+        if (existingLead.convertedUserId && options.userId) {
+          logger.debug("Lead already converted to user (internal)", {
+            leadId,
+            existingUserId: existingLead.convertedUserId,
+            newUserId: options.userId,
+          });
+          return success(LeadsRepository.formatLeadResponse(existingLead));
+        }
+
+        // Prepare update data
+        const updateData: Partial<Lead> = {
+          updatedAt: new Date(),
+        };
+
+        // Handle anonymous lead conversion (email update)
+        if (options.email && existingLead.metadata?.anonymous) {
+          logger.debug("Converting anonymous lead with real email (internal)", {
+            leadId,
+            oldEmail: existingLead.email,
+            newEmail: options.email,
+          });
+
+          // Check for duplicate email
+          const [duplicateLead] = await tx
             .select()
             .from(leads)
-            .where(eq(leads.id, leadId))
+            .where(eq(leads.email, options.email.toLowerCase().trim()))
             .limit(1);
 
-          if (!existingLead) {
+          if (duplicateLead && duplicateLead.id !== existingLead.id) {
             return fail({
-              message:
-                "app.api.leads.leadsErrors.leads.patch.error.not_found.title",
-              errorType: ErrorResponseTypes.NOT_FOUND,
+              message: "app.api.leads.leadsErrors.leads.post.error.duplicate.title",
+              errorType: ErrorResponseTypes.CONFLICT,
             });
           }
 
-          // Check if lead is already converted to a user
-          if (existingLead.convertedUserId && options.userId) {
-            logger.debug("Lead already converted to user (internal)", {
-              leadId,
-              existingUserId: existingLead.convertedUserId,
-              newUserId: options.userId,
-            });
-            return success(LeadsRepository.formatLeadResponse(existingLead));
-          }
-
-          // Prepare update data
-          const updateData: Partial<Lead> = {
-            updatedAt: new Date(),
+          updateData.email = options.email.toLowerCase().trim();
+          updateData.status = getWebsiteUserStatus(existingLead.status);
+          updateData.metadata = {
+            ...existingLead.metadata,
+            anonymous: false,
+            convertedAt: new Date().toISOString(),
+            originalEmail: existingLead.email,
           };
+        }
 
-          // Handle anonymous lead conversion (email update)
-          if (options.email && existingLead.metadata?.anonymous) {
-            logger.debug(
-              "Converting anonymous lead with real email (internal)",
-              {
-                leadId,
-                oldEmail: existingLead.email,
-                newEmail: options.email,
-              },
-            );
-
-            // Check for duplicate email
-            const [duplicateLead] = await tx
-              .select()
-              .from(leads)
-              .where(eq(leads.email, options.email.toLowerCase().trim()))
-              .limit(1);
-
-            if (duplicateLead && duplicateLead.id !== existingLead.id) {
-              return fail({
-                message:
-                  "app.api.leads.leadsErrors.leads.post.error.duplicate.title",
-                errorType: ErrorResponseTypes.CONFLICT,
-              });
-            }
-
-            updateData.email = options.email.toLowerCase().trim();
-            updateData.status = getWebsiteUserStatus(existingLead.status);
-            updateData.metadata = {
-              ...existingLead.metadata,
-              anonymous: false,
-              convertedAt: new Date().toISOString(),
-              originalEmail: existingLead.email,
-            };
+        // Handle additional data updates
+        if (options.additionalData) {
+          if (options.additionalData.businessName) {
+            updateData.businessName = options.additionalData.businessName;
           }
-
-          // Handle additional data updates
-          if (options.additionalData) {
-            if (options.additionalData.businessName) {
-              updateData.businessName = options.additionalData.businessName;
-            }
-            if (options.additionalData.contactName) {
-              updateData.contactName = options.additionalData.contactName;
-            }
-            if (options.additionalData.phone) {
-              updateData.phone = options.additionalData.phone;
-            }
-            if (options.additionalData.website) {
-              updateData.website = options.additionalData.website;
-            }
+          if (options.additionalData.contactName) {
+            updateData.contactName = options.additionalData.contactName;
           }
+          if (options.additionalData.phone) {
+            updateData.phone = options.additionalData.phone;
+          }
+          if (options.additionalData.website) {
+            updateData.website = options.additionalData.website;
+          }
+        }
 
-          // Handle user-lead relationship establishment
-          if (options.userId) {
-            updateData.status = LeadStatus.SIGNED_UP;
-            updateData.convertedUserId = options.userId;
-            updateData.convertedAt = new Date();
-            updateData.signedUpAt = new Date();
+        // Handle user-lead relationship establishment
+        if (options.userId) {
+          updateData.status = LeadStatus.SIGNED_UP;
+          updateData.convertedUserId = options.userId;
+          updateData.convertedAt = new Date();
+          updateData.signedUpAt = new Date();
 
-            // Check if user-lead relationship already exists
-            const [existingRelationship] = await tx
-              .select()
-              .from(userLeadLinks)
-              .where(
-                and(
-                  eq(userLeadLinks.userId, options.userId),
-                  eq(userLeadLinks.leadId, existingLead.id),
-                ),
-              )
-              .limit(1);
+          // Check if user-lead relationship already exists
+          const [existingRelationship] = await tx
+            .select()
+            .from(userLeadLinks)
+            .where(
+              and(
+                eq(userLeadLinks.userId, options.userId),
+                eq(userLeadLinks.leadId, existingLead.id),
+              ),
+            )
+            .limit(1);
 
-            if (existingRelationship) {
-              logger.debug("User-lead relationship already exists (internal)", {
+          if (existingRelationship) {
+            logger.debug("User-lead relationship already exists (internal)", {
+              userId: options.userId,
+              leadId: existingLead.id,
+              relationshipId: existingRelationship.id,
+            });
+          } else {
+            await tx
+              .insert(userLeadLinks)
+              .values({
                 userId: options.userId,
                 leadId: existingLead.id,
-                relationshipId: existingRelationship.id,
-              });
-            } else {
-              await tx
-                .insert(userLeadLinks)
-                .values({
-                  userId: options.userId,
-                  leadId: existingLead.id,
-                  linkReason: "manual",
-                })
-                .onConflictDoNothing();
+                linkReason: "manual",
+              })
+              .onConflictDoNothing();
 
-              logger.debug("User-lead relationship created (internal)", {
-                userId: options.userId,
-                leadId: existingLead.id,
-              });
-            }
+            logger.debug("User-lead relationship created (internal)", {
+              userId: options.userId,
+              leadId: existingLead.id,
+            });
           }
+        }
 
-          // Apply updates
-          const [updatedLead] = await tx
-            .update(leads)
-            .set(updateData)
-            .where(eq(leads.id, existingLead.id))
-            .returning();
+        // Apply updates
+        const [updatedLead] = await tx
+          .update(leads)
+          .set(updateData)
+          .where(eq(leads.id, existingLead.id))
+          .returning();
 
-          return success(LeadsRepository.formatLeadResponse(updatedLead));
-        },
-      );
+        return success(LeadsRepository.formatLeadResponse(updatedLead));
+      });
 
       if (result?.success) {
         logger.debug("Lead converted successfully (internal)", {
@@ -1264,16 +1146,11 @@ export class LeadsRepository {
       });
 
       // First, check if the lead exists
-      const [lead] = await db
-        .select()
-        .from(leads)
-        .where(eq(leads.id, data.leadId))
-        .limit(1);
+      const [lead] = await db.select().from(leads).where(eq(leads.id, data.leadId)).limit(1);
 
       if (!lead) {
         return fail({
-          message:
-            "app.api.leads.leadsErrors.leadsEngagement.post.error.validation.title",
+          message: "app.api.leads.leadsErrors.leadsEngagement.post.error.validation.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -1293,8 +1170,7 @@ export class LeadsRepository {
 
       if (!engagement) {
         return fail({
-          message:
-            "app.api.leads.leadsErrors.leadsEngagement.post.error.server.title",
+          message: "app.api.leads.leadsErrors.leadsEngagement.post.error.server.title",
           errorType: ErrorResponseTypes.DATABASE_ERROR,
         });
       }
@@ -1363,8 +1239,7 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Error recording engagement", parseError(error));
       return fail({
-        message:
-          "app.api.leads.leadsErrors.leadsEngagement.post.error.server.title",
+        message: "app.api.leads.leadsErrors.leadsEngagement.post.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1442,8 +1317,7 @@ export class LeadsRepository {
         conditions.push(lte(leads.createdAt, new Date(query.dateTo)));
       }
 
-      const whereClause =
-        conditions.length > 0 ? and(...conditions) : undefined;
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
       // Get leads data
       const leadsData = await db
@@ -1466,8 +1340,7 @@ export class LeadsRepository {
       const EXCEL_EXTENSION = ".xlsx";
 
       const filePrefix = DEFAULT_FILE_PREFIX;
-      const fileSuffix =
-        query.format === ExportFormat.CSV ? CSV_EXTENSION : EXCEL_EXTENSION;
+      const fileSuffix = query.format === ExportFormat.CSV ? CSV_EXTENSION : EXCEL_EXTENSION;
       const fileName = `${filePrefix}${dateString}${fileSuffix}`;
       const fileContent = Buffer.from(csvContent).toString("base64");
 
@@ -1480,8 +1353,7 @@ export class LeadsRepository {
       return success({
         fileName,
         fileContent,
-        mimeType:
-          query.format === ExportFormat.CSV ? MimeType.CSV : MimeType.XLSX,
+        mimeType: query.format === ExportFormat.CSV ? MimeType.CSV : MimeType.XLSX,
         totalRecords: leadsData.length,
         exportedAt: new Date(),
       });
@@ -1579,10 +1451,7 @@ export class LeadsRepository {
         stringValue.includes(CSV_QUOTE) ||
         stringValue.includes(CSV_NEWLINE)
       ) {
-        const quotedValue = stringValue.replaceAll(
-          new RegExp(CSV_QUOTE, "g"),
-          CSV_DOUBLE_QUOTE,
-        );
+        const quotedValue = stringValue.replaceAll(new RegExp(CSV_QUOTE, "g"), CSV_DOUBLE_QUOTE);
         return `${CSV_QUOTE}${quotedValue}${CSV_QUOTE}`;
       }
       return stringValue;
@@ -1677,14 +1546,9 @@ export class LeadsRepository {
       if (status && Array.isArray(status) && status.length > 0) {
         const mappedStatuses = status
           .map((filter: LeadStatusFilterType) => mapStatusFilter(filter))
-          .filter(
-            (s): s is NonNullable<ReturnType<typeof mapStatusFilter>> =>
-              s !== null,
-          );
+          .filter((s): s is NonNullable<ReturnType<typeof mapStatusFilter>> => s !== null);
         if (mappedStatuses.length > 0) {
-          conditions.push(
-            or(...mappedStatuses.map((s) => eq(leads.status, s)))!,
-          );
+          conditions.push(or(...mappedStatuses.map((s) => eq(leads.status, s)))!);
         }
       } else if (status && !Array.isArray(status)) {
         const dbStatus = mapStatusFilter(status);
@@ -1700,17 +1564,10 @@ export class LeadsRepository {
         currentCampaignStage.length > 0
       ) {
         const mappedStages = currentCampaignStage
-          .map((filter: EmailCampaignStageFilterType) =>
-            mapCampaignStageFilter(filter),
-          )
-          .filter(
-            (s): s is NonNullable<ReturnType<typeof mapCampaignStageFilter>> =>
-              s !== null,
-          );
+          .map((filter: EmailCampaignStageFilterType) => mapCampaignStageFilter(filter))
+          .filter((s): s is NonNullable<ReturnType<typeof mapCampaignStageFilter>> => s !== null);
         if (mappedStages.length > 0) {
-          conditions.push(
-            or(...mappedStages.map((s) => eq(leads.currentCampaignStage, s)))!,
-          );
+          conditions.push(or(...mappedStages.map((s) => eq(leads.currentCampaignStage, s)))!);
         }
       } else if (currentCampaignStage && !Array.isArray(currentCampaignStage)) {
         const dbStage = mapCampaignStageFilter(currentCampaignStage);
@@ -1723,14 +1580,9 @@ export class LeadsRepository {
       if (source && Array.isArray(source) && source.length > 0) {
         const mappedSources = source
           .map((filter: LeadSourceFilterType) => mapSourceFilter(filter))
-          .filter(
-            (s): s is NonNullable<ReturnType<typeof mapSourceFilter>> =>
-              s !== null,
-          );
+          .filter((s): s is NonNullable<ReturnType<typeof mapSourceFilter>> => s !== null);
         if (mappedSources.length > 0) {
-          conditions.push(
-            or(...mappedSources.map((s) => eq(leads.source, s)))!,
-          );
+          conditions.push(or(...mappedSources.map((s) => eq(leads.source, s)))!);
         }
       } else if (source && !Array.isArray(source)) {
         const dbSource = mapSourceFilter(source);
@@ -1745,9 +1597,7 @@ export class LeadsRepository {
           .map((filter: CountryFilter) => convertCountryFilter(filter))
           .filter((c): c is NonNullable<Countries> => c !== null);
         if (mappedCountries.length > 0) {
-          conditions.push(
-            or(...mappedCountries.map((c) => eq(leads.country, c)))!,
-          );
+          conditions.push(or(...mappedCountries.map((c) => eq(leads.country, c)))!);
         }
       } else if (country && !Array.isArray(country)) {
         const dbCountry = convertCountryFilter(country);
@@ -1762,9 +1612,7 @@ export class LeadsRepository {
           .map((filter: LanguageFilter) => convertLanguageFilter(filter))
           .filter((l): l is NonNullable<Languages> => l !== null);
         if (mappedLanguages.length > 0) {
-          conditions.push(
-            or(...mappedLanguages.map((l) => eq(leads.language, l)))!,
-          );
+          conditions.push(or(...mappedLanguages.map((l) => eq(leads.language, l)))!);
         }
       } else if (language && !Array.isArray(language)) {
         const dbLanguage = convertLanguageFilter(language);
@@ -1775,10 +1623,7 @@ export class LeadsRepository {
 
       if (search) {
         conditions.push(
-          or(
-            ilike(leads.email, `%${search}%`),
-            ilike(leads.businessName, `%${search}%`),
-          )!,
+          or(ilike(leads.email, `%${search}%`), ilike(leads.businessName, `%${search}%`))!,
         );
       }
 
@@ -1788,42 +1633,27 @@ export class LeadsRepository {
         conditions.length > 0 ? baseQuery.where(and(...conditions)) : baseQuery;
 
       // Apply sorting
-      const sortByField = Array.isArray(sortBy)
-        ? sortBy[0]
-        : (sortBy ?? LeadSortField.CREATED_AT);
-      const sortDirection = Array.isArray(sortOrder)
-        ? sortOrder[0]
-        : (sortOrder ?? SortOrder.DESC);
+      const sortByField = Array.isArray(sortBy) ? sortBy[0] : (sortBy ?? LeadSortField.CREATED_AT);
+      const sortDirection = Array.isArray(sortOrder) ? sortOrder[0] : (sortOrder ?? SortOrder.DESC);
 
       let orderClause;
       switch (sortByField) {
         case LeadSortField.EMAIL:
-          orderClause =
-            sortDirection === SortOrder.ASC ? leads.email : desc(leads.email);
+          orderClause = sortDirection === SortOrder.ASC ? leads.email : desc(leads.email);
           break;
         case LeadSortField.BUSINESS_NAME:
           orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.businessName
-              : desc(leads.businessName);
+            sortDirection === SortOrder.ASC ? leads.businessName : desc(leads.businessName);
           break;
         case LeadSortField.UPDATED_AT:
-          orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.updatedAt
-              : desc(leads.updatedAt);
+          orderClause = sortDirection === SortOrder.ASC ? leads.updatedAt : desc(leads.updatedAt);
           break;
         case LeadSortField.LAST_ENGAGEMENT_AT:
           orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.lastEngagementAt
-              : desc(leads.lastEngagementAt);
+            sortDirection === SortOrder.ASC ? leads.lastEngagementAt : desc(leads.lastEngagementAt);
           break;
         default:
-          orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.createdAt
-              : desc(leads.createdAt);
+          orderClause = sortDirection === SortOrder.ASC ? leads.createdAt : desc(leads.createdAt);
       }
 
       const queryWithOrdering = queryWithConditions.orderBy(orderClause);
@@ -1866,12 +1696,7 @@ export class LeadsRepository {
       // Prepare update data with proper type safety
       const updateData: Record<
         string,
-        | string
-        | number
-        | boolean
-        | Date
-        | null
-        | Record<string, string | number | boolean | null>
+        string | number | boolean | Date | null | Record<string, string | number | boolean | null>
       > = {
         updatedAt: new Date(),
       };
@@ -1880,10 +1705,7 @@ export class LeadsRepository {
       if (updates.status !== null && updates.status !== undefined) {
         updateData.status = updates.status;
       }
-      if (
-        updates.currentCampaignStage !== null &&
-        updates.currentCampaignStage !== undefined
-      ) {
+      if (updates.currentCampaignStage !== null && updates.currentCampaignStage !== undefined) {
         updateData.currentCampaignStage = updates.currentCampaignStage;
       }
       if (updates.source !== null && updates.source !== undefined) {
@@ -1913,10 +1735,7 @@ export class LeadsRepository {
             await tx.update(leads).set(updateData).where(eq(leads.id, lead.id));
             totalUpdated++;
           } catch (error) {
-            logger.error(
-              "Error updating lead in batch",
-              parseError(error).message,
-            );
+            logger.error("Error updating lead in batch", parseError(error).message);
             errors.push({
               leadId: lead.id,
               error: parseError(error).toString(),
@@ -2023,8 +1842,7 @@ export class LeadsRepository {
       // Validation: confirmDelete must be true for actual deletion
       if (!dryRun && !confirmDelete) {
         return fail({
-          message:
-            "app.api.leads.leadsErrors.batch.update.error.validation.title",
+          message: "app.api.leads.leadsErrors.batch.update.error.validation.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -2048,14 +1866,9 @@ export class LeadsRepository {
       if (status && Array.isArray(status) && status.length > 0) {
         const mappedStatuses = status
           .map((filter: LeadStatusFilterType) => mapStatusFilter(filter))
-          .filter(
-            (s): s is NonNullable<ReturnType<typeof mapStatusFilter>> =>
-              s !== null,
-          );
+          .filter((s): s is NonNullable<ReturnType<typeof mapStatusFilter>> => s !== null);
         if (mappedStatuses.length > 0) {
-          conditions.push(
-            or(...mappedStatuses.map((s) => eq(leads.status, s)))!,
-          );
+          conditions.push(or(...mappedStatuses.map((s) => eq(leads.status, s)))!);
         }
       } else if (status && !Array.isArray(status)) {
         const dbStatus = mapStatusFilter(status);
@@ -2071,17 +1884,10 @@ export class LeadsRepository {
         currentCampaignStage.length > 0
       ) {
         const mappedStages = currentCampaignStage
-          .map((filter: EmailCampaignStageFilterType) =>
-            mapCampaignStageFilter(filter),
-          )
-          .filter(
-            (s): s is NonNullable<ReturnType<typeof mapCampaignStageFilter>> =>
-              s !== null,
-          );
+          .map((filter: EmailCampaignStageFilterType) => mapCampaignStageFilter(filter))
+          .filter((s): s is NonNullable<ReturnType<typeof mapCampaignStageFilter>> => s !== null);
         if (mappedStages.length > 0) {
-          conditions.push(
-            or(...mappedStages.map((s) => eq(leads.currentCampaignStage, s)))!,
-          );
+          conditions.push(or(...mappedStages.map((s) => eq(leads.currentCampaignStage, s)))!);
         }
       } else if (currentCampaignStage && !Array.isArray(currentCampaignStage)) {
         const dbStage = mapCampaignStageFilter(currentCampaignStage);
@@ -2094,14 +1900,9 @@ export class LeadsRepository {
       if (source && Array.isArray(source) && source.length > 0) {
         const mappedSources = source
           .map((filter: LeadSourceFilterType) => mapSourceFilter(filter))
-          .filter(
-            (s): s is NonNullable<ReturnType<typeof mapSourceFilter>> =>
-              s !== null,
-          );
+          .filter((s): s is NonNullable<ReturnType<typeof mapSourceFilter>> => s !== null);
         if (mappedSources.length > 0) {
-          conditions.push(
-            or(...mappedSources.map((s) => eq(leads.source, s)))!,
-          );
+          conditions.push(or(...mappedSources.map((s) => eq(leads.source, s)))!);
         }
       } else if (source && !Array.isArray(source)) {
         const dbSource = mapSourceFilter(source);
@@ -2116,9 +1917,7 @@ export class LeadsRepository {
           .map((filter: CountryFilter) => convertCountryFilter(filter))
           .filter((c): c is NonNullable<Countries> => c !== null);
         if (mappedCountries.length > 0) {
-          conditions.push(
-            or(...mappedCountries.map((c) => eq(leads.country, c)))!,
-          );
+          conditions.push(or(...mappedCountries.map((c) => eq(leads.country, c)))!);
         }
       } else if (country && !Array.isArray(country)) {
         const dbCountry = convertCountryFilter(country);
@@ -2133,9 +1932,7 @@ export class LeadsRepository {
           .map((filter: LanguageFilter) => convertLanguageFilter(filter))
           .filter((l): l is NonNullable<Languages> => l !== null);
         if (mappedLanguages.length > 0) {
-          conditions.push(
-            or(...mappedLanguages.map((l) => eq(leads.language, l)))!,
-          );
+          conditions.push(or(...mappedLanguages.map((l) => eq(leads.language, l)))!);
         }
       } else if (language && !Array.isArray(language)) {
         const dbLanguage = convertLanguageFilter(language);
@@ -2144,8 +1941,7 @@ export class LeadsRepository {
         }
       }
 
-      const whereClause =
-        conditions.length > 0 ? and(...conditions) : undefined;
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
       logger.debug("Applied filter conditions", {
         totalConditions: conditions.length,
@@ -2153,50 +1949,31 @@ export class LeadsRepository {
       });
 
       // Apply sorting
-      const sortByField = Array.isArray(sortBy)
-        ? sortBy[0]
-        : (sortBy ?? LeadSortField.CREATED_AT);
-      const sortDirection = Array.isArray(sortOrder)
-        ? sortOrder[0]
-        : (sortOrder ?? SortOrder.DESC);
+      const sortByField = Array.isArray(sortBy) ? sortBy[0] : (sortBy ?? LeadSortField.CREATED_AT);
+      const sortDirection = Array.isArray(sortOrder) ? sortOrder[0] : (sortOrder ?? SortOrder.DESC);
 
       let orderClause;
       switch (sortByField) {
         case LeadSortField.EMAIL:
-          orderClause =
-            sortDirection === SortOrder.ASC ? leads.email : desc(leads.email);
+          orderClause = sortDirection === SortOrder.ASC ? leads.email : desc(leads.email);
           break;
         case LeadSortField.BUSINESS_NAME:
           orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.businessName
-              : desc(leads.businessName);
+            sortDirection === SortOrder.ASC ? leads.businessName : desc(leads.businessName);
           break;
         case LeadSortField.UPDATED_AT:
-          orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.updatedAt
-              : desc(leads.updatedAt);
+          orderClause = sortDirection === SortOrder.ASC ? leads.updatedAt : desc(leads.updatedAt);
           break;
         case LeadSortField.LAST_ENGAGEMENT_AT:
           orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.lastEngagementAt
-              : desc(leads.lastEngagementAt);
+            sortDirection === SortOrder.ASC ? leads.lastEngagementAt : desc(leads.lastEngagementAt);
           break;
         default:
-          orderClause =
-            sortDirection === SortOrder.ASC
-              ? leads.createdAt
-              : desc(leads.createdAt);
+          orderClause = sortDirection === SortOrder.ASC ? leads.createdAt : desc(leads.createdAt);
       }
 
       // Build query with Drizzle's type-safe chaining
-      const baseQuery = db
-        .select()
-        .from(leads)
-        .where(whereClause)
-        .orderBy(orderClause);
+      const baseQuery = db.select().from(leads).where(whereClause).orderBy(orderClause);
 
       // Apply scope-based pagination or limit - Drizzle maintains type through method chaining
       const finalQuery =
@@ -2212,8 +1989,7 @@ export class LeadsRepository {
         page,
         pageSize,
         maxRecords,
-        appliedLimit:
-          scope === BatchOperationScope.CURRENT_PAGE ? pageSize : maxRecords,
+        appliedLimit: scope === BatchOperationScope.CURRENT_PAGE ? pageSize : maxRecords,
       });
 
       // If dry run, return preview
@@ -2259,10 +2035,7 @@ export class LeadsRepository {
             await tx.delete(leads).where(eq(leads.id, lead.id));
             totalDeleted++;
           } catch (error) {
-            logger.error(
-              "Error deleting lead in batch",
-              parseError(error).message,
-            );
+            logger.error("Error deleting lead in batch", parseError(error).message);
             errors.push({
               leadId: lead.id,
               error: parseError(error).toString(),

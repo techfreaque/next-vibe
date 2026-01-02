@@ -16,10 +16,7 @@
 
 import { z } from "zod";
 
-import {
-  type ContactTranslationKey,
-  scopedTranslation,
-} from "@/app/api/[locale]/contact/i18n";
+import { type ContactTranslationKey, scopedTranslation } from "@/app/api/[locale]/contact/i18n";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
@@ -32,11 +29,7 @@ import {
   scopedObjectField,
   scopedRequestDataField,
 } from "../../field/utils";
-import type {
-  ObjectField,
-  PrimitiveField,
-  UnifiedField,
-} from "../../types/endpoint";
+import type { ObjectField, PrimitiveField, UnifiedField } from "../../types/endpoint";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -132,9 +125,7 @@ interface BaseType<T> {
 interface UIConstraint<TKey extends string> {
   ui: { label: NoInfer<TKey> };
 }
-function testE_fn<TKey extends string, T extends BaseType<string>>(
-  obj: T & UIConstraint<TKey>,
-): T {
+function testE_fn<TKey extends string, T extends BaseType<string>>(obj: T & UIConstraint<TKey>): T {
   return obj;
 }
 const testE_valid = testE_fn<ValidKeys, BaseType<string>>({
@@ -258,10 +249,10 @@ interface FieldTypeConstrained<TKey extends string> {
   data: string;
 }
 
-function testI_fn<
-  TKey extends string,
-  TField extends FieldTypeConstrained<TKey>,
->(scoped: ScopedTranslationType<TKey>, field: TField): TField {
+function testI_fn<TKey extends string, TField extends FieldTypeConstrained<TKey>>(
+  scoped: ScopedTranslationType<TKey>,
+  field: TField,
+): TField {
   return field;
 }
 
@@ -289,10 +280,10 @@ interface SimpleField<TKey extends string> {
 
 type SimpleUnifiedField<TKey extends string> = SimpleField<TKey>;
 
-function testJ_fn<
-  TKey extends string,
-  TFields extends SimpleUnifiedField<TKey>,
->(scoped: ScopedTranslationType<TKey>, config: { fields: TFields }): TFields {
+function testJ_fn<TKey extends string, TFields extends SimpleUnifiedField<TKey>>(
+  scoped: ScopedTranslationType<TKey>,
+  config: { fields: TFields },
+): TFields {
   return config.fields;
 }
 
@@ -341,10 +332,9 @@ interface FieldLike<TKey extends string, TUIConfig extends { label?: TKey }> {
   ui: TUIConfig;
 }
 
-function createFieldL<
-  TKey extends string,
-  const TUIConfig extends { label?: TKey },
->(ui: TUIConfig): FieldLike<TKey, TUIConfig> {
+function createFieldL<TKey extends string, const TUIConfig extends { label?: TKey }>(
+  ui: TUIConfig,
+): FieldLike<TKey, TUIConfig> {
   return { type: "field", ui };
 }
 
@@ -404,9 +394,7 @@ testR_fn(testF_scoped, {
 // ---------------------------------------------------------------------------
 // TEST S: What if we use a satisfies-like pattern?
 // ---------------------------------------------------------------------------
-function createFieldS<TKey extends string>(ui: {
-  label?: NoInfer<TKey>;
-}): ContextualField<TKey> {
+function createFieldS<TKey extends string>(ui: { label?: NoInfer<TKey> }): ContextualField<TKey> {
   return { type: "field", ui };
 }
 
@@ -522,8 +510,7 @@ const allScopedErrorTypes = {
 type ContactScopedKeys = ExtractScopedKeyType<typeof scopedTranslation>;
 
 // Alternative: Use the ScopedTranslationKey directly (preferred approach)
-type ContactScopedKeysDirect =
-  (typeof scopedTranslation)["ScopedTranslationKey"];
+type ContactScopedKeysDirect = (typeof scopedTranslation)["ScopedTranslationKey"];
 
 // Verify both approaches produce equivalent types
 type _Test0_0_TypesMatch = ContactScopedKeys extends ContactScopedKeysDirect
@@ -535,18 +522,14 @@ const _test0_0: _Test0_0_TypesMatch = true;
 
 // Verify that the extracted type includes expected keys
 type _Test0_1_TitleExists = "title" extends ContactScopedKeys ? true : false;
-type _Test0_2_DescriptionExists = "description" extends ContactScopedKeys
-  ? true
-  : false;
-type _Test0_3_FormLabelExists = "form.label" extends ContactScopedKeys
-  ? true
-  : false;
-type _Test0_4_NestedFieldExists =
-  "form.fields.name.label" extends ContactScopedKeys ? true : false;
+type _Test0_2_DescriptionExists = "description" extends ContactScopedKeys ? true : false;
+type _Test0_3_FormLabelExists = "form.label" extends ContactScopedKeys ? true : false;
+type _Test0_4_NestedFieldExists = "form.fields.name.label" extends ContactScopedKeys ? true : false;
 
 // Verify invalid keys are NOT in the type
-type _Test0_5_InvalidKeyNotExists =
-  "invalid.key.not.in.translations" extends ContactScopedKeys ? false : true;
+type _Test0_5_InvalidKeyNotExists = "invalid.key.not.in.translations" extends ContactScopedKeys
+  ? false
+  : true;
 
 // These should all be true
 const _test0_1: _Test0_1_TitleExists = true;
@@ -556,9 +539,7 @@ const _test0_4: _Test0_4_NestedFieldExists = true;
 const _test0_5: _Test0_5_InvalidKeyNotExists = true;
 
 // Verify the exported type alias works
-type _Test0_6_TypeAliasWorks = "title" extends ContactTranslationKey
-  ? true
-  : false;
+type _Test0_6_TypeAliasWorks = "title" extends ContactTranslationKey ? true : false;
 const _test0_6: _Test0_6_TypeAliasWorks = true;
 
 // ============================================================================
@@ -1619,80 +1600,75 @@ const test6A_invalidField = scopedRequestDataField(
 // When we try to assign a field to UnifiedField<ContactTranslationKey>,
 // TypeScript validates that the field's TKey matches ContactTranslationKey
 // ---------------------------------------------------------------------------
-const test6B_validField: UnifiedField<ContactTranslationKey, z.ZodString> =
-  requestDataField(
-    {
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.TEXT,
-      label: "form.fields.name.label", // Valid key
-      columns: 12,
-    },
-    z.string(),
-  );
+const test6B_validField: UnifiedField<ContactTranslationKey, z.ZodString> = requestDataField(
+  {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.TEXT,
+    label: "form.fields.name.label", // Valid key
+    columns: 12,
+  },
+  z.string(),
+);
 
 // This should work - TKey is "form.fields.name.label" which extends ContactTranslationKey
-const test6B_assignToUnified: UnifiedField<ContactTranslationKey, z.ZodString> =
-  test6B_validField;
+const test6B_assignToUnified: UnifiedField<ContactTranslationKey, z.ZodString> = test6B_validField;
 
-const test6B_invalidField: UnifiedField<ContactTranslationKey, z.ZodString> =
-  requestDataField(
-    {
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.TEXT,
-      // @ts-expect-error - Should error at the label property level
-      label: "invalid.key", // Invalid key
-      columns: 12,
-    },
-    z.string(),
-  );
+const test6B_invalidField: UnifiedField<ContactTranslationKey, z.ZodString> = requestDataField(
+  {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.TEXT,
+    // @ts-expect-error - Should error at the label property level
+    label: "invalid.key", // Invalid key
+    columns: 12,
+  },
+  z.string(),
+);
 
 // ---------------------------------------------------------------------------
 // Test 6C: objectField validation
 // objectField captures keys from both container AND children
 // TKey becomes union of all keys
 // ---------------------------------------------------------------------------
-const test6C_validObject: UnifiedField<ContactTranslationKey, z.ZodTypeAny> =
-  objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "form.label", // Valid key
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      name: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "form.fields.name.label", // Valid key
-          columns: 12,
-        },
-        z.string(),
-      ),
-    },
-  );
+const test6C_validObject: UnifiedField<ContactTranslationKey, z.ZodTypeAny> = objectField(
+  {
+    type: WidgetType.CONTAINER,
+    title: "form.label", // Valid key
+    layoutType: LayoutType.GRID,
+    columns: 12,
+  },
+  { request: "data", response: true },
+  {
+    name: requestDataField(
+      {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "form.fields.name.label", // Valid key
+        columns: 12,
+      },
+      z.string(),
+    ),
+  },
+);
 
 // Invalid - child has bad key
-const test6C_invalidObject: UnifiedField<ContactTranslationKey, z.ZodTypeAny> =
-  objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "form.label", // Valid
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      name: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          // @ts-expect-error - Should error at the label property level
-          label: "bad.invalid.key.xyz", // Invalid
-          columns: 12,
-        },
-        z.string(),
-      ),
-    },
-  );
+const test6C_invalidObject: UnifiedField<ContactTranslationKey, z.ZodTypeAny> = objectField(
+  {
+    type: WidgetType.CONTAINER,
+    title: "form.label", // Valid
+    layoutType: LayoutType.GRID,
+    columns: 12,
+  },
+  { request: "data", response: true },
+  {
+    name: requestDataField(
+      {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        // @ts-expect-error - Should error at the label property level
+        label: "bad.invalid.key.xyz", // Invalid
+        columns: 12,
+      },
+      z.string(),
+    ),
+  },
+);

@@ -14,9 +14,7 @@ export class CodeQualityFilesWidgetRenderer extends BaseWidgetRenderer<
 > {
   readonly widgetType = WidgetType.CODE_QUALITY_FILES;
 
-  render(
-    props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_FILES, string>,
-  ): string {
+  render(props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_FILES, string>): string {
     const { value, context } = props;
 
     if (!Array.isArray(value) || value.length === 0) {
@@ -27,11 +25,7 @@ export class CodeQualityFilesWidgetRenderer extends BaseWidgetRenderer<
 
     // Header
     const headerIcon = context.options.useEmojis ? "📂 " : "";
-    const headerText = this.styleText(
-      `${headerIcon}Affected Files`,
-      "bold",
-      context,
-    );
+    const headerText = this.styleText(`${headerIcon}Affected Files`, "bold", context);
     result.push(headerText);
 
     // Separator
@@ -44,22 +38,12 @@ export class CodeQualityFilesWidgetRenderer extends BaseWidgetRenderer<
         continue;
       }
 
-      const file =
-        "file" in fileData && typeof fileData.file === "string"
-          ? fileData.file
-          : "";
+      const file = "file" in fileData && typeof fileData.file === "string" ? fileData.file : "";
       const errors =
-        "errors" in fileData && typeof fileData.errors === "number"
-          ? fileData.errors
-          : 0;
+        "errors" in fileData && typeof fileData.errors === "number" ? fileData.errors : 0;
       const warnings =
-        "warnings" in fileData && typeof fileData.warnings === "number"
-          ? fileData.warnings
-          : 0;
-      const total =
-        "total" in fileData && typeof fileData.total === "number"
-          ? fileData.total
-          : 0;
+        "warnings" in fileData && typeof fileData.warnings === "number" ? fileData.warnings : 0;
+      const total = "total" in fileData && typeof fileData.total === "number" ? fileData.total : 0;
 
       if (!file) {
         continue;
@@ -77,9 +61,7 @@ export class CodeQualityFilesWidgetRenderer extends BaseWidgetRenderer<
       }
 
       const countText =
-        parts.length > 0
-          ? parts.join(", ")
-          : `${total} issue${total !== 1 ? "s" : ""}`;
+        parts.length > 0 ? parts.join(", ") : `${total} issue${total !== 1 ? "s" : ""}`;
 
       result.push(`   ${displayPath} (${countText})`);
     }

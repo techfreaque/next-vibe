@@ -32,10 +32,7 @@ export type ChartConfig<
   [K in keyof TData | string]: {
     label?: React.ReactNode;
     icon?: React.ComponentType;
-  } & (
-    | { color?: string; theme?: never }
-    | { color?: never; theme: Record<ThemeKeys, string> }
-  );
+  } & ({ color?: string; theme?: never } | { color?: never; theme: Record<ThemeKeys, string> });
 };
 
 // Type for chart data points
@@ -59,21 +56,16 @@ interface ChartBasePropsBase {
 
 export type ChartBaseProps = ChartBasePropsBase & StyleType;
 
-interface ChartContainerBasePropsBase<
-  TData extends ChartDataPoint = ChartDataPoint,
-> {
+interface ChartContainerBasePropsBase<TData extends ChartDataPoint = ChartDataPoint> {
   children: ReactNode;
   config: ChartConfig<TData>;
 }
 
-export type ChartContainerBaseProps<
-  TData extends ChartDataPoint = ChartDataPoint,
-> = ChartContainerBasePropsBase<TData> & StyleType;
+export type ChartContainerBaseProps<TData extends ChartDataPoint = ChartDataPoint> =
+  ChartContainerBasePropsBase<TData> & StyleType;
 
 // Explicit interface for ChartContainer props
-interface ChartContainerPropsBase<
-  TData extends ChartDataPoint = ChartDataPoint,
-> {
+interface ChartContainerPropsBase<TData extends ChartDataPoint = ChartDataPoint> {
   config: ChartConfig<TData>;
   children: ReactNode;
 }
@@ -88,9 +80,7 @@ export interface ChartStyleProps {
 }
 
 // Context interface
-export interface ChartContextProps<
-  TData extends ChartDataPoint = ChartDataPoint,
-> {
+export interface ChartContextProps<TData extends ChartDataPoint = ChartDataPoint> {
   config: ChartConfig<TData>;
 }
 
@@ -118,10 +108,7 @@ export function ChartContainer<TData extends ChartDataPoint = ChartDataPoint>({
 }: ChartContainerProps<TData>): React.JSX.Element {
   return (
     <ChartContext.Provider value={{ config }}>
-      <div
-        className={cn("flex aspect-video justify-center text-xs", className)}
-        style={style}
-      >
+      <div className={cn("flex aspect-video justify-center text-xs", className)} style={style}>
         {children}
       </div>
     </ChartContext.Provider>
@@ -157,14 +144,7 @@ export function ChartTooltip({
   }
 
   return (
-    <VictoryTooltipBase
-      text={text}
-      x={x}
-      y={y}
-      active={active}
-      style={style}
-      flyoutStyle={style}
-    />
+    <VictoryTooltipBase text={text} x={x} y={y} active={active} style={style} flyoutStyle={style} />
   );
 }
 
@@ -208,11 +188,7 @@ export function ChartLegendContent({
   ...props
 }: ChartLegendContentProps): React.JSX.Element {
   return (
-    <div
-      className={cn("flex flex-wrap gap-4 text-sm", className)}
-      style={style}
-      {...props}
-    >
+    <div className={cn("flex flex-wrap gap-4 text-sm", className)} style={style} {...props}>
       {children}
     </div>
   );
@@ -223,18 +199,13 @@ export interface ChartProps {
   children?: React.ReactNode;
   width?: number;
   height?: number;
-  padding?:
-    | number
-    | { top?: number; bottom?: number; left?: number; right?: number };
+  padding?: number | { top?: number; bottom?: number; left?: number; right?: number };
   domainPadding?: number | { x?: number; y?: number };
 }
 
 export interface LineProps {
   data?: Array<Record<string, number | string>>;
-  x?:
-    | string
-    | number
-    | ((datum: Record<string, number | string>) => number | string);
+  x?: string | number | ((datum: Record<string, number | string>) => number | string);
   y?: string | number | ((datum: Record<string, number | string>) => number);
   interpolation?:
     | "basis"
@@ -248,9 +219,7 @@ export interface LineProps {
     | "step"
     | "stepAfter"
     | "stepBefore";
-  animate?:
-    | boolean
-    | { duration?: number; onLoad?: Record<string, number | string> };
+  animate?: boolean | { duration?: number; onLoad?: Record<string, number | string> };
   style?: {
     data?: Record<string, number | string>;
     labels?: Record<string, number | string>;
@@ -288,10 +257,7 @@ export interface BarProps {
 
 export interface AreaProps {
   data?: Array<Record<string, number | string>>;
-  x?:
-    | string
-    | number
-    | ((datum: Record<string, number | string>) => number | string);
+  x?: string | number | ((datum: Record<string, number | string>) => number | string);
   y?: string | number | ((datum: Record<string, number | string>) => number);
   y0?: string | number | ((datum: Record<string, number | string>) => number);
   interpolation?:
@@ -306,9 +272,7 @@ export interface AreaProps {
     | "step"
     | "stepAfter"
     | "stepBefore";
-  animate?:
-    | boolean
-    | { duration?: number; onLoad?: Record<string, number | string> };
+  animate?: boolean | { duration?: number; onLoad?: Record<string, number | string> };
   style?: {
     data?: Record<string, number | string>;
     labels?: Record<string, number | string>;
@@ -339,9 +303,7 @@ export interface PieProps {
   padAngle?: number;
   startAngle?: number;
   endAngle?: number;
-  animate?:
-    | boolean
-    | { duration?: number; onLoad?: Record<string, number | string> };
+  animate?: boolean | { duration?: number; onLoad?: Record<string, number | string> };
   style?: {
     data?: Record<string, number | string>;
     labels?: Record<string, number | string>;

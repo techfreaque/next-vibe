@@ -19,16 +19,9 @@ import {
   sql,
 } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import type { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
-import {
-  getDateRangeFromPreset,
-  TimePeriod,
-} from "next-vibe/shared/types/stats-filtering.schema";
+import { getDateRangeFromPreset, TimePeriod } from "next-vibe/shared/types/stats-filtering.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { emailCampaigns, leads } from "@/app/api/[locale]/leads/db";
@@ -52,10 +45,7 @@ import {
   mapSourceFilter,
   mapStatusFilter,
 } from "../enum";
-import type {
-  LeadsStatsRequestOutput,
-  LeadsStatsResponseOutput,
-} from "./definition";
+import type { LeadsStatsRequestOutput, LeadsStatsResponseOutput } from "./definition";
 
 // Constants for metric types to avoid literal strings
 const METRIC_TYPES = {
@@ -140,11 +130,7 @@ export class LeadStatsRepository {
       dateTo = dateRange.to;
 
       // Build where conditions
-      const whereConditions = LeadStatsRepository.buildWhereConditions(
-        data,
-        dateFrom,
-        dateTo,
-      );
+      const whereConditions = LeadStatsRepository.buildWhereConditions(data, dateFrom, dateTo);
 
       // Get all metrics in parallel
       const [
@@ -279,10 +265,7 @@ export class LeadStatsRepository {
     >
   > {
     // Get basic counts
-    const totalLeadsResult = await db
-      .select({ count: count() })
-      .from(leads)
-      .where(whereConditions);
+    const totalLeadsResult = await db.select({ count: count() }).from(leads).where(whereConditions);
 
     const activeLeadsResult = await db
       .select({ count: count() })
@@ -327,10 +310,7 @@ export class LeadStatsRepository {
       .from(leads)
       .where(
         whereConditions
-          ? and(
-              whereConditions,
-              eq(leads.status, LeadStatus.NEWSLETTER_SUBSCRIBER),
-            )
+          ? and(whereConditions, eq(leads.status, LeadStatus.NEWSLETTER_SUBSCRIBER))
           : eq(leads.status, LeadStatus.NEWSLETTER_SUBSCRIBER),
       );
 
@@ -348,10 +328,7 @@ export class LeadStatsRepository {
       .from(leads)
       .where(
         whereConditions
-          ? and(
-              whereConditions,
-              eq(leads.status, LeadStatus.CONSULTATION_BOOKED),
-            )
+          ? and(whereConditions, eq(leads.status, LeadStatus.CONSULTATION_BOOKED))
           : eq(leads.status, LeadStatus.CONSULTATION_BOOKED),
       );
 
@@ -360,10 +337,7 @@ export class LeadStatsRepository {
       .from(leads)
       .where(
         whereConditions
-          ? and(
-              whereConditions,
-              eq(leads.status, LeadStatus.SUBSCRIPTION_CONFIRMED),
-            )
+          ? and(whereConditions, eq(leads.status, LeadStatus.SUBSCRIPTION_CONFIRMED))
           : eq(leads.status, LeadStatus.SUBSCRIPTION_CONFIRMED),
       );
 
@@ -412,8 +386,7 @@ export class LeadStatsRepository {
     };
 
     // Calculate rates
-    const averageEmailsPerLead =
-      totalLeads > 0 ? emailMetrics.totalEmailsSent / totalLeads : 0;
+    const averageEmailsPerLead = totalLeads > 0 ? emailMetrics.totalEmailsSent / totalLeads : 0;
     const averageOpenRate =
       emailMetrics.totalEmailsSent > 0
         ? emailMetrics.totalEmailsOpened / emailMetrics.totalEmailsSent
@@ -424,12 +397,8 @@ export class LeadStatsRepository {
         : 0;
 
     const signedUpLeads = Number(signedUpLeadsResult[0]?.count || 0);
-    const consultationBookedLeads = Number(
-      consultationBookedLeadsResult[0]?.count || 0,
-    );
-    const subscriptionConfirmedLeads = Number(
-      subscriptionConfirmedLeadsResult[0]?.count || 0,
-    );
+    const consultationBookedLeads = Number(consultationBookedLeadsResult[0]?.count || 0);
+    const subscriptionConfirmedLeads = Number(subscriptionConfirmedLeadsResult[0]?.count || 0);
 
     // Fix conversion rate calculation - converted means having convertedAt timestamp
     const actualConvertedLeads = await db
@@ -445,8 +414,7 @@ export class LeadStatsRepository {
 
     const conversionRate = totalLeads > 0 ? actualConverted / totalLeads : 0;
     const signupRate = totalLeads > 0 ? signedUpLeads / totalLeads : 0;
-    const consultationBookingRate =
-      totalLeads > 0 ? consultationBookedLeads / totalLeads : 0;
+    const consultationBookingRate = totalLeads > 0 ? consultationBookedLeads / totalLeads : 0;
     const subscriptionConfirmationRate =
       totalLeads > 0 ? subscriptionConfirmedLeads / totalLeads : 0;
 
@@ -456,10 +424,7 @@ export class LeadStatsRepository {
       .from(leads)
       .where(
         whereConditions
-          ? and(
-              whereConditions,
-              sql`(${leads.emailsOpened} > 0 OR ${leads.emailsClicked} > 0)`,
-            )
+          ? and(whereConditions, sql`(${leads.emailsOpened} > 0 OR ${leads.emailsClicked} > 0)`)
           : sql`(${leads.emailsOpened} > 0 OR ${leads.emailsClicked} > 0)`,
       );
 
@@ -472,9 +437,7 @@ export class LeadStatsRepository {
       activeLeads: Number(activeLeadsResult[0]?.count || 0),
       campaignRunningLeads: Number(campaignRunningLeadsResult[0]?.count || 0),
       websiteUserLeads: Number(websiteUserLeadsResult[0]?.count || 0),
-      newsletterSubscriberLeads: Number(
-        newsletterSubscriberLeadsResult[0]?.count || 0,
-      ),
+      newsletterSubscriberLeads: Number(newsletterSubscriberLeadsResult[0]?.count || 0),
       convertedLeads: actualConverted, // Use the corrected converted count
       signedUpLeads,
       consultationBookedLeads,
@@ -485,46 +448,33 @@ export class LeadStatsRepository {
       totalEmailsSent: emailMetrics.totalEmailsSent,
       totalEmailsOpened: emailMetrics.totalEmailsOpened,
       totalEmailsClicked: emailMetrics.totalEmailsClicked,
-      averageEmailsPerLead:
-        Math.round((averageEmailsPerLead + Number.EPSILON) * 100) / 100,
-      averageOpenRate:
-        Math.round((averageOpenRate + Number.EPSILON) * 100) / 100,
-      averageClickRate:
-        Math.round((averageClickRate + Number.EPSILON) * 100) / 100,
+      averageEmailsPerLead: Math.round((averageEmailsPerLead + Number.EPSILON) * 100) / 100,
+      averageOpenRate: Math.round((averageOpenRate + Number.EPSILON) * 100) / 100,
+      averageClickRate: Math.round((averageClickRate + Number.EPSILON) * 100) / 100,
       leadsWithEmailEngagement: Number(leadsWithEmailEngagement[0]?.count || 0),
       leadsWithoutEmailEngagement,
       averageEmailEngagementScore:
         emailMetrics.totalEmailsSent > 0
           ? Math.round(
-              ((emailMetrics.totalEmailsOpened +
-                emailMetrics.totalEmailsClicked * 2) /
+              ((emailMetrics.totalEmailsOpened + emailMetrics.totalEmailsClicked * 2) /
                 emailMetrics.totalEmailsSent +
                 Number.EPSILON) *
                 100,
             ) / 100
           : 0,
-      totalEmailEngagements:
-        emailMetrics.totalEmailsOpened + emailMetrics.totalEmailsClicked,
+      totalEmailEngagements: emailMetrics.totalEmailsOpened + emailMetrics.totalEmailsClicked,
       conversionRate,
       signupRate,
       consultationBookingRate,
       subscriptionConfirmationRate,
-      leadsByCampaignStage:
-        await LeadStatsRepository.getLeadsByCampaignStage(whereConditions),
-      leadsInActiveCampaigns:
-        await LeadStatsRepository.getLeadsInActiveCampaigns(whereConditions),
-      leadsNotInCampaigns:
-        await LeadStatsRepository.getLeadsNotInCampaigns(whereConditions),
-      leadsByJourneyVariant:
-        await LeadStatsRepository.getLeadsByJourneyVariant(whereConditions),
-      leadsByCountry:
-        await LeadStatsRepository.getLeadsByCountry(whereConditions),
-      leadsByLanguage:
-        await LeadStatsRepository.getLeadsByLanguage(whereConditions),
-      leadsBySource:
-        await LeadStatsRepository.getLeadsBySource(whereConditions),
-      leadsByStatus:
-        await LeadStatsRepository.getLeadsByStatus(whereConditions),
+      leadsByCampaignStage: await LeadStatsRepository.getLeadsByCampaignStage(whereConditions),
+      leadsInActiveCampaigns: await LeadStatsRepository.getLeadsInActiveCampaigns(whereConditions),
+      leadsNotInCampaigns: await LeadStatsRepository.getLeadsNotInCampaigns(whereConditions),
+      leadsByJourneyVariant: await LeadStatsRepository.getLeadsByJourneyVariant(whereConditions),
+      leadsByCountry: await LeadStatsRepository.getLeadsByCountry(whereConditions),
+      leadsByLanguage: await LeadStatsRepository.getLeadsByLanguage(whereConditions),
+      leadsBySource: await LeadStatsRepository.getLeadsBySource(whereConditions),
+      leadsByStatus: await LeadStatsRepository.getLeadsByStatus(whereConditions),
       leadsWithBusinessName: await LeadStatsRepository.getLeadsWithField(
         whereConditions,
         "businessName",
@@ -533,22 +483,11 @@ export class LeadStatsRepository {
         whereConditions,
         "contactName",
       ),
-      leadsWithPhone: await LeadStatsRepository.getLeadsWithField(
-        whereConditions,
-        "phone",
-      ),
-      leadsWithWebsite: await LeadStatsRepository.getLeadsWithField(
-        whereConditions,
-        "website",
-      ),
-      leadsWithNotes: await LeadStatsRepository.getLeadsWithField(
-        whereConditions,
-        "notes",
-      ),
+      leadsWithPhone: await LeadStatsRepository.getLeadsWithField(whereConditions, "phone"),
+      leadsWithWebsite: await LeadStatsRepository.getLeadsWithField(whereConditions, "website"),
+      leadsWithNotes: await LeadStatsRepository.getLeadsWithField(whereConditions, "notes"),
       dataCompletenessRate:
-        await LeadStatsRepository.calculateDataCompletenessRate(
-          whereConditions,
-        ),
+        await LeadStatsRepository.calculateDataCompletenessRate(whereConditions),
       leadsCreatedToday: await LeadStatsRepository.getLeadsCreatedInPeriod(
         whereConditions,
         "today",
@@ -574,17 +513,11 @@ export class LeadStatsRepository {
         "month",
       ),
       averageTimeToConversion:
-        await LeadStatsRepository.calculateAverageTimeToConversion(
-          whereConditions,
-        ),
-      averageTimeToSignup:
-        await LeadStatsRepository.calculateAverageTimeToSignup(whereConditions),
+        await LeadStatsRepository.calculateAverageTimeToConversion(whereConditions),
+      averageTimeToSignup: await LeadStatsRepository.calculateAverageTimeToSignup(whereConditions),
       averageTimeToConsultation:
-        await LeadStatsRepository.calculateAverageTimeToConsultation(
-          whereConditions,
-        ),
-      leadVelocity:
-        await LeadStatsRepository.calculateCurrentLeadVelocity(whereConditions),
+        await LeadStatsRepository.calculateAverageTimeToConsultation(whereConditions),
+      leadVelocity: await LeadStatsRepository.calculateCurrentLeadVelocity(whereConditions),
     };
   }
 
@@ -800,14 +733,11 @@ export class LeadStatsRepository {
             "emailsOpened",
             "emailsClicked",
           ];
-          logger.error(
-            `Error getting historical metric: ${metricNames[index]}`,
-            {
-              error: parseError(result.reason).message,
-              timePeriod,
-              intervalCount: intervals.length,
-            },
-          );
+          logger.error(`Error getting historical metric: ${metricNames[index]}`, {
+            error: parseError(result.reason).message,
+            timePeriod,
+            intervalCount: intervals.length,
+          });
           return emptyIntervalData;
         });
       });
@@ -838,12 +768,11 @@ export class LeadStatsRepository {
         totalLeadsData,
         logger,
       );
-      const subscriptionConfirmationRateData =
-        LeadStatsRepository.calculateRateData(
-          subscriptionConfirmedLeadsData,
-          totalLeadsData,
-          logger,
-        );
+      const subscriptionConfirmationRateData = LeadStatsRepository.calculateRateData(
+        subscriptionConfirmedLeadsData,
+        totalLeadsData,
+        logger,
+      );
 
       return {
         totalLeads: {
@@ -1138,8 +1067,7 @@ export class LeadStatsRepository {
         emailsOpened: lead.emailsOpened || 0,
         emailsClicked: lead.emailsClicked || 0,
         daysSinceCreated: Math.floor(
-          (lead.timestamp.getTime() - lead.createdAt.getTime()) /
-            (1000 * 60 * 60 * 24),
+          (lead.timestamp.getTime() - lead.createdAt.getTime()) / (1000 * 60 * 60 * 24),
         ),
         isConverted: lead.convertedAt !== null,
       },
@@ -1165,9 +1093,7 @@ export class LeadStatsRepository {
       .from(leads)
       .where(whereConditions)
       .groupBy(leads.currentCampaignStage)
-      .orderBy(
-        desc(sql`COUNT(CASE WHEN ${leads.convertedAt} IS NOT NULL THEN 1 END)`),
-      )
+      .orderBy(desc(sql`COUNT(CASE WHEN ${leads.convertedAt} IS NOT NULL THEN 1 END)`))
       .limit(5);
 
     return campaignStats.map((campaign) => {
@@ -1207,9 +1133,7 @@ export class LeadStatsRepository {
       .from(leads)
       .where(whereConditions)
       .groupBy(leads.source)
-      .orderBy(
-        desc(sql`COUNT(CASE WHEN ${leads.convertedAt} IS NOT NULL THEN 1 END)`),
-      )
+      .orderBy(desc(sql`COUNT(CASE WHEN ${leads.convertedAt} IS NOT NULL THEN 1 END)`))
       .limit(5);
 
     return sourceStats.map((source) => {
@@ -1241,10 +1165,7 @@ export class LeadStatsRepository {
       const intervals: Array<{ start: Date; end: Date; label: string }> = [];
 
       // Align the start date to the appropriate boundary for the time period
-      const alignedStart = LeadStatsRepository.alignDateToPeriodStart(
-        dateFrom,
-        timePeriod,
-      );
+      const alignedStart = LeadStatsRepository.alignDateToPeriodStart(dateFrom, timePeriod);
       const current = new Date(alignedStart);
 
       while (current < dateTo) {
@@ -1348,10 +1269,7 @@ export class LeadStatsRepository {
   /**
    * Align a date to the start of the specified time period
    */
-  private static alignDateToPeriodStart(
-    date: Date,
-    timePeriod: TimePeriod,
-  ): Date {
+  private static alignDateToPeriodStart(date: Date, timePeriod: TimePeriod): Date {
     const aligned = new Date(date);
 
     switch (timePeriod) {
@@ -1425,10 +1343,7 @@ export class LeadStatsRepository {
       });
 
       // Build base conditions
-      const baseConditions: SQL[] = [
-        gte(leads.createdAt, dateFrom),
-        lte(leads.createdAt, dateTo),
-      ];
+      const baseConditions: SQL[] = [gte(leads.createdAt, dateFrom), lte(leads.createdAt, dateTo)];
 
       if (whereConditions) {
         baseConditions.push(whereConditions);
@@ -1449,9 +1364,7 @@ export class LeadStatsRepository {
             .from(leads)
             .where(and(...baseConditions))
             .groupBy(sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${leads.createdAt})`)
-            .orderBy(
-              sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${leads.createdAt})`,
-            );
+            .orderBy(sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${leads.createdAt})`);
           break;
         }
 
@@ -1465,9 +1378,7 @@ export class LeadStatsRepository {
             .from(leads)
             .where(and(...baseConditions))
             .groupBy(sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${leads.createdAt})`)
-            .orderBy(
-              sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${leads.createdAt})`,
-            );
+            .orderBy(sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${leads.createdAt})`);
           break;
         }
 
@@ -1486,8 +1397,7 @@ export class LeadStatsRepository {
           activeConditions.push(gte(timestampField, dateFrom));
           activeConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions =
-            LeadStatsRepository.buildNonDateConditions(filters);
+          const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             activeConditions.push(...nonDateConditions);
           }
@@ -1506,16 +1416,13 @@ export class LeadStatsRepository {
 
         case "campaign_running": {
           // For campaign running leads, use campaignStartedAt or updatedAt
-          const campaignRunningConditions: SQL[] = [
-            eq(leads.status, LeadStatus.CAMPAIGN_RUNNING),
-          ];
+          const campaignRunningConditions: SQL[] = [eq(leads.status, LeadStatus.CAMPAIGN_RUNNING)];
 
           const timestampField = sql`COALESCE(${leads.campaignStartedAt}, ${leads.updatedAt})`;
           campaignRunningConditions.push(gte(timestampField, dateFrom));
           campaignRunningConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions =
-            LeadStatsRepository.buildNonDateConditions(filters);
+          const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             campaignRunningConditions.push(...nonDateConditions);
           }
@@ -1542,8 +1449,7 @@ export class LeadStatsRepository {
           ];
 
           // Apply other filters but not the original date range filters
-          const nonDateConditions =
-            LeadStatsRepository.buildNonDateConditions(filters);
+          const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             convertedConditions.push(...nonDateConditions);
           }
@@ -1555,28 +1461,21 @@ export class LeadStatsRepository {
             })
             .from(leads)
             .where(and(...convertedConditions))
-            .groupBy(
-              sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${leads.convertedAt})`,
-            )
-            .orderBy(
-              sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${leads.convertedAt})`,
-            );
+            .groupBy(sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${leads.convertedAt})`)
+            .orderBy(sql`DATE_TRUNC(${sql.raw(dateTrunc)}, ${leads.convertedAt})`);
           break;
         }
 
         case "signed_up": {
           // For signed up leads, use the actual signup timestamp when available
-          const signedUpConditions: SQL[] = [
-            eq(leads.status, LeadStatus.SIGNED_UP),
-          ];
+          const signedUpConditions: SQL[] = [eq(leads.status, LeadStatus.SIGNED_UP)];
 
           // Use signedUpAt if available, otherwise fall back to createdAt for date filtering
           const timestampField = sql`COALESCE(${leads.signedUpAt}, ${leads.createdAt})`;
           signedUpConditions.push(gte(timestampField, dateFrom));
           signedUpConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions =
-            LeadStatsRepository.buildNonDateConditions(filters);
+          const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             signedUpConditions.push(...nonDateConditions);
           }
@@ -1595,16 +1494,13 @@ export class LeadStatsRepository {
 
         case "consultation_booked": {
           // For consultation booked leads, use the actual booking timestamp when available
-          const consultationConditions: SQL[] = [
-            eq(leads.status, LeadStatus.CONSULTATION_BOOKED),
-          ];
+          const consultationConditions: SQL[] = [eq(leads.status, LeadStatus.CONSULTATION_BOOKED)];
 
           const timestampField = sql`COALESCE(${leads.consultationBookedAt}, ${leads.createdAt})`;
           consultationConditions.push(gte(timestampField, dateFrom));
           consultationConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions =
-            LeadStatsRepository.buildNonDateConditions(filters);
+          const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             consultationConditions.push(...nonDateConditions);
           }
@@ -1631,8 +1527,7 @@ export class LeadStatsRepository {
           subscriptionConditions.push(gte(timestampField, dateFrom));
           subscriptionConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions =
-            LeadStatsRepository.buildNonDateConditions(filters);
+          const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             subscriptionConditions.push(...nonDateConditions);
           }
@@ -1651,16 +1546,13 @@ export class LeadStatsRepository {
 
         case "unsubscribed": {
           // For unsubscribed leads, use the actual unsubscribe timestamp when available
-          const unsubscribedConditions: SQL[] = [
-            eq(leads.status, LeadStatus.UNSUBSCRIBED),
-          ];
+          const unsubscribedConditions: SQL[] = [eq(leads.status, LeadStatus.UNSUBSCRIBED)];
 
           const timestampField = sql`COALESCE(${leads.unsubscribedAt}, ${leads.createdAt})`;
           unsubscribedConditions.push(gte(timestampField, dateFrom));
           unsubscribedConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions =
-            LeadStatsRepository.buildNonDateConditions(filters);
+          const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             unsubscribedConditions.push(...nonDateConditions);
           }
@@ -1679,16 +1571,13 @@ export class LeadStatsRepository {
 
         case "bounced": {
           // For bounced leads, use the actual bounce timestamp when available
-          const bouncedConditions: SQL[] = [
-            eq(leads.status, LeadStatus.BOUNCED),
-          ];
+          const bouncedConditions: SQL[] = [eq(leads.status, LeadStatus.BOUNCED)];
 
           const timestampField = sql`COALESCE(${leads.bouncedAt}, ${leads.createdAt})`;
           bouncedConditions.push(gte(timestampField, dateFrom));
           bouncedConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions =
-            LeadStatsRepository.buildNonDateConditions(filters);
+          const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             bouncedConditions.push(...nonDateConditions);
           }
@@ -1707,16 +1596,13 @@ export class LeadStatsRepository {
 
         case "invalid": {
           // For invalid leads, use the actual invalid timestamp when available
-          const invalidConditions: SQL[] = [
-            eq(leads.status, LeadStatus.INVALID),
-          ];
+          const invalidConditions: SQL[] = [eq(leads.status, LeadStatus.INVALID)];
 
           const timestampField = sql`COALESCE(${leads.invalidAt}, ${leads.createdAt})`;
           invalidConditions.push(gte(timestampField, dateFrom));
           invalidConditions.push(lte(timestampField, dateTo));
 
-          const nonDateConditions =
-            LeadStatsRepository.buildNonDateConditions(filters);
+          const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             invalidConditions.push(...nonDateConditions);
           }
@@ -1743,8 +1629,7 @@ export class LeadStatsRepository {
           emailsSentConditions.push(lte(timestampField, dateTo));
           emailsSentConditions.push(sql`${leads.emailsSent} > 0`); // Only include leads that have sent emails
 
-          const nonDateConditions =
-            LeadStatsRepository.buildNonDateConditions(filters);
+          const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             emailsSentConditions.push(...nonDateConditions);
           }
@@ -1771,8 +1656,7 @@ export class LeadStatsRepository {
           emailsOpenedConditions.push(lte(timestampField, dateTo));
           emailsOpenedConditions.push(sql`${leads.emailsOpened} > 0`); // Only include leads that have opened emails
 
-          const nonDateConditions =
-            LeadStatsRepository.buildNonDateConditions(filters);
+          const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             emailsOpenedConditions.push(...nonDateConditions);
           }
@@ -1799,8 +1683,7 @@ export class LeadStatsRepository {
           emailsClickedConditions.push(lte(timestampField, dateTo));
           emailsClickedConditions.push(sql`${leads.emailsClicked} > 0`); // Only include leads that have clicked emails
 
-          const nonDateConditions =
-            LeadStatsRepository.buildNonDateConditions(filters);
+          const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
           if (nonDateConditions.length > 0) {
             emailsClickedConditions.push(...nonDateConditions);
           }
@@ -1898,8 +1781,7 @@ export class LeadStatsRepository {
       const nonDateConditions: SQL[] = [];
 
       // Extract non-date conditions from whereConditions
-      const extractedConditions =
-        LeadStatsRepository.buildNonDateConditions(filters);
+      const extractedConditions = LeadStatsRepository.buildNonDateConditions(filters);
       if (extractedConditions.length > 0) {
         nonDateConditions.push(...extractedConditions);
       }
@@ -1964,9 +1846,7 @@ export class LeadStatsRepository {
    * This is needed when we use different timestamp fields for filtering
    * We need to rebuild the conditions without the date range filters
    */
-  private static buildNonDateConditions(
-    filters: LeadsStatsRequestOutput,
-  ): SQL[] {
+  private static buildNonDateConditions(filters: LeadsStatsRequestOutput): SQL[] {
     const conditions: SQL[] = [];
 
     // Add status filter if specified (single value, not array)
@@ -2024,13 +1904,9 @@ export class LeadStatsRepository {
 
     // Add engagement filters
     if (filters.hasEngagement === true) {
-      conditions.push(
-        sql`${leads.emailsOpened} > 0 OR ${leads.emailsClicked} > 0`,
-      );
+      conditions.push(sql`${leads.emailsOpened} > 0 OR ${leads.emailsClicked} > 0`);
     } else if (filters.hasEngagement === false) {
-      conditions.push(
-        sql`${leads.emailsOpened} = 0 AND ${leads.emailsClicked} = 0`,
-      );
+      conditions.push(sql`${leads.emailsOpened} = 0 AND ${leads.emailsClicked} = 0`);
     }
 
     // Add conversion filters
@@ -2209,9 +2085,7 @@ export class LeadStatsRepository {
   /**
    * Get color for lead status
    */
-  private static getStatusColor(
-    status: (typeof LeadStatus)[keyof typeof LeadStatus],
-  ): string {
+  private static getStatusColor(status: (typeof LeadStatus)[keyof typeof LeadStatus]): string {
     switch (status) {
       case LeadStatus.NEW:
         return "#3b82f6";
@@ -2247,10 +2121,7 @@ export class LeadStatsRepository {
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byStatus"]> {
     // Get total count for percentage calculation
-    const totalCountResult = await db
-      .select({ count: count() })
-      .from(leads)
-      .where(whereConditions);
+    const totalCountResult = await db.select({ count: count() }).from(leads).where(whereConditions);
 
     const totalCount = Number(totalCountResult[0]?.count || 0);
 
@@ -2279,10 +2150,7 @@ export class LeadStatsRepository {
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["bySource"]> {
     // Get total count for percentage calculation
-    const totalCountResult = await db
-      .select({ count: count() })
-      .from(leads)
-      .where(whereConditions);
+    const totalCountResult = await db.select({ count: count() }).from(leads).where(whereConditions);
 
     const totalCount = Number(totalCountResult[0]?.count || 0);
 
@@ -2312,10 +2180,7 @@ export class LeadStatsRepository {
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byCountry"]> {
     // Get total count for percentage calculation
-    const totalCountResult = await db
-      .select({ count: count() })
-      .from(leads)
-      .where(whereConditions);
+    const totalCountResult = await db.select({ count: count() }).from(leads).where(whereConditions);
 
     const totalCount = Number(totalCountResult[0]?.count || 0);
 
@@ -2345,10 +2210,7 @@ export class LeadStatsRepository {
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byLanguage"]> {
     // Get total count for percentage calculation
-    const totalCountResult = await db
-      .select({ count: count() })
-      .from(leads)
-      .where(whereConditions);
+    const totalCountResult = await db.select({ count: count() }).from(leads).where(whereConditions);
 
     const totalCount = Number(totalCountResult[0]?.count || 0);
 
@@ -2378,10 +2240,7 @@ export class LeadStatsRepository {
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byCampaignStage"]> {
     // Get total count for percentage calculation
-    const totalCountResult = await db
-      .select({ count: count() })
-      .from(leads)
-      .where(whereConditions);
+    const totalCountResult = await db.select({ count: count() }).from(leads).where(whereConditions);
 
     const totalCount = Number(totalCountResult[0]?.count || 0);
 
@@ -2431,8 +2290,7 @@ export class LeadStatsRepository {
       engagementConditions.push(lte(timestampField, dateTo));
       engagementConditions.push(sql`${leads.emailsSent} > 0`); // Only include leads with email activity
 
-      const nonDateConditions =
-        LeadStatsRepository.buildNonDateConditions(filters);
+      const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
       if (nonDateConditions.length > 0) {
         engagementConditions.push(...nonDateConditions);
       }
@@ -2520,8 +2378,7 @@ export class LeadStatsRepository {
         )`,
       ];
 
-      const nonDateConditions =
-        LeadStatsRepository.buildNonDateConditions(filters);
+      const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
       if (nonDateConditions.length > 0) {
         velocityConditions.push(...nonDateConditions);
       }
@@ -2611,14 +2468,10 @@ export class LeadStatsRepository {
       const dateTo = intervals[intervals.length - 1].end;
       const dateTrunc = LeadStatsRepository.getDateTruncString(timePeriod);
 
-      const baseConditions: SQL[] = [
-        gte(leads.createdAt, dateFrom),
-        lte(leads.createdAt, dateTo),
-      ];
+      const baseConditions: SQL[] = [gte(leads.createdAt, dateFrom), lte(leads.createdAt, dateTo)];
 
       // Add non-date conditions from filters
-      const nonDateConditions =
-        LeadStatsRepository.buildNonDateConditions(filters);
+      const nonDateConditions = LeadStatsRepository.buildNonDateConditions(filters);
       if (nonDateConditions.length > 0) {
         baseConditions.push(...nonDateConditions);
       }
@@ -2653,8 +2506,7 @@ export class LeadStatsRepository {
         const completeLeads = Number(result.completeLeads || 0);
 
         // Calculate completeness rate as decimal (0-1)
-        const completenessRate =
-          totalLeads > 0 ? completeLeads / totalLeads : 0;
+        const completenessRate = totalLeads > 0 ? completeLeads / totalLeads : 0;
 
         // Ensure rate is within valid bounds
         const clampedRate = Math.max(0, Math.min(completenessRate, 1));
@@ -2859,9 +2711,7 @@ export class LeadStatsRepository {
   /**
    * Get count of leads not in campaigns
    */
-  private static async getLeadsNotInCampaigns(
-    whereConditions: SQL | undefined,
-  ): Promise<number> {
+  private static async getLeadsNotInCampaigns(whereConditions: SQL | undefined): Promise<number> {
     const result = await db
       .select({
         count: count(),
@@ -3083,10 +2933,7 @@ export class LeadStatsRepository {
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byJourneyVariant"]> {
     // Get total count for percentage calculation
-    const totalCountResult = await db
-      .select({ count: count() })
-      .from(leads)
-      .where(whereConditions);
+    const totalCountResult = await db.select({ count: count() }).from(leads).where(whereConditions);
 
     const totalCount = Number(totalCountResult[0]?.count || 0);
 
@@ -3118,10 +2965,7 @@ export class LeadStatsRepository {
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byEngagementLevel"]> {
     // Get total count for percentage calculation
-    const totalCountResult = await db
-      .select({ count: count() })
-      .from(leads)
-      .where(whereConditions);
+    const totalCountResult = await db.select({ count: count() }).from(leads).where(whereConditions);
 
     const totalCount = Number(totalCountResult[0]?.count || 0);
 
@@ -3163,10 +3007,7 @@ export class LeadStatsRepository {
     whereConditions: SQL | undefined,
   ): Promise<LeadsStatsResponseOutput["groupedStats"]["byConversionFunnel"]> {
     // Get total count for percentage calculation
-    const totalCountResult = await db
-      .select({ count: count() })
-      .from(leads)
-      .where(whereConditions);
+    const totalCountResult = await db.select({ count: count() }).from(leads).where(whereConditions);
 
     const totalCount = Number(totalCountResult[0]?.count || 0);
 
@@ -3181,10 +3022,7 @@ export class LeadStatsRepository {
       .groupBy(leads.status);
 
     // Create a map for quick lookup
-    const statusCounts = new Map<
-      (typeof LeadStatus)[keyof typeof LeadStatus],
-      number
-    >();
+    const statusCounts = new Map<(typeof LeadStatus)[keyof typeof LeadStatus], number>();
     for (const group of statusGroups) {
       statusCounts.set(group.status, Number(group.count));
     }

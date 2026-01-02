@@ -53,9 +53,7 @@ export function ImapConfigurationManagement({
     return (
       <Card>
         <CardContent className="p-6">
-          <Div className="text-center">
-            {t("app.admin.emails.imap.common.loading")}
-          </Div>
+          <Div className="text-center">{t("app.admin.emails.imap.common.loading")}</Div>
         </CardContent>
       </Card>
     );
@@ -78,17 +76,12 @@ export function ImapConfigurationManagement({
       <Card>
         <CardHeader>
           <Div className="flex items-center justify-between">
-            <CardTitle>
-              {t("app.admin.emails.imap.admin.config.settings.title")}
-            </CardTitle>
+            <CardTitle>{t("app.admin.emails.imap.admin.config.settings.title")}</CardTitle>
             <Div className="flex flex-row gap-2">
               <Button variant="outline" onClick={configEndpoint.read.refetch}>
                 {t("app.admin.emails.imap.common.refresh")}
               </Button>
-              <Button
-                variant="outline"
-                onClick={configEndpoint.read.clearSavedForm}
-              >
+              <Button variant="outline" onClick={configEndpoint.read.clearSavedForm}>
                 {t("app.admin.emails.imap.common.reset")}
               </Button>
             </Div>
@@ -104,12 +97,8 @@ export function ImapConfigurationManagement({
 
             <Tabs defaultValue="server">
               <TabsList className="grid w-full grid-cols-6">
-                <TabsTrigger value="server">
-                  {t("app.admin.emails.imap.nav.config")}
-                </TabsTrigger>
-                <TabsTrigger value="sync">
-                  {t("app.admin.emails.imap.nav.sync")}
-                </TabsTrigger>
+                <TabsTrigger value="server">{t("app.admin.emails.imap.nav.config")}</TabsTrigger>
+                <TabsTrigger value="sync">{t("app.admin.emails.imap.nav.sync")}</TabsTrigger>
                 <TabsTrigger value="performance">
                   {t("app.admin.emails.imap.common.performance")}
                 </TabsTrigger>
@@ -219,9 +208,7 @@ export function ImapConfigurationManagement({
                 <Card>
                   <CardHeader>
                     <CardTitle>
-                      {t(
-                        "app.admin.emails.imap.admin.config.development.title",
-                      )}
+                      {t("app.admin.emails.imap.admin.config.development.title")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -246,17 +233,10 @@ export function ImapConfigurationManagement({
 
             {/* Form Actions */}
             <Div className="flex justify-end flex-row gap-4 pt-6 border-t">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={configEndpoint.read.refetch}
-              >
+              <Button type="button" variant="outline" onClick={configEndpoint.read.refetch}>
                 {t("app.admin.emails.imap.common.reset")}
               </Button>
-              <Button
-                type="submit"
-                disabled={configEndpoint.create.isSubmitting}
-              >
+              <Button type="submit" disabled={configEndpoint.create.isSubmitting}>
                 {configEndpoint.create.isSubmitting
                   ? t("app.admin.emails.imap.common.saving")
                   : t("app.admin.emails.imap.common.save")}
@@ -269,10 +249,7 @@ export function ImapConfigurationManagement({
       {/* Configuration Status */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            {" "}
-            {t("app.admin.emails.imap.admin.config.status.title")}
-          </CardTitle>
+          <CardTitle> {t("app.admin.emails.imap.admin.config.status.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -4,17 +4,11 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type {
-  BrowserRequestOutput,
-  BrowserResponseOutput,
-} from "../definition";
+import type { BrowserRequestOutput, BrowserResponseOutput } from "../definition";
 import type { BrowserTool } from "../enum";
 import { browserRepository } from "../repository";
 
@@ -42,9 +36,9 @@ export interface MCPToolParams {
 /**
  * Filter undefined values from args object
  */
-export function filterUndefinedArgs<
-  T extends Record<string, MCPArgValue | undefined>,
->(args: T): Record<string, MCPArgValue> {
+export function filterUndefinedArgs<T extends Record<string, MCPArgValue | undefined>>(
+  args: T,
+): Record<string, MCPArgValue> {
   const filtered: Record<string, MCPArgValue> = {};
   for (const [key, value] of Object.entries(args)) {
     if (value !== undefined) {

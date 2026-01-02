@@ -30,27 +30,16 @@ import { LeadSource, LeadStatus } from "../../leads/enum";
 import { db } from "../../system/db";
 import { type AuthContext } from "../../system/unified-interface/shared/server-only/auth/base-auth-handler";
 import { getPlatformAuthHandler } from "../../system/unified-interface/shared/server-only/auth/factory";
-import {
-  isCliPlatform,
-  Platform,
-} from "../../system/unified-interface/shared/types/platform";
+import { isCliPlatform, Platform } from "../../system/unified-interface/shared/types/platform";
 import { users } from "../db";
 import { UserDetailLevel } from "../enum";
 import { SessionRepository } from "../private/session/repository";
 import { UserRepository } from "../repository";
 import type { CompleteUserType } from "../types";
 import type { UserRoleValue } from "../user-roles/enum";
-import {
-  filterUserPermissionRoles,
-  UserPermissionRole,
-  UserRole,
-} from "../user-roles/enum";
+import { filterUserPermissionRoles, UserPermissionRole, UserRole } from "../user-roles/enum";
 import { UserRolesRepository } from "../user-roles/repository";
-import type {
-  JwtPayloadType,
-  JwtPrivatePayloadType,
-  JWTPublicPayloadType,
-} from "./types";
+import type { JwtPayloadType, JwtPrivatePayloadType, JWTPublicPayloadType } from "./types";
 
 export type InferUserType<TRoles extends readonly UserRoleValue[]> =
   Exclude<TRoles[number], "PUBLIC"> extends never
@@ -155,11 +144,7 @@ export class AuthRepository {
     platform?: Platform,
   ): Promise<{ leadId: string | null; shouldUpdateCookie: boolean }> {
     if (userId) {
-      const leadId = await AuthRepository.getLeadIdForUser(
-        userId,
-        locale,
-        logger,
-      );
+      const leadId = await AuthRepository.getLeadIdForUser(userId, locale, logger);
       return { leadId, shouldUpdateCookie: false };
     }
 
@@ -172,43 +157,31 @@ export class AuthRepository {
 
     // Use LeadAuthRepository to validate and reuse existing leadId
     if (existingLeadId) {
-      const isValid = await LeadAuthRepository.validateLeadId(
-        existingLeadId,
-        logger,
-      );
+      const isValid = await LeadAuthRepository.validateLeadId(existingLeadId, logger);
       if (isValid) {
         logger.debug("Reusing existing leadId from cookie for public user", {
           leadId: existingLeadId,
         });
         return { leadId: existingLeadId, shouldUpdateCookie: false };
       }
-      logger.warn(
-        "Invalid leadId in cookie (possibly after DB reset), creating new one",
-        {
-          invalidLeadId: existingLeadId,
-          platform,
-        },
-      );
+      logger.warn("Invalid leadId in cookie (possibly after DB reset), creating new one", {
+        invalidLeadId: existingLeadId,
+        platform,
+      });
     }
 
     // For page context, don't create new leads - return null and let middleware handle it
     // Pages can't set cookies, so creating a lead here would be wasted
     if (platform === Platform.NEXT_PAGE) {
-      logger.debug(
-        "Skipping lead creation in page context (middleware will handle)",
-        {
-          platform,
-        },
-      );
+      logger.debug("Skipping lead creation in page context (middleware will handle)", {
+        platform,
+      });
       // Return the invalid leadId temporarily - middleware will fix it on next request
       return { leadId: existingLeadId || null, shouldUpdateCookie: false };
     }
 
     // No valid leadId in cookie, create a new one and flag that cookie needs update
-    const newLeadId = await AuthRepository.getLeadIdForPublicUser(
-      locale,
-      logger,
-    );
+    const newLeadId = await AuthRepository.getLeadIdForPublicUser(locale, logger);
     logger.info("Created new lead for public user, cookie will be updated", {
       leadId: newLeadId,
       platform,
@@ -276,32 +249,19 @@ export class AuthRepository {
         return null;
       }
 
-      const { leadId } = await AuthRepository.getLeadIdFromDb(
-        userId,
-        locale,
-        logger,
-        undefined,
-      );
+      const { leadId } = await AuthRepository.getLeadIdFromDb(userId, locale, logger, undefined);
       if (!leadId) {
         logger.error("Failed to get or create lead for user", { userId });
         return null;
       }
 
       // Fetch user roles
-      const userRolesResponse = await UserRolesRepository.findByUserId(
-        userId,
-        logger,
-      );
-      const roles = userRolesResponse.success
-        ? userRolesResponse.data.map((r) => r.role)
-        : [];
+      const userRolesResponse = await UserRolesRepository.findByUserId(userId, logger);
+      const roles = userRolesResponse.success ? userRolesResponse.data.map((r) => r.role) : [];
 
       return { isPublic: false, id: userId, leadId, roles };
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorValidatingUserSession",
-        parseError(error),
-      );
+      logger.error("app.api.user.auth.debug.errorValidatingUserSession", parseError(error));
       return null;
     }
   }
@@ -327,10 +287,7 @@ export class AuthRepository {
       }
 
       // Check for other roles in database (e.g., ADMIN, MODERATOR)
-      const userRolesResponse = await UserRolesRepository.findByUserId(
-        userId,
-        logger,
-      );
+      const userRolesResponse = await UserRolesRepository.findByUserId(userId, logger);
       if (userRolesResponse.success) {
         const dbRoles = userRolesResponse.data
           .map((r) => r.role)
@@ -357,22 +314,16 @@ export class AuthRepository {
       // Only return PUBLIC role if user has no other roles
       // (This shouldn't happen for authenticated users, but handle gracefully)
       if (requiredRoles.includes(UserRole.PUBLIC)) {
-        logger.debug(
-          "User has no roles in database, returning PUBLIC as fallback",
-          {
-            userId,
-            requiredRoles: [...requiredRoles] as string[],
-          },
-        );
+        logger.debug("User has no roles in database, returning PUBLIC as fallback", {
+          userId,
+          requiredRoles: [...requiredRoles] as string[],
+        });
         return [UserRole.PUBLIC];
       }
 
       return roles;
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorGettingUserRoles",
-        parseError(error),
-      );
+      logger.error("app.api.user.auth.debug.errorGettingUserRoles", parseError(error));
       return [];
     }
   }
@@ -405,10 +356,7 @@ export class AuthRepository {
       // Create new lead if none exists
       return await AuthRepository.createLeadForUser(userId, locale, logger);
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorGettingLeadId",
-        parseError(error),
-      );
+      logger.error("app.api.user.auth.debug.errorGettingLeadId", parseError(error));
       // Try to create lead as fallback
       return await AuthRepository.createLeadForUser(userId, locale, logger);
     }
@@ -515,10 +463,7 @@ export class AuthRepository {
       logger.debug("Created public lead", { leadId: newLead.id });
       return newLead.id;
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorGettingPublicLeadId",
-        parseError(error),
-      );
+      logger.error("app.api.user.auth.debug.errorGettingPublicLeadId", parseError(error));
       throwErrorResponse(
         "app.api.user.auth.errors.failed_to_create_lead",
         ErrorResponseTypes.INTERNAL_ERROR,
@@ -534,9 +479,7 @@ export class AuthRepository {
    * @param logger - Logger for debugging
    * @returns Authenticated user or public user
    */
-  private static async getAuthenticatedUserInternal<
-    TRoles extends readonly UserRoleValue[],
-  >(
+  private static async getAuthenticatedUserInternal<TRoles extends readonly UserRoleValue[]>(
     userId: string,
     leadId: string,
     requiredRoles: TRoles,
@@ -555,11 +498,7 @@ export class AuthRepository {
           originalRoles: [...requiredRoles] as string[],
         },
       );
-      const userRoles = await AuthRepository.getUserRolesInternal(
-        userId,
-        requiredRoles,
-        logger,
-      );
+      const userRoles = await AuthRepository.getUserRolesInternal(userId, requiredRoles, logger);
       return createPrivateUser(
         userId,
         leadId,
@@ -569,28 +508,20 @@ export class AuthRepository {
 
     // Check if endpoint only allows PUBLIC role (no authenticated users allowed)
     const onlyPublicAllowed =
-      permissionRoles.length === 1 &&
-      permissionRoles.includes(UserPermissionRole.PUBLIC);
+      permissionRoles.length === 1 && permissionRoles.includes(UserPermissionRole.PUBLIC);
 
     if (onlyPublicAllowed) {
       // Endpoint only allows public users - authenticated users should not access this
-      logger.debug(
-        "Endpoint only allows PUBLIC role, rejecting authenticated user",
-        {
-          userId,
-          leadId,
-          requiredRoles: [...permissionRoles] as string[],
-        },
-      );
+      logger.debug("Endpoint only allows PUBLIC role, rejecting authenticated user", {
+        userId,
+        leadId,
+        requiredRoles: [...permissionRoles] as string[],
+      });
       return createPublicUser<TRoles>(leadId);
     }
 
     // Get user roles from database
-    const userRoles = await AuthRepository.getUserRolesInternal(
-      userId,
-      requiredRoles,
-      logger,
-    );
+    const userRoles = await AuthRepository.getUserRolesInternal(userId, requiredRoles, logger);
 
     // Customer role is allowed for any authenticated user
     if (permissionRoles.includes(UserPermissionRole.CUSTOMER)) {
@@ -603,10 +534,7 @@ export class AuthRepository {
 
     // For other roles (ADMIN, etc.), check the user's roles
     try {
-      const userRolesResponse = await UserRolesRepository.findByUserId(
-        userId,
-        logger,
-      );
+      const userRolesResponse = await UserRolesRepository.findByUserId(userId, logger);
       if (!userRolesResponse.success) {
         // If we can't get user roles, but the user is authenticated,
         // treat them as a CUSTOMER (all authenticated users have CUSTOMER role)
@@ -633,8 +561,7 @@ export class AuthRepository {
         }
         // Otherwise, user doesn't have required roles
         logger.warn("User does not have required permission roles", {
-          translationKey:
-            "app.api.user.auth.debug.userDoesNotHaveRequiredRoles",
+          translationKey: "app.api.user.auth.debug.userDoesNotHaveRequiredRoles",
           userId,
           leadId,
           requiredRoles: permissionRoles.join(", "),
@@ -731,10 +658,7 @@ export class AuthRepository {
       });
       return success(token);
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorSigningJwt",
-        parseError(error),
-      );
+      logger.error("app.api.user.auth.debug.errorSigningJwt", parseError(error));
       return fail({
         message: "app.api.user.auth.errors.jwt_signing_failed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -755,10 +679,7 @@ export class AuthRepository {
       logger.debug("app.api.user.auth.debug.verifyingJwt");
 
       // Verify the token
-      const { payload } = await jwtVerify<JwtPrivatePayloadType>(
-        token,
-        SECRET_KEY,
-      );
+      const { payload } = await jwtVerify<JwtPrivatePayloadType>(token, SECRET_KEY);
 
       // Validate the payload structure
       if (!payload.id || typeof payload.id !== "string") {
@@ -836,28 +757,19 @@ export class AuthRepository {
           const cliEmail = cliEnv.VIBE_CLI_USER_EMAIL;
           if (cliEmail) {
             logger.debug("Attempting CLI email authentication");
-            return await AuthRepository.authenticateUserByEmail(
-              cliEmail,
-              context.locale,
-              logger,
-            );
+            return await AuthRepository.authenticateUserByEmail(cliEmail, context.locale, logger);
           }
         }
 
         // Fall back to public user
-        const { leadId, shouldUpdateCookie } =
-          await AuthRepository.getLeadIdFromDb(
-            undefined,
-            context.locale,
-            logger,
-            context.platform,
-          );
+        const { leadId, shouldUpdateCookie } = await AuthRepository.getLeadIdFromDb(
+          undefined,
+          context.locale,
+          logger,
+          context.platform,
+        );
         if (shouldUpdateCookie && leadId) {
-          await AuthRepository.updateLeadIdCookieIfPossible(
-            leadId,
-            context.platform,
-            logger,
-          );
+          await AuthRepository.updateLeadIdCookieIfPossible(leadId, context.platform, logger);
         }
         return success(createPublicUser(leadId || ""));
       }
@@ -865,33 +777,23 @@ export class AuthRepository {
       // Verify token
       const verifyResult = await AuthRepository.verifyJwt(token, logger);
       if (!verifyResult.success) {
-        logger.debug(
-          "Token verification failed - returning public user without clearing cookies",
-        );
+        logger.debug("Token verification failed - returning public user without clearing cookies");
         // NEVER clear cookies on verification failure
         // Let tokens expire naturally to prevent losing sessions on temporary issues
-        const { leadId, shouldUpdateCookie } =
-          await AuthRepository.getLeadIdFromDb(
-            undefined,
-            context.locale,
-            logger,
-            context.platform,
-          );
+        const { leadId, shouldUpdateCookie } = await AuthRepository.getLeadIdFromDb(
+          undefined,
+          context.locale,
+          logger,
+          context.platform,
+        );
         if (shouldUpdateCookie && leadId) {
-          await AuthRepository.updateLeadIdCookieIfPossible(
-            leadId,
-            context.platform,
-            logger,
-          );
+          await AuthRepository.updateLeadIdCookieIfPossible(leadId, context.platform, logger);
         }
         return success(createPublicUser(leadId || ""));
       }
 
       // For Next.js platforms (both page and API), validate session against database
-      if (
-        context.platform === Platform.NEXT_PAGE ||
-        context.platform === Platform.NEXT_API
-      ) {
+      if (context.platform === Platform.NEXT_PAGE || context.platform === Platform.NEXT_API) {
         const sessionValid = await AuthRepository.validateWebSession(
           token,
           verifyResult.data.id,
@@ -903,19 +805,14 @@ export class AuthRepository {
           );
           // NEVER clear cookies on session validation failure
           // Let tokens expire naturally to prevent losing sessions on DB resets
-          const { leadId, shouldUpdateCookie } =
-            await AuthRepository.getLeadIdFromDb(
-              undefined,
-              context.locale,
-              logger,
-              context.platform,
-            );
+          const { leadId, shouldUpdateCookie } = await AuthRepository.getLeadIdFromDb(
+            undefined,
+            context.locale,
+            logger,
+            context.platform,
+          );
           if (shouldUpdateCookie && leadId) {
-            await AuthRepository.updateLeadIdCookieIfPossible(
-              leadId,
-              context.platform,
-              logger,
-            );
+            await AuthRepository.updateLeadIdCookieIfPossible(leadId, context.platform, logger);
           }
           return success(createPublicUser(leadId || ""));
         }
@@ -947,19 +844,14 @@ export class AuthRepository {
       return success(payload);
     } catch (error) {
       logger.error("Authentication failed", parseError(error));
-      const { leadId, shouldUpdateCookie } =
-        await AuthRepository.getLeadIdFromDb(
-          undefined,
-          context.locale,
-          logger,
-          context.platform,
-        );
+      const { leadId, shouldUpdateCookie } = await AuthRepository.getLeadIdFromDb(
+        undefined,
+        context.locale,
+        logger,
+        context.platform,
+      );
       if (shouldUpdateCookie && leadId) {
-        await AuthRepository.updateLeadIdCookieIfPossible(
-          leadId,
-          context.platform,
-          logger,
-        );
+        await AuthRepository.updateLeadIdCookieIfPossible(leadId, context.platform, logger);
       }
       return success(createPublicUser(leadId || ""));
     }
@@ -1036,13 +928,12 @@ export class AuthRepository {
           platform: context.platform,
           error: authResult.message,
         });
-        const { leadId, shouldUpdateCookie } =
-          await AuthRepository.getLeadIdFromDb(
-            undefined,
-            context.locale,
-            logger,
-            context.platform,
-          );
+        const { leadId, shouldUpdateCookie } = await AuthRepository.getLeadIdFromDb(
+          undefined,
+          context.locale,
+          logger,
+          context.platform,
+        );
         if (!leadId) {
           logger.error("Failed to get lead ID for public user");
           return throwErrorResponse(
@@ -1051,11 +942,7 @@ export class AuthRepository {
           );
         }
         if (shouldUpdateCookie) {
-          await AuthRepository.updateLeadIdCookieIfPossible(
-            leadId,
-            context.platform,
-            logger,
-          );
+          await AuthRepository.updateLeadIdCookieIfPossible(leadId, context.platform, logger);
         }
         return createPublicUser<TRoles>(leadId);
       }
@@ -1084,17 +971,13 @@ export class AuthRepository {
         logger,
       );
     } catch (error) {
-      logger.debug(
-        "app.api.user.auth.debug.errorInUnifiedGetAuthMinimalUser",
-        parseError(error),
+      logger.debug("app.api.user.auth.debug.errorInUnifiedGetAuthMinimalUser", parseError(error));
+      const { leadId, shouldUpdateCookie } = await AuthRepository.getLeadIdFromDb(
+        undefined,
+        context.locale,
+        logger,
+        context.platform,
       );
-      const { leadId, shouldUpdateCookie } =
-        await AuthRepository.getLeadIdFromDb(
-          undefined,
-          context.locale,
-          logger,
-          context.platform,
-        );
       if (!leadId) {
         logger.error("Failed to get lead ID for public user");
         return throwErrorResponse(
@@ -1103,11 +986,7 @@ export class AuthRepository {
         );
       }
       if (shouldUpdateCookie) {
-        await AuthRepository.updateLeadIdCookieIfPossible(
-          leadId,
-          context.platform,
-          logger,
-        );
+        await AuthRepository.updateLeadIdCookieIfPossible(leadId, context.platform, logger);
       }
       return createPublicUser<TRoles>(leadId);
     }
@@ -1122,9 +1001,7 @@ export class AuthRepository {
    * @param logger - Logger for debugging
    * @returns Authenticated user
    */
-  private static async authenticateWithPayload<
-    TRoles extends readonly UserRoleValue[],
-  >(
+  private static async authenticateWithPayload<TRoles extends readonly UserRoleValue[]>(
     jwtPayload: JwtPrivatePayloadType,
     roles: TRoles,
     locale: CountryLanguage,
@@ -1159,21 +1036,13 @@ export class AuthRepository {
       }
 
       // Use internal method to check authentication with roles
-      return await AuthRepository.getAuthenticatedUserInternal(
-        userId,
-        leadId,
-        roles,
-        logger,
-      );
+      return await AuthRepository.getAuthenticatedUserInternal(userId, leadId, roles, logger);
     } catch (error) {
       logger.error(
         "app.api.user.auth.debug.errorAuthenticatingCliUserWithPayload",
         parseError(error),
       );
-      const leadId = await AuthRepository.getLeadIdForPublicUser(
-        locale,
-        logger,
-      );
+      const leadId = await AuthRepository.getLeadIdForPublicUser(locale, logger);
       if (!leadId) {
         // Try to use leadId from payload as last resort
         if (jwtPayload.leadId) {
@@ -1182,9 +1051,7 @@ export class AuthRepository {
           });
           return createPublicUser<TRoles>(jwtPayload.leadId);
         }
-        logger.error(
-          "Failed to create public lead and no payload leadId available",
-        );
+        logger.error("Failed to create public lead and no payload leadId available");
         return throwErrorResponse(
           "app.api.user.auth.errors.session_retrieval_failed",
           ErrorResponseTypes.INTERNAL_ERROR,
@@ -1204,11 +1071,7 @@ export class AuthRepository {
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles> | null> {
     // Don't spread roles - preserve readonly tuple type for proper type inference
-    const user = await AuthRepository.getAuthMinimalUser(
-      roles,
-      context,
-      logger,
-    );
+    const user = await AuthRepository.getAuthMinimalUser(roles, context, logger);
     return user as InferUserType<TRoles> | null;
   }
 
@@ -1229,27 +1092,16 @@ export class AuthRepository {
       }
 
       // Get user using platform handler
-      const user = await AuthRepository.getAuthMinimalUser(
-        requiredRoles,
-        context,
-        logger,
-      );
+      const user = await AuthRepository.getAuthMinimalUser(requiredRoles, context, logger);
 
       // Return roles for authenticated users
       if (user && !user.isPublic) {
-        return await AuthRepository.getUserRolesInternal(
-          user.id,
-          requiredRoles,
-          logger,
-        );
+        return await AuthRepository.getUserRolesInternal(user.id, requiredRoles, logger);
       }
 
       return [];
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorGettingUserRoles",
-        parseError(error),
-      );
+      logger.error("app.api.user.auth.debug.errorGettingUserRoles", parseError(error));
       return [];
     }
   }
@@ -1278,13 +1130,7 @@ export class AuthRepository {
       const handler = getPlatformAuthHandler(platform);
 
       // Delegate to platform handler
-      return await handler.storeAuthToken(
-        token,
-        userId,
-        leadId,
-        logger,
-        rememberMe,
-      );
+      return await handler.storeAuthToken(token, userId, leadId, logger, rememberMe);
     } catch (error) {
       logger.error("Error storing auth token for platform", parseError(error));
       return fail({
@@ -1341,23 +1187,15 @@ export class AuthRepository {
       );
 
       // Fetch user roles from DB to include in JWT
-      const rolesResult = await UserRolesRepository.getUserRoles(
-        userId,
-        logger,
-      );
+      const rolesResult = await UserRolesRepository.getUserRoles(userId, logger);
 
       // Default to CUSTOMER role if roles fetch fails
-      const roles = rolesResult.success
-        ? rolesResult.data
-        : [UserPermissionRole.CUSTOMER];
+      const roles = rolesResult.success ? rolesResult.data : [UserPermissionRole.CUSTOMER];
 
       if (!rolesResult.success) {
-        logger.warn(
-          "Failed to fetch user roles for CLI token, using default CUSTOMER role",
-          {
-            userId,
-          },
-        );
+        logger.warn("Failed to fetch user roles for CLI token, using default CUSTOMER role", {
+          userId,
+        });
       }
 
       const payload: JwtPrivatePayloadType = {
@@ -1369,10 +1207,7 @@ export class AuthRepository {
 
       return await AuthRepository.signJwt(payload, logger);
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorCreatingCliToken",
-        parseError(error),
-      );
+      logger.error("app.api.user.auth.debug.errorCreatingCliToken", parseError(error));
       return fail({
         message: "app.api.user.auth.errors.jwt_signing_failed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -1406,10 +1241,7 @@ export class AuthRepository {
 
       return user;
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorValidatingCliToken",
-        parseError(error),
-      );
+      logger.error("app.api.user.auth.debug.errorValidatingCliToken", parseError(error));
       return null;
     }
   }
@@ -1420,11 +1252,7 @@ export class AuthRepository {
    * @returns The user ID if available, null otherwise
    */
   static extractUserId(payload: JwtPrivatePayloadType): string | null {
-    if (
-      !payload.isPublic &&
-      "id" in payload &&
-      typeof payload.id === "string"
-    ) {
+    if (!payload.isPublic && "id" in payload && typeof payload.id === "string") {
       return payload.id;
     }
     return null;
@@ -1469,19 +1297,13 @@ export class AuthRepository {
     );
 
     if (!userResponse.success) {
-      redirect(
-        `/${locale}/user/login?callbackUrl=${encodeURIComponent(callbackUrl)}`,
-      );
+      redirect(`/${locale}/user/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
     }
 
     const user = userResponse.data;
 
     // Check if user has admin role
-    const hasAdminRole = await UserRolesRepository.hasRole(
-      user.id,
-      UserRole.ADMIN,
-      logger,
-    );
+    const hasAdminRole = await UserRolesRepository.hasRole(user.id, UserRole.ADMIN, logger);
 
     if (!hasAdminRole.success || !hasAdminRole.data) {
       redirect(`/${locale}/`);
@@ -1519,12 +1341,7 @@ export class AuthRepository {
       }
 
       const user = userResult.data;
-      const { leadId } = await AuthRepository.getLeadIdFromDb(
-        user.id,
-        locale,
-        logger,
-        undefined,
-      );
+      const { leadId } = await AuthRepository.getLeadIdFromDb(user.id, locale, logger, undefined);
 
       if (!leadId) {
         logger.error("Failed to get lead ID for user", { userId: user.id });
@@ -1535,10 +1352,7 @@ export class AuthRepository {
       }
 
       // Fetch user roles
-      const userRolesResponse = await UserRolesRepository.findByUserId(
-        user.id,
-        logger,
-      );
+      const userRolesResponse = await UserRolesRepository.findByUserId(user.id, logger);
       const roles = userRolesResponse.success
         ? userRolesResponse.data.map((r) => r.role)
         : [UserPermissionRole.CUSTOMER];
@@ -1562,7 +1376,4 @@ export class AuthRepository {
 }
 
 // Pick + keyof excludes private members automatically
-export type AuthRepositoryType = Pick<
-  typeof AuthRepository,
-  keyof typeof AuthRepository
->;
+export type AuthRepositoryType = Pick<typeof AuthRepository, keyof typeof AuthRepository>;

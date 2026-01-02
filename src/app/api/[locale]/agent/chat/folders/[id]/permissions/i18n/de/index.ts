@@ -3,8 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
     title: "Ordnerberechtigungen abrufen",
-    description:
-      "Die Liste der Moderatoren für einen bestimmten Ordner abrufen",
+    description: "Die Liste der Moderatoren für einen bestimmten Ordner abrufen",
     container: {
       title: "Ordnerberechtigungen",
       description: "Ordnerzugriffsberechtigungen anzeigen und verwalten",
@@ -41,8 +40,7 @@ export const translations: typeof enTranslations = {
       },
       moderatorIds: {
         title: "Moderator-IDs",
-        description:
-          "Liste der Benutzer-IDs, die diesen Ordner moderieren können",
+        description: "Liste der Benutzer-IDs, die diesen Ordner moderieren können",
         content: "Benutzer-ID",
       },
     },
@@ -53,18 +51,15 @@ export const translations: typeof enTranslations = {
       },
       network: {
         title: "Netzwerkfehler",
-        description:
-          "Beim Abrufen der Ordnerberechtigungen ist ein Netzwerkfehler aufgetreten",
+        description: "Beim Abrufen der Ordnerberechtigungen ist ein Netzwerkfehler aufgetreten",
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um Ordnerberechtigungen anzuzeigen",
+        description: "Sie müssen angemeldet sein, um Ordnerberechtigungen anzuzeigen",
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, die Berechtigungen dieses Ordners anzuzeigen",
+        description: "Sie haben keine Berechtigung, die Berechtigungen dieses Ordners anzuzeigen",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -72,8 +67,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description:
-          "Beim Abrufen der Ordnerberechtigungen ist ein Fehler aufgetreten",
+        description: "Beim Abrufen der Ordnerberechtigungen ist ein Fehler aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -95,8 +89,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Ordnerberechtigungen aktualisieren",
-    description:
-      "Die Liste der Moderatoren für einen bestimmten Ordner aktualisieren",
+    description: "Die Liste der Moderatoren für einen bestimmten Ordner aktualisieren",
     container: {
       title: "Ordnerberechtigungen aktualisieren",
       description: "Ordnerzugriffsberechtigungen ändern",
@@ -133,8 +126,7 @@ export const translations: typeof enTranslations = {
       title: "Berechtigungsaktualisierung",
       moderatorIds: {
         label: "Moderator-IDs",
-        description:
-          "Liste der Benutzer-IDs, die diesen Ordner moderieren können",
+        description: "Liste der Benutzer-IDs, die diesen Ordner moderieren können",
       },
     },
     response: {
@@ -184,8 +176,7 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um Ordnerberechtigungen zu aktualisieren",
+        description: "Sie müssen angemeldet sein, um Ordnerberechtigungen zu aktualisieren",
       },
       forbidden: {
         title: "Verboten",
@@ -198,8 +189,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description:
-          "Beim Aktualisieren der Ordnerberechtigungen ist ein Fehler aufgetreten",
+        description: "Beim Aktualisieren der Ordnerberechtigungen ist ein Fehler aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",

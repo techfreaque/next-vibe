@@ -60,8 +60,7 @@ export const translations: typeof enTranslations = {
       welcome: {
         meta: {
           name: "Willkommens-E-Mail zur Registrierung",
-          description:
-            "Willkommens-E-Mail an neue Benutzer nach der Registrierung",
+          description: "Willkommens-E-Mail an neue Benutzer nach der Registrierung",
         },
         preview: {
           privateName: {
@@ -156,8 +155,7 @@ export const translations: typeof enTranslations = {
         confirm: {
           meta: {
             name: "E-Mail zur Bestätigung des Passwort-Zurücksets",
-            description:
-              "Bestätigungsl-E-Mail nach dem Zurücksetzen des Passworts",
+            description: "Bestätigungsl-E-Mail nach dem Zurücksetzen des Passworts",
           },
           preview: {
             privateName: {
@@ -176,8 +174,7 @@ export const translations: typeof enTranslations = {
       form: {
         meta: {
           name: "E-Mail aus Kontaktformular",
-          description:
-            "E-Mail wird versendet, wenn das Kontaktformular eingereicht wird",
+          description: "E-Mail wird versendet, wenn das Kontaktformular eingereicht wird",
         },
         preview: {
           name: {
@@ -202,8 +199,7 @@ export const translations: typeof enTranslations = {
           },
           isForCompany: {
             label: "Für Firmenkonto",
-            description:
-              "Ob dies für ein Unternehmen oder eine Einzelperson ist",
+            description: "Ob dies für ein Unternehmen oder eine Einzelperson ist",
           },
           userId: {
             label: "Benutzer-ID",

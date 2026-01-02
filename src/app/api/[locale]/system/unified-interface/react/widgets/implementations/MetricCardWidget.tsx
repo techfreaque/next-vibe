@@ -29,9 +29,7 @@ export function MetricCardWidget({
   const data = extractMetricCardData(value);
 
   if (!data) {
-    return (
-      <Div className={cn("text-muted-foreground italic", className)}>—</Div>
-    );
+    return <Div className={cn("text-muted-foreground italic", className)}>—</Div>;
   }
 
   const { value: metricValue, label, icon, color, trend } = data;
@@ -47,18 +45,12 @@ export function MetricCardWidget({
   const trendColorClassName = getTrendColorClassName(trendDirection);
 
   const TrendIcon =
-    trendDirection === "up"
-      ? TrendingUp
-      : trendDirection === "down"
-        ? TrendingDown
-        : null;
+    trendDirection === "up" ? TrendingUp : trendDirection === "down" ? TrendingDown : null;
 
   return (
     <Card className={className}>
       <CardHeader className="flex flex-col items-center justify-between gap-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
-          {label}
-        </CardTitle>
+        <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
         {icon && (
           <Span className="text-2xl" role="img" aria-label={label}>
             {icon}
@@ -74,12 +66,7 @@ export function MetricCardWidget({
             </Div>
           </Div>
           {trendValue !== undefined && TrendIcon && (
-            <Div
-              className={cn(
-                "flex items-center gap-1 text-xs",
-                trendColorClassName,
-              )}
-            >
+            <Div className={cn("flex items-center gap-1 text-xs", trendColorClassName)}>
               <TrendIcon className="h-3 w-3" />
               <Span>{Math.abs(trendValue)}%</Span>
             </Div>

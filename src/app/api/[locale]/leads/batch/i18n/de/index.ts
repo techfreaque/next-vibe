@@ -102,8 +102,7 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Ungespeicherte Änderungen",
-        description:
-          "Es gibt ungespeicherte Änderungen in der Batch-Aktualisierung",
+        description: "Es gibt ungespeicherte Änderungen in der Batch-Aktualisierung",
       },
     },
     success: {
@@ -128,8 +127,7 @@ export const translations: typeof enTranslations = {
     },
     confirmDelete: {
       label: "Löschung bestätigen",
-      description:
-        "Bestätigen, dass die ausgewählten Leads gelöscht werden sollen",
+      description: "Bestätigen, dass die ausgewählten Leads gelöscht werden sollen",
     },
     dryRun: {
       label: "Testlauf",
@@ -152,8 +150,7 @@ export const translations: typeof enTranslations = {
     errors: {
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Authentifizierung für Batch-Löschungsoperationen erforderlich",
+        description: "Authentifizierung für Batch-Löschungsoperationen erforderlich",
       },
       validation: {
         title: "Validierungsfehler",
@@ -206,8 +203,7 @@ export const translations: typeof enTranslations = {
         totalProcessed: "Gesamt Verarbeitet",
         totalUpdated: "Gesamt Aktualisiert",
         errors: "Fehler",
-        dryRunNote:
-          "Dies war ein Testlauf - es wurden keine tatsächlichen Änderungen vorgenommen.",
+        dryRunNote: "Dies war ein Testlauf - es wurden keine tatsächlichen Änderungen vorgenommen.",
         viewLeads: "Aktualisierte Leads Anzeigen",
         error: {
           noData: "Keine Batch-Aktualisierungsdaten verfügbar",
@@ -224,8 +220,7 @@ export const translations: typeof enTranslations = {
         totalProcessed: "Gesamt Verarbeitet",
         totalDeleted: "Gesamt Gelöscht",
         errors: "Fehler",
-        dryRunNote:
-          "Dies war ein Testlauf - es wurden keine tatsächlichen Löschungen vorgenommen.",
+        dryRunNote: "Dies war ein Testlauf - es wurden keine tatsächlichen Löschungen vorgenommen.",
         viewLeads: "Leads Anzeigen",
         error: {
           noData: "Keine Batch-Löschungsdaten verfügbar",

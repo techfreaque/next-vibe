@@ -54,10 +54,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.createMcpConfig.label",
-          description:
-            "app.api.system.check.config.create.fields.createMcpConfig.description",
+          label: "app.api.system.check.config.create.fields.createMcpConfig.label",
+          description: "app.api.system.check.config.create.fields.createMcpConfig.description",
           columns: 6,
         },
         z.boolean().optional(),
@@ -67,10 +65,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.updateVscodeSettings.label",
-          description:
-            "app.api.system.check.config.create.fields.updateVscodeSettings.description",
+          label: "app.api.system.check.config.create.fields.updateVscodeSettings.label",
+          description: "app.api.system.check.config.create.fields.updateVscodeSettings.description",
           columns: 6,
         },
         z.boolean().optional(),
@@ -80,10 +76,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.updatePackageJson.label",
-          description:
-            "app.api.system.check.config.create.fields.updatePackageJson.description",
+          label: "app.api.system.check.config.create.fields.updatePackageJson.label",
+          description: "app.api.system.check.config.create.fields.updatePackageJson.description",
           columns: 6,
         },
         z.boolean().optional().default(true),
@@ -94,8 +88,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.check.config.create.fields.enableEslint.label",
-          description:
-            "app.api.system.check.config.create.fields.enableEslint.description",
+          description: "app.api.system.check.config.create.fields.enableEslint.description",
           columns: 6,
         },
         z.boolean().optional(),
@@ -105,10 +98,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.enableReactRules.label",
-          description:
-            "app.api.system.check.config.create.fields.enableReactRules.description",
+          label: "app.api.system.check.config.create.fields.enableReactRules.label",
+          description: "app.api.system.check.config.create.fields.enableReactRules.description",
           columns: 4,
         },
         z.boolean().optional(),
@@ -118,10 +109,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.enableNextjsRules.label",
-          description:
-            "app.api.system.check.config.create.fields.enableNextjsRules.description",
+          label: "app.api.system.check.config.create.fields.enableNextjsRules.label",
+          description: "app.api.system.check.config.create.fields.enableNextjsRules.description",
           columns: 4,
         },
         z.boolean().optional(),
@@ -131,10 +120,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.enableI18nRules.label",
-          description:
-            "app.api.system.check.config.create.fields.enableI18nRules.description",
+          label: "app.api.system.check.config.create.fields.enableI18nRules.label",
+          description: "app.api.system.check.config.create.fields.enableI18nRules.description",
           columns: 4,
         },
         z.boolean().optional(),
@@ -144,10 +131,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.jsxCapitalization.label",
-          description:
-            "app.api.system.check.config.create.fields.jsxCapitalization.description",
+          label: "app.api.system.check.config.create.fields.jsxCapitalization.label",
+          description: "app.api.system.check.config.create.fields.jsxCapitalization.description",
           columns: 4,
         },
         z.boolean().optional(),
@@ -157,10 +142,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.enablePedanticRules.label",
-          description:
-            "app.api.system.check.config.create.fields.enablePedanticRules.description",
+          label: "app.api.system.check.config.create.fields.enablePedanticRules.label",
+          description: "app.api.system.check.config.create.fields.enablePedanticRules.description",
           columns: 4,
         },
         z.boolean().optional(),
@@ -170,8 +153,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.check.config.create.fields.enableRestrictedSyntax.label",
+          label: "app.api.system.check.config.create.fields.enableRestrictedSyntax.label",
           description:
             "app.api.system.check.config.create.fields.enableRestrictedSyntax.description",
           columns: 4,
@@ -184,8 +166,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.check.config.create.fields.interactive.label",
-          description:
-            "app.api.system.check.config.create.fields.interactive.description",
+          description: "app.api.system.check.config.create.fields.interactive.description",
           columns: 6,
         },
         z.boolean().optional().default(true),
@@ -206,48 +187,39 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.check.config.create.errors.validation.title",
-      description:
-        "app.api.system.check.config.create.errors.validation.description",
+      description: "app.api.system.check.config.create.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.check.config.create.errors.internal.title",
-      description:
-        "app.api.system.check.config.create.errors.internal.description",
+      description: "app.api.system.check.config.create.errors.internal.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.check.config.create.errors.validation.title",
-      description:
-        "app.api.system.check.config.create.errors.validation.description",
+      description: "app.api.system.check.config.create.errors.validation.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.check.config.create.errors.validation.title",
-      description:
-        "app.api.system.check.config.create.errors.validation.description",
+      description: "app.api.system.check.config.create.errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.check.config.create.errors.validation.title",
-      description:
-        "app.api.system.check.config.create.errors.validation.description",
+      description: "app.api.system.check.config.create.errors.validation.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.check.config.create.errors.internal.title",
-      description:
-        "app.api.system.check.config.create.errors.internal.description",
+      description: "app.api.system.check.config.create.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.check.config.create.errors.internal.title",
-      description:
-        "app.api.system.check.config.create.errors.internal.description",
+      description: "app.api.system.check.config.create.errors.internal.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.check.config.create.errors.conflict.title",
-      description:
-        "app.api.system.check.config.create.errors.conflict.description",
+      description: "app.api.system.check.config.create.errors.conflict.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.check.config.create.errors.conflict.title",
-      description:
-        "app.api.system.check.config.create.errors.conflict.description",
+      description: "app.api.system.check.config.create.errors.conflict.description",
     },
   },
 

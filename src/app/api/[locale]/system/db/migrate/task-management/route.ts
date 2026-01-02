@@ -13,7 +13,6 @@ import { migrationTaskManagementRepository as repository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) =>
-      repository.executeMigrationTaskOperation(data, logger),
+    handler: ({ data, logger }) => repository.executeMigrationTaskOperation(data, logger),
   },
 });

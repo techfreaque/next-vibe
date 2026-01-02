@@ -22,12 +22,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import {
-  Countries,
-  CountriesOptions,
-  Languages,
-  LanguagesOptions,
-} from "@/i18n/core/config";
+import { Countries, CountriesOptions, Languages, LanguagesOptions } from "@/i18n/core/config";
 
 import { UserRole } from "../../user/user-roles/enum";
 import {
@@ -61,10 +56,7 @@ const { GET } = createEndpoint({
   title: "app.api.leads.list.get.title" as const,
   description: "app.api.leads.list.get.description" as const,
   category: "app.api.leads.category" as const,
-  tags: [
-    "app.api.leads.tags.leads" as const,
-    "app.api.leads.tags.management" as const,
-  ],
+  tags: ["app.api.leads.tags.leads" as const, "app.api.leads.tags.management" as const],
   icon: "list",
 
   fields: objectField(
@@ -90,8 +82,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.leads.list.get.statusFilters.title" as const,
-          description:
-            "app.api.leads.list.get.statusFilters.description" as const,
+          description: "app.api.leads.list.get.statusFilters.description" as const,
           layoutType: LayoutType.GRID,
           columns: 3,
           order: 1,
@@ -125,12 +116,9 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
-              label:
-                "app.api.leads.list.get.currentCampaignStage.label" as const,
-              description:
-                "app.api.leads.list.get.currentCampaignStage.description" as const,
-              placeholder:
-                "app.api.leads.list.get.currentCampaignStage.placeholder" as const,
+              label: "app.api.leads.list.get.currentCampaignStage.label" as const,
+              description: "app.api.leads.list.get.currentCampaignStage.description" as const,
+              placeholder: "app.api.leads.list.get.currentCampaignStage.placeholder" as const,
               options: EmailCampaignStageFilterOptions,
               columns: 6,
             },
@@ -156,8 +144,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.leads.list.get.locationFilters.title" as const,
-          description:
-            "app.api.leads.list.get.locationFilters.description" as const,
+          description: "app.api.leads.list.get.locationFilters.description" as const,
           layoutType: LayoutType.GRID_2_COLUMNS,
           order: 2,
         },
@@ -168,10 +155,8 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
               label: "app.api.leads.list.get.country.label" as const,
-              description:
-                "app.api.leads.list.get.country.description" as const,
-              placeholder:
-                "app.api.leads.list.get.country.placeholder" as const,
+              description: "app.api.leads.list.get.country.description" as const,
+              placeholder: "app.api.leads.list.get.country.placeholder" as const,
               options: CountriesOptions,
               columns: 6,
             },
@@ -182,10 +167,8 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
               label: "app.api.leads.list.get.language.label" as const,
-              description:
-                "app.api.leads.list.get.language.description" as const,
-              placeholder:
-                "app.api.leads.list.get.language.placeholder" as const,
+              description: "app.api.leads.list.get.language.description" as const,
+              placeholder: "app.api.leads.list.get.language.placeholder" as const,
               options: LanguagesOptions,
               columns: 6,
             },
@@ -199,8 +182,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.leads.list.get.sortingOptions.title" as const,
-          description:
-            "app.api.leads.list.get.sortingOptions.description" as const,
+          description: "app.api.leads.list.get.sortingOptions.description" as const,
           layoutType: LayoutType.GRID_2_COLUMNS,
           order: 3,
         },
@@ -216,20 +198,15 @@ const { GET } = createEndpoint({
               options: LeadSortFieldOptions,
               columns: 6,
             },
-            z
-              .nativeEnum(LeadSortField)
-              .optional()
-              .default(LeadSortField.CREATED_AT),
+            z.nativeEnum(LeadSortField).optional().default(LeadSortField.CREATED_AT),
           ),
           sortOrder: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.leads.list.get.sortOrder.label" as const,
-              description:
-                "app.api.leads.list.get.sortOrder.description" as const,
-              placeholder:
-                "app.api.leads.list.get.sortOrder.placeholder" as const,
+              description: "app.api.leads.list.get.sortOrder.description" as const,
+              placeholder: "app.api.leads.list.get.sortOrder.placeholder" as const,
               options: SortOrderOptions,
               columns: 6,
             },
@@ -275,24 +252,21 @@ const { GET } = createEndpoint({
                 email: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.email" as const,
+                    content: "app.api.leads.list.get.response.leads.email" as const,
                   },
                   z.string().nullable(),
                 ),
                 businessName: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.businessName" as const,
+                    content: "app.api.leads.list.get.response.leads.businessName" as const,
                   },
                   z.string(),
                 ),
                 contactName: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.contactName" as const,
+                    content: "app.api.leads.list.get.response.leads.contactName" as const,
                   },
                   z.string().nullable(),
                 ),
@@ -340,16 +314,14 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.createdAt" as const,
+                    content: "app.api.leads.list.get.response.leads.createdAt" as const,
                   },
                   z.coerce.date(),
                 ),
                 phone: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.phone" as const,
+                    content: "app.api.leads.list.get.response.leads.phone" as const,
                   },
                   z.string().nullable(),
                 ),
@@ -363,16 +335,14 @@ const { GET } = createEndpoint({
                 notes: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.notes" as const,
+                    content: "app.api.leads.list.get.response.leads.notes" as const,
                   },
                   z.string().nullable(),
                 ),
                 convertedUserId: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.convertedUserId" as const,
+                    content: "app.api.leads.list.get.response.leads.convertedUserId" as const,
                   },
                   z.string().nullable(),
                 ),
@@ -380,8 +350,7 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.convertedAt" as const,
+                    content: "app.api.leads.list.get.response.leads.convertedAt" as const,
                   },
                   z.coerce.date().nullable(),
                 ),
@@ -389,8 +358,7 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.signedUpAt" as const,
+                    content: "app.api.leads.list.get.response.leads.signedUpAt" as const,
                   },
                   z.coerce.date().nullable(),
                 ),
@@ -398,8 +366,7 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.consultationBookedAt" as const,
+                    content: "app.api.leads.list.get.response.leads.consultationBookedAt" as const,
                   },
                   z.coerce.date().nullable(),
                 ),
@@ -415,8 +382,7 @@ const { GET } = createEndpoint({
                 emailsSent: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.emailsSent" as const,
+                    content: "app.api.leads.list.get.response.leads.emailsSent" as const,
                   },
                   z.coerce.number(),
                 ),
@@ -424,8 +390,7 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.lastEmailSentAt" as const,
+                    content: "app.api.leads.list.get.response.leads.lastEmailSentAt" as const,
                   },
                   z.coerce.date().nullable(),
                 ),
@@ -433,24 +398,21 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.unsubscribedAt" as const,
+                    content: "app.api.leads.list.get.response.leads.unsubscribedAt" as const,
                   },
                   z.coerce.date().nullable(),
                 ),
                 emailsOpened: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.emailsOpened" as const,
+                    content: "app.api.leads.list.get.response.leads.emailsOpened" as const,
                   },
                   z.coerce.number(),
                 ),
                 emailsClicked: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.emailsClicked" as const,
+                    content: "app.api.leads.list.get.response.leads.emailsClicked" as const,
                   },
                   z.coerce.number(),
                 ),
@@ -458,16 +420,14 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.lastEngagementAt" as const,
+                    content: "app.api.leads.list.get.response.leads.lastEngagementAt" as const,
                   },
                   z.coerce.date().nullable(),
                 ),
                 metadata: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.metadata" as const,
+                    content: "app.api.leads.list.get.response.leads.metadata" as const,
                   },
                   z.record(z.string(), z.any()),
                 ),
@@ -475,16 +435,14 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.leads.list.get.response.leads.updatedAt" as const,
+                    content: "app.api.leads.list.get.response.leads.updatedAt" as const,
                   },
                   z.coerce.date(),
                 ),
                 id: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.list.get.response.leads.id" as const,
+                    content: "app.api.leads.list.get.response.leads.id" as const,
                   },
                   z.string(),
                 ),
@@ -549,13 +507,11 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.leads.list.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.leads.list.get.errors.unauthorized.description" as const,
+      description: "app.api.leads.list.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.leads.list.get.errors.validation.title" as const,
-      description:
-        "app.api.leads.list.get.errors.validation.description" as const,
+      description: "app.api.leads.list.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.leads.list.get.errors.server.title" as const,
@@ -571,23 +527,19 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.leads.list.get.errors.forbidden.title" as const,
-      description:
-        "app.api.leads.list.get.errors.forbidden.description" as const,
+      description: "app.api.leads.list.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.leads.list.get.errors.notFound.title" as const,
-      description:
-        "app.api.leads.list.get.errors.notFound.description" as const,
+      description: "app.api.leads.list.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.leads.list.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.leads.list.get.errors.unsavedChanges.description" as const,
+      description: "app.api.leads.list.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.leads.list.get.errors.conflict.title" as const,
-      description:
-        "app.api.leads.list.get.errors.conflict.description" as const,
+      description: "app.api.leads.list.get.errors.conflict.description" as const,
     },
   },
 

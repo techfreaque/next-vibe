@@ -4,11 +4,7 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
-import {
-  Check,
-  ChevronDown,
-  ChevronUp,
-} from "@/packages/next-vibe-ui/web/ui/icons";
+import { Check, ChevronDown, ChevronUp } from "@/packages/next-vibe-ui/web/ui/icons";
 
 import type { StyleType } from "../utils/style-type";
 
@@ -62,10 +58,7 @@ export type SelectItemProps = {
 
 export type SelectSeparatorProps = StyleType;
 
-export function Select({
-  children,
-  ...props
-}: SelectRootProps): React.JSX.Element {
+export function Select({ children, ...props }: SelectRootProps): React.JSX.Element {
   return <SelectPrimitive.Root {...props}>{children}</SelectPrimitive.Root>;
 }
 Select.displayName = SelectPrimitive.Root.displayName;
@@ -132,10 +125,7 @@ export function SelectScrollUpButton({
 }: SelectLabelProps): React.JSX.Element {
   return (
     <SelectPrimitive.ScrollUpButton
-      className={cn(
-        "flex cursor-default items-center justify-center py-1",
-        className,
-      )}
+      className={cn("flex cursor-default items-center justify-center py-1", className)}
       style={style}
       {...props}
     >
@@ -152,10 +142,7 @@ export function SelectScrollDownButton({
 }: SelectLabelProps): React.JSX.Element {
   return (
     <SelectPrimitive.ScrollDownButton
-      className={cn(
-        "flex cursor-default items-center justify-center py-1",
-        className,
-      )}
+      className={cn("flex cursor-default items-center justify-center py-1", className)}
       style={style}
       {...props}
     >
@@ -163,8 +150,7 @@ export function SelectScrollDownButton({
     </SelectPrimitive.ScrollDownButton>
   );
 }
-SelectScrollDownButton.displayName =
-  SelectPrimitive.ScrollDownButton.displayName;
+SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName;
 
 export function SelectContent({
   className,
@@ -203,11 +189,7 @@ export function SelectContent({
 }
 SelectContent.displayName = SelectPrimitive.Content.displayName;
 
-export function SelectLabel({
-  className,
-  style,
-  ...props
-}: SelectLabelProps): React.JSX.Element {
+export function SelectLabel({ className, style, ...props }: SelectLabelProps): React.JSX.Element {
   return (
     <SelectPrimitive.Label
       className={cn("px-2 py-1.5 text-sm font-semibold", className)}

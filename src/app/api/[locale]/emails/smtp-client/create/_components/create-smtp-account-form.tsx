@@ -27,9 +27,7 @@ interface CreateSmtpAccountFormProps {
   locale: CountryLanguage;
 }
 
-export function CreateSmtpAccountForm({
-  locale,
-}: CreateSmtpAccountFormProps): React.JSX.Element {
+export function CreateSmtpAccountForm({ locale }: CreateSmtpAccountFormProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const router = useRouter();
 

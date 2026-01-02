@@ -13,11 +13,7 @@ export type BreadcrumbProps = {
   separator?: React.ReactNode;
 } & StyleType;
 
-export function Breadcrumb({
-  className,
-  style,
-  children,
-}: BreadcrumbProps): React.JSX.Element {
+export function Breadcrumb({ className, style, children }: BreadcrumbProps): React.JSX.Element {
   return (
     <nav aria-label="breadcrumb" className={className} style={style}>
       {children}
@@ -68,15 +64,7 @@ export type BreadcrumbItemProps = {
   id?: string;
   role?: string;
   "aria-label"?: string;
-  "aria-current"?:
-    | "page"
-    | "step"
-    | "location"
-    | "date"
-    | "time"
-    | "true"
-    | "false"
-    | boolean;
+  "aria-current"?: "page" | "step" | "location" | "date" | "time" | "true" | "false" | boolean;
 } & StyleType;
 
 export function BreadcrumbItem({
@@ -86,11 +74,7 @@ export function BreadcrumbItem({
   ...props
 }: BreadcrumbItemProps): React.JSX.Element {
   return (
-    <li
-      className={cn("inline-flex items-center gap-1.5", className)}
-      style={style}
-      {...props}
-    >
+    <li className={cn("inline-flex items-center gap-1.5", className)} style={style} {...props}>
       {children}
     </li>
   );
@@ -117,15 +101,7 @@ export type BreadcrumbLinkProps = {
   type?: string;
   onClick?: (e: BreadcrumbLinkClickEvent) => void;
   "aria-label"?: string;
-  "aria-current"?:
-    | "page"
-    | "step"
-    | "location"
-    | "date"
-    | "time"
-    | "true"
-    | "false"
-    | boolean;
+  "aria-current"?: "page" | "step" | "location" | "date" | "time" | "true" | "false" | boolean;
 } & StyleType;
 
 export function BreadcrumbLink({
@@ -175,15 +151,7 @@ export type BreadcrumbPageProps = {
   id?: string;
   role?: string;
   "aria-label"?: string;
-  "aria-current"?:
-    | "page"
-    | "step"
-    | "location"
-    | "date"
-    | "time"
-    | "true"
-    | "false"
-    | boolean;
+  "aria-current"?: "page" | "step" | "location" | "date" | "time" | "true" | "false" | boolean;
 } & StyleType;
 
 export function BreadcrumbPage({
@@ -196,15 +164,7 @@ export function BreadcrumbPage({
   "aria-label": ariaLabel,
 }: BreadcrumbPageProps): React.JSX.Element {
   const spanProps: {
-    "aria-current"?:
-      | "page"
-      | "step"
-      | "location"
-      | "date"
-      | "time"
-      | "true"
-      | "false"
-      | boolean;
+    "aria-current"?: "page" | "step" | "location" | "date" | "time" | "true" | "false" | boolean;
     className: string;
     style?: React.CSSProperties;
     id?: string;
@@ -290,9 +250,7 @@ export function BreadcrumbEllipsis({
       aria-label={ariaLabel}
     >
       <DotsHorizontalIcon className="h-4 w-4" />
-      <span className="sr-only">
-        {t("app.common.accessibility.srOnly.more")}
-      </span>
+      <span className="sr-only">{t("app.common.accessibility.srOnly.more")}</span>
     </span>
   );
 }

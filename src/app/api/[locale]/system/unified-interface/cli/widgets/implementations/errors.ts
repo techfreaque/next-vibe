@@ -9,9 +9,7 @@ import { extractErrorData } from "@/app/api/[locale]/system/unified-interface/sh
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class ErrorWidgetRenderer extends BaseWidgetRenderer<
-  typeof WidgetType.ERROR
-> {
+export class ErrorWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.ERROR> {
   readonly widgetType = WidgetType.ERROR;
 
   render(props: CLIWidgetProps<typeof WidgetType.ERROR, string>): string {
@@ -57,9 +55,7 @@ export class ErrorWidgetRenderer extends BaseWidgetRenderer<
     // Action
     if (data.action) {
       lines.push("");
-      lines.push(
-        `${indent}${this.styleText(data.action.label, "yellow", context)}`,
-      );
+      lines.push(`${indent}${this.styleText(data.action.label, "yellow", context)}`);
     }
 
     return lines.join("\n");

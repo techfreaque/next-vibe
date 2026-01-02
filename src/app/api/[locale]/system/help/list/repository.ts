@@ -5,11 +5,7 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -19,10 +15,7 @@ import { definitionsRegistry } from "../../unified-interface/shared/endpoints/de
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { Platform } from "../../unified-interface/shared/types/platform";
 import { getTranslatorFromEndpoint } from "../../unified-interface/shared/widgets/utils/field-helpers";
-import type {
-  HelpListRequestOutput,
-  HelpListResponseOutput,
-} from "./definition";
+import type { HelpListRequestOutput, HelpListResponseOutput } from "./definition";
 
 /**
  * Help List Repository
@@ -42,11 +35,7 @@ class HelpListRepository {
 
     try {
       // Use unified endpoint listing service (filtered by user permissions from JWT)
-      const endpoints = definitionsRegistry.getEndpointsForUser(
-        platform,
-        user,
-        logger,
-      );
+      const endpoints = definitionsRegistry.getEndpointsForUser(platform, user, logger);
 
       // Sort endpoints by category and toolName
       const sortedEndpoints = endpoints.toSorted((a, b) => {
@@ -66,23 +55,15 @@ class HelpListRepository {
         const { t } = getTranslatorFromEndpoint(ep)(locale);
 
         // Use first alias if available, otherwise use full tool name
-        const displayName =
-          ep.aliases && ep.aliases.length > 0
-            ? ep.aliases[0]
-            : ep.path.join("_");
+        const displayName = ep.aliases && ep.aliases.length > 0 ? ep.aliases[0] : ep.path.join("_");
 
         const translatedDescription =
-          data.showDescriptions && ep.description
-            ? t(ep.description)
-            : displayName;
+          data.showDescriptions && ep.description ? t(ep.description) : displayName;
 
         return {
           alias: displayName,
           message: translatedDescription,
-          description:
-            data.showDescriptions && ep.description
-              ? translatedDescription
-              : undefined,
+          description: data.showDescriptions && ep.description ? translatedDescription : undefined,
           category: ep.category ? t(ep.category) : "",
           aliases:
             data.showAliases && ep.aliases && ep.aliases.length > 1

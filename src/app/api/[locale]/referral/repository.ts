@@ -7,11 +7,7 @@ import "server-only";
 
 import { and, desc, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
@@ -29,10 +25,7 @@ import {
   referralEarnings,
   userReferrals,
 } from "./db";
-import type {
-  ReferralPostRequestOutput,
-  ReferralPostResponseOutput,
-} from "./definition";
+import type { ReferralPostRequestOutput, ReferralPostResponseOutput } from "./definition";
 import type { EarningsListGetResponseOutput } from "./earnings/list/definition";
 import {
   PayoutCurrency,
@@ -274,12 +267,7 @@ export class ReferralRepository {
       const [existingReferral] = await db
         .select()
         .from(leadReferrals)
-        .where(
-          and(
-            eq(leadReferrals.leadId, leadId),
-            eq(leadReferrals.referralCodeId, codeId),
-          ),
-        )
+        .where(and(eq(leadReferrals.leadId, leadId), eq(leadReferrals.referralCodeId, codeId)))
         .limit(1);
 
       if (existingReferral) {
@@ -331,10 +319,7 @@ export class ReferralRepository {
           code: referralCodes.code,
         })
         .from(leadReferrals)
-        .innerJoin(
-          referralCodes,
-          eq(leadReferrals.referralCodeId, referralCodes.id),
-        )
+        .innerJoin(referralCodes, eq(leadReferrals.referralCodeId, referralCodes.id))
         .where(eq(leadReferrals.leadId, leadId))
         .orderBy(desc(leadReferrals.createdAt))
         .limit(1);
@@ -489,10 +474,7 @@ export class ReferralRepository {
         })
         .from(payoutRequests)
         .where(
-          and(
-            eq(payoutRequests.userId, userId),
-            eq(payoutRequests.status, PayoutStatus.COMPLETED),
-          ),
+          and(eq(payoutRequests.userId, userId), eq(payoutRequests.status, PayoutStatus.COMPLETED)),
         );
 
       const totalPaidOutCredits = payoutResult?.total || 0;
@@ -593,10 +575,7 @@ export class ReferralRepository {
       }
 
       // Calculate commission shares based on credits (1 credit = 1 cent for commission)
-      const shares = ReferralRepository.calculateCommissionShares(
-        creditsAmount,
-        chain,
-      );
+      const shares = ReferralRepository.calculateCommissionShares(creditsAmount, chain);
 
       // Get source user email for transaction metadata
       const [sourceUser] = await db
@@ -659,10 +638,7 @@ export class ReferralRepository {
   /**
    * Get referral chain for a user (private helper)
    */
-  private static async getReferralChain(
-    userId: string,
-    logger: EndpointLogger,
-  ): Promise<string[]> {
+  private static async getReferralChain(userId: string, logger: EndpointLogger): Promise<string[]> {
     const chain: string[] = [];
     let currentUserId: string | null = userId;
 
@@ -766,10 +742,7 @@ export class ReferralRepository {
   > {
     try {
       // Get earned credits balance
-      const balanceResult = await CreditRepository.getEarnedCreditsBalance(
-        userId,
-        logger,
-      );
+      const balanceResult = await CreditRepository.getEarnedCreditsBalance(userId, logger);
       if (!balanceResult.success) {
         return balanceResult;
       }
@@ -832,10 +805,7 @@ export class ReferralRepository {
       }
 
       // Get earned balance
-      const balanceResult = await CreditRepository.getEarnedCreditsBalance(
-        userId,
-        logger,
-      );
+      const balanceResult = await CreditRepository.getEarnedCreditsBalance(userId, logger);
       if (!balanceResult.success) {
         return balanceResult;
       }
@@ -862,12 +832,7 @@ export class ReferralRepository {
 
       // If converting to credits, process immediately
       if (currency === PayoutCurrency.CREDITS) {
-        await ReferralRepository.processCreditsConversion(
-          request.id,
-          userId,
-          amountCents,
-          logger,
-        );
+        await ReferralRepository.processCreditsConversion(request.id, userId, amountCents, logger);
       }
 
       logger.info("Payout request created", {
@@ -919,12 +884,7 @@ export class ReferralRepository {
     }
 
     // Add to permanent credits
-    await CreditRepository.addUserCredits(
-      userId,
-      amountCents,
-      "permanent",
-      logger,
-    );
+    await CreditRepository.addUserCredits(userId, amountCents, "permanent", logger);
 
     // Mark request as completed
     await db
@@ -970,9 +930,7 @@ export class ReferralRepository {
     }>
   > {
     try {
-      const whereClause = status
-        ? eq(payoutRequests.status, status)
-        : undefined;
+      const whereClause = status ? eq(payoutRequests.status, status) : undefined;
 
       const requests = await db
         .select({

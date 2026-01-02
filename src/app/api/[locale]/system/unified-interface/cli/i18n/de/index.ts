@@ -7,8 +7,7 @@ export const translations: typeof enTranslations = {
     errors: {
       userNotFound:
         "CLI-Benutzer mit E-Mail {{email}} wurde nicht in der Datenbank gefunden. Bitte führen Sie zuerst 'vibe seed' aus.",
-      databaseError:
-        "Datenbankfehler beim Abrufen des CLI-Benutzers: {{error}}",
+      databaseError: "Datenbankfehler beim Abrufen des CLI-Benutzers: {{error}}",
       authNotAvailable: "Authentifizierung ist nicht verfügbar",
     },
   },

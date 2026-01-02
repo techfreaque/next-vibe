@@ -64,10 +64,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /**
  * Login Page Component
  */
-export default async function LoginPage({
-  params,
-  searchParams,
-}: Props): Promise<JSX.Element> {
+export default async function LoginPage({ params, searchParams }: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { callbackUrl } = await searchParams;
   const { t } = simpleT(locale);
@@ -97,16 +94,9 @@ export default async function LoginPage({
   }
 
   // Get login options
-  const loginOptionsResponse = await LoginRepository.getLoginOptions(
-    logger,
-    locale,
-  );
+  const loginOptionsResponse = await LoginRepository.getLoginOptions(logger, locale);
   if (!loginOptionsResponse.success) {
-    return (
-      <Div>
-        {t(loginOptionsResponse.message, loginOptionsResponse.messageParams)}
-      </Div>
-    );
+    return <Div>{t(loginOptionsResponse.message, loginOptionsResponse.messageParams)}</Div>;
   }
 
   return (

@@ -97,9 +97,7 @@ export const smtpAccounts = pgTable(
     lastUsedAt: timestamp("last_used_at"),
 
     // Configuration metadata
-    metadata: jsonb("metadata")
-      .$type<Record<string, string | number | boolean>>()
-      .default({}),
+    metadata: jsonb("metadata").$type<Record<string, string | number | boolean>>().default({}),
 
     // Multi-select selection criteria fields (moved from nested object to top-level)
     campaignTypes: jsonb("campaign_types")
@@ -135,9 +133,7 @@ export const smtpAccounts = pgTable(
     priorityIdx: index("smtp_accounts_priority_idx").on(table.priority),
     fromEmailIdx: index("smtp_accounts_from_email_idx").on(table.fromEmail),
     createdByIdx: index("smtp_accounts_created_by_idx").on(table.createdBy),
-    lastHealthCheckIdx: index("smtp_accounts_last_health_check_idx").on(
-      table.lastHealthCheck,
-    ),
+    lastHealthCheckIdx: index("smtp_accounts_last_health_check_idx").on(table.lastHealthCheck),
     lastUsedAtIdx: index("smtp_accounts_last_used_at_idx").on(table.lastUsedAt),
   }),
 );

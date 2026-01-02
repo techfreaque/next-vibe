@@ -48,8 +48,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.db.migrateProd.fields.skipSeeding.title",
-          description:
-            "app.api.system.db.migrateProd.fields.skipSeeding.description",
+          description: "app.api.system.db.migrateProd.fields.skipSeeding.description",
           columns: 4,
         },
         z.boolean().optional().default(false),
@@ -71,8 +70,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.db.migrateProd.fields.dryRun.title",
-          description:
-            "app.api.system.db.migrateProd.fields.dryRun.description",
+          description: "app.api.system.db.migrateProd.fields.dryRun.description",
           columns: 4,
         },
         z.boolean().optional().default(false),
@@ -114,8 +112,7 @@ const { POST } = createEndpoint({
       migrationsGenerated: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateProd.fields.migrationsGenerated.title",
+          content: "app.api.system.db.migrateProd.fields.migrationsGenerated.title",
         },
         z.boolean(),
       ),
@@ -123,8 +120,7 @@ const { POST } = createEndpoint({
       migrationsApplied: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateProd.fields.migrationsApplied.title",
+          content: "app.api.system.db.migrateProd.fields.migrationsApplied.title",
         },
         z.boolean(),
       ),
@@ -132,8 +128,7 @@ const { POST } = createEndpoint({
       seedingCompleted: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateProd.fields.seedingCompleted.title",
+          content: "app.api.system.db.migrateProd.fields.seedingCompleted.title",
         },
         z.boolean(),
       ),
@@ -144,48 +139,39 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.db.migrateProd.post.errors.validation.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.validation.description",
+      description: "app.api.system.db.migrateProd.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.db.migrateProd.post.errors.network.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.network.description",
+      description: "app.api.system.db.migrateProd.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.db.migrateProd.post.errors.unauthorized.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.unauthorized.description",
+      description: "app.api.system.db.migrateProd.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.db.migrateProd.post.errors.forbidden.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.forbidden.description",
+      description: "app.api.system.db.migrateProd.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.db.migrateProd.post.errors.notFound.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.notFound.description",
+      description: "app.api.system.db.migrateProd.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.db.migrateProd.post.errors.server.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.server.description",
+      description: "app.api.system.db.migrateProd.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.db.migrateProd.post.errors.unknown.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.unknown.description",
+      description: "app.api.system.db.migrateProd.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.db.migrateProd.post.errors.server.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.server.description",
+      description: "app.api.system.db.migrateProd.post.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.db.migrateProd.post.errors.conflict.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.conflict.description",
+      description: "app.api.system.db.migrateProd.post.errors.conflict.description",
     },
   },
 
@@ -223,8 +209,7 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        output:
-          "✅ Production migration completed successfully! 🚀 Ready for deployment",
+        output: "✅ Production migration completed successfully! 🚀 Ready for deployment",
         environment: "production",
         databaseUrl: "postgresql://user:***@prod-server:5432/db",
         migrationsGenerated: true,

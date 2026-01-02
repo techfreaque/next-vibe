@@ -13,8 +13,7 @@ export const translations: typeof enTranslations = {
       journeyInfo: {
         personalApproach: {
           name: "Podejście Osobiste",
-          description:
-            "Buduj prawdziwe połączenia poprzez spersonalizowane wiadomości",
+          description: "Buduj prawdziwe połączenia poprzez spersonalizowane wiadomości",
         },
         resultsFocused: {
           name: "Skupione na Wynikach",
@@ -22,8 +21,7 @@ export const translations: typeof enTranslations = {
         },
         personalResults: {
           name: "Osobiste + Wyniki",
-          description:
-            "Połącz osobisty akcent z wiadomościami ukierunkowanymi na wyniki",
+          description: "Połącz osobisty akcent z wiadomościami ukierunkowanymi na wyniki",
         },
       },
     },
@@ -40,13 +38,11 @@ export const translations: typeof enTranslations = {
               "To, co przyciągnęło moją uwagę do Twojej firmy, to potencjał wzrostu i wpływu, który widzę.",
             practicalTransition:
               "Ale pozwól, że będę praktyczny - prawdopodobnie zastanawiasz się, co to właściwie dla Ciebie oznacza.",
-            plansBridge:
-              "Oto, co myślę w zakresie konkretnych następnych kroków:",
+            plansBridge: "Oto, co myślę w zakresie konkretnych następnych kroków:",
             ctaText: "Porozmawiajmy o Twoich Celach",
             signature: "Z niecierpliwością czekam na kontakt,",
             signatureClosing: "Z poważaniem",
-            postScript:
-              "P.S. Bez presji - jeśli termin nie jest odpowiedni, całkowicie rozumiem.",
+            postScript: "P.S. Bez presji - jeśli termin nie jest odpowiedni, całkowicie rozumiem.",
           },
           followup1: {
             subject: "Twoja mapa drogowa na następne 90 dni",
@@ -59,11 +55,9 @@ export const translations: typeof enTranslations = {
               "Zamiast ogólnych obietnic, pozwól, że przejdę z Tobą przez to, jak mogłoby wyglądać pierwsze 90 dni:",
             timelineTitle: "Twoja mapa drogowa na 90 dni:",
             week1Title: "Tydzień 1: Fundament",
-            week1Content:
-              "Usiądziemy i naprawdę zrozumiemy cele i wyzwania Twojej firmy.",
+            week1Content: "Usiądziemy i naprawdę zrozumiemy cele i wyzwania Twojej firmy.",
             month2Title: "Miesiąc 2: Implementacja",
-            month2Content:
-              "To tutaj zaczynamy widzieć prawdziwe tempo budowania.",
+            month2Content: "To tutaj zaczynamy widzieć prawdziwe tempo budowania.",
             week3Title: "Tydzień 3-4: Szybkie Zwycięstwa",
             week3Content:
               "Zobaczysz pierwsze namacalne rezultaty - zazwyczaj szybciej niż oczekiwano.",
@@ -71,8 +65,7 @@ export const translations: typeof enTranslations = {
               "To, co lubię w tym podejściu, to że nie czekasz 6 miesięcy, aby zobaczyć, czy rzeczy działają.",
             personalCommitment:
               "Oto coś, co chcę, żebyś wiedział: jestem osobiście zaangażowany w Twój sukces. To nie jest dla mnie tylko kolejna relacja z klientem.",
-            nextSteps:
-              "Jeśli to do Ciebie przemawia, porozmawiajmy o tym naprawdę.",
+            nextSteps: "Jeśli to do Ciebie przemawia, porozmawiajmy o tym naprawdę.",
             ctaText: "Zaplanuj Rozmowę Strategiczną",
             signature: "Podekscytowany możliwościami,",
             signatureClosing: "Serdeczne pozdrowienia",
@@ -118,8 +111,7 @@ export const translations: typeof enTranslations = {
               "Więc oto moja praktyczna oferta: Jeśli kiedykolwiek chcesz przeprowadzić rozmowę bez presji o celach Twojej firmy, jestem tutaj.",
             noHighPressure:
               "Żadnej prezentacji sprzedażowej. Żadnej twardej sprzedaży. Tylko szczera rozmowa o tym, gdzie chcesz poprowadzić swoją firmę i czy możemy pomóc.",
-            finalCTA:
-              "Drzwi są otwarte, kiedy tylko będziesz gotowy, aby przez nie przejść.",
+            finalCTA: "Drzwi są otwarte, kiedy tylko będziesz gotowy, aby przez nie przejść.",
             ctaText: "Przeprowadźmy tę rozmowę",
             signature: "Życzę Ci wszystkiego najlepszego,",
             postScript:
@@ -181,8 +173,7 @@ export const translations: typeof enTranslations = {
             convenience: "Wszystko, czego potrzebujesz, na wyciągnięcie ręki.",
             ctaText: "Zacznij",
             signature: "Witamy na pokładzie,",
-            postScript:
-              "P.S. Jeśli masz jakieś pytania, jesteśmy tutaj, aby pomóc.",
+            postScript: "P.S. Jeśli masz jakieś pytania, jesteśmy tutaj, aby pomóc.",
           },
           followup1: {
             subject: "Jak się sprawy mają?",
@@ -203,14 +194,11 @@ export const translations: typeof enTranslations = {
             subject: "Nasza historia i misja",
             previewText: "Dlaczego robimy to, co robimy",
             greeting: "Cześć {{businessName}},",
-            intro:
-              "Chciałem podzielić się trochę o tym, dlaczego robimy to, co robimy.",
-            mission:
-              "Naszą misją jest uczynienie profesjonalnych usług dostępnymi dla wszystkich.",
+            intro: "Chciałem podzielić się trochę o tym, dlaczego robimy to, co robimy.",
+            mission: "Naszą misją jest uczynienie profesjonalnych usług dostępnymi dla wszystkich.",
             story1:
               "Zaczęliśmy, ponieważ widzieliśmy firmy zmagające się z przestarzałymi rozwiązaniami.",
-            story2:
-              "Dzisiaj jesteśmy dumni, że pomagamy setkom firm odnieść sukces.",
+            story2: "Dzisiaj jesteśmy dumni, że pomagamy setkom firm odnieść sukces.",
             ctaText: "Dowiedz się więcej o nas",
             signature: "Z celem,",
             closing: "Dziękujemy, że jesteś częścią naszej podróży.",
@@ -234,8 +222,7 @@ export const translations: typeof enTranslations = {
             greeting: "Cześć {{businessName}},",
             intro: "Natknąłem się na coś, co uważam, że uznasz za wartościowe.",
             tip: "Oto szybka wskazówka, która może zrobić prawdziwą różnicę:",
-            value:
-              "Małe zmiany mogą prowadzić do znaczących ulepszeń w czasie.",
+            value: "Małe zmiany mogą prowadzić do znaczących ulepszeń w czasie.",
             ctaText: "Dowiedz się więcej",
             signature: "Do Twojego sukcesu,",
           },

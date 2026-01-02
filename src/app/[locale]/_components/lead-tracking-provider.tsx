@@ -2,11 +2,7 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
-import {
-  getCurrentUrl,
-  getReferrer,
-  getUserAgent,
-} from "next-vibe-ui/utils/browser";
+import { getCurrentUrl, getReferrer, getUserAgent } from "next-vibe-ui/utils/browser";
 import { useEffect, useMemo, useRef } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -29,10 +25,7 @@ let lastTrackedTime = 0;
  */
 export function LeadTrackingProvider(): null {
   const { locale } = useTranslation();
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
   const hasTrackedRef = useRef(false);
 
   useEffect(() => {
@@ -87,8 +80,7 @@ export function LeadTrackingProvider(): null {
           return;
         }
 
-        const apiResult =
-          (await response.json()) as ResponseType<LeadEngagementResponseOutput>;
+        const apiResult = (await response.json()) as ResponseType<LeadEngagementResponseOutput>;
 
         if (apiResult.success) {
           // Store tracking timestamp in session storage
@@ -99,10 +91,7 @@ export function LeadTrackingProvider(): null {
           });
         }
       } catch (error) {
-        logger.error(
-          "error.leads.tracking.engagement.fetch_error",
-          parseError(error),
-        );
+        logger.error("error.leads.tracking.engagement.fetch_error", parseError(error));
       }
     };
 

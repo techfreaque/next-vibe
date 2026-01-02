@@ -35,11 +35,7 @@ function kebabToCamelCase(str: string): string {
  * Converts kebab-case keys to camelCase for API compatibility
  * Example: setNestedValue(obj, "user.name", "John") -> { user: { name: "John" } }
  */
-function setNestedValue(
-  obj: CliObject,
-  path: string,
-  value: string | number | boolean,
-): void {
+function setNestedValue(obj: CliObject, path: string, value: string | number | boolean): void {
   // Convert kebab-case path segments to camelCase for API compatibility
   const keys = path.split(".").map(kebabToCamelCase);
 
@@ -246,10 +242,7 @@ export function parseCliArguments(
         if (valueParts.length > 0) {
           // --key=value format
           value = valueParts.join("=");
-        } else if (
-          i + 1 < relevantArgs.length &&
-          !relevantArgs[i + 1].startsWith("-")
-        ) {
+        } else if (i + 1 < relevantArgs.length && !relevantArgs[i + 1].startsWith("-")) {
           // --key value format
           value = relevantArgs[i + 1];
           i++; // Skip the next argument as it's the value
@@ -267,10 +260,7 @@ export function parseCliArguments(
         // Support nested object notation (e.g., --group.name=value)
         setNestedValue(namedArgs, key, value);
       } catch (parseError) {
-        logger.error(
-          "parseCliArguments: Error parsing double hyphen arg",
-          parseError as Error,
-        );
+        logger.error("parseCliArguments: Error parsing double hyphen arg", parseError as Error);
         continue;
       }
     } else if (arg.startsWith("-")) {

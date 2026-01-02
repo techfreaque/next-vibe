@@ -29,12 +29,7 @@ const { POST } = createEndpoint({
   category: "app.api.system.db.category",
   tags: ["app.api.system.db.migrate.tag"],
   icon: "arrow-right",
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.CLI_AUTH_BYPASS,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.CLI_AUTH_BYPASS],
   aliases: ["migrate", "db:migrate"],
 
   fields: objectField(
@@ -139,8 +134,7 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.db.migrate.post.errors.validation.title",
-      description:
-        "app.api.system.db.migrate.post.errors.validation.description",
+      description: "app.api.system.db.migrate.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.db.migrate.post.errors.network.title",
@@ -148,13 +142,11 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.db.migrate.post.errors.unauthorized.title",
-      description:
-        "app.api.system.db.migrate.post.errors.unauthorized.description",
+      description: "app.api.system.db.migrate.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.db.migrate.post.errors.forbidden.title",
-      description:
-        "app.api.system.db.migrate.post.errors.forbidden.description",
+      description: "app.api.system.db.migrate.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.db.migrate.post.errors.notFound.title",

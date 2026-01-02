@@ -9,11 +9,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 
 import { mergeFormData } from "./endpoint-utils";
-import type {
-  ApiFormOptions,
-  ApiFormReturn,
-  ApiMutationOptions,
-} from "./types";
+import type { ApiFormOptions, ApiFormReturn, ApiMutationOptions } from "./types";
 import { useApiForm } from "./use-api-mutation-form";
 
 /**
@@ -83,20 +79,11 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
   }, [formOptions, autoPrefillData, initialState, primaryEndpoint]);
 
   // Use the existing mutation form hook with enhanced options
-  const formResult = useApiForm(
-    primaryEndpoint,
-    logger,
-    enhancedFormOptions,
-    mutationOptions,
-  );
+  const formResult = useApiForm(primaryEndpoint, logger, enhancedFormOptions, mutationOptions);
 
   // Reset form when autoPrefillData becomes available (after initial render)
   useEffect(() => {
-    if (
-      autoPrefillData &&
-      formResult?.form &&
-      Object.keys(autoPrefillData).length > 0
-    ) {
+    if (autoPrefillData && formResult?.form && Object.keys(autoPrefillData).length > 0) {
       formResult.form.reset(autoPrefillData as never);
     }
   }, [autoPrefillData, formResult?.form]);

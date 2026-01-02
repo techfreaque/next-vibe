@@ -64,11 +64,7 @@ export function extractDataTableData<TKey extends string>(
 
     // Auto-detect columns from first row
     const firstRow = value[0];
-    if (
-      typeof firstRow === "object" &&
-      firstRow !== null &&
-      !Array.isArray(firstRow)
-    ) {
+    if (typeof firstRow === "object" && firstRow !== null && !Array.isArray(firstRow)) {
       const columns: TableColumn<TKey>[] = Object.keys(firstRow).map((key) => ({
         key,
         label: key as TKey,
@@ -76,10 +72,7 @@ export function extractDataTableData<TKey extends string>(
 
       const rows = value.filter(
         (item): item is TableRow =>
-          item !== undefined &&
-          typeof item === "object" &&
-          item !== null &&
-          !Array.isArray(item),
+          item !== undefined && typeof item === "object" && item !== null && !Array.isArray(item),
       ) as TableRow[];
 
       return {
@@ -94,13 +87,11 @@ export function extractDataTableData<TKey extends string>(
   // Handle object with rows and columns
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
     const rows = "rows" in value && Array.isArray(value.rows) ? value.rows : [];
-    const columns =
-      "columns" in value && Array.isArray(value.columns) ? value.columns : [];
+    const columns = "columns" in value && Array.isArray(value.columns) ? value.columns : [];
 
     // Validate rows
     const validRows = rows.filter(
-      (item): item is TableRow =>
-        typeof item === "object" && item !== null && !Array.isArray(item),
+      (item): item is TableRow => typeof item === "object" && item !== null && !Array.isArray(item),
     );
 
     // Validate columns
@@ -111,8 +102,7 @@ export function extractDataTableData<TKey extends string>(
         }
 
         const key = "key" in col && typeof col.key === "string" ? col.key : "";
-        const label =
-          "label" in col && typeof col.label === "string" ? col.label : key;
+        const label = "label" in col && typeof col.label === "string" ? col.label : key;
 
         if (!key) {
           return null;
@@ -129,12 +119,10 @@ export function extractDataTableData<TKey extends string>(
     // If no columns provided, auto-detect from first row
     if (validColumns.length === 0 && validRows.length > 0) {
       const firstRow = validRows[0];
-      const autoColumns: TableColumn<TKey>[] = Object.keys(firstRow).map(
-        (key) => ({
-          key,
-          label: key as TKey,
-        }),
-      );
+      const autoColumns: TableColumn<TKey>[] = Object.keys(firstRow).map((key) => ({
+        key,
+        label: key as TKey,
+      }));
       return {
         rows: validRows,
         columns: autoColumns,
@@ -214,11 +202,7 @@ export function getTableConfig<TKey extends string>(
   } = {
     enabled: false,
   };
-  if (
-    typeof sortingValue === "object" &&
-    sortingValue !== null &&
-    !Array.isArray(sortingValue)
-  ) {
+  if (typeof sortingValue === "object" && sortingValue !== null && !Array.isArray(sortingValue)) {
     const sortingObj = sortingValue;
     if ("enabled" in sortingObj) {
       const enabledVal = sortingObj.enabled;
@@ -344,11 +328,7 @@ export function getColumnFormatter(
       };
     case FieldDataType.OBJECT:
       return (value) => {
-        if (
-          typeof value === "object" &&
-          value !== null &&
-          !Array.isArray(value)
-        ) {
+        if (typeof value === "object" && value !== null && !Array.isArray(value)) {
           return `{${Object.keys(value).length} properties}`;
         }
         return formatCellValue(value);

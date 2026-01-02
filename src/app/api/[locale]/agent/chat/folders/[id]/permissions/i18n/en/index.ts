@@ -49,8 +49,7 @@ export const translations = {
       },
       network: {
         title: "Network Error",
-        description:
-          "A network error occurred while retrieving folder permissions",
+        description: "A network error occurred while retrieving folder permissions",
       },
       unauthorized: {
         title: "Unauthorized",
@@ -58,8 +57,7 @@ export const translations = {
       },
       forbidden: {
         title: "Forbidden",
-        description:
-          "You don't have permission to view this folder's permissions",
+        description: "You don't have permission to view this folder's permissions",
       },
       notFound: {
         title: "Not Found",
@@ -171,8 +169,7 @@ export const translations = {
       },
       network: {
         title: "Network Error",
-        description:
-          "A network error occurred while updating folder permissions",
+        description: "A network error occurred while updating folder permissions",
       },
       unauthorized: {
         title: "Unauthorized",
@@ -180,8 +177,7 @@ export const translations = {
       },
       forbidden: {
         title: "Forbidden",
-        description:
-          "You don't have permission to update this folder's permissions",
+        description: "You don't have permission to update this folder's permissions",
       },
       notFound: {
         title: "Not Found",

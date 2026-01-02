@@ -88,72 +88,63 @@ export const { GET } = createEndpoint({
             id: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.id",
+                content: "app.api.referral.earnings.list.get.response.earnings.id",
               },
               z.string(),
             ),
             earnerUserId: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.earnerUserId",
+                content: "app.api.referral.earnings.list.get.response.earnings.earnerUserId",
               },
               z.string(),
             ),
             sourceUserId: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.sourceUserId",
+                content: "app.api.referral.earnings.list.get.response.earnings.sourceUserId",
               },
               z.string(),
             ),
             transactionId: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.transactionId",
+                content: "app.api.referral.earnings.list.get.response.earnings.transactionId",
               },
               z.string(),
             ),
             level: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.level",
+                content: "app.api.referral.earnings.list.get.response.earnings.level",
               },
               z.coerce.number(),
             ),
             amountCents: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.amountCents",
+                content: "app.api.referral.earnings.list.get.response.earnings.amountCents",
               },
               z.coerce.number(),
             ),
             currency: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.currency",
+                content: "app.api.referral.earnings.list.get.response.earnings.currency",
               },
               z.string(),
             ),
             status: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.status",
+                content: "app.api.referral.earnings.list.get.response.earnings.status",
               },
               z.string(),
             ),
             createdAt: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.referral.earnings.list.get.response.earnings.createdAt",
+                content: "app.api.referral.earnings.list.get.response.earnings.createdAt",
               },
               z.string(),
             ),

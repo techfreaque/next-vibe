@@ -12,9 +12,7 @@ export interface Coordinates {
  * @param coords - The coordinates to validate
  * @returns True if coordinates are valid
  */
-export function isValidCoordinates(
-  coords: Coordinates | null | undefined,
-): boolean {
+export function isValidCoordinates(coords: Coordinates | null | undefined): boolean {
   if (!coords) {
     return false;
   }
@@ -38,9 +36,7 @@ export function isValidCoordinates(
  * @param coordsString - String containing coordinates
  * @returns Coordinates object or null if invalid
  */
-export function parseCoordinatesString(
-  coordsString: string,
-): Coordinates | null {
+export function parseCoordinatesString(coordsString: string): Coordinates | null {
   try {
     const [latStr, lngStr] = coordsString.split(",").map((s) => s.trim());
     const latitude = parseFloat(latStr);

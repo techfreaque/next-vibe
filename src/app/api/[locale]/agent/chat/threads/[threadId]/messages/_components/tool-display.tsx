@@ -5,8 +5,8 @@ import type { JSX } from "react";
 
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import { ToolCallRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/ToolCallRenderer";
-import type { CountryLanguage } from "@/i18n/core/config";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Tool Display Props

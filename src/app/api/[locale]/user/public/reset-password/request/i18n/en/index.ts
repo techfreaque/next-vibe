@@ -11,8 +11,7 @@ export const translations = {
     previewText:
       "Reset your password to regain access to your {{appName}} account and continue chatting with 38 AI models.",
     greeting: "Hello,",
-    requestInfo:
-      "We received a request to reset the password for your {{appName}} account.",
+    requestInfo: "We received a request to reset the password for your {{appName}} account.",
     instructions:
       "Click the button below to create a new password. This link is valid for 24 hours and can only be used once.",
     buttonText: "Reset My Password",

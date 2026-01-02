@@ -24,7 +24,5 @@ export default async function AdminLeadsLayout({
   // Require admin user authentication
   await requireAdminUser(locale, `/${locale}/admin/leads`);
 
-  return (
-    <AdminLeadsLayoutClient locale={locale}>{children}</AdminLeadsLayoutClient>
-  );
+  return <AdminLeadsLayoutClient locale={locale}>{children}</AdminLeadsLayoutClient>;
 }

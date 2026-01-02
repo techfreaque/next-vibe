@@ -7,14 +7,7 @@
  */
 
 import type { ComponentPropsWithoutRef } from "react";
-import type {
-  Image,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import type { Image, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 
 export type ViewPropsWithClassName = ComponentPropsWithoutRef<typeof View> & {
   className?: string;
@@ -24,9 +17,7 @@ export type TextPropsWithClassName = ComponentPropsWithoutRef<typeof Text> & {
   className?: string;
 };
 
-export type PressablePropsWithClassName = ComponentPropsWithoutRef<
-  typeof Pressable
-> & {
+export type PressablePropsWithClassName = ComponentPropsWithoutRef<typeof Pressable> & {
   className?: string;
 };
 
@@ -34,15 +25,11 @@ export type ImagePropsWithClassName = ComponentPropsWithoutRef<typeof Image> & {
   className?: string;
 };
 
-export type ScrollViewPropsWithClassName = ComponentPropsWithoutRef<
-  typeof ScrollView
-> & {
+export type ScrollViewPropsWithClassName = ComponentPropsWithoutRef<typeof ScrollView> & {
   className?: string;
 };
 
-export type TextInputPropsWithClassName = ComponentPropsWithoutRef<
-  typeof TextInput
-> & {
+export type TextInputPropsWithClassName = ComponentPropsWithoutRef<typeof TextInput> & {
   className?: string;
 };
 
@@ -69,10 +56,9 @@ export type SlottableViewPropsWithClassName = RNPSlottableViewProps & {
   className?: string;
 };
 
-export type SlottablePressablePropsWithClassName =
-  RNPSlottablePressableProps & {
-    className?: string;
-  };
+export type SlottablePressablePropsWithClassName = RNPSlottablePressableProps & {
+  className?: string;
+};
 
 /**
  * Type helper to extract component props with className support

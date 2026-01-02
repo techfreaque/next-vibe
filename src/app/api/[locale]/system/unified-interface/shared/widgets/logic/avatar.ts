@@ -32,18 +32,12 @@ export function extractAvatarData(value: WidgetData): ProcessedAvatar | null {
 
   // Handle object value with avatar properties
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const src =
-      "src" in value && typeof value.src === "string" ? value.src : "";
-    const alt =
-      "alt" in value && typeof value.alt === "string" ? value.alt : "Avatar";
+    const src = "src" in value && typeof value.src === "string" ? value.src : "";
+    const alt = "alt" in value && typeof value.alt === "string" ? value.alt : "Avatar";
     const fallback =
-      "fallback" in value && typeof value.fallback === "string"
-        ? value.fallback
-        : getInitials(alt);
+      "fallback" in value && typeof value.fallback === "string" ? value.fallback : getInitials(alt);
     const size =
-      "size" in value && typeof value.size === "string"
-        ? (value.size as "sm" | "md" | "lg")
-        : "md";
+      "size" in value && typeof value.size === "string" ? (value.size as "sm" | "md" | "lg") : "md";
 
     return {
       src: src || undefined,

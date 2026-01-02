@@ -74,13 +74,7 @@ export function AccordionItem({
   style,
   ...props
 }: AccordionItemProps): React.JSX.Element {
-  return (
-    <AccordionPrimitive.Item
-      className={cn("border-b", className)}
-      style={style}
-      {...props}
-    />
-  );
+  return <AccordionPrimitive.Item className={cn("border-b", className)} style={style} {...props} />;
 }
 AccordionItem.displayName = AccordionPrimitive.Item.displayName;
 

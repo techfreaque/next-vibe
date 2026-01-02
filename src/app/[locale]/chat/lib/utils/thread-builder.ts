@@ -3,10 +3,7 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 /**
  * Get direct replies for a specific message
  */
-export function getDirectReplies(
-  messages: ChatMessage[],
-  messageId: string,
-): ChatMessage[] {
+export function getDirectReplies(messages: ChatMessage[], messageId: string): ChatMessage[] {
   return messages.filter((msg) => msg.parentId === messageId);
 }
 
@@ -24,9 +21,7 @@ export function getRootMessages(
  * Sort messages by timestamp (oldest first)
  */
 export function sortMessagesByTime(messages: ChatMessage[]): ChatMessage[] {
-  return [...messages].toSorted(
-    (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-  );
+  return [...messages].toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
 
 /**
@@ -68,28 +63,20 @@ export function buildMessagePath(
   for (const [parentId, siblings] of childrenMap.entries()) {
     childrenMap.set(
       parentId,
-      siblings.toSorted(
-        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-      ),
+      siblings.toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
     );
   }
 
   // Traverse the tree following branch indices
   const path: ChatMessage[] = [];
-  const branchInfo: Record<
-    string,
-    { siblings: ChatMessage[]; currentIndex: number }
-  > = {};
+  const branchInfo: Record<string, { siblings: ChatMessage[]; currentIndex: number }> = {};
 
   // Handle root-level branches
   let currentMessage: ChatMessage | undefined;
   if (rootMessages.length > 1) {
     // Multiple root messages - treat as branches at root level
     const rootBranchIndex = branchIndices["__root__"] ?? 0;
-    const validRootIndex = Math.min(
-      Math.max(0, rootBranchIndex),
-      rootMessages.length - 1,
-    );
+    const validRootIndex = Math.min(Math.max(0, rootBranchIndex), rootMessages.length - 1);
     branchInfo["__root__"] = {
       siblings: rootMessages,
       currentIndex: validRootIndex,
@@ -111,10 +98,7 @@ export function buildMessagePath(
     // Store branch info if there are multiple children
     if (children.length > 1) {
       const branchIndex = branchIndices[currentMessage.id] ?? 0;
-      const validIndex = Math.min(
-        Math.max(0, branchIndex),
-        children.length - 1,
-      );
+      const validIndex = Math.min(Math.max(0, branchIndex), children.length - 1);
       branchInfo[currentMessage.id] = {
         siblings: children,
         currentIndex: validIndex,

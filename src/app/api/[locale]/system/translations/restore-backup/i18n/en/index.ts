@@ -21,8 +21,7 @@ export const translations = {
       },
     },
     messages: {
-      validationSuccessful:
-        "Backup validation successful - backup is valid and can be restored",
+      validationSuccessful: "Backup validation successful - backup is valid and can be restored",
       restoreSuccessful: "Backup restored successfully",
       backupNotFound: "Backup not found at specified path",
     },

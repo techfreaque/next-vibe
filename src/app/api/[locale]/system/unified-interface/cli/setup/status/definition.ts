@@ -25,17 +25,11 @@ import { UserRole } from "../../../../../user/user-roles/enum";
  */
 const { POST } = createEndpoint({
   title: "app.api.system.unifiedInterface.cli.setup.status.post.title",
-  description:
-    "app.api.system.unifiedInterface.cli.setup.status.post.description",
+  description: "app.api.system.unifiedInterface.cli.setup.status.post.description",
   icon: "terminal",
   category: "app.api.system.unifiedInterface.cli.setup.status.post.title",
   tags: ["app.api.system.unifiedInterface.cli.setup.status.post.title"],
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.MCP_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.MCP_OFF],
   aliases: ["status", "setup:status"],
   method: Methods.POST,
   path: ["system", "setup", "status"],
@@ -49,8 +43,7 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.system.unifiedInterface.cli.setup.status.post.title",
-      description:
-        "app.api.system.unifiedInterface.cli.setup.status.post.description",
+      description: "app.api.system.unifiedInterface.cli.setup.status.post.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -60,8 +53,7 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.success",
+          content: "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.success",
         },
         z.boolean(),
       ),
@@ -78,8 +70,7 @@ const { POST } = createEndpoint({
       version: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.version",
+          content: "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.version",
         },
         z.string().optional(),
       ),
@@ -87,8 +78,7 @@ const { POST } = createEndpoint({
       path: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.path",
+          content: "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.path",
         },
         z.string().optional(),
       ),
@@ -96,8 +86,7 @@ const { POST } = createEndpoint({
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.message",
+          content: "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.message",
         },
         z.string(),
       ),
@@ -107,56 +96,47 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.validation.title",
+      title: "app.api.system.unifiedInterface.cli.setup.status.post.errors.validation.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.status.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.unauthorized.title",
+      title: "app.api.system.unifiedInterface.cli.setup.status.post.errors.unauthorized.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.status.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.server.title",
+      title: "app.api.system.unifiedInterface.cli.setup.status.post.errors.server.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.status.post.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.network.title",
+      title: "app.api.system.unifiedInterface.cli.setup.status.post.errors.network.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.status.post.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.forbidden.title",
+      title: "app.api.system.unifiedInterface.cli.setup.status.post.errors.forbidden.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.status.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.notFound.title",
+      title: "app.api.system.unifiedInterface.cli.setup.status.post.errors.notFound.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.status.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.unknown.title",
+      title: "app.api.system.unifiedInterface.cli.setup.status.post.errors.unknown.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.status.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.conflict.title",
+      title: "app.api.system.unifiedInterface.cli.setup.status.post.errors.conflict.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.status.post.errors.conflict.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.conflict.title",
+      title: "app.api.system.unifiedInterface.cli.setup.status.post.errors.conflict.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.status.post.errors.conflict.description",
     },
@@ -164,10 +144,8 @@ const { POST } = createEndpoint({
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title:
-      "app.api.system.unifiedInterface.cli.setup.status.post.success.title",
-    description:
-      "app.api.system.unifiedInterface.cli.setup.status.post.success.description",
+    title: "app.api.system.unifiedInterface.cli.setup.status.post.success.title",
+    description: "app.api.system.unifiedInterface.cli.setup.status.post.success.description",
   },
 });
 

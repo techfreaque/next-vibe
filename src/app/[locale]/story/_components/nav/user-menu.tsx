@@ -29,11 +29,7 @@ interface UserMenuProps {
   hasSubscription: boolean;
 }
 
-export function UserMenu({
-  user,
-  locale,
-  hasSubscription,
-}: UserMenuProps): JSX.Element {
+export function UserMenu({ user, locale, hasSubscription }: UserMenuProps): JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
   const logout = useLogout(logger);
@@ -53,19 +49,13 @@ export function UserMenu({
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <Div className="flex flex-col gap-1">
-            <P className="text-sm font-medium leading-none">
-              {getUserDisplayName(user)}
-            </P>
-            <P className="text-xs leading-none text-muted-foreground">
-              {user.email}
-            </P>
+            <P className="text-sm font-medium leading-none">{getUserDisplayName(user)}</P>
+            <P className="text-xs leading-none text-muted-foreground">{user.email}</P>
           </Div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link
-            href={hasSubscription ? `/${locale}` : `/${locale}/subscription`}
-          >
+          <Link href={hasSubscription ? `/${locale}` : `/${locale}/subscription`}>
             {hasSubscription ? (
               <>
                 <User className="mr-2 h-4 w-4" />

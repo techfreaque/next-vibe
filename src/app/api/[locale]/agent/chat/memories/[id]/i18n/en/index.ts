@@ -20,8 +20,7 @@ export const translations = {
     },
     priority: {
       label: "Priority",
-      description:
-        "Higher priority memories appear first (leave empty to keep current)",
+      description: "Higher priority memories appear first (leave empty to keep current)",
     },
     response: {
       success: {

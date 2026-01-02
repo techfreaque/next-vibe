@@ -4,8 +4,7 @@ export const translations = {
   tag: "reset",
   post: {
     title: "Database Reset",
-    description:
-      "Reset database by truncating tables, dropping schema, or full initialization",
+    description: "Reset database by truncating tables, dropping schema, or full initialization",
     form: {
       title: "Reset Configuration",
       description: "Configure database reset options",
@@ -142,8 +141,7 @@ export const translations = {
   taskManagement: taskManagementTranslations,
   messages: {
     dryRun: "DRY RUN: No actual changes were made",
-    truncateRequiresForce:
-      "Truncate operation requires --force flag for safety",
+    truncateRequiresForce: "Truncate operation requires --force flag for safety",
     noTablesToTruncate: "No tables found to truncate",
     truncatedTables: "Truncated {{count}} tables successfully",
     failedToTruncate: "Failed to truncate tables: {{error}}",

@@ -7,10 +7,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import {
-  renderAdminUnsubscribeNotificationMail,
-  renderUnsubscribeConfirmationMail,
-} from "./email";
+import { renderAdminUnsubscribeNotificationMail, renderUnsubscribeConfirmationMail } from "./email";
 import { NewsletterUnsubscribeRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({

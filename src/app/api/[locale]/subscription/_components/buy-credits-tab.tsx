@@ -1,11 +1,5 @@
 import { Button } from "next-vibe-ui/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "next-vibe-ui/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -35,10 +29,7 @@ import { useState } from "react";
 import { useCreditPurchase } from "@/app/api/[locale]/credits/hooks";
 import purchaseDefinitions from "@/app/api/[locale]/credits/purchase/definition";
 import { useSubscriptionCheckout } from "@/app/api/[locale]/payment/checkout/hooks";
-import {
-  PaymentProvider,
-  type PaymentProviderValue,
-} from "@/app/api/[locale]/payment/enum";
+import { PaymentProvider, type PaymentProviderValue } from "@/app/api/[locale]/payment/enum";
 import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import {
@@ -77,9 +68,7 @@ export function BuyCreditsTab({
 
   // Modal and provider state
   const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<"subscription" | "credits">(
-    "subscription",
-  );
+  const [modalType, setModalType] = useState<"subscription" | "credits">("subscription");
   const [billingInterval, setBillingInterval] = useState<
     typeof BillingInterval.MONTHLY | typeof BillingInterval.YEARLY
   >(BillingInterval.MONTHLY);
@@ -97,8 +86,7 @@ export function BuyCreditsTab({
   const handleBuyCredits = (): void => {
     // Check if quantity is sufficient for crypto (minimum 4 packs)
     if (creditPurchaseEndpoint.create) {
-      const quantity =
-        creditPurchaseEndpoint.create.form.getValues("quantity") || 1;
+      const quantity = creditPurchaseEndpoint.create.form.getValues("quantity") || 1;
       // Ensure minimum quantity is met
       if (quantity < 1) {
         creditPurchaseEndpoint.create.form.setValue("quantity", 1);
@@ -108,9 +96,7 @@ export function BuyCreditsTab({
     setIsProviderModalOpen(true);
   };
 
-  const handleProviderSelect = (
-    provider: typeof PaymentProviderValue,
-  ): void => {
+  const handleProviderSelect = (provider: typeof PaymentProviderValue): void => {
     setIsProviderModalOpen(false);
 
     if (modalType === "subscription") {
@@ -140,22 +126,16 @@ export function BuyCreditsTab({
     modalType === "subscription" && billingInterval === BillingInterval.MONTHLY;
 
   // Check if crypto is disabled for credit packs (below minimum)
-  const creditQuantity =
-    creditPurchaseEndpoint.create?.form.watch("quantity") || 1;
-  const isCryptoDisabledForCredits =
-    modalType === "credits" && creditQuantity < 5;
+  const creditQuantity = creditPurchaseEndpoint.create?.form.watch("quantity") || 1;
+  const isCryptoDisabledForCredits = modalType === "credits" && creditQuantity < 5;
 
   // Get current subscription price based on billing interval
   const currentSubscriptionPrice =
-    billingInterval === BillingInterval.YEARLY
-      ? yearlySubscriptionPrice
-      : subscriptionPrice;
+    billingInterval === BillingInterval.YEARLY ? yearlySubscriptionPrice : subscriptionPrice;
 
   // Calculate monthly price for yearly subscription
   const monthlyEquivalent =
-    billingInterval === BillingInterval.YEARLY
-      ? yearlySubscriptionPrice / 12
-      : subscriptionPrice;
+    billingInterval === BillingInterval.YEARLY ? yearlySubscriptionPrice / 12 : subscriptionPrice;
 
   return (
     <>
@@ -167,9 +147,7 @@ export function BuyCreditsTab({
               {t("app.api.subscription.checkout.form.fields.provider.label")}
             </DialogTitle>
             <DialogDescription>
-              {t(
-                "app.api.subscription.checkout.form.fields.provider.description",
-              )}
+              {t("app.api.subscription.checkout.form.fields.provider.description")}
             </DialogDescription>
           </DialogHeader>
           <Div className="grid gap-4 py-4">
@@ -184,9 +162,7 @@ export function BuyCreditsTab({
                   {t("app.api.payment.enums.paymentProvider.stripe")}
                 </Div>
                 <Div className="text-sm text-muted-foreground">
-                  {t(
-                    "app.subscription.subscription.buy.provider.stripe.description",
-                  )}
+                  {t("app.subscription.subscription.buy.provider.stripe.description")}
                 </Div>
               </Div>
             </Button>
@@ -202,9 +178,7 @@ export function BuyCreditsTab({
                   {t("app.api.payment.enums.paymentProvider.nowpayments")}
                 </Div>
                 <Div className="text-sm text-muted-foreground">
-                  {t(
-                    "app.subscription.subscription.buy.provider.nowpayments.description",
-                  )}
+                  {t("app.subscription.subscription.buy.provider.nowpayments.description")}
                 </Div>
               </Div>
             </Button>
@@ -213,9 +187,7 @@ export function BuyCreditsTab({
                 <Div className="text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
                   <Info className="h-4 w-4 mt-0.5 shrink-0" />
                   <Span>
-                    {t(
-                      "app.subscription.subscription.buy.provider.cryptoMonthlyDisabled",
-                    )}
+                    {t("app.subscription.subscription.buy.provider.cryptoMonthlyDisabled")}
                   </Span>
                 </Div>
               </Div>
@@ -225,13 +197,10 @@ export function BuyCreditsTab({
                 <Div className="text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
                   <Info className="h-4 w-4 mt-0.5 shrink-0" />
                   <Span>
-                    {t(
-                      "app.subscription.subscription.buy.provider.cryptoMinimumPacks",
-                      {
-                        minPacks: 5,
-                        minValue: formatPrice(packPrice * 5, locale),
-                      },
-                    )}
+                    {t("app.subscription.subscription.buy.provider.cryptoMinimumPacks", {
+                      minPacks: 5,
+                      minValue: formatPrice(packPrice * 5, locale),
+                    })}
                   </Span>
                 </Div>
               </Div>
@@ -264,11 +233,7 @@ export function BuyCreditsTab({
             {/* Billing Interval Toggle */}
             <Div className="flex items-center justify-center gap-2 p-1 bg-muted rounded-lg">
               <Button
-                variant={
-                  billingInterval === BillingInterval.MONTHLY
-                    ? "default"
-                    : "ghost"
-                }
+                variant={billingInterval === BillingInterval.MONTHLY ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setBillingInterval(BillingInterval.MONTHLY)}
                 className="flex-1"
@@ -276,11 +241,7 @@ export function BuyCreditsTab({
                 {t("app.api.subscription.billing.monthly")}
               </Button>
               <Button
-                variant={
-                  billingInterval === BillingInterval.YEARLY
-                    ? "default"
-                    : "ghost"
-                }
+                variant={billingInterval === BillingInterval.YEARLY ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setBillingInterval(BillingInterval.YEARLY)}
                 className="flex-1"
@@ -296,22 +257,15 @@ export function BuyCreditsTab({
                 </Div>
                 <Div className="text-sm text-muted-foreground">
                   {billingInterval === BillingInterval.YEARLY
-                    ? t(
-                        "app.subscription.subscription.buy.subscription.perYear",
-                      )
-                    : t(
-                        "app.subscription.subscription.buy.subscription.perMonth",
-                      )}
+                    ? t("app.subscription.subscription.buy.subscription.perYear")
+                    : t("app.subscription.subscription.buy.subscription.perMonth")}
                 </Div>
               </Div>
               {billingInterval === BillingInterval.YEARLY && (
                 <Div className="text-sm text-green-600 dark:text-green-400">
-                  {t(
-                    "app.subscription.subscription.buy.subscription.yearlyEquivalent",
-                    {
-                      monthlyPrice: formatPrice(monthlyEquivalent, locale),
-                    },
-                  )}
+                  {t("app.subscription.subscription.buy.subscription.yearlyEquivalent", {
+                    monthlyPrice: formatPrice(monthlyEquivalent, locale),
+                  })}
                 </Div>
               )}
             </Div>
@@ -320,42 +274,28 @@ export function BuyCreditsTab({
               <Div className="flex items-center gap-2">
                 <Zap className="h-4 w-4 text-primary" />
                 <Span>
-                  {t(
-                    "app.subscription.subscription.buy.subscription.features.credits",
-                    {
-                      count: subscriptionCredits,
-                    },
-                  )}
+                  {t("app.subscription.subscription.buy.subscription.features.credits", {
+                    count: subscriptionCredits,
+                  })}
                 </Span>
               </Div>
               <Div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-amber-600" />
                 <Span>
-                  {t(
-                    "app.subscription.subscription.buy.subscription.features.expiry",
-                    {
-                      modelCount: TOTAL_MODEL_COUNT,
-                    },
-                  )}
+                  {t("app.subscription.subscription.buy.subscription.features.expiry", {
+                    modelCount: TOTAL_MODEL_COUNT,
+                  })}
                 </Span>
               </Div>
               <Div className="flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-green-600" />
-                <Span>
-                  {t(
-                    "app.subscription.subscription.buy.subscription.features.bestFor",
-                  )}
-                </Span>
+                <Span>{t("app.subscription.subscription.buy.subscription.features.bestFor")}</Span>
               </Div>
             </Div>
 
             {!isAuthenticated ? (
               <Div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  asChild
-                  className="flex-1 hidden sm:flex"
-                >
+                <Button variant="ghost" asChild className="flex-1 hidden sm:flex">
                   <Link href={`/${locale}/user/login`}>
                     {t("app.story._components.nav.user.login")}
                   </Link>
@@ -383,12 +323,8 @@ export function BuyCreditsTab({
                 {subscriptionCheckoutEndpoint.create?.isSubmitting
                   ? "Loading..."
                   : initialSubscription?.status === SubscriptionStatus.ACTIVE
-                    ? t(
-                        "app.subscription.subscription.buy.subscription.buttonAlreadySubscribed",
-                      )
-                    : t(
-                        "app.subscription.subscription.buy.subscription.button",
-                      )}
+                    ? t("app.subscription.subscription.buy.subscription.buttonAlreadySubscribed")
+                    : t("app.subscription.subscription.buy.subscription.button")}
               </Button>
             )}
           </CardContent>
@@ -406,9 +342,7 @@ export function BuyCreditsTab({
           </CardHeader>
           <CardContent className="flex flex-col gap-6">
             <Div className="flex items-baseline gap-1">
-              <Div className="text-4xl font-bold">
-                {formatPrice(packPrice, locale)}
-              </Div>
+              <Div className="text-4xl font-bold">{formatPrice(packPrice, locale)}</Div>
               <Div className="text-sm text-muted-foreground">
                 {t("app.subscription.subscription.buy.pack.perPack")}
               </Div>
@@ -418,25 +352,18 @@ export function BuyCreditsTab({
               <Div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-green-600" />
                 <Span>
-                  {t(
-                    "app.subscription.subscription.buy.pack.features.credits",
-                    {
-                      count: packCredits,
-                    },
-                  )}
+                  {t("app.subscription.subscription.buy.pack.features.credits", {
+                    count: packCredits,
+                  })}
                 </Span>
               </Div>
               <Div className="flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 text-green-600" />
-                <Span>
-                  {t("app.subscription.subscription.buy.pack.features.expiry")}
-                </Span>
+                <Span>{t("app.subscription.subscription.buy.pack.features.expiry")}</Span>
               </Div>
               <Div className="flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-blue-600" />
-                <Span>
-                  {t("app.subscription.subscription.buy.pack.features.bestFor")}
-                </Span>
+                <Span>{t("app.subscription.subscription.buy.pack.features.bestFor")}</Span>
               </Div>
             </Div>
 
@@ -471,22 +398,17 @@ export function BuyCreditsTab({
                   >
                     {creditPurchaseEndpoint.create.isSubmitting
                       ? "Loading..."
-                      : t(
-                          "app.subscription.subscription.buy.pack.button.submit",
-                        )}
+                      : t("app.subscription.subscription.buy.pack.button.submit")}
                   </Button>
                 </Form>
               )}
 
             {/* Message for non-subscribers */}
-            {(!initialSubscription ||
-              initialSubscription.status !== SubscriptionStatus.ACTIVE) && (
+            {(!initialSubscription || initialSubscription.status !== SubscriptionStatus.ACTIVE) && (
               <Div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
                 <Div className="text-sm text-amber-700 dark:text-amber-300">
                   <Info className="h-4 w-4 inline mr-2" />
-                  {t(
-                    "app.subscription.subscription.buy.pack.requiresSubscription",
-                  )}
+                  {t("app.subscription.subscription.buy.pack.requiresSubscription")}
                 </Div>
               </Div>
             )}

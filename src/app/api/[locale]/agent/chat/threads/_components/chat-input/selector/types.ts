@@ -14,10 +14,7 @@ import {
   type PriceLevelFilterValue,
   SpeedLevel,
 } from "@/app/api/[locale]/agent/chat/favorites/enum";
-import type {
-  ModelId,
-  ModelOption,
-} from "@/app/api/[locale]/agent/chat/model-access/models";
+import type { ModelId, ModelOption } from "@/app/api/[locale]/agent/chat/model-access/models";
 import type { ModelFeatures } from "@/app/api/[locale]/agent/chat/types";
 
 /**
@@ -77,10 +74,7 @@ export const DEFAULT_FAVORITE_MODELS: ModelId[] = [];
 /**
  * Check if a model meets character requirements (hard filters)
  */
-export function modelMeetsRequirements(
-  model: ModelOption,
-  character: Character,
-): boolean {
+export function modelMeetsRequirements(model: ModelOption, character: Character): boolean {
   const { requirements } = character;
   if (!requirements) {
     return true;
@@ -88,11 +82,7 @@ export function modelMeetsRequirements(
 
   // Content level check
   if (requirements.minContent) {
-    const contentOrder = [
-      ContentLevel.MAINSTREAM,
-      ContentLevel.OPEN,
-      ContentLevel.UNCENSORED,
-    ];
+    const contentOrder = [ContentLevel.MAINSTREAM, ContentLevel.OPEN, ContentLevel.UNCENSORED];
     const modelIndex = contentOrder.indexOf(model.content);
     const requiredIndex = contentOrder.indexOf(requirements.minContent);
     if (modelIndex < requiredIndex) {
@@ -101,11 +91,7 @@ export function modelMeetsRequirements(
   }
 
   if (requirements.maxContent) {
-    const contentOrder = [
-      ContentLevel.MAINSTREAM,
-      ContentLevel.OPEN,
-      ContentLevel.UNCENSORED,
-    ];
+    const contentOrder = [ContentLevel.MAINSTREAM, ContentLevel.OPEN, ContentLevel.UNCENSORED];
     const modelIndex = contentOrder.indexOf(model.content);
     const maxIndex = contentOrder.indexOf(requirements.maxContent);
     if (modelIndex > maxIndex) {
@@ -121,9 +107,7 @@ export function modelMeetsRequirements(
       IntelligenceLevel.BRILLIANT,
     ];
     const modelIndex = intelligenceOrder.indexOf(model.intelligence);
-    const requiredIndex = intelligenceOrder.indexOf(
-      requirements.minIntelligence,
-    );
+    const requiredIndex = intelligenceOrder.indexOf(requirements.minIntelligence);
     if (modelIndex < requiredIndex) {
       return false;
     }
@@ -144,11 +128,7 @@ export function modelMeetsRequirements(
 
   // Speed level check
   if (requirements.minSpeed) {
-    const speedOrder = [
-      SpeedLevel.FAST,
-      SpeedLevel.BALANCED,
-      SpeedLevel.THOROUGH,
-    ];
+    const speedOrder = [SpeedLevel.FAST, SpeedLevel.BALANCED, SpeedLevel.THOROUGH];
     const modelIndex = speedOrder.indexOf(model.speed);
     const requiredIndex = speedOrder.indexOf(requirements.minSpeed);
     if (modelIndex < requiredIndex) {
@@ -157,11 +137,7 @@ export function modelMeetsRequirements(
   }
 
   if (requirements.maxSpeed) {
-    const speedOrder = [
-      SpeedLevel.FAST,
-      SpeedLevel.BALANCED,
-      SpeedLevel.THOROUGH,
-    ];
+    const speedOrder = [SpeedLevel.FAST, SpeedLevel.BALANCED, SpeedLevel.THOROUGH];
     const modelIndex = speedOrder.indexOf(model.speed);
     const maxIndex = speedOrder.indexOf(requirements.maxSpeed);
     if (modelIndex > maxIndex) {
@@ -185,10 +161,7 @@ export function modelMeetsRequirements(
  * Score a model for a character (soft preferences)
  * Higher score = better match
  */
-export function scoreModelForCharacter(
-  model: ModelOption,
-  character: Character,
-): number {
+export function scoreModelForCharacter(model: ModelOption, character: Character): number {
   let score = 0;
   const { preferences } = character;
 
@@ -223,10 +196,7 @@ export function scoreModelForCharacter(
 /**
  * Get compatible models for a character
  */
-export function getCompatibleModels(
-  models: ModelOption[],
-  character: Character,
-): ModelOption[] {
+export function getCompatibleModels(models: ModelOption[], character: Character): ModelOption[] {
   return models.filter((model) => modelMeetsRequirements(model, character));
 }
 
@@ -261,16 +231,8 @@ export function findBestModel(
     minContent?: typeof ContentLevelFilterValue;
   } = {},
 ): ModelOption | null {
-  const priceOrder = [
-    PriceLevelFilter.CHEAP,
-    PriceLevelFilter.STANDARD,
-    PriceLevelFilter.PREMIUM,
-  ];
-  const contentOrder = [
-    ContentLevel.MAINSTREAM,
-    ContentLevel.OPEN,
-    ContentLevel.UNCENSORED,
-  ];
+  const priceOrder = [PriceLevelFilter.CHEAP, PriceLevelFilter.STANDARD, PriceLevelFilter.PREMIUM];
+  const contentOrder = [ContentLevel.MAINSTREAM, ContentLevel.OPEN, ContentLevel.UNCENSORED];
   const intelligenceOrder = [
     IntelligenceLevel.QUICK,
     IntelligenceLevel.SMART,
@@ -278,15 +240,10 @@ export function findBestModel(
   ];
 
   // Filter by character requirements first
-  let candidates = models.filter((model) =>
-    modelMeetsRequirements(model, character),
-  );
+  let candidates = models.filter((model) => modelMeetsRequirements(model, character));
 
   // Apply intelligence constraint
-  if (
-    constraints.intelligence &&
-    constraints.intelligence !== IntelligenceLevelFilter.ANY
-  ) {
+  if (constraints.intelligence && constraints.intelligence !== IntelligenceLevelFilter.ANY) {
     const targetIndex = intelligenceOrder.indexOf(constraints.intelligence);
     candidates = candidates.filter((model) => {
       const modelIndex = intelligenceOrder.indexOf(model.intelligence);
@@ -310,10 +267,7 @@ export function findBestModel(
   }
 
   // Apply content constraint
-  if (
-    constraints.minContent &&
-    constraints.minContent !== ContentLevelFilter.ANY
-  ) {
+  if (constraints.minContent && constraints.minContent !== ContentLevelFilter.ANY) {
     const minIndex = contentOrder.indexOf(constraints.minContent);
     candidates = candidates.filter((model) => {
       const modelIndex = contentOrder.indexOf(model.content);

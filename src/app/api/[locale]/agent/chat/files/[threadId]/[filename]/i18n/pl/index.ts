@@ -25,8 +25,7 @@ export const translations = {
       },
       notFound: {
         title: "Plik nie znaleziony",
-        description:
-          "Żądany plik nie został znaleziony lub dostęp został odmówiony",
+        description: "Żądany plik nie został znaleziony lub dostęp został odmówiony",
       },
       server: {
         title: "Błąd serwera",

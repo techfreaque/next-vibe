@@ -22,8 +22,7 @@ export const translations = {
       backToLogin: "Back to Login",
       emailSent: "Email Sent!",
       successTitle: "Check Your Email",
-      successMessage:
-        "We've sent you a password reset link. Please check your inbox.",
+      successMessage: "We've sent you a password reset link. Please check your inbox.",
       requestNewLink: "Request New Link",
       createNewPasswordTitle: "Create New Password",
       createNewPasswordSubtitle: "Enter your new password below",

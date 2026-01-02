@@ -1,12 +1,7 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "next-vibe-ui/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
@@ -146,10 +141,7 @@ export function FolderPermissionsDialog({
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               {t("app.chat.common.cancel")}
             </Button>
-            <Button
-              type="submit"
-              disabled={endpoint.isLoading || !!endpoint.read?.error}
-            >
+            <Button type="submit" disabled={endpoint.isLoading || !!endpoint.read?.error}>
               {t("app.chat.common.save")}
             </Button>
           </Div>

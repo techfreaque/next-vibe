@@ -59,10 +59,8 @@ export const translations: typeof enTranslations = {
   },
   docker: {
     executing_command: "Wykonywanie polecenia Docker: {{command}}",
-    command_timeout:
-      "Polecenie Docker przekroczyło czas {{timeout}}ms: {{command}}",
-    command_failed:
-      "Polecenie Docker nie powiodło się z kodem {{code}}: {{command}}",
+    command_timeout: "Polecenie Docker przekroczyło czas {{timeout}}ms: {{command}}",
+    command_failed: "Polecenie Docker nie powiodło się z kodem {{code}}: {{command}}",
     execution_failed: "Nie udało się wykonać polecenia Docker: {{command}}",
     command_error: "Błąd polecenia Docker: {{error}}",
     stopping_containers: "Zatrzymywanie kontenerów Docker...",

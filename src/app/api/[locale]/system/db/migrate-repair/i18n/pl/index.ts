@@ -16,18 +16,15 @@ export const translations: typeof enTranslations = {
       },
       network: {
         title: "Błąd Sieci",
-        description:
-          "Nie udało się połączyć z bazą danych w celu naprawy migracji",
+        description: "Nie udało się połączyć z bazą danych w celu naprawy migracji",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description:
-          "Nie jesteś upoważniony do wykonywania operacji naprawy migracji",
+        description: "Nie jesteś upoważniony do wykonywania operacji naprawy migracji",
       },
       forbidden: {
         title: "Zabronione",
-        description:
-          "Operacje naprawy migracji nie są dozwolone dla Twojej roli",
+        description: "Operacje naprawy migracji nie są dozwolone dla Twojej roli",
       },
       notFound: {
         title: "Nie Znaleziono",
@@ -35,8 +32,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd Serwera",
-        description:
-          "Wystąpił wewnętrzny błąd serwera podczas naprawy migracji",
+        description: "Wystąpił wewnętrzny błąd serwera podczas naprawy migracji",
       },
       unknown: {
         title: "Nieznany Błąd",
@@ -59,13 +55,11 @@ export const translations: typeof enTranslations = {
     },
     dryRun: {
       title: "Próbny Przebieg",
-      description:
-        "Pokaż co zostałoby zrobione bez faktycznego wykonywania zmian",
+      description: "Pokaż co zostałoby zrobione bez faktycznego wykonywania zmian",
     },
     reset: {
       title: "Resetuj Śledzenie",
-      description:
-        "Resetuj śledzenie migracji (wyczyść wszystkie śledzone migracje)",
+      description: "Resetuj śledzenie migracji (wyczyść wszystkie śledzone migracje)",
     },
     success: {
       title: "Sukces",
@@ -93,13 +87,11 @@ export const translations: typeof enTranslations = {
     },
   },
   messages: {
-    upToDate:
-      "✅ Śledzenie migracji jest aktualne - naprawa nie jest potrzebna",
+    upToDate: "✅ Śledzenie migracji jest aktualne - naprawa nie jest potrzebna",
     dryRunComplete: "✅ Próbny przebieg zakończony - nie wprowadzono zmian",
     repairComplete:
       "✅ Naprawa migracji zakończona pomyślnie! Oznaczono {{count}} migracji jako zastosowane",
-    success:
-      "✅ Naprawa migracji zakończona pomyślnie! 🚀 Gotowe do buildów produkcyjnych",
+    success: "✅ Naprawa migracji zakończona pomyślnie! 🚀 Gotowe do buildów produkcyjnych",
   },
   tag: "Baza Danych",
 };

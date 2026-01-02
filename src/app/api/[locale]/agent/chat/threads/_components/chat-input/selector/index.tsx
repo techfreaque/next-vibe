@@ -4,21 +4,14 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 import { useTourState } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-state-context";
-import {
-  type Character,
-  getCharacterById,
-} from "@/app/api/[locale]/agent/chat/characters/config";
+import { type Character, getCharacterById } from "@/app/api/[locale]/agent/chat/characters/config";
 import charactersDefinition, {
   type CharacterListResponseOutput,
 } from "@/app/api/[locale]/agent/chat/characters/definition";
@@ -31,14 +24,8 @@ import {
   PriceLevelFilter,
   type PriceLevelFilterValue,
 } from "@/app/api/[locale]/agent/chat/favorites/enum";
-import {
-  getIconComponent,
-  type IconKey,
-} from "@/app/api/[locale]/agent/chat/model-access/icons";
-import {
-  type ModelId,
-  modelOptions,
-} from "@/app/api/[locale]/agent/chat/model-access/models";
+import { getIconComponent, type IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { type ModelId, modelOptions } from "@/app/api/[locale]/agent/chat/model-access/models";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -88,9 +75,7 @@ type SelectorView =
 /**
  * Get default intelligence from character preferences
  */
-function getDefaultIntelligence(
-  character: Character | null,
-): typeof IntelligenceLevelFilterValue {
+function getDefaultIntelligence(character: Character | null): typeof IntelligenceLevelFilterValue {
   if (character?.preferences?.preferredStrengths) {
     if (character.preferences.preferredStrengths.includes(ModelUtility.SMART)) {
       return IntelligenceLevelFilter.BRILLIANT;
@@ -105,9 +90,7 @@ function getDefaultIntelligence(
 /**
  * Get default content from character requirements
  */
-function getDefaultContent(
-  character: Character | null,
-): typeof ContentLevelFilterValue {
+function getDefaultContent(character: Character | null): typeof ContentLevelFilterValue {
   if (character?.requirements?.minContent) {
     return character.requirements.minContent;
   }
@@ -142,16 +125,11 @@ function applyFavoriteSelection(
   }
 
   // Resolve and set model
-  const character = favorite.characterId
-    ? (getCharacterById(favorite.characterId) ?? null)
-    : null;
+  const character = favorite.characterId ? (getCharacterById(favorite.characterId) ?? null) : null;
 
   const allModels = Object.values(modelOptions);
   const selectedModelId = selectModelForCharacter(allModels, character, {
-    mode:
-      favorite.modelSettings.mode === ModelSelectionMode.MANUAL
-        ? "manual"
-        : "auto",
+    mode: favorite.modelSettings.mode === ModelSelectionMode.MANUAL ? "manual" : "auto",
     manualModelId: favorite.modelSettings.manualModelId,
     filters: favorite.modelSettings.filters,
   });
@@ -188,8 +166,7 @@ function createFavoriteFromCharacter(
   const character = characterId ? getCharacterById(characterId) : null;
 
   // Use character-specific defaults if not provided
-  const defaultIntelligence =
-    intelligence ?? getDefaultIntelligence(character ?? null);
+  const defaultIntelligence = intelligence ?? getDefaultIntelligence(character ?? null);
   const defaultContent = content ?? getDefaultContent(character ?? null);
 
   return {
@@ -220,8 +197,7 @@ function createFavoriteFromCharacterObject(
   content?: typeof ContentLevelFilterValue,
 ): FavoriteItem {
   // Use character-specific defaults if not provided
-  const defaultIntelligence =
-    intelligence ?? getDefaultIntelligence(character as Character);
+  const defaultIntelligence = intelligence ?? getDefaultIntelligence(character as Character);
   const defaultContent = content ?? getDefaultContent(character as Character);
 
   return {
@@ -285,10 +261,7 @@ export function Selector({
       "characters" in response.data
     ) {
       const charactersList = response.data.characters;
-      const map: Record<
-        string,
-        CharacterListResponseOutput["characters"][number]
-      > = {};
+      const map: Record<string, CharacterListResponseOutput["characters"][number]> = {};
       charactersList.forEach((p) => {
         map[p.id] = p;
       });
@@ -301,12 +274,8 @@ export function Selector({
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [view, setView] = useState<SelectorView>("favorites");
   const [isOnboardingActive, setIsOnboardingActive] = useState(false);
-  const [onboardingStep, setOnboardingStep] = useState<
-    "story" | "pick" | "specialists"
-  >("story");
-  const [onboardingSelectedId, setOnboardingSelectedId] = useState<
-    string | null
-  >(null);
+  const [onboardingStep, setOnboardingStep] = useState<"story" | "pick" | "specialists">("story");
+  const [onboardingSelectedId, setOnboardingSelectedId] = useState<string | null>(null);
 
   const needsOnboarding = useMemo(() => {
     return !favoritesLoading && favorites.length === 0;
@@ -315,12 +284,8 @@ export function Selector({
   // Use tour state if active
   const open = tourIsActive ? tourOpen : popoverOpen;
 
-  const [editingFavoriteId, setEditingFavoriteId] = useState<string | null>(
-    null,
-  );
-  const [editingCharacterId, setEditingCharacterId] = useState<string | null>(
-    null,
-  );
+  const [editingFavoriteId, setEditingFavoriteId] = useState<string | null>(null);
+  const [editingCharacterId, setEditingCharacterId] = useState<string | null>(null);
   const [editingCharacterData, setEditingCharacterData] = useState<
     CharacterListResponseOutput["characters"][number] | null
   >(null);
@@ -340,33 +305,19 @@ export function Selector({
       }
     }
     prevTourOpen.current = tourOpen;
-  }, [
-    tourIsActive,
-    tourOpen,
-    needsOnboarding,
-    favoritesLoading,
-    isOnboardingActive,
-  ]);
+  }, [tourIsActive, tourOpen, needsOnboarding, favoritesLoading, isOnboardingActive]);
 
   // Derive actual view - allow switching to settings even during onboarding
   const actualView =
-    isOnboardingActive && view !== "settings" && view !== "edit"
-      ? "onboarding"
-      : view;
+    isOnboardingActive && view !== "settings" && view !== "edit" ? "onboarding" : view;
 
   // Get current selections
-  const currentCharacter = useMemo(
-    () => getCharacterById(characterId),
-    [characterId],
-  );
+  const currentCharacter = useMemo(() => getCharacterById(characterId), [characterId]);
   const currentModel = useMemo(() => modelOptions[modelId], [modelId]);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
 
   // Get active favorite
-  const activeFavorite = useMemo(
-    () => favorites.find((f) => f.isActive),
-    [favorites],
-  );
+  const activeFavorite = useMemo(() => favorites.find((f) => f.isActive), [favorites]);
 
   // Get the favorite being edited (could be different from active)
   const editingFavorite = useMemo(() => {
@@ -405,13 +356,7 @@ export function Selector({
         setIsOnboardingActive(false);
       }
     },
-    [
-      tourIsActive,
-      setTourOpen,
-      needsOnboarding,
-      favoritesLoading,
-      isOnboardingActive,
-    ],
+    [tourIsActive, setTourOpen, needsOnboarding, favoritesLoading, isOnboardingActive],
   );
 
   // Close modal and reset to favorites view
@@ -432,13 +377,7 @@ export function Selector({
 
       closeModal();
     },
-    [
-      favorites,
-      onCharacterChange,
-      onModelChange,
-      closeModal,
-      setActiveFavorite,
-    ],
+    [favorites, onCharacterChange, onModelChange, closeModal, setActiveFavorite],
   );
 
   // Switch to settings view for a specific favorite
@@ -472,11 +411,7 @@ export function Selector({
 
       if (saveMode === "temporary") {
         // Just apply to current chat without saving
-        applyFavoriteSelection(
-          updatedFavorite,
-          onCharacterChange,
-          onModelChange,
-        );
+        applyFavoriteSelection(updatedFavorite, onCharacterChange, onModelChange);
       } else if (saveMode === "update") {
         if (isNewCharacter) {
           // Creating new favorite from character browser
@@ -492,11 +427,7 @@ export function Selector({
 
           // Apply changes if this is the active favorite
           if (editingFavorite.isActive) {
-            applyFavoriteSelection(
-              updatedFavorite,
-              onCharacterChange,
-              onModelChange,
-            );
+            applyFavoriteSelection(updatedFavorite, onCharacterChange, onModelChange);
           }
         }
       } else {
@@ -512,11 +443,7 @@ export function Selector({
         });
 
         // Apply changes (new favorite is always active)
-        applyFavoriteSelection(
-          updatedFavorite,
-          onCharacterChange,
-          onModelChange,
-        );
+        applyFavoriteSelection(updatedFavorite, onCharacterChange, onModelChange);
       }
 
       setEditingFavoriteId(null);
@@ -547,8 +474,7 @@ export function Selector({
     async (newCharacterId: string): Promise<void> => {
       // Check if non-customized version already exists
       const exists = favorites.some(
-        (f) =>
-          f.characterId === newCharacterId && !f.customName && !f.customIcon,
+        (f) => f.characterId === newCharacterId && !f.customName && !f.customIcon,
       );
 
       // Don't add duplicates
@@ -573,8 +499,7 @@ export function Selector({
     (newCharacterId: string): void => {
       // Check if non-customized version already exists
       const existingFavorite = favorites.find(
-        (f) =>
-          f.characterId === newCharacterId && !f.customName && !f.customIcon,
+        (f) => f.characterId === newCharacterId && !f.customName && !f.customIcon,
       );
 
       if (existingFavorite) {
@@ -648,8 +573,7 @@ export function Selector({
       }
 
       // Get character data (from API response or built-in)
-      const character =
-        characters[newCharacterId] ?? getCharacterById(newCharacterId);
+      const character = characters[newCharacterId] ?? getCharacterById(newCharacterId);
 
       // Prepare update - include voice
       const updates: Partial<FavoriteItem> = {
@@ -664,10 +588,8 @@ export function Selector({
             mode: ModelSelectionMode.AUTO,
             filters: {
               intelligence:
-                character.requirements?.minIntelligence ||
-                IntelligenceLevelFilter.SMART,
-              content:
-                character.requirements?.minContent || ContentLevelFilter.OPEN,
+                character.requirements?.minIntelligence || IntelligenceLevelFilter.SMART,
+              content: character.requirements?.minContent || ContentLevelFilter.OPEN,
               maxPrice: PriceLevelFilter.STANDARD,
             },
           };
@@ -684,20 +606,10 @@ export function Selector({
           ...updates,
           modelSettings: updates.modelSettings || editingFavorite.modelSettings,
         };
-        applyFavoriteSelection(
-          updatedFavorite,
-          onCharacterChange,
-          onModelChange,
-        );
+        applyFavoriteSelection(updatedFavorite, onCharacterChange, onModelChange);
       }
     },
-    [
-      editingFavorite,
-      updateFavorite,
-      onCharacterChange,
-      onModelChange,
-      characters,
-    ],
+    [editingFavorite, updateFavorite, onCharacterChange, onModelChange, characters],
   );
 
   // Handle saving favorite during onboarding (called when clicking Continue on pick screen)
@@ -723,9 +635,7 @@ export function Selector({
   const handleOnboardingComplete = useCallback(
     async (selectedCharacterId: string): Promise<void> => {
       // Check if favorite already exists for this character
-      const existingFavorite = favorites.find(
-        (f) => f.characterId === selectedCharacterId,
-      );
+      const existingFavorite = favorites.find((f) => f.characterId === selectedCharacterId);
 
       // Only save if no existing favorite (fallback case)
       if (!existingFavorite) {
@@ -747,14 +657,7 @@ export function Selector({
       setIsOnboardingActive(false);
       handleOpenChange(false);
     },
-    [
-      favorites,
-      onCharacterChange,
-      onModelChange,
-      handleOpenChange,
-      addFavorite,
-      updateFavorite,
-    ],
+    [favorites, onCharacterChange, onModelChange, handleOpenChange, addFavorite, updateFavorite],
   );
 
   return (
@@ -774,9 +677,7 @@ export function Selector({
         >
           {/* Character icon */}
           <Span className="flex items-center justify-center w-5 h-5 shrink-0">
-            {currentCharacter
-              ? renderIcon(currentCharacter.icon, "h-4 w-4")
-              : null}
+            {currentCharacter ? renderIcon(currentCharacter.icon, "h-4 w-4") : null}
           </Span>
 
           {/* Character name - hidden when container is narrow, always shown when no tools */}
@@ -902,9 +803,7 @@ export function Selector({
                       const wasActive = editingFavorite.isActive;
 
                       // Calculate what will remain BEFORE deleting
-                      const willRemain = favorites.filter(
-                        (f) => f.id !== deletedId,
-                      );
+                      const willRemain = favorites.filter((f) => f.id !== deletedId);
                       const willBeEmpty = willRemain.length === 0;
 
                       // Close settings panel

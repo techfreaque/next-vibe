@@ -12,43 +12,35 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Błąd Walidacji",
-        description:
-          "Podane parametry synchronizacji migracji są nieprawidłowe",
+        description: "Podane parametry synchronizacji migracji są nieprawidłowe",
       },
       network: {
         title: "Błąd Sieci",
-        description:
-          "Nie udało się połączyć z bazą danych w celu synchronizacji migracji",
+        description: "Nie udało się połączyć z bazą danych w celu synchronizacji migracji",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description:
-          "Nie jesteś upoważniony do wykonywania operacji synchronizacji migracji",
+        description: "Nie jesteś upoważniony do wykonywania operacji synchronizacji migracji",
       },
       forbidden: {
         title: "Zabronione",
-        description:
-          "Operacje synchronizacji migracji nie są dozwolone dla Twojej roli",
+        description: "Operacje synchronizacji migracji nie są dozwolone dla Twojej roli",
       },
       notFound: {
         title: "Nie Znaleziono",
-        description:
-          "Żądany zasób synchronizacji migracji nie został znaleziony",
+        description: "Żądany zasób synchronizacji migracji nie został znaleziony",
       },
       server: {
         title: "Błąd Serwera",
-        description:
-          "Wystąpił wewnętrzny błąd serwera podczas synchronizacji migracji",
+        description: "Wystąpił wewnętrzny błąd serwera podczas synchronizacji migracji",
       },
       unknown: {
         title: "Nieznany Błąd",
-        description:
-          "Wystąpił nieoczekiwany błąd podczas synchronizacji migracji",
+        description: "Wystąpił nieoczekiwany błąd podczas synchronizacji migracji",
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "Wystąpił konflikt podczas operacji synchronizacji migracji",
+        description: "Wystąpił konflikt podczas operacji synchronizacji migracji",
       },
     },
     success: {
@@ -63,8 +55,7 @@ export const translations: typeof enTranslations = {
     },
     dryRun: {
       title: "Próbny Przebieg",
-      description:
-        "Pokaż co zostałoby zrobione bez faktycznego wykonywania zmian",
+      description: "Pokaż co zostałoby zrobione bez faktycznego wykonywania zmian",
     },
     success: {
       title: "Sukces",

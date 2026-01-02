@@ -9,10 +9,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import type { WidgetType } from "../../../shared/types/enums";
-import type {
-  ReactWidgetProps,
-  WidgetData,
-} from "../../../shared/widgets/types";
+import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
 
 /**
  * Displays a credit transaction as a card with conditional red/green styling
@@ -23,10 +20,7 @@ export function CreditTransactionCardWidget<const TKey extends string>({
   field,
   context,
   className,
-}: ReactWidgetProps<
-  typeof WidgetType.CREDIT_TRANSACTION_CARD,
-  TKey
->): JSX.Element {
+}: ReactWidgetProps<typeof WidgetType.CREDIT_TRANSACTION_CARD, TKey>): JSX.Element {
   const { t } = context.scopedT(context.locale);
   const { t: globalT } = simpleT(context.locale);
 
@@ -38,10 +32,7 @@ export function CreditTransactionCardWidget<const TKey extends string>({
 
   // Extract child field definitions
   let fieldDefinitions: Record<string, UnifiedField<string>> = {};
-  if (
-    "type" in field &&
-    (field.type === "object" || field.type === "object-optional")
-  ) {
+  if ("type" in field && (field.type === "object" || field.type === "object-optional")) {
     if ("children" in field && field.children) {
       fieldDefinitions = field.children as Record<string, UnifiedField<string>>;
     }
@@ -105,12 +96,9 @@ export function CreditTransactionCardWidget<const TKey extends string>({
             displayValue = (val > 0 ? "+" : "") + val;
           } else if (key === "balanceAfter" && typeof val === "number") {
             // Format balance with label
-            displayValue = globalT(
-              "app.subscription.subscription.history.balance",
-              {
-                count: val,
-              },
-            );
+            displayValue = globalT("app.subscription.subscription.history.balance", {
+              count: val,
+            });
           } else {
             displayValue = String(val);
           }
@@ -120,12 +108,8 @@ export function CreditTransactionCardWidget<const TKey extends string>({
               key={key}
               className={cn(
                 key === "amount" && "text-lg font-bold",
-                key === "amount" &&
-                  isPositive &&
-                  "text-green-700 dark:text-green-300",
-                key === "amount" &&
-                  !isPositive &&
-                  "text-red-700 dark:text-red-300",
+                key === "amount" && isPositive && "text-green-700 dark:text-green-300",
+                key === "amount" && !isPositive && "text-red-700 dark:text-red-300",
                 key !== "amount" && "text-xs text-muted-foreground",
               )}
             >

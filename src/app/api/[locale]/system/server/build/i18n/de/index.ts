@@ -77,8 +77,7 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um die Anwendung zu erstellen",
+        description: "Sie müssen angemeldet sein, um die Anwendung zu erstellen",
       },
       forbidden: {
         title: "Verboten",
@@ -90,13 +89,11 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Server-Fehler",
-        description:
-          "Ein interner Server-Fehler ist während des Builds aufgetreten",
+        description: "Ein interner Server-Fehler ist während des Builds aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description:
-          "Ein unbekannter Fehler ist während des Builds aufgetreten",
+        description: "Ein unbekannter Fehler ist während des Builds aufgetreten",
       },
       conflict: {
         title: "Konflikt",
@@ -118,13 +115,11 @@ export const translations: typeof enTranslations = {
         packageBuildSuccess: "✅ Paket-Build erfolgreich abgeschlossen",
         packageBuildFailed: "Paket-Build fehlgeschlagen",
         buildPrerequisites: "Build-Voraussetzungen werden ausgeführt...",
-        skipGeneration:
-          "API-Endpunkt-Generierung wird übersprungen (--skip-generation)",
+        skipGeneration: "API-Endpunkt-Generierung wird übersprungen (--skip-generation)",
         generatingEndpoints: "API-Endpunkte werden generiert...",
         generationSuccess: "✅ Code-Generierung erfolgreich abgeschlossen",
         generationFailed: "Code-Generierung fehlgeschlagen",
-        skipNextBuild:
-          "Next.js-Build wird übersprungen (wird von package.json behandelt)",
+        skipNextBuild: "Next.js-Build wird übersprungen (wird von package.json behandelt)",
         buildingNextjs: "Next.js-Anwendung wird erstellt...",
         nextjsBuildSuccess: "✅ Next.js-Build erfolgreich abgeschlossen",
         nextjsBuildFailed: "Next.js-Build fehlgeschlagen",
@@ -132,8 +127,7 @@ export const translations: typeof enTranslations = {
           "Produktions-Datenbankoperationen werden übersprungen (--run-prod-database=false)",
         buildFailed: "❌ Build fehlgeschlagen",
         schemaGenerationStart: "Datenbank-Schema wird generiert...",
-        schemaGenerationSuccess:
-          "✅ Datenbank-Schema-Generierung abgeschlossen",
+        schemaGenerationSuccess: "✅ Datenbank-Schema-Generierung abgeschlossen",
         schemaGenerationFailed: "Datenbank-Schema-Generierung fehlgeschlagen",
         skipSchemaGeneration:
           "Datenbank-Schema-Generierung wird übersprungen (--run-prod-database=false)",
@@ -141,22 +135,16 @@ export const translations: typeof enTranslations = {
         reportsGenerationSuccess: "✅ Alle Berichte erfolgreich generiert",
         reportsGenerationFailed: "Berichtsgenerierung fehlgeschlagen",
         prodDbStart: "🚀 Produktions-Datenbankoperationen werden ausgeführt...",
-        prodDbSuccess:
-          "🎉 Produktions-Datenbankoperationen erfolgreich abgeschlossen",
-        prodDbFailed:
-          "❌ Produktions-Build während Datenbankoperationen fehlgeschlagen",
-        prodDbNotReady:
-          "💡 Dieser Build ist NICHT für Produktionsbereitstellung bereit",
-        deploymentReady:
-          "🚀 Ihre Anwendung ist bereit für Produktionsbereitstellung!",
+        prodDbSuccess: "🎉 Produktions-Datenbankoperationen erfolgreich abgeschlossen",
+        prodDbFailed: "❌ Produktions-Build während Datenbankoperationen fehlgeschlagen",
+        prodDbNotReady: "💡 Dieser Build ist NICHT für Produktionsbereitstellung bereit",
+        deploymentReady: "🚀 Ihre Anwendung ist bereit für Produktionsbereitstellung!",
         dbConnectionError:
           "Datenbankverbindung fehlgeschlagen. Stellen Sie sicher, dass die Datenbank läuft und erreichbar ist.",
         dbStartSuggestion:
           "Versuchen Sie 'docker compose -f docker-compose-dev.yml up -d' auszuführen, um die Datenbank zu starten",
-        nextBuildHandled:
-          "✅ Next.js-Build wird vom yarn build-Befehl behandelt",
-        failedProdMigrations:
-          "Produktions-Migrationen konnten nicht ausgeführt werden",
+        nextBuildHandled: "✅ Next.js-Build wird vom yarn build-Befehl behandelt",
+        failedProdMigrations: "Produktions-Migrationen konnten nicht ausgeführt werden",
       },
     },
   },

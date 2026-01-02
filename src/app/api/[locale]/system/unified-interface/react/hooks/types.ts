@@ -1,12 +1,5 @@
-import type {
-  DefaultError,
-  QueryKey,
-  UseQueryOptions,
-} from "@tanstack/react-query";
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
+import type { DefaultError, QueryKey, UseQueryOptions } from "@tanstack/react-query";
+import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
 import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -73,11 +66,7 @@ export type InferEnhancedMutationResult<T> = T extends CreateApiEndpointAny
         UrlVariablesOutput: infer TUrlVariablesOutput;
       };
     }
-    ? EnhancedMutationResult<
-        TResponseOutput,
-        TRequestOutput,
-        TUrlVariablesOutput
-      >
+    ? EnhancedMutationResult<TResponseOutput, TRequestOutput, TUrlVariablesOutput>
     : never
   : never;
 
@@ -118,11 +107,10 @@ export interface ApiQueryReturn<TResponse> {
 /**
  * Type for the API query options
  */
-export interface ApiQueryOptions<TRequest, TResponse, TUrlVariables>
-  extends Omit<
-    UseQueryOptions<TResponse, DefaultError, TResponse, QueryKey>,
-    "queryFn" | "initialData" | "queryKey"
-  > {
+export interface ApiQueryOptions<TRequest, TResponse, TUrlVariables> extends Omit<
+  UseQueryOptions<TResponse, DefaultError, TResponse, QueryKey>,
+  "queryFn" | "initialData" | "queryKey"
+> {
   queryKey?: QueryKey;
   enabled?: boolean;
   staleTime?: number;
@@ -163,18 +151,18 @@ export interface ApiMutationOptions<TRequest, TResponse, TUrlVariables> {
   invalidateQueries?: string[]; // List of queries to invalidate after mutation
 }
 
-export type ApiInferMutationOptions<TEndpoint extends CreateApiEndpointAny> =
-  ApiMutationOptions<
-    TEndpoint["types"]["RequestOutput"],
-    TEndpoint["types"]["ResponseOutput"],
-    TEndpoint["types"]["UrlVariablesOutput"]
-  >;
+export type ApiInferMutationOptions<TEndpoint extends CreateApiEndpointAny> = ApiMutationOptions<
+  TEndpoint["types"]["RequestOutput"],
+  TEndpoint["types"]["ResponseOutput"],
+  TEndpoint["types"]["UrlVariablesOutput"]
+>;
 
 /**
  * Type for the API query form options
  */
-export interface ApiQueryFormOptions<TRequest extends FieldValues>
-  extends ApiFormOptions<TRequest> {
+export interface ApiQueryFormOptions<
+  TRequest extends FieldValues,
+> extends ApiFormOptions<TRequest> {
   autoSubmit?: boolean; // Whether to automatically submit the form when values change
   debounceMs?: number; // Debounce time in ms for auto-submission
 }
@@ -212,26 +200,21 @@ export interface ApiQueryFormReturn<
 }
 
 // Form-specific types
-export type ApiFormOptions<TRequest extends FieldValues> =
-  UseFormProps<TRequest> & {
-    defaultValues?: Partial<TRequest>;
-    /**
-     * Whether to enable form persistence using localStorage
-     * @default true
-     */
-    persistForm?: boolean;
-    /**
-     * The key to use for storing form data in localStorage
-     * If not provided, a key will be generated based on the endpoint
-     */
-    persistenceKey?: string;
-  };
+export type ApiFormOptions<TRequest extends FieldValues> = UseFormProps<TRequest> & {
+  defaultValues?: Partial<TRequest>;
+  /**
+   * Whether to enable form persistence using localStorage
+   * @default true
+   */
+  persistForm?: boolean;
+  /**
+   * The key to use for storing form data in localStorage
+   * If not provided, a key will be generated based on the endpoint
+   */
+  persistenceKey?: string;
+};
 
-export interface ApiFormReturn<
-  TRequest extends FieldValues,
-  TResponse,
-  TUrlVariables,
-> {
+export interface ApiFormReturn<TRequest extends FieldValues, TResponse, TUrlVariables> {
   form: UseFormReturn<TRequest>;
 
   /** The complete response including success/error state */

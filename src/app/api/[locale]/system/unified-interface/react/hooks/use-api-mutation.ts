@@ -2,10 +2,7 @@
 
 import type { UseMutationResult } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
+import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
 import { useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -133,10 +130,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
       TEndpoint["types"]["RequestOutput"],
       TEndpoint["types"]["UrlVariablesOutput"]
     >,
-    MutationContext<
-      TEndpoint["types"]["RequestOutput"],
-      TEndpoint["types"]["UrlVariablesOutput"]
-    >
+    MutationContext<TEndpoint["types"]["RequestOutput"], TEndpoint["types"]["UrlVariablesOutput"]>
   >({
     mutationFn: async (variables) => {
       // Clear any existing error when starting a new mutation
@@ -161,9 +155,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
         locale,
         options: {
           onSuccess: options.onSuccess
-            ? (
-                context,
-              ): void | ErrorResponseType | Promise<void | ErrorResponseType> =>
+            ? (context): void | ErrorResponseType | Promise<void | ErrorResponseType> =>
                 options.onSuccess?.({
                   requestData: context.requestData,
                   pathParams: context.urlPathParams,

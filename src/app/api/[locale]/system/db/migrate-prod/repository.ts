@@ -3,11 +3,7 @@
  * Handles production migration operations with safety checks
  */
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -21,10 +17,8 @@ const UNKNOWN_ERROR = "Unknown error";
 const SEED_COMMAND = ["vibe", "db:seed", "--data"];
 const SEED_ENV_PROD = { env: "prod" };
 
-type MigrateProdRequestType =
-  typeof migrateProdEndpoints.POST.types.RequestOutput;
-type MigrateProdResponseType =
-  typeof migrateProdEndpoints.POST.types.ResponseOutput;
+type MigrateProdRequestType = typeof migrateProdEndpoints.POST.types.RequestOutput;
+type MigrateProdResponseType = typeof migrateProdEndpoints.POST.types.ResponseOutput;
 
 /**
  * Database Production Migration Repository Interface
@@ -40,9 +34,7 @@ export interface DatabaseMigrateProdRepository {
 /**
  * Database Production Migration Repository Implementation
  */
-export class DatabaseMigrateProdRepositoryImpl
-  implements DatabaseMigrateProdRepository
-{
+export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRepository {
   async runProductionMigrations(
     data: MigrateProdRequestType,
     locale: CountryLanguage,
@@ -60,9 +52,7 @@ export class DatabaseMigrateProdRepositoryImpl
 
       if (data.dryRun) {
         logger.info("DRY RUN MODE - No changes will be made");
-        const output = t(
-          "app.api.system.db.migrateProd.messages.dryRunComplete",
-        );
+        const output = t("app.api.system.db.migrateProd.messages.dryRunComplete");
 
         return success({
           success: true,
@@ -76,9 +66,7 @@ export class DatabaseMigrateProdRepositoryImpl
       }
 
       // Log that this is a production migration
-      logger.info(
-        "Starting production migration - ensure environment is properly configured",
-      );
+      logger.info("Starting production migration - ensure environment is properly configured");
 
       // Step 1: Generate latest migrations
       logger.info("Generating Drizzle migrations");
@@ -205,14 +193,10 @@ export class DatabaseMigrateProdRepositoryImpl
     try {
       // Run production seeds by executing seed command
       const { spawnSync } = await import("node:child_process");
-      const result = spawnSync(
-        "bunx",
-        [...SEED_COMMAND, JSON.stringify(SEED_ENV_PROD)],
-        {
-          stdio: "pipe",
-          encoding: "utf-8",
-        },
-      );
+      const result = spawnSync("bunx", [...SEED_COMMAND, JSON.stringify(SEED_ENV_PROD)], {
+        stdio: "pipe",
+        encoding: "utf-8",
+      });
 
       if (result.status !== 0) {
         const error = result.stderr || result.error?.message || UNKNOWN_ERROR;
@@ -250,5 +234,4 @@ export class DatabaseMigrateProdRepositoryImpl
 /**
  * Export repository instance
  */
-export const databaseMigrateProdRepository =
-  new DatabaseMigrateProdRepositoryImpl();
+export const databaseMigrateProdRepository = new DatabaseMigrateProdRepositoryImpl();

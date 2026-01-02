@@ -5,10 +5,7 @@ import { useState } from "react";
 
 import { parseError } from "@/app/api/[locale]/shared/utils";
 
-import {
-  type WidgetAction,
-  type WidgetActionType,
-} from "../../../shared/widgets/types";
+import { type WidgetAction, type WidgetActionType } from "../../../shared/widgets/types";
 /**
  * Tool Action Handler Props
  */
@@ -76,9 +73,7 @@ ToolActionHandler.displayName = "ToolActionHandler";
 /**
  * Hook for handling widget actions
  */
-export function useWidgetActions(
-  onAction?: (action: WidgetAction) => void | Promise<void>,
-): {
+export function useWidgetActions(onAction?: (action: WidgetAction) => void | Promise<void>): {
   isProcessing: boolean;
   error: string | null;
   handleAction: (

@@ -1,17 +1,14 @@
 export const translations = {
   meta: {
     title: "Sign Up - {{appName}}",
-    description:
-      "Create your {{appName}} account and start building amazing applications",
+    description: "Create your {{appName}} account and start building amazing applications",
     category: "Authentication",
     imageAlt: "{{appName}} Sign Up",
     keywords: "signup, register, create account, {{appName}}",
     ogTitle: "Sign Up for {{appName}}",
-    ogDescription:
-      "Join {{appName}} and start building amazing applications today",
+    ogDescription: "Join {{appName}} and start building amazing applications today",
     twitterTitle: "Sign Up for {{appName}}",
-    twitterDescription:
-      "Create your account and start building with {{appName}}",
+    twitterDescription: "Create your account and start building with {{appName}}",
   },
   auth: {
     signup: {

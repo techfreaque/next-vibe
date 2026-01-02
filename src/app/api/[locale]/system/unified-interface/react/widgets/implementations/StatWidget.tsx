@@ -51,13 +51,7 @@ const iconMap: Record<string, ComponentType<{ className?: string }>> = {
 };
 
 // Color variants for different stat types
-type StatVariant =
-  | "default"
-  | "success"
-  | "warning"
-  | "danger"
-  | "info"
-  | "muted";
+type StatVariant = "default" | "success" | "warning" | "danger" | "info" | "muted";
 
 const variantClasses: Record<StatVariant, string> = {
   default: "text-foreground",
@@ -71,11 +65,7 @@ const variantClasses: Record<StatVariant, string> = {
 /**
  * Format a numeric value based on format type
  */
-function formatStatValue(
-  value: number,
-  format: string | undefined,
-  locale: string,
-): string {
+function formatStatValue(value: number, format: string | undefined, locale: string): string {
   if (format === "percentage" || format === "percent") {
     // Assume value is 0-1 range, convert to percentage
     return new Intl.NumberFormat(locale, {
@@ -178,8 +168,7 @@ export function StatWidget<const TKey extends string>({
   const IconComponent = getIconComponent(icon, labelKey || "");
 
   // Get variant class
-  const variantClass =
-    variantClasses[variant as StatVariant] || variantClasses.default;
+  const variantClass = variantClasses[variant as StatVariant] || variantClasses.default;
 
   // Size classes
   const sizeClasses = {
@@ -197,8 +186,7 @@ export function StatWidget<const TKey extends string>({
       padding: "p-5",
     },
   };
-  const sizeClass =
-    sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
+  const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
 
   // Trend icon and color
   const TrendIcon =
@@ -210,11 +198,7 @@ export function StatWidget<const TKey extends string>({
           ? Minus
           : null;
   const trendColorClass =
-    trend === "up"
-      ? "text-green-500"
-      : trend === "down"
-        ? "text-red-500"
-        : "text-muted-foreground";
+    trend === "up" ? "text-green-500" : trend === "down" ? "text-red-500" : "text-muted-foreground";
 
   return (
     <Card className={cn("h-full hover:shadow-md transition-shadow", className)}>
@@ -226,42 +210,24 @@ export function StatWidget<const TKey extends string>({
       >
         {/* Icon (optional) */}
         {IconComponent && (
-          <IconComponent
-            className={cn(sizeClass.icon, "text-muted-foreground mb-2")}
-          />
+          <IconComponent className={cn(sizeClass.icon, "text-muted-foreground mb-2")} />
         )}
 
         {/* Value */}
-        <Span
-          className={cn(
-            sizeClass.value,
-            "font-bold tabular-nums",
-            variantClass,
-          )}
-        >
+        <Span className={cn(sizeClass.value, "font-bold tabular-nums", variantClass)}>
           {formattedValue}
         </Span>
 
         {/* Trend indicator (optional) */}
         {TrendIcon && trendValue !== undefined && (
-          <Span
-            className={cn(
-              "flex items-center gap-0.5 text-xs mt-1",
-              trendColorClass,
-            )}
-          >
+          <Span className={cn("flex items-center gap-0.5 text-xs mt-1", trendColorClass)}>
             <TrendIcon className="h-3 w-3" />
             {Math.abs(trendValue)}%
           </Span>
         )}
 
         {/* Label */}
-        <Span
-          className={cn(
-            sizeClass.label,
-            "text-muted-foreground mt-1.5 leading-tight",
-          )}
-        >
+        <Span className={cn(sizeClass.label, "text-muted-foreground mt-1.5 leading-tight")}>
           {label}
         </Span>
       </CardContent>

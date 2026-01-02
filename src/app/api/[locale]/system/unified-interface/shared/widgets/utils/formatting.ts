@@ -73,13 +73,7 @@ export class BaseDataFormatter {
    * Format number with precision and unit
    */
   formatNumber(value: number, options: NumberFormatOptions): string {
-    const {
-      precision = 2,
-      unit,
-      locale,
-      style = "decimal",
-      currency,
-    } = options;
+    const { precision = 2, unit, locale, style = "decimal", currency } = options;
 
     let formatted: string;
 
@@ -106,10 +100,7 @@ export class BaseDataFormatter {
   /**
    * Format boolean as symbol or text
    */
-  formatBoolean(
-    value: boolean,
-    options: { style?: "symbol" | "text" | "emoji" } = {},
-  ): string {
+  formatBoolean(value: boolean, options: { style?: "symbol" | "text" | "emoji" } = {}): string {
     const { style = "emoji" } = options;
 
     if (style === "emoji") {
@@ -129,10 +120,7 @@ export class BaseDataFormatter {
   /**
    * Format duration in milliseconds
    */
-  formatDuration(
-    milliseconds: number,
-    options: DurationFormatOptions = {},
-  ): string {
+  formatDuration(milliseconds: number, options: DurationFormatOptions = {}): string {
     const { unit = "s", precision = 2 } = options;
 
     switch (unit) {
@@ -186,9 +174,7 @@ export class BaseDataFormatter {
     const { separator = ", ", maxItems = 10, showCount = true } = options;
 
     const items = value.slice(0, maxItems);
-    const formatted = items
-      .map((item) => this.safeToString(item))
-      .join(separator);
+    const formatted = items.map((item) => this.safeToString(item)).join(separator);
 
     if (value.length > maxItems && showCount) {
       const remaining = value.length - maxItems;
@@ -236,10 +222,7 @@ export class BaseDataFormatter {
   /**
    * Format percentage
    */
-  formatPercentage(
-    value: number,
-    options: { precision?: number } = {},
-  ): string {
+  formatPercentage(value: number, options: { precision?: number } = {}): string {
     const { precision = 1 } = options;
     return `${(value * 100).toFixed(precision)}%`;
   }
@@ -278,15 +261,9 @@ export class BaseDataFormatter {
     const seen = new WeakSet();
     let depth = 0;
 
-    return function replacer(
-      this: WidgetData,
-      propertyKey: string,
-      value: WidgetData,
-    ): WidgetData {
+    return function replacer(this: WidgetData, propertyKey: string, value: WidgetData): WidgetData {
       if (depth > maxDepth) {
-        return propertyKey
-          ? `[Max Depth: ${propertyKey}]`
-          : "[Max Depth Reached]";
+        return propertyKey ? `[Max Depth: ${propertyKey}]` : "[Max Depth Reached]";
       }
 
       if (typeof value === "object" && value !== null) {

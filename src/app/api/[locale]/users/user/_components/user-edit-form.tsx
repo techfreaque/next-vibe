@@ -30,11 +30,7 @@ interface UserEditFormProps {
   userId: string;
 }
 
-export function UserEditForm({
-  user,
-  locale,
-  userId,
-}: UserEditFormProps): React.JSX.Element {
+export function UserEditForm({ user, locale, userId }: UserEditFormProps): React.JSX.Element {
   const router = useRouter();
   const { t } = simpleT(locale);
 
@@ -79,17 +75,11 @@ export function UserEditForm({
         <CardHeader>
           <CardTitle className="flex items-center flex flex-row gap-2">
             <Span>{t("app.admin.users.actions.editUser")}</Span>
-            <Span className="text-lg font-normal text-gray-500">
-              - {user.email}
-            </Span>
+            <Span className="text-lg font-normal text-gray-500">- {user.email}</Span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Form
-            form={endpoint.create.form}
-            onSubmit={handleSubmit}
-            className="flex flex-col gap-6"
-          >
+          <Form form={endpoint.create.form} onSubmit={handleSubmit} className="flex flex-col gap-6">
             <FormFieldGroup>
               <EndpointFormField
                 name="basicInfo.email"
@@ -162,12 +152,7 @@ export function UserEditForm({
 
             {/* Submit Button */}
             <Div className="flex justify-end flex flex-row gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleBack}
-                disabled={isSaving}
-              >
+              <Button type="button" variant="outline" onClick={handleBack} disabled={isSaving}>
                 {t("app.admin.users.form.buttons.cancel")}
               </Button>
               <Button type="submit" disabled={isSaving}>

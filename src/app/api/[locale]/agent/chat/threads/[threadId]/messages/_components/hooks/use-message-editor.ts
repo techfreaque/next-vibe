@@ -161,16 +161,7 @@ export function useMessageEditor({
       setIsLoading(false);
       setActionType(null);
     }
-  }, [
-    content,
-    attachments,
-    isLoading,
-    message.id,
-    onBranch,
-    logger,
-    draftKey,
-    onCancel,
-  ]);
+  }, [content, attachments, isLoading, message.id, onBranch, logger, draftKey, onCancel]);
 
   const handleKeyDown = useCallback(
     (e: TextareaKeyboardEvent): void => {

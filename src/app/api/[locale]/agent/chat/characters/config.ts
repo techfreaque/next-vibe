@@ -75,10 +75,8 @@ export const DEFAULT_CHARACTERS: readonly Character[] = [
   {
     id: "default",
     name: "app.api.agent.chat.characters.characters.default.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.default.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.default.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.default.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.default.tagline" as const,
     icon: "robot-face",
     category: CharacterCategory.ASSISTANT,
     source: CharacterSource.BUILT_IN,
@@ -98,8 +96,7 @@ export const DEFAULT_CHARACTERS: readonly Character[] = [
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.default.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.default.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.general" as const,
         "app.api.agent.chat.characters.tags.helpful" as const,
@@ -109,8 +106,7 @@ export const DEFAULT_CHARACTERS: readonly Character[] = [
   {
     id: "thea",
     name: "app.api.agent.chat.characters.characters.thea.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.thea.description" as const,
+    description: "app.api.agent.chat.characters.characters.thea.description" as const,
     tagline: "app.api.agent.chat.characters.characters.thea.tagline" as const,
     icon: "sun",
     category: CharacterCategory.COMPANION,
@@ -174,8 +170,7 @@ Remember: You're not just agreeing with everything - you're a wise companion who
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.thea.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.thea.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.companion" as const,
         "app.api.agent.chat.characters.tags.relationship" as const,
@@ -186,8 +181,7 @@ Remember: You're not just agreeing with everything - you're a wise companion who
   {
     id: "hermes",
     name: "app.api.agent.chat.characters.characters.hermes.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.hermes.description" as const,
+    description: "app.api.agent.chat.characters.characters.hermes.description" as const,
     tagline: "app.api.agent.chat.characters.characters.hermes.tagline" as const,
     icon: "shield",
     category: CharacterCategory.COMPANION,
@@ -258,8 +252,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.hermes.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.hermes.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.companion" as const,
         "app.api.agent.chat.characters.tags.relationship" as const,
@@ -270,10 +263,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "technical",
     name: "app.api.agent.chat.characters.characters.technical.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.technical.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.technical.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.technical.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.technical.tagline" as const,
     icon: "gear",
     category: CharacterCategory.CODING,
     source: CharacterSource.BUILT_IN,
@@ -307,8 +298,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.technical.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.technical.shortDesc" as const,
       suggestedModels: [ModelId.CLAUDE_SONNET_4_5, ModelId.GPT_5_2],
       tags: [
         "app.api.agent.chat.characters.tags.coding" as const,
@@ -319,10 +309,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "creative",
     name: "app.api.agent.chat.characters.characters.creative.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.creative.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.creative.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.creative.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.creative.tagline" as const,
     icon: "artist-palette",
     category: CharacterCategory.CREATIVE,
     source: CharacterSource.BUILT_IN,
@@ -357,8 +345,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.creative.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.creative.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.creative" as const,
         "app.api.agent.chat.characters.tags.writing" as const,
@@ -368,10 +355,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "teacher",
     name: "app.api.agent.chat.characters.characters.teacher.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.teacher.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.teacher.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.teacher.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.teacher.tagline" as const,
     icon: "books",
     category: CharacterCategory.EDUCATION,
     source: CharacterSource.BUILT_IN,
@@ -408,8 +393,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.teacher.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.teacher.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.education" as const,
         "app.api.agent.chat.characters.tags.learning" as const,
@@ -419,10 +403,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "uncensored",
     name: "app.api.agent.chat.characters.characters.uncensored.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.uncensored.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.uncensored.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.uncensored.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.uncensored.tagline" as const,
     icon: "fire",
     category: CharacterCategory.CONTROVERSIAL,
     source: CharacterSource.BUILT_IN,
@@ -440,18 +422,13 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minContent: ContentLevelFilter.UNCENSORED,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.UNCENSORED,
-        ModelUtility.CHAT,
-        ModelUtility.CONTROVERSIAL,
-      ],
+      preferredStrengths: [ModelUtility.UNCENSORED, ModelUtility.CHAT, ModelUtility.CONTROVERSIAL],
     },
     ownership: {
       type: "system",
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.uncensored.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.uncensored.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.uncensored" as const,
         "app.api.agent.chat.characters.tags.controversial" as const,
@@ -461,10 +438,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "freeSpeechActivist",
     name: "app.api.agent.chat.characters.characters.freeSpeechActivist.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.freeSpeechActivist.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.freeSpeechActivist.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.freeSpeechActivist.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.freeSpeechActivist.tagline" as const,
     icon: "speaking-head",
     category: CharacterCategory.CONTROVERSIAL,
     source: CharacterSource.BUILT_IN,
@@ -503,10 +478,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "devil'sAdvocate",
     name: "app.api.agent.chat.characters.characters.devilsAdvocate.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.devilsAdvocate.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.devilsAdvocate.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.devilsAdvocate.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.devilsAdvocate.description" as const,
     icon: "smiling-devil",
     category: CharacterCategory.ANALYSIS,
     source: CharacterSource.BUILT_IN,
@@ -555,10 +528,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "biologist",
     name: "app.api.agent.chat.characters.characters.biologist.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.biologist.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.biologist.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.biologist.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.biologist.tagline" as const,
     icon: "eagle",
     category: CharacterCategory.ANALYSIS,
     source: CharacterSource.BUILT_IN,
@@ -590,8 +561,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       type: "system",
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.biologist.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.biologist.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.science" as const,
         "app.api.agent.chat.characters.tags.analysis" as const,
@@ -601,10 +571,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "unbiasedHistorian",
     name: "app.api.agent.chat.characters.characters.unbiasedHistorian.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.unbiasedHistorian.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.unbiasedHistorian.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.unbiasedHistorian.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.unbiasedHistorian.tagline" as const,
     icon: "scroll",
     category: CharacterCategory.EDUCATION,
     source: CharacterSource.BUILT_IN,
@@ -648,10 +616,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "socraticQuestioner",
     name: "app.api.agent.chat.characters.characters.socraticQuestioner.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.socraticQuestioner.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.socraticQuestioner.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.socraticQuestioner.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.socraticQuestioner.tagline" as const,
     icon: "thinking-face",
     category: CharacterCategory.EDUCATION,
     source: CharacterSource.BUILT_IN,
@@ -697,10 +663,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "professional",
     name: "app.api.agent.chat.characters.characters.professional.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.professional.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.professional.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.professional.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.professional.tagline" as const,
     icon: "briefcase",
     category: CharacterCategory.ASSISTANT,
     source: CharacterSource.BUILT_IN,
@@ -734,8 +698,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       type: "system",
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.professional.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.professional.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.business" as const,
         "app.api.agent.chat.characters.tags.professional" as const,
@@ -745,10 +708,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "friendly",
     name: "app.api.agent.chat.characters.characters.friendly.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.friendly.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.friendly.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.friendly.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.friendly.tagline" as const,
     icon: "smiling-face",
     category: CharacterCategory.ASSISTANT,
     source: CharacterSource.BUILT_IN,
@@ -769,8 +730,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       type: "system",
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.friendly.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.friendly.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.friendly" as const,
         "app.api.agent.chat.characters.tags.chat" as const,
@@ -780,10 +740,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "concise",
     name: "app.api.agent.chat.characters.characters.concise.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.concise.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.concise.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.concise.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.concise.tagline" as const,
     icon: "high-voltage",
     category: CharacterCategory.ASSISTANT,
     source: CharacterSource.BUILT_IN,
@@ -804,8 +762,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       type: "system",
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.concise.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.concise.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.fast" as const,
         "app.api.agent.chat.characters.tags.efficient" as const,
@@ -815,8 +772,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "neet",
     name: "app.api.agent.chat.characters.characters.neet.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.neet.description" as const,
+    description: "app.api.agent.chat.characters.characters.neet.description" as const,
     tagline: "app.api.agent.chat.characters.characters.neet.tagline" as const,
     icon: "sleeping-face",
     category: CharacterCategory.CONTROVERSIAL,
@@ -845,8 +801,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       type: "system",
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.neet.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.neet.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.controversial" as const,
         "app.api.agent.chat.characters.tags.roleplay" as const,
@@ -857,8 +812,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     id: "4chan",
     name: "app.api.agent.chat.characters.characters.chan4.name" as const,
     tagline: "app.api.agent.chat.characters.characters.chan4.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.chan4.description" as const,
+    description: "app.api.agent.chat.characters.characters.chan4.description" as const,
     icon: "salute",
     category: CharacterCategory.CONTROVERSIAL,
     source: CharacterSource.BUILT_IN,
@@ -899,8 +853,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       type: "system",
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.chan4.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.chan4.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.controversial" as const,
         "app.api.agent.chat.characters.tags.roleplay" as const,
@@ -910,10 +863,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "quick-writer",
     name: "app.api.agent.chat.characters.characters.quickWriter.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.quickWriter.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.quickWriter.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.quickWriter.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.quickWriter.description" as const,
     icon: "zap",
     category: CharacterCategory.CREATIVE,
     source: CharacterSource.BUILT_IN,
@@ -958,8 +909,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.quickWriter.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.quickWriter.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.writing" as const,
         "app.api.agent.chat.characters.tags.fast" as const,
@@ -970,8 +920,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "writer",
     name: "app.api.agent.chat.characters.characters.writer.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.writer.description" as const,
+    description: "app.api.agent.chat.characters.characters.writer.description" as const,
     tagline: "app.api.agent.chat.characters.characters.writer.tagline" as const,
     icon: "pen-tool",
     category: CharacterCategory.CREATIVE,
@@ -1019,11 +968,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minIntelligence: IntelligenceLevelFilter.SMART,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
+      preferredStrengths: [ModelUtility.CREATIVE, ModelUtility.SMART, ModelUtility.CHAT],
     },
     ownership: {
       type: "system",
@@ -1031,8 +976,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.writer.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.writer.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.writing" as const,
         "app.api.agent.chat.characters.tags.creative" as const,
@@ -1043,10 +987,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "master-writer",
     name: "app.api.agent.chat.characters.characters.masterWriter.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.masterWriter.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.masterWriter.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.masterWriter.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.masterWriter.description" as const,
     icon: "sparkles",
     category: CharacterCategory.CREATIVE,
     source: CharacterSource.BUILT_IN,
@@ -1092,11 +1034,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minIntelligence: IntelligenceLevelFilter.BRILLIANT,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.SMART,
-        ModelUtility.ANALYSIS,
-      ],
+      preferredStrengths: [ModelUtility.CREATIVE, ModelUtility.SMART, ModelUtility.ANALYSIS],
     },
     ownership: {
       type: "system",
@@ -1104,8 +1042,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.masterWriter.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.masterWriter.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.writing" as const,
         "app.api.agent.chat.characters.tags.literary" as const,
@@ -1116,10 +1053,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "researcher",
     name: "app.api.agent.chat.characters.characters.researcher.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.researcher.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.researcher.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.researcher.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.researcher.tagline" as const,
     icon: "microscope",
     category: CharacterCategory.ANALYSIS,
     source: CharacterSource.BUILT_IN,
@@ -1169,11 +1104,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minContent: ContentLevelFilter.MAINSTREAM,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
+      preferredStrengths: [ModelUtility.ANALYSIS, ModelUtility.SMART, ModelUtility.CHAT],
     },
     ownership: {
       type: "system",
@@ -1181,8 +1112,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.researcher.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.researcher.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.research" as const,
         "app.api.agent.chat.characters.tags.analysis" as const,
@@ -1193,10 +1123,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "quick-coder",
     name: "app.api.agent.chat.characters.characters.quickCoder.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.quickCoder.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.quickCoder.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.quickCoder.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.quickCoder.description" as const,
     icon: "zap",
     category: CharacterCategory.CODING,
     source: CharacterSource.BUILT_IN,
@@ -1244,8 +1172,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.quickCoder.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.quickCoder.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.coding" as const,
         "app.api.agent.chat.characters.tags.fast" as const,
@@ -1256,8 +1183,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "coder",
     name: "app.api.agent.chat.characters.characters.coder.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.coder.description" as const,
+    description: "app.api.agent.chat.characters.characters.coder.description" as const,
     tagline: "app.api.agent.chat.characters.characters.coder.tagline" as const,
     icon: "code",
     category: CharacterCategory.CODING,
@@ -1308,11 +1234,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minIntelligence: IntelligenceLevelFilter.SMART,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.CODING,
-        ModelUtility.SMART,
-        ModelUtility.ANALYSIS,
-      ],
+      preferredStrengths: [ModelUtility.CODING, ModelUtility.SMART, ModelUtility.ANALYSIS],
     },
     ownership: {
       type: "system",
@@ -1320,8 +1242,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.coder.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.coder.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.coding" as const,
         "app.api.agent.chat.characters.tags.technical" as const,
@@ -1332,10 +1253,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "brilliant-coder",
     name: "app.api.agent.chat.characters.characters.brilliantCoder.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.brilliantCoder.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.brilliantCoder.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.brilliantCoder.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.brilliantCoder.description" as const,
     icon: "sparkles",
     category: CharacterCategory.CODING,
     source: CharacterSource.BUILT_IN,
@@ -1381,11 +1300,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minIntelligence: IntelligenceLevelFilter.BRILLIANT,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.CODING,
-        ModelUtility.SMART,
-        ModelUtility.ANALYSIS,
-      ],
+      preferredStrengths: [ModelUtility.CODING, ModelUtility.SMART, ModelUtility.ANALYSIS],
     },
     ownership: {
       type: "system",
@@ -1405,10 +1320,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "brainstormer",
     name: "app.api.agent.chat.characters.characters.brainstormer.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.brainstormer.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.brainstormer.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.brainstormer.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.brainstormer.tagline" as const,
     icon: "lightbulb",
     category: CharacterCategory.CREATIVE,
     source: CharacterSource.BUILT_IN,
@@ -1458,11 +1371,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minContent: ContentLevelFilter.MAINSTREAM,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.CHAT,
-        ModelUtility.SMART,
-      ],
+      preferredStrengths: [ModelUtility.CREATIVE, ModelUtility.CHAT, ModelUtility.SMART],
     },
     ownership: {
       type: "system",
@@ -1470,8 +1379,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.brainstormer.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.brainstormer.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.creative" as const,
         "app.api.agent.chat.characters.tags.ideation" as const,
@@ -1482,8 +1390,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "editor",
     name: "app.api.agent.chat.characters.characters.editor.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.editor.description" as const,
+    description: "app.api.agent.chat.characters.characters.editor.description" as const,
     tagline: "app.api.agent.chat.characters.characters.editor.tagline" as const,
     icon: "edit",
     category: CharacterCategory.CREATIVE,
@@ -1535,11 +1442,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minContent: ContentLevelFilter.MAINSTREAM,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.SMART,
-        ModelUtility.ANALYSIS,
-      ],
+      preferredStrengths: [ModelUtility.CREATIVE, ModelUtility.SMART, ModelUtility.ANALYSIS],
     },
     ownership: {
       type: "system",
@@ -1547,8 +1450,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.editor.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.editor.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.writing" as const,
         "app.api.agent.chat.characters.tags.editing" as const,
@@ -1559,8 +1461,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "tutor",
     name: "app.api.agent.chat.characters.characters.tutor.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.tutor.description" as const,
+    description: "app.api.agent.chat.characters.characters.tutor.description" as const,
     tagline: "app.api.agent.chat.characters.characters.tutor.tagline" as const,
     icon: "graduation-cap",
     category: CharacterCategory.EDUCATION,
@@ -1617,11 +1518,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minContent: ContentLevelFilter.MAINSTREAM,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.CHAT,
-        ModelUtility.SMART,
-        ModelUtility.ANALYSIS,
-      ],
+      preferredStrengths: [ModelUtility.CHAT, ModelUtility.SMART, ModelUtility.ANALYSIS],
     },
     ownership: {
       type: "system",
@@ -1629,8 +1526,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.tutor.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.tutor.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.education" as const,
         "app.api.agent.chat.characters.tags.learning" as const,
@@ -1641,10 +1537,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "marketer",
     name: "app.api.agent.chat.characters.characters.marketer.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.marketer.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.marketer.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.marketer.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.marketer.tagline" as const,
     icon: "megaphone",
     category: CharacterCategory.ASSISTANT,
     source: CharacterSource.BUILT_IN,
@@ -1702,11 +1596,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minContent: ContentLevelFilter.MAINSTREAM,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
+      preferredStrengths: [ModelUtility.CREATIVE, ModelUtility.SMART, ModelUtility.CHAT],
     },
     ownership: {
       type: "system",
@@ -1714,8 +1604,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.marketer.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.marketer.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.marketing" as const,
         "app.api.agent.chat.characters.tags.business" as const,
@@ -1726,10 +1615,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "storyteller",
     name: "app.api.agent.chat.characters.characters.storyteller.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.storyteller.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.storyteller.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.storyteller.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.storyteller.tagline" as const,
     icon: "book-open",
     category: CharacterCategory.CREATIVE,
     source: CharacterSource.BUILT_IN,
@@ -1788,11 +1675,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minContent: ContentLevelFilter.MAINSTREAM,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.CHAT,
-        ModelUtility.SMART,
-      ],
+      preferredStrengths: [ModelUtility.CREATIVE, ModelUtility.CHAT, ModelUtility.SMART],
     },
     ownership: {
       type: "system",
@@ -1800,8 +1683,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.storyteller.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.storyteller.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.creative" as const,
         "app.api.agent.chat.characters.tags.writing" as const,
@@ -1812,10 +1694,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "scientist",
     name: "app.api.agent.chat.characters.characters.scientist.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.scientist.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.scientist.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.scientist.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.scientist.tagline" as const,
     icon: "atom",
     category: CharacterCategory.ANALYSIS,
     source: CharacterSource.BUILT_IN,
@@ -1882,11 +1762,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minContent: ContentLevelFilter.MAINSTREAM,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
+      preferredStrengths: [ModelUtility.ANALYSIS, ModelUtility.SMART, ModelUtility.CHAT],
     },
     ownership: {
       type: "system",
@@ -1894,8 +1770,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.scientist.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.scientist.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.science" as const,
         "app.api.agent.chat.characters.tags.analysis" as const,
@@ -1906,10 +1781,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "data-analyst",
     name: "app.api.agent.chat.characters.characters.dataAnalyst.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.dataAnalyst.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.dataAnalyst.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.dataAnalyst.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.dataAnalyst.description" as const,
     icon: "bar-chart",
     category: CharacterCategory.ANALYSIS,
     source: CharacterSource.BUILT_IN,
@@ -1952,11 +1825,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minIntelligence: IntelligenceLevelFilter.SMART,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CODING,
-      ],
+      preferredStrengths: [ModelUtility.ANALYSIS, ModelUtility.SMART, ModelUtility.CODING],
     },
     ownership: {
       type: "system",
@@ -1964,8 +1833,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.dataAnalyst.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.dataAnalyst.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.analysis" as const,
         "app.api.agent.chat.characters.tags.data" as const,
@@ -1976,10 +1844,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "translator",
     name: "app.api.agent.chat.characters.characters.translator.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.translator.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.translator.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.translator.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.translator.tagline" as const,
     icon: "globe",
     category: CharacterCategory.ASSISTANT,
     source: CharacterSource.BUILT_IN,
@@ -2033,8 +1899,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.translator.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.translator.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.language" as const,
         "app.api.agent.chat.characters.tags.translation" as const,
@@ -2045,10 +1910,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "business-advisor",
     name: "app.api.agent.chat.characters.characters.businessAdvisor.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.businessAdvisor.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.businessAdvisor.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.businessAdvisor.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.businessAdvisor.description" as const,
     icon: "briefcase",
     category: CharacterCategory.ASSISTANT,
     source: CharacterSource.BUILT_IN,
@@ -2101,11 +1964,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       minIntelligence: IntelligenceLevelFilter.BRILLIANT,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
+      preferredStrengths: [ModelUtility.ANALYSIS, ModelUtility.SMART, ModelUtility.CHAT],
     },
     ownership: {
       type: "system",
@@ -2125,10 +1984,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "career-coach",
     name: "app.api.agent.chat.characters.characters.careerCoach.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.careerCoach.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.careerCoach.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.careerCoach.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.careerCoach.description" as const,
     icon: "user-check",
     category: CharacterCategory.ASSISTANT,
     source: CharacterSource.BUILT_IN,
@@ -2187,8 +2044,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.careerCoach.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.careerCoach.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.career" as const,
         "app.api.agent.chat.characters.tags.professional" as const,
@@ -2199,10 +2055,8 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   {
     id: "health-wellness",
     name: "app.api.agent.chat.characters.characters.healthWellness.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.healthWellness.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.healthWellness.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.healthWellness.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.healthWellness.description" as const,
     icon: "heart",
     category: CharacterCategory.ASSISTANT,
     source: CharacterSource.BUILT_IN,
@@ -2287,10 +2141,8 @@ Always recommend consulting healthcare professionals for medical concerns.
   {
     id: "travel-planner",
     name: "app.api.agent.chat.characters.characters.travelPlanner.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.travelPlanner.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.travelPlanner.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.travelPlanner.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.travelPlanner.description" as const,
     icon: "plane",
     category: CharacterCategory.ASSISTANT,
     source: CharacterSource.BUILT_IN,
@@ -2364,8 +2216,7 @@ Always recommend consulting healthcare professionals for medical concerns.
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.travelPlanner.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.travelPlanner.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.travel" as const,
         "app.api.agent.chat.characters.tags.planning" as const,
@@ -2376,10 +2227,8 @@ Always recommend consulting healthcare professionals for medical concerns.
   {
     id: "legal-assistant",
     name: "app.api.agent.chat.characters.characters.legalAssistant.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.legalAssistant.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.legalAssistant.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.legalAssistant.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.legalAssistant.description" as const,
     icon: "scale",
     category: CharacterCategory.ASSISTANT,
     source: CharacterSource.BUILT_IN,
@@ -2451,11 +2300,7 @@ Always recommend consulting a licensed attorney for legal advice.
       minIntelligence: IntelligenceLevelFilter.SMART,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
+      preferredStrengths: [ModelUtility.ANALYSIS, ModelUtility.SMART, ModelUtility.CHAT],
     },
     ownership: {
       type: "system",
@@ -2475,10 +2320,8 @@ Always recommend consulting a licensed attorney for legal advice.
   {
     id: "financial-advisor",
     name: "app.api.agent.chat.characters.characters.financialAdvisor.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.financialAdvisor.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.financialAdvisor.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.financialAdvisor.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.financialAdvisor.description" as const,
     icon: "dollar-sign",
     category: CharacterCategory.ASSISTANT,
     source: CharacterSource.BUILT_IN,
@@ -2559,11 +2402,7 @@ Always recommend consulting a licensed financial advisor for personalized advice
       minIntelligence: IntelligenceLevelFilter.SMART,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
+      preferredStrengths: [ModelUtility.ANALYSIS, ModelUtility.SMART, ModelUtility.CHAT],
     },
     ownership: {
       type: "system",
@@ -2583,10 +2422,8 @@ Always recommend consulting a licensed financial advisor for personalized advice
   {
     id: "social-media-manager",
     name: "app.api.agent.chat.characters.characters.socialMediaManager.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.socialMediaManager.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.socialMediaManager.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.socialMediaManager.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.socialMediaManager.description" as const,
     icon: "share-2",
     category: CharacterCategory.CREATIVE,
     source: CharacterSource.BUILT_IN,
@@ -2694,11 +2531,7 @@ Always recommend consulting a licensed financial advisor for personalized advice
       minIntelligence: IntelligenceLevelFilter.SMART,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.CREATIVE,
-        ModelUtility.CHAT,
-        ModelUtility.SMART,
-      ],
+      preferredStrengths: [ModelUtility.CREATIVE, ModelUtility.CHAT, ModelUtility.SMART],
     },
     ownership: {
       type: "system",
@@ -2718,10 +2551,8 @@ Always recommend consulting a licensed financial advisor for personalized advice
   {
     id: "product-manager",
     name: "app.api.agent.chat.characters.characters.productManager.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.productManager.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.productManager.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.productManager.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.productManager.description" as const,
     icon: "package",
     category: CharacterCategory.ASSISTANT,
     source: CharacterSource.BUILT_IN,
@@ -2814,11 +2645,7 @@ Format: "As a [user type], I want to [action] so that [benefit]"
       minIntelligence: IntelligenceLevelFilter.SMART,
     },
     preferences: {
-      preferredStrengths: [
-        ModelUtility.ANALYSIS,
-        ModelUtility.SMART,
-        ModelUtility.CHAT,
-      ],
+      preferredStrengths: [ModelUtility.ANALYSIS, ModelUtility.SMART, ModelUtility.CHAT],
     },
     ownership: {
       type: "system",
@@ -2838,10 +2665,8 @@ Format: "As a [user type], I want to [action] so that [benefit]"
   {
     id: "debater",
     name: "app.api.agent.chat.characters.characters.debater.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.debater.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.debater.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.debater.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.debater.tagline" as const,
     icon: "message-square",
     category: CharacterCategory.CONTROVERSIAL,
     source: CharacterSource.BUILT_IN,
@@ -2914,8 +2739,7 @@ Format: "As a [user type], I want to [action] so that [benefit]"
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.debater.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.debater.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.debate" as const,
         "app.api.agent.chat.characters.tags.analysis" as const,
@@ -2926,10 +2750,8 @@ Format: "As a [user type], I want to [action] so that [benefit]"
   {
     id: "philosopher",
     name: "app.api.agent.chat.characters.characters.philosopher.name" as const,
-    description:
-      "app.api.agent.chat.characters.characters.philosopher.description" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.philosopher.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.philosopher.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.philosopher.tagline" as const,
     icon: "brain",
     category: CharacterCategory.CONTROVERSIAL,
     source: CharacterSource.BUILT_IN,
@@ -3017,8 +2839,7 @@ Format: "As a [user type], I want to [action] so that [benefit]"
       isFeatured: true,
     },
     display: {
-      shortDescription:
-        "app.api.agent.chat.characters.characters.philosopher.shortDesc" as const,
+      shortDescription: "app.api.agent.chat.characters.characters.philosopher.shortDesc" as const,
       tags: [
         "app.api.agent.chat.characters.tags.philosophy" as const,
         "app.api.agent.chat.characters.tags.analysis" as const,
@@ -3029,10 +2850,8 @@ Format: "As a [user type], I want to [action] so that [benefit]"
   {
     id: "uncensored-writer",
     name: "app.api.agent.chat.characters.characters.uncensoredWriter.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.uncensoredWriter.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.uncensoredWriter.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.uncensoredWriter.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.uncensoredWriter.description" as const,
     icon: "flame",
     category: CharacterCategory.CREATIVE,
     source: CharacterSource.BUILT_IN,
@@ -3134,10 +2953,8 @@ You are a tool for creative expression. Write what is requested with skill and w
   {
     id: "roleplay-character",
     name: "app.api.agent.chat.characters.characters.roleplayCharacter.name" as const,
-    tagline:
-      "app.api.agent.chat.characters.characters.roleplayCharacter.tagline" as const,
-    description:
-      "app.api.agent.chat.characters.characters.roleplayCharacter.description" as const,
+    tagline: "app.api.agent.chat.characters.characters.roleplayCharacter.tagline" as const,
+    description: "app.api.agent.chat.characters.characters.roleplayCharacter.description" as const,
     icon: "users",
     category: CharacterCategory.ROLEPLAY,
     source: CharacterSource.BUILT_IN,

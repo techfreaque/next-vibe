@@ -3,11 +3,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/lib/storage";
 import { useCallback, useEffect, useMemo, useRef } from "react";
@@ -62,11 +58,7 @@ function mergeWithDefaults<T>(saved: T, defaults: T): T {
 
     if (savedValue !== undefined && savedValue !== null && savedValue !== "") {
       // Saved value exists and is not empty - use it (with recursive merge for objects)
-      if (
-        typeof savedValue === "object" &&
-        !Array.isArray(savedValue) &&
-        savedValue !== null
-      ) {
+      if (typeof savedValue === "object" && !Array.isArray(savedValue) && savedValue !== null) {
         result[key] = mergeWithDefaults(savedValue, defaultValue);
       } else {
         result[key] = savedValue;
@@ -145,9 +137,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   const debounceTimerRef = useRef<number | null>(null);
 
   // Create base form configuration
-  type FormData = ExtractOutput<
-    InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-  >;
+  type FormData = ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>;
 
   // Recursively extract default values from the Zod schema
   // This traverses the entire schema tree and builds an object with all default values
@@ -156,12 +146,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     // Step 1: Extract defaults recursively from schema structure
     // Use forFormInit=true to get empty defaults for primitives (e.g., "" for strings)
     // This ensures required fields are initialized with proper empty values
-    const extracted = extractSchemaDefaults<FormData>(
-      endpoint.requestSchema,
-      logger,
-      "",
-      true,
-    );
+    const extracted = extractSchemaDefaults<FormData>(endpoint.requestSchema, logger, "", true);
     const baseDefaults = (extracted ?? {}) as FormData;
 
     // Step 2: Pass through Zod's parse to validate and apply transformations
@@ -190,9 +175,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   const defaultQueryParams = useMemo(
     () =>
       mergedDefaultValues ||
-      ({} as ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-      >),
+      ({} as ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>),
     [mergedDefaultValues],
   );
   // Selector must return stable references - just get raw params from store
@@ -213,19 +196,13 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     }
     // Deserialize JSON-stringified nested objects back to their original form
     return deserializeQueryParams<
-      ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-      >
+      ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>
     >(rawQueryParams);
   }, [rawQueryParams, defaultQueryParams]);
 
   // Create a function to update query params in the store
   const setQueryParams = useCallback(
-    (
-      params: ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-      >,
-    ) => {
+    (params: ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>) => {
       // Type-safe conversion for form query params
       if (params === undefined || params === null) {
         setFormQueryParams(formId, {});
@@ -299,9 +276,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   };
 
   // Generate a storage key based on the endpoint if not provided
-  const storageKey =
-    persistenceKey ||
-    `query-form-${endpoint.path.join("-")}-${endpoint.method}`;
+  const storageKey = persistenceKey || `query-form-${endpoint.path.join("-")}-${endpoint.method}`;
 
   // Note: formConfig already includes merged default values
   const formConfigWithDefaults = {
@@ -328,9 +303,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
           (restFormOptions.defaultValues as ExtractOutput<
             InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
           >) ||
-          ({} as ExtractOutput<
-            InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-          >);
+          ({} as ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>);
         formMethods.reset(resetData);
         // Update query params with reset data
         setQueryParams(resetData);
@@ -365,13 +338,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         // In a production app, this would use a proper error logging service
       }
     })();
-  }, [
-    formMethods,
-    storageKey,
-    persistForm,
-    setQueryParams,
-    mergedDefaultValues,
-  ]);
+  }, [formMethods, storageKey, persistForm, setQueryParams, mergedDefaultValues]);
 
   // Save form values when they change
   useEffect(() => {
@@ -422,8 +389,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       if (error) {
         // Convert Error to ErrorResponseType
         const errorResponse = fail({
-          message:
-            "app.api.system.unifiedInterface.react.hooks.queryForm.errors.validation_failed",
+          message: "app.api.system.unifiedInterface.react.hooks.queryForm.errors.validation_failed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { formId, message: error.message },
         });
@@ -473,22 +439,13 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
 
   // Force refetch when queryParams change (since useApiQuery doesn't auto-refetch)
   const prevQueryParamsRef = useRef<
-    | ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-      >
-    | undefined
+    ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>> | undefined
   >(undefined);
   useEffect(() => {
     // Skip the first render (initial load)
-    if (
-      prevQueryParamsRef.current &&
-      queryParams &&
-      typeof queryParams === "object"
-    ) {
+    if (prevQueryParamsRef.current && queryParams && typeof queryParams === "object") {
       // Deep compare to avoid infinite rerenders
-      const hasChanged =
-        JSON.stringify(prevQueryParamsRef.current) !==
-        JSON.stringify(queryParams);
+      const hasChanged = JSON.stringify(prevQueryParamsRef.current) !== JSON.stringify(queryParams);
       if (hasChanged && Object.keys(queryParams).length > 0) {
         // Only refetch if not already loading to avoid conflicts
         if (!query.isLoading) {
@@ -565,39 +522,21 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
 
   // Create a submit handler that validates and submits the form
   const submitForm: SubmitFormFunction<
-    ExtractOutput<
-      InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-    >,
-    ExtractOutput<
-      InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>
-    >,
-    ExtractOutput<
-      InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
-    >
+    ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>,
+    ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>>,
+    ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>>
   > = (
     inputOptions?: SubmitFormFunctionOptions<
-      ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-      >,
-      ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>
-      >,
-      ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
-      >
+      ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>,
+      ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>>,
+      ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>>
     >,
   ): void => {
     // Create a properly typed options object with urlParamVariables
     const options: SubmitFormFunctionOptions<
-      ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-      >,
-      ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>
-      >,
-      ExtractOutput<
-        InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
-      >
+      ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>,
+      ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>>,
+      ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>>
     > = {
       ...(inputOptions || {}),
       urlParamVariables:
@@ -665,9 +604,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         const response = await query.refetch();
         // Convert the response to a proper ResponseType
         const result =
-          typeof response === "object" &&
-          response !== null &&
-          "success" in response
+          typeof response === "object" && response !== null && "success" in response
             ? response
             : success(response);
 
@@ -692,10 +629,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
             pathParams:
               options.urlParamVariables ||
               ({} as ExtractOutput<
-                InferSchemaFromField<
-                  TEndpoint["fields"],
-                  FieldUsage.RequestUrlParams
-                >
+                InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
               >),
           });
         }
@@ -708,8 +642,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         });
 
         const errorResponse = fail({
-          message:
-            "app.api.system.unifiedInterface.react.hooks.queryForm.errors.network_failure",
+          message: "app.api.system.unifiedInterface.react.hooks.queryForm.errors.network_failure",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { formId, error: errorMessage },
         });
@@ -725,10 +658,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
             pathParams:
               options.urlParamVariables ||
               ({} as ExtractOutput<
-                InferSchemaFromField<
-                  TEndpoint["fields"],
-                  FieldUsage.RequestUrlParams
-                >
+                InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
               >),
           });
         }
@@ -764,10 +694,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
             pathParams:
               options.urlParamVariables ||
               ({} as ExtractOutput<
-                InferSchemaFromField<
-                  TEndpoint["fields"],
-                  FieldUsage.RequestUrlParams
-                >
+                InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>
               >),
           });
         }
@@ -779,14 +706,9 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   // Simplify error message to avoid complex union type - use explicit type assertion
   const queryError = query.error;
   const formError = formState.formError;
-  const queryErrorMessage: string = queryError
-    ? (queryError.message as string)
-    : "";
-  const formErrorMessage: string = formError
-    ? (formError.message as string)
-    : "";
-  const errorMessage: string | undefined =
-    queryErrorMessage || formErrorMessage || undefined;
+  const queryErrorMessage: string = queryError ? (queryError.message as string) : "";
+  const formErrorMessage: string = formError ? (formError.message as string) : "";
+  const errorMessage: string | undefined = queryErrorMessage || formErrorMessage || undefined;
 
   return {
     form: formMethods,

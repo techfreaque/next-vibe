@@ -37,9 +37,7 @@ export function getLocaleString(countryLanguage: CountryLanguage): string {
 /**
  * Check if locale should use 24-hour time format
  */
-export function shouldUse24HourFormat(
-  countryLanguage: CountryLanguage,
-): boolean {
+export function shouldUse24HourFormat(countryLanguage: CountryLanguage): boolean {
   const country = countryLanguage.split("-")[1];
   return country === "DE" || country === "PL" || country === "AT";
 }
@@ -63,11 +61,7 @@ export function getDateFnsLocale(countryLanguage: CountryLanguage): Locale {
 /**
  * Format date with proper localization using date-fns
  */
-export function formatDate(
-  date: Date,
-  locale: CountryLanguage,
-  formatString = "PPP",
-): string {
+export function formatDate(date: Date, locale: CountryLanguage, formatString = "PPP"): string {
   const dateFnsLocale = getDateFnsLocale(locale);
   return format(date, formatString, { locale: dateFnsLocale });
 }
@@ -75,10 +69,7 @@ export function formatDate(
 /**
  * Format date for display with native Intl.DateTimeFormat
  */
-export function formatDateForDisplay(
-  date: Date,
-  locale: CountryLanguage,
-): string {
+export function formatDateForDisplay(date: Date, locale: CountryLanguage): string {
   const localeString = getLocaleString(locale);
   return date.toLocaleDateString(localeString, {
     weekday: "long",
@@ -91,10 +82,7 @@ export function formatDateForDisplay(
 /**
  * Format time for display with locale-specific formatting
  */
-export function formatTimeForDisplay(
-  time: string,
-  locale: CountryLanguage,
-): string {
+export function formatTimeForDisplay(time: string, locale: CountryLanguage): string {
   const [hours, minutes] = time.split(":").map(Number);
   const date = new Date();
   date.setHours(hours, minutes, 0, 0);
@@ -112,13 +100,9 @@ export function formatTimeForDisplay(
 /**
  * Format timestamp for display with proper localization
  */
-export function formatTimestamp(
-  timestamp: string | Date,
-  locale: CountryLanguage,
-): string {
+export function formatTimestamp(timestamp: string | Date, locale: CountryLanguage): string {
   try {
-    const date =
-      typeof timestamp === "string" ? new Date(timestamp) : timestamp;
+    const date = typeof timestamp === "string" ? new Date(timestamp) : timestamp;
     const localeString = getLocaleString(locale);
     const use24Hour = shouldUse24HourFormat(locale);
 
@@ -180,10 +164,7 @@ export function formatTimeString(date: Date): string {
 /**
  * Format simple date string for locale
  */
-export function formatSimpleDate(
-  date: Date | string,
-  locale: CountryLanguage,
-): string {
+export function formatSimpleDate(date: Date | string, locale: CountryLanguage): string {
   const dateObj = typeof date === "string" ? new Date(date) : date;
   const localeString = getLocaleString(locale);
 
@@ -216,10 +197,7 @@ export function formatTimeWithTimezone(
 /**
  * Get current time in timezone with locale formatting
  */
-export function getCurrentTimeInTimezone(
-  timezone: string,
-  locale: CountryLanguage,
-): string {
+export function getCurrentTimeInTimezone(timezone: string, locale: CountryLanguage): string {
   try {
     const localeString = getLocaleString(locale);
     const use24Hour = shouldUse24HourFormat(locale);
@@ -278,10 +256,7 @@ export function formatShortDate(date: Date, locale: CountryLanguage): string {
  * Format single date to YYYY-MM-DD string with timezone support
  * Uses en-CA locale for consistent YYYY-MM-DD format regardless of user locale
  */
-export function formatSingleDateStringWithTimezone(
-  date: Date,
-  timezone: string,
-): string {
+export function formatSingleDateStringWithTimezone(date: Date, timezone: string): string {
   try {
     // Use en-CA format for consistent YYYY-MM-DD output regardless of user locale
     const formatter = new Intl.DateTimeFormat("en-CA", {
@@ -396,10 +371,7 @@ export function formatDateTimeInTimezone(
  * @param timeString Time in HH:MM format
  * @returns Date object or null if parsing fails
  */
-export function parseDateTime(
-  dateString: string,
-  timeString: string,
-): Date | null {
+export function parseDateTime(dateString: string, timeString: string): Date | null {
   try {
     const [year, month, day] = dateString.split("-").map(Number);
     const [hours, minutes] = timeString.split(":").map(Number);

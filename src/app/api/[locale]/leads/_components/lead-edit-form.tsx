@@ -26,11 +26,7 @@ interface LeadEditFormProps {
   leadId: string;
 }
 
-export function LeadEditForm({
-  lead,
-  locale,
-  leadId,
-}: LeadEditFormProps): JSX.Element {
+export function LeadEditForm({ lead, locale, leadId }: LeadEditFormProps): JSX.Element {
   const router = useRouter();
   const { t } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -57,8 +53,7 @@ export function LeadEditForm({
       <Card>
         <CardHeader>
           <CardTitle>
-            {t("app.admin.common.actions.edit")} -{" "}
-            {lead.lead.basicInfo.businessName}
+            {t("app.admin.common.actions.edit")} - {lead.lead.basicInfo.businessName}
           </CardTitle>
         </CardHeader>
         <CardContent>

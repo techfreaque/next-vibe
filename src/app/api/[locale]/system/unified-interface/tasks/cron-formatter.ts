@@ -37,15 +37,7 @@ export function formatCronSchedule(
     });
 
     // Generate human-readable description
-    return generateDescription(
-      minute,
-      hour,
-      dayOfMonth,
-      month,
-      dayOfWeek,
-      timezone,
-      locale,
-    );
+    return generateDescription(minute, hour, dayOfMonth, month, dayOfWeek, timezone, locale);
   } catch (error) {
     logger.error("Failed to parse cron schedule", parseError(error));
     // If parsing fails, try to generate a basic description anyway
@@ -53,15 +45,7 @@ export function formatCronSchedule(
     if (parts.length >= 5) {
       const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
       try {
-        return generateDescription(
-          minute,
-          hour,
-          dayOfMonth,
-          month,
-          dayOfWeek,
-          timezone,
-          locale,
-        );
+        return generateDescription(minute, hour, dayOfMonth, month, dayOfWeek, timezone, locale);
       } catch {
         // If all else fails, return the original schedule
         return schedule;
@@ -87,43 +71,27 @@ function generateDescription(
   const { t } = simpleT(locale);
 
   // Handle frequency
-  if (
-    minute === "*" &&
-    hour === "*" &&
-    dayOfMonth === "*" &&
-    month === "*" &&
-    dayOfWeek === "*"
-  ) {
-    return t(
-      "app.api.system.unifiedInterface.tasks.cron.frequency.everyMinute",
-    );
+  if (minute === "*" && hour === "*" && dayOfMonth === "*" && month === "*" && dayOfWeek === "*") {
+    return t("app.api.system.unifiedInterface.tasks.cron.frequency.everyMinute");
   }
 
   // Handle minute
   if (minute === "*") {
-    parts.push(
-      t("app.api.system.unifiedInterface.tasks.cron.frequency.everyMinutes"),
-    );
+    parts.push(t("app.api.system.unifiedInterface.tasks.cron.frequency.everyMinutes"));
   } else if (minute.includes("/")) {
     const [start, interval] = minute.split("/");
     if (start === "*") {
       parts.push(
-        t(
-          "app.api.system.unifiedInterface.tasks.cron.patterns.everyIntervalMinutes",
-          {
-            interval,
-          },
-        ),
+        t("app.api.system.unifiedInterface.tasks.cron.patterns.everyIntervalMinutes", {
+          interval,
+        }),
       );
     } else {
       parts.push(
-        t(
-          "app.api.system.unifiedInterface.tasks.cron.patterns.everyIntervalMinutesStarting",
-          {
-            interval,
-            start,
-          },
-        ),
+        t("app.api.system.unifiedInterface.tasks.cron.patterns.everyIntervalMinutesStarting", {
+          interval,
+          start,
+        }),
       );
     }
   } else if (minute.includes(",")) {
@@ -136,13 +104,10 @@ function generateDescription(
   } else if (minute.includes("-")) {
     const [start, end] = minute.split("-");
     parts.push(
-      t(
-        "app.api.system.unifiedInterface.tasks.cron.patterns.fromMinuteToMinute",
-        {
-          start,
-          end,
-        },
-      ),
+      t("app.api.system.unifiedInterface.tasks.cron.patterns.fromMinuteToMinute", {
+        start,
+        end,
+      }),
     );
   } else if (minute !== "0") {
     parts.push(
@@ -155,30 +120,22 @@ function generateDescription(
   // Handle hour
   if (hour === "*") {
     if (!parts.some((p) => p.includes("minute"))) {
-      parts.push(
-        t("app.api.system.unifiedInterface.tasks.cron.frequency.everyHour"),
-      );
+      parts.push(t("app.api.system.unifiedInterface.tasks.cron.frequency.everyHour"));
     }
   } else if (hour.includes("/")) {
     const [start, interval] = hour.split("/");
     if (start === "*") {
       parts.push(
-        t(
-          "app.api.system.unifiedInterface.tasks.cron.patterns.everyIntervalHours",
-          {
-            interval,
-          },
-        ),
+        t("app.api.system.unifiedInterface.tasks.cron.patterns.everyIntervalHours", {
+          interval,
+        }),
       );
     } else {
       parts.push(
-        t(
-          "app.api.system.unifiedInterface.tasks.cron.patterns.everyIntervalHoursStarting",
-          {
-            interval,
-            start: formatHour(start, locale),
-          },
-        ),
+        t("app.api.system.unifiedInterface.tasks.cron.patterns.everyIntervalHoursStarting", {
+          interval,
+          start: formatHour(start, locale),
+        }),
       );
     }
   } else if (hour.includes(",")) {
@@ -259,13 +216,10 @@ function generateDescription(
     } else if (dayOfWeek.includes("-")) {
       const [start, end] = dayOfWeek.split("-");
       parts.push(
-        t(
-          "app.api.system.unifiedInterface.tasks.cron.calendar.fromWeekdayToWeekday",
-          {
-            start: formatDayOfWeek(start, locale),
-            end: formatDayOfWeek(end, locale),
-          },
-        ),
+        t("app.api.system.unifiedInterface.tasks.cron.calendar.fromWeekdayToWeekday", {
+          start: formatDayOfWeek(start, locale),
+          end: formatDayOfWeek(end, locale),
+        }),
       );
     } else {
       parts.push(
@@ -383,10 +337,7 @@ function formatDayOfWeek(day: string, locale: CountryLanguage): string {
  * Returns the interval between executions in minutes
  * Uses cron-parser library for accurate calculation
  */
-export function getCronFrequencyMinutes(
-  schedule: string,
-  logger: EndpointLogger,
-): number {
+export function getCronFrequencyMinutes(schedule: string, logger: EndpointLogger): number {
   try {
     // Parse the cron expression using cron-parser
     const interval = cronParser.parse(schedule, {
@@ -429,64 +380,41 @@ export function formatCronScheduleShort(
 
     // Common patterns
     if (schedule === "0 0 * * *") {
-      return t(
-        "app.api.system.unifiedInterface.tasks.cron.common.dailyAtMidnight",
-      );
+      return t("app.api.system.unifiedInterface.tasks.cron.common.dailyAtMidnight");
     }
     if (schedule === "0 12 * * *") {
       return t("app.api.system.unifiedInterface.tasks.cron.common.dailyAtNoon");
     }
     if (schedule === "0 0 * * 0") {
-      return t(
-        "app.api.system.unifiedInterface.tasks.cron.common.weeklyOnSunday",
-      );
+      return t("app.api.system.unifiedInterface.tasks.cron.common.weeklyOnSunday");
     }
     if (schedule === "0 0 1 * *") {
-      return t(
-        "app.api.system.unifiedInterface.tasks.cron.common.monthlyOnFirst",
-      );
+      return t("app.api.system.unifiedInterface.tasks.cron.common.monthlyOnFirst");
     }
     if (schedule === "*/5 * * * *") {
-      return t(
-        "app.api.system.unifiedInterface.tasks.cron.common.everyFiveMinutes",
-      );
+      return t("app.api.system.unifiedInterface.tasks.cron.common.everyFiveMinutes");
     }
     if (schedule === "*/3 * * * *") {
-      return t(
-        "app.api.system.unifiedInterface.tasks.cron.common.everyThreeMinutes",
-      );
+      return t("app.api.system.unifiedInterface.tasks.cron.common.everyThreeMinutes");
     }
     if (schedule === "*/1 * * * *") {
-      return t(
-        "app.api.system.unifiedInterface.tasks.cron.common.everyOneMinutes",
-      );
+      return t("app.api.system.unifiedInterface.tasks.cron.common.everyOneMinutes");
     }
     if (schedule === "*/10 * * * *") {
-      return t(
-        "app.api.system.unifiedInterface.tasks.cron.common.everyTenMinutes",
-      );
+      return t("app.api.system.unifiedInterface.tasks.cron.common.everyTenMinutes");
     }
     if (schedule === "*/15 * * * *") {
-      return t(
-        "app.api.system.unifiedInterface.tasks.cron.common.everyFifteenMinutes",
-      );
+      return t("app.api.system.unifiedInterface.tasks.cron.common.everyFifteenMinutes");
     }
     if (schedule === "*/30 * * * *") {
-      return t(
-        "app.api.system.unifiedInterface.tasks.cron.common.everyThirtyMinutes",
-      );
+      return t("app.api.system.unifiedInterface.tasks.cron.common.everyThirtyMinutes");
     }
     if (schedule === "0 * * * *") {
       return t("app.api.system.unifiedInterface.tasks.cron.frequency.hourly");
     }
 
     // Try to generate a short description
-    const fullDescription = formatCronSchedule(
-      schedule,
-      timezone,
-      locale,
-      logger,
-    );
+    const fullDescription = formatCronSchedule(schedule, timezone, locale, logger);
 
     // Truncate if too long
     if (fullDescription.length > 50) {
@@ -525,10 +453,7 @@ export function calculateNextExecutionTime(
  * Validate cron schedule
  * Uses cron-parser library to validate the schedule format
  */
-export function validateCronSchedule(
-  schedule: string,
-  timezone = "UTC",
-): boolean {
+export function validateCronSchedule(schedule: string, timezone = "UTC"): boolean {
   try {
     cronParser.parse(schedule, { tz: timezone });
     return true;

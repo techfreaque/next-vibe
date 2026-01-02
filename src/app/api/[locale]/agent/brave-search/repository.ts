@@ -20,8 +20,7 @@ import { FRESHNESS_API_MAP } from "./definition";
  * These are technical messages for AI, not user-facing translations
  */
 export const SEARCH_MESSAGES = {
-  QUERY_REQUIRED:
-    "Error: Search query is required but was not provided by the model.",
+  QUERY_REQUIRED: "Error: Search query is required but was not provided by the model.",
   NO_RESULTS_PREFIX: "No results found for",
   UNKNOWN_ERROR: "Unknown error occurred",
   SEARCH_FAILED_PREFIX: "Search failed",
@@ -130,10 +129,7 @@ class BraveSearchService {
   /**
    * Search the web with rate limiting and caching
    */
-  async search(
-    query: string,
-    config: SearchConfig = {},
-  ): Promise<SearchResponse> {
+  async search(query: string, config: SearchConfig = {}): Promise<SearchResponse> {
     const normalizedQuery = query.trim().toLowerCase();
 
     // Validate query
@@ -168,10 +164,7 @@ class BraveSearchService {
   /**
    * Fetch results from Brave Search API
    */
-  private async fetchResults(
-    query: string,
-    config: SearchConfig,
-  ): Promise<SearchResult[]> {
+  private async fetchResults(query: string, config: SearchConfig): Promise<SearchResult[]> {
     const params = new URLSearchParams({
       q: query,
       count: String(config.maxResults ?? 5),
@@ -225,10 +218,7 @@ class BraveSearchService {
   /**
    * Parse and normalize API results
    */
-  private parseResults(
-    data: BraveSearchApiResponse,
-    includeNews = false,
-  ): SearchResult[] {
+  private parseResults(data: BraveSearchApiResponse, includeNews = false): SearchResult[] {
     const results: SearchResult[] = [];
 
     // Add web results
@@ -293,9 +283,7 @@ class BraveSearchService {
    */
   private async enforceRateLimit(): Promise<void> {
     const now = Date.now();
-    this.rateLimitQueue = this.rateLimitQueue.filter(
-      (timestamp) => now - timestamp < 1000,
-    );
+    this.rateLimitQueue = this.rateLimitQueue.filter((timestamp) => now - timestamp < 1000);
 
     if (this.rateLimitQueue.length >= this.MAX_REQUESTS_PER_SECOND) {
       const oldestRequest = this.rateLimitQueue[0];
@@ -400,12 +388,7 @@ function getBraveSearchService(): BraveSearchService {
 /**
  * Freshness options for Brave Search (readable values)
  */
-const FRESHNESS_OPTIONS = [
-  "past_day",
-  "past_week",
-  "past_month",
-  "past_year",
-] as const;
+const FRESHNESS_OPTIONS = ["past_day", "past_week", "past_month", "past_year"] as const;
 
 /**
  * AI SDK Tool for Brave Search
@@ -525,15 +508,13 @@ export class BraveSearchRepository {
     },
     logger: EndpointLogger,
   ): Promise<ResponseType<BraveSearchGetResponseOutput>> {
-    const { fail, success, ErrorResponseTypes } = await import(
-      "next-vibe/shared/types/response.schema"
-    );
+    const { fail, success, ErrorResponseTypes } =
+      await import("next-vibe/shared/types/response.schema");
 
     try {
       if (!query || typeof query !== "string" || query.trim() === "") {
         return fail({
-          message:
-            "app.api.agent.chat.tools.braveSearch.get.errors.validation.title" as const,
+          message: "app.api.agent.chat.tools.braveSearch.get.errors.validation.title" as const,
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { message: SEARCH_MESSAGES.QUERY_REQUIRED },
         });
@@ -576,8 +557,7 @@ export class BraveSearchRepository {
       });
 
       return fail({
-        message:
-          "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
+        message: "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { message: braveError.message },
       });

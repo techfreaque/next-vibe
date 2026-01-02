@@ -9,11 +9,7 @@
 import "server-only";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import {
@@ -67,19 +63,16 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("📝 Generating endpoints index (singleton)...");
-              const { endpointsIndexGeneratorRepository } = await import(
-                "../endpoints-index/repository"
-              );
+              const { endpointsIndexGeneratorRepository } =
+                await import("../endpoints-index/repository");
 
-              const result =
-                await endpointsIndexGeneratorRepository.generateEndpointsIndex(
-                  {
-                    outputFile:
-                      "src/app/api/[locale]/system/generated/endpoints.ts",
-                    dryRun: false,
-                  },
-                  logger,
-                );
+              const result = await endpointsIndexGeneratorRepository.generateEndpointsIndex(
+                {
+                  outputFile: "src/app/api/[locale]/system/generated/endpoints.ts",
+                  dryRun: false,
+                },
+                logger,
+              );
 
               if (result.success) {
                 outputLines.push("✅ Endpoints index generated successfully");
@@ -91,9 +84,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               );
               return null;
             } catch (error) {
-              outputLines.push(
-                `❌ Endpoints index generator failed: ${parseError(error).message}`,
-              );
+              outputLines.push(`❌ Endpoints index generator failed: ${parseError(error).message}`);
               return null;
             }
           })(),
@@ -108,14 +99,11 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("📝 Generating endpoint (dynamic imports)...");
-              const { endpointGeneratorRepository } = await import(
-                "../endpoint/repository"
-              );
+              const { endpointGeneratorRepository } = await import("../endpoint/repository");
 
               const result = await endpointGeneratorRepository.generateEndpoint(
                 {
-                  outputFile:
-                    "src/app/api/[locale]/system/generated/endpoint.ts",
+                  outputFile: "src/app/api/[locale]/system/generated/endpoint.ts",
                   dryRun: false,
                 },
                 logger,
@@ -131,9 +119,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               );
               return null;
             } catch (error) {
-              outputLines.push(
-                `❌ Endpoint generator failed: ${parseError(error).message}`,
-              );
+              outputLines.push(`❌ Endpoint generator failed: ${parseError(error).message}`);
               return null;
             }
           })(),
@@ -145,22 +131,17 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              outputLines.push(
-                "📝 Generating route handlers (dynamic imports)...",
-              );
-              const { routeHandlersGeneratorRepository } = await import(
-                "../route-handlers/repository"
-              );
+              outputLines.push("📝 Generating route handlers (dynamic imports)...");
+              const { routeHandlersGeneratorRepository } =
+                await import("../route-handlers/repository");
 
-              const result =
-                await routeHandlersGeneratorRepository.generateRouteHandlers(
-                  {
-                    outputFile:
-                      "src/app/api/[locale]/system/generated/route-handlers.ts",
-                    dryRun: false,
-                  },
-                  logger,
-                );
+              const result = await routeHandlersGeneratorRepository.generateRouteHandlers(
+                {
+                  outputFile: "src/app/api/[locale]/system/generated/route-handlers.ts",
+                  dryRun: false,
+                },
+                logger,
+              );
 
               if (result.success) {
                 outputLines.push("✅ Route handlers generated successfully");
@@ -172,9 +153,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               );
               return null;
             } catch (error) {
-              outputLines.push(
-                `❌ Route handlers generator failed: ${parseError(error).message}`,
-              );
+              outputLines.push(`❌ Route handlers generator failed: ${parseError(error).message}`);
               return null;
             }
           })(),
@@ -187,9 +166,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("🌱 Generating seeds...");
-              const { seedsGeneratorRepository } = await import(
-                "../seeds/repository"
-              );
+              const { seedsGeneratorRepository } = await import("../seeds/repository");
 
               const result = await seedsGeneratorRepository.generateSeeds(
                 {
@@ -206,14 +183,10 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 generatorsRun++;
                 return "seeds";
               }
-              outputLines.push(
-                `❌ Seeds generator failed: ${result.message || "Unknown error"}`,
-              );
+              outputLines.push(`❌ Seeds generator failed: ${result.message || "Unknown error"}`);
               return null;
             } catch (error) {
-              outputLines.push(
-                `❌ Seeds generator failed: ${parseError(error).message}`,
-              );
+              outputLines.push(`❌ Seeds generator failed: ${parseError(error).message}`);
               return null;
             }
           })(),
@@ -228,24 +201,18 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("📋 Generating task index...");
-              const { taskIndexGeneratorRepository } = await import(
-                "../task-index/repository"
+              const { taskIndexGeneratorRepository } = await import("../task-index/repository");
+
+              const result = await taskIndexGeneratorRepository.generateTaskIndex(
+                {
+                  outputFile: "src/app/api/[locale]/system/generated/tasks-index.ts",
+                  dryRun: false,
+                },
+                logger,
               );
 
-              const result =
-                await taskIndexGeneratorRepository.generateTaskIndex(
-                  {
-                    outputFile:
-                      "src/app/api/[locale]/system/generated/tasks-index.ts",
-                    dryRun: false,
-                  },
-                  logger,
-                );
-
               if (result.success) {
-                outputLines.push(
-                  `✅ Task index generated successfully: ${result.data.message}`,
-                );
+                outputLines.push(`✅ Task index generated successfully: ${result.data.message}`);
                 generatorsRun++;
                 return "task-index";
               }
@@ -254,9 +221,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               );
               return null;
             } catch (error) {
-              outputLines.push(
-                `❌ Task index generator failed: ${parseError(error).message}`,
-              );
+              outputLines.push(`❌ Task index generator failed: ${parseError(error).message}`);
               return null;
             }
           })(),
@@ -272,26 +237,22 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("🔌 Generating tRPC router...");
-              const { generateTrpcRouterRepository } = await import(
-                "../generate-trpc-router/repository"
+              const { generateTrpcRouterRepository } =
+                await import("../generate-trpc-router/repository");
+
+              const result = await generateTrpcRouterRepository.generateTrpcRouter(
+                {
+                  apiDir: "src/app/api",
+                  outputFile:
+                    "src/app/api/[locale]/system/unified-interface/trpc/[...trpc]/router.ts",
+                  includeWarnings: false,
+                  excludePatterns: [],
+                },
+                logger,
               );
 
-              const result =
-                await generateTrpcRouterRepository.generateTrpcRouter(
-                  {
-                    apiDir: "src/app/api",
-                    outputFile:
-                      "src/app/api/[locale]/system/unified-interface/trpc/[...trpc]/router.ts",
-                    includeWarnings: false,
-                    excludePatterns: [],
-                  },
-                  logger,
-                );
-
               if (result.success && result.data) {
-                outputLines.push(
-                  `✅ tRPC router generated successfully: ${result.data.output}`,
-                );
+                outputLines.push(`✅ tRPC router generated successfully: ${result.data.output}`);
                 generatorsRun++;
                 return "trpc-router";
               }
@@ -300,9 +261,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               );
               return null;
             } catch (error) {
-              outputLines.push(
-                `❌ tRPC router generator failed: ${parseError(error).message}`,
-              );
+              outputLines.push(`❌ tRPC router generator failed: ${parseError(error).message}`);
               return null;
             }
           })(),
@@ -317,24 +276,19 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         (async (): Promise<string | null> => {
           try {
             outputLines.push("📧 Generating email templates registry...");
-            const { emailTemplateGeneratorRepository } = await import(
-              "../email-templates/repository"
+            const { emailTemplateGeneratorRepository } =
+              await import("../email-templates/repository");
+
+            const result = await emailTemplateGeneratorRepository.generateEmailTemplates(
+              {
+                outputFile: "src/app/api/[locale]/emails/registry/generated.ts",
+                dryRun: false,
+              },
+              logger,
             );
 
-            const result =
-              await emailTemplateGeneratorRepository.generateEmailTemplates(
-                {
-                  outputFile:
-                    "src/app/api/[locale]/emails/registry/generated.ts",
-                  dryRun: false,
-                },
-                logger,
-              );
-
             if (result.success) {
-              outputLines.push(
-                "✅ Email templates registry generated successfully",
-              );
+              outputLines.push("✅ Email templates registry generated successfully");
               generatorsRun++;
               return "email-templates";
             }
@@ -343,9 +297,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
             );
             return null;
           } catch (error) {
-            outputLines.push(
-              `❌ Email templates generator failed: ${parseError(error).message}`,
-            );
+            outputLines.push(`❌ Email templates generator failed: ${parseError(error).message}`);
             return null;
           }
         })(),
@@ -373,8 +325,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           totalGenerators: 7,
           generatorsRun,
           generatorsSkipped,
-          outputDirectory:
-            data.outputDir || "src/app/api/[locale]/system/generated",
+          outputDirectory: data.outputDir || "src/app/api/[locale]/system/generated",
           functionalGeneratorsCompleted,
         },
       });
@@ -384,8 +335,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       outputLines.push(`❌ Generation failed: ${errorMessage}`);
 
       return fail({
-        message:
-          "app.api.system.generators.generateAll.post.errors.internal.title",
+        message: "app.api.system.generators.generateAll.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage.message },
       });

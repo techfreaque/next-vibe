@@ -7,11 +7,7 @@ import { join } from "node:path";
 
 import { confirm, select } from "@inquirer/prompts";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -94,10 +90,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
     // Timings tracking
     const timings: Timings = { total: 0 };
-    const trackTime = (
-      phase: keyof Omit<Timings, "total">,
-      start: number,
-    ): void => {
+    const trackTime = (phase: keyof Omit<Timings, "total">, start: number): void => {
       timings[phase] = Date.now() - start;
     };
 
@@ -159,17 +152,13 @@ export class ReleaseExecutor implements IReleaseExecutor {
         `  ${formatConfig("Dry Run", dryRun ? "YES" : "NO")}  ${formatHint(dryRun ? "(changes won't be applied)" : "")}`,
       );
       if (ciEnv.isCI) {
-        logger.vibe(
-          `  ${formatConfig("CI Environment", ciEnv.provider ?? "detected")}`,
-        );
+        logger.vibe(`  ${formatConfig("CI Environment", ciEnv.provider ?? "detected")}`);
       }
       logger.vibe("");
 
       // Show what will be checked/skipped
       logger.vibe(`  ${formatConfig("Lint", skipLint ? "SKIP" : "ON")}`);
-      logger.vibe(
-        `  ${formatConfig("Typecheck", skipTypecheck ? "SKIP" : "ON")}`,
-      );
+      logger.vibe(`  ${formatConfig("Typecheck", skipTypecheck ? "SKIP" : "ON")}`);
       logger.vibe(`  ${formatConfig("Build", skipBuild ? "SKIP" : "ON")}`);
       logger.vibe(`  ${formatConfig("Tests", skipTests ? "SKIP" : "ON")}`);
       logger.vibe(`  ${formatConfig("Publish", isCI ? "CI ONLY" : "SKIP")}`);
@@ -220,10 +209,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
         if (shouldUpdate) {
           logger.vibe(formatProgress("Updating dependencies..."));
-          const pkgJsonResult = packageService.getPackageJson(
-            originalCwd,
-            logger,
-          );
+          const pkgJsonResult = packageService.getPackageJson(originalCwd, logger);
           if (pkgJsonResult.success) {
             const updateResult = dependencyManager.updateDependencies(
               originalCwd,
@@ -235,9 +221,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
             if (updateResult.success) {
               logger.vibe(formatSuccess("Dependencies updated"));
             } else {
-              logger.vibe(
-                formatWarning("Failed to update dependencies, continuing..."),
-              );
+              logger.vibe(formatWarning("Failed to update dependencies, continuing..."));
             }
           }
         } else {
@@ -247,16 +231,11 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
       // Handle force update mode - just update deps and return
       if (forceUpdate) {
-        logger.vibe(
-          formatProgress("Force update mode: updating dependencies..."),
-        );
+        logger.vibe(formatProgress("Force update mode: updating dependencies..."));
         const packages = config.packages ?? [];
         for (const pkg of packages) {
           // Skip dependency updates in CI mode
-          if (
-            (pkg.updateDeps === true || pkg.updateDeps === "force") &&
-            !isCI
-          ) {
+          if ((pkg.updateDeps === true || pkg.updateDeps === "force") && !isCI) {
             const cwd = join(originalCwd, pkg.directory);
             const pkgJsonResult = packageService.getPackageJson(cwd, logger);
             if (pkgJsonResult.success) {
@@ -268,9 +247,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
                 dryRun,
               );
               if (!updateResult.success) {
-                errors.push(
-                  `Failed to update ${pkgJsonResult.data.name}: ${updateResult.message}`,
-                );
+                errors.push(`Failed to update ${pkgJsonResult.data.name}: ${updateResult.message}`);
               }
             }
           }
@@ -325,9 +302,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
       let packages = config.packages ?? [];
       if (targetPackage) {
         packages = packages.filter(
-          (pkg) =>
-            pkg.directory === targetPackage ||
-            pkg.directory.includes(targetPackage),
+          (pkg) => pkg.directory === targetPackage || pkg.directory.includes(targetPackage),
         );
         if (packages.length === 0) {
           return fail({
@@ -392,10 +367,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
         // Helper to handle hook failures (same behavior as quality failures)
         const handleHookFailure = (hookName: string): boolean => {
-          return handleFailure(
-            { success: false, message: `Hook ${hookName} failed` },
-            "Hook",
-          );
+          return handleFailure({ success: false, message: `Hook ${hookName} failed` }, "Hook");
         };
 
         // Install dependencies if configured
@@ -412,8 +384,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               continue;
             }
           }
-          const installCommand =
-            typeof pkg.install === "string" ? pkg.install : undefined;
+          const installCommand = typeof pkg.install === "string" ? pkg.install : undefined;
           const installResult = qualityRunner.runInstall(
             cwd,
             packageManager,
@@ -452,8 +423,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               continue;
             }
           }
-          const cleanCommand =
-            typeof pkg.clean === "string" ? pkg.clean : undefined;
+          const cleanCommand = typeof pkg.clean === "string" ? pkg.clean : undefined;
           const cleanResult = qualityRunner.runClean(
             cwd,
             packageManager,
@@ -495,8 +465,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               continue;
             }
           }
-          const lintCommand =
-            typeof pkg.lint === "string" ? pkg.lint : undefined;
+          const lintCommand = typeof pkg.lint === "string" ? pkg.lint : undefined;
           const lintResult = qualityRunner.runLint(
             cwd,
             packageManager,
@@ -523,8 +492,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
         // Typecheck
         if (pkg.typecheck && !skipTypecheck && !packageFailed) {
-          const typecheckCommand =
-            typeof pkg.typecheck === "string" ? pkg.typecheck : undefined;
+          const typecheckCommand = typeof pkg.typecheck === "string" ? pkg.typecheck : undefined;
           const typecheckResult = qualityRunner.runTypecheck(
             cwd,
             packageManager,
@@ -551,8 +519,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               continue;
             }
           }
-          const buildCommand =
-            typeof pkg.build === "string" ? pkg.build : undefined;
+          const buildCommand = typeof pkg.build === "string" ? pkg.build : undefined;
           const buildResult = qualityRunner.runBuild(
             cwd,
             packageManager,
@@ -591,8 +558,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               continue;
             }
           }
-          const testCommand =
-            typeof pkg.test === "string" ? pkg.test : undefined;
+          const testCommand = typeof pkg.test === "string" ? pkg.test : undefined;
           const testResult = qualityRunner.runTests(
             cwd,
             packageManager,
@@ -658,15 +624,10 @@ export class ReleaseExecutor implements IReleaseExecutor {
             prereleaseId,
           );
 
-          logger.debug(
-            `Processing tag release (${versionInfo.newTag}) for ${packageJson.name}...`,
-          );
+          logger.debug(`Processing tag release (${versionInfo.newTag}) for ${packageJson.name}...`);
 
           // Check if tag exists
-          const tagExists = await gitService.checkTagExists(
-            versionInfo.newTag,
-            logger,
-          );
+          const tagExists = await gitService.checkTagExists(versionInfo.newTag, logger);
           if (tagExists) {
             packagesProcessed.push({
               name: packageJson.name,
@@ -681,14 +642,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
           // Check for new commits (only skip if we're also doing git operations)
           // If skipGitTag is true, allow publishing even without new commits
-          if (
-            !gitService.hasNewCommitsSinceTag(
-              versionInfo.lastTag,
-              cwd,
-              logger,
-            ) &&
-            !skipGitTag
-          ) {
+          if (!gitService.hasNewCommitsSinceTag(versionInfo.lastTag, cwd, logger) && !skipGitTag) {
             packagesProcessed.push({
               name: packageJson.name,
               directory: pkg.directory,
@@ -728,17 +682,9 @@ export class ReleaseExecutor implements IReleaseExecutor {
             }
 
             // Update version in other files
-            versionService.updateVariableStringValue(
-              logger,
-              versionInfo.newVersion,
-              releaseConfig,
-            );
+            versionService.updateVariableStringValue(logger, versionInfo.newVersion, releaseConfig);
           } else {
-            logger.vibe(
-              formatSkip(
-                "Skipping version bump (CI mode - using existing version)",
-              ),
-            );
+            logger.vibe(formatSkip("Skipping version bump (CI mode - using existing version)"));
           }
 
           // Zip folders
@@ -783,26 +729,15 @@ export class ReleaseExecutor implements IReleaseExecutor {
           // Create git tag and publish (publish only in CI, git tags can be local)
           if (!packageFailed) {
             // Branch check RIGHT BEFORE git operations (last chance to warn)
-            const currentBranch =
-              globalGitInfo?.currentBranch ?? gitService.getCurrentBranch();
-            if (
-              currentBranch &&
-              currentBranch !== mainBranch &&
-              !config.branch?.allowNonMain
-            ) {
+            const currentBranch = globalGitInfo?.currentBranch ?? gitService.getCurrentBranch();
+            if (currentBranch && currentBranch !== mainBranch && !config.branch?.allowNonMain) {
               logger.vibe(
-                formatWarning(
-                  `Releasing from '${currentBranch}' branch (not '${mainBranch}')`,
-                ),
+                formatWarning(`Releasing from '${currentBranch}' branch (not '${mainBranch}')`),
               );
               logger.vibe(
-                formatHint(
-                  "Set branch.allowNonMain: true in config to suppress this warning",
-                ),
+                formatHint("Set branch.allowNonMain: true in config to suppress this warning"),
               );
-              warnings.push(
-                `Released from ${currentBranch} instead of ${mainBranch}`,
-              );
+              warnings.push(`Released from ${currentBranch} instead of ${mainBranch}`);
             }
 
             logger.vibe(formatProgress(`Releasing ${packageJson.name}...`));
@@ -827,11 +762,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
                 });
 
                 if (!shouldCommit) {
-                  logger.vibe(
-                    formatWarning(
-                      "Continuing without committing version changes",
-                    ),
-                  );
+                  logger.vibe(formatWarning("Continuing without committing version changes"));
                   // User chose not to commit, but we continue
                 }
               }
@@ -932,11 +863,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
                 }
 
                 // Track JSR publish
-                if (
-                  jsrResult.success &&
-                  releaseConfig.jsr?.enabled &&
-                  !dryRun
-                ) {
+                if (jsrResult.success && releaseConfig.jsr?.enabled && !dryRun) {
                   publishedPackages.push({
                     name: packageJson.name,
                     version: versionInfo.newVersion,
@@ -946,11 +873,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
                 }
               }
             } else if (!isCI) {
-              logger.vibe(
-                formatSkip(
-                  "Skipping npm publish (local mode - only CI publishes)",
-                ),
-              );
+              logger.vibe(formatSkip("Skipping npm publish (local mode - only CI publishes)"));
             }
 
             // Create GitHub/GitLab release if configured
@@ -977,9 +900,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               hookContext,
             );
             if (!hookResult.success) {
-              warnings.push(
-                `[${packageJson.name}] postPublish hook failed: ${hookResult.message}`,
-              );
+              warnings.push(`[${packageJson.name}] postPublish hook failed: ${hookResult.message}`);
             }
           }
 
@@ -993,9 +914,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               hookContext,
             );
             if (!hookResult.success) {
-              warnings.push(
-                `[${packageJson.name}] postRelease hook failed: ${hookResult.message}`,
-              );
+              warnings.push(`[${packageJson.name}] postRelease hook failed: ${hookResult.message}`);
             }
           }
 
@@ -1006,9 +925,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               version: versionInfo.newVersion,
               tag: versionInfo.newTag,
               status: "success",
-              message: dryRun
-                ? "Would have been released"
-                : "Released successfully",
+              message: dryRun ? "Would have been released" : "Released successfully",
             });
           }
         } else {
@@ -1023,14 +940,8 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
       // Run global post-release hook only if no errors occurred
       // (errors logged but don't fail release since it's post-processing)
-      const hasFailedPackages = packagesProcessed.some(
-        (p) => p.status === "failed",
-      );
-      if (
-        config.hooks?.postRelease &&
-        !hasFailedPackages &&
-        errors.length === 0
-      ) {
+      const hasFailedPackages = packagesProcessed.some((p) => p.status === "failed");
+      if (config.hooks?.postRelease && !hasFailedPackages && errors.length === 0) {
         const hookResult = hookRunner.runHook(
           config.hooks.postRelease,
           originalCwd,
@@ -1039,14 +950,9 @@ export class ReleaseExecutor implements IReleaseExecutor {
           { packageManager },
         );
         if (!hookResult.success) {
-          warnings.push(
-            `Global postRelease hook failed: ${hookResult.message}`,
-          );
+          warnings.push(`Global postRelease hook failed: ${hookResult.message}`);
         }
-      } else if (
-        config.hooks?.postRelease &&
-        (hasFailedPackages || errors.length > 0)
-      ) {
+      } else if (config.hooks?.postRelease && (hasFailedPackages || errors.length > 0)) {
         logger.vibe(formatSkip("Skipping postRelease hook due to errors"));
       }
 
@@ -1056,15 +962,9 @@ export class ReleaseExecutor implements IReleaseExecutor {
       timings.total = Date.now() - startTime;
 
       // Add summary
-      const successCount = packagesProcessed.filter(
-        (p) => p.status === "success",
-      ).length;
-      const skipCount = packagesProcessed.filter(
-        (p) => p.status === "skipped",
-      ).length;
-      const failCount = packagesProcessed.filter(
-        (p) => p.status === "failed",
-      ).length;
+      const successCount = packagesProcessed.filter((p) => p.status === "success").length;
+      const skipCount = packagesProcessed.filter((p) => p.status === "skipped").length;
+      const failCount = packagesProcessed.filter((p) => p.status === "failed").length;
 
       // Show summary
       logger.vibe("");
@@ -1129,17 +1029,14 @@ export class ReleaseExecutor implements IReleaseExecutor {
           errors: hasErrors ? errors : null,
           warnings: warnings.length > 0 ? warnings : null,
           gitInfo: globalGitInfo,
-          publishedPackages:
-            publishedPackages.length > 0 ? publishedPackages : null,
+          publishedPackages: publishedPackages.length > 0 ? publishedPackages : null,
           timings,
-          notificationsSent:
-            notificationsSent.length > 0 ? notificationsSent : null,
+          notificationsSent: notificationsSent.length > 0 ? notificationsSent : null,
         } satisfies ReleaseResponseType,
         hasErrors ? { isErrorResponse: true } : undefined,
       );
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       errors.push(errorMessage);
       output.push(MESSAGES.RELEASE_FAILED);
 
@@ -1173,11 +1070,9 @@ export class ReleaseExecutor implements IReleaseExecutor {
           errors,
           warnings: warnings.length > 0 ? warnings : null,
           gitInfo: globalGitInfo,
-          publishedPackages:
-            publishedPackages.length > 0 ? publishedPackages : null,
+          publishedPackages: publishedPackages.length > 0 ? publishedPackages : null,
           timings,
-          notificationsSent:
-            notificationsSent.length > 0 ? notificationsSent : null,
+          notificationsSent: notificationsSent.length > 0 ? notificationsSent : null,
         } satisfies ReleaseResponseType,
         { isErrorResponse: true },
       );

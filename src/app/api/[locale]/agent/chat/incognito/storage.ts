@@ -77,10 +77,7 @@ export async function loadIncognitoState(): Promise<IncognitoState> {
     messages: await getItem(STORAGE_KEYS.MESSAGES, {}),
     folders: await getItem(STORAGE_KEYS.FOLDERS, {}),
     activeThreadId: await getItem(STORAGE_KEYS.ACTIVE_THREAD, null),
-    currentRootFolderId: await getItem(
-      STORAGE_KEYS.CURRENT_ROOT_FOLDER,
-      "incognito",
-    ),
+    currentRootFolderId: await getItem(STORAGE_KEYS.CURRENT_ROOT_FOLDER, "incognito"),
     currentSubFolderId: await getItem(STORAGE_KEYS.CURRENT_SUB_FOLDER, null),
   };
 }
@@ -89,10 +86,7 @@ export async function loadIncognitoState(): Promise<IncognitoState> {
  * Save thread to storage
  */
 export async function saveThread(thread: ChatThread): Promise<void> {
-  const threads = await getItem<Record<string, ChatThread>>(
-    STORAGE_KEYS.THREADS,
-    {},
-  );
+  const threads = await getItem<Record<string, ChatThread>>(STORAGE_KEYS.THREADS, {});
   threads[thread.id] = thread;
   await setItem(STORAGE_KEYS.THREADS, threads);
 }
@@ -109,10 +103,7 @@ let messageSaveQueue: Promise<void> = Promise.resolve();
 export async function saveMessage(message: ChatMessage): Promise<void> {
   // Chain this save operation after the previous one completes
   messageSaveQueue = messageSaveQueue.then(async () => {
-    const messages = await getItem<Record<string, ChatMessage>>(
-      STORAGE_KEYS.MESSAGES,
-      {},
-    );
+    const messages = await getItem<Record<string, ChatMessage>>(STORAGE_KEYS.MESSAGES, {});
     messages[message.id] = message;
     await setItem(STORAGE_KEYS.MESSAGES, messages);
     return undefined;
@@ -135,8 +126,7 @@ export async function saveMessageWithAttachments(
   }
 
   const { convertFilesToIncognitoAttachments } = await import("./file-utils");
-  const incognitoAttachments =
-    await convertFilesToIncognitoAttachments(attachments);
+  const incognitoAttachments = await convertFilesToIncognitoAttachments(attachments);
 
   const messageWithAttachments: ChatMessage = {
     ...message,
@@ -153,10 +143,7 @@ export async function saveMessageWithAttachments(
  * Save folder to storage
  */
 export async function saveFolder(folder: ChatFolder): Promise<void> {
-  const folders = await getItem<Record<string, ChatFolder>>(
-    STORAGE_KEYS.FOLDERS,
-    {},
-  );
+  const folders = await getItem<Record<string, ChatFolder>>(STORAGE_KEYS.FOLDERS, {});
   folders[folder.id] = folder;
   await setItem(STORAGE_KEYS.FOLDERS, folders);
 }
@@ -165,18 +152,12 @@ export async function saveFolder(folder: ChatFolder): Promise<void> {
  * Delete thread from storage
  */
 export async function deleteThread(threadId: string): Promise<void> {
-  const threads = await getItem<Record<string, ChatThread>>(
-    STORAGE_KEYS.THREADS,
-    {},
-  );
+  const threads = await getItem<Record<string, ChatThread>>(STORAGE_KEYS.THREADS, {});
   delete threads[threadId];
   await setItem(STORAGE_KEYS.THREADS, threads);
 
   // Also delete all messages in this thread
-  const messages = await getItem<Record<string, ChatMessage>>(
-    STORAGE_KEYS.MESSAGES,
-    {},
-  );
+  const messages = await getItem<Record<string, ChatMessage>>(STORAGE_KEYS.MESSAGES, {});
   const updatedMessages = Object.fromEntries(
     Object.entries(messages).filter(([, msg]) => msg.threadId !== threadId),
   );
@@ -187,10 +168,7 @@ export async function deleteThread(threadId: string): Promise<void> {
  * Delete message from storage
  */
 export async function deleteMessage(messageId: string): Promise<void> {
-  const messages = await getItem<Record<string, ChatMessage>>(
-    STORAGE_KEYS.MESSAGES,
-    {},
-  );
+  const messages = await getItem<Record<string, ChatMessage>>(STORAGE_KEYS.MESSAGES, {});
   delete messages[messageId];
   await setItem(STORAGE_KEYS.MESSAGES, messages);
 }
@@ -200,18 +178,12 @@ export async function deleteMessage(messageId: string): Promise<void> {
  * Also deletes all threads and messages inside the folder
  */
 export async function deleteFolder(folderId: string): Promise<void> {
-  const folders = await getItem<Record<string, ChatFolder>>(
-    STORAGE_KEYS.FOLDERS,
-    {},
-  );
+  const folders = await getItem<Record<string, ChatFolder>>(STORAGE_KEYS.FOLDERS, {});
   delete folders[folderId];
   await setItem(STORAGE_KEYS.FOLDERS, folders);
 
   // Delete all threads in this folder
-  const threads = await getItem<Record<string, ChatThread>>(
-    STORAGE_KEYS.THREADS,
-    {},
-  );
+  const threads = await getItem<Record<string, ChatThread>>(STORAGE_KEYS.THREADS, {});
   const threadsToDelete = Object.entries(threads)
     .filter(([, thread]) => thread.folderId === folderId)
     .map(([threadId]) => threadId);
@@ -247,14 +219,10 @@ export async function getThreadsForFolder(
   rootFolderId: DefaultFolderId,
   subFolderId: string | null,
 ): Promise<ChatThread[]> {
-  const threads = await getItem<Record<string, ChatThread>>(
-    STORAGE_KEYS.THREADS,
-    {},
-  );
+  const threads = await getItem<Record<string, ChatThread>>(STORAGE_KEYS.THREADS, {});
 
   return Object.values(threads).filter(
-    (thread) =>
-      thread.rootFolderId === rootFolderId && thread.folderId === subFolderId,
+    (thread) => thread.rootFolderId === rootFolderId && thread.folderId === subFolderId,
   );
 }
 
@@ -265,26 +233,17 @@ function parseMessage(message: ChatMessage): ChatMessage {
   return {
     ...message,
     createdAt:
-      typeof message.createdAt === "string"
-        ? new Date(message.createdAt)
-        : message.createdAt,
+      typeof message.createdAt === "string" ? new Date(message.createdAt) : message.createdAt,
     updatedAt:
-      typeof message.updatedAt === "string"
-        ? new Date(message.updatedAt)
-        : message.updatedAt,
+      typeof message.updatedAt === "string" ? new Date(message.updatedAt) : message.updatedAt,
   };
 }
 
 /**
  * Get messages for a specific thread
  */
-export async function getMessagesForThread(
-  threadId: string,
-): Promise<ChatMessage[]> {
-  const messages = await getItem<Record<string, ChatMessage>>(
-    STORAGE_KEYS.MESSAGES,
-    {},
-  );
+export async function getMessagesForThread(threadId: string): Promise<ChatMessage[]> {
+  const messages = await getItem<Record<string, ChatMessage>>(STORAGE_KEYS.MESSAGES, {});
 
   return Object.values(messages)
     .filter((msg) => msg.threadId === threadId)
@@ -411,10 +370,7 @@ export async function updateIncognitoThread(
   threadId: string,
   updates: Partial<ChatThread>,
 ): Promise<void> {
-  const threads = await getItem<Record<string, ChatThread>>(
-    STORAGE_KEYS.THREADS,
-    {},
-  );
+  const threads = await getItem<Record<string, ChatThread>>(STORAGE_KEYS.THREADS, {});
   const thread = threads[threadId];
 
   if (thread) {
@@ -434,10 +390,7 @@ export async function updateIncognitoMessage(
   messageId: string,
   updates: Partial<ChatMessage>,
 ): Promise<void> {
-  const messages = await getItem<Record<string, ChatMessage>>(
-    STORAGE_KEYS.MESSAGES,
-    {},
-  );
+  const messages = await getItem<Record<string, ChatMessage>>(STORAGE_KEYS.MESSAGES, {});
   const message = messages[messageId];
 
   if (message) {

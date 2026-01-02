@@ -29,6 +29,7 @@ import { ChatMessageRole, ViewMode } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useSystemPrompt } from "@/app/api/[locale]/agent/chat/hooks/use-system-prompt";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -40,7 +41,6 @@ import { MessageEditor } from "../message-editor";
 import { groupMessagesBySequence } from "../message-grouping";
 import { ModelCharacterSelectorModal } from "../model-character-selector-modal";
 import { UserMessageBubble } from "../user-message-bubble";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 interface LinearMessageViewProps {
   messages: ChatMessage[];
@@ -97,9 +97,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
 
   // Get the current character's system prompt (memoized to ensure stable reference)
   const characterPrompt = useMemo(() => {
-    const prompt = selectedCharacter
-      ? characters[selectedCharacter]?.systemPrompt || ""
-      : "";
+    const prompt = selectedCharacter ? characters[selectedCharacter]?.systemPrompt || "" : "";
 
     return prompt;
   }, [selectedCharacter, characters]);
@@ -118,9 +116,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
       systemPromptLength: systemPrompt.length,
       systemPromptPreview: systemPrompt.slice(0, 500),
       includesYourRole: systemPrompt.includes("## Your Role"),
-      includesFormattingInstructions: systemPrompt.includes(
-        "# Formatting Instructions",
-      ),
+      includesFormattingInstructions: systemPrompt.includes("# Formatting Instructions"),
     });
   }
 
@@ -163,9 +159,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
               totalBranches={rootBranches.siblings.length}
               branches={rootBranches.siblings.map((sibling) => ({
                 id: sibling.id,
-                preview:
-                  sibling.content.slice(0, 50) +
-                  (sibling.content.length > 50 ? "..." : ""),
+                preview: sibling.content.slice(0, 50) + (sibling.content.length > 50 ? "..." : ""),
               }))}
               onSwitchBranch={(index) =>
                 // eslint-disable-next-line i18next/no-literal-string
@@ -212,15 +206,9 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                   size="sm"
                   variant="ghost"
                   className="h-7 px-2 hover:bg-purple-500/20"
-                  title={
-                    showMarkdown ? "Show as plain text" : "Show as markdown"
-                  }
+                  title={showMarkdown ? "Show as plain text" : "Show as markdown"}
                 >
-                  {showMarkdown ? (
-                    <FileText className="h-4 w-4" />
-                  ) : (
-                    <Code className="h-4 w-4" />
-                  )}
+                  {showMarkdown ? <FileText className="h-4 w-4" /> : <Code className="h-4 w-4" />}
                 </Button>
               </Div>
 
@@ -246,8 +234,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
 
       {messages.map((message, index) => {
         const isEditing = editingMessageId === message.id;
-        const isRetrying =
-          retryingMessageId === message.id && !isLoadingRetryAttachments;
+        const isRetrying = retryingMessageId === message.id && !isLoadingRetryAttachments;
         const isAnswering = answeringMessageId === message.id;
 
         // Check if this message has branches (multiple children)
@@ -255,8 +242,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
         const hasBranches = branches && branches.siblings.length > 1;
 
         // Get the next message in the path (the child we're following)
-        const nextMessage =
-          index < messages.length - 1 ? messages[index + 1] : null;
+        const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
 
         // Check if this is a continuation message (part of a sequence but not the primary)
         const group = messageToGroupMap.get(message.id);
@@ -323,9 +309,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                         if (onRetryMessage) {
                           void onRetryMessage(
                             message.id,
-                            editorAttachments.length > 0
-                              ? editorAttachments
-                              : undefined,
+                            editorAttachments.length > 0 ? editorAttachments : undefined,
                           );
                         }
                         onCancelAction();
@@ -356,61 +340,54 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                         />
                       </Div>
                     )}
-                    {(message.role === "assistant" ||
-                      message.role === "tool") &&
-                      group && (
-                        <GroupedAssistantMessage
-                          group={group}
-                          locale={locale}
-                          onAnswerAsModel={onStartAnswer}
-                          onDelete={onDeleteMessage}
-                          showAuthor={true}
-                          logger={logger}
-                          collapseState={collapseState}
-                        />
-                      )}
-                    {message.role === "error" && (
-                      <ErrorMessageBubble message={message} />
+                    {(message.role === "assistant" || message.role === "tool") && group && (
+                      <GroupedAssistantMessage
+                        group={group}
+                        locale={locale}
+                        onAnswerAsModel={onStartAnswer}
+                        onDelete={onDeleteMessage}
+                        showAuthor={true}
+                        logger={logger}
+                        collapseState={collapseState}
+                      />
                     )}
+                    {message.role === "error" && <ErrorMessageBubble message={message} />}
                     {/* Debug mode: Show system messages inline */}
-                    {viewMode === ViewMode.DEBUG &&
-                      message.role === ChatMessageRole.SYSTEM && (
-                        <Div className="flex items-start gap-3">
-                          <Div className="flex-1 max-w-full">
-                            <Div className="mb-2">
-                              <MessageAuthorInfo
-                                authorName={t(
-                                  "app.chat.debugView.systemMessage",
-                                )}
-                                authorId={null}
-                                currentUserId={undefined}
-                                isAI={true}
-                                model={message.model}
-                                timestamp={message.createdAt}
-                                edited={message.edited}
-                                character={null}
-                                locale={locale}
-                                rootFolderId={rootFolderId}
-                                compact
-                              />
-                            </Div>
+                    {viewMode === ViewMode.DEBUG && message.role === ChatMessageRole.SYSTEM && (
+                      <Div className="flex items-start gap-3">
+                        <Div className="flex-1 max-w-full">
+                          <Div className="mb-2">
+                            <MessageAuthorInfo
+                              authorName={t("app.chat.debugView.systemMessage")}
+                              authorId={null}
+                              currentUserId={undefined}
+                              isAI={true}
+                              model={message.model}
+                              timestamp={message.createdAt}
+                              edited={message.edited}
+                              character={null}
+                              locale={locale}
+                              rootFolderId={rootFolderId}
+                              compact
+                            />
+                          </Div>
 
-                            <Div
-                              className={cn(
-                                chatProse.all,
-                                "pl-2 py-2.5 sm:py-3",
-                                "border border-blue-500/30 bg-blue-500/5 rounded-md",
-                              )}
-                            >
-                              <Markdown content={message.content} />
-                            </Div>
+                          <Div
+                            className={cn(
+                              chatProse.all,
+                              "pl-2 py-2.5 sm:py-3",
+                              "border border-blue-500/30 bg-blue-500/5 rounded-md",
+                            )}
+                          >
+                            <Markdown content={message.content} />
+                          </Div>
 
-                            <Div className="mt-1 text-xs text-muted-foreground pl-2">
-                              {t("app.chat.debugView.systemMessageHint")}
-                            </Div>
+                          <Div className="mt-1 text-xs text-muted-foreground pl-2">
+                            {t("app.chat.debugView.systemMessageHint")}
                           </Div>
                         </Div>
-                      )}
+                      </Div>
+                    )}
                   </>
                 )}
               </Div>
@@ -440,11 +417,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                   inputPlaceholderKey="app.chat.linearMessageView.answerModal.inputPlaceholder"
                   onConfirm={async (): Promise<void> => {
                     if (onAnswerAsModel) {
-                      await onAnswerAsModel(
-                        message.id,
-                        answerContent,
-                        undefined,
-                      );
+                      await onAnswerAsModel(message.id, answerContent, undefined);
                     }
                     onCancelAction();
                   }}
@@ -466,8 +439,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                   branches={branches.siblings.map((sibling) => ({
                     id: sibling.id,
                     preview:
-                      sibling.content.slice(0, 50) +
-                      (sibling.content.length > 50 ? "..." : ""),
+                      sibling.content.slice(0, 50) + (sibling.content.length > 50 ? "..." : ""),
                   }))}
                   onSwitchBranch={(index) => onSwitchBranch(message.id, index)}
                   locale={locale}

@@ -54,8 +54,7 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description:
-        "Wystąpił wewnętrzny błąd serwera podczas operacji kliknięcia",
+      description: "Wystąpił wewnętrzny błąd serwera podczas operacji kliknięcia",
     },
     unknown: {
       title: "Nieznany błąd",

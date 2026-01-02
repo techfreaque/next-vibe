@@ -59,8 +59,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.db.migrateSync.fields.dryRun.title",
-          description:
-            "app.api.system.db.migrateSync.fields.dryRun.description",
+          description: "app.api.system.db.migrateSync.fields.dryRun.description",
           columns: 6,
         },
         z.boolean().optional().default(false),
@@ -94,8 +93,7 @@ const { POST } = createEndpoint({
       trackingFilesCreated: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateSync.fields.trackingFilesCreated.title",
+          content: "app.api.system.db.migrateSync.fields.trackingFilesCreated.title",
         },
         z.boolean(),
       ),
@@ -103,8 +101,7 @@ const { POST } = createEndpoint({
       drizzleMigrationRun: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateSync.fields.drizzleMigrationRun.title",
+          content: "app.api.system.db.migrateSync.fields.drizzleMigrationRun.title",
         },
         z.boolean(),
       ),
@@ -112,8 +109,7 @@ const { POST } = createEndpoint({
       originalFilesRestored: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateSync.fields.originalFilesRestored.title",
+          content: "app.api.system.db.migrateSync.fields.originalFilesRestored.title",
         },
         z.boolean(),
       ),
@@ -121,8 +117,7 @@ const { POST } = createEndpoint({
       migrationsProcessed: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.migrateSync.fields.migrationsProcessed.title",
+          content: "app.api.system.db.migrateSync.fields.migrationsProcessed.title",
         },
         z.coerce.number(),
       ),
@@ -133,48 +128,39 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.db.migrateSync.post.errors.validation.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.validation.description",
+      description: "app.api.system.db.migrateSync.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.db.migrateSync.post.errors.network.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.network.description",
+      description: "app.api.system.db.migrateSync.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.db.migrateSync.post.errors.unauthorized.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.unauthorized.description",
+      description: "app.api.system.db.migrateSync.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.db.migrateSync.post.errors.forbidden.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.forbidden.description",
+      description: "app.api.system.db.migrateSync.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.db.migrateSync.post.errors.notFound.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.notFound.description",
+      description: "app.api.system.db.migrateSync.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.db.migrateSync.post.errors.server.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.server.description",
+      description: "app.api.system.db.migrateSync.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.db.migrateSync.post.errors.unknown.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.unknown.description",
+      description: "app.api.system.db.migrateSync.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.db.migrateSync.post.errors.server.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.server.description",
+      description: "app.api.system.db.migrateSync.post.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.db.migrateSync.post.errors.conflict.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.conflict.description",
+      description: "app.api.system.db.migrateSync.post.errors.conflict.description",
     },
   },
 
@@ -223,8 +209,7 @@ const { POST } = createEndpoint({
       },
       force: {
         success: true,
-        output:
-          "✅ Migration sync completed with force option - existing tracking overridden",
+        output: "✅ Migration sync completed with force option - existing tracking overridden",
         trackingCleared: true,
         trackingFilesCreated: true,
         drizzleMigrationRun: true,

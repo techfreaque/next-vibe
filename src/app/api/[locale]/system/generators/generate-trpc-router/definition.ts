@@ -24,25 +24,17 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "side-tasks", "generators", "generate-trpc-router"],
   title: "app.api.system.sideTasks.generators.generateTrpcRouter.title",
-  description:
-    "app.api.system.sideTasks.generators.generateTrpcRouter.description",
+  description: "app.api.system.sideTasks.generators.generateTrpcRouter.description",
   category: "app.api.system.sideTasks.category",
   tags: ["app.api.system.sideTasks.generators.generateTrpcRouter.tag"],
   icon: "code",
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.PRODUCTION_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.sideTasks.generators.generateTrpcRouter.container.title",
-      description:
-        "app.api.system.sideTasks.generators.generateTrpcRouter.container.description",
+      title: "app.api.system.sideTasks.generators.generateTrpcRouter.container.title",
+      description: "app.api.system.sideTasks.generators.generateTrpcRouter.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -71,9 +63,7 @@ const { POST } = createEndpoint({
         z
           .string()
           .optional()
-          .default(
-            "src/app/api/[locale]/system/unified-interface/trpc/[...trpc]/router.ts",
-          ),
+          .default("src/app/api/[locale]/system/unified-interface/trpc/[...trpc]/router.ts"),
       ),
 
       includeWarnings: requestDataField(
@@ -143,56 +133,47 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.sideTasks.generators.generateTrpcRouter.errors.validation.title",
+      title: "app.api.system.sideTasks.generators.generateTrpcRouter.errors.validation.title",
       description:
         "app.api.system.sideTasks.generators.generateTrpcRouter.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
+      title: "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
       description:
         "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.title",
+      title: "app.api.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.title",
       description:
         "app.api.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.title",
+      title: "app.api.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.title",
       description:
         "app.api.system.sideTasks.generators.generateTrpcRouter.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
+      title: "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
       description:
         "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
+      title: "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
       description:
         "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
+      title: "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
       description:
         "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
+      title: "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
       description:
         "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
+      title: "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.title",
       description:
         "app.api.system.sideTasks.generators.generateTrpcRouter.errors.internal.description",
     },
@@ -200,10 +181,8 @@ const { POST } = createEndpoint({
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title:
-      "app.api.system.sideTasks.generators.generateTrpcRouter.success.title",
-    description:
-      "app.api.system.sideTasks.generators.generateTrpcRouter.success.description",
+    title: "app.api.system.sideTasks.generators.generateTrpcRouter.success.title",
+    description: "app.api.system.sideTasks.generators.generateTrpcRouter.success.description",
   },
 
   // === EXAMPLES ===

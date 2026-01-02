@@ -33,9 +33,7 @@ function formatCreditsAsUSD(credits: number): string {
   }).format(usd);
 }
 
-export function ReferralStats({
-  locale,
-}: ReferralStatsProps): React.JSX.Element {
+export function ReferralStats({ locale }: ReferralStatsProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const endpoint = useReferralStats();
 
@@ -60,11 +58,7 @@ export function ReferralStats({
   }
 
   if (!endpoint.read.data) {
-    return (
-      <P className="text-muted-foreground">
-        {t("app.user.referral.stats.error")}
-      </P>
-    );
+    return <P className="text-muted-foreground">{t("app.user.referral.stats.error")}</P>;
   }
 
   const stats = endpoint.read.data;
@@ -80,9 +74,7 @@ export function ReferralStats({
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <P className="font-mono text-3xl font-bold tabular-nums">
-            {stats.totalSignups}
-          </P>
+          <P className="font-mono text-3xl font-bold tabular-nums">{stats.totalSignups}</P>
           <P className="text-xs text-muted-foreground mt-1">
             {t("app.user.referral.stats.totalSignupsDesc")}
           </P>

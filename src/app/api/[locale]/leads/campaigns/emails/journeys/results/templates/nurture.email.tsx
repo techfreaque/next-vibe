@@ -5,12 +5,7 @@
 
 import React from "react";
 
-import {
-  CTAButton,
-  EmailContent,
-  EmailFooter,
-  EmailLayout,
-} from "../../../components.email";
+import { CTAButton, EmailContent, EmailFooter, EmailLayout } from "../../../components.email";
 import type { EmailRenderContext, EmailTemplateFunction } from "../../../types";
 
 /**

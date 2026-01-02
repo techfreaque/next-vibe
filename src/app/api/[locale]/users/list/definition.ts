@@ -72,8 +72,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.users.list.get.searchFilters.title" as const,
-          description:
-            "app.api.users.list.get.searchFilters.description" as const,
+          description: "app.api.users.list.get.searchFilters.description" as const,
           layoutType: LayoutType.GRID,
           columns: 3,
           order: 1,
@@ -123,8 +122,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.users.list.get.sortingOptions.title" as const,
-          description:
-            "app.api.users.list.get.sortingOptions.description" as const,
+          description: "app.api.users.list.get.sortingOptions.description" as const,
           layoutType: LayoutType.GRID_2_COLUMNS,
           order: 2,
         },
@@ -140,20 +138,15 @@ const { GET } = createEndpoint({
               options: UserSortFieldOptions,
               columns: 6,
             },
-            z
-              .nativeEnum(UserSortField)
-              .optional()
-              .default(UserSortField.CREATED_AT),
+            z.nativeEnum(UserSortField).optional().default(UserSortField.CREATED_AT),
           ),
           sortOrder: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.users.list.get.sortOrder.label" as const,
-              description:
-                "app.api.users.list.get.sortOrder.description" as const,
-              placeholder:
-                "app.api.users.list.get.sortOrder.placeholder" as const,
+              description: "app.api.users.list.get.sortOrder.description" as const,
+              placeholder: "app.api.users.list.get.sortOrder.placeholder" as const,
               options: SortOrderOptions,
               columns: 6,
             },
@@ -199,24 +192,21 @@ const { GET } = createEndpoint({
                 email: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.users.list.get.response.users.email" as const,
+                    content: "app.api.users.list.get.response.users.email" as const,
                   },
                   z.string(),
                 ),
                 privateName: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.users.list.get.response.users.privateName" as const,
+                    content: "app.api.users.list.get.response.users.privateName" as const,
                   },
                   z.string(),
                 ),
                 publicName: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.users.list.get.response.users.publicName" as const,
+                    content: "app.api.users.list.get.response.users.publicName" as const,
                   },
                   z.string(),
                 ),
@@ -238,8 +228,7 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.users.list.get.response.users.createdAt" as const,
+                    content: "app.api.users.list.get.response.users.createdAt" as const,
                   },
                   z.coerce.date(),
                 ),
@@ -247,16 +236,14 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.TEXT,
                     fieldType: FieldDataType.DATETIME,
-                    content:
-                      "app.api.users.list.get.response.users.updatedAt" as const,
+                    content: "app.api.users.list.get.response.users.updatedAt" as const,
                   },
                   z.coerce.date(),
                 ),
                 id: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.users.list.get.response.users.id" as const,
+                    content: "app.api.users.list.get.response.users.id" as const,
                   },
                   z.string(),
                 ),
@@ -321,18 +308,15 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.users.list.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.users.list.get.errors.unauthorized.description" as const,
+      description: "app.api.users.list.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.users.list.get.errors.validation.title" as const,
-      description:
-        "app.api.users.list.get.errors.validation.description" as const,
+      description: "app.api.users.list.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.users.list.get.errors.forbidden.title" as const,
-      description:
-        "app.api.users.list.get.errors.forbidden.description" as const,
+      description: "app.api.users.list.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.users.list.get.errors.server.title" as const,
@@ -344,8 +328,7 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.users.list.get.errors.conflict.title" as const,
-      description:
-        "app.api.users.list.get.errors.conflict.description" as const,
+      description: "app.api.users.list.get.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.users.list.get.errors.network.title" as const,
@@ -353,13 +336,11 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.users.list.get.errors.notFound.title" as const,
-      description:
-        "app.api.users.list.get.errors.notFound.description" as const,
+      description: "app.api.users.list.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.users.list.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.users.list.get.errors.unsavedChanges.description" as const,
+      description: "app.api.users.list.get.errors.unsavedChanges.description" as const,
     },
   },
 

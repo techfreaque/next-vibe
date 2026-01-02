@@ -8,9 +8,7 @@ import { renderTranslation } from "./translation-utils";
 interface SimpleTranslationProps<K extends TranslationKey> {
   lang: CountryLanguage;
   i18nKey: K;
-  values?: TranslationValue<K> extends string
-    ? Record<string, string | number>
-    : never;
+  values?: TranslationValue<K> extends string ? Record<string, string | number> : never;
 }
 
 /**

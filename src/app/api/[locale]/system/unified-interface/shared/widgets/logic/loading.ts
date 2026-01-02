@@ -38,9 +38,7 @@ export function extractLoadingData(value: WidgetData): ProcessedLoading {
   // Handle object value with loading properties
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
     const message =
-      "message" in value && typeof value.message === "string"
-        ? value.message
-        : undefined;
+      "message" in value && typeof value.message === "string" ? value.message : undefined;
     const progress =
       "progress" in value && typeof value.progress === "number"
         ? Math.max(0, Math.min(100, value.progress))

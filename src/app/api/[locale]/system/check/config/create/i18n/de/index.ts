@@ -28,28 +28,23 @@ export const translations = {
     },
     enableReactRules: {
       label: "React-Regeln aktivieren",
-      description:
-        "Aktivieren Sie React-spezifische Linting-Regeln (react-hooks, jsx-a11y)",
+      description: "Aktivieren Sie React-spezifische Linting-Regeln (react-hooks, jsx-a11y)",
     },
     enableNextjsRules: {
       label: "Next.js-Regeln aktivieren",
-      description:
-        "Aktivieren Sie Next.js-spezifische Linting-Regeln und Konfigurationen",
+      description: "Aktivieren Sie Next.js-spezifische Linting-Regeln und Konfigurationen",
     },
     enableI18nRules: {
       label: "i18n-Regeln aktivieren",
-      description:
-        "Aktivieren Sie Internationalisierungs-Linting-Regeln (eslint-plugin-i18next)",
+      description: "Aktivieren Sie Internationalisierungs-Linting-Regeln (eslint-plugin-i18next)",
     },
     jsxCapitalization: {
       label: "JSX-Großschreibung",
-      description:
-        "Großschreibung von JSX-Komponentennamen erzwingen (react/jsx-pascal-case)",
+      description: "Großschreibung von JSX-Komponentennamen erzwingen (react/jsx-pascal-case)",
     },
     enablePromiseRules: {
       label: "Promise-Regeln aktivieren",
-      description:
-        "Promise Best Practices und async/await Linting-Regeln aktivieren",
+      description: "Promise Best Practices und async/await Linting-Regeln aktivieren",
     },
     enableNodeRules: {
       label: "Node.js-Regeln aktivieren",
@@ -57,18 +52,15 @@ export const translations = {
     },
     enableUnicornRules: {
       label: "Unicorn-Regeln aktivieren",
-      description:
-        "Moderne JavaScript Best Practices aktivieren (eslint-plugin-unicorn)",
+      description: "Moderne JavaScript Best Practices aktivieren (eslint-plugin-unicorn)",
     },
     enablePedanticRules: {
       label: "Pedantische Regeln aktivieren",
-      description:
-        "Strengere/pedantische Linting-Regeln für höhere Codequalität aktivieren",
+      description: "Strengere/pedantische Linting-Regeln für höhere Codequalität aktivieren",
     },
     enableRestrictedSyntax: {
       label: "Eingeschränkte Syntax aktivieren",
-      description:
-        "Verwendung von throw, unknown und object-Typen einschränken",
+      description: "Verwendung von throw, unknown und object-Typen einschränken",
     },
     enableTsgo: {
       label: "tsgo aktivieren",
@@ -89,20 +81,17 @@ export const translations = {
     welcome: "🔧 Interaktive Konfigurationseinrichtung",
     description:
       "Konfigurieren wir Ihre Code-Qualitätswerkzeuge! Beantworten Sie einige Fragen, um Ihre Einrichtung anzupassen.",
-    createMcpConfig:
-      "MCP-Konfiguration (.mcp.json) für KI-Tool-Integration erstellen?",
+    createMcpConfig: "MCP-Konfiguration (.mcp.json) für KI-Tool-Integration erstellen?",
     updateVscodeSettings:
       "VSCode-Einstellungen (.vscode/settings.json) mit empfohlenen Formatter-Einstellungen aktualisieren?",
-    updatePackageJson:
-      "package.json-Skripte aktualisieren (check, lint, typecheck)?",
+    updatePackageJson: "package.json-Skripte aktualisieren (check, lint, typecheck)?",
     enableReactRules: "React-spezifische Linting-Regeln aktivieren?",
     enableNextjsRules: "Next.js-spezifische Linting-Regeln aktivieren?",
     enableI18nRules: "Internationalisierungs (i18n) Linting-Regeln aktivieren?",
     jsxCapitalization: "JSX-Komponentennamen-Großschreibung erzwingen?",
     enablePromiseRules: "Promise Best Practices Regeln aktivieren?",
     enableNodeRules: "Node.js-spezifische Regeln aktivieren?",
-    enableUnicornRules:
-      "Moderne JavaScript Best Practices aktivieren (Unicorn)?",
+    enableUnicornRules: "Moderne JavaScript Best Practices aktivieren (Unicorn)?",
     enablePedanticRules: "Strengere/pedantische Regeln aktivieren?",
     enableRestrictedSyntax: "throw, unknown und object-Typen einschränken?",
     enableTsgo: "tsgo anstelle von tsc für Typprüfung verwenden?",
@@ -149,8 +138,7 @@ export const translations = {
     },
     internal: {
       title: "Interner Fehler",
-      description:
-        "Ein interner Fehler ist während der Konfiguration aufgetreten",
+      description: "Ein interner Fehler ist während der Konfiguration aufgetreten",
     },
     conflict: {
       title: "Konfiguration existiert bereits",

@@ -51,8 +51,7 @@ export const translations: typeof enTranslations = {
     },
     unauthorized: {
       title: "Nieautoryzowany",
-      description:
-        "Nie masz uprawnień do wykonywania operacji wypełniania formularza",
+      description: "Nie masz uprawnień do wykonywania operacji wypełniania formularza",
     },
     forbidden: {
       title: "Zabronione",
@@ -64,8 +63,7 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description:
-        "Wystąpił wewnętrzny błąd serwera podczas wypełniania formularza",
+      description: "Wystąpił wewnętrzny błąd serwera podczas wypełniania formularza",
     },
     unknown: {
       title: "Nieznany błąd",

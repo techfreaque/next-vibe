@@ -4,11 +4,7 @@
  */
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-import type {
-  NotificationConfig,
-  NotificationData,
-  NotificationResult,
-} from "../definition";
+import type { NotificationConfig, NotificationData, NotificationResult } from "../definition";
 import { MESSAGES, RETRY_DEFAULTS, TIMEOUTS } from "./constants";
 import { formatDuration, sleep } from "./utils";
 
@@ -199,17 +195,9 @@ export interface INotificationService {
 
 const payloadBuilders: Record<
   string,
-  (
-    message: string,
-    data: NotificationData,
-    config: NotificationConfig,
-  ) => WebhookPayload
+  (message: string, data: NotificationData, config: NotificationConfig) => WebhookPayload
 > = {
-  slack: (
-    message: string,
-    data: NotificationData,
-    config: NotificationConfig,
-  ): SlackPayload => ({
+  slack: (message: string, data: NotificationData, config: NotificationConfig): SlackPayload => ({
     text: message,
     username: "Release Bot",
     icon_emoji: data.success ? ":rocket:" : ":x:",
@@ -220,9 +208,7 @@ const payloadBuilders: Record<
               color: data.success ? "good" : "danger",
               title: "Release Details",
               fields: [
-                ...(data.version
-                  ? [{ title: "Version", value: data.version, short: true }]
-                  : []),
+                ...(data.version ? [{ title: "Version", value: data.version, short: true }] : []),
                 ...(data.duration
                   ? [
                       {
@@ -234,9 +220,7 @@ const payloadBuilders: Record<
                   : []),
                 ...Object.entries(data.timings)
                   .filter(
-                    ([key]) =>
-                      key !== "total" &&
-                      data.timings?.[key as keyof typeof data.timings],
+                    ([key]) => key !== "total" && data.timings?.[key as keyof typeof data.timings],
                   )
                   .map(([key, value]) => ({
                     title: key.charAt(0).toUpperCase() + key.slice(1),
@@ -251,11 +235,7 @@ const payloadBuilders: Record<
         : undefined,
   }),
 
-  discord: (
-    message: string,
-    data: NotificationData,
-    config: NotificationConfig,
-  ) => ({
+  discord: (message: string, data: NotificationData, config: NotificationConfig) => ({
     content: message,
     username: "Release Bot",
     embeds:
@@ -265,9 +245,7 @@ const payloadBuilders: Record<
               title: data.success ? "Release Successful" : "Release Failed",
               color: data.success ? 0x00ff00 : 0xff0000,
               fields: [
-                ...(data.version
-                  ? [{ name: "Version", value: data.version, inline: true }]
-                  : []),
+                ...(data.version ? [{ name: "Version", value: data.version, inline: true }] : []),
                 ...(data.duration
                   ? [
                       {
@@ -279,9 +257,7 @@ const payloadBuilders: Record<
                   : []),
                 ...Object.entries(data.timings)
                   .filter(
-                    ([key]) =>
-                      key !== "total" &&
-                      data.timings?.[key as keyof typeof data.timings],
+                    ([key]) => key !== "total" && data.timings?.[key as keyof typeof data.timings],
                   )
                   .map(([key, value]) => ({
                     name: key.charAt(0).toUpperCase() + key.slice(1),
@@ -296,11 +272,7 @@ const payloadBuilders: Record<
         : undefined,
   }),
 
-  teams: (
-    message: string,
-    data: NotificationData,
-    config: NotificationConfig,
-  ) => ({
+  teams: (message: string, data: NotificationData, config: NotificationConfig) => ({
     "@type": "MessageCard",
     "@context": "http://schema.org/extensions",
     themeColor: data.success ? "00FF00" : "FF0000",
@@ -317,9 +289,7 @@ const payloadBuilders: Record<
                   : []),
                 ...Object.entries(data.timings)
                   .filter(
-                    ([key]) =>
-                      key !== "total" &&
-                      data.timings?.[key as keyof typeof data.timings],
+                    ([key]) => key !== "total" && data.timings?.[key as keyof typeof data.timings],
                   )
                   .map(([key, value]) => ({
                     name: key.charAt(0).toUpperCase() + key.slice(1),
@@ -341,11 +311,7 @@ const payloadBuilders: Record<
       : undefined,
   }),
 
-  mattermost: (
-    message: string,
-    data: NotificationData,
-    config: NotificationConfig,
-  ) => ({
+  mattermost: (message: string, data: NotificationData, config: NotificationConfig) => ({
     text: message,
     username: "Release Bot",
     icon_emoji: data.success ? ":rocket:" : ":x:",
@@ -357,9 +323,7 @@ const payloadBuilders: Record<
               title: "Release Details",
               fields: Object.entries(data.timings)
                 .filter(
-                  ([key]) =>
-                    key !== "total" &&
-                    data.timings?.[key as keyof typeof data.timings],
+                  ([key]) => key !== "total" && data.timings?.[key as keyof typeof data.timings],
                 )
                 .map(([key, value]) => ({
                   title: key.charAt(0).toUpperCase() + key.slice(1),
@@ -371,11 +335,7 @@ const payloadBuilders: Record<
         : undefined,
   }),
 
-  googlechat: (
-    message: string,
-    data: NotificationData,
-    config: NotificationConfig,
-  ) => ({
+  googlechat: (message: string, data: NotificationData, config: NotificationConfig) => ({
     cards: [
       {
         header: {
@@ -394,9 +354,7 @@ const payloadBuilders: Record<
                     {
                       keyValue: {
                         topLabel: "Duration",
-                        content: data.duration
-                          ? formatDuration(data.duration)
-                          : "N/A",
+                        content: data.duration ? formatDuration(data.duration) : "N/A",
                       },
                     },
                   ]
@@ -414,20 +372,14 @@ const payloadBuilders: Record<
     disable_notification: data.success,
   }),
 
-  custom: (
-    message: string,
-    data: NotificationData,
-    config: NotificationConfig,
-  ) => ({
+  custom: (message: string, data: NotificationData, config: NotificationConfig) => ({
     event: data.success ? "release.success" : "release.failure",
     message,
     success: data.success,
     package: data.packageName,
     version: data.version,
     duration: data.duration,
-    durationFormatted: data.duration
-      ? formatDuration(data.duration)
-      : undefined,
+    durationFormatted: data.duration ? formatDuration(data.duration) : undefined,
     timings: config.includeTimings ? data.timings : undefined,
     error: data.error,
     releaseUrl: data.releaseUrl,
@@ -474,23 +426,15 @@ export class NotificationService implements INotificationService {
     });
 
     const extConfig = config as ExtendedNotificationConfig;
-    const maxAttempts =
-      extConfig.retry?.maxAttempts ?? RETRY_DEFAULTS.MAX_ATTEMPTS;
-    const initialDelay =
-      extConfig.retry?.delayMs ?? RETRY_DEFAULTS.INITIAL_DELAY;
-    const backoff =
-      extConfig.retry?.backoffMultiplier ?? RETRY_DEFAULTS.BACKOFF_MULTIPLIER;
+    const maxAttempts = extConfig.retry?.maxAttempts ?? RETRY_DEFAULTS.MAX_ATTEMPTS;
+    const initialDelay = extConfig.retry?.delayMs ?? RETRY_DEFAULTS.INITIAL_DELAY;
+    const backoff = extConfig.retry?.backoffMultiplier ?? RETRY_DEFAULTS.BACKOFF_MULTIPLIER;
     const timeout = extConfig.timeout ?? TIMEOUTS.NOTIFICATION;
 
     let lastErrorMsg = "Unknown error";
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      const result = await this.sendWithTimeout(
-        config,
-        data,
-        timeout,
-        extConfig.headers,
-      );
+      const result = await this.sendWithTimeout(config, data, timeout, extConfig.headers);
 
       if (result.success) {
         logger.info(MESSAGES.NOTIFICATION_SENT, {
@@ -539,18 +483,14 @@ export class NotificationService implements INotificationService {
     logger.info(`Sending ${enabledConfigs.length} notifications in parallel`);
 
     const results = await Promise.all(
-      enabledConfigs.map((config) =>
-        this.sendNotification(config, data, logger),
-      ),
+      enabledConfigs.map((config) => this.sendNotification(config, data, logger)),
     );
 
     const successCount = results.filter((r) => r.success).length;
     const failCount = results.filter((r) => !r.success).length;
 
     if (failCount > 0) {
-      logger.warn(
-        `${failCount} of ${enabledConfigs.length} notifications failed`,
-      );
+      logger.warn(`${failCount} of ${enabledConfigs.length} notifications failed`);
     } else {
       logger.info(`All ${successCount} notifications sent successfully`);
     }
@@ -585,10 +525,7 @@ export class NotificationService implements INotificationService {
         ?.replaceAll("${name}", data.packageName ?? "")
         .replaceAll("${version}", data.version ?? "")
         .replaceAll("${status}", status)
-        .replaceAll(
-          "${duration}",
-          data.duration ? formatDuration(data.duration) : "",
-        )
+        .replaceAll("${duration}", data.duration ? formatDuration(data.duration) : "")
         .replaceAll("${error}", data.error ?? "")
         .replaceAll("${branch}", data.branch ?? "")
         .replaceAll("${commit}", data.commitSha ?? "")

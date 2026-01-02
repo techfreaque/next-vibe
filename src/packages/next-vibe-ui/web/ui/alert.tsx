@@ -46,34 +46,19 @@ export interface AlertDescriptionProps {
   className?: string;
 }
 
-const Alert = ({
-  className,
-  variant,
-  icon: Icon,
-  children,
-}: AlertProps): React.JSX.Element => (
+const Alert = ({ className, variant, icon: Icon, children }: AlertProps): React.JSX.Element => (
   <div role="alert" className={cn(alertVariants({ variant }), className)}>
     {Icon && <Icon />}
     {children}
   </div>
 );
 
-const AlertTitle = ({
-  className,
-  children,
-}: AlertTitleProps): React.JSX.Element => (
-  <h5 className={cn("mb-1 font-medium leading-none tracking-tight", className)}>
-    {children}
-  </h5>
+const AlertTitle = ({ className, children }: AlertTitleProps): React.JSX.Element => (
+  <h5 className={cn("mb-1 font-medium leading-none tracking-tight", className)}>{children}</h5>
 );
 
-const AlertDescription = ({
-  className,
-  children,
-}: AlertDescriptionProps): React.JSX.Element => (
-  <div className={cn("text-sm [&_p]:leading-relaxed", className)}>
-    {children}
-  </div>
+const AlertDescription = ({ className, children }: AlertDescriptionProps): React.JSX.Element => (
+  <div className={cn("text-sm [&_p]:leading-relaxed", className)}>{children}</div>
 );
 
 export { Alert, AlertDescription, AlertTitle, alertVariants };

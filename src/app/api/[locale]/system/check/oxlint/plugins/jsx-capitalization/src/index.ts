@@ -20,10 +20,7 @@ import type {
   OxlintComment,
   OxlintRuleContext,
 } from "../../../types";
-import type {
-  createPluginMessages,
-  loadPluginConfig,
-} from "../../shared/config-loader";
+import type { createPluginMessages, loadPluginConfig } from "../../shared/config-loader";
 
 /** JSXOpeningElement AST node */
 interface JSXOpeningElement extends OxlintASTNode {
@@ -94,38 +91,10 @@ const DEFAULT_CONFIG: JsxCapitalizationPluginConfig = {
     "code",
     "pre",
   ],
-  standaloneElements: [
-    "div",
-    "button",
-    "input",
-    "label",
-    "form",
-    "table",
-    "ul",
-    "ol",
-    "li",
-  ],
-  svgElements: [
-    "svg",
-    "path",
-    "circle",
-    "rect",
-    "line",
-    "polygon",
-    "polyline",
-    "ellipse",
-    "g",
-  ],
+  standaloneElements: ["div", "button", "input", "label", "form", "table", "ul", "ol", "li"],
+  svgElements: ["svg", "path", "circle", "rect", "line", "polygon", "polyline", "ellipse", "g"],
   imageElements: ["img", "picture", "source", "video", "audio"],
-  commonUiElements: [
-    "nav",
-    "header",
-    "footer",
-    "main",
-    "section",
-    "article",
-    "aside",
-  ],
+  commonUiElements: ["nav", "header", "footer", "main", "section", "article", "aside"],
 };
 
 const DEFAULT_MESSAGES: JsxCapitalizationMessages = {
@@ -210,13 +179,10 @@ function loadConfigFallback(): JsxCapitalizationPluginConfig {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment -- Plugin fallback requires dynamic loading
     const config = require(`${process.cwd()}/check.config.ts`);
     const checkConfig = config.default ?? config;
-    const exported =
-      typeof checkConfig === "function" ? checkConfig() : checkConfig;
+    const exported = typeof checkConfig === "function" ? checkConfig() : checkConfig;
 
     const ruleConfig =
-      exported?.oxlint?.rules?.[
-        "oxlint-plugin-jsx-capitalization/jsx-capitalization"
-      ];
+      exported?.oxlint?.rules?.["oxlint-plugin-jsx-capitalization/jsx-capitalization"];
     if (Array.isArray(ruleConfig) && ruleConfig[1]) {
       return ruleConfig[1] as JsxCapitalizationPluginConfig;
     }
@@ -241,11 +207,7 @@ function getMessages(): JsxCapitalizationMessages {
 /**
  * Format a message with value substitution
  */
-function formatMessage(
-  template: string,
-  elementName: string,
-  capitalizedName: string,
-): string {
+function formatMessage(template: string, elementName: string, capitalizedName: string): string {
   return template
     .replaceAll("{elementName}", elementName)
     .replaceAll("{capitalizedName}", capitalizedName);
@@ -261,10 +223,7 @@ function formatMessage(
  */
 function isLowercaseElement(elementName: string): boolean {
   const firstChar = elementName.charAt(0);
-  return (
-    firstChar === firstChar.toLowerCase() &&
-    firstChar !== firstChar.toUpperCase()
-  );
+  return firstChar === firstChar.toLowerCase() && firstChar !== firstChar.toUpperCase();
 }
 
 /**
@@ -311,12 +270,8 @@ function isExcludedPath(
 /**
  * Check if the node has a disable comment
  */
-function hasDisableComment(
-  context: JsxCapitalizationRuleContext,
-  node: OxlintASTNode,
-): boolean {
-  const getComments =
-    context.getCommentsBefore ?? context.sourceCode?.getCommentsBefore;
+function hasDisableComment(context: JsxCapitalizationRuleContext, node: OxlintASTNode): boolean {
+  const getComments = context.getCommentsBefore ?? context.sourceCode?.getCommentsBefore;
   if (typeof getComments !== "function") {
     return false;
   }
@@ -335,8 +290,7 @@ function hasDisableComment(
       if (
         (commentText.includes("eslint-disable-next-line") ||
           commentText.includes("oxlint-disable-next-line")) &&
-        (commentText.includes("jsx-capitalization") ||
-          commentText.includes("no-lowercase-jsx"))
+        (commentText.includes("jsx-capitalization") || commentText.includes("no-lowercase-jsx"))
       ) {
         return true;
       }
@@ -437,10 +391,7 @@ function getExcludedPaths(context: JsxCapitalizationRuleContext): {
 /**
  * Get error message for lowercase JSX element with smart import suggestions
  */
-function getErrorMessage(
-  elementName: string,
-  elementSets: ElementSets,
-): string {
+function getErrorMessage(elementName: string, elementSets: ElementSets): string {
   const capitalizedName = capitalize(elementName);
   const messages = getMessages();
 
@@ -456,20 +407,12 @@ function getErrorMessage(
 
   // Typography elements from typography.tsx
   if (elementSets.typography.has(elementName)) {
-    return formatMessage(
-      messages.typographyElement,
-      elementName,
-      capitalizedName,
-    );
+    return formatMessage(messages.typographyElement, elementName, capitalizedName);
   }
 
   // Standalone UI elements with their own files
   if (elementSets.standalone.has(elementName)) {
-    return formatMessage(
-      messages.standaloneElement,
-      elementName,
-      capitalizedName,
-    );
+    return formatMessage(messages.standaloneElement, elementName, capitalizedName);
   }
 
   // SVG elements - suggest using icons instead
@@ -484,11 +427,7 @@ function getErrorMessage(
 
   // Common UI elements with known wrappers
   if (elementSets.commonUi.has(elementName)) {
-    return formatMessage(
-      messages.commonUiElement,
-      elementName,
-      capitalizedName,
-    );
+    return formatMessage(messages.commonUiElement, elementName, capitalizedName);
   }
 
   // Generic/unknown elements - guide to create platform-specific components
@@ -523,20 +462,14 @@ const jsxCapitalizationRule = {
       },
     ],
   },
-  create(
-    context: JsxCapitalizationRuleContext,
-  ): Record<string, (node: OxlintASTNode) => void> {
+  create(context: JsxCapitalizationRuleContext): Record<string, (node: OxlintASTNode) => void> {
     // Load config from check.config.ts (single source of truth)
     // Falls back to rule options if config file not available
     const { excludedPaths, excludedFilePatterns } = getExcludedPaths(context);
     const elementSets = getElementSets(context);
 
     // Check if file is in excluded path
-    const isExcluded = isExcludedPath(
-      context,
-      excludedPaths,
-      excludedFilePatterns,
-    );
+    const isExcluded = isExcludedPath(context, excludedPaths, excludedFilePatterns);
 
     return {
       JSXOpeningElement(node: OxlintASTNode): void {

@@ -6,8 +6,7 @@ export const translations: typeof enTranslations = {
   interactive: {
     post: {
       title: "Tryb interaktywny",
-      description:
-        "Uruchom interaktywny tryb eksploratora plików do nawigacji i wykonywania tras",
+      description: "Uruchom interaktywny tryb eksploratora plików do nawigacji i wykonywania tras",
       category: "Pomoc systemowa",
       tags: {
         system: "system",
@@ -156,8 +155,7 @@ export const translations: typeof enTranslations = {
   list: {
     post: {
       title: "Lista dostępnych poleceń",
-      description:
-        "Pokaż wszystkie dostępne polecenia CLI z opisami i aliasami",
+      description: "Pokaż wszystkie dostępne polecenia CLI z opisami i aliasami",
       form: {
         title: "Opcje listy poleceń",
         description: "Skonfiguruj sposób wyświetlania poleceń",
@@ -190,8 +188,7 @@ export const translations: typeof enTranslations = {
         },
         unknown: {
           title: "Nieznany błąd",
-          description:
-            "Wystąpił nieoczekiwany błąd podczas wyświetlania poleceń",
+          description: "Wystąpił nieoczekiwany błąd podczas wyświetlania poleceń",
         },
         conflict: {
           title: "Konflikt",

@@ -27,11 +27,7 @@ export async function geocodeAddress(
     // This is a placeholder that should be implemented with actual geocoding service
 
     // Example implementation with browser's Geolocation API
-    if (
-      typeof window !== "undefined" &&
-      "navigator" in window &&
-      "geolocation" in navigator
-    ) {
+    if (typeof window !== "undefined" && "navigator" in window && "geolocation" in navigator) {
       return await new Promise<GeocodeResult | null>((resolve) => {
         navigator.geolocation.getCurrentPosition(
           (position) => {

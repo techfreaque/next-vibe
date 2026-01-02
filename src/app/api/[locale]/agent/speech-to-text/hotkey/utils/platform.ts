@@ -5,16 +5,9 @@
 
 import "server-only";
 
-import type {
-  PlatformType,
-  RecorderBackendType,
-  TyperBackendType,
-} from "../enum";
+import type { PlatformType, RecorderBackendType, TyperBackendType } from "../enum";
 import { Platform, RecorderBackend, TyperBackend } from "../enum";
-import type {
-  PlatformCapabilities,
-  PlatformDetector as IPlatformDetector,
-} from "../types";
+import type { PlatformCapabilities, PlatformDetector as IPlatformDetector } from "../types";
 import { dependencyChecker } from "./dependencies";
 
 /**
@@ -70,8 +63,7 @@ class PlatformDetectorImpl implements IPlatformDetector {
   isWayland(): boolean {
     return (
       process.platform === "linux" &&
-      (!!process.env.WAYLAND_DISPLAY ||
-        process.env.XDG_SESSION_TYPE === "wayland")
+      (!!process.env.WAYLAND_DISPLAY || process.env.XDG_SESSION_TYPE === "wayland")
     );
   }
 
@@ -94,8 +86,7 @@ class PlatformDetectorImpl implements IPlatformDetector {
     nodeProcess: string;
   } {
     const platform = this.detect();
-    let displayServer: "wayland" | "x11" | "aqua" | "windows" | "unknown" =
-      "unknown";
+    let displayServer: "wayland" | "x11" | "aqua" | "windows" | "unknown" = "unknown";
 
     if (platform === Platform.MACOS) {
       displayServer = "aqua";
@@ -134,10 +125,7 @@ export async function getPlatformCapabilities(): Promise<PlatformCapabilities> {
         availableTypers: [TyperBackend.APPLESCRIPT] as const,
         recommendedRecorder: RecorderBackend.FFMPEG_AVFOUNDATION,
         recommendedTyper: TyperBackend.APPLESCRIPT,
-        requiresPermissions: [
-          "Microphone",
-          "Accessibility (for keyboard simulation)",
-        ] as const,
+        requiresPermissions: ["Microphone", "Accessibility (for keyboard simulation)"] as const,
       };
 
     case Platform.LINUX_WAYLAND: {
@@ -162,11 +150,9 @@ export async function getPlatformCapabilities(): Promise<PlatformCapabilities> {
 
       return {
         platform,
-        availableRecorders:
-          availableRecorders as readonly RecorderBackendType[],
+        availableRecorders: availableRecorders as readonly RecorderBackendType[],
         availableTypers: availableTypers as readonly TyperBackendType[],
-        recommendedRecorder:
-          availableRecorders[0] || RecorderBackend.WF_RECORDER,
+        recommendedRecorder: availableRecorders[0] || RecorderBackend.WF_RECORDER,
         recommendedTyper: availableTypers[0] || TyperBackend.WTYPE,
         requiresPermissions: ["PipeWire audio access"] as const,
       };
@@ -178,10 +164,7 @@ export async function getPlatformCapabilities(): Promise<PlatformCapabilities> {
 
       // Check recorders
       if (await dependencyChecker.which("ffmpeg")) {
-        availableRecorders.push(
-          RecorderBackend.FFMPEG_PULSE,
-          RecorderBackend.FFMPEG_ALSA,
-        );
+        availableRecorders.push(RecorderBackend.FFMPEG_PULSE, RecorderBackend.FFMPEG_ALSA);
       }
       if (await dependencyChecker.which("arecord")) {
         availableRecorders.push(RecorderBackend.ARECORD);
@@ -197,11 +180,9 @@ export async function getPlatformCapabilities(): Promise<PlatformCapabilities> {
 
       return {
         platform,
-        availableRecorders:
-          availableRecorders as readonly RecorderBackendType[],
+        availableRecorders: availableRecorders as readonly RecorderBackendType[],
         availableTypers: availableTypers as readonly TyperBackendType[],
-        recommendedRecorder:
-          availableRecorders[0] || RecorderBackend.FFMPEG_PULSE,
+        recommendedRecorder: availableRecorders[0] || RecorderBackend.FFMPEG_PULSE,
         recommendedTyper: availableTypers[0] || TyperBackend.XDOTOOL,
         requiresPermissions: ["PulseAudio/ALSA access"] as const,
       };
@@ -229,9 +210,7 @@ export async function getPlatformCapabilities(): Promise<PlatformCapabilities> {
 /**
  * Check if all required dependencies are available for the platform
  */
-export async function checkPlatformDependencies(
-  platform: PlatformType,
-): Promise<{
+export async function checkPlatformDependencies(platform: PlatformType): Promise<{
   readonly available: boolean;
   readonly missing: readonly string[];
   readonly recommendations: readonly string[];
@@ -256,16 +235,12 @@ export async function checkPlatformDependencies(
 
       if (!hasWfRecorder && !hasFfmpeg) {
         missing.push("wf-recorder or ffmpeg");
-        recommendations.push(
-          "Install with: sudo apt install wf-recorder (or ffmpeg)",
-        );
+        recommendations.push("Install with: sudo apt install wf-recorder (or ffmpeg)");
       }
 
       if (!hasWtype && !hasWlClipboard) {
         missing.push("wtype or wl-clipboard");
-        recommendations.push(
-          "Install with: sudo apt install wtype (or wl-clipboard)",
-        );
+        recommendations.push("Install with: sudo apt install wtype (or wl-clipboard)");
       }
       break;
     }
@@ -278,16 +253,12 @@ export async function checkPlatformDependencies(
 
       if (!hasFfmpeg && !hasArecord) {
         missing.push("ffmpeg or arecord");
-        recommendations.push(
-          "Install with: sudo apt install ffmpeg (or alsa-utils)",
-        );
+        recommendations.push("Install with: sudo apt install ffmpeg (or alsa-utils)");
       }
 
       if (!hasXdotool && !hasXclip) {
         missing.push("xdotool or xclip");
-        recommendations.push(
-          "Install with: sudo apt install xdotool (or xclip)",
-        );
+        recommendations.push("Install with: sudo apt install xdotool (or xclip)");
       }
       break;
     }

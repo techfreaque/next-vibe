@@ -29,8 +29,7 @@ const { POST } = createEndpoint({
   path: ["system", "tasks", "unified-runner"],
   aliases: ["unified-runner", "task-runner", "runner"],
   title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.title",
-  description:
-    "app.api.system.unifiedInterface.tasks.unifiedRunner.post.description",
+  description: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.description",
   icon: "check-circle",
   category: "app.api.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN],
@@ -38,10 +37,8 @@ const { POST } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.container.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.container.description",
+      title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.container.title",
+      description: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -52,8 +49,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.label",
+          label: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.label",
           description:
             "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.description",
           options: [
@@ -87,8 +83,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.label",
+          label: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.label",
           description:
             "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.description",
           options: [
@@ -117,8 +112,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.dryRun.label",
+          label: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.dryRun.label",
           description:
             "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.dryRun.description",
           columns: 6,
@@ -130,8 +124,7 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.success",
+          content: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.success",
         },
         z.boolean(),
       ),
@@ -139,8 +132,7 @@ const { POST } = createEndpoint({
       actionResult: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.actionResult",
+          content: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.actionResult",
         },
         z.string(),
       ),
@@ -148,8 +140,7 @@ const { POST } = createEndpoint({
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
+          content: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
         },
         z.string(),
       ),
@@ -157,8 +148,7 @@ const { POST } = createEndpoint({
       timestamp: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.timestamp",
+          content: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.timestamp",
         },
         z.string(),
       ),
@@ -205,66 +195,55 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.validation.title",
+      title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.validation.title",
       description:
         "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unauthorized.title",
+      title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unauthorized.title",
       description:
         "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+      title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
       description:
         "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unknown.title",
+      title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unknown.title",
       description:
         "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.network.title",
+      title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.network.title",
       description:
         "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.forbidden.title",
+      title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.forbidden.title",
       description:
         "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.notFound.title",
+      title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.notFound.title",
       description:
         "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.conflict.title",
+      title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.conflict.title",
       description:
         "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.conflict.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unsaved.title",
+      title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unsaved.title",
       description:
         "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unsaved.description",
     },
   },
 
   successTypes: {
-    title:
-      "app.api.system.unifiedInterface.tasks.unifiedRunner.post.success.title",
-    description:
-      "app.api.system.unifiedInterface.tasks.unifiedRunner.post.success.description",
+    title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.success.title",
+    description: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.success.description",
   },
 });
 

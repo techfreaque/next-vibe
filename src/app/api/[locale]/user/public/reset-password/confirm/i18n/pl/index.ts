@@ -10,15 +10,13 @@ export const translations: typeof enTranslations = {
     previewText:
       "Twoje hasło zostało pomyślnie zresetowane. Możesz się teraz zalogować i kontynuować rozmowy z 38 modelami AI.",
     greeting: "Witaj,",
-    confirmationMessage:
-      "Twoje hasło {{appName}} zostało pomyślnie zresetowane.",
+    confirmationMessage: "Twoje hasło {{appName}} zostało pomyślnie zresetowane.",
     successMessage:
       "Resetowanie hasła zakończone! Możesz teraz zalogować się do swojego konta przy użyciu nowego hasła i kontynuować odkrywanie niecenzurowanych rozmów z AI.",
     loginInstructions:
       "Możesz się teraz zalogować przy użyciu nowego hasła i uzyskać dostęp do wszystkich 38 modeli AI.",
     loginButton: "Zaloguj się do {{appName}}",
-    securityInfo:
-      "Ta zmiana hasła została dokonana z {{ipAddress}} dnia {{resetTime}}.",
+    securityInfo: "Ta zmiana hasła została dokonana z {{ipAddress}} dnia {{resetTime}}.",
     securityWarning:
       "Jeśli nie dokonałeś tej zmiany, Twoje konto może być zagrożone. Skontaktuj się natychmiast z naszym zespołem wsparcia.",
     securityTip:
@@ -92,8 +90,7 @@ export const translations: typeof enTranslations = {
       label: "Wiadomość",
       description: "Wiadomość odpowiedzi",
     },
-    securityTip:
-      "Rozważ włączenie uwierzytelniania dwuskładnikowego dla lepszego bezpieczeństwa",
+    securityTip: "Rozważ włączenie uwierzytelniania dwuskładnikowego dla lepszego bezpieczeństwa",
     nextSteps: [
       "Zaloguj się za pomocą nowego hasła",
       "Zaktualizuj zapisane hasła w swojej przeglądarce",

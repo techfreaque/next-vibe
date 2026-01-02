@@ -8,14 +8,11 @@ import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/s
 /**
  * Credit type identifier for tracking which credit pool is being used
  */
-export const {
-  enum: CreditTypeIdentifier,
-  options: CreditTypeIdentifierOptions,
-} = createEnumOptions({
-  USER_SUBSCRIPTION:
-    "app.api.agent.chat.credits.enums.creditType.userSubscription",
-  LEAD_FREE: "app.api.agent.chat.credits.enums.creditType.leadFree",
-});
+export const { enum: CreditTypeIdentifier, options: CreditTypeIdentifierOptions } =
+  createEnumOptions({
+    USER_SUBSCRIPTION: "app.api.agent.chat.credits.enums.creditType.userSubscription",
+    LEAD_FREE: "app.api.agent.chat.credits.enums.creditType.leadFree",
+  });
 
 /**
  * Credit transaction type for tracking credit movements
@@ -85,5 +82,4 @@ export const CreditTransactionTypeDB = [
  * Value types derived directly from DB arrays
  */
 export type CreditTypeIdentifierValue = (typeof CreditTypeIdentifierDB)[number];
-export type CreditTransactionTypeValue =
-  (typeof CreditTransactionTypeDB)[number];
+export type CreditTransactionTypeValue = (typeof CreditTransactionTypeDB)[number];

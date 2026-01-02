@@ -7,11 +7,7 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -56,12 +52,7 @@ export async function getCharacterById(
   const [customCharacter] = await db
     .select()
     .from(customCharacters)
-    .where(
-      and(
-        eq(customCharacters.id, characterId),
-        eq(customCharacters.userId, userId),
-      ),
-    )
+    .where(and(eq(customCharacters.id, characterId), eq(customCharacters.userId, userId)))
     .limit(1);
 
   return customCharacter ? (customCharacter as Character) : null;
@@ -124,9 +115,7 @@ export class CharactersRepository {
       logger.debug("Getting character by ID", { characterId, userId });
 
       // Check default characters first
-      const defaultCharacter = DEFAULT_CHARACTERS.find(
-        (p) => p.id === characterId,
-      );
+      const defaultCharacter = DEFAULT_CHARACTERS.find((p) => p.id === characterId);
       if (defaultCharacter) {
         return success({
           character: {
@@ -147,12 +136,7 @@ export class CharactersRepository {
       const [customCharacter] = await db
         .select()
         .from(customCharacters)
-        .where(
-          and(
-            eq(customCharacters.id, characterId),
-            eq(customCharacters.userId, userId),
-          ),
-        )
+        .where(and(eq(customCharacters.id, characterId), eq(customCharacters.userId, userId)))
         .limit(1);
 
       if (!customCharacter) {
@@ -190,8 +174,7 @@ export class CharactersRepository {
 
       if (!userId) {
         return fail({
-          message:
-            "app.api.agent.chat.characters.post.errors.unauthorized.title",
+          message: "app.api.agent.chat.characters.post.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -212,9 +195,7 @@ export class CharactersRepository {
         const { intelligence, maxPrice, contentLevel } = data.modelSelection;
 
         // Map intelligence filter to minIntelligence requirement (skip if ANY)
-        if (
-          intelligence !== "app.api.agent.chat.favorites.enums.intelligence.any"
-        ) {
+        if (intelligence !== "app.api.agent.chat.favorites.enums.intelligence.any") {
           requirements.minIntelligence = intelligence;
         }
 
@@ -289,8 +270,7 @@ export class CharactersRepository {
 
       if (!userId) {
         return fail({
-          message:
-            "app.api.agent.chat.characters.id.patch.errors.unauthorized.title",
+          message: "app.api.agent.chat.characters.id.patch.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -310,17 +290,12 @@ export class CharactersRepository {
           const { intelligence, maxPrice, contentLevel } = data.modelSelection;
 
           // Map intelligence filter to minIntelligence requirement (skip if ANY)
-          if (
-            intelligence !==
-            "app.api.agent.chat.favorites.enums.intelligence.any"
-          ) {
+          if (intelligence !== "app.api.agent.chat.favorites.enums.intelligence.any") {
             requirements.minIntelligence = intelligence;
           }
 
           // Map content level filter to minContent requirement (skip if ANY)
-          if (
-            contentLevel !== "app.api.agent.chat.favorites.enums.content.any"
-          ) {
+          if (contentLevel !== "app.api.agent.chat.favorites.enums.content.any") {
             requirements.minContent = contentLevel;
           }
 
@@ -355,18 +330,12 @@ export class CharactersRepository {
           ...updateValues,
           updatedAt: new Date(),
         })
-        .where(
-          and(
-            eq(customCharacters.id, characterId),
-            eq(customCharacters.userId, userId),
-          ),
-        )
+        .where(and(eq(customCharacters.id, characterId), eq(customCharacters.userId, userId)))
         .returning();
 
       if (!updated) {
         return fail({
-          message:
-            "app.api.agent.chat.characters.id.patch.errors.notFound.title",
+          message: "app.api.agent.chat.characters.id.patch.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -395,8 +364,7 @@ export class CharactersRepository {
 
       if (!userId) {
         return fail({
-          message:
-            "app.api.agent.chat.characters.id.delete.errors.unauthorized.title",
+          message: "app.api.agent.chat.characters.id.delete.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -405,18 +373,12 @@ export class CharactersRepository {
 
       const result = await db
         .delete(customCharacters)
-        .where(
-          and(
-            eq(customCharacters.id, characterId),
-            eq(customCharacters.userId, userId),
-          ),
-        )
+        .where(and(eq(customCharacters.id, characterId), eq(customCharacters.userId, userId)))
         .returning();
 
       if (result.length === 0) {
         return fail({
-          message:
-            "app.api.agent.chat.characters.id.delete.errors.notFound.title",
+          message: "app.api.agent.chat.characters.id.delete.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }

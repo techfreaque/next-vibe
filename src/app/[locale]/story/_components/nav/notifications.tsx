@@ -9,12 +9,7 @@ import {
 } from "next-vibe-ui/ui/dropdown-menu";
 import { AlertCircle, Bell, CheckCircle, Info } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
@@ -22,11 +17,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
-export function Notifications({
-  locale,
-}: {
-  locale: CountryLanguage;
-}): JSX.Element {
+export function Notifications({ locale }: { locale: CountryLanguage }): JSX.Element {
   const { t } = simpleT(locale);
   const unreadNotifications: {
     title: TranslationKey;
@@ -51,11 +42,7 @@ export function Notifications({
           className="w-72 bg-white dark:bg-gray-900 shadow-md border rounded-md"
         >
           {unreadNotifications.map((childItem, index) => (
-            <Link
-              key={index}
-              href={`/${locale}${childItem.href}`}
-              className="w-full font-medium"
-            >
+            <Link key={index} href={`/${locale}${childItem.href}`} className="w-full font-medium">
               <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
                 {childItem.level === "info" ? (
                   <Info className="h-4 w-4 text-blue-500" />

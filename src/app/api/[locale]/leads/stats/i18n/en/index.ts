@@ -4,8 +4,7 @@
 
 export const translations = {
   title: "Lead Statistics",
-  description:
-    "Comprehensive leads statistics and analytics with historical data",
+  description: "Comprehensive leads statistics and analytics with historical data",
   category: "Lead Management",
   tags: {
     leads: "Leads",
@@ -284,8 +283,7 @@ export const translations = {
     },
     server: {
       title: "Server Error",
-      description:
-        "Internal server error occurred while retrieving leads statistics",
+      description: "Internal server error occurred while retrieving leads statistics",
     },
     unknown: {
       title: "Unknown Error",

@@ -1,10 +1,6 @@
 "use client";
 import { cn } from "next-vibe/shared/utils/utils";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  DotsHorizontalIcon,
-} from "next-vibe-ui/ui/icons";
+import { ChevronLeftIcon, ChevronRightIcon, DotsHorizontalIcon } from "next-vibe-ui/ui/icons";
 import * as React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 
@@ -29,11 +25,7 @@ import type {
   PaginationProps,
 } from "@/packages/next-vibe-ui/web/ui/pagination";
 
-const Pagination = ({
-  className,
-  style,
-  children,
-}: PaginationProps): React.JSX.Element => {
+const Pagination = ({ className, style, children }: PaginationProps): React.JSX.Element => {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <StyledView
@@ -71,11 +63,7 @@ function PaginationContent({
 }
 PaginationContent.displayName = "PaginationContent";
 
-function PaginationItem({
-  className,
-  style,
-  children,
-}: PaginationItemProps): React.JSX.Element {
+function PaginationItem({ className, style, children }: PaginationItemProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <StyledView
@@ -134,11 +122,7 @@ const PaginationPrevious = ({
   const { t } = useTranslation();
 
   return (
-    <PaginationLink
-      size="default"
-      className={cn("gap-1 pl-2.5", className)}
-      {...props}
-    >
+    <PaginationLink size="default" className={cn("gap-1 pl-2.5", className)} {...props}>
       <StyledView className="flex flex-row items-center gap-1">
         <ChevronLeftIcon className="h-4 w-4" />
         <StyledText>{t("app.common.actions.previous")}</StyledText>
@@ -148,18 +132,11 @@ const PaginationPrevious = ({
 };
 PaginationPrevious.displayName = "PaginationPrevious";
 
-const PaginationNext = ({
-  className,
-  ...props
-}: PaginationNextProps): React.JSX.Element => {
+const PaginationNext = ({ className, ...props }: PaginationNextProps): React.JSX.Element => {
   const { t } = useTranslation();
 
   return (
-    <PaginationLink
-      size="default"
-      className={cn("gap-1 pr-2.5", className)}
-      {...props}
-    >
+    <PaginationLink size="default" className={cn("gap-1 pr-2.5", className)} {...props}>
       <StyledView className="flex flex-row items-center gap-1">
         <StyledText>{t("app.common.actions.next")}</StyledText>
         <ChevronRightIcon className="h-4 w-4" />
@@ -169,10 +146,7 @@ const PaginationNext = ({
 };
 PaginationNext.displayName = "PaginationNext";
 
-const PaginationEllipsis = ({
-  className,
-  style,
-}: PaginationEllipsisProps): React.JSX.Element => {
+const PaginationEllipsis = ({ className, style }: PaginationEllipsisProps): React.JSX.Element => {
   const { t } = useTranslation();
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 

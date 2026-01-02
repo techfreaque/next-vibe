@@ -38,12 +38,10 @@ export const translations: typeof enTranslations = {
       defaultMessage: "Wystąpił błąd podczas renderowania tego widgetu",
     },
     formField: {
-      requiresContext:
-        "Pole formularza wymaga kontekstu formularza i konfiguracji pola",
+      requiresContext: "Pole formularza wymaga kontekstu formularza i konfiguracji pola",
     },
     filterPills: {
-      requiresContext:
-        "Widget filtrowania wymaga kontekstu formularza i nazwy pola",
+      requiresContext: "Widget filtrowania wymaga kontekstu formularza i nazwy pola",
     },
     toolCall: {
       status: {
@@ -61,10 +59,8 @@ export const translations: typeof enTranslations = {
         errorLabel: "Błąd:",
         noArguments: "Brak argumentów",
         noResult: "Brak wyniku",
-        metadataNotAvailable:
-          "Metadane widgetu niedostępne. Pokazywanie surowych danych.",
-        confirmationRequired:
-          "Sprawdź i edytuj parametry, następnie potwierdź.",
+        metadataNotAvailable: "Metadane widgetu niedostępne. Pokazywanie surowych danych.",
+        confirmationRequired: "Sprawdź i edytuj parametry, następnie potwierdź.",
       },
       actions: {
         confirm: "Potwierdź",

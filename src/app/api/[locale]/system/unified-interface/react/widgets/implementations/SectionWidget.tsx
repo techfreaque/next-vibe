@@ -2,18 +2,8 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "next-vibe-ui/ui/card";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "next-vibe-ui/ui/collapsible";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "next-vibe-ui/ui/collapsible";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
@@ -24,10 +14,7 @@ import { simpleT } from "@/i18n/core/shared";
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import { WidgetType } from "../../../shared/types/enums";
 import { extractSectionData } from "../../../shared/widgets/logic/section";
-import type {
-  ReactWidgetProps,
-  WidgetData,
-} from "../../../shared/widgets/types";
+import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**
@@ -35,12 +22,7 @@ import { WidgetRenderer } from "../renderers/WidgetRenderer";
  */
 // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard: Must accept unknown to narrow any value to UnifiedField. This is the standard TypeScript pattern for type guards.
 function isUnifiedField(obj: unknown): obj is UnifiedField<string> {
-  return (
-    typeof obj === "object" &&
-    obj !== null &&
-    "ui" in obj &&
-    typeof obj.ui === "object"
-  );
+  return typeof obj === "object" && obj !== null && "ui" in obj && typeof obj.ui === "object";
 }
 
 /**
@@ -60,14 +42,13 @@ export function SectionWidget<const TKey extends string>({
   const data = extractSectionData(value);
 
   // Extract values with defaults for hooks (hooks must be called unconditionally)
-  const { title, content, description, collapsible, defaultExpanded } =
-    data ?? {
-      title: "",
-      content: null,
-      description: undefined,
-      collapsible: false,
-      defaultExpanded: true,
-    };
+  const { title, content, description, collapsible, defaultExpanded } = data ?? {
+    title: "",
+    content: null,
+    description: undefined,
+    collapsible: false,
+    defaultExpanded: true,
+  };
 
   // State for collapsible sections - must be called before any early returns
   const [isExpanded, setIsExpanded] = useState(defaultExpanded ?? true);
@@ -88,22 +69,15 @@ export function SectionWidget<const TKey extends string>({
   // Render content - can be a widget config or raw data
   const renderContent = (): JSX.Element => {
     // Check if content is a widget configuration
-    if (
-      typeof content === "object" &&
-      content !== null &&
-      !Array.isArray(content)
-    ) {
+    if (typeof content === "object" && content !== null && !Array.isArray(content)) {
       const contentType =
         "type" in content && typeof content.type === "string"
           ? (content.type as WidgetType)
           : WidgetType.TEXT;
-      const contentData =
-        "data" in content ? (content.data as WidgetData) : content;
+      const contentData = "data" in content ? (content.data as WidgetData) : content;
 
       const contentField =
-        "field" in content && isUnifiedField(content.field)
-          ? content.field
-          : field;
+        "field" in content && isUnifiedField(content.field) ? content.field : field;
 
       return (
         <WidgetRenderer
@@ -145,27 +119,16 @@ export function SectionWidget<const TKey extends string>({
 
   // Render collapsible section
   return (
-    <Collapsible
-      open={isExpanded}
-      onOpenChange={setIsExpanded}
-      className={className}
-    >
+    <Collapsible open={isExpanded} onOpenChange={setIsExpanded} className={className}>
       <Card>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
             <Div className="flex items-center justify-between">
               <Div className="flex-1">
                 <CardTitle>{title}</CardTitle>
-                {description && (
-                  <CardDescription>{description}</CardDescription>
-                )}
+                {description && <CardDescription>{description}</CardDescription>}
               </Div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0"
-                type="button"
-              >
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" type="button">
                 <ChevronDown
                   className={cn(
                     "h-5 w-5 text-gray-500 transition-transform",

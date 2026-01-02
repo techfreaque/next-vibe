@@ -109,12 +109,7 @@ export async function generateTRPCRouter(
   warnings: string[];
 }> {
   // Debug: generateTRPCRouter started with config
-  const {
-    apiDir,
-    outputFile,
-    includeWarnings = true,
-    excludePatterns = [],
-  } = config;
+  const { apiDir, outputFile, includeWarnings = true, excludePatterns = [] } = config;
   const errors: string[] = [];
   const warnings: string[] = [];
   const routeFiles: RouteFileInfo[] = [];
@@ -152,9 +147,7 @@ export async function generateTRPCRouter(
 
         if (!routeInfo.validation.isValid) {
           errors.push(
-            ...routeInfo.validation.errors.map(
-              (err) => `${routeInfo.relativePath}: ${err}`,
-            ),
+            ...routeInfo.validation.errors.map((err) => `${routeInfo.relativePath}: ${err}`),
           );
           // Debug first few invalid routes
           if (errors.length <= 6) {
@@ -169,9 +162,7 @@ export async function generateTRPCRouter(
 
         if (includeWarnings) {
           warnings.push(
-            ...routeInfo.validation.warnings.map(
-              (warn) => `${routeInfo.relativePath}: ${warn}`,
-            ),
+            ...routeInfo.validation.warnings.map((warn) => `${routeInfo.relativePath}: ${warn}`),
           );
         }
       } catch {
@@ -187,9 +178,7 @@ export async function generateTRPCRouter(
     const validRoutes = routeFiles.filter((f) => f.validation.isValid);
     // Debug: Generating router code
 
-    logger.debug(
-      `Valid routes: ${validRoutes.length}, Total routes: ${routeFiles.length}`,
-    );
+    logger.debug(`Valid routes: ${validRoutes.length}, Total routes: ${routeFiles.length}`);
     const routerCode = generateRouterCode(validRoutes, outputFile);
 
     // Write to output file
@@ -201,9 +190,7 @@ export async function generateTRPCRouter(
 
     // Debug: tRPC router generation completed
 
-    const validRouteCount = routeFiles.filter(
-      (f) => f.validation.isValid,
-    ).length;
+    const validRouteCount = routeFiles.filter((f) => f.validation.isValid).length;
     return {
       success: validRouteCount > 0, // Success if we have at least one valid route
       routeFiles,
@@ -228,10 +215,7 @@ export async function generateTRPCRouter(
 /**
  * Scan directory recursively for route.ts files
  */
-function scanForRouteFiles(
-  apiDir: string,
-  excludePatterns: string[],
-): string[] {
+function scanForRouteFiles(apiDir: string, excludePatterns: string[]): string[] {
   // Use consolidated directory scanner
   const results = findRouteFiles(apiDir, excludePatterns);
   return results.map((r) => r.fullPath);
@@ -240,10 +224,7 @@ function scanForRouteFiles(
 /**
  * Process a single route file and extract information
  */
-async function processRouteFile(
-  filePath: string,
-  apiDir: string,
-): Promise<RouteFileInfo> {
+async function processRouteFile(filePath: string, apiDir: string): Promise<RouteFileInfo> {
   const relativePath = path.relative(apiDir, filePath);
 
   // Calculate router path from file path
@@ -252,9 +233,7 @@ async function processRouteFile(
     .dirname(relativePath)
     .split(path.sep)
     .filter((segment: string) => segment !== "." && segment !== "")
-    .filter(
-      (segment: string) => !segment.startsWith("[") || !segment.endsWith("]"),
-    ); // Remove dynamic segments like [locale]
+    .filter((segment: string) => !segment.startsWith("[") || !segment.endsWith("]")); // Remove dynamic segments like [locale]
 
   // Try to import and validate the route file
   let validation: {
@@ -321,10 +300,7 @@ async function processRouteFile(
 /**
  * Generate TypeScript code for the router with proper nested structure
  */
-function generateRouterCode(
-  validRouteFiles: RouteFileInfo[],
-  outputFile: string,
-): string {
+function generateRouterCode(validRouteFiles: RouteFileInfo[], outputFile: string): string {
   const routerStructure = buildNestedRouterStructure(validRouteFiles);
 
   // Collect all routes that are actually used in the router structure
@@ -349,10 +325,7 @@ function generateRouterCode(
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       typeof process !== "undefined" && process.cwd ? process.cwd() : "";
     const importPath = path
-      .relative(
-        path.dirname(path.join(cwd, outputFile)),
-        routeFile.filePath.replace(/\.ts$/, ""),
-      )
+      .relative(path.dirname(path.join(cwd, outputFile)), routeFile.filePath.replace(/\.ts$/, ""))
       .replaceAll("\\", "/");
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -395,10 +368,7 @@ export type AppRouter = typeof appRouter;
 /**
  * Recursively collect all routes that are actually used in the router structure
  */
-function collectUsedRoutes(
-  structure: NestedRouterStructure,
-  usedRoutes: Set<RouteFileInfo>,
-): void {
+function collectUsedRoutes(structure: NestedRouterStructure, usedRoutes: Set<RouteFileInfo>): void {
   for (const [key, value] of Object.entries(structure)) {
     if (key === "_root" && Array.isArray(value)) {
       for (const route of value) {
@@ -417,9 +387,7 @@ function collectUsedRoutes(
 /**
  * Build nested router structure from route files
  */
-function buildNestedRouterStructure(
-  routeFiles: RouteFileInfo[],
-): NestedRouterStructure {
+function buildNestedRouterStructure(routeFiles: RouteFileInfo[]): NestedRouterStructure {
   const structure: NestedRouterStructure = {};
 
   for (const routeFile of routeFiles) {
@@ -494,24 +462,16 @@ function generateNestedRouterCode(
       if (value.length === 1) {
         // Single route file - spread the procedures object (e.g., { GET: procedure, POST: procedure })
 
-        entries.push(
-          `${indent}${quotedKey}: router({ ...${value[0].varName} }),`,
-        );
+        entries.push(`${indent}${quotedKey}: router({ ...${value[0].varName} }),`);
       } else {
         // Multiple route files at same level - merge them
-        const mergedProcedures = value
-          .map((rf) => `...${rf.varName}`)
-          .join(", ");
+        const mergedProcedures = value.map((rf) => `...${rf.varName}`).join(", ");
         // eslint-disable-next-line i18next/no-literal-string
         entries.push(`${indent}${quotedKey}: router({ ${mergedProcedures} }),`);
       }
     } else if (value) {
       // Nested structure
-      const nestedCode = generateNestedRouterCode(
-        value,
-        allRouteFiles,
-        `${indent}  `,
-      );
+      const nestedCode = generateNestedRouterCode(value, allRouteFiles, `${indent}  `);
       // eslint-disable-next-line i18next/no-literal-string
       const nestedRouterEntry = `${indent}${quotedKey}: router({\n${nestedCode}\n${indent}}),`;
       entries.push(nestedRouterEntry);

@@ -7,21 +7,15 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type guardDestroyEndpoints from "./definition";
 
-type GuardDestroyRequestType =
-  typeof guardDestroyEndpoints.POST.types.RequestOutput;
-type GuardDestroyResponseType =
-  typeof guardDestroyEndpoints.POST.types.ResponseOutput;
+type GuardDestroyRequestType = typeof guardDestroyEndpoints.POST.types.RequestOutput;
+type GuardDestroyResponseType = typeof guardDestroyEndpoints.POST.types.ResponseOutput;
 
 /**
  * Guard Destroy Repository Interface
@@ -60,14 +54,11 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
 
       // Default to current project if no parameters specified
       const currentProjectPath = process.cwd();
-      logger.info(
-        `No parameters specified, defaulting to current project: ${currentProjectPath}`,
-      );
+      logger.info(`No parameters specified, defaulting to current project: ${currentProjectPath}`);
       return this.destroyByProject(currentProjectPath, logger);
     } catch (error) {
       logger.error("Guard destruction failed", parseError(error));
-      const parsedError =
-        error instanceof Error ? error : new Error(String(error));
+      const parsedError = error instanceof Error ? error : new Error(String(error));
 
       return fail({
         message: "app.api.system.guard.destroy.errors.destruction_failed.title",
@@ -77,9 +68,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
     }
   }
 
-  private handleDryRun(
-    logger: EndpointLogger,
-  ): ResponseType<GuardDestroyResponseType> {
+  private handleDryRun(logger: EndpointLogger): ResponseType<GuardDestroyResponseType> {
     logger.info("Executing dry run for guard destruction");
 
     const response: GuardDestroyResponseType = {
@@ -159,9 +148,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
     return success(response);
   }
 
-  private destroyAllGuards(
-    logger: EndpointLogger,
-  ): ResponseType<GuardDestroyResponseType> {
+  private destroyAllGuards(logger: EndpointLogger): ResponseType<GuardDestroyResponseType> {
     logger.debug("Destroying all guards");
 
     // Mock implementation - in real system would find and destroy all guards

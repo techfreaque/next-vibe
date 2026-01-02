@@ -13,10 +13,7 @@ interface HistoryTabProps {
   initialData: CreditsHistoryGetResponseOutput | null;
 }
 
-export function HistoryTab({
-  locale,
-  initialData,
-}: HistoryTabProps): JSX.Element {
+export function HistoryTab({ locale, initialData }: HistoryTabProps): JSX.Element {
   return (
     <MotionDiv
       initial={{ opacity: 0, y: 20 }}

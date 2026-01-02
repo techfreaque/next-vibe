@@ -19,9 +19,7 @@ interface UserCreatePageProps {
   }>;
 }
 
-export async function generateMetadata({
-  params,
-}: UserCreatePageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: UserCreatePageProps): Promise<Metadata> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 
@@ -47,9 +45,7 @@ export default async function UserCreatePage({
         <H1 className="text-3xl font-bold tracking-tight">
           {t("app.admin.users.actions.addUser")}
         </H1>
-        <P className="text-muted-foreground mt-2">
-          {t("app.admin.users.create.description")}
-        </P>
+        <P className="text-muted-foreground mt-2">{t("app.admin.users.create.description")}</P>
       </Div>
 
       {/* Create Form */}

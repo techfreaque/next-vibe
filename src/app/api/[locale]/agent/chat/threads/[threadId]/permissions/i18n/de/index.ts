@@ -3,8 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
     title: "Thread-Berechtigungen abrufen",
-    description:
-      "Die Liste der Moderatoren für einen bestimmten Thread abrufen",
+    description: "Die Liste der Moderatoren für einen bestimmten Thread abrufen",
     container: {
       title: "Thread-Berechtigungen",
       description: "Thread-Zugriffsberechtigungen anzeigen und verwalten",
@@ -37,8 +36,7 @@ export const translations: typeof enTranslations = {
       },
       moderatorIds: {
         title: "Moderator-IDs",
-        description:
-          "Liste der Benutzer-IDs, die diesen Thread moderieren können",
+        description: "Liste der Benutzer-IDs, die diesen Thread moderieren können",
         content: "Benutzer-ID",
       },
     },
@@ -49,18 +47,15 @@ export const translations: typeof enTranslations = {
       },
       network: {
         title: "Netzwerkfehler",
-        description:
-          "Beim Abrufen der Thread-Berechtigungen ist ein Netzwerkfehler aufgetreten",
+        description: "Beim Abrufen der Thread-Berechtigungen ist ein Netzwerkfehler aufgetreten",
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um Thread-Berechtigungen anzuzeigen",
+        description: "Sie müssen angemeldet sein, um Thread-Berechtigungen anzuzeigen",
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, die Berechtigungen dieses Threads anzuzeigen",
+        description: "Sie haben keine Berechtigung, die Berechtigungen dieses Threads anzuzeigen",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -68,8 +63,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description:
-          "Beim Abrufen der Thread-Berechtigungen ist ein Fehler aufgetreten",
+        description: "Beim Abrufen der Thread-Berechtigungen ist ein Fehler aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -91,8 +85,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Thread-Berechtigungen aktualisieren",
-    description:
-      "Die Liste der Moderatoren für einen bestimmten Thread aktualisieren",
+    description: "Die Liste der Moderatoren für einen bestimmten Thread aktualisieren",
     container: {
       title: "Thread-Berechtigungen aktualisieren",
       description: "Thread-Zugriffsberechtigungen ändern",
@@ -125,8 +118,7 @@ export const translations: typeof enTranslations = {
       title: "Berechtigungsaktualisierung",
       moderatorIds: {
         label: "Moderator-IDs",
-        description:
-          "Liste der Benutzer-IDs, die diesen Thread moderieren können",
+        description: "Liste der Benutzer-IDs, die diesen Thread moderieren können",
       },
     },
     response: {
@@ -172,8 +164,7 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um Thread-Berechtigungen zu aktualisieren",
+        description: "Sie müssen angemeldet sein, um Thread-Berechtigungen zu aktualisieren",
       },
       forbidden: {
         title: "Verboten",
@@ -186,8 +177,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description:
-          "Beim Aktualisieren der Thread-Berechtigungen ist ein Fehler aufgetreten",
+        description: "Beim Aktualisieren der Thread-Berechtigungen ist ein Fehler aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",

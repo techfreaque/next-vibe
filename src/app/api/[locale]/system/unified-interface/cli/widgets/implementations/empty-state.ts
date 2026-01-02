@@ -9,9 +9,7 @@ import { extractEmptyStateData } from "@/app/api/[locale]/system/unified-interfa
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class EmptyStateWidgetRenderer extends BaseWidgetRenderer<
-  typeof WidgetType.EMPTY_STATE
-> {
+export class EmptyStateWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.EMPTY_STATE> {
   readonly widgetType = WidgetType.EMPTY_STATE;
 
   render(props: CLIWidgetProps<typeof WidgetType.EMPTY_STATE, string>): string {
@@ -37,17 +35,13 @@ export class EmptyStateWidgetRenderer extends BaseWidgetRenderer<
 
     // Description
     if (data.description) {
-      lines.push(
-        `${indent}${this.styleText(data.description, "dim", context)}`,
-      );
+      lines.push(`${indent}${this.styleText(data.description, "dim", context)}`);
     }
 
     // Action
     if (data.action) {
       lines.push("");
-      lines.push(
-        `${indent}${this.styleText(data.action.label, "blue", context)}`,
-      );
+      lines.push(`${indent}${this.styleText(data.action.label, "blue", context)}`);
     }
 
     return lines.join("\n");

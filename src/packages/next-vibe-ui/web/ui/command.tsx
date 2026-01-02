@@ -42,10 +42,7 @@ Command.displayName = CommandPrimitive.displayName;
 // CommandDialog
 export type CommandDialogProps = DialogProps;
 
-export const CommandDialog = ({
-  children,
-  ...props
-}: CommandDialogProps): React.JSX.Element => {
+export const CommandDialog = ({ children, ...props }: CommandDialogProps): React.JSX.Element => {
   return (
     <Dialog {...props}>
       <DialogContent className="overflow-hidden p-0">
@@ -95,17 +92,10 @@ export type CommandListProps = {
   children?: React.ReactNode;
 } & StyleType;
 
-export function CommandList({
-  className,
-  style,
-  children,
-}: CommandListProps): React.JSX.Element {
+export function CommandList({ className, style, children }: CommandListProps): React.JSX.Element {
   return (
     <CommandPrimitive.List
-      className={cn(
-        "max-h-[300px] overflow-y-auto overflow-x-hidden",
-        className,
-      )}
+      className={cn("max-h-[300px] overflow-y-auto overflow-x-hidden", className)}
       style={style}
     >
       {children}
@@ -120,16 +110,9 @@ export type CommandEmptyProps = {
   children?: React.ReactNode;
 } & StyleType;
 
-export function CommandEmpty({
-  className,
-  style,
-  children,
-}: CommandEmptyProps): React.JSX.Element {
+export function CommandEmpty({ className, style, children }: CommandEmptyProps): React.JSX.Element {
   return (
-    <CommandPrimitive.Empty
-      className={cn("py-6 text-center text-sm", className)}
-      style={style}
-    >
+    <CommandPrimitive.Empty className={cn("py-6 text-center text-sm", className)} style={style}>
       {children}
     </CommandPrimitive.Empty>
   );
@@ -167,15 +150,9 @@ CommandGroup.displayName = CommandPrimitive.Group.displayName;
 
 export type CommandSeparatorProps = StyleType;
 
-export function CommandSeparator({
-  className,
-  style,
-}: CommandSeparatorProps): React.JSX.Element {
+export function CommandSeparator({ className, style }: CommandSeparatorProps): React.JSX.Element {
   return (
-    <CommandPrimitive.Separator
-      className={cn("-mx-1 h-px bg-border", className)}
-      style={style}
-    />
+    <CommandPrimitive.Separator className={cn("-mx-1 h-px bg-border", className)} style={style} />
   );
 }
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
@@ -228,10 +205,7 @@ export const CommandShortcut = ({
 }: CommandShortcutProps): React.JSX.Element => {
   return (
     <span
-      className={cn(
-        "ml-auto text-xs tracking-widest text-muted-foreground",
-        className,
-      )}
+      className={cn("ml-auto text-xs tracking-widest text-muted-foreground", className)}
       style={style}
     >
       {children}

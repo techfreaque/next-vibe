@@ -21,8 +21,7 @@ export const translations: typeof enTranslations = {
       availableEndpoints: "verfügbare Endpunkte",
       endpointsLabel: "Endpunkte",
       aliasesLabel: "Aliase:",
-      selectEndpoint:
-        "Wählen Sie einen Endpunkt aus der Liste aus, um zu beginnen",
+      selectEndpoint: "Wählen Sie einen Endpunkt aus der Liste aus, um zu beginnen",
     },
     response: {
       started: "Interaktiver Modus erfolgreich gestartet",
@@ -85,8 +84,7 @@ export const translations: typeof enTranslations = {
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description:
-          "Ein unerwarteter Fehler ist beim Generieren der Hilfe aufgetreten",
+        description: "Ein unerwarteter Fehler ist beim Generieren der Hilfe aufgetreten",
       },
       conflict: {
         title: "Konflikt",
@@ -158,8 +156,7 @@ export const translations: typeof enTranslations = {
   list: {
     post: {
       title: "Verfügbare Befehle auflisten",
-      description:
-        "Zeigt alle verfügbaren CLI-Befehle mit Beschreibungen und Aliasen an",
+      description: "Zeigt alle verfügbaren CLI-Befehle mit Beschreibungen und Aliasen an",
       form: {
         title: "Befehlslisten-Optionen",
         description: "Konfigurieren Sie, wie Befehle angezeigt werden",
@@ -192,8 +189,7 @@ export const translations: typeof enTranslations = {
         },
         unknown: {
           title: "Unbekannter Fehler",
-          description:
-            "Ein unerwarteter Fehler ist beim Auflisten der Befehle aufgetreten",
+          description: "Ein unerwarteter Fehler ist beim Auflisten der Befehle aufgetreten",
         },
         conflict: {
           title: "Konflikt",

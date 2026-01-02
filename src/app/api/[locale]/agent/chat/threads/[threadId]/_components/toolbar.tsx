@@ -23,11 +23,7 @@ export function ChatToolbar({ locale }: ChatToolbarProps): JSX.Element {
   return (
     <Div className="absolute right-4 top-4 z-40 flex gap-1">
       {/* Thread view mode toggle */}
-      <ViewModeToggle
-        mode={viewMode}
-        onChange={onViewModeChange}
-        locale={locale}
-      />
+      <ViewModeToggle mode={viewMode} onChange={onViewModeChange} locale={locale} />
 
       {/* Screenshot button */}
       {/* TODO fix screenshot */}

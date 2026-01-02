@@ -40,9 +40,7 @@ interface ImapAccountsListProps {
  * IMAP Accounts List Component
  * Uses useEndpoint for all state management following leads/cron patterns
  */
-export function ImapAccountsList({
-  locale,
-}: ImapAccountsListProps): JSX.Element {
+export function ImapAccountsList({ locale }: ImapAccountsListProps): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -101,21 +99,15 @@ export function ImapAccountsList({
         );
       case ImapSyncStatus.ERROR:
         return (
-          <Badge variant="destructive">
-            {t("app.admin.emails.imap.account.status.error")}
-          </Badge>
+          <Badge variant="destructive">{t("app.admin.emails.imap.account.status.error")}</Badge>
         );
       case ImapSyncStatus.PENDING:
         return (
-          <Badge variant="secondary">
-            {t("app.admin.emails.imap.account.status.pending")}
-          </Badge>
+          <Badge variant="secondary">{t("app.admin.emails.imap.account.status.pending")}</Badge>
         );
       default:
         return (
-          <Badge variant="outline">
-            {t("app.admin.emails.imap.account.status.disconnected")}
-          </Badge>
+          <Badge variant="outline">{t("app.admin.emails.imap.account.status.disconnected")}</Badge>
         );
     }
   };
@@ -144,10 +136,7 @@ export function ImapAccountsList({
           onChange={(e) => form?.setValue("search", e.target.value)}
           className="max-w-sm"
         />
-        <Button
-          variant="outline"
-          onClick={() => accountsEndpoint.read?.refetch()}
-        >
+        <Button variant="outline" onClick={() => accountsEndpoint.read?.refetch()}>
           {t("app.admin.emails.imap.common.refresh")}
         </Button>
       </Div>
@@ -157,27 +146,13 @@ export function ImapAccountsList({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>
-                {t("app.admin.emails.imap.account.table.name")}
-              </TableHead>
-              <TableHead>
-                {t("app.admin.emails.imap.account.table.email")}
-              </TableHead>
-              <TableHead>
-                {t("app.admin.emails.imap.account.table.host")}
-              </TableHead>
-              <TableHead>
-                {t("app.admin.emails.imap.account.table.status")}
-              </TableHead>
-              <TableHead>
-                {t("app.admin.emails.imap.account.table.last_sync")}
-              </TableHead>
-              <TableHead>
-                {t("app.admin.emails.imap.account.table.max_messages")}
-              </TableHead>
-              <TableHead>
-                {t("app.admin.emails.imap.account.table.actions")}
-              </TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.name")}</TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.email")}</TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.host")}</TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.status")}</TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.last_sync")}</TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.max_messages")}</TableHead>
+              <TableHead>{t("app.admin.emails.imap.account.table.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -208,9 +183,7 @@ export function ImapAccountsList({
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          router.push(
-                            `/admin/emails/imap/accounts/${account.id}/edit`,
-                          );
+                          router.push(`/admin/emails/imap/accounts/${account.id}/edit`);
                         }}
                       >
                         {t("app.admin.emails.imap.common.edit")}
@@ -219,10 +192,7 @@ export function ImapAccountsList({
                         variant="outline"
                         size="sm"
                         onClick={async () => {
-                          testEndpoint.create.form.setValue(
-                            "accountId",
-                            account.id,
-                          );
+                          testEndpoint.create.form.setValue("accountId", account.id);
                           await testEndpoint.create.onSubmit();
                         }}
                       >

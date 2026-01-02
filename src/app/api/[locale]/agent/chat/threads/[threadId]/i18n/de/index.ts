@@ -244,13 +244,11 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, diesen Thread zu aktualisieren",
+        description: "Sie haben keine Berechtigung, diesen Thread zu aktualisieren",
       },
       notFound: {
         title: "Thread nicht gefunden",
-        description:
-          "Der zu aktualisierende Thread konnte nicht gefunden werden",
+        description: "Der zu aktualisierende Thread konnte nicht gefunden werden",
       },
       server: {
         title: "Serverfehler",
@@ -334,8 +332,7 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "Thread kann aufgrund bestehender Abhängigkeiten nicht gelöscht werden",
+        description: "Thread kann aufgrund bestehender Abhängigkeiten nicht gelöscht werden",
       },
     },
     success: {

@@ -3,9 +3,10 @@
  * Handles images for emails with Gmail optimization and base64 fallback
  */
 
-import { Img } from "@react-email/components";
 import fs from "node:fs";
 import path from "node:path";
+
+import { Img } from "@react-email/components";
 import type { JSX } from "react";
 
 import { envClient } from "@/config/env-client";
@@ -36,9 +37,7 @@ function isGmailRecipient(email?: string): boolean {
 function getImageAsBase64(imagePath: string): string {
   try {
     // Remove leading slash and construct absolute path
-    const relativePath = imagePath.startsWith("/")
-      ? imagePath.slice(1)
-      : imagePath;
+    const relativePath = imagePath.startsWith("/") ? imagePath.slice(1) : imagePath;
     const absolutePath = path.join(process.cwd(), "public", relativePath);
 
     // Read file and convert to base64
@@ -66,12 +65,8 @@ function getImageAsBase64(imagePath: string): string {
 /**
  * Get optimized image URL for Gmail
  */
-function getOptimizedImageUrl(
-  imagePath: string,
-  width?: string | number,
-): string {
-  const widthNum =
-    typeof width === "string" ? parseInt(width, 10) : width || 32;
+function getOptimizedImageUrl(imagePath: string, width?: string | number): string {
+  const widthNum = typeof width === "string" ? parseInt(width, 10) : width || 32;
   const encodedPath = encodeURIComponent(imagePath);
   return `${envClient.NEXT_PUBLIC_APP_URL}/_next/image?url=${encodedPath}&w=${widthNum}&q=75`;
 }
@@ -90,11 +85,7 @@ export function EmailImage({
 }: EmailImageProps): JSX.Element {
   const isGmail = isGmailRecipient(recipientEmail);
 
-  const imageSrc = isGmail
-    ? getOptimizedImageUrl(src, width)
-    : getImageAsBase64(src);
+  const imageSrc = isGmail ? getOptimizedImageUrl(src, width) : getImageAsBase64(src);
 
-  return (
-    <Img src={imageSrc} alt={alt} width={width} height={height} style={style} />
-  );
+  return <Img src={imageSrc} alt={alt} width={width} height={height} style={style} />;
 }

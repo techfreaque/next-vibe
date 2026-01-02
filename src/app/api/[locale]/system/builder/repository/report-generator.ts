@@ -20,11 +20,7 @@ export interface IReportGenerator {
   /**
    * Generate a JSON build report
    */
-  generate(
-    report: BuildReport,
-    output: string[],
-    t: TFunction,
-  ): Promise<string>;
+  generate(report: BuildReport, output: string[], t: TFunction): Promise<string>;
 
   /**
    * Append build summary to output
@@ -45,16 +41,8 @@ export interface IReportGenerator {
 // ============================================================================
 
 export class ReportGenerator implements IReportGenerator {
-  async generate(
-    report: BuildReport,
-    output: string[],
-    t: TFunction,
-  ): Promise<string> {
-    output.push(
-      outputFormatter.formatStep(
-        t("app.api.system.builder.messages.generatingReport"),
-      ),
-    );
+  async generate(report: BuildReport, output: string[], t: TFunction): Promise<string> {
+    output.push(outputFormatter.formatStep(t("app.api.system.builder.messages.generatingReport")));
 
     const reportPath = resolve(ROOT_DIR, "dist", "build-report.json");
     const reportDir = dirname(reportPath);
@@ -90,12 +78,8 @@ export class ReportGenerator implements IReportGenerator {
     output.push(
       `📊 ${t("app.api.system.builder.messages.buildSummary")} [${profile.toUpperCase()}]`,
     );
-    output.push(
-      `  ⏱  ${t("app.api.system.builder.messages.totalDuration")}: ${totalDuration}ms`,
-    );
-    output.push(
-      `  📦 ${t("app.api.system.builder.messages.filesBuilt")}: ${filesBuilt.length}`,
-    );
+    output.push(`  ⏱  ${t("app.api.system.builder.messages.totalDuration")}: ${totalDuration}ms`);
+    output.push(`  📦 ${t("app.api.system.builder.messages.filesBuilt")}: ${filesBuilt.length}`);
     output.push(
       `  📋 ${t("app.api.system.builder.messages.filesCopiedCount")}: ${filesCopied.length}`,
     );

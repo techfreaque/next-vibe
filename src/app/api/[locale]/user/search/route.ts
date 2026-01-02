@@ -12,7 +12,6 @@ import { UserSearchRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ data, logger }) =>
-      UserSearchRepository.searchUsers(data, logger),
+    handler: ({ data, logger }) => UserSearchRepository.searchUsers(data, logger),
   },
 });

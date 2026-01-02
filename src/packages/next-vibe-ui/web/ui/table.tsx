@@ -13,10 +13,7 @@ export type TableProps = {
 export function Table({ className, ...props }: TableProps): React.JSX.Element {
   return (
     <div className="relative w-full overflow-auto">
-      <table
-        className={cn("w-full caption-bottom text-sm", className)}
-        {...props}
-      />
+      <table className={cn("w-full caption-bottom text-sm", className)} {...props} />
     </div>
   );
 }
@@ -27,10 +24,7 @@ export type TableHeaderProps = {
   children?: ReactNode;
 } & StyleType;
 
-export function TableHeader({
-  className,
-  ...props
-}: TableHeaderProps): React.JSX.Element {
+export function TableHeader({ className, ...props }: TableHeaderProps): React.JSX.Element {
   return <thead className={cn("[&_tr]:border-b", className)} {...props} />;
 }
 TableHeader.displayName = "TableHeader";
@@ -40,13 +34,8 @@ export type TableBodyProps = {
   children?: ReactNode;
 } & StyleType;
 
-export function TableBody({
-  className,
-  ...props
-}: TableBodyProps): React.JSX.Element {
-  return (
-    <tbody className={cn("[&_tr:last-child]:border-0", className)} {...props} />
-  );
+export function TableBody({ className, ...props }: TableBodyProps): React.JSX.Element {
+  return <tbody className={cn("[&_tr:last-child]:border-0", className)} {...props} />;
 }
 TableBody.displayName = "TableBody";
 
@@ -55,16 +44,10 @@ export type TableFooterProps = {
   children?: ReactNode;
 } & StyleType;
 
-export function TableFooter({
-  className,
-  ...props
-}: TableFooterProps): React.JSX.Element {
+export function TableFooter({ className, ...props }: TableFooterProps): React.JSX.Element {
   return (
     <tfoot
-      className={cn(
-        "border-t bg-accent font-medium [&>tr]:last:border-b-0",
-        className,
-      )}
+      className={cn("border-t bg-accent font-medium [&>tr]:last:border-b-0", className)}
       {...props}
     />
   );
@@ -162,11 +145,7 @@ export type TableCellProps = {
   colSpan?: number;
 } & StyleType;
 
-export function TableCell({
-  className,
-  colSpan,
-  ...props
-}: TableCellProps): React.JSX.Element {
+export function TableCell({ className, colSpan, ...props }: TableCellProps): React.JSX.Element {
   return (
     <td
       className={cn(
@@ -185,15 +164,7 @@ export type TableCaptionProps = {
   children?: ReactNode;
 } & StyleType;
 
-export function TableCaption({
-  className,
-  ...props
-}: TableCaptionProps): React.JSX.Element {
-  return (
-    <caption
-      className={cn("mt-4 text-sm text-muted-foreground", className)}
-      {...props}
-    />
-  );
+export function TableCaption({ className, ...props }: TableCaptionProps): React.JSX.Element {
+  return <caption className={cn("mt-4 text-sm text-muted-foreground", className)} {...props} />;
 }
 TableCaption.displayName = "TableCaption";

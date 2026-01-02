@@ -7,11 +7,7 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -55,8 +51,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
 
       if (!uninstallResult.success) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.cli.setup.update.post.errors.server.title",
+          message: "app.api.system.unifiedInterface.cli.setup.update.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: t(
@@ -80,9 +75,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
           installed: true,
           version: installResult.data.version,
           path: installResult.data.path,
-          message: t(
-            "app.api.system.unifiedInterface.cli.setup.update.post.success.description",
-          ),
+          message: t("app.api.system.unifiedInterface.cli.setup.update.post.success.description"),
           output: installResult.data.output,
         });
       }
@@ -96,8 +89,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
     } catch (err) {
       const parsedError = parseError(err);
       return fail({
-        message:
-          "app.api.system.unifiedInterface.cli.setup.update.post.errors.server.title",
+        message: "app.api.system.unifiedInterface.cli.setup.update.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

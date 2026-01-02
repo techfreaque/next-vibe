@@ -50,9 +50,7 @@ export function DataListWidget<const TKey extends string>({
   if (!data) {
     return (
       <Div className={cn("text-muted-foreground italic", className)}>
-        {globalT(
-          "app.api.system.unifiedInterface.react.widgets.dataList.noData",
-        )}
+        {globalT("app.api.system.unifiedInterface.react.widgets.dataList.noData")}
       </Div>
     );
   }
@@ -63,10 +61,7 @@ export function DataListWidget<const TKey extends string>({
   let childField: UnifiedField<string> | null = null;
   let isSimpleValueArray = false;
 
-  if (
-    "type" in field &&
-    (field.type === "array" || field.type === "array-optional")
-  ) {
+  if ("type" in field && (field.type === "array" || field.type === "array-optional")) {
     if ("child" in field && field.child) {
       childField = field.child as UnifiedField<string>;
       if (
@@ -74,10 +69,7 @@ export function DataListWidget<const TKey extends string>({
         (childField.type === "object" || childField.type === "object-optional")
       ) {
         if ("children" in childField && childField.children) {
-          fieldDefinitions = childField.children as Record<
-            string,
-            UnifiedField<string>
-          >;
+          fieldDefinitions = childField.children as Record<string, UnifiedField<string>>;
         }
       } else {
         // Simple value array (string, number, etc.)
@@ -123,9 +115,7 @@ export function DataListWidget<const TKey extends string>({
             onClick={() => setViewMode("list")}
             className="h-8 px-3"
           >
-            {globalT(
-              "app.api.system.unifiedInterface.react.widgets.dataList.viewList",
-            )}
+            {globalT("app.api.system.unifiedInterface.react.widgets.dataList.viewList")}
           </Button>
           <Button
             variant={viewMode === "grid" ? "default" : "ghost"}
@@ -133,9 +123,7 @@ export function DataListWidget<const TKey extends string>({
             onClick={() => setViewMode("grid")}
             className="h-8 px-3"
           >
-            {globalT(
-              "app.api.system.unifiedInterface.react.widgets.dataList.viewGrid",
-            )}
+            {globalT("app.api.system.unifiedInterface.react.widgets.dataList.viewGrid")}
           </Button>
         </Div>
       </Div>
@@ -150,25 +138,13 @@ export function DataListWidget<const TKey extends string>({
                   // Check for label first, then fallback to content/text/href, then key
                   let label = key;
                   if (fieldUi) {
-                    if (
-                      "label" in fieldUi &&
-                      typeof fieldUi.label === "string"
-                    ) {
+                    if ("label" in fieldUi && typeof fieldUi.label === "string") {
                       label = t(fieldUi.label);
-                    } else if (
-                      "content" in fieldUi &&
-                      typeof fieldUi.content === "string"
-                    ) {
+                    } else if ("content" in fieldUi && typeof fieldUi.content === "string") {
                       label = t(fieldUi.content);
-                    } else if (
-                      "text" in fieldUi &&
-                      typeof fieldUi.text === "string"
-                    ) {
+                    } else if ("text" in fieldUi && typeof fieldUi.text === "string") {
                       label = t(fieldUi.text);
-                    } else if (
-                      "href" in fieldUi &&
-                      typeof fieldUi.href === "string"
-                    ) {
+                    } else if ("href" in fieldUi && typeof fieldUi.href === "string") {
                       // For LINK widgets that use href as the label key
                       label = fieldUi.href;
                     }
@@ -192,10 +168,7 @@ export function DataListWidget<const TKey extends string>({
                 }
 
                 return (
-                  <TableRow
-                    key={index}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
-                  >
+                  <TableRow key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                     {Object.entries(fieldDefinitions).map(([key, fieldDef]) => {
                       const cellValue = key in item ? item[key] : null;
 
@@ -245,34 +218,19 @@ export function DataListWidget<const TKey extends string>({
                       // Check for label first, then fallback to content/text/href, then key
                       let label = key;
                       if (fieldUi) {
-                        if (
-                          "label" in fieldUi &&
-                          typeof fieldUi.label === "string"
-                        ) {
+                        if ("label" in fieldUi && typeof fieldUi.label === "string") {
                           label = t(fieldUi.label);
-                        } else if (
-                          "content" in fieldUi &&
-                          typeof fieldUi.content === "string"
-                        ) {
+                        } else if ("content" in fieldUi && typeof fieldUi.content === "string") {
                           label = t(fieldUi.content);
-                        } else if (
-                          "text" in fieldUi &&
-                          typeof fieldUi.text === "string"
-                        ) {
+                        } else if ("text" in fieldUi && typeof fieldUi.text === "string") {
                           label = t(fieldUi.text);
-                        } else if (
-                          "href" in fieldUi &&
-                          typeof fieldUi.href === "string"
-                        ) {
+                        } else if ("href" in fieldUi && typeof fieldUi.href === "string") {
                           label = fieldUi.href;
                         }
                       }
 
                       return (
-                        <Div
-                          key={key}
-                          className="flex justify-between gap-4 text-sm"
-                        >
+                        <Div key={key} className="flex justify-between gap-4 text-sm">
                           <Span className="font-medium text-gray-700 dark:text-gray-300">
                             {label}:
                           </Span>
@@ -307,12 +265,9 @@ export function DataListWidget<const TKey extends string>({
           onClick={() => setShowAll(true)}
           className="mt-2 text-sm font-medium text-blue-600 hover:bg-gray-50 dark:text-blue-400 dark:hover:bg-gray-800"
         >
-          {globalT(
-            "app.api.system.unifiedInterface.react.widgets.dataList.showMore",
-            {
-              count: remainingCount,
-            },
-          )}
+          {globalT("app.api.system.unifiedInterface.react.widgets.dataList.showMore", {
+            count: remainingCount,
+          })}
         </Button>
       )}
 
@@ -322,9 +277,7 @@ export function DataListWidget<const TKey extends string>({
           onClick={() => setShowAll(false)}
           className="mt-2 text-sm font-medium text-blue-600 hover:bg-gray-50 dark:text-blue-400 dark:hover:bg-gray-800"
         >
-          {globalT(
-            "app.api.system.unifiedInterface.react.widgets.dataList.showLess",
-          )}
+          {globalT("app.api.system.unifiedInterface.react.widgets.dataList.showLess")}
         </Button>
       )}
     </Div>

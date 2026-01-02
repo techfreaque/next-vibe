@@ -4,11 +4,7 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -16,8 +12,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type guardStopEndpoints from "./definition";
 
 type GuardStopRequestType = typeof guardStopEndpoints.POST.types.RequestOutput;
-type GuardStopResponseType =
-  typeof guardStopEndpoints.POST.types.ResponseOutput;
+type GuardStopResponseType = typeof guardStopEndpoints.POST.types.ResponseOutput;
 
 /**
  * Guard Stop Repository Interface
@@ -46,11 +41,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
       }
 
       if (data.projectPath) {
-        return this.stopByProject(
-          data.projectPath,
-          data.force || false,
-          logger,
-        );
+        return this.stopByProject(data.projectPath, data.force || false, logger);
       }
 
       if (data.stopAll) {
@@ -66,8 +57,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
       });
     } catch (error) {
       logger.error("Guard stop failed", parseError(error));
-      const parsedError =
-        error instanceof Error ? error : new Error(String(error));
+      const parsedError = error instanceof Error ? error : new Error(String(error));
 
       return fail({
         message: "app.api.system.guard.stop.errors.internal.title",
@@ -111,9 +101,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
     force: boolean,
     logger: EndpointLogger,
   ): ResponseType<GuardStopResponseType> {
-    logger.debug(
-      `Stopping guard for project: ${projectPath} (force: ${force})`,
-    );
+    logger.debug(`Stopping guard for project: ${projectPath} (force: ${force})`);
 
     const projectName = projectPath.split("/").pop() || "unknown";
 

@@ -13,13 +13,11 @@ export const translations = {
       },
       network: {
         title: "Netzwerkfehler",
-        description:
-          "Datei konnte aufgrund eines Netzwerkfehlers nicht abgerufen werden",
+        description: "Datei konnte aufgrund eines Netzwerkfehlers nicht abgerufen werden",
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Authentifizierung erforderlich um auf diese Datei zuzugreifen",
+        description: "Authentifizierung erforderlich um auf diese Datei zuzugreifen",
       },
       forbidden: {
         title: "Verboten",
@@ -32,8 +30,7 @@ export const translations = {
       },
       server: {
         title: "Serverfehler",
-        description:
-          "Datei konnte aufgrund eines Serverfehlers nicht abgerufen werden",
+        description: "Datei konnte aufgrund eines Serverfehlers nicht abgerufen werden",
       },
       unknown: {
         title: "Unbekannter Fehler",

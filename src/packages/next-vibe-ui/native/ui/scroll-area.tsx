@@ -39,11 +39,7 @@ const StyledScrollView = styledNative(ScrollView);
  * Accepts all Radix UI ScrollArea.Root props for web compatibility.
  * React Native ScrollView provides native scrolling behavior automatically.
  */
-export function ScrollArea({
-  className,
-  style,
-  children,
-}: ScrollAreaRootProps): React.JSX.Element {
+export function ScrollArea({ className, style, children }: ScrollAreaRootProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Map to React Native ScrollView
@@ -69,9 +65,7 @@ ScrollArea.displayName = "ScrollArea";
  * This component accepts all web props for API compatibility but renders nothing.
  * The function signature matches web exactly to ensure type safety.
  */
-export function ScrollBar({
-  className,
-}: ScrollAreaBarProps): React.JSX.Element {
+export function ScrollBar({ className }: ScrollAreaBarProps): React.JSX.Element {
   void className;
   // React Native handles scrollbars natively - no custom rendering needed
   // Return empty fragment to maintain component contract

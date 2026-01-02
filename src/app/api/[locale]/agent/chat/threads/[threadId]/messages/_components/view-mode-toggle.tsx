@@ -6,10 +6,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Bug, Hash, List, Network } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
-import {
-  ViewMode,
-  type ViewModeValue,
-} from "@/app/api/[locale]/agent/chat/enum";
+import { ViewMode, type ViewModeValue } from "@/app/api/[locale]/agent/chat/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -36,8 +33,7 @@ export function ViewModeToggle({
         onClick={() => onChange(ViewMode.LINEAR)}
         className={cn(
           "bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9",
-          mode === ViewMode.LINEAR &&
-            "bg-primary/10 text-primary hover:bg-primary/20",
+          mode === ViewMode.LINEAR && "bg-primary/10 text-primary hover:bg-primary/20",
         )}
         title={t("app.chat.common.viewModeToggle.linearView")}
       >
@@ -49,8 +45,7 @@ export function ViewModeToggle({
         onClick={() => onChange(ViewMode.THREADED)}
         className={cn(
           "bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9",
-          mode === ViewMode.THREADED &&
-            "bg-primary/10 text-primary hover:bg-primary/20",
+          mode === ViewMode.THREADED && "bg-primary/10 text-primary hover:bg-primary/20",
         )}
         title={t("app.chat.common.viewModeToggle.threadedView")}
       >
@@ -63,8 +58,7 @@ export function ViewModeToggle({
         onClick={() => onChange(ViewMode.FLAT)}
         className={cn(
           "bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9",
-          mode === ViewMode.FLAT &&
-            "bg-primary/10 text-primary hover:bg-primary/20",
+          mode === ViewMode.FLAT && "bg-primary/10 text-primary hover:bg-primary/20",
         )}
         title={t("app.chat.common.viewModeToggle.flatView")}
       >
@@ -77,8 +71,7 @@ export function ViewModeToggle({
         onClick={() => onChange(ViewMode.DEBUG)}
         className={cn(
           "bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9",
-          mode === ViewMode.DEBUG &&
-            "bg-primary/10 text-primary hover:bg-primary/20",
+          mode === ViewMode.DEBUG && "bg-primary/10 text-primary hover:bg-primary/20",
         )}
         title={t("app.chat.common.viewModeToggle.debugView")}
       >

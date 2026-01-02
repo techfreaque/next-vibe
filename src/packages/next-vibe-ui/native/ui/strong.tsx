@@ -17,11 +17,7 @@ export interface StrongProps {
   className?: string;
 }
 
-function Strong({
-  className,
-  children,
-  ...props
-}: StrongProps): React.JSX.Element {
+function Strong({ className, children, ...props }: StrongProps): React.JSX.Element {
   return (
     <Text className={cn("font-bold", className)} {...props}>
       {children}

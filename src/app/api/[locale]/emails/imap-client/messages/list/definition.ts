@@ -49,8 +49,7 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.emails.imapClient.messages.list.get.container.title",
-      description:
-        "app.api.emails.imapClient.messages.list.get.container.description",
+      description: "app.api.emails.imapClient.messages.list.get.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -62,8 +61,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.emails.imapClient.messages.list.get.page.label",
-          description:
-            "app.api.emails.imapClient.messages.list.get.page.description",
+          description: "app.api.emails.imapClient.messages.list.get.page.description",
           columns: 3,
         },
         z.coerce.number().int().positive().default(1),
@@ -74,8 +72,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.emails.imapClient.messages.list.get.limit.label",
-          description:
-            "app.api.emails.imapClient.messages.list.get.limit.description",
+          description: "app.api.emails.imapClient.messages.list.get.limit.description",
           columns: 3,
         },
         z.coerce.number().int().positive().max(100).default(20),
@@ -86,10 +83,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.imapClient.messages.list.get.accountId.label",
-          description:
-            "app.api.emails.imapClient.messages.list.get.accountId.description",
-          placeholder:
-            "app.api.emails.imapClient.messages.list.get.accountId.placeholder",
+          description: "app.api.emails.imapClient.messages.list.get.accountId.description",
+          placeholder: "app.api.emails.imapClient.messages.list.get.accountId.placeholder",
           columns: 6,
         },
         z.uuid(),
@@ -100,10 +95,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.imapClient.messages.list.get.folderId.label",
-          description:
-            "app.api.emails.imapClient.messages.list.get.folderId.description",
-          placeholder:
-            "app.api.emails.imapClient.messages.list.get.folderId.placeholder",
+          description: "app.api.emails.imapClient.messages.list.get.folderId.description",
+          placeholder: "app.api.emails.imapClient.messages.list.get.folderId.placeholder",
           columns: 6,
         },
         z.uuid().optional(),
@@ -114,10 +107,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.imapClient.messages.list.get.search.label",
-          description:
-            "app.api.emails.imapClient.messages.list.get.search.description",
-          placeholder:
-            "app.api.emails.imapClient.messages.list.get.search.placeholder",
+          description: "app.api.emails.imapClient.messages.list.get.search.description",
+          placeholder: "app.api.emails.imapClient.messages.list.get.search.placeholder",
           columns: 12,
         },
         z.string().optional(),
@@ -128,8 +119,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.imapClient.messages.list.get.status.label",
-          description:
-            "app.api.emails.imapClient.messages.list.get.status.description",
+          description: "app.api.emails.imapClient.messages.list.get.status.description",
           options: ImapMessageStatusFilterOptions,
           columns: 4,
         },
@@ -141,14 +131,11 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.imapClient.messages.list.get.sortBy.label",
-          description:
-            "app.api.emails.imapClient.messages.list.get.sortBy.description",
+          description: "app.api.emails.imapClient.messages.list.get.sortBy.description",
           options: ImapMessageSortFieldOptions,
           columns: 4,
         },
-        z
-          .nativeEnum(ImapMessageSortField)
-          .default(ImapMessageSortField.SENT_AT),
+        z.nativeEnum(ImapMessageSortField).default(ImapMessageSortField.SENT_AT),
       ),
 
       sortOrder: requestDataField(
@@ -156,8 +143,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.imapClient.messages.list.get.sortOrder.label",
-          description:
-            "app.api.emails.imapClient.messages.list.get.sortOrder.description",
+          description: "app.api.emails.imapClient.messages.list.get.sortOrder.description",
           options: SortOrderOptions,
           columns: 4,
         },
@@ -169,8 +155,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.DATE,
           label: "app.api.emails.imapClient.messages.list.get.dateFrom.label",
-          description:
-            "app.api.emails.imapClient.messages.list.get.dateFrom.description",
+          description: "app.api.emails.imapClient.messages.list.get.dateFrom.description",
           columns: 6,
         },
         z.string().optional(),
@@ -181,8 +166,7 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.DATE,
           label: "app.api.emails.imapClient.messages.list.get.dateTo.label",
-          description:
-            "app.api.emails.imapClient.messages.list.get.dateTo.description",
+          description: "app.api.emails.imapClient.messages.list.get.dateTo.description",
           columns: 6,
         },
         z.string().optional(),
@@ -197,10 +181,8 @@ const { GET } = createEndpoint({
         objectField(
           {
             type: WidgetType.CONTAINER,
-            title:
-              "app.api.emails.imapClient.messages.list.get.response.message.title",
-            description:
-              "app.api.emails.imapClient.messages.list.get.response.message.description",
+            title: "app.api.emails.imapClient.messages.list.get.response.message.title",
+            description: "app.api.emails.imapClient.messages.list.get.response.message.description",
             layoutType: LayoutType.GRID,
             columns: 12,
           },
@@ -209,32 +191,28 @@ const { GET } = createEndpoint({
             id: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.messages.list.get.response.message.id",
+                content: "app.api.emails.imapClient.messages.list.get.response.message.id",
               },
               z.string(),
             ),
             subject: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.messages.list.get.response.message.subject",
+                content: "app.api.emails.imapClient.messages.list.get.response.message.subject",
               },
               z.string(),
             ),
             senderEmail: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.messages.list.get.response.message.senderEmail",
+                content: "app.api.emails.imapClient.messages.list.get.response.message.senderEmail",
               },
               z.string(),
             ),
             senderName: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.messages.list.get.response.message.senderName",
+                content: "app.api.emails.imapClient.messages.list.get.response.message.senderName",
               },
               z.string().nullable(),
             ),
@@ -262,16 +240,14 @@ const { GET } = createEndpoint({
             sentAt: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.messages.list.get.response.message.sentAt",
+                content: "app.api.emails.imapClient.messages.list.get.response.message.sentAt",
               },
               z.string().nullable(),
             ),
             headers: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.emails.imapClient.messages.list.get.response.message.headers",
+                content: "app.api.emails.imapClient.messages.list.get.response.message.headers",
               },
               z.record(z.string(), z.string()).optional(),
             ),
@@ -306,8 +282,7 @@ const { GET } = createEndpoint({
       totalPages: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.emails.imapClient.messages.list.get.response.totalPages",
+          content: "app.api.emails.imapClient.messages.list.get.response.totalPages",
         },
         z.coerce.number(),
       ),
@@ -316,55 +291,40 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.emails.imapClient.messages.list.get.errors.validation.title",
-      description:
-        "app.api.emails.imapClient.messages.list.get.errors.validation.description",
+      title: "app.api.emails.imapClient.messages.list.get.errors.validation.title",
+      description: "app.api.emails.imapClient.messages.list.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.imapClient.messages.list.get.errors.unauthorized.title",
-      description:
-        "app.api.emails.imapClient.messages.list.get.errors.unauthorized.description",
+      title: "app.api.emails.imapClient.messages.list.get.errors.unauthorized.title",
+      description: "app.api.emails.imapClient.messages.list.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.emails.imapClient.messages.list.get.errors.forbidden.title",
-      description:
-        "app.api.emails.imapClient.messages.list.get.errors.forbidden.description",
+      title: "app.api.emails.imapClient.messages.list.get.errors.forbidden.title",
+      description: "app.api.emails.imapClient.messages.list.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.emails.imapClient.messages.list.get.errors.notFound.title",
-      description:
-        "app.api.emails.imapClient.messages.list.get.errors.notFound.description",
+      title: "app.api.emails.imapClient.messages.list.get.errors.notFound.title",
+      description: "app.api.emails.imapClient.messages.list.get.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.emails.imapClient.messages.list.get.errors.conflict.title",
-      description:
-        "app.api.emails.imapClient.messages.list.get.errors.conflict.description",
+      title: "app.api.emails.imapClient.messages.list.get.errors.conflict.title",
+      description: "app.api.emails.imapClient.messages.list.get.errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.emails.imapClient.messages.list.get.errors.server.title",
-      description:
-        "app.api.emails.imapClient.messages.list.get.errors.server.description",
+      description: "app.api.emails.imapClient.messages.list.get.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.emails.imapClient.messages.list.get.errors.network.title",
-      description:
-        "app.api.emails.imapClient.messages.list.get.errors.network.description",
+      description: "app.api.emails.imapClient.messages.list.get.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.emails.imapClient.messages.list.get.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.imapClient.messages.list.get.errors.unsavedChanges.description",
+      title: "app.api.emails.imapClient.messages.list.get.errors.unsavedChanges.title",
+      description: "app.api.emails.imapClient.messages.list.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.imapClient.messages.list.get.errors.unknown.title",
-      description:
-        "app.api.emails.imapClient.messages.list.get.errors.unknown.description",
+      description: "app.api.emails.imapClient.messages.list.get.errors.unknown.description",
     },
   },
 
@@ -405,8 +365,7 @@ const { GET } = createEndpoint({
 
   successTypes: {
     title: "app.api.emails.imapClient.messages.list.get.success.title",
-    description:
-      "app.api.emails.imapClient.messages.list.get.success.description",
+    description: "app.api.emails.imapClient.messages.list.get.success.description",
   },
 });
 
@@ -417,8 +376,7 @@ export type ImapMessagesListGetResponseInput = typeof GET.types.ResponseInput;
 export type ImapMessagesListGetResponseOutput = typeof GET.types.ResponseOutput;
 
 // Export individual message type from the array
-export type ImapMessageResponseType =
-  ImapMessagesListGetResponseOutput["messages"][number];
+export type ImapMessageResponseType = ImapMessagesListGetResponseOutput["messages"][number];
 
 /**
  * Export definitions

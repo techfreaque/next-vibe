@@ -10,8 +10,7 @@ export const translations = {
   generate: {
     post: {
       title: "Generate Expo Indexes",
-      description:
-        "Generate Expo Router compatibility wrappers for Next.js pages",
+      description: "Generate Expo Router compatibility wrappers for Next.js pages",
       response: {
         fields: {
           success: "Success",
@@ -57,8 +56,7 @@ export const translations = {
       },
       success: {
         title: "Success",
-        description:
-          "Generated {{created}} files, skipped {{skipped}} files, {{errors}} errors",
+        description: "Generated {{created}} files, skipped {{skipped}} files, {{errors}} errors",
       },
     },
   },

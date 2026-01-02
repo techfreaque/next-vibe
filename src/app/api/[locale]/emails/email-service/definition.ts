@@ -5,10 +5,7 @@
 
 import { z } from "zod";
 
-import {
-  EmailCampaignStageDB,
-  EmailJourneyVariantDB,
-} from "@/app/api/[locale]/leads/enum";
+import { EmailCampaignStageDB, EmailJourneyVariantDB } from "@/app/api/[locale]/leads/enum";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -53,8 +50,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.emails.emailService.send.recipientInfo.title",
-          description:
-            "app.api.emails.emailService.send.recipientInfo.description",
+          description: "app.api.emails.emailService.send.recipientInfo.description",
           layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { request: "data" },
@@ -76,10 +72,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.emails.emailService.send.toName.label",
-              description:
-                "app.api.emails.emailService.send.toName.description",
-              placeholder:
-                "app.api.emails.emailService.send.toName.placeholder",
+              description: "app.api.emails.emailService.send.toName.description",
+              placeholder: "app.api.emails.emailService.send.toName.placeholder",
               columns: 12,
               helpText: "app.api.emails.emailService.send.toName.description",
             },
@@ -93,8 +87,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.emails.emailService.send.emailContent.title",
-          description:
-            "app.api.emails.emailService.send.emailContent.description",
+          description: "app.api.emails.emailService.send.emailContent.description",
           layoutType: LayoutType.STACKED,
         },
         { request: "data" },
@@ -104,10 +97,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.emails.emailService.send.subject.label",
-              description:
-                "app.api.emails.emailService.send.subject.description",
-              placeholder:
-                "app.api.emails.emailService.send.subject.placeholder",
+              description: "app.api.emails.emailService.send.subject.description",
+              placeholder: "app.api.emails.emailService.send.subject.placeholder",
               columns: 12,
             },
             z.string().min(1).max(998),
@@ -145,8 +136,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.emails.emailService.send.senderSettings.title",
-          description:
-            "app.api.emails.emailService.send.senderSettings.description",
+          description: "app.api.emails.emailService.send.senderSettings.description",
           layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { request: "data" },
@@ -156,10 +146,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.emails.emailService.send.senderName.label",
-              description:
-                "app.api.emails.emailService.send.senderName.description",
-              placeholder:
-                "app.api.emails.emailService.send.senderName.placeholder",
+              description: "app.api.emails.emailService.send.senderName.description",
+              placeholder: "app.api.emails.emailService.send.senderName.placeholder",
               columns: 12,
             },
             z.string().min(1),
@@ -170,10 +158,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.EMAIL,
               label: "app.api.emails.emailService.send.replyTo.label",
-              description:
-                "app.api.emails.emailService.send.replyTo.description",
-              placeholder:
-                "app.api.emails.emailService.send.replyTo.placeholder",
+              description: "app.api.emails.emailService.send.replyTo.description",
+              placeholder: "app.api.emails.emailService.send.replyTo.placeholder",
               columns: 12,
               helpText: "app.api.emails.emailService.send.replyTo.description",
             },
@@ -187,8 +173,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.emails.emailService.send.campaignSettings.title",
-          description:
-            "app.api.emails.emailService.send.campaignSettings.description",
+          description: "app.api.emails.emailService.send.campaignSettings.description",
           layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { request: "data" },
@@ -198,10 +183,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.emails.emailService.send.campaignType.label",
-              description:
-                "app.api.emails.emailService.send.campaignType.description",
-              placeholder:
-                "app.api.emails.emailService.send.campaignType.placeholder",
+              description: "app.api.emails.emailService.send.campaignType.description",
+              placeholder: "app.api.emails.emailService.send.campaignType.placeholder",
               options: CampaignTypeOptions,
               columns: 12,
             },
@@ -213,13 +196,10 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.URL,
               label: "app.api.emails.emailService.send.unsubscribeUrl.label",
-              description:
-                "app.api.emails.emailService.send.unsubscribeUrl.description",
-              placeholder:
-                "app.api.emails.emailService.send.unsubscribeUrl.placeholder",
+              description: "app.api.emails.emailService.send.unsubscribeUrl.description",
+              placeholder: "app.api.emails.emailService.send.unsubscribeUrl.placeholder",
               columns: 12,
-              helpText:
-                "app.api.emails.emailService.send.unsubscribeUrl.description",
+              helpText: "app.api.emails.emailService.send.unsubscribeUrl.description",
             },
             z.string().url().optional(),
           ),
@@ -228,12 +208,9 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.emails.emailService.send.emailJourneyVariant.label",
-              description:
-                "app.api.emails.emailService.send.emailJourneyVariant.description",
-              placeholder:
-                "app.api.emails.emailService.send.emailJourneyVariant.placeholder",
+              label: "app.api.emails.emailService.send.emailJourneyVariant.label",
+              description: "app.api.emails.emailService.send.emailJourneyVariant.description",
+              placeholder: "app.api.emails.emailService.send.emailJourneyVariant.placeholder",
               columns: 12,
             },
             z.enum(EmailJourneyVariantDB).optional().nullable(),
@@ -243,12 +220,9 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.emails.emailService.send.emailCampaignStage.label",
-              description:
-                "app.api.emails.emailService.send.emailCampaignStage.description",
-              placeholder:
-                "app.api.emails.emailService.send.emailCampaignStage.placeholder",
+              label: "app.api.emails.emailService.send.emailCampaignStage.label",
+              description: "app.api.emails.emailService.send.emailCampaignStage.description",
+              placeholder: "app.api.emails.emailService.send.emailCampaignStage.placeholder",
               columns: 12,
             },
             z.enum(EmailCampaignStageDB).optional().nullable(),
@@ -259,10 +233,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.emails.emailService.send.leadId.label",
-              description:
-                "app.api.emails.emailService.send.leadId.description",
-              placeholder:
-                "app.api.emails.emailService.send.leadId.placeholder",
+              description: "app.api.emails.emailService.send.leadId.description",
+              placeholder: "app.api.emails.emailService.send.leadId.placeholder",
               columns: 12,
             },
             z.string().optional(),
@@ -273,10 +245,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.emails.emailService.send.campaignId.label",
-              description:
-                "app.api.emails.emailService.send.campaignId.description",
-              placeholder:
-                "app.api.emails.emailService.send.campaignId.placeholder",
+              description: "app.api.emails.emailService.send.campaignId.description",
+              placeholder: "app.api.emails.emailService.send.campaignId.placeholder",
               columns: 12,
             },
             z.string().optional(),
@@ -289,8 +259,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.emails.emailService.send.advancedOptions.title",
-          description:
-            "app.api.emails.emailService.send.advancedOptions.description",
+          description: "app.api.emails.emailService.send.advancedOptions.description",
           layoutType: LayoutType.STACKED,
         },
         { request: "data" },
@@ -299,13 +268,10 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label:
-                "app.api.emails.emailService.send.skipRateLimitCheck.label",
-              description:
-                "app.api.emails.emailService.send.skipRateLimitCheck.description",
+              label: "app.api.emails.emailService.send.skipRateLimitCheck.label",
+              description: "app.api.emails.emailService.send.skipRateLimitCheck.description",
               columns: 12,
-              helpText:
-                "app.api.emails.emailService.send.skipRateLimitCheck.description",
+              helpText: "app.api.emails.emailService.send.skipRateLimitCheck.description",
             },
             z.boolean().optional(),
           ),
@@ -317,8 +283,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.emails.emailService.send.response.result.title",
-          description:
-            "app.api.emails.emailService.send.response.result.description",
+          description: "app.api.emails.emailService.send.response.result.description",
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -333,40 +298,35 @@ const { POST } = createEndpoint({
           messageId: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.emailService.send.response.result.messageId.label",
+              content: "app.api.emails.emailService.send.response.result.messageId.label",
             },
             z.string(),
           ),
           accountId: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.emailService.send.response.result.accountId.label",
+              content: "app.api.emails.emailService.send.response.result.accountId.label",
             },
             z.string(),
           ),
           accountName: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.emailService.send.response.result.accountName.label",
+              content: "app.api.emails.emailService.send.response.result.accountName.label",
             },
             z.string(),
           ),
           response: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.emailService.send.response.result.response.label",
+              content: "app.api.emails.emailService.send.response.result.response.label",
             },
             z.string(),
           ),
           sentAt: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.emailService.send.response.result.sentAt",
+              content: "app.api.emails.emailService.send.response.result.sentAt",
             },
             z.string(),
           ),
@@ -376,10 +336,8 @@ const { POST } = createEndpoint({
       deliveryStatus: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.emails.emailService.send.response.deliveryStatus.title",
-          description:
-            "app.api.emails.emailService.send.response.deliveryStatus.description",
+          title: "app.api.emails.emailService.send.response.deliveryStatus.title",
+          description: "app.api.emails.emailService.send.response.deliveryStatus.description",
           layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { response: true },
@@ -387,8 +345,7 @@ const { POST } = createEndpoint({
           accepted: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.emailService.send.response.accepted.title",
+              content: "app.api.emails.emailService.send.response.accepted.title",
             },
             z.array(z.string()),
           ),
@@ -396,8 +353,7 @@ const { POST } = createEndpoint({
           rejected: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.emailService.send.response.rejected.title",
+              content: "app.api.emails.emailService.send.response.rejected.title",
             },
             z.array(z.string()),
           ),
@@ -410,28 +366,23 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.emails.emailService.send.errors.validation.title",
-      description:
-        "app.api.emails.emailService.send.errors.validation.description",
+      description: "app.api.emails.emailService.send.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.emails.emailService.send.errors.unauthorized.title",
-      description:
-        "app.api.emails.emailService.send.errors.unauthorized.description",
+      description: "app.api.emails.emailService.send.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.emails.emailService.send.errors.forbidden.title",
-      description:
-        "app.api.emails.emailService.send.errors.forbidden.description",
+      description: "app.api.emails.emailService.send.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.emails.emailService.send.errors.notFound.title",
-      description:
-        "app.api.emails.emailService.send.errors.notFound.description",
+      description: "app.api.emails.emailService.send.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.emails.emailService.send.errors.conflict.title",
-      description:
-        "app.api.emails.emailService.send.errors.conflict.description",
+      description: "app.api.emails.emailService.send.errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.emails.emailService.send.errors.server.title",
@@ -439,18 +390,15 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.emails.emailService.send.errors.network.title",
-      description:
-        "app.api.emails.emailService.send.errors.network.description",
+      description: "app.api.emails.emailService.send.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.emails.emailService.send.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.emailService.send.errors.unsavedChanges.description",
+      description: "app.api.emails.emailService.send.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.emailService.send.errors.unknown.title",
-      description:
-        "app.api.emails.emailService.send.errors.unknown.description",
+      description: "app.api.emails.emailService.send.errors.unknown.description",
     },
   },
 
@@ -575,8 +523,7 @@ const { POST } = createEndpoint({
 export type EmailServiceSendPostRequestInput = typeof POST.types.RequestInput;
 export type EmailServiceSendPostRequestOutput = typeof POST.types.RequestOutput;
 export type EmailServiceSendPostResponseInput = typeof POST.types.ResponseInput;
-export type EmailServiceSendPostResponseOutput =
-  typeof POST.types.ResponseOutput;
+export type EmailServiceSendPostResponseOutput = typeof POST.types.ResponseOutput;
 
 // Export repository types for import standardization
 // Repository types for standardized import patterns

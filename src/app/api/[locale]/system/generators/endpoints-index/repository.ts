@@ -8,11 +8,7 @@ import "server-only";
 import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -58,9 +54,7 @@ interface EndpointsIndexGeneratorRepository {
 /**
  * Endpoints Index Generator Repository Implementation
  */
-class EndpointsIndexGeneratorRepositoryImpl
-  implements EndpointsIndexGeneratorRepository
-{
+class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRepository {
   async generateEndpointsIndex(
     data: EndpointsRequestType,
     logger: EndpointLogger,
@@ -123,9 +117,7 @@ class EndpointsIndexGeneratorRepositoryImpl
   /**
    * Extract HTTP methods from definition file (async)
    */
-  private async extractMethodsFromDefinition(
-    defFile: string,
-  ): Promise<string[]> {
+  private async extractMethodsFromDefinition(defFile: string): Promise<string[]> {
     try {
       const definition = (await import(defFile)) as {
         default?: ApiSection;
@@ -138,9 +130,7 @@ class EndpointsIndexGeneratorRepositoryImpl
 
       // Get all HTTP methods from the definition
       const methods = Object.keys(defaultExport).filter((key) =>
-        ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(
-          key,
-        ),
+        ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(key),
       );
       return methods;
     } catch {
@@ -151,9 +141,7 @@ class EndpointsIndexGeneratorRepositoryImpl
   /**
    * Extract aliases from definition file (async)
    */
-  private async extractAliasesFromDefinition(
-    defFile: string,
-  ): Promise<string[]> {
+  private async extractAliasesFromDefinition(defFile: string): Promise<string[]> {
     try {
       const definition = (await import(defFile)) as {
         default?: Record<string, { aliases?: string[] }>;
@@ -184,8 +172,7 @@ class EndpointsIndexGeneratorRepositoryImpl
     // eslint-disable-next-line i18next/no-literal-string
     const pathArrayElements = pathSegments.map((p) => `"${p}"`);
     const pathArrayLiteral = pathArrayElements.join(", ");
-    const shouldSplitArray =
-      pathArrayElements.length > 7 || pathArrayLiteral.length > 70;
+    const shouldSplitArray = pathArrayElements.length > 7 || pathArrayLiteral.length > 70;
 
     if (shouldSplitArray) {
       // eslint-disable-next-line i18next/no-literal-string
@@ -200,10 +187,7 @@ class EndpointsIndexGeneratorRepositoryImpl
    * Each import includes method in the name (e.g., endpointDefinition_POST_0)
    * No aliases generated
    */
-  private async generateContent(
-    definitionFiles: string[],
-    outputFile: string,
-  ): Promise<string> {
+  private async generateContent(definitionFiles: string[], outputFile: string): Promise<string> {
     const imports: string[] = [];
     const setNestedPathCalls: string[] = [];
     let importCounter = 0;
@@ -292,5 +276,4 @@ export function setupEndpoints(): Record<string, ApiSection> {
   }
 }
 
-export const endpointsIndexGeneratorRepository =
-  new EndpointsIndexGeneratorRepositoryImpl();
+export const endpointsIndexGeneratorRepository = new EndpointsIndexGeneratorRepositoryImpl();

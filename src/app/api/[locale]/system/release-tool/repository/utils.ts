@@ -4,12 +4,7 @@
  */
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-import type {
-  PackageJson,
-  ParsedVersion,
-  ReleaseConfig,
-  RetryConfig,
-} from "../definition";
+import type { PackageJson, ParsedVersion, ReleaseConfig, RetryConfig } from "../definition";
 import { MESSAGES, RETRY_DEFAULTS } from "./constants";
 
 // ============================================================================
@@ -54,9 +49,7 @@ interface ExecSyncError {
  * Check if a parsed JSON value is a valid PackageJson
  * Returns the value typed as PackageJson if valid, otherwise undefined
  */
-export function parsePackageJson(
-  value: JsonValue | undefined,
-): PackageJson | undefined {
+export function parsePackageJson(value: JsonValue | undefined): PackageJson | undefined {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return undefined;
   }
@@ -70,8 +63,7 @@ export function parsePackageJson(
       dependencies: obj.dependencies as PackageJson["dependencies"],
       devDependencies: obj.devDependencies as PackageJson["devDependencies"],
       peerDependencies: obj.peerDependencies as PackageJson["peerDependencies"],
-      optionalDependencies:
-        obj.optionalDependencies as PackageJson["optionalDependencies"],
+      optionalDependencies: obj.optionalDependencies as PackageJson["optionalDependencies"],
       updateIgnoreDependencies:
         obj.updateIgnoreDependencies as PackageJson["updateIgnoreDependencies"],
     };
@@ -116,9 +108,7 @@ export function isReleaseConfigModule(
  * Convert catch error to typed error
  * Accepts any value from catch block and converts to CatchError
  */
-export function toCatchError(
-  err: Error | ExecSyncError | string | null | undefined,
-): CatchError {
+export function toCatchError(err: Error | ExecSyncError | string | null | undefined): CatchError {
   if (err instanceof Error) {
     return err;
   }
@@ -134,9 +124,7 @@ export function toCatchError(
 /**
  * Type guard for errors with stdout
  */
-export function hasStdout(
-  error: CatchError,
-): error is CatchError & { stdout: string | Buffer } {
+export function hasStdout(error: CatchError): error is CatchError & { stdout: string | Buffer } {
   if (typeof error !== "object" || error === null) {
     return false;
   }
@@ -150,9 +138,7 @@ export function hasStdout(
 /**
  * Type guard for errors with stderr
  */
-export function hasStderr(
-  error: CatchError,
-): error is CatchError & { stderr: string | Buffer } {
+export function hasStderr(error: CatchError): error is CatchError & { stderr: string | Buffer } {
   if (typeof error !== "object" || error === null) {
     return false;
   }
@@ -166,9 +152,7 @@ export function hasStderr(
 /**
  * Type guard for errors with exit code
  */
-export function hasExitCode(
-  error: CatchError,
-): error is CatchError & { status: number } {
+export function hasExitCode(error: CatchError): error is CatchError & { status: number } {
   if (typeof error !== "object" || error === null) {
     return false;
   }
@@ -178,9 +162,7 @@ export function hasExitCode(
 /**
  * Check if a value is a non-empty string
  */
-export function isNonEmptyString(
-  value: string | undefined | null,
-): value is string {
+export function isNonEmptyString(value: string | undefined | null): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
@@ -199,9 +181,7 @@ export function isValidSemver(value: string): boolean {
 /**
  * Result type for retry operations
  */
-export type RetryResult<T> =
-  | { success: true; data: T }
-  | { success: false; message: string };
+export type RetryResult<T> = { success: true; data: T } | { success: false; message: string };
 
 /**
  * Handler for retrying failed operations with exponential backoff
@@ -215,8 +195,7 @@ export class RetryHandler {
   constructor(config?: RetryConfig) {
     this.maxAttempts = config?.maxAttempts ?? RETRY_DEFAULTS.MAX_ATTEMPTS;
     this.delayMs = config?.delayMs ?? RETRY_DEFAULTS.INITIAL_DELAY;
-    this.backoffMultiplier =
-      config?.backoffMultiplier ?? RETRY_DEFAULTS.BACKOFF_MULTIPLIER;
+    this.backoffMultiplier = config?.backoffMultiplier ?? RETRY_DEFAULTS.BACKOFF_MULTIPLIER;
     this.maxDelayMs = config?.maxDelayMs ?? RETRY_DEFAULTS.MAX_DELAY;
   }
 
@@ -260,9 +239,7 @@ export class RetryHandler {
 
     return {
       success: false,
-      message:
-        lastError?.message ??
-        `${operationName} failed after ${this.maxAttempts} attempts`,
+      message: lastError?.message ?? `${operationName} failed after ${this.maxAttempts} attempts`,
     };
   }
 
@@ -300,18 +277,14 @@ export function formatDuration(ms: number): string {
   const remainingMs = ms % 1000;
 
   if (seconds < 60) {
-    return remainingMs > 0
-      ? `${seconds}.${Math.floor(remainingMs / 100)}s`
-      : `${seconds}s`;
+    return remainingMs > 0 ? `${seconds}.${Math.floor(remainingMs / 100)}s` : `${seconds}s`;
   }
 
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
 
   if (minutes < 60) {
-    return remainingSeconds > 0
-      ? `${minutes}m ${remainingSeconds}s`
-      : `${minutes}m`;
+    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
   }
 
   const hours = Math.floor(minutes / 60);
@@ -374,11 +347,7 @@ export function toKebabCase(str: string): string {
 /**
  * Pluralize a word based on count
  */
-export function pluralize(
-  count: number,
-  singular: string,
-  plural?: string,
-): string {
+export function pluralize(count: number, singular: string, plural?: string): string {
   return count === 1 ? singular : (plural ?? `${singular}s`);
 }
 
@@ -390,8 +359,7 @@ export function pluralize(
  * Parse a semantic version string into components
  */
 export function parseVersion(version: string): ParsedVersion {
-  const regex =
-    /^(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z0-9.-]+))?(?:\+([a-zA-Z0-9.-]+))?$/;
+  const regex = /^(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z0-9.-]+))?(?:\+([a-zA-Z0-9.-]+))?$/;
   const match = version.match(regex);
 
   if (!match) {
@@ -556,9 +524,7 @@ export function omit<T extends Record<string, JsonValue>, K extends keyof T>(
 /**
  * Result type for environment variable retrieval
  */
-export type EnvResult =
-  | { success: true; value: string }
-  | { success: false; message: string };
+export type EnvResult = { success: true; value: string } | { success: false; message: string };
 
 /**
  * Get an environment variable with a default value
@@ -633,10 +599,5 @@ export function getISODate(): string {
  * Get current timestamp suitable for filenames
  */
 export function getFileTimestamp(): string {
-  return new Date()
-    .toISOString()
-    .replaceAll(/[:.T]/g, "-")
-    .split("-")
-    .slice(0, 6)
-    .join("-");
+  return new Date().toISOString().replaceAll(/[:.T]/g, "-").split("-").slice(0, 6).join("-");
 }

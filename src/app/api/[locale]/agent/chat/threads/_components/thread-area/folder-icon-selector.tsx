@@ -80,11 +80,7 @@ import {
   Utensils,
   Zap,
 } from "next-vibe-ui/ui/icons";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "next-vibe-ui/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
 import type { ComponentType, JSX } from "react";
 import React from "react";
@@ -218,17 +214,12 @@ const ICON_OPTIONS: {
   { id: "si-google", label: "Google", Icon: SiGoogle },
 ];
 
-export function getIconComponent(
-  iconId: string,
-): ComponentType<{ className?: string }> {
+export function getIconComponent(iconId: string): ComponentType<{ className?: string }> {
   const option = ICON_OPTIONS.find((opt) => opt.id === iconId);
   return option?.Icon || Folder;
 }
 
-export function FolderIconSelector({
-  value,
-  onChange,
-}: FolderIconSelectorProps): JSX.Element {
+export function FolderIconSelector({ value, onChange }: FolderIconSelectorProps): JSX.Element {
   const [open, setOpen] = React.useState(false);
   const SelectedIcon = getIconComponent(value);
 
@@ -239,10 +230,7 @@ export function FolderIconSelector({
           <SelectedIcon className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent
-        className="w-80 p-2 max-h-96 overflow-y-auto"
-        align="start"
-      >
+      <PopoverContent className="w-80 p-2 max-h-96 overflow-y-auto" align="start">
         <Div className="grid grid-cols-6 gap-1">
           {ICON_OPTIONS.map((option) => {
             const Icon = option.Icon;

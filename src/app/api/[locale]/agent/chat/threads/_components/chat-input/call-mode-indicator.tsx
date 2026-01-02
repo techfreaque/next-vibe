@@ -20,10 +20,7 @@ interface CallModeIndicatorProps {
   locale: CountryLanguage;
 }
 
-export function CallModeIndicator({
-  show,
-  locale,
-}: CallModeIndicatorProps): JSX.Element | null {
+export function CallModeIndicator({ show, locale }: CallModeIndicatorProps): JSX.Element | null {
   const { t } = simpleT(locale);
 
   if (!show) {
@@ -35,8 +32,7 @@ export function CallModeIndicator({
       <Div className="flex items-center gap-2">
         <Phone className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
         <Span className="text-xs font-medium text-green-700 dark:text-green-300">
-          {t("app.chat.voiceMode.callMode")} -{" "}
-          {t("app.chat.voiceMode.callModeDescription")}
+          {t("app.chat.voiceMode.callMode")} - {t("app.chat.voiceMode.callModeDescription")}
         </Span>
       </Div>
     </Div>

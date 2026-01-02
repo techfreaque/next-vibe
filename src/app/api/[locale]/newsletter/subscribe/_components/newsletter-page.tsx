@@ -3,15 +3,7 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
-import {
-  Check,
-  Mail,
-  Send,
-  TrendingUp,
-  Users,
-  X,
-  Zap,
-} from "next-vibe-ui/ui/icons";
+import { Check, Mail, Send, TrendingUp, Users, X, Zap } from "next-vibe-ui/ui/icons";
 import { Input } from "next-vibe-ui/ui/input";
 import { Link } from "next-vibe-ui/ui/link";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
@@ -30,11 +22,7 @@ interface NewsletterPageProps {
   user: MeGetResponseOutput | undefined;
 }
 
-export function NewsletterPage({
-  locale,
-  prefilledEmail,
-  user,
-}: NewsletterPageProps): JSX.Element {
+export function NewsletterPage({ locale, prefilledEmail, user }: NewsletterPageProps): JSX.Element {
   const { t } = simpleT(locale);
 
   const {
@@ -156,20 +144,12 @@ export function NewsletterPage({
                         : "border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
                       : "bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
                   }`}
-                  variant={
-                    isSubscribed && !showConfirmUnsubscribe
-                      ? "outline"
-                      : "default"
-                  }
+                  variant={isSubscribed && !showConfirmUnsubscribe ? "outline" : "default"}
                   aria-label={
                     isSubscribed
                       ? showConfirmUnsubscribe
-                        ? t(
-                            "app.story.newsletter.subscription.unsubscribe.confirmButton",
-                          )
-                        : t(
-                            "app.story.newsletter.subscription.unsubscribe.title",
-                          )
+                        ? t("app.story.newsletter.subscription.unsubscribe.confirmButton")
+                        : t("app.story.newsletter.subscription.unsubscribe.title")
                       : t("app.story.newsletter.page.cta.subscribeButton")
                   }
                   disabled={isAnyOperationInProgress}
@@ -189,9 +169,7 @@ export function NewsletterPage({
                   )}
                   {isSubscribed
                     ? showConfirmUnsubscribe
-                      ? t(
-                          "app.story.newsletter.subscription.unsubscribe.confirmButton",
-                        )
+                      ? t("app.story.newsletter.subscription.unsubscribe.confirmButton")
                       : t("app.story.newsletter.subscription.unsubscribe.title")
                     : t("app.story.newsletter.page.cta.subscribeButton")}
                 </Button>
@@ -254,12 +232,8 @@ export function NewsletterPage({
                   <Div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 rounded-full mb-4">
                     <IconComponent className="h-8 w-8 text-white" />
                   </Div>
-                  <H3 className="text-xl font-semibold mb-3">
-                    {benefit.title}
-                  </H3>
-                  <P className="text-gray-600 dark:text-gray-400">
-                    {benefit.description}
-                  </P>
+                  <H3 className="text-xl font-semibold mb-3">{benefit.title}</H3>
+                  <P className="text-gray-600 dark:text-gray-400">{benefit.description}</P>
                 </Div>
               );
             })}

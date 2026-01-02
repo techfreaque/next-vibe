@@ -31,9 +31,7 @@ type LoadedModule =
 /**
  * Type guard to check if module has a default export with ReleaseConfig
  */
-function hasDefaultReleaseConfig(
-  module: LoadedModule,
-): module is ModuleWithDefault {
+function hasDefaultReleaseConfig(module: LoadedModule): module is ModuleWithDefault {
   if (!("default" in module)) {
     return false;
   }
@@ -106,10 +104,7 @@ export function discoverReleaseTargets(rootDir: string): ReleaseTarget[] {
 /**
  * Validates that a release target has all required files and configuration
  */
-export function validateReleaseTarget(
-  rootDir: string,
-  target: ReleaseTarget,
-): boolean {
+export function validateReleaseTarget(rootDir: string, target: ReleaseTarget): boolean {
   const fullPath = join(rootDir, target.directory);
 
   // Check directory exists
@@ -196,9 +191,7 @@ export async function findTargetByGitTag(
 /**
  * Lists all available tag prefixes from all targets
  */
-export async function listAvailableTagPrefixes(
-  targets: ReleaseTarget[],
-): Promise<string[]> {
+export async function listAvailableTagPrefixes(targets: ReleaseTarget[]): Promise<string[]> {
   const prefixes: string[] = [];
 
   for (const target of targets) {

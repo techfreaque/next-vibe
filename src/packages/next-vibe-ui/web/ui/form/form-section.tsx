@@ -37,9 +37,7 @@ export function FormFieldGroup({
       {title && (
         <div className="space-y-1">
           <h3 className="text-lg font-semibold">{t(title)}</h3>
-          {description && (
-            <p className="text-sm text-muted-foreground">{t(description)}</p>
-          )}
+          {description && <p className="text-sm text-muted-foreground">{t(description)}</p>}
         </div>
       )}
       <div className="space-y-6">{children}</div>
@@ -83,8 +81,7 @@ export function FormSection({
           {completionStatus && (
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">
-                {completionStatus.completedFields} of{" "}
-                {completionStatus.totalFields} fields
+                {completionStatus.completedFields} of {completionStatus.totalFields} fields
               </span>
               <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
                 <div
@@ -95,9 +92,7 @@ export function FormSection({
             </div>
           )}
         </div>
-        {description && (
-          <p className="text-muted-foreground">{t(description)}</p>
-        )}
+        {description && <p className="text-muted-foreground">{t(description)}</p>}
       </div>
       {children}
     </div>

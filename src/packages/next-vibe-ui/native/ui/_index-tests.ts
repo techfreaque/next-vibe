@@ -272,8 +272,7 @@ export * from "./kbd";
 // keyboard-avoiding-view
 import type * as webKeyboardAvoidingView from "../../web/ui/keyboard-avoiding-view";
 import * as KeyboardAvoidingView from "./keyboard-avoiding-view";
-const testKeyboardAvoidingView: typeof webKeyboardAvoidingView =
-  KeyboardAvoidingView;
+const testKeyboardAvoidingView: typeof webKeyboardAvoidingView = KeyboardAvoidingView;
 void testKeyboardAvoidingView;
 export * from "./keyboard-avoiding-view";
 

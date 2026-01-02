@@ -29,8 +29,7 @@ export const translations: typeof enTranslations = {
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description:
-          "Ein unbekannter Fehler ist beim Datenbank-Ping aufgetreten",
+        description: "Ein unbekannter Fehler ist beim Datenbank-Ping aufgetreten",
       },
       network: {
         title: "Netzwerkfehler",

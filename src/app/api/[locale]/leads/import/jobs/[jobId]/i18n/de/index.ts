@@ -25,8 +25,7 @@ export const translations: typeof enTranslations = {
     },
     maxRetries: {
       label: "Maximale Wiederholungen",
-      description:
-        "Maximale Anzahl von Wiederholungsversuchen für fehlgeschlagene Zeilen",
+      description: "Maximale Anzahl von Wiederholungsversuchen für fehlgeschlagene Zeilen",
       placeholder: "3",
     },
     response: {
@@ -107,13 +106,11 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Authentifizierung erforderlich zum Aktualisieren von Jobs",
+        description: "Authentifizierung erforderlich zum Aktualisieren von Jobs",
       },
       forbidden: {
         title: "Zugriff verweigert",
-        description:
-          "Sie haben keine Berechtigung, diesen Job zu aktualisieren",
+        description: "Sie haben keine Berechtigung, diesen Job zu aktualisieren",
       },
       notFound: {
         title: "Job nicht gefunden",
@@ -201,8 +198,7 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Löschkonflikt",
-        description:
-          "Job, der gerade verarbeitet wird, kann nicht gelöscht werden",
+        description: "Job, der gerade verarbeitet wird, kann nicht gelöscht werden",
       },
     },
     success: {

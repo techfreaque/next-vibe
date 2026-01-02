@@ -60,10 +60,8 @@ export const translations: typeof enTranslations = {
     stripeCustomerFailed: "Nie udało się utworzyć klienta Stripe",
     checkoutFailed: "Nie udało się utworzyć sesji płatności",
     mergeFailed: "Nie udało się połączyć kredytów leada",
-    mergeLeadWalletsFailed:
-      "Nie udało się połączyć portfeli leadów z kontem użytkownika",
-    cleanupOrphanedFailed:
-      "Nie udało się wyczyścić osieroconych portfeli leadów",
+    mergeLeadWalletsFailed: "Nie udało się połączyć portfeli leadów z kontem użytkownika",
+    cleanupOrphanedFailed: "Nie udało się wyczyścić osieroconych portfeli leadów",
     monthlyResetFailed: "Nie udało się odnowić miesięcznych kredytów",
     noLeadsToMerge: "Brak leadów do połączenia",
     oldestLeadNotFound: "Nie znaleziono najstarszego leada w klastrze",
@@ -76,8 +74,7 @@ export const translations: typeof enTranslations = {
     walletCreationFailed: "Nie udało się utworzyć portfela",
     addEarnedCreditsFailed: "Nie udało się dodać zarobionych kredytów",
     getEarnedBalanceFailed: "Nie udało się pobrać salda zarobionych kredytów",
-    insufficientEarnedCredits:
-      "Niewystarczające zarobione kredyty dla tej operacji",
+    insufficientEarnedCredits: "Niewystarczające zarobione kredyty dla tej operacji",
     deductEarnedCreditsFailed: "Nie udało się odjąć zarobionych kredytów",
     getReferralTransactionsFailed: "Nie udało się pobrać transakcji poleceń",
   },
@@ -141,8 +138,7 @@ export const translations: typeof enTranslations = {
       },
       noActiveSubscription: {
         title: "Wymagane aktywne subskrypcja",
-        description:
-          "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
+        description: "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
@@ -154,8 +150,7 @@ export const translations: typeof enTranslations = {
       },
       no_active_subscription: {
         title: "Wymagane aktywne subskrypcja",
-        description:
-          "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
+        description: "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
       },
     },
   },
@@ -230,8 +225,7 @@ export const translations: typeof enTranslations = {
         },
         unauthorized: {
           title: "Nieautoryzowany",
-          description:
-            "Musisz być zalogowany, aby zobaczyć swoją historię kredytów",
+          description: "Musisz być zalogowany, aby zobaczyć swoją historię kredytów",
         },
         forbidden: {
           title: "Zabronione",

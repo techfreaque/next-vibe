@@ -16,9 +16,7 @@ interface LeadsListClientProps {
   locale: CountryLanguage;
 }
 
-export function LeadsListClient({
-  locale,
-}: LeadsListClientProps): React.JSX.Element {
+export function LeadsListClient({ locale }: LeadsListClientProps): React.JSX.Element {
   return (
     <EndpointsPage
       endpoint={leadsListEndpoints}

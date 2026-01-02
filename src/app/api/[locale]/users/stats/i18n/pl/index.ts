@@ -373,8 +373,7 @@ export const translations: typeof enTranslations = {
     },
     conflict: {
       title: "Błąd konfliktu",
-      description:
-        "Nie można wygenerować statystyk z powodu istniejących konfliktów",
+      description: "Nie można wygenerować statystyk z powodu istniejących konfliktów",
     },
     network: {
       title: "Błąd sieci",

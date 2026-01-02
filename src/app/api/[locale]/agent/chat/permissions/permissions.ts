@@ -29,10 +29,7 @@ import "server-only";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import {
-  type UserPermissionRoleValue,
-  UserRole,
-} from "@/app/api/[locale]/user/user-roles/enum";
+import { type UserPermissionRoleValue, UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { UserRolesRepository } from "@/app/api/[locale]/user/user-roles/repository";
 
 import { type DefaultFolderConfig, getDefaultFolderConfig } from "../config";
@@ -45,25 +42,15 @@ import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 /**
  * Check if user is an admin
  */
-export async function isAdmin(
-  userId: string,
-  logger: EndpointLogger,
-): Promise<boolean> {
-  const hasAdminRole = await UserRolesRepository.hasRole(
-    userId,
-    UserRole.ADMIN,
-    logger,
-  );
+export async function isAdmin(userId: string, logger: EndpointLogger): Promise<boolean> {
+  const hasAdminRole = await UserRolesRepository.hasRole(userId, UserRole.ADMIN, logger);
   return hasAdminRole.success && hasAdminRole.data;
 }
 
 /**
  * Check if user is the owner of a resource
  */
-export function isOwner(
-  userId: string,
-  resourceUserId: string | null,
-): boolean {
+export function isOwner(userId: string, resourceUserId: string | null): boolean {
   if (!resourceUserId) {
     return false;
   }
@@ -91,12 +78,7 @@ function getFolderPermissionValue(
 
 function getThreadPermissionValue(
   thread: ChatThread,
-  permissionType:
-    | "rolesView"
-    | "rolesEdit"
-    | "rolesPost"
-    | "rolesModerate"
-    | "rolesAdmin",
+  permissionType: "rolesView" | "rolesEdit" | "rolesPost" | "rolesModerate" | "rolesAdmin",
 ): (typeof UserPermissionRoleValue)[] | null {
   return thread[permissionType] ?? null;
 }
@@ -119,10 +101,7 @@ function getPermissionValue(
     return getFolderPermissionValue(resource, permissionType);
   }
 
-  if (
-    permissionType === "rolesManage" ||
-    permissionType === "rolesCreateThread"
-  ) {
+  if (permissionType === "rolesManage" || permissionType === "rolesCreateThread") {
     return null;
   }
   return getThreadPermissionValue(resource, permissionType);
@@ -320,16 +299,8 @@ export async function canCreateFolder(
     // Only users with hide permission can create subfolders in PUBLIC folders
     // This replaces the old moderator check
     const allFolders = { [parentFolder.id]: parentFolder };
-    const effectiveHideRoles = getEffectiveRoles(
-      parentFolder,
-      "rolesModerate",
-      allFolders,
-    );
-    const hasHidePermission = await hasRolePermission(
-      user,
-      effectiveHideRoles,
-      logger,
-    );
+    const effectiveHideRoles = getEffectiveRoles(parentFolder, "rolesModerate", allFolders);
+    const hasHidePermission = await hasRolePermission(user, effectiveHideRoles, logger);
     logger.debug("PUBLIC subfolder creation permission check", {
       userId,
       parentFolderId: parentId,
@@ -411,11 +382,7 @@ export async function canCreateThreadInFolder(
   }
 
   // Get effective rolesCreateThread (with inheritance)
-  const effectiveRoles = getEffectiveRoles(
-    folder,
-    "rolesCreateThread",
-    allFolders,
-  );
+  const effectiveRoles = getEffectiveRoles(folder, "rolesCreateThread", allFolders);
 
   // Check if user has required role
   return await hasRolePermission(user, effectiveRoles, logger);

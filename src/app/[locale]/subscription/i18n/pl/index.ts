@@ -13,8 +13,7 @@ export const translations: typeof enTranslations = {
     endedOn: "Zakończono",
     cancellation: {
       title: "Subskrypcja zaplanowana do anulowania",
-      description:
-        "Twoja subskrypcja zakończy się {{date}}. Zachowasz dostęp do tego czasu.",
+      description: "Twoja subskrypcja zakończy się {{date}}. Zachowasz dostęp do tego czasu.",
     },
     canceled: {
       title: "Subskrypcja anulowana",
@@ -32,15 +31,13 @@ export const translations: typeof enTranslations = {
     },
     balance: {
       title: "Saldo kredytów",
-      description:
-        "Twoje dostępne kredyty na rozmowy z AI z {{modelCount}} modelami",
+      description: "Twoje dostępne kredyty na rozmowy z AI z {{modelCount}} modelami",
       credit: "{{count}} kredyt",
       credits: "{{count}} kredytów",
       nextExpiration: "Następne wygaśnięcie",
       expiring: {
         title: "Kredyty subskrypcyjne",
-        description:
-          "Z miesięcznej subskrypcji ({{subCredits}} kredytów/miesiąc)",
+        description: "Z miesięcznej subskrypcji ({{subCredits}} kredytów/miesiąc)",
       },
       permanent: {
         title: "Kredyty stałe",
@@ -106,8 +103,7 @@ export const translations: typeof enTranslations = {
     buy: {
       signInRequired: {
         title: "Wymagane logowanie",
-        description:
-          "Zaloguj się lub utwórz konto, aby kupić kredyty i subskrypcje.",
+        description: "Zaloguj się lub utwórz konto, aby kupić kredyty i subskrypcje.",
       },
       provider: {
         stripe: {
@@ -128,8 +124,7 @@ export const translations: typeof enTranslations = {
           "{{subPrice}}/miesiąc - {{subCredits}} kredytów miesięcznie ze wszystkimi {{modelCount}} modelami AI",
         perMonth: "/miesiąc",
         perYear: "/rok",
-        yearlyEquivalent:
-          "Tylko {{monthlyPrice}}/miesiąc przy rozliczeniu rocznym",
+        yearlyEquivalent: "Tylko {{monthlyPrice}}/miesiąc przy rozliczeniu rocznym",
         features: {
           credits: "{{count}} kredytów miesięcznie",
           expiry: "Dostęp do wszystkich {{modelCount}} modeli AI",
@@ -150,8 +145,7 @@ export const translations: typeof enTranslations = {
           credits: "{{count}} kredytów na pakiet",
           permanent: "Nigdy nie wygasa",
           expiry: "Nigdy nie wygasa",
-          bestFor:
-            "Dla zaawansowanych użytkowników potrzebujących dodatkowych kredytów",
+          bestFor: "Dla zaawansowanych użytkowników potrzebujących dodatkowych kredytów",
         },
         button: {
           submit: "Kup pakiet kredytów",

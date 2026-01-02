@@ -2,11 +2,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 
 import { chatFolders } from "@/app/api/[locale]/agent/chat/db";
 import { canManageFolderPermissions } from "@/app/api/[locale]/agent/chat/permissions/permissions";
@@ -33,8 +29,7 @@ export async function getFolderPermissions(
 ): Promise<ResponseType<FolderPermissionsGetResponseOutput>> {
   if (user.isPublic) {
     return fail({
-      message:
-        "app.api.agent.chat.folders.id.permissions.get.errors.unauthorized.title",
+      message: "app.api.agent.chat.folders.id.permissions.get.errors.unauthorized.title",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
@@ -48,8 +43,7 @@ export async function getFolderPermissions(
 
     if (!folder) {
       return fail({
-        message:
-          "app.api.agent.chat.folders.id.permissions.get.errors.notFound.title",
+        message: "app.api.agent.chat.folders.id.permissions.get.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -58,8 +52,7 @@ export async function getFolderPermissions(
     const canManage = await canManageFolderPermissions(user, folder, logger);
     if (!canManage) {
       return fail({
-        message:
-          "app.api.agent.chat.folders.id.permissions.get.errors.forbidden.title",
+        message: "app.api.agent.chat.folders.id.permissions.get.errors.forbidden.title",
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -79,8 +72,7 @@ export async function getFolderPermissions(
     return success(responseData);
   } catch {
     return fail({
-      message:
-        "app.api.agent.chat.folders.id.permissions.get.errors.server.title",
+      message: "app.api.agent.chat.folders.id.permissions.get.errors.server.title",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -98,22 +90,14 @@ export async function updateFolderPermissions(
 ): Promise<ResponseType<FolderPermissionsUpdateResponseOutput>> {
   if (user.isPublic) {
     return fail({
-      message:
-        "app.api.agent.chat.folders.id.permissions.patch.errors.unauthorized.title",
+      message: "app.api.agent.chat.folders.id.permissions.patch.errors.unauthorized.title",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
 
   try {
-    const {
-      id,
-      rolesView,
-      rolesManage,
-      rolesCreateThread,
-      rolesPost,
-      rolesModerate,
-      rolesAdmin,
-    } = data;
+    const { id, rolesView, rolesManage, rolesCreateThread, rolesPost, rolesModerate, rolesAdmin } =
+      data;
 
     // Verify folder exists
     const [existingFolder] = await db
@@ -124,22 +108,16 @@ export async function updateFolderPermissions(
 
     if (!existingFolder) {
       return fail({
-        message:
-          "app.api.agent.chat.folders.id.permissions.patch.errors.notFound.title",
+        message: "app.api.agent.chat.folders.id.permissions.patch.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
     // Check if user can manage this folder's permissions
-    const canManage = await canManageFolderPermissions(
-      user,
-      existingFolder,
-      logger,
-    );
+    const canManage = await canManageFolderPermissions(user, existingFolder, logger);
     if (!canManage) {
       return fail({
-        message:
-          "app.api.agent.chat.folders.id.permissions.patch.errors.forbidden.title",
+        message: "app.api.agent.chat.folders.id.permissions.patch.errors.forbidden.title",
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -199,8 +177,7 @@ export async function updateFolderPermissions(
       response: {
         rolesView: rolesView ?? existingFolder.rolesView,
         rolesManage: rolesManage ?? existingFolder.rolesManage,
-        rolesCreateThread:
-          rolesCreateThread ?? existingFolder.rolesCreateThread,
+        rolesCreateThread: rolesCreateThread ?? existingFolder.rolesCreateThread,
         rolesPost: rolesPost ?? existingFolder.rolesPost,
         rolesModerate: rolesModerate ?? existingFolder.rolesModerate,
         rolesAdmin: rolesAdmin ?? existingFolder.rolesAdmin,
@@ -208,8 +185,7 @@ export async function updateFolderPermissions(
     });
   } catch {
     return fail({
-      message:
-        "app.api.agent.chat.folders.id.permissions.patch.errors.server.title",
+      message: "app.api.agent.chat.folders.id.permissions.patch.errors.server.title",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

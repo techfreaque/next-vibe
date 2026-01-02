@@ -2,10 +2,7 @@
  * Hooks for password reset confirmation functionality
  */
 
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
+import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useMemo, useState } from "react";
 
@@ -91,9 +88,7 @@ export function useResetPasswordConfirm(
 
         toast({
           title: t("app.api.user.public.resetPassword.confirm.success.title"),
-          description: t(
-            "app.api.user.public.resetPassword.confirm.success.password_reset",
-          ),
+          description: t("app.api.user.public.resetPassword.confirm.success.password_reset"),
           variant: "default",
         });
       },
@@ -145,8 +140,7 @@ export function useResetPasswordConfirm(
           message: "app.api.user.public.resetPassword.confirm.success.title",
         },
         message: {
-          message:
-            "app.api.user.public.resetPassword.confirm.success.password_reset",
+          message: "app.api.user.public.resetPassword.confirm.success.password_reset",
         },
       };
     }
@@ -159,8 +153,7 @@ export function useResetPasswordConfirm(
   const tokenIsValid = tokenValidationResponse.success;
   const tokenError = tokenIsValid
     ? ""
-    : (tokenValidationResponse.message as string) ||
-      "app.api.user.auth.reset.errors.token_invalid";
+    : (tokenValidationResponse.message as string) || "app.api.user.auth.reset.errors.token_invalid";
 
   return {
     form: formResult.form,

@@ -9,10 +9,7 @@ import type { ApiHandlerProps } from "@/app/api/[locale]/system/unified-interfac
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import type {
-  UserListRequestOutput,
-  UserListResponseOutput,
-} from "./definition";
+import type { UserListRequestOutput, UserListResponseOutput } from "./definition";
 import definitions from "./definition";
 import { UserListRepository } from "./repository";
 
@@ -27,11 +24,7 @@ export const { GET, tools } = endpointsHandler({
         typeof definitions.GET.allowedRoles
       >,
     ): Promise<ResponseType<UserListResponseOutput>> => {
-      return await UserListRepository.listUsers(
-        props.data,
-        props.user,
-        props.logger,
-      );
+      return await UserListRepository.listUsers(props.data, props.user, props.logger);
     },
   },
 });

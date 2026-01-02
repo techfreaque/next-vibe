@@ -40,11 +40,7 @@ export async function generateMetadata({
   });
 }
 
-export default function UserLayout({
-  children,
-}: {
-  children: ReactNode;
-}): JSX.Element {
+export default function UserLayout({ children }: { children: ReactNode }): JSX.Element {
   return (
     <PageLayout scrollable={true}>
       <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">

@@ -9,8 +9,7 @@ export const translations = {
     description: "Neues Benutzerkonto erstellen",
     form: {
       title: "Benutzer-Erstellungsformular",
-      description:
-        "Füllen Sie die Details aus, um einen neuen Benutzer zu erstellen",
+      description: "Füllen Sie die Details aus, um einen neuen Benutzer zu erstellen",
     },
     email: {
       label: "E-Mail-Adresse",
@@ -174,23 +173,19 @@ export const translations = {
       },
       validation: {
         title: "Validierung fehlgeschlagen",
-        description:
-          "Bitte überprüfen Sie die Formulardaten und versuchen Sie es erneut",
+        description: "Bitte überprüfen Sie die Formulardaten und versuchen Sie es erneut",
       },
       server: {
         title: "Serverfehler",
-        description:
-          "Benutzer konnte aufgrund eines Serverfehlers nicht erstellt werden",
+        description: "Benutzer konnte aufgrund eines Serverfehlers nicht erstellt werden",
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description:
-          "Ein unerwarteter Fehler ist beim Erstellen des Benutzers aufgetreten",
+        description: "Ein unerwarteter Fehler ist beim Erstellen des Benutzers aufgetreten",
       },
       network: {
         title: "Netzwerkfehler",
-        description:
-          "Netzwerkverbindung während der Benutzererstellung fehlgeschlagen",
+        description: "Netzwerkverbindung während der Benutzererstellung fehlgeschlagen",
       },
       forbidden: {
         title: "Zugriff verboten",
@@ -198,8 +193,7 @@ export const translations = {
       },
       notFound: {
         title: "Ressource nicht gefunden",
-        description:
-          "Erforderliche Ressource für Benutzererstellung nicht gefunden",
+        description: "Erforderliche Ressource für Benutzererstellung nicht gefunden",
       },
       conflict: {
         title: "Benutzer existiert bereits",
@@ -207,26 +201,22 @@ export const translations = {
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
-        description:
-          "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
+        description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
       },
       internal: {
         title: "Interner Fehler",
-        description:
-          "Ein interner Fehler ist beim Erstellen des Benutzers aufgetreten",
+        description: "Ein interner Fehler ist beim Erstellen des Benutzers aufgetreten",
       },
     },
     sms: {
       errors: {
         welcome_failed: {
           title: "SMS-Willkommensnachricht fehlgeschlagen",
-          description:
-            "Willkommensnachricht per SMS konnte nicht gesendet werden",
+          description: "Willkommensnachricht per SMS konnte nicht gesendet werden",
         },
         verification_failed: {
           title: "SMS-Verifizierung fehlgeschlagen",
-          description:
-            "Verifizierungsnachricht per SMS konnte nicht gesendet werden",
+          description: "Verifizierungsnachricht per SMS konnte nicht gesendet werden",
         },
       },
     },
@@ -264,8 +254,7 @@ export const translations = {
         newUser: "Neuer Benutzer erstellt",
         preview: "Ein neuer Benutzer {{firstName}} {{lastName}} wurde erstellt",
         subject: "Neues Benutzerkonto erstellt - {{firstName}} {{lastName}}",
-        notification:
-          "Ein neues Benutzerkonto wurde im System erstellt. Hier sind die Details:",
+        notification: "Ein neues Benutzerkonto wurde im System erstellt. Hier sind die Details:",
         userDetails: "Benutzerdetails",
         viewUser: "Benutzerprofil anzeigen",
       },
@@ -301,13 +290,11 @@ export const translations = {
     errors: {
       welcome_failed: {
         title: "SMS-Willkommensnachricht fehlgeschlagen",
-        description:
-          "Willkommensnachricht per SMS konnte nicht gesendet werden",
+        description: "Willkommensnachricht per SMS konnte nicht gesendet werden",
       },
       verification_failed: {
         title: "SMS-Verifizierung fehlgeschlagen",
-        description:
-          "Verifizierungsnachricht per SMS konnte nicht gesendet werden",
+        description: "Verifizierungsnachricht per SMS konnte nicht gesendet werden",
       },
     },
   },

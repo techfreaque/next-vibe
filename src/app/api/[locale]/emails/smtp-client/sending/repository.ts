@@ -7,11 +7,7 @@ import "server-only";
 
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
@@ -27,12 +23,7 @@ import { emails } from "../../messages/db";
 import { EmailStatus, EmailType } from "../../messages/enum";
 import type { SmtpAccount } from "../db";
 import { smtpAccounts } from "../db";
-import {
-  CampaignType,
-  SmtpAccountStatus,
-  SmtpHealthStatus,
-  SmtpSecurityType,
-} from "../enum";
+import { CampaignType, SmtpAccountStatus, SmtpHealthStatus, SmtpSecurityType } from "../enum";
 import type {
   SmtpCapacityRequestOutput,
   SmtpCapacityResponseOutput,
@@ -43,10 +34,7 @@ import type {
   SmtpSendResult,
 } from "./types";
 
-const transportCache = new Map<
-  string,
-  Transporter<SMTPTransport.SentMessageInfo>
->();
+const transportCache = new Map<string, Transporter<SMTPTransport.SentMessageInfo>>();
 
 /**
  * SMTP Sending Repository Implementation
@@ -65,8 +53,7 @@ export class SmtpSendingRepository {
 
       // For lead campaigns, we must enforce strict criteria matching
       // All criteria must be explicitly set on the SMTP account
-      const isLeadCampaign =
-        selectionCriteria?.campaignType === CampaignType.LEAD_CAMPAIGN;
+      const isLeadCampaign = selectionCriteria?.campaignType === CampaignType.LEAD_CAMPAIGN;
 
       // Campaign type is always required and must be explicitly set
       if (selectionCriteria?.campaignType) {
@@ -142,9 +129,7 @@ export class SmtpSendingRepository {
         // For lead campaigns, NO fallback is allowed - strict criteria matching required
         if (isLeadCampaign) {
           // Note: Would use logger here if passed to private method
-          logger.error(
-            "No SMTP accounts match lead campaign criteria - strict matching required",
-          );
+          logger.error("No SMTP accounts match lead campaign criteria - strict matching required");
           return null;
         }
 
@@ -234,8 +219,7 @@ export class SmtpSendingRepository {
         }
 
         // Calculate match percentage
-        const matchPercentage =
-          totalCriteria > 0 ? exactMatchCount / totalCriteria : 1;
+        const matchPercentage = totalCriteria > 0 ? exactMatchCount / totalCriteria : 1;
 
         // If exact match is required, the account must match ALL criteria
         if (account.isExactMatch && matchPercentage < 1) {
@@ -253,9 +237,7 @@ export class SmtpSendingRepository {
       });
 
       // Filter out disqualified accounts (score = 0)
-      const qualifiedAccounts = accountsWithScoring.filter(
-        (item) => item.score > 0,
-      );
+      const qualifiedAccounts = accountsWithScoring.filter((item) => item.score > 0);
 
       if (qualifiedAccounts.length === 0) {
         return null;
@@ -270,14 +252,8 @@ export class SmtpSendingRepository {
       });
 
       // Weighted random selection from top candidates
-      const topCandidates = qualifiedAccounts.slice(
-        0,
-        Math.min(3, qualifiedAccounts.length),
-      );
-      const totalWeight = topCandidates.reduce(
-        (sum, item) => sum + item.score,
-        0,
-      );
+      const topCandidates = qualifiedAccounts.slice(0, Math.min(3, qualifiedAccounts.length));
+      const totalWeight = topCandidates.reduce((sum, item) => sum + item.score, 0);
 
       if (totalWeight === 0) {
         return topCandidates[0].account;
@@ -296,10 +272,7 @@ export class SmtpSendingRepository {
       // Fallback to first candidate
       return topCandidates[0].account;
     } catch (error) {
-      logger.error(
-        "Error getting SMTP account with criteria",
-        parseError(error),
-      );
+      logger.error("Error getting SMTP account with criteria", parseError(error));
       return null;
     }
   }
@@ -307,9 +280,7 @@ export class SmtpSendingRepository {
   /**
    * Get any available SMTP account as fallback
    */
-  private static async getFallbackSmtpAccount(
-    logger: EndpointLogger,
-  ): Promise<SmtpAccount | null> {
+  private static async getFallbackSmtpAccount(logger: EndpointLogger): Promise<SmtpAccount | null> {
     try {
       const fallbackAccounts = await db
         .select()
@@ -383,12 +354,7 @@ export class SmtpSendingRepository {
       });
 
       // Update account health status
-      await this.updateAccountHealth(
-        account.id,
-        false,
-        logger,
-        parseError(error).message,
-      );
+      await this.updateAccountHealth(account.id, false, logger, parseError(error).message);
 
       return await Promise.reject(new Error(parseError(error).message));
     }
@@ -408,25 +374,18 @@ export class SmtpSendingRepository {
       });
 
       // Get the primary account first
-      const primaryAccount = await this.getSmtpAccountWithCriteria(
-        data.selectionCriteria,
-        logger,
-      );
+      const primaryAccount = await this.getSmtpAccountWithCriteria(data.selectionCriteria, logger);
       if (!primaryAccount) {
-        const isLeadCampaign =
-          data.selectionCriteria.campaignType === CampaignType.LEAD_CAMPAIGN;
+        const isLeadCampaign = data.selectionCriteria.campaignType === CampaignType.LEAD_CAMPAIGN;
 
         if (isLeadCampaign) {
           return fail({
-            message:
-              "app.api.emails.smtpClient.sending.errors.no_account.title",
+            message: "app.api.emails.smtpClient.sending.errors.no_account.title",
             errorType: ErrorResponseTypes.NOT_FOUND,
             messageParams: {
               campaignType: data.selectionCriteria.campaignType,
-              emailJourneyVariant:
-                data.selectionCriteria.emailJourneyVariant || "null",
-              emailCampaignStage:
-                data.selectionCriteria.emailCampaignStage || "null",
+              emailJourneyVariant: data.selectionCriteria.emailJourneyVariant || "null",
+              emailCampaignStage: data.selectionCriteria.emailCampaignStage || "null",
               country: data.selectionCriteria.country,
               language: data.selectionCriteria.language,
             },
@@ -453,14 +412,11 @@ export class SmtpSendingRepository {
       }
 
       // If primary failed after retries, try with fallback account
-      logger.debug(
-        "Primary SMTP account failed after retries, trying fallback",
-        {
-          to: data.to,
-          primaryAccountId: primaryAccount.id,
-          primaryError: primaryResult.message,
-        },
-      );
+      logger.debug("Primary SMTP account failed after retries, trying fallback", {
+        to: data.to,
+        primaryAccountId: primaryAccount.id,
+        primaryError: primaryResult.message,
+      });
 
       const fallbackAccount = await this.getFallbackSmtpAccount(logger);
       if (!fallbackAccount || fallbackAccount.id === primaryAccount.id) {
@@ -545,17 +501,14 @@ export class SmtpSendingRepository {
         const isRetryable = this.isRetryableError(result.message);
         if (!isRetryable || attempt === maxRetries) {
           // Note: Would use logger here if passed to private method
-          logger.info(
-            "Email send failed - not retryable or max retries reached",
-            {
-              to: params.to,
-              accountId: account.id,
-              attempt,
-              maxRetries,
-              error: result.message,
-              isRetryable,
-            },
-          );
+          logger.info("Email send failed - not retryable or max retries reached", {
+            to: params.to,
+            accountId: account.id,
+            attempt,
+            maxRetries,
+            error: result.message,
+            isRetryable,
+          });
           break;
         }
 
@@ -614,8 +567,7 @@ export class SmtpSendingRepository {
    * Check if an error is retryable (temporary connection issues)
    */
   private static isRetryableError(errorMessage: string): boolean {
-    const retryablePatterns =
-      /greeting|timeout|connect|refused|unreachable|reset|temporary/i;
+    const retryablePatterns = /greeting|timeout|connect|refused|unreachable|reset|temporary/i;
     return retryablePatterns.test(errorMessage);
   }
 
@@ -682,12 +634,7 @@ export class SmtpSendingRepository {
             ? result.rejected[0]
             : "app.api.emails.smtpClient.sending.errors.rejected.defaultReason";
 
-        await this.updateAccountHealth(
-          account.id,
-          false,
-          logger,
-          rejectedReason,
-        );
+        await this.updateAccountHealth(account.id, false, logger, rejectedReason);
 
         return fail({
           message: "app.api.emails.smtpClient.sending.errors.rejected.title",
@@ -709,8 +656,7 @@ export class SmtpSendingRepository {
         );
 
         return fail({
-          message:
-            "app.api.emails.smtpClient.sending.errors.no_recipients.title",
+          message: "app.api.emails.smtpClient.sending.errors.no_recipients.title",
           errorType: ErrorResponseTypes.EMAIL_ERROR,
           messageParams: {
             recipient: params.to,
@@ -774,8 +720,7 @@ export class SmtpSendingRepository {
 
       // Mark account as unhealthy on connection errors
       const errorMessage = parseError(error).message;
-      const isConnectionError =
-        /greeting|timeout|connect|refused|unreachable/i.test(errorMessage);
+      const isConnectionError = /greeting|timeout|connect|refused|unreachable/i.test(errorMessage);
       if (isConnectionError) {
         await this.updateAccountHealth(account.id, false, logger, errorMessage);
       }
@@ -845,13 +790,9 @@ export class SmtpSendingRepository {
           ),
       ]);
 
-      const emailsSentThisHour =
-        (emailsCount[0]?.count || 0) + (campaignsCount[0]?.count || 0);
+      const emailsSentThisHour = (emailsCount[0]?.count || 0) + (campaignsCount[0]?.count || 0);
 
-      const remainingCapacity = Math.max(
-        0,
-        account.rateLimitPerHour - emailsSentThisHour,
-      );
+      const remainingCapacity = Math.max(0, account.rateLimitPerHour - emailsSentThisHour);
       const canSend = remainingCapacity > 0;
 
       if (!canSend) {
@@ -1032,8 +973,7 @@ export class SmtpSendingRepository {
       // Check user authorization
       if (user.isPublic) {
         return fail({
-          message:
-            "app.api.emails.smtpClient.sending.errors.unauthorized.title",
+          message: "app.api.emails.smtpClient.sending.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -1105,11 +1045,7 @@ export class SmtpSendingRepository {
           resolve();
         });
       } catch (error) {
-        logger.error(
-          "Error closing transport",
-          { accountId },
-          parseError(error),
-        );
+        logger.error("Error closing transport", { accountId }, parseError(error));
       }
     }
     transportCache.clear();

@@ -73,9 +73,7 @@ export class NpmPackageGenerator implements INpmPackageGenerator {
     dryRun?: boolean,
   ): Promise<string> {
     output.push(
-      outputFormatter.formatSection(
-        t("app.api.system.builder.messages.creatingPackageJson"),
-      ),
+      outputFormatter.formatSection(t("app.api.system.builder.messages.creatingPackageJson")),
     );
     logger.info("Generating npm package.json", { name: config.name });
 
@@ -91,8 +89,7 @@ export class NpmPackageGenerator implements INpmPackageGenerator {
       description: config.description ?? "",
       type: "module",
       ...(config.license && { license: config.license }),
-      ...(config.keywords &&
-        config.keywords.length > 0 && { keywords: config.keywords }),
+      ...(config.keywords && config.keywords.length > 0 && { keywords: config.keywords }),
       ...(config.repository && { repository: config.repository }),
       ...(config.bin && { bin: config.bin }),
       ...(config.main && { main: config.main }),

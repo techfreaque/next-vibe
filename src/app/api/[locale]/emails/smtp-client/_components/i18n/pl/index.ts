@@ -33,17 +33,13 @@ export const translations: typeof enTranslations = {
       basicInfo: "Podstawowe informacje",
       basicInfoDescription: "Skonfiguruj podstawowe szczegóły konta i cel",
       connectionSettings: "Ustawienia połączenia",
-      connectionSettingsDescription:
-        "Skonfiguruj szczegóły połączenia serwera SMTP",
+      connectionSettingsDescription: "Skonfiguruj szczegóły połączenia serwera SMTP",
       emailSettings: "Ustawienia e-mail",
-      emailSettingsDescription:
-        "Skonfiguruj e-mail nadawcy i nazwę wyświetlaną",
+      emailSettingsDescription: "Skonfiguruj e-mail nadawcy i nazwę wyświetlaną",
       advancedSettings: "Ustawienia zaawansowane",
-      advancedSettingsDescription:
-        "Skonfiguruj limity czasu, ograniczenia i priorytet",
+      advancedSettingsDescription: "Skonfiguruj limity czasu, ograniczenia i priorytet",
       selectionCriteria: "Kryteria wyboru",
-      selectionCriteriaDescription:
-        "Skonfiguruj automatyczne reguły wyboru konta",
+      selectionCriteriaDescription: "Skonfiguruj automatyczne reguły wyboru konta",
     },
     fields: {
       name: "Nazwa konta",
@@ -89,16 +85,13 @@ export const translations: typeof enTranslations = {
       weight: "Waga",
       weightPlaceholder: "1-100 (wyższy = bardziej prawdopodobny wybór)",
       failoverPriority: "Priorytet failover",
-      failoverPriorityPlaceholder:
-        "0-100 (wyższy = używany pierwszy w failover)",
+      failoverPriorityPlaceholder: "0-100 (wyższy = używany pierwszy w failover)",
       isExactMatch: "Tylko dokładne dopasowanie",
-      isExactMatchDescription:
-        "Używaj tego konta tylko dla dokładnych dopasowań kryteriów",
+      isExactMatchDescription: "Używaj tego konta tylko dla dokładnych dopasowań kryteriów",
       isFailover: "Konto failover",
       isFailoverDescription: "Używaj tego konta gdy główne konta zawodzą",
       campaignTypes: "Typy kampanii",
-      campaignTypesDescription:
-        "Wybierz które typy kampanii mogą używać tego konta",
+      campaignTypesDescription: "Wybierz które typy kampanii mogą używać tego konta",
       campaignTypesPlaceholder: "Skonfiguruj ograniczenia typów kampanii",
       countries: "Kraje",
       countriesDescription: "Wybierz które kraje mogą używać tego konta",
@@ -112,8 +105,7 @@ export const translations: typeof enTranslations = {
         "Wybierz które warianty podróży e-mail mogą używać tego konta",
       emailJourneyVariantsPlaceholder: "Wybierz warianty podróży",
       emailCampaignStages: "Etapy kampanii e-mail",
-      emailCampaignStagesDescription:
-        "Wybierz które etapy kampanii mogą używać tego konta",
+      emailCampaignStagesDescription: "Wybierz które etapy kampanii mogą używać tego konta",
       emailCampaignStagesPlaceholder: "Wybierz etapy kampanii",
     },
     // Campaign type options
@@ -277,8 +269,7 @@ export const translations: typeof enTranslations = {
       },
       unknown: {
         title: "Błąd wyszukiwania",
-        description:
-          "Wystąpił nieoczekiwany błąd podczas przeszukiwania kont SMTP.",
+        description: "Wystąpił nieoczekiwany błąd podczas przeszukiwania kont SMTP.",
       },
     },
     success: {

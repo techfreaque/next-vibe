@@ -12,7 +12,6 @@ import { ManifestRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: manifestEndpoints,
   [Methods.GET]: {
-    handler: ({ locale, logger }) =>
-      ManifestRepository.generateManifest(locale, logger),
+    handler: ({ locale, logger }) => ManifestRepository.generateManifest(locale, logger),
   },
 });

@@ -34,11 +34,7 @@ function Dialog({ children, ...props }: DialogRootProps): React.JSX.Element {
 }
 Dialog.displayName = DialogPrimitive.Root.displayName;
 
-function DialogTrigger({
-  children,
-  asChild,
-  ...props
-}: DialogTriggerProps): React.JSX.Element {
+function DialogTrigger({ children, asChild, ...props }: DialogTriggerProps): React.JSX.Element {
   return (
     <DialogPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -47,19 +43,12 @@ function DialogTrigger({
 }
 DialogTrigger.displayName = DialogPrimitive.Trigger.displayName;
 
-function DialogPortal({
-  children,
-  ...props
-}: DialogPortalProps): React.JSX.Element {
+function DialogPortal({ children, ...props }: DialogPortalProps): React.JSX.Element {
   return <DialogPrimitive.Portal {...props}>{children}</DialogPrimitive.Portal>;
 }
 DialogPortal.displayName = "DialogPortal";
 
-function DialogClose({
-  children,
-  asChild,
-  ...props
-}: DialogCloseProps): React.JSX.Element {
+function DialogClose({ children, asChild, ...props }: DialogCloseProps): React.JSX.Element {
   return (
     <DialogPrimitive.Close asChild={asChild} {...props}>
       {children}
@@ -68,11 +57,7 @@ function DialogClose({
 }
 DialogClose.displayName = DialogPrimitive.Close.displayName;
 
-function DialogOverlay({
-  className,
-  style,
-  children,
-}: DialogOverlayProps): React.JSX.Element {
+function DialogOverlay({ className, style, children }: DialogOverlayProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   const renderChildren = (): React.ReactNode => {
     if (typeof children === "function") {
@@ -88,10 +73,7 @@ function DialogOverlay({
       <StyledView
         {...applyStyleType({
           nativeStyle,
-          className: cn(
-            "flex bg-black/80 justify-center items-center p-2",
-            className,
-          ),
+          className: cn("flex bg-black/80 justify-center items-center p-2", className),
         })}
       >
         <Animated.View
@@ -135,9 +117,7 @@ function DialogContent({
               nativeStyle,
               className: cn(
                 "max-w-lg gap-4 border border-border cursor-default bg-background p-6 shadow-lg duration-200 rounded-lg",
-                open
-                  ? "animate-in fade-in-0 zoom-in-95"
-                  : "animate-out fade-out-0 zoom-out-95",
+                open ? "animate-in fade-in-0 zoom-in-95" : "animate-out fade-out-0 zoom-out-95",
                 className,
               ),
             })}
@@ -147,10 +127,7 @@ function DialogContent({
               <StyledPressable className={CLOSE_BUTTON_CLASSNAME}>
                 <X
                   size={Platform.OS === "web" ? 16 : 18}
-                  className={cn(
-                    "text-muted-foreground",
-                    open && "text-accent-foreground",
-                  )}
+                  className={cn("text-muted-foreground", open && "text-accent-foreground")}
                 />
               </StyledPressable>
             </DialogPrimitive.Close>
@@ -162,20 +139,13 @@ function DialogContent({
 }
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
-function DialogHeader({
-  className,
-  style,
-  children,
-}: DialogHeaderProps): React.JSX.Element {
+function DialogHeader({ className, style, children }: DialogHeaderProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <StyledView
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "flex flex-col gap-1.5 text-center sm:text-left",
-          className,
-        ),
+        className: cn("flex flex-col gap-1.5 text-center sm:text-left", className),
       })}
     >
       {children}
@@ -184,20 +154,13 @@ function DialogHeader({
 }
 DialogHeader.displayName = "DialogHeader";
 
-function DialogFooter({
-  className,
-  style,
-  children,
-}: DialogFooterProps): React.JSX.Element {
+function DialogFooter({ className, style, children }: DialogFooterProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <StyledView
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "flex flex-col-reverse sm:flex-row sm:justify-end gap-2",
-          className,
-        ),
+        className: cn("flex flex-col-reverse sm:flex-row sm:justify-end gap-2", className),
       })}
     >
       {children}

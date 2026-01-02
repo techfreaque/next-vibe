@@ -195,8 +195,7 @@ const { POST } = createEndpoint({
         email: "john.doe@example.com",
         company: "Acme Corp",
         subject: ContactSubject.GENERAL_INQUIRY,
-        message:
-          "I would like to learn more about your social media management services.",
+        message: "I would like to learn more about your social media management services.",
         priority: ContactPriority.MEDIUM,
       },
       success: {

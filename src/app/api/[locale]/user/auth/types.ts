@@ -6,10 +6,7 @@
 
 import { z } from "zod";
 
-import {
-  UserPermissionRole,
-  UserRoleDB,
-} from "@/app/api/[locale]/user/user-roles/enum";
+import { UserPermissionRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
 /**
  * JWT Payload Schema
@@ -23,9 +20,7 @@ import {
 const publicJwtPayloadSchema = z.object({
   isPublic: z.literal(true),
   leadId: z.uuid(),
-  roles: z
-    .array(z.enum([UserPermissionRole.PUBLIC]))
-    .default([UserPermissionRole.PUBLIC]),
+  roles: z.array(z.enum([UserPermissionRole.PUBLIC])).default([UserPermissionRole.PUBLIC]),
 });
 
 const privateJwtPayloadSchema = z.object({

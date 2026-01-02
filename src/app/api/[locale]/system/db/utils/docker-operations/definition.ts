@@ -33,12 +33,7 @@ const { POST } = createEndpoint({
     "app.api.system.db.utils.dockerOperations.tags.utils",
   ],
   icon: "box",
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.PRODUCTION_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
   aliases: ["docker", "docker-utils"],
   method: Methods.POST,
   path: ["system", "db", "utils", "docker-operations"],
@@ -99,8 +94,7 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.system.db.utils.dockerOperations.container.title",
-      description:
-        "app.api.system.db.utils.dockerOperations.container.description",
+      description: "app.api.system.db.utils.dockerOperations.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -111,12 +105,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.db.utils.dockerOperations.fields.command.label",
-          description:
-            "app.api.system.db.utils.dockerOperations.fields.command.description",
-          placeholder:
-            "app.api.system.db.utils.dockerOperations.fields.command.placeholder",
+          label: "app.api.system.db.utils.dockerOperations.fields.command.label",
+          description: "app.api.system.db.utils.dockerOperations.fields.command.description",
+          placeholder: "app.api.system.db.utils.dockerOperations.fields.command.placeholder",
           columns: 12,
         },
         z.string().min(1).describe("Docker command to execute"),
@@ -125,28 +116,19 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.JSON,
-          label:
-            "app.api.system.db.utils.dockerOperations.fields.options.label",
-          description:
-            "app.api.system.db.utils.dockerOperations.fields.options.description",
-          placeholder:
-            "app.api.system.db.utils.dockerOperations.fields.options.placeholder",
+          label: "app.api.system.db.utils.dockerOperations.fields.options.label",
+          description: "app.api.system.db.utils.dockerOperations.fields.options.description",
+          placeholder: "app.api.system.db.utils.dockerOperations.fields.options.placeholder",
           columns: 12,
         },
         z
           .object({
-            timeout: z.coerce
-              .number()
-              .optional()
-              .describe("Timeout in milliseconds"),
+            timeout: z.coerce.number().optional().describe("Timeout in milliseconds"),
             hideStandardLogs: z
               .boolean()
               .optional()
               .describe("Whether to hide standard Docker logs"),
-            description: z
-              .string()
-              .optional()
-              .describe("Description of the operation"),
+            description: z.string().optional().describe("Description of the operation"),
           })
           .optional(),
       ),
@@ -155,24 +137,21 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.utils.dockerOperations.response.success.label",
+          content: "app.api.system.db.utils.dockerOperations.response.success.label",
         },
         z.boolean().describe("Whether the command executed successfully"),
       ),
       output: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.utils.dockerOperations.response.output.label",
+          content: "app.api.system.db.utils.dockerOperations.response.output.label",
         },
         z.string().describe("Command output"),
       ),
       error: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.utils.dockerOperations.response.error.label",
+          content: "app.api.system.db.utils.dockerOperations.response.error.label",
         },
         z.string().optional().describe("Error message if command failed"),
       ),
@@ -183,49 +162,39 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.db.utils.dockerOperations.errors.validation.title",
-      description:
-        "app.api.system.db.utils.dockerOperations.errors.validation.description",
+      description: "app.api.system.db.utils.dockerOperations.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.db.utils.dockerOperations.errors.unauthorized.title",
-      description:
-        "app.api.system.db.utils.dockerOperations.errors.unauthorized.description",
+      title: "app.api.system.db.utils.dockerOperations.errors.unauthorized.title",
+      description: "app.api.system.db.utils.dockerOperations.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.db.utils.dockerOperations.errors.forbidden.title",
-      description:
-        "app.api.system.db.utils.dockerOperations.errors.forbidden.description",
+      description: "app.api.system.db.utils.dockerOperations.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.db.utils.dockerOperations.errors.internal.title",
-      description:
-        "app.api.system.db.utils.dockerOperations.errors.internal.description",
+      description: "app.api.system.db.utils.dockerOperations.errors.internal.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.db.utils.dockerOperations.errors.timeout.title",
-      description:
-        "app.api.system.db.utils.dockerOperations.errors.timeout.description",
+      description: "app.api.system.db.utils.dockerOperations.errors.timeout.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.db.utils.dockerOperations.errors.internal.title",
-      description:
-        "app.api.system.db.utils.dockerOperations.errors.internal.description",
+      description: "app.api.system.db.utils.dockerOperations.errors.internal.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.db.utils.dockerOperations.errors.internal.title",
-      description:
-        "app.api.system.db.utils.dockerOperations.errors.internal.description",
+      description: "app.api.system.db.utils.dockerOperations.errors.internal.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.db.utils.dockerOperations.errors.internal.title",
-      description:
-        "app.api.system.db.utils.dockerOperations.errors.internal.description",
+      description: "app.api.system.db.utils.dockerOperations.errors.internal.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.db.utils.dockerOperations.errors.internal.title",
-      description:
-        "app.api.system.db.utils.dockerOperations.errors.internal.description",
+      description: "app.api.system.db.utils.dockerOperations.errors.internal.description",
     },
   },
 

@@ -2,12 +2,7 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "next-vibe-ui/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { MessageSquarePlus, Search } from "next-vibe-ui/ui/icons";
 import { Input } from "next-vibe-ui/ui/input";
@@ -61,9 +56,7 @@ export function SearchModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] max-h-[90dvh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>
-            {t("app.chat.common.searchModal.searchAndCreate")}
-          </DialogTitle>
+          <DialogTitle>{t("app.chat.common.searchModal.searchAndCreate")}</DialogTitle>
         </DialogHeader>
 
         <Div className="flex flex-col gap-4 flex-1 overflow-hidden flex flex-col">
@@ -78,9 +71,7 @@ export function SearchModal({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder={t(
-                "app.chat.common.searchModal.searchThreadsPlaceholder",
-              )}
+              placeholder={t("app.chat.common.searchModal.searchThreadsPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"

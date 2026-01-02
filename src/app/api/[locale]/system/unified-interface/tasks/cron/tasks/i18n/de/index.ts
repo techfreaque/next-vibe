@@ -73,13 +73,11 @@ export const translations: typeof enTranslations = {
     errors: {
       internal: {
         title: "Interner Serverfehler beim Abrufen der Aufgaben",
-        description:
-          "Ein unerwarteter Fehler ist beim Abrufen der Aufgabenliste aufgetreten",
+        description: "Ein unerwarteter Fehler ist beim Abrufen der Aufgabenliste aufgetreten",
       },
       unauthorized: {
         title: "Unbefugter Zugriff auf Aufgabenliste",
-        description:
-          "Sie haben keine Berechtigung, die Aufgabenliste anzuzeigen",
+        description: "Sie haben keine Berechtigung, die Aufgabenliste anzuzeigen",
       },
       validation: {
         title: "Ungültige Anfrageparameter",
@@ -91,13 +89,11 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Aufgaben nicht gefunden",
-        description:
-          "Es wurden keine Aufgaben gefunden, die den Kriterien entsprechen",
+        description: "Es wurden keine Aufgaben gefunden, die den Kriterien entsprechen",
       },
       network: {
         title: "Netzwerkfehler",
-        description:
-          "Ein Netzwerkfehler ist beim Abrufen der Aufgaben aufgetreten",
+        description: "Ein Netzwerkfehler ist beim Abrufen der Aufgaben aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -105,13 +101,11 @@ export const translations: typeof enTranslations = {
       },
       unsaved: {
         title: "Nicht gespeicherte Änderungen",
-        description:
-          "Es gibt nicht gespeicherte Änderungen, die bearbeitet werden müssen",
+        description: "Es gibt nicht gespeicherte Änderungen, die bearbeitet werden müssen",
       },
       conflict: {
         title: "Konfliktfehler",
-        description:
-          "Ein Konflikt ist bei der Verarbeitung der Anfrage aufgetreten",
+        description: "Ein Konflikt ist bei der Verarbeitung der Anfrage aufgetreten",
       },
     },
     success: {

@@ -27,10 +27,7 @@ const { POST } = createEndpoint({
   description: "app.api.browser.select-page.description",
   category: "app.api.browser.category",
   icon: "square-check",
-  tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.navigationAutomation",
-  ],
+  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.navigationAutomation"],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -55,17 +52,11 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.browser.select-page.form.fields.pageIdx.label",
-          description:
-            "app.api.browser.select-page.form.fields.pageIdx.description",
-          placeholder:
-            "app.api.browser.select-page.form.fields.pageIdx.placeholder",
+          description: "app.api.browser.select-page.form.fields.pageIdx.description",
+          placeholder: "app.api.browser.select-page.form.fields.pageIdx.placeholder",
           columns: 6,
         },
-        z
-          .number()
-          .describe(
-            "The index of the page to select. Call list_pages to list pages.",
-          ),
+        z.number().describe("The index of the page to select. Call list_pages to list pages."),
       ),
 
       // Response fields
@@ -136,8 +127,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.browser.select-page.errors.unauthorized.title",
-      description:
-        "app.api.browser.select-page.errors.unauthorized.description",
+      description: "app.api.browser.select-page.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.browser.select-page.errors.forbidden.title",
@@ -157,8 +147,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.select-page.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.select-page.errors.unsavedChanges.description",
+      description: "app.api.browser.select-page.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.select-page.errors.conflict.title",

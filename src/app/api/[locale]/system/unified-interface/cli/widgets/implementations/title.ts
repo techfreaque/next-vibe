@@ -12,9 +12,7 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class TitleWidgetRenderer extends BaseWidgetRenderer<
-  typeof WidgetType.TITLE
-> {
+export class TitleWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TITLE> {
   readonly widgetType = WidgetType.TITLE;
 
   render(props: CLIWidgetProps<typeof WidgetType.TITLE, string>): string {
@@ -32,10 +30,7 @@ export class TitleWidgetRenderer extends BaseWidgetRenderer<
     return this.renderTitle(data, context);
   }
 
-  private renderTitle(
-    data: ProcessedTitle,
-    context: WidgetRenderContext,
-  ): string {
+  private renderTitle(data: ProcessedTitle, context: WidgetRenderContext): string {
     const styled = this.styleText(data.text, "bold", context);
     return styled;
   }

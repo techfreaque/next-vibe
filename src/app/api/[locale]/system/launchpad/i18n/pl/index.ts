@@ -3,8 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   category: "Executor Wydań",
   errors: {
-    configNotLoaded:
-      "Konfiguracja nie została załadowana. Proszę najpierw załadować konfigurację.",
+    configNotLoaded: "Konfiguracja nie została załadowana. Proszę najpierw załadować konfigurację.",
     configFileNotFound: "Nie znaleziono pliku konfiguracyjnego: {{path}}",
     configFileNotFoundInParents:
       "Plik konfiguracyjny '{{filename}}' nie został znaleziony w bieżącym katalogu ani w katalogach nadrzędnych",
@@ -45,8 +44,7 @@ export const translations: typeof enTranslations = {
     summary: {
       title: "Podsumowanie końcowe:",
       allSuccess: "Wszystkie cele przetworzone pomyślnie!",
-      failedTargets:
-        "{{count}} celów nie powiodło się. Użyj --continue, aby ponowić.",
+      failedTargets: "{{count}} celów nie powiodło się. Użyj --continue, aby ponowić.",
     },
 
     forceUpdate: {
@@ -58,16 +56,14 @@ export const translations: typeof enTranslations = {
     },
 
     forceRelease: {
-      starting:
-        "Wymuszanie wydania wszystkich celów z {{versionBump}} zwiększeniem wersji...",
+      starting: "Wymuszanie wydania wszystkich celów z {{versionBump}} zwiększeniem wersji...",
     },
 
     weeklyUpdate: {
       starting: "Rozpoczynanie tygodniowego procesu aktualizacji...",
       targetBranch: "Docelowa gałąź: {{branchName}}",
       creatingBranch: "Tworzenie gałęzi aktualizacji...",
-      gitCheckout:
-        "git checkout -b {{branchName}} || git checkout {{branchName}}",
+      gitCheckout: "git checkout -b {{branchName}} || git checkout {{branchName}}",
       updatingPackages: "Aktualizowanie wszystkich zależności pakietów...",
       runningSnyk: "Uruchamianie monitorowania bezpieczeństwa Snyk...",
       noChanges: "Nie wykryto zmian, pomijam commit i tworzenie PR",
@@ -83,8 +79,7 @@ export const translations: typeof enTranslations = {
       noCredentials:
         "Nie znaleziono danych uwierzytelniających Snyk, pomijam monitorowanie bezpieczeństwa",
       monitoring: "Monitorowanie {{packageName}}...",
-      failed:
-        "Monitorowanie Snyk nie powiodło się dla {{packageFile}}, kontynuuję...",
+      failed: "Monitorowanie Snyk nie powiodło się dla {{packageFile}}, kontynuuję...",
     },
 
     github: {
@@ -111,10 +106,8 @@ export const translations: typeof enTranslations = {
 
   updateAll: {
     updating: "🔄 Updating all repositories...",
-    failedClone:
-      "⚠️  Failed to clone {{repoPath}}, continuing with other repositories...",
-    failedUpdate:
-      "⚠️  Failed to update {{repoPath}}, continuing with other repositories...",
+    failedClone: "⚠️  Failed to clone {{repoPath}}, continuing with other repositories...",
+    failedUpdate: "⚠️  Failed to update {{repoPath}}, continuing with other repositories...",
     clonedSuccess: "✅ Successfully cloned {{count}} missing repositories.",
     updatedSuccess: "✅ Successfully updated {{count}} existing repositories.",
     cloneFailed: "❌ Failed to clone {{count}} repositories:",

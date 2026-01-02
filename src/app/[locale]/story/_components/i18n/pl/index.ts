@@ -41,10 +41,8 @@ export const translations: typeof enTranslations = {
     forumHero: {
       badge: "Witamy w społeczności",
       title: "Forum społeczności wspierane przez AI",
-      subtitle:
-        "Zadawaj pytania, dziel się wiedzą i łącz się z innymi w świecie AI.",
-      description:
-        "Eksploruj dyskusje, uzyskaj pomoc i przyczyń się do przyszłości rozwoju AI.",
+      subtitle: "Zadawaj pytania, dziel się wiedzą i łącz się z innymi w świecie AI.",
+      description: "Eksploruj dyskusje, uzyskaj pomoc i przyczyń się do przyszłości rozwoju AI.",
       cta: "Utwórz nowy wątek",
       secondaryCta: "Przeglądaj wątki",
     },
@@ -123,8 +121,7 @@ export const translations: typeof enTranslations = {
     },
     pricingSection: {
       title: "Proste ceny",
-      description:
-        "Jeden plan dla wszystkich. Dodatkowe kredyty dla zaawansowanych użytkowników.",
+      description: "Jeden plan dla wszystkich. Dodatkowe kredyty dla zaawansowanych użytkowników.",
     },
     stats: {
       clients: "Aktywni użytkownicy",
@@ -134,14 +131,12 @@ export const translations: typeof enTranslations = {
     pricing: {
       free: {
         name: "Darmowy plan",
-        description:
-          "Zacznij z {{credits}} darmowymi kredytami - bez karty kredytowej",
+        description: "Zacznij z {{credits}} darmowymi kredytami - bez karty kredytowej",
         credits: "{{credits}} darmowe kredyty (jednorazowo)",
         features: {
           credits: "{{credits}} kredytów na start",
           models: "Dostęp do wszystkich {{modelCount}} modeli AI",
-          folders:
-            "Wszystkie typy folderów (prywatne, incognito, współdzielone, publiczne)",
+          folders: "Wszystkie typy folderów (prywatne, incognito, współdzielone, publiczne)",
           characters: "Korzystanie z person społeczności",
           support: "Wsparcie społeczności",
         },
@@ -210,10 +205,8 @@ export const translations: typeof enTranslations = {
       badge: "Nasz proces",
       title: "Jak to działa",
       subtitle: "Zacznij z {{appName}} w 4 prostych krokach",
-      readyTransform:
-        "Gotowy, aby przekształcić swoje doświadczenie z czatem AI?",
-      handleSocial:
-        "Pozwól nam zarządzać Twoimi niecenzurowanymi rozmowami z AI",
+      readyTransform: "Gotowy, aby przekształcić swoje doświadczenie z czatem AI?",
+      handleSocial: "Pozwól nam zarządzać Twoimi niecenzurowanymi rozmowami z AI",
       getStarted: "Zacznij dzisiaj",
       steps: {
         strategyDevelopment: {
@@ -316,8 +309,7 @@ export const translations: typeof enTranslations = {
     careers: {
       meta: {
         title: "Kariera - {{appName}}",
-        description:
-          "Dołącz do naszego zespołu i pomóż budować przyszłość niecenzurowanej AI",
+        description: "Dołącz do naszego zespołu i pomóż budować przyszłość niecenzurowanej AI",
         category: "Kariera",
         imageAlt: "Kariera w {{appName}}",
         keywords: "kariera, praca, praca AI, praca zdalna, kariera {{appName}}",
@@ -326,31 +318,25 @@ export const translations: typeof enTranslations = {
       description:
         "Pomóż nam budować przyszłość niecenzurowanego czatu AI. Szukamy pasjonatów, którzy wierzą w wolność wypowiedzi i prywatność użytkowników.",
       joinTeam: "Dołącz do naszego zespołu",
-      subtitle:
-        "Bądź częścią misji, aby uczynić AI szczerą, dostępną i niecenzurowaną.",
+      subtitle: "Bądź częścią misji, aby uczynić AI szczerą, dostępną i niecenzurowaną.",
       whyWorkWithUs: "Dlaczego warto z nami pracować",
       workplaceDescription:
         "Jesteśmy firmą zdalną, która ceni autonomię, kreatywność i wpływ. Dołącz do zespołu, który zmienia sposób, w jaki ludzie wchodzą w interakcje z AI.",
       benefits: {
         title: "Co oferujemy",
         growthTitle: "Rozwój i nauka",
-        growthDesc:
-          "Pracuj z najnowocześniejszą technologią AI i ucz się od ekspertów branżowych.",
+        growthDesc: "Pracuj z najnowocześniejszą technologią AI i ucz się od ekspertów branżowych.",
         meaningfulTitle: "Znacząca praca",
-        meaningfulDesc:
-          "Twórz produkty, które wzmacniają użytkowników i chronią ich prywatność.",
+        meaningfulDesc: "Twórz produkty, które wzmacniają użytkowników i chronią ich prywatność.",
         balanceTitle: "Równowaga między pracą a życiem",
         balanceDesc:
           "Elastyczne godziny, praca zdalna i nieograniczony urlop. Ufamy, że wykonasz świetną pracę.",
         compensationTitle: "Konkurencyjne wynagrodzenie",
-        compensationDesc:
-          "Wiodące w branży wynagrodzenie, kapitał własny i pakiet świadczeń.",
+        compensationDesc: "Wiodące w branży wynagrodzenie, kapitał własny i pakiet świadczeń.",
         innovationTitle: "Innowacja i wpływ",
-        innovationDesc:
-          "Pracuj nad najnowocześniejszą technologią AI, która ma rzeczywisty wpływ.",
+        innovationDesc: "Pracuj nad najnowocześniejszą technologią AI, która ma rzeczywisty wpływ.",
         teamTitle: "Świetny zespół",
-        teamDesc:
-          "Pracuj z utalentowanymi, pasyjonatami, którym zależy na etyce AI.",
+        teamDesc: "Pracuj z utalentowanymi, pasyjonatami, którym zależy na etyce AI.",
       },
       openPositions: "Otwarte stanowiska",
       noOpenings: "Obecnie brak otwartych stanowisk",
@@ -404,8 +390,7 @@ export const translations: typeof enTranslations = {
           type: "Pełny etat",
           responsibilities: {
             item1: "Budowanie i angażowanie społeczności {{appName}}",
-            item2:
-              "Tworzenie przekonujących treści dla mediów społecznościowych",
+            item2: "Tworzenie przekonujących treści dla mediów społecznościowych",
             item3: "Moderowanie dyskusji i zapewnianie wsparcia",
             item4: "Organizowanie wydarzeń i inicjatyw społeczności",
             item5: "Zbieranie i analizowanie opinii społeczności",
@@ -524,8 +509,7 @@ export const translations: typeof enTranslations = {
       sections: {
         partnerships: {
           title: "Partnerstwa i powiązania",
-          description:
-            "Informacje o naszych partnerstwach biznesowych i powiązaniach.",
+          description: "Informacje o naszych partnerstwach biznesowych i powiązaniach.",
           content:
             "{{appName}} utrzymuje partnerstwa z wiodącymi dostawcami AI, aby zapewnić naszym użytkownikom najlepszą możliwą usługę.",
         },
@@ -536,13 +520,11 @@ export const translations: typeof enTranslations = {
         },
         responsiblePerson: {
           title: "Osoba odpowiedzialna",
-          description:
-            "Informacje o osobie odpowiedzialnej za treść tej strony internetowej.",
+          description: "Informacje o osobie odpowiedzialnej za treść tej strony internetowej.",
         },
         contactInfo: {
           title: "Informacje kontaktowe",
-          description:
-            "Jak się z nami skontaktować w sprawach prawnych i biznesowych.",
+          description: "Jak się z nami skontaktować w sprawach prawnych i biznesowych.",
           communication: {
             phone: "{{config.group.contact.phone}}",
           },
@@ -567,8 +549,7 @@ export const translations: typeof enTranslations = {
         },
         disputeResolution: {
           title: "Rozwiązywanie sporów",
-          description:
-            "Informacje o tym, jak spory są rozpatrywane i rozwiązywane.",
+          description: "Informacje o tym, jak spory są rozpatrywane i rozwiązywane.",
           content:
             "Wszelkie spory wynikające z korzystania z tej strony będą rozwiązywane zgodnie z obowiązującym prawem.",
         },
@@ -623,10 +604,8 @@ export const translations: typeof enTranslations = {
           description:
             "Twoja prywatność jest naszym priorytetem. Wdrażamy standardowe w branży środki bezpieczeństwa:",
           items: {
-            encryption:
-              "Szyfrowanie end-to-end dla prywatnych folderów i wrażliwych danych",
-            incognito:
-              "Tryb incognito dla czatów tylko w sesji, które nigdy nie są przechowywane",
+            encryption: "Szyfrowanie end-to-end dla prywatnych folderów i wrażliwych danych",
+            incognito: "Tryb incognito dla czatów tylko w sesji, które nigdy nie są przechowywane",
             gdpr: "Pełna zgodność z RODO dla użytkowników z UE",
             noSelling: "Nigdy nie sprzedajemy Twoich danych stronom trzecim",
             minimal: "Minimalne zbieranie danych - tylko to, co konieczne",
@@ -672,18 +651,15 @@ export const translations: typeof enTranslations = {
         },
         useOfInformation: {
           title: "Wykorzystanie Twoich informacji",
-          description:
-            "Wykorzystujemy zebrane informacje do różnych celów, w tym:",
+          description: "Wykorzystujemy zebrane informacje do różnych celów, w tym:",
           items: {
             provide: "Świadczenie i utrzymywanie naszych usług czatu AI",
             process: "Przetwarzanie Twoich transakcji i zarządzanie kontem",
             send: "Wysyłanie aktualizacji, newsletterów i komunikatów marketingowych",
-            respond:
-              "Odpowiadanie na Twoje zapytania i zapewnianie obsługi klienta",
+            respond: "Odpowiadanie na Twoje zapytania i zapewnianie obsługi klienta",
             monitor:
               "Monitorowanie i analiza wzorców użytkowania w celu ulepszenia naszej platformy",
-            personalize:
-              "Personalizacja Twojego doświadczenia i dostarczanie odpowiednich treści",
+            personalize: "Personalizacja Twojego doświadczenia i dostarczanie odpowiednich treści",
           },
         },
         disclosure: {
@@ -732,10 +708,8 @@ export const translations: typeof enTranslations = {
             "Zgodnie z przepisami o ochronie danych masz określone prawa dotyczące Twoich danych osobowych:",
           items: {
             access: "Prawo dostępu do Twoich danych osobowych",
-            correction:
-              "Prawo do poprawiania niedokładnych lub niekompletnych danych",
-            deletion:
-              "Prawo do żądania usunięcia Twoich danych (prawo do bycia zapomnianym)",
+            correction: "Prawo do poprawiania niedokładnych lub niekompletnych danych",
+            deletion: "Prawo do żądania usunięcia Twoich danych (prawo do bycia zapomnianym)",
             objection: "Prawo do sprzeciwu wobec przetwarzania Twoich danych",
             portability: "Prawo do przenoszenia i transferu danych",
           },
@@ -805,8 +779,7 @@ export const translations: typeof enTranslations = {
           },
           guidelines: {
             title: "Wytyczne dotyczące treści",
-            intro:
-              "Chociaż zapewniamy niecenzurowany dostęp do AI, nie możesz używać usługi do:",
+            intro: "Chociaż zapewniamy niecenzurowany dostęp do AI, nie możesz używać usługi do:",
             items: {
               item1: "Angażowania się w nielegalne działania",
               item2: "Nękania, grożenia lub szkodzenia innym",
@@ -856,8 +829,7 @@ export const translations: typeof enTranslations = {
   },
   footer: {
     tagline: "Rozmawiaj z AI, łącz się ze społecznością",
-    privacyTagline:
-      "Czat AI zorientowany na prywatność z {{modelCount}} niecenzurowanymi modelami",
+    privacyTagline: "Czat AI zorientowany na prywatność z {{modelCount}} niecenzurowanymi modelami",
     platform: {
       title: "Platforma",
       features: "Funkcje",

@@ -13,21 +13,13 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/card";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import {
-  convertCSSToTextStyle,
-  convertCSSToViewStyle,
-} from "../utils/style-converter";
+import { convertCSSToTextStyle, convertCSSToViewStyle } from "../utils/style-converter";
 import { TextClassContext } from "./text";
 
 const StyledView = styled(View, { className: "style" });
 const StyledText = styled(RNText, { className: "style" });
 
-function Card({
-  className,
-  style,
-  id,
-  children,
-}: CardProps): React.JSX.Element {
+function Card({ className, style, id, children }: CardProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
@@ -47,12 +39,7 @@ function Card({
 }
 Card.displayName = "Card";
 
-function CardHeader({
-  className,
-  style,
-  id,
-  children,
-}: CardHeaderProps): React.JSX.Element {
+function CardHeader({ className, style, id, children }: CardHeaderProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
@@ -69,12 +56,7 @@ function CardHeader({
 }
 CardHeader.displayName = "CardHeader";
 
-function CardTitle({
-  className,
-  style,
-  id,
-  children,
-}: CardTitleProps): React.JSX.Element {
+function CardTitle({ className, style, id, children }: CardTitleProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
 
   return (
@@ -116,12 +98,7 @@ function CardDescription({
 }
 CardDescription.displayName = "CardDescription";
 
-function CardContent({
-  className,
-  style,
-  id,
-  children,
-}: CardContentProps): React.JSX.Element {
+function CardContent({ className, style, id, children }: CardContentProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
@@ -140,12 +117,7 @@ function CardContent({
 }
 CardContent.displayName = "CardContent";
 
-function CardFooter({
-  className,
-  style,
-  id,
-  children,
-}: CardFooterProps): React.JSX.Element {
+function CardFooter({ className, style, id, children }: CardFooterProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
@@ -162,11 +134,4 @@ function CardFooter({
 }
 CardFooter.displayName = "CardFooter";
 
-export {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-};
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle };

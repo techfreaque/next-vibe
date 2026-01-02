@@ -12,8 +12,7 @@ export const translations: typeof enTranslations = {
 
   container: {
     title: "Konfiguracja wysyłania e-maili",
-    description:
-      "Skonfiguruj ustawienia e-maili i opcjonalnych powiadomień SMS",
+    description: "Skonfiguruj ustawienia e-maili i opcjonalnych powiadomień SMS",
   },
 
   // Field groups
@@ -176,8 +175,7 @@ export const translations: typeof enTranslations = {
       title: "Błąd walidacji",
       description: "Sprawdź swoje dane i spróbuj ponownie",
       smsFields: "Pola powiadomień SMS",
-      smsRequired:
-        "Numer telefonu i wiadomość są wymagane, gdy powiadomienie SMS jest włączone",
+      smsRequired: "Numer telefonu i wiadomość są wymagane, gdy powiadomienie SMS jest włączone",
     },
     sms: {
       temporarilyUnavailable: "Usługa SMS jest tymczasowo niedostępna",

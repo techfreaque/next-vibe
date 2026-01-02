@@ -33,11 +33,7 @@ export class KeyUsageAnalyzer {
       for (const [key, value] of Object.entries(obj)) {
         const fullKey = prefix ? `${prefix}.${key}` : key;
 
-        if (
-          typeof value === "object" &&
-          value !== null &&
-          !Array.isArray(value)
-        ) {
+        if (typeof value === "object" && value !== null && !Array.isArray(value)) {
           // Recursively extract keys from nested objects
           extractKeys(value, fullKey);
         } else {
@@ -57,15 +53,10 @@ export class KeyUsageAnalyzer {
    * @param logger - Logger instance for debugging
    * @returns Map of translation keys to arrays of file paths where they are used
    */
-  scanCodebaseForKeyUsage(
-    allKeys: Set<string>,
-    logger: EndpointLogger,
-  ): Map<string, string[]> {
+  scanCodebaseForKeyUsage(allKeys: Set<string>, logger: EndpointLogger): Map<string, string[]> {
     const keyUsageMap = new Map<string, string[]>();
 
-    logger.debug(
-      `Scanning codebase for usage of ${allKeys.size} translation keys`,
-    );
+    logger.debug(`Scanning codebase for usage of ${allKeys.size} translation keys`);
 
     // Get all source files to scan
     const sourceFiles = this.findFiles(SRC_DIR, FILE_EXTENSIONS);
@@ -102,9 +93,7 @@ export class KeyUsageAnalyzer {
     }
 
     const usedKeysCount = [...keyUsageMap.keys()].length;
-    logger.debug(
-      `Found usage for ${usedKeysCount} keys across ${sourceFiles.length} files`,
-    );
+    logger.debug(`Found usage for ${usedKeysCount} keys across ${sourceFiles.length} files`);
 
     return keyUsageMap;
   }

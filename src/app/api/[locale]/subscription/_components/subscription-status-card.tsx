@@ -1,19 +1,8 @@
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "next-vibe-ui/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  AlertCircle,
-  Bitcoin,
-  CreditCard,
-  ExternalLink,
-} from "next-vibe-ui/ui/icons";
+import { AlertCircle, Bitcoin, CreditCard, ExternalLink } from "next-vibe-ui/ui/icons";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 
@@ -102,9 +91,7 @@ export function SubscriptionStatusCard({
                 </Div>
                 {t("app.subscription.subscription.title")}
               </CardTitle>
-              <CardDescription>
-                {t("app.subscription.subscription.description")}
-              </CardDescription>
+              <CardDescription>{t("app.subscription.subscription.description")}</CardDescription>
             </Div>
             <Div className="flex gap-2">
               <Badge
@@ -202,14 +189,11 @@ export function SubscriptionStatusCard({
                     {t("app.subscription.subscription.cancellation.title")}
                   </Div>
                   <Div>
-                    {t(
-                      "app.subscription.subscription.cancellation.description",
-                      {
-                        date: initialSubscription.cancelAt
-                          ? formatDate(initialSubscription.cancelAt, locale)
-                          : t("app.common.notAvailable"),
-                      },
-                    )}
+                    {t("app.subscription.subscription.cancellation.description", {
+                      date: initialSubscription.cancelAt
+                        ? formatDate(initialSubscription.cancelAt, locale)
+                        : t("app.common.notAvailable"),
+                    })}
                   </Div>
                 </Div>
               </Div>
@@ -225,9 +209,7 @@ export function SubscriptionStatusCard({
                   <Div className="font-semibold mb-1">
                     {t("app.subscription.subscription.canceled.title")}
                   </Div>
-                  <Div>
-                    {t("app.subscription.subscription.canceled.description")}
-                  </Div>
+                  <Div>{t("app.subscription.subscription.canceled.description")}</Div>
                 </Div>
               </Div>
             </Div>
@@ -236,11 +218,7 @@ export function SubscriptionStatusCard({
           {/* Management Button */}
           {!isCanceled && (
             <Div className="mt-6 pt-4 border-t">
-              <Button
-                onClick={handleManageSubscription}
-                variant="outline"
-                className="w-full"
-              >
+              <Button onClick={handleManageSubscription} variant="outline" className="w-full">
                 <ExternalLink className="h-4 w-4 mr-2" />
                 {initialSubscription.provider === PaymentProvider.NOWPAYMENTS
                   ? t("app.subscription.subscription.manage.nowpayments.button")

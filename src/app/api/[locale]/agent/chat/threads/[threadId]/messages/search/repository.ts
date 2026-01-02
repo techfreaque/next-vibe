@@ -69,15 +69,12 @@ export class MessageSearchRepository {
       const [thread] = await db
         .select({ id: chatThreads.id, rootFolderId: chatThreads.rootFolderId })
         .from(chatThreads)
-        .where(
-          and(eq(chatThreads.id, threadId), eq(chatThreads.userId, user.id)),
-        )
+        .where(and(eq(chatThreads.id, threadId), eq(chatThreads.userId, user.id)))
         .limit(1);
 
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.search.get.errors.notFound.title",
+          message: "app.api.agent.chat.threads.threadId.messages.search.get.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -152,8 +149,7 @@ export class MessageSearchRepository {
     } catch (error) {
       logger.error("Failed to search messages", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.messages.search.get.errors.serverError.title",
+        message: "app.api.agent.chat.threads.threadId.messages.search.get.errors.serverError.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

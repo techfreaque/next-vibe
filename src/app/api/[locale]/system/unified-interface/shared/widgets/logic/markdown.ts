@@ -19,15 +19,7 @@ export interface ProcessedMarkdown {
  * Markdown element types
  */
 export interface MarkdownElement {
-  type:
-    | "heading"
-    | "paragraph"
-    | "bold"
-    | "italic"
-    | "code"
-    | "list"
-    | "link"
-    | "text";
+  type: "heading" | "paragraph" | "bold" | "italic" | "code" | "list" | "link" | "text";
   content: string;
   level?: number; // for headings (1-6)
   ordered?: boolean; // for lists
@@ -134,9 +126,7 @@ export function parseMarkdownElements(content: string): MarkdownElement[] {
 /**
  * Extract and validate markdown data from WidgetData
  */
-export function extractMarkdownData(
-  value: WidgetData,
-): ProcessedMarkdown | null {
+export function extractMarkdownData(value: WidgetData): ProcessedMarkdown | null {
   // Handle string value directly
   if (typeof value === "string") {
     return {
@@ -148,18 +138,11 @@ export function extractMarkdownData(
 
   // Handle object value with markdown properties
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const content =
-      "content" in value && typeof value.content === "string"
-        ? value.content
-        : "";
+    const content = "content" in value && typeof value.content === "string" ? value.content : "";
     const sanitize =
-      "sanitize" in value && typeof value.sanitize === "boolean"
-        ? value.sanitize
-        : true;
+      "sanitize" in value && typeof value.sanitize === "boolean" ? value.sanitize : true;
     const allowHtml =
-      "allowHtml" in value && typeof value.allowHtml === "boolean"
-        ? value.allowHtml
-        : false;
+      "allowHtml" in value && typeof value.allowHtml === "boolean" ? value.allowHtml : false;
 
     if (!content) {
       return null;

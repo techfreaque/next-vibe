@@ -48,9 +48,7 @@ export function CreateCharacterForm({
         </Button>
         <Div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5" />
-          <Span className="font-medium">
-            {t("app.chat.createCharacter.title")}
-          </Span>
+          <Span className="font-medium">{t("app.chat.createCharacter.title")}</Span>
         </Div>
       </Div>
 

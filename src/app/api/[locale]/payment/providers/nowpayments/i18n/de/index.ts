@@ -18,8 +18,7 @@ export const translations: typeof enTranslations = {
     },
     productNotFound: {
       title: "Produkt nicht gefunden",
-      description:
-        "Das angegebene Produkt konnte nicht gefunden werden: {productId}",
+      description: "Das angegebene Produkt konnte nicht gefunden werden: {productId}",
     },
     userEmailRequired: {
       title: "Benutzer-E-Mail erforderlich",
@@ -27,8 +26,7 @@ export const translations: typeof enTranslations = {
     },
     checkoutCreationFailed: {
       title: "Checkout-Erstellung fehlgeschlagen",
-      description:
-        "NOWPayments-Checkout-Sitzung konnte nicht erstellt werden: {error}",
+      description: "NOWPayments-Checkout-Sitzung konnte nicht erstellt werden: {error}",
     },
     invoiceCreationFailed: {
       title: "Rechnungserstellung fehlgeschlagen",
@@ -45,33 +43,27 @@ export const translations: typeof enTranslations = {
     },
     subscriptionCreationFailed: {
       title: "Abo-Erstellung fehlgeschlagen",
-      description:
-        "NOWPayments-Abonnement konnte nicht erstellt werden: {error}",
+      description: "NOWPayments-Abonnement konnte nicht erstellt werden: {error}",
     },
     subscriptionRetrievalFailed: {
       title: "Abo-Abruf fehlgeschlagen",
-      description:
-        "NOWPayments-Abonnement konnte nicht abgerufen werden: {error}",
+      description: "NOWPayments-Abonnement konnte nicht abgerufen werden: {error}",
     },
     subscriptionCancellationFailed: {
       title: "Abo-Kündigung fehlgeschlagen",
-      description:
-        "NOWPayments-Abonnement konnte nicht gekündigt werden: {error}",
+      description: "NOWPayments-Abonnement konnte nicht gekündigt werden: {error}",
     },
     subscriptionListFailed: {
       title: "Abo-Listenabruf fehlgeschlagen",
-      description:
-        "NOWPayments-Abonnements konnten nicht aufgelistet werden: {error}",
+      description: "NOWPayments-Abonnements konnten nicht aufgelistet werden: {error}",
     },
     webhookVerificationFailed: {
       title: "Webhook-Verifizierung fehlgeschlagen",
-      description:
-        "NOWPayments-Webhook-Signatur konnte nicht verifiziert werden: {error}",
+      description: "NOWPayments-Webhook-Signatur konnte nicht verifiziert werden: {error}",
     },
     paymentStatusFailed: {
       title: "Abruf des Zahlungsstatus fehlgeschlagen",
-      description:
-        "Zahlungsstatus konnte nicht von NOWPayments abgerufen werden: {error}",
+      description: "Zahlungsstatus konnte nicht von NOWPayments abgerufen werden: {error}",
     },
   },
 

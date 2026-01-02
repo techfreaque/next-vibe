@@ -39,20 +39,14 @@ function isReleaseState(value: ParsedState | null): value is ReleaseState {
 export class StateManager {
   private stateFilePath: string;
 
-  constructor(
-    rootDir: string,
-    stateFileName = ".launchpad-release-state.json",
-  ) {
+  constructor(rootDir: string, stateFileName = ".launchpad-release-state.json") {
     this.stateFilePath = join(rootDir, stateFileName);
   }
 
   /**
    * Initialize a new release state
    */
-  initializeState(
-    targets: ReleaseTarget[],
-    logger: EndpointLogger,
-  ): ReleaseState {
+  initializeState(targets: ReleaseTarget[], logger: EndpointLogger): ReleaseState {
     const state: ReleaseState = {
       targets,
       completed: [],
@@ -80,9 +74,7 @@ export class StateManager {
       const parsedData = JSON.parse(stateData) as ParsedState | null;
 
       if (!isReleaseState(parsedData)) {
-        logger.error(
-          "Invalid state file format - does not match expected structure",
-        );
+        logger.error("Invalid state file format - does not match expected structure");
         return null;
       }
 
@@ -111,11 +103,7 @@ export class StateManager {
   /**
    * Mark a target as completed
    */
-  markCompleted(
-    state: ReleaseState,
-    directory: string,
-    logger: EndpointLogger,
-  ): void {
+  markCompleted(state: ReleaseState, directory: string, logger: EndpointLogger): void {
     if (!state.completed.includes(directory)) {
       state.completed.push(directory);
     }
@@ -127,11 +115,7 @@ export class StateManager {
   /**
    * Mark a target as failed
    */
-  markFailed(
-    state: ReleaseState,
-    directory: string,
-    logger: EndpointLogger,
-  ): void {
+  markFailed(state: ReleaseState, directory: string, logger: EndpointLogger): void {
     if (!state.failed.includes(directory)) {
       state.failed.push(directory);
     }
@@ -141,11 +125,7 @@ export class StateManager {
   /**
    * Mark a target as skipped
    */
-  markSkipped(
-    state: ReleaseState,
-    directory: string,
-    logger: EndpointLogger,
-  ): void {
+  markSkipped(state: ReleaseState, directory: string, logger: EndpointLogger): void {
     if (!state.skipped.includes(directory)) {
       state.skipped.push(directory);
     }
@@ -155,11 +135,7 @@ export class StateManager {
   /**
    * Update current index
    */
-  updateCurrentIndex(
-    state: ReleaseState,
-    index: number,
-    logger: EndpointLogger,
-  ): void {
+  updateCurrentIndex(state: ReleaseState, index: number, logger: EndpointLogger): void {
     state.currentIndex = index;
     this.saveState(state, logger);
   }
@@ -182,23 +158,16 @@ export class StateManager {
    * Get remaining targets to process
    */
   getRemainingTargets(state: ReleaseState): ReleaseTarget[] {
-    const processedDirectories = new Set([
-      ...state.completed,
-      ...state.skipped,
-    ]);
+    const processedDirectories = new Set([...state.completed, ...state.skipped]);
 
-    return state.targets.filter(
-      (target) => !processedDirectories.has(target.directory),
-    );
+    return state.targets.filter((target) => !processedDirectories.has(target.directory));
   }
 
   /**
    * Get failed targets that can be retried
    */
   getFailedTargets(state: ReleaseState): ReleaseTarget[] {
-    return state.targets.filter((target) =>
-      state.failed.includes(target.directory),
-    );
+    return state.targets.filter((target) => state.failed.includes(target.directory));
   }
 
   /**

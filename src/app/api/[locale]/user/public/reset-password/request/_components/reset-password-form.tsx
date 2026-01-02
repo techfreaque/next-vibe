@@ -5,13 +5,7 @@ import { ArrowLeft, CheckCircle, Loader2, Mail } from "next-vibe-ui/ui/icons";
 import { Environment } from "next-vibe/shared/utils/env-util";
 import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "next-vibe-ui/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
@@ -30,9 +24,7 @@ interface ResetPasswordFormProps {
   locale: CountryLanguage;
 }
 
-export default function ResetPasswordForm({
-  locale,
-}: ResetPasswordFormProps): JSX.Element {
+export default function ResetPasswordForm({ locale }: ResetPasswordFormProps): JSX.Element {
   const { t } = simpleT(locale);
 
   // Initialize logger for client-side operations
@@ -43,8 +35,7 @@ export default function ResetPasswordForm({
   );
 
   // Use the enhanced reset password request hook that includes all form logic
-  const { form, submitForm, isSubmitting, isSuccess, alert } =
-    useResetPasswordRequest(logger);
+  const { form, submitForm, isSubmitting, isSuccess, alert } = useResetPasswordRequest(logger);
 
   // Show success state when the form has been successfully submitted
   if (isSuccess) {
@@ -60,14 +51,10 @@ export default function ResetPasswordForm({
               <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
             </Div>
             <CardTitle className="text-2xl font-bold text-green-700 dark:text-green-400">
-              {t(
-                "app.user.other.resetPassword.auth.resetPassword.successTitle",
-              )}
+              {t("app.user.other.resetPassword.auth.resetPassword.successTitle")}
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-300 text-base">
-              {t(
-                "app.user.other.resetPassword.auth.resetPassword.successMessage",
-              )}
+              {t("app.user.other.resetPassword.auth.resetPassword.successMessage")}
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center flex flex-col gap-4">
@@ -81,9 +68,7 @@ export default function ResetPasswordForm({
               <Button asChild variant="outline" className="flex-1">
                 <Link href={`/${locale}/user/login`}>
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  {t(
-                    "app.user.other.resetPassword.auth.resetPassword.backToLogin",
-                  )}
+                  {t("app.user.other.resetPassword.auth.resetPassword.backToLogin")}
                 </Link>
               </Button>
             </Div>
@@ -115,11 +100,7 @@ export default function ResetPasswordForm({
           {/* Show form alert if any */}
           {alert && <FormAlert alert={alert} className="mb-6" />}
 
-          <Form
-            form={form}
-            onSubmit={submitForm}
-            className="flex flex-col gap-6"
-          >
+          <Form form={form} onSubmit={submitForm} className="flex flex-col gap-6">
             <EndpointFormField
               name="emailInput.email"
               control={form.control}
@@ -144,9 +125,7 @@ export default function ResetPasswordForm({
               ) : (
                 <>
                   <Mail className="mr-2 h-5 w-5" />
-                  {t(
-                    "app.user.other.resetPassword.auth.resetPassword.sendResetLink",
-                  )}
+                  {t("app.user.other.resetPassword.auth.resetPassword.sendResetLink")}
                 </>
               )}
             </Button>

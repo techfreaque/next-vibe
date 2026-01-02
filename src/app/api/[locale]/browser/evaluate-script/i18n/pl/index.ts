@@ -14,8 +14,7 @@ export const translations: typeof enTranslations = {
       },
       args: {
         label: "Argumenty",
-        description:
-          "Opcjonalna lista argumentów (UID elementów) do przekazania do funkcji",
+        description: "Opcjonalna lista argumentów (UID elementów) do przekazania do funkcji",
         placeholder: '[{"uid": "element-uid"}]',
         uid: {
           label: "UID elementu",

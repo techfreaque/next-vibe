@@ -41,10 +41,7 @@ export function BadgeWidget<const TKey extends string>({
 
   if (!value) {
     return (
-      <Badge
-        variant="outline"
-        className={cn("text-muted-foreground", className)}
-      >
+      <Badge variant="outline" className={cn("text-muted-foreground", className)}>
         —
       </Badge>
     );

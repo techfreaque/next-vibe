@@ -120,10 +120,7 @@ export function ImapMessagesList({
         // Convert string to enum if needed
         const statusEnum = statusFilter as keyof typeof ImapMessageStatusFilter;
         if (statusEnum in ImapMessageStatusFilter) {
-          messagesEndpoint.read.form.setValue(
-            "status",
-            ImapMessageStatusFilter[statusEnum],
-          );
+          messagesEndpoint.read.form.setValue("status", ImapMessageStatusFilter[statusEnum]);
         }
       }
       // Parse dateRange if provided (assuming format like "2024-01-01,2024-12-31")
@@ -184,9 +181,7 @@ export function ImapMessagesList({
   };
 
   if (isLoading) {
-    return (
-      <Div className="p-4">{t("app.admin.emails.imap.common.loading")}</Div>
-    );
+    return <Div className="p-4">{t("app.admin.emails.imap.common.loading")}</Div>;
   }
 
   return (
@@ -223,21 +218,12 @@ export function ImapMessagesList({
                 />
               </TableHead>
               <TableHead className="w-12" />
-              <TableHead>
-                {" "}
-                {t("app.admin.emails.imap.common.subject")}
-              </TableHead>
+              <TableHead> {t("app.admin.emails.imap.common.subject")}</TableHead>
               <TableHead> {t("app.admin.emails.imap.common.from")} </TableHead>
               <TableHead> {t("app.admin.emails.imap.common.date")} </TableHead>
               <TableHead> {t("app.admin.emails.imap.common.size")} </TableHead>
-              <TableHead>
-                {" "}
-                {t("app.admin.emails.imap.common.status")}{" "}
-              </TableHead>
-              <TableHead>
-                {" "}
-                {t("app.admin.emails.imap.common.actions")}{" "}
-              </TableHead>
+              <TableHead> {t("app.admin.emails.imap.common.status")} </TableHead>
+              <TableHead> {t("app.admin.emails.imap.common.actions")} </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -271,15 +257,11 @@ export function ImapMessagesList({
                       {message.isFlagged && (
                         <Star className="h-4 w-4 text-yellow-500 fill-current" />
                       )}
-                      {message.hasAttachments && (
-                        <Paperclip className="h-4 w-4 text-gray-600" />
-                      )}
+                      {message.hasAttachments && <Paperclip className="h-4 w-4 text-gray-600" />}
                     </Div>
                   </TableCell>
                   <TableCell>
-                    <Div
-                      className={`truncate max-w-xs ${!message.isRead ? "font-semibold" : ""}`}
-                    >
+                    <Div className={`truncate max-w-xs ${!message.isRead ? "font-semibold" : ""}`}>
                       {message.subject}
                     </Div>
                   </TableCell>
@@ -289,9 +271,7 @@ export function ImapMessagesList({
                         {message.senderName || message.senderEmail}
                       </Div>
                       {message.senderName && (
-                        <Div className="text-sm text-gray-500">
-                          {message.senderEmail}
-                        </Div>
+                        <Div className="text-sm text-gray-500">{message.senderEmail}</Div>
                       )}
                     </Div>
                   </TableCell>
@@ -301,9 +281,7 @@ export function ImapMessagesList({
                     </Div>
                   </TableCell>
                   <TableCell>
-                    <Div className="text-sm">
-                      {/* TODO: Add messageSize to API definition */}-
-                    </Div>
+                    <Div className="text-sm">{/* TODO: Add messageSize to API definition */}-</Div>
                   </TableCell>
                   <TableCell>
                     {/* TODO: Add syncStatus to API definition */}
@@ -344,11 +322,7 @@ export function ImapMessagesList({
             >
               {t("app.admin.emails.imap.common.previous")}
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(page + 1)}
-            >
+            <Button variant="outline" size="sm" onClick={() => setPage(page + 1)}>
               {t("app.admin.emails.imap.common.next")}
             </Button>
           </Div>

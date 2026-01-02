@@ -47,8 +47,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.system.generators.env.post.fields.outputDir.label",
-          description:
-            "app.api.system.generators.env.post.fields.outputDir.description",
+          description: "app.api.system.generators.env.post.fields.outputDir.description",
           columns: 12,
         },
         z.string().default("src/app/api/[locale]/system/generated"),
@@ -59,8 +58,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.generators.env.post.fields.verbose.label",
-          description:
-            "app.api.system.generators.env.post.fields.verbose.description",
+          description: "app.api.system.generators.env.post.fields.verbose.description",
           columns: 6,
         },
         z.boolean().default(false),
@@ -71,8 +69,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.generators.env.post.fields.dryRun.label",
-          description:
-            "app.api.system.generators.env.post.fields.dryRun.description",
+          description: "app.api.system.generators.env.post.fields.dryRun.description",
           columns: 6,
         },
         z.boolean().default(false),
@@ -96,16 +93,14 @@ const { POST } = createEndpoint({
       serverEnvFiles: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.env.post.fields.serverEnvFiles.label",
+          content: "app.api.system.generators.env.post.fields.serverEnvFiles.label",
         },
         z.coerce.number(),
       ),
       clientEnvFiles: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.env.post.fields.clientEnvFiles.label",
+          content: "app.api.system.generators.env.post.fields.clientEnvFiles.label",
         },
         z.coerce.number(),
       ),
@@ -119,8 +114,7 @@ const { POST } = createEndpoint({
       outputPaths: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.env.post.fields.outputPaths.label",
+          content: "app.api.system.generators.env.post.fields.outputPaths.label",
         },
         z.object({
           server: z.string().optional(),
@@ -156,48 +150,39 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.generators.env.post.errors.validation.title",
-      description:
-        "app.api.system.generators.env.post.errors.validation.description",
+      description: "app.api.system.generators.env.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.generators.env.post.errors.unauthorized.title",
-      description:
-        "app.api.system.generators.env.post.errors.unauthorized.description",
+      description: "app.api.system.generators.env.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.generators.env.post.errors.forbidden.title",
-      description:
-        "app.api.system.generators.env.post.errors.forbidden.description",
+      description: "app.api.system.generators.env.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.generators.env.post.errors.notFound.title",
-      description:
-        "app.api.system.generators.env.post.errors.notFound.description",
+      description: "app.api.system.generators.env.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.generators.env.post.errors.server.title",
-      description:
-        "app.api.system.generators.env.post.errors.server.description",
+      description: "app.api.system.generators.env.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.generators.env.post.errors.unknown.title",
-      description:
-        "app.api.system.generators.env.post.errors.unknown.description",
+      description: "app.api.system.generators.env.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.generators.env.post.errors.unsavedChanges.title",
-      description:
-        "app.api.system.generators.env.post.errors.unsavedChanges.description",
+      description: "app.api.system.generators.env.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.generators.env.post.errors.conflict.title",
-      description:
-        "app.api.system.generators.env.post.errors.conflict.description",
+      description: "app.api.system.generators.env.post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.generators.env.post.errors.network.title",
-      description:
-        "app.api.system.generators.env.post.errors.network.description",
+      description: "app.api.system.generators.env.post.errors.network.description",
     },
   },
   successTypes: {

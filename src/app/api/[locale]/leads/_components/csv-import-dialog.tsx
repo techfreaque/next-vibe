@@ -55,10 +55,7 @@ export function CsvImportDialog({
   locale,
 }: CsvImportDialogProps): React.JSX.Element {
   const { t } = simpleT(locale);
-  const logger = React.useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = React.useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
 
   const endpoint = useLeadsImportEndpoint(logger);
 
@@ -100,9 +97,7 @@ export function CsvImportDialog({
               >
                 <FormFieldGroup
                   title={"app.admin.leads.leads.admin.import.title" as const}
-                  description={
-                    "app.admin.leads.leads.admin.import.description" as const
-                  }
+                  description={"app.admin.leads.leads.admin.import.description" as const}
                 >
                   {/* Template Download */}
                   <Div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
@@ -110,14 +105,10 @@ export function CsvImportDialog({
                       <FileText className="h-5 w-5 text-blue-600" />
                       <Div>
                         <P className="font-medium text-blue-900 dark:text-blue-100">
-                          {t(
-                            "app.admin.leads.leads.admin.import.template.title",
-                          )}
+                          {t("app.admin.leads.leads.admin.import.template.title")}
                         </P>
                         <P className="text-sm text-blue-700 dark:text-blue-300">
-                          {t(
-                            "app.admin.leads.leads.admin.import.template.description",
-                          )}
+                          {t("app.admin.leads.leads.admin.import.template.description")}
                         </P>
                       </Div>
                     </Div>
@@ -128,9 +119,7 @@ export function CsvImportDialog({
                       className="border-blue-200 text-blue-700 hover:bg-blue-100"
                     >
                       <Download className="h-4 w-4 mr-2" />
-                      {t(
-                        "app.admin.leads.leads.admin.import.template.download",
-                      )}
+                      {t("app.admin.leads.leads.admin.import.template.download")}
                     </Button>
                   </Div>
 
@@ -153,12 +142,9 @@ export function CsvImportDialog({
                         <Div className="flex items-center justify-center gap-3">
                           <FileText className="h-8 w-8 text-green-600" />
                           <Div>
-                            <P className="font-medium">
-                              {endpoint.selectedFile.name}
-                            </P>
+                            <P className="font-medium">{endpoint.selectedFile.name}</P>
                             <P className="text-sm text-gray-500">
-                              {(endpoint.selectedFile.size / 1024).toFixed(1)}{" "}
-                              KB
+                              {(endpoint.selectedFile.size / 1024).toFixed(1)} KB
                             </P>
                           </Div>
                         </Div>
@@ -166,14 +152,10 @@ export function CsvImportDialog({
                         <Div>
                           <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                           <P className="text-lg font-medium mb-2">
-                            {t(
-                              "app.admin.leads.leads.admin.import.file.dropzone.title",
-                            )}
+                            {t("app.admin.leads.leads.admin.import.file.dropzone.title")}
                           </P>
                           <P className="text-gray-500 mb-4">
-                            {t(
-                              "app.admin.leads.leads.admin.import.file.dropzone.description",
-                            )}
+                            {t("app.admin.leads.leads.admin.import.file.dropzone.description")}
                           </P>
                           <Input<"file">
                             type="file"
@@ -189,13 +171,10 @@ export function CsvImportDialog({
                 </FormFieldGroup>
 
                 {/* File validation - show errors if file is missing */}
-                {(!endpoint.selectedFile ||
-                  !endpoint.create.form.watch("file")) && (
+                {(!endpoint.selectedFile || !endpoint.create.form.watch("file")) && (
                   <Div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800">
                     <P className="text-red-800 dark:text-red-200 text-sm">
-                      {t(
-                        "app.admin.leads.leads.admin.import.file.validation.required",
-                      )}
+                      {t("app.admin.leads.leads.admin.import.file.validation.required")}
                     </P>
                   </Div>
                 )}
@@ -221,12 +200,8 @@ export function CsvImportDialog({
                 />
 
                 <FormFieldGroup
-                  title={
-                    "app.admin.leads.leads.admin.import.options.title" as const
-                  }
-                  description={
-                    "app.admin.leads.leads.admin.import.options.description" as const
-                  }
+                  title={"app.admin.leads.leads.admin.import.options.title" as const}
+                  description={"app.admin.leads.leads.admin.import.options.description" as const}
                 >
                   {/* Skip Duplicates */}
                   <EndpointFormField
@@ -254,12 +229,8 @@ export function CsvImportDialog({
                 </FormFieldGroup>
 
                 <FormFieldGroup
-                  title={
-                    "app.admin.leads.leads.admin.import.batch.title" as const
-                  }
-                  description={
-                    "app.admin.leads.leads.admin.import.batch.description" as const
-                  }
+                  title={"app.admin.leads.leads.admin.import.batch.title" as const}
+                  description={"app.admin.leads.leads.admin.import.batch.description" as const}
                 >
                   {/* Use Chunked Processing */}
                   <EndpointFormField
@@ -289,12 +260,8 @@ export function CsvImportDialog({
                 </FormFieldGroup>
 
                 <FormFieldGroup
-                  title={
-                    "app.admin.leads.leads.admin.import.defaults.title" as const
-                  }
-                  description={
-                    "app.admin.leads.leads.admin.import.defaults.description" as const
-                  }
+                  title={"app.admin.leads.leads.admin.import.defaults.title" as const}
+                  description={"app.admin.leads.leads.admin.import.defaults.description" as const}
                 >
                   {/* Default Country */}
                   <EndpointFormField
@@ -365,9 +332,7 @@ export function CsvImportDialog({
                         {t("app.admin.leads.leads.admin.import.progress.title")}
                       </P>
                       <Span className="text-sm text-gray-500">
-                        {t(
-                          "app.admin.leads.leads.admin.import.progress.processing",
-                        )}
+                        {t("app.admin.leads.leads.admin.import.progress.processing")}
                       </Span>
                     </Div>
                     <Progress value={undefined} className="w-full" />
@@ -380,12 +345,10 @@ export function CsvImportDialog({
                     <CheckCircle className="h-4 w-4" />
                     <AlertDescription>
                       {t("app.admin.leads.leads.admin.import.success", {
-                        successful:
-                          endpoint.create.response.data.successfulImports,
+                        successful: endpoint.create.response.data.successfulImports,
                         total: endpoint.create.response.data.totalRows,
                         failed: endpoint.create.response.data.failedImports,
-                        duplicates:
-                          endpoint.create.response.data.duplicateEmails,
+                        duplicates: endpoint.create.response.data.duplicateEmails,
                       })}
                     </AlertDescription>
                   </Alert>
@@ -401,11 +364,7 @@ export function CsvImportDialog({
             <FormAlert alert={endpoint.alert} />
           </Div>
 
-          <Button
-            variant="outline"
-            onClick={handleClose}
-            disabled={endpoint.create.isSubmitting}
-          >
+          <Button variant="outline" onClick={handleClose} disabled={endpoint.create.isSubmitting}>
             {t("app.admin.common.actions.cancel")}
           </Button>
           <Button

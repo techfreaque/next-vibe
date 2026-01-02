@@ -152,8 +152,7 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Postać zaktualizowana",
-      description:
-        "Twoja niestandardowa postać została pomyślnie zaktualizowana",
+      description: "Twoja niestandardowa postać została pomyślnie zaktualizowana",
     },
   },
   delete: {

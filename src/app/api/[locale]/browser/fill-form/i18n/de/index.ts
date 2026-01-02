@@ -43,18 +43,15 @@ export const translations: typeof enTranslations = {
   errors: {
     validation: {
       title: "Validierungsfehler",
-      description:
-        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
     },
     network: {
       title: "Netzwerkfehler",
-      description:
-        "Ein Netzwerkfehler ist während des Formularausfüllens aufgetreten",
+      description: "Ein Netzwerkfehler ist während des Formularausfüllens aufgetreten",
     },
     unauthorized: {
       title: "Nicht autorisiert",
-      description:
-        "Sie sind nicht berechtigt, Formularausfüllvorgänge durchzuführen",
+      description: "Sie sind nicht berechtigt, Formularausfüllvorgänge durchzuführen",
     },
     forbidden: {
       title: "Verboten",
@@ -66,23 +63,19 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Serverfehler",
-      description:
-        "Ein interner Serverfehler ist während des Formularausfüllens aufgetreten",
+      description: "Ein interner Serverfehler ist während des Formularausfüllens aufgetreten",
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description:
-        "Ein unbekannter Fehler ist während des Formularausfüllens aufgetreten",
+      description: "Ein unbekannter Fehler ist während des Formularausfüllens aufgetreten",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description:
-        "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
+      description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
     },
     conflict: {
       title: "Konflikt",
-      description:
-        "Ein Konflikt ist während des Formularausfüllens aufgetreten",
+      description: "Ein Konflikt ist während des Formularausfüllens aufgetreten",
     },
   },
 

@@ -59,8 +59,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.db.ping.fields.keepConnectionOpen.title",
-          description:
-            "app.api.system.db.ping.fields.keepConnectionOpen.description",
+          description: "app.api.system.db.ping.fields.keepConnectionOpen.description",
           columns: 6,
         },
         z.boolean().optional().default(false),
@@ -79,8 +78,7 @@ const { POST } = createEndpoint({
       isAccessible: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.ping.fields.isAccessible.content" as const,
+          content: "app.api.system.db.ping.fields.isAccessible.content" as const,
           label: "app.api.system.db.ping.fields.isAccessible.title",
         },
         z.boolean(),
@@ -98,10 +96,8 @@ const { POST } = createEndpoint({
       totalConnections: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.ping.fields.connectionInfo.totalConnections.content" as const,
-          label:
-            "app.api.system.db.ping.fields.connectionInfo.totalConnections.content",
+          content: "app.api.system.db.ping.fields.connectionInfo.totalConnections.content" as const,
+          label: "app.api.system.db.ping.fields.connectionInfo.totalConnections.content",
         },
         z.coerce.number(),
       ),
@@ -109,10 +105,8 @@ const { POST } = createEndpoint({
       idleConnections: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.ping.fields.connectionInfo.idleConnections.content" as const,
-          label:
-            "app.api.system.db.ping.fields.connectionInfo.idleConnections.content",
+          content: "app.api.system.db.ping.fields.connectionInfo.idleConnections.content" as const,
+          label: "app.api.system.db.ping.fields.connectionInfo.idleConnections.content",
         },
         z.coerce.number(),
       ),
@@ -120,10 +114,8 @@ const { POST } = createEndpoint({
       waitingClients: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.db.ping.fields.connectionInfo.waitingClients.content" as const,
-          label:
-            "app.api.system.db.ping.fields.connectionInfo.waitingClients.content",
+          content: "app.api.system.db.ping.fields.connectionInfo.waitingClients.content" as const,
+          label: "app.api.system.db.ping.fields.connectionInfo.waitingClients.content",
         },
         z.coerce.number(),
       ),
@@ -142,8 +134,7 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.db.ping.post.errors.unauthorized.title",
-      description:
-        "app.api.system.db.ping.post.errors.unauthorized.description",
+      description: "app.api.system.db.ping.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.db.ping.post.errors.forbidden.title",

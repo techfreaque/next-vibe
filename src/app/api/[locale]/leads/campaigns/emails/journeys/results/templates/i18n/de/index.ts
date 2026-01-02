@@ -63,8 +63,7 @@ export const translations: typeof enTranslations = {
       caseStudyTimeframe: "Zeitraum",
       caseStudyResults: "Erzielte Ergebnisse",
       roiTitle: "Ihr potenzieller ROI",
-      roiExplanation:
-        "Basierend auf ähnlichen Kunden ist das, was Sie erwarten können",
+      roiExplanation: "Basierend auf ähnlichen Kunden ist das, was Sie erwarten können",
       metric1Label: "Umsatzwachstum",
       metric1Value: "Bis zu 300%",
       metric2Label: "Zeitersparnis",
@@ -91,19 +90,15 @@ export const translations: typeof enTranslations = {
       intro:
         "Wir verstehen, dass Sie die richtige Wahl treffen möchten. Lassen Sie uns transparent darüber sprechen, was uns auszeichnet.",
       competitorTitle: "Was Sie über Alternativen wissen sollten",
-      competitorAnalysis:
-        "Während es andere Optionen gibt, sollten Sie Folgendes bedenken:",
-      competitorPoint1:
-        "Höhere Kosten mit versteckten Gebühren, die sich summieren",
+      competitorAnalysis: "Während es andere Optionen gibt, sollten Sie Folgendes bedenken:",
+      competitorPoint1: "Höhere Kosten mit versteckten Gebühren, die sich summieren",
       competitorPoint2: "Eingeschränkter Support und längere Reaktionszeiten",
-      competitorPoint3:
-        "Weniger flexible Bedingungen und starre Vertragsanforderungen",
+      competitorPoint3: "Weniger flexible Bedingungen und starre Vertragsanforderungen",
       opportunityCostTitle: "Die wahren Kosten des Wartens",
       opportunityCostText:
         "Jeder Tag ohne die richtige Lösung bedeutet verpasste Chancen und verlorenes Potenzial. Lassen Sie nicht zu, dass Unentschlossenheit Sie mehr kostet als unser Service.",
       ctaText: "Treffen Sie heute die kluge Wahl",
-      urgency:
-        "Begrenzte Plätze verfügbar diesen Monat. Verpassen Sie es nicht.",
+      urgency: "Begrenzte Plätze verfügbar diesen Monat. Verpassen Sie es nicht.",
       subject: "Die Wahrheit über Ihre Optionen",
     },
     followup3: {
@@ -130,13 +125,11 @@ export const translations: typeof enTranslations = {
         "Wir sind hier, um Ihnen zum Erfolg zu verhelfen, ob Sie mit uns arbeiten oder nicht. Hier sind einige Einblicke, die Ihrem Unternehmen zum Erfolg verhelfen.",
       insightsTitle: "Brancheneinblicke & Tipps",
       insight1: "Neueste Trends und Best Practices in Ihrer Branche",
-      insight2:
-        "Bewährte Strategien zur Verbesserung von Effizienz und Ergebnissen",
+      insight2: "Bewährte Strategien zur Verbesserung von Effizienz und Ergebnissen",
       freeResourceTitle: "Kostenlose Ressource für Sie",
       freeResourceDescription:
         "Laden Sie unseren umfassenden Leitfaden voller umsetzbarer Tipps und Strategien herunter",
-      noObligationText:
-        "Ohne Verpflichtung - das ist unsere Art, Ihnen zum Erfolg zu verhelfen",
+      noObligationText: "Ohne Verpflichtung - das ist unsere Art, Ihnen zum Erfolg zu verhelfen",
       ctaText: "Kostenlose Ressource herunterladen",
       subject: "Einblicke für das Wachstum Ihres Unternehmens",
     },
@@ -146,8 +139,7 @@ export const translations: typeof enTranslations = {
       intro:
         "Wir haben bemerkt, dass Sie in letzter Zeit nicht aktiv waren. Wir haben einige aufregende Verbesserungen vorgenommen und haben ein spezielles Willkommen-zurück-Angebot nur für Sie.",
       specialOfferTitle: "Exklusives Willkommen-zurück-Angebot",
-      discountOffer:
-        "Erhalten Sie 50% Rabatt auf Ihren ersten Monat bei Ihrer Rückkehr",
+      discountOffer: "Erhalten Sie 50% Rabatt auf Ihren ersten Monat bei Ihrer Rückkehr",
       ctaText: "Fordern Sie Ihr Willkommen-zurück-Angebot an",
       subject: "Wir vermissen Sie - Sonderangebot im Inneren",
     },

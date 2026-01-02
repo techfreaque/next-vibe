@@ -26,21 +26,17 @@ const pulseStatusEndpoint = createEndpoint({
   method: Methods.GET,
   path: ["system", "tasks", "pulse", "status"],
   title: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.title",
-  description:
-    "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.description",
+  description: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.description",
   icon: "activity",
   category: "app.api.system.unifiedInterface.tasks.pulseSystem.status.category",
   allowedRoles: [],
   aliases: ["pulse:status"],
-  tags: [
-    "app.api.system.unifiedInterface.tasks.pulseSystem.status.tags.status",
-  ],
+  tags: ["app.api.system.unifiedInterface.tasks.pulseSystem.status.tags.status"],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.container.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.container.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.container.description",
       layoutType: LayoutType.GRID,
@@ -106,14 +102,12 @@ const pulseStatusEndpoint = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.validation.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.validation.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.network.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.network.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.network.description",
     },
@@ -124,55 +118,45 @@ const pulseStatusEndpoint = createEndpoint({
         "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.forbidden.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.forbidden.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.notFound.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.notFound.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.internal.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.internal.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unknown.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unknown.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unsaved.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unsaved.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.conflict.title",
+      title: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.conflict.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title:
-      "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.success.title",
-    description:
-      "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.success.description",
+    title: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.success.title",
+    description: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.success.description",
   },
 });
 
-export type PulseStatusResponseInput =
-  typeof pulseStatusEndpoint.GET.types.ResponseInput;
-export type PulseStatusResponseOutput =
-  typeof pulseStatusEndpoint.GET.types.ResponseOutput;
+export type PulseStatusResponseInput = typeof pulseStatusEndpoint.GET.types.ResponseInput;
+export type PulseStatusResponseOutput = typeof pulseStatusEndpoint.GET.types.ResponseOutput;
 
 const definitions = {
   GET: pulseStatusEndpoint.GET,

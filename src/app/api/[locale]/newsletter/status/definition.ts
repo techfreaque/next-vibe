@@ -83,48 +83,39 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.newsletter.status.errors.validation.title" as const,
-      description:
-        "app.api.newsletter.status.errors.validation.description" as const,
+      description: "app.api.newsletter.status.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.newsletter.status.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.status.errors.internal.description" as const,
+      description: "app.api.newsletter.status.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.newsletter.status.errors.unauthorized.title" as const,
-      description:
-        "app.api.newsletter.status.errors.unauthorized.description" as const,
+      description: "app.api.newsletter.status.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.newsletter.status.errors.unauthorized.title" as const,
-      description:
-        "app.api.newsletter.status.errors.unauthorized.description" as const,
+      description: "app.api.newsletter.status.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.newsletter.status.errors.notFound.title" as const,
-      description:
-        "app.api.newsletter.status.errors.notFound.description" as const,
+      description: "app.api.newsletter.status.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.newsletter.status.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.status.errors.internal.description" as const,
+      description: "app.api.newsletter.status.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.newsletter.status.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.status.errors.internal.description" as const,
+      description: "app.api.newsletter.status.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.newsletter.status.errors.validation.title" as const,
-      description:
-        "app.api.newsletter.status.errors.validation.description" as const,
+      description: "app.api.newsletter.status.errors.validation.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.newsletter.status.errors.validation.title" as const,
-      description:
-        "app.api.newsletter.status.errors.validation.description" as const,
+      description: "app.api.newsletter.status.errors.validation.description" as const,
     },
   },
   successTypes: {

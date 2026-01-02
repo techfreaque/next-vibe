@@ -12,12 +12,7 @@ import { Form } from "next-vibe-ui/ui/form/form";
 import { Mic, Phone, Send, Square } from "next-vibe-ui/ui/icons";
 import { Kbd } from "next-vibe-ui/ui/kbd";
 import { Textarea } from "next-vibe-ui/ui/textarea";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
@@ -45,12 +40,7 @@ interface ChatInputProps {
   className?: string;
 }
 
-export function ChatInput({
-  locale,
-  logger,
-  user,
-  className,
-}: ChatInputProps): JSX.Element {
+export function ChatInput({ locale, logger, user, className }: ChatInputProps): JSX.Element {
   const chat = useChatContext();
   const {
     input,
@@ -131,10 +121,7 @@ export function ChatInput({
 
       {/* Input area */}
       {showTextarea && (
-        <Div
-          className="relative mb-2 @sm:mb-3"
-          data-tour={TOUR_DATA_ATTRS.CHAT_INPUT}
-        >
+        <Div className="relative mb-2 @sm:mb-3" data-tour={TOUR_DATA_ATTRS.CHAT_INPUT}>
           <Textarea
             ref={inputRef}
             value={input}
@@ -278,9 +265,7 @@ export function ChatInput({
                     <Mic className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>
-                  {t("app.chat.voiceMode.tapToRecord")}
-                </TooltipContent>
+                <TooltipContent>{t("app.chat.voiceMode.tapToRecord")}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
@@ -300,9 +285,7 @@ export function ChatInput({
                     <Square className="h-3.5 w-3.5 fill-current" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>
-                  {t("app.chat.actions.stopGeneration")}
-                </TooltipContent>
+                <TooltipContent>{t("app.chat.actions.stopGeneration")}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           ) : (
@@ -319,9 +302,7 @@ export function ChatInput({
                     <Send className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>
-                  {t("app.chat.actions.sendMessage")}
-                </TooltipContent>
+                <TooltipContent>{t("app.chat.actions.sendMessage")}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}

@@ -67,11 +67,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
     logger: EndpointLogger,
   ): Promise<string | null> {
     try {
-      const [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, userId))
-        .limit(1);
+      const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
 
       if (!user?.stripeCustomerId) {
         logger.debug("No Stripe customer ID found for user", { userId });
@@ -96,10 +92,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
           });
 
           // Clear invalid customer ID
-          await db
-            .update(users)
-            .set({ stripeCustomerId: null })
-            .where(eq(users.id, userId));
+          await db.update(users).set({ stripeCustomerId: null }).where(eq(users.id, userId));
 
           return null;
         }
@@ -134,10 +127,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         currency: data.currency,
       });
 
-      const stripeCustomerId = await this.findStripeCustomerByUserId(
-        userId,
-        logger,
-      );
+      const stripeCustomerId = await this.findStripeCustomerByUserId(userId, logger);
       if (!stripeCustomerId) {
         logger.error("payment.invoice.error.customerNotFound", { userId });
         return fail({
@@ -165,16 +155,12 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         invoice: invoice.id,
         amount: Math.round(data.amount * 100),
         currency: data.currency.toLowerCase(),
-        description:
-          data.description || t("app.api.payment.invoice.defaultItem"),
+        description: data.description || t("app.api.payment.invoice.defaultItem"),
       });
 
-      const finalizedInvoice = await stripe.invoices.finalizeInvoice(
-        invoice.id,
-        {
-          auto_advance: true,
-        },
-      );
+      const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id, {
+        auto_advance: true,
+      });
 
       logger.debug("Invoice created successfully", {
         invoiceId: finalizedInvoice.id,
@@ -205,9 +191,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
           invoicePdf: finalizedInvoice.invoice_pdf || "",
           dueDate: data.dueDate || new Date().toISOString(),
           paidAt: finalizedInvoice.status_transitions?.paid_at
-            ? new Date(
-                finalizedInvoice.status_transitions.paid_at * 1000,
-              ).toISOString()
+            ? new Date(finalizedInvoice.status_transitions.paid_at * 1000).toISOString()
             : undefined,
           createdAt: new Date(finalizedInvoice.created * 1000).toISOString(),
           updatedAt: new Date().toISOString(),
@@ -239,10 +223,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
     try {
       logger.debug("Creating customer portal session", { userId });
 
-      const stripeCustomerId = await this.findStripeCustomerByUserId(
-        userId,
-        logger,
-      );
+      const stripeCustomerId = await this.findStripeCustomerByUserId(userId, logger);
       if (!stripeCustomerId) {
         logger.error("payment.portal.error.customerNotFound", { userId });
         return fail({
@@ -270,8 +251,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         customerPortalUrl: session.url,
       });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
 
       // Check for Stripe portal configuration error
       if (
@@ -289,8 +269,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
           messageParams: {
             error:
               "Stripe Customer Portal is not configured. Please configure it in Stripe Dashboard.",
-            configUrl:
-              "https://dashboard.stripe.com/test/settings/billing/portal",
+            configUrl: "https://dashboard.stripe.com/test/settings/billing/portal",
           },
         });
       }
@@ -347,8 +326,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         });
       }
 
-      const paymentIntentId =
-        transaction.providerPaymentIntentId || transaction.providerSessionId;
+      const paymentIntentId = transaction.providerPaymentIntentId || transaction.providerSessionId;
       if (!paymentIntentId) {
         logger.error("payment.refund.error.noPaymentIntent", {
           transactionId: data.transactionId,
@@ -366,10 +344,8 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         payment_intent: paymentIntentId,
         amount: data.amount ? Math.round(data.amount * 100) : undefined,
         reason:
-          (data.reason as
-            | "duplicate"
-            | "fraudulent"
-            | "requested_by_customer") || "requested_by_customer",
+          (data.reason as "duplicate" | "fraudulent" | "requested_by_customer") ||
+          "requested_by_customer",
         metadata: {
           userId,
           transactionId: data.transactionId,
@@ -393,9 +369,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
           amount: (refund.amount || 0) / 100,
           currency: refund.currency.toUpperCase(),
           status: refund.status || "pending",
-          reason:
-            data.reason ||
-            t("app.api.payment.refund.reason.requestedByCustomer"),
+          reason: data.reason || t("app.api.payment.refund.reason.requestedByCustomer"),
           createdAt: new Date(refund.created * 1000).toISOString(),
           updatedAt: new Date().toISOString(),
         },

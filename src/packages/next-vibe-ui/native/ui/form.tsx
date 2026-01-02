@@ -60,10 +60,7 @@ const FormFieldContext = React.createContext<
   FormFieldContextValue<FieldValues, FieldPath<FieldValues>> | undefined
 >(undefined);
 
-const FormField = <
-  TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>,
->({
+const FormField = <TFieldValues extends FieldValues, TName extends FieldPath<TFieldValues>>({
   ...props
 }: ControllerProps<TFieldValues, TName>): JSX.Element => {
   return (
@@ -102,9 +99,7 @@ const useFormField = (): UseFormFieldReturn => {
   };
 };
 
-const FormItemContext = React.createContext<FormItemContextValue | undefined>(
-  undefined,
-);
+const FormItemContext = React.createContext<FormItemContextValue | undefined>(undefined);
 
 function FormItem({ className, children }: FormItemProps): JSX.Element {
   const id = React.useId();
@@ -142,10 +137,7 @@ function FormDescription({
   const { formDescriptionId } = useFormField();
 
   return (
-    <Span
-      id={formDescriptionId}
-      className={className ?? "text-sm text-muted-foreground pt-1"}
-    >
+    <Span id={formDescriptionId} className={className ?? "text-sm text-muted-foreground pt-1"}>
       {children}
     </Span>
   );
@@ -193,8 +185,7 @@ function FormInput({
   description?: string;
   onChange?: (value: string) => void;
 }): JSX.Element {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField();
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
 
   return (
     <FormItem>
@@ -202,11 +193,7 @@ function FormInput({
 
       <Input
         aria-labelledby={formItemId}
-        aria-describedby={
-          error
-            ? `${formDescriptionId} ${formMessageId}`
-            : `${formDescriptionId}`
-        }
+        aria-describedby={error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`}
         aria-invalid={!!error}
         onChangeText={onChange}
         {...(className ? { className } : style ? { style } : {})}
@@ -245,8 +232,7 @@ function FormTextarea({
   description?: string;
   onChange?: (value: string) => void;
 }): JSX.Element {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField();
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
 
   return (
     <FormItem>
@@ -254,11 +240,7 @@ function FormTextarea({
 
       <Textarea
         aria-labelledby={formItemId}
-        aria-describedby={
-          error
-            ? `${formDescriptionId} ${formMessageId}`
-            : `${formDescriptionId}`
-        }
+        aria-describedby={error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`}
         aria-invalid={!!error}
         onChangeText={onChange}
         {...(className ? { className } : style ? { style } : {})}
@@ -288,17 +270,13 @@ function FormCheckbox({
   style,
   className,
   disabled,
-}: Omit<
-  React.ComponentPropsWithoutRef<typeof Checkbox>,
-  "checked" | "onCheckedChange"
-> & {
+}: Omit<React.ComponentPropsWithoutRef<typeof Checkbox>, "checked" | "onCheckedChange"> & {
   label?: string;
   description?: string;
   value?: boolean;
   onChange?: (value: boolean) => void;
 }): JSX.Element {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField();
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
 
   const formItemClassName = "px-1";
   const viewClassName = "flex-row gap-3 items-center";
@@ -309,9 +287,7 @@ function FormCheckbox({
         <Checkbox
           aria-labelledby={formItemId}
           aria-describedby={
-            error
-              ? `${formDescriptionId} ${formMessageId}`
-              : `${formDescriptionId}`
+            error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`
           }
           aria-invalid={!!error}
           onCheckedChange={onChange}
@@ -329,14 +305,8 @@ function FormCheckbox({
 
 FormCheckbox.displayName = "FormCheckbox";
 
-function FormDatePicker({
-  label,
-  description,
-  value,
-  onChange,
-}: FormDatePickerProps): JSX.Element {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField();
+function FormDatePicker({ label, description, value, onChange }: FormDatePickerProps): JSX.Element {
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
 
   const buttonClassName = "flex-row gap-3 justify-start px-3 relative";
   const clearButtonClassName = "absolute right-0 active:opacity-70 pr-3";
@@ -352,9 +322,7 @@ function FormDatePicker({
             className={buttonClassName}
             aria-labelledby={formItemId}
             aria-describedby={
-              error
-                ? `${formDescriptionId} ${formMessageId}`
-                : `${formDescriptionId}`
+              error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`
             }
             aria-invalid={!!error}
           >
@@ -403,17 +371,13 @@ function FormRadioGroup({
   disabled,
   defaultValue,
   children,
-}: Omit<
-  React.ComponentPropsWithoutRef<typeof RadioGroup>,
-  "onValueChange" | "value"
-> & {
+}: Omit<React.ComponentPropsWithoutRef<typeof RadioGroup>, "onValueChange" | "value"> & {
   label?: string;
   description?: string;
   value?: string;
   onChange?: (value: string) => void;
 }): JSX.Element {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField();
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
 
   return (
     <FormItem className="gap-3">
@@ -423,11 +387,7 @@ function FormRadioGroup({
       </View>
       <RadioGroup
         aria-labelledby={formItemId}
-        aria-describedby={
-          error
-            ? `${formDescriptionId} ${formMessageId}`
-            : `${formDescriptionId}`
-        }
+        aria-describedby={error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`}
         aria-invalid={!!error}
         onValueChange={onChange}
         value={value}
@@ -456,10 +416,7 @@ function FormCombobox({
   return (
     <FormItem>
       {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
-      <Select
-        value={value?.value}
-        onValueChange={(val) => onChange?.({ label: val, value: val })}
-      >
+      <Select value={value?.value} onValueChange={(val) => onChange?.({ label: val, value: val })}>
         <SelectTrigger>
           <SelectValue placeholder="Select an option" />
         </SelectTrigger>
@@ -469,11 +426,7 @@ function FormCombobox({
               return null;
             }
             return (
-              <SelectItem
-                key={option.value}
-                value={option.value}
-                label={option.label}
-              >
+              <SelectItem key={option.value} value={option.value} label={option.label}>
                 {option.label}
               </SelectItem>
             );
@@ -520,19 +473,14 @@ function FormSelect({
   value?: Partial<Option>;
   onChange: (value: { label: string; value: string }) => void;
 }): JSX.Element {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField();
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
 
   return (
     <FormItem>
       {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
       <Select
         aria-labelledby={formItemId}
-        aria-describedby={
-          error
-            ? `${formDescriptionId} ${formMessageId}`
-            : `${formDescriptionId}`
-        }
+        aria-describedby={error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`}
         aria-invalid={!!error}
         value={value?.value}
         onValueChange={(val) => onChange({ label: val, value: val })}
@@ -556,17 +504,13 @@ function FormSwitch({
   disabled,
   defaultChecked,
   id,
-}: Omit<
-  React.ComponentPropsWithoutRef<typeof Switch>,
-  "checked" | "onCheckedChange"
-> & {
+}: Omit<React.ComponentPropsWithoutRef<typeof Switch>, "checked" | "onCheckedChange"> & {
   label?: string;
   description?: string;
   value?: boolean;
   onChange?: (value: boolean) => void;
 }): JSX.Element {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField();
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
 
   const formItemClassName = "px-1";
   const viewClassName = "flex-row gap-3 items-center";
@@ -577,9 +521,7 @@ function FormSwitch({
         <Switch
           aria-labelledby={formItemId}
           aria-describedby={
-            error
-              ? `${formDescriptionId} ${formMessageId}`
-              : `${formDescriptionId}`
+            error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`
           }
           aria-invalid={!!error}
           onCheckedChange={onChange}

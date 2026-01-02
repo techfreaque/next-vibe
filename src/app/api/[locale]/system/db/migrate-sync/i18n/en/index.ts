@@ -18,8 +18,7 @@ export const translations = {
       },
       unauthorized: {
         title: "Unauthorized",
-        description:
-          "You are not authorized to perform migration sync operations",
+        description: "You are not authorized to perform migration sync operations",
       },
       forbidden: {
         title: "Forbidden",

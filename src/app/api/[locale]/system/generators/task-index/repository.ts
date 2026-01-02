@@ -12,11 +12,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -73,15 +69,10 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       );
 
       // Validate files
-      const validationResult = await this.validateTaskFiles(
-        taskFiles,
-        taskRunnerFiles,
-        logger,
-      );
+      const validationResult = await this.validateTaskFiles(taskFiles, taskRunnerFiles, logger);
       if (!validationResult.success) {
         return fail({
-          message:
-            "app.api.system.generators.taskIndex.post.errors.validation.title",
+          message: "app.api.system.generators.taskIndex.post.errors.validation.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             error: validationResult.error || "Validation failed",
@@ -90,12 +81,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       }
 
       // Generate content
-      const content = this.generateContent(
-        taskFiles,
-        taskRunnerFiles,
-        sideTaskFiles,
-        outputFile,
-      );
+      const content = this.generateContent(taskFiles, taskRunnerFiles, sideTaskFiles, outputFile);
 
       // Write file
       await writeGeneratedFile(outputFile, content, data.dryRun);
@@ -116,8 +102,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
         error: parseError(error),
       });
       return fail({
-        message:
-          "app.api.system.generators.taskIndex.post.errors.internal.title",
+        message: "app.api.system.generators.taskIndex.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: `Task index generation failed: ${parseError(error).message}`,
@@ -165,10 +150,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
         try {
           const content = await readFile(file, "utf-8");
 
-          if (
-            !content.includes("export const tasks") &&
-            !content.includes("export { tasks }")
-          ) {
+          if (!content.includes("export const tasks") && !content.includes("export { tasks }")) {
             return {
               success: false,
               error: `Task file ${file} must export 'tasks' array`,
@@ -180,9 +162,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
             content.includes("export const execute");
 
           if (hasLegacyExports) {
-            logger.debug(
-              `Task file ${file} has legacy exports - properly migrate to new format`,
-            );
+            logger.debug(`Task file ${file} has legacy exports - properly migrate to new format`);
           }
         } catch (error) {
           return {
@@ -241,9 +221,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
     // Process task.ts files
     for (const taskFile of taskFiles) {
       const relativePath = getRelativeImportPath(taskFile, outputFile);
-      imports.push(
-        `import { tasks as taskModule${moduleIndex} } from "${relativePath}";`,
-      );
+      imports.push(`import { tasks as taskModule${moduleIndex} } from "${relativePath}";`);
       taskExports.push(`  ...taskModule${moduleIndex},`);
       moduleIndex++;
     }
@@ -251,9 +229,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
     // Process task-runner.ts files
     for (const runnerFile of taskRunnerFiles) {
       const relativePath = getRelativeImportPath(runnerFile, outputFile);
-      imports.push(
-        `import { taskRunners as runnerModule${moduleIndex} } from "${relativePath}";`,
-      );
+      imports.push(`import { taskRunners as runnerModule${moduleIndex} } from "${relativePath}";`);
       taskRunnerExports.push(`  ...runnerModule${moduleIndex},`);
       moduleIndex++;
     }
@@ -268,16 +244,12 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       moduleIndex++;
     }
 
-    const header = generateFileHeader(
-      "AUTO-GENERATED TASK INDEX",
-      "Task Index Generator",
-      {
-        Implements: "spec.md unified task registry requirements",
-        "Task files": taskFiles.length,
-        "Task runner files": taskRunnerFiles.length,
-        "Side task config files": sideTaskFiles.length,
-      },
-    );
+    const header = generateFileHeader("AUTO-GENERATED TASK INDEX", "Task Index Generator", {
+      Implements: "spec.md unified task registry requirements",
+      "Task files": taskFiles.length,
+      "Task runner files": taskRunnerFiles.length,
+      "Side task config files": sideTaskFiles.length,
+    });
 
     return `${header}
 
@@ -331,5 +303,4 @@ export default allTasks;
   }
 }
 
-export const taskIndexGeneratorRepository =
-  new TaskIndexGeneratorRepositoryImpl();
+export const taskIndexGeneratorRepository = new TaskIndexGeneratorRepositoryImpl();

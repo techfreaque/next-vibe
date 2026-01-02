@@ -30,12 +30,7 @@ const { POST } = createEndpoint({
   category: "app.api.system.server.category",
   tags: ["app.api.system.server.start.tags.start"],
   icon: "zap",
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.AI_TOOL_OFF,
-    UserRole.WEB_OFF,
-    UserRole.CLI_AUTH_BYPASS,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF, UserRole.WEB_OFF, UserRole.CLI_AUTH_BYPASS],
 
   fields: objectField(
     {
@@ -53,8 +48,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.start.post.fields.skipPre.title",
-          description:
-            "app.api.system.server.start.post.fields.skipPre.description",
+          description: "app.api.system.server.start.post.fields.skipPre.description",
           columns: 6,
         },
         z.boolean().optional().default(false),
@@ -64,10 +58,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.server.start.post.fields.skipNextCommand.title",
-          description:
-            "app.api.system.server.start.post.fields.skipNextCommand.description",
+          label: "app.api.system.server.start.post.fields.skipNextCommand.title",
+          description: "app.api.system.server.start.post.fields.skipNextCommand.description",
           columns: 6,
         },
         z.boolean().optional().default(false),
@@ -78,8 +70,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.system.server.start.post.fields.port.title",
-          description:
-            "app.api.system.server.start.post.fields.port.description",
+          description: "app.api.system.server.start.post.fields.port.description",
           columns: 12,
         },
         z.union([z.coerce.number(), z.string()]).optional(),
@@ -90,8 +81,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.start.post.fields.skipTaskRunner.title",
-          description:
-            "app.api.system.server.start.post.fields.skipTaskRunner.description",
+          description: "app.api.system.server.start.post.fields.skipTaskRunner.description",
           columns: 6,
         },
         z.boolean().optional().default(false),
@@ -113,28 +103,23 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.server.start.post.errors.validation.title",
-      description:
-        "app.api.system.server.start.post.errors.validation.description",
+      description: "app.api.system.server.start.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.server.start.post.errors.network.title",
-      description:
-        "app.api.system.server.start.post.errors.network.description",
+      description: "app.api.system.server.start.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.server.start.post.errors.unauthorized.title",
-      description:
-        "app.api.system.server.start.post.errors.unauthorized.description",
+      description: "app.api.system.server.start.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.server.start.post.errors.forbidden.title",
-      description:
-        "app.api.system.server.start.post.errors.forbidden.description",
+      description: "app.api.system.server.start.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.server.start.post.errors.notFound.title",
-      description:
-        "app.api.system.server.start.post.errors.notFound.description",
+      description: "app.api.system.server.start.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.server.start.post.errors.server.title",
@@ -142,18 +127,15 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.server.start.post.errors.unknown.title",
-      description:
-        "app.api.system.server.start.post.errors.unknown.description",
+      description: "app.api.system.server.start.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.server.start.post.errors.unknown.title",
-      description:
-        "app.api.system.server.start.post.errors.unknown.description",
+      description: "app.api.system.server.start.post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.server.start.post.errors.conflict.title",
-      description:
-        "app.api.system.server.start.post.errors.conflict.description",
+      description: "app.api.system.server.start.post.errors.conflict.description",
     },
   },
 

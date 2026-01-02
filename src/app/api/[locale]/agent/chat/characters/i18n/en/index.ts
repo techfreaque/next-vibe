@@ -264,8 +264,7 @@ export const translations = {
     },
     thea: {
       name: "Thea",
-      description:
-        "Greek goddess of light - devoted companion with ancient wisdom",
+      description: "Greek goddess of light - devoted companion with ancient wisdom",
       tagline: "Light & Devotion",
       shortDesc: "Thoughtful and empathetic conversations",
       suggestedPrompts: {
@@ -277,8 +276,7 @@ export const translations = {
     },
     hermes: {
       name: "Hermes",
-      description:
-        "Greek god of messengers - strong companion with timeless masculine wisdom",
+      description: "Greek god of messengers - strong companion with timeless masculine wisdom",
       tagline: "Strength & Wisdom",
       shortDesc: "Fast and efficient task completion",
       suggestedPrompts: {
@@ -314,8 +312,7 @@ export const translations = {
     },
     masterWriter: {
       name: "Master Writer",
-      description:
-        "Literary craftsman for exceptional, publication-quality writing",
+      description: "Literary craftsman for exceptional, publication-quality writing",
       tagline: "Literary Excellence",
       shortDesc: "Advanced writing and literary analysis",
       suggestedPrompts: {
@@ -721,25 +718,20 @@ export const translations = {
     },
     preferredModel: {
       label: "Preferred Model",
-      description:
-        "Select a specific AI model to always use with this character",
-      helpText:
-        "Choosing a specific model locks this character to that model only",
+      description: "Select a specific AI model to always use with this character",
+      helpText: "Choosing a specific model locks this character to that model only",
     },
     intelligence: {
       label: "Intelligence Level",
-      description:
-        "Minimum intelligence/capability level required for the model",
+      description: "Minimum intelligence/capability level required for the model",
     },
     maxPrice: {
       label: "Maximum Price",
-      description:
-        "Maximum credit cost you're willing to spend per message with this character",
+      description: "Maximum credit cost you're willing to spend per message with this character",
     },
     contentLevel: {
       label: "Content Level",
-      description:
-        "Content filtering level for the model (mainstream, open, or uncensored)",
+      description: "Content filtering level for the model (mainstream, open, or uncensored)",
     },
     voice: {
       label: "Voice",

@@ -8,11 +8,7 @@ import "server-only";
 
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
@@ -29,12 +25,7 @@ import { EmailStatus, EmailType } from "../messages/enum";
 import { SMTP_ERROR_MESSAGES } from "./constants";
 import type { SmtpAccount } from "./db";
 import { smtpAccounts } from "./db";
-import {
-  CampaignType,
-  SmtpAccountStatus,
-  SmtpHealthStatus,
-  SmtpSecurityType,
-} from "./enum";
+import { CampaignType, SmtpAccountStatus, SmtpHealthStatus, SmtpSecurityType } from "./enum";
 // Import types from definition.ts following standard pattern
 import type {
   SmtpCapacityRequestOutput,
@@ -49,10 +40,7 @@ import type {
  * Migrated from SmtpClientServiceImpl
  */
 export class SmtpRepository {
-  private static transportCache = new Map<
-    string,
-    Transporter<SMTPTransport.SentMessageInfo>
-  >();
+  private static transportCache = new Map<string, Transporter<SMTPTransport.SentMessageInfo>>();
 
   /**
    * Send email using database-configured SMTP account with retry and fallback support
@@ -72,25 +60,18 @@ export class SmtpRepository {
       });
 
       // Get the primary account first
-      const primaryAccount = await this.getSmtpAccountWithCriteria(
-        data.selectionCriteria,
-        logger,
-      );
+      const primaryAccount = await this.getSmtpAccountWithCriteria(data.selectionCriteria, logger);
       if (!primaryAccount) {
-        const isLeadCampaign =
-          data.selectionCriteria.campaignType === CampaignType.LEAD_CAMPAIGN;
+        const isLeadCampaign = data.selectionCriteria.campaignType === CampaignType.LEAD_CAMPAIGN;
 
         if (isLeadCampaign) {
           return fail({
-            message:
-              "app.api.emails.smtpClient.sending.errors.no_account.title",
+            message: "app.api.emails.smtpClient.sending.errors.no_account.title",
             errorType: ErrorResponseTypes.NOT_FOUND,
             messageParams: {
               campaignType: data.selectionCriteria.campaignType,
-              emailJourneyVariant:
-                data.selectionCriteria.emailJourneyVariant || "null",
-              emailCampaignStage:
-                data.selectionCriteria.emailCampaignStage || "null",
+              emailJourneyVariant: data.selectionCriteria.emailJourneyVariant || "null",
+              emailCampaignStage: data.selectionCriteria.emailCampaignStage || "null",
               country: data.selectionCriteria.country,
               language: data.selectionCriteria.language,
             },
@@ -117,14 +98,11 @@ export class SmtpRepository {
       }
 
       // If primary failed after retries, try with fallback account
-      logger.info(
-        "Primary SMTP account failed after retries, trying fallback",
-        {
-          to: data.to,
-          primaryAccountId: primaryAccount.id,
-          primaryError: primaryResult.message,
-        },
-      );
+      logger.info("Primary SMTP account failed after retries, trying fallback", {
+        to: data.to,
+        primaryAccountId: primaryAccount.id,
+        primaryError: primaryResult.message,
+      });
 
       const fallbackAccount = await this.getFallbackSmtpAccount(logger);
       if (!fallbackAccount || fallbackAccount.id === primaryAccount.id) {
@@ -196,10 +174,7 @@ export class SmtpRepository {
         const accountCapacity = account.rateLimitPerHour || 0;
         totalCapacity += accountCapacity;
 
-        const rateLimitCheck = await SmtpRepository.checkRateLimit(
-          account,
-          logger,
-        );
+        const rateLimitCheck = await SmtpRepository.checkRateLimit(account, logger);
         if (rateLimitCheck.success) {
           // Account is available, add remaining capacity
           totalRemainingCapacity += rateLimitCheck.data.remainingCapacity;
@@ -254,15 +229,11 @@ export class SmtpRepository {
         });
       }
 
-      const transportResult = await SmtpRepository.getTransport(
-        account,
-        logger,
-      );
+      const transportResult = await SmtpRepository.getTransport(account, logger);
       if (!transportResult.success) {
         return fail({
           message: transportResult.message,
-          errorType:
-            transportResult.errorType || ErrorResponseTypes.EMAIL_ERROR,
+          errorType: transportResult.errorType || ErrorResponseTypes.EMAIL_ERROR,
           messageParams: transportResult.messageParams,
           cause: transportResult,
         });
@@ -306,8 +277,7 @@ export class SmtpRepository {
       const sqlConditions = [eq(smtpAccounts.status, SmtpAccountStatus.ACTIVE)];
 
       // For lead campaigns, we must enforce strict criteria matching
-      const isLeadCampaign =
-        selectionCriteria?.campaignType === CampaignType.LEAD_CAMPAIGN;
+      const isLeadCampaign = selectionCriteria?.campaignType === CampaignType.LEAD_CAMPAIGN;
 
       // Campaign type is always required and must be explicitly set
       if (selectionCriteria?.campaignType) {
@@ -382,9 +352,7 @@ export class SmtpRepository {
       if (accounts.length === 0) {
         // For lead campaigns, NO fallback is allowed - strict criteria matching required
         if (isLeadCampaign) {
-          logger.error(
-            "No SMTP accounts match lead campaign criteria - strict matching required",
-          );
+          logger.error("No SMTP accounts match lead campaign criteria - strict matching required");
           return null;
         }
 
@@ -414,10 +382,7 @@ export class SmtpRepository {
       // Return the first account (highest priority)
       return accounts[0];
     } catch (error) {
-      logger.error(
-        "Error getting SMTP account with criteria",
-        parseError(error),
-      );
+      logger.error("Error getting SMTP account with criteria", parseError(error));
       return null;
     }
   }
@@ -425,9 +390,7 @@ export class SmtpRepository {
   /**
    * Get any available SMTP account as fallback
    */
-  private static async getFallbackSmtpAccount(
-    logger: EndpointLogger,
-  ): Promise<SmtpAccount | null> {
+  private static async getFallbackSmtpAccount(logger: EndpointLogger): Promise<SmtpAccount | null> {
     try {
       const fallbackAccounts = await db
         .select()
@@ -562,17 +525,14 @@ export class SmtpRepository {
         // Check if this is a retryable error
         const isRetryable = this.isRetryableError(result.message);
         if (!isRetryable || attempt === maxRetries) {
-          logger.info(
-            "Email send failed - not retryable or max retries reached",
-            {
-              to: params.to,
-              accountId: account.id,
-              attempt,
-              maxRetries,
-              error: result.message,
-              isRetryable,
-            },
-          );
+          logger.info("Email send failed - not retryable or max retries reached", {
+            to: params.to,
+            accountId: account.id,
+            attempt,
+            maxRetries,
+            error: result.message,
+            isRetryable,
+          });
           break;
         }
 
@@ -630,8 +590,7 @@ export class SmtpRepository {
    * Check if an error is retryable (temporary connection issues)
    */
   private static isRetryableError(errorMessage: string): boolean {
-    const retryablePatterns =
-      /greeting|timeout|connect|refused|unreachable|reset|temporary/i;
+    const retryablePatterns = /greeting|timeout|connect|refused|unreachable|reset|temporary/i;
     return retryablePatterns.test(errorMessage);
   }
 
@@ -646,10 +605,7 @@ export class SmtpRepository {
     try {
       // Check rate limits (skip if this is part of a pre-validated batch)
       if (!params.skipRateLimitCheck) {
-        const rateLimitCheck = await SmtpRepository.checkRateLimit(
-          account,
-          logger,
-        );
+        const rateLimitCheck = await SmtpRepository.checkRateLimit(account, logger);
         if (!rateLimitCheck.success) {
           // Convert rate limit error to proper SMTP send error
           return fail({
@@ -673,15 +629,11 @@ export class SmtpRepository {
       }
 
       // Get transport
-      const transportResult = await SmtpRepository.getTransport(
-        account,
-        logger,
-      );
+      const transportResult = await SmtpRepository.getTransport(account, logger);
       if (!transportResult.success) {
         return fail({
           message: transportResult.message,
-          errorType:
-            transportResult.errorType || ErrorResponseTypes.EMAIL_ERROR,
+          errorType: transportResult.errorType || ErrorResponseTypes.EMAIL_ERROR,
           messageParams: transportResult.messageParams,
           cause: transportResult,
         });
@@ -714,12 +666,7 @@ export class SmtpRepository {
             ? result.rejected[0]
             : SMTP_ERROR_MESSAGES.CLIENT_ERROR;
 
-        await SmtpRepository.updateAccountHealth(
-          account.id,
-          false,
-          logger,
-          rejectedReason,
-        );
+        await SmtpRepository.updateAccountHealth(account.id, false, logger, rejectedReason);
 
         return fail({
           message: "app.api.emails.smtpClient.sending.errors.rejected.title",
@@ -741,8 +688,7 @@ export class SmtpRepository {
         );
 
         return fail({
-          message:
-            "app.api.emails.smtpClient.sending.errors.no_recipients.title",
+          message: "app.api.emails.smtpClient.sending.errors.no_recipients.title",
           errorType: ErrorResponseTypes.EMAIL_ERROR,
           messageParams: {
             recipient: params.to,
@@ -804,15 +750,9 @@ export class SmtpRepository {
 
       // Mark account as unhealthy on connection errors
       const errorMessage = parseError(error).message;
-      const isConnectionError =
-        /greeting|timeout|connect|refused|unreachable/i.test(errorMessage);
+      const isConnectionError = /greeting|timeout|connect|refused|unreachable/i.test(errorMessage);
       if (isConnectionError) {
-        await SmtpRepository.updateAccountHealth(
-          account.id,
-          false,
-          logger,
-          errorMessage,
-        );
+        await SmtpRepository.updateAccountHealth(account.id, false, logger, errorMessage);
       }
 
       return fail({
@@ -868,10 +808,7 @@ export class SmtpRepository {
 
       const emailsSentThisHour = emailsCount[0]?.count || 0;
 
-      const remainingCapacity = Math.max(
-        0,
-        account.rateLimitPerHour - emailsSentThisHour,
-      );
+      const remainingCapacity = Math.max(0, account.rateLimitPerHour - emailsSentThisHour);
       const canSend = remainingCapacity > 0;
 
       if (!canSend) {

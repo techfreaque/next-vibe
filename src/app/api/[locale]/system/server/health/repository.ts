@@ -7,20 +7,13 @@ import { loadavg } from "node:os";
 import { performance } from "node:perf_hooks";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { getCurrentEnvironmentInfo } from "../environment";
-import type {
-  HealthCheckRequestOutput,
-  HealthCheckResponseOutput,
-} from "./definition";
+import type { HealthCheckRequestOutput, HealthCheckResponseOutput } from "./definition";
 
 /**
  * Health Check Repository Interface
@@ -35,9 +28,7 @@ export interface HealthCheckRepositoryInterface {
 /**
  * Health Check Repository Implementation
  */
-export class HealthCheckRepositoryImpl
-  implements HealthCheckRepositoryInterface
-{
+export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface {
   private startTime = Date.now();
 
   async checkHealth(
@@ -99,8 +90,7 @@ export class HealthCheckRepositoryImpl
           activeTasks: 0, // Would be populated from actual task runner
           totalTasks: 0, // Would be populated from task registry
           errors: 0, // Would be populated from task runner
-          lastError:
-            taskCheck.status === "fail" ? taskCheck.message : undefined,
+          lastError: taskCheck.status === "fail" ? taskCheck.message : undefined,
         };
       }
 
@@ -183,8 +173,7 @@ export class HealthCheckRepositoryImpl
     try {
       // Basic checks: process is running, memory not exhausted, etc.
       const memoryUsage = process.memoryUsage();
-      const memoryUsagePercent =
-        (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100;
+      const memoryUsagePercent = (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100;
 
       if (memoryUsagePercent > 90) {
         return Promise.resolve({
@@ -349,8 +338,7 @@ export class HealthCheckRepositoryImpl
    * Get CPU information
    */
   private getCpuInfo(): { usage: number; loadAverage: number[] } {
-    const loadAverageValues =
-      process.platform === "win32" ? [0, 0, 0] : loadavg();
+    const loadAverageValues = process.platform === "win32" ? [0, 0, 0] : loadavg();
     return {
       usage: 0, // Would require additional implementation to get actual CPU usage
       loadAverage: loadAverageValues,

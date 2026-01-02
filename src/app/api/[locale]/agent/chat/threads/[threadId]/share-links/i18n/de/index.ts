@@ -57,8 +57,7 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, diese Teilen-Links anzuzeigen",
+        description: "Sie haben keine Berechtigung, diese Teilen-Links anzuzeigen",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -103,13 +102,11 @@ export const translations: typeof enTranslations = {
     },
     allowPosting: {
       label: "Posten erlauben",
-      description:
-        "Empfängern erlauben, Nachrichten in diesem Thread zu posten",
+      description: "Empfängern erlauben, Nachrichten in diesem Thread zu posten",
     },
     requireAuth: {
       label: "Authentifizierung erforderlich",
-      description:
-        "Benutzer müssen sich anmelden, um auf diesen Link zuzugreifen",
+      description: "Benutzer müssen sich anmelden, um auf diesen Link zuzugreifen",
     },
     response: {
       id: {
@@ -130,8 +127,7 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Nur Threads im Ordner 'Geteilt' können über Links geteilt werden",
+        description: "Nur Threads im Ordner 'Geteilt' können über Links geteilt werden",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -180,13 +176,11 @@ export const translations: typeof enTranslations = {
     },
     allowPosting: {
       label: "Posten erlauben",
-      description:
-        "Empfängern erlauben, Nachrichten in diesem Thread zu posten",
+      description: "Empfängern erlauben, Nachrichten in diesem Thread zu posten",
     },
     requireAuth: {
       label: "Authentifizierung erforderlich",
-      description:
-        "Benutzer müssen sich anmelden, um auf diesen Link zuzugreifen",
+      description: "Benutzer müssen sich anmelden, um auf diesen Link zuzugreifen",
     },
     deleteAction: {
       text: "Link widerrufen",
@@ -203,13 +197,11 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um Teilen-Links zu aktualisieren",
+        description: "Sie müssen angemeldet sein, um Teilen-Links zu aktualisieren",
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, diesen Link zu aktualisieren",
+        description: "Sie haben keine Berechtigung, diesen Link zu aktualisieren",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -264,8 +256,7 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um Teilen-Links zu widerrufen",
+        description: "Sie müssen angemeldet sein, um Teilen-Links zu widerrufen",
       },
       forbidden: {
         title: "Verboten",

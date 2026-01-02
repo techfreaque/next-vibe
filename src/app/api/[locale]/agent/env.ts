@@ -45,8 +45,4 @@ const agentEnvSchema = z.discriminatedUnion("CHAT_STORAGE_TYPE", [
   filesystemStorageSchema,
 ]);
 
-export const agentEnv = validateEnv(
-  process.env,
-  agentEnvSchema,
-  envValidationLogger,
-);
+export const agentEnv = validateEnv(process.env, agentEnvSchema, envValidationLogger);

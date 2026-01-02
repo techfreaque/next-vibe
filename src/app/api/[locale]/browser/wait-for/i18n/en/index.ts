@@ -54,8 +54,7 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description:
-        "An internal server error occurred during the wait operation",
+      description: "An internal server error occurred during the wait operation",
     },
     unknown: {
       title: "Unknown Error",

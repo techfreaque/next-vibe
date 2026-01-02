@@ -6,8 +6,7 @@ export const translations: typeof enTranslations = {
     "Bietet detailliertere Informationen zu einem spezifischen Leistungs-Insight eines Insight-Sets, das in den Ergebnissen einer Trace-Aufzeichnung hervorgehoben wurde",
   form: {
     label: "Leistungs-Insight analysieren",
-    description:
-      "Detaillierte Informationen über einen spezifischen Leistungs-Insight abrufen",
+    description: "Detaillierte Informationen über einen spezifischen Leistungs-Insight abrufen",
     fields: {
       insightSetId: {
         label: "Insight-Set-ID",
@@ -32,18 +31,15 @@ export const translations: typeof enTranslations = {
   errors: {
     validation: {
       title: "Validierungsfehler",
-      description:
-        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
     },
     network: {
       title: "Netzwerkfehler",
-      description:
-        "Ein Netzwerkfehler ist bei der Analyse des Leistungs-Insights aufgetreten",
+      description: "Ein Netzwerkfehler ist bei der Analyse des Leistungs-Insights aufgetreten",
     },
     unauthorized: {
       title: "Nicht autorisiert",
-      description:
-        "Sie sind nicht berechtigt, Leistungs-Insights zu analysieren",
+      description: "Sie sind nicht berechtigt, Leistungs-Insights zu analysieren",
     },
     forbidden: {
       title: "Verboten",
@@ -60,18 +56,15 @@ export const translations: typeof enTranslations = {
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description:
-        "Ein unbekannter Fehler ist bei der Analyse des Leistungs-Insights aufgetreten",
+      description: "Ein unbekannter Fehler ist bei der Analyse des Leistungs-Insights aufgetreten",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description:
-        "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
+      description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
     },
     conflict: {
       title: "Konflikt",
-      description:
-        "Ein Konflikt ist bei der Analyse des Leistungs-Insights aufgetreten",
+      description: "Ein Konflikt ist bei der Analyse des Leistungs-Insights aufgetreten",
     },
   },
   success: {

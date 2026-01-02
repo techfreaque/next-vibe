@@ -21,10 +21,7 @@ export interface CategoryConfig {
  * Centralized category configuration
  * Maps each category to its icon and primary task utility
  */
-export const CATEGORY_CONFIG: Record<
-  typeof CharacterCategoryValue,
-  CategoryConfig
-> = {
+export const CATEGORY_CONFIG: Record<typeof CharacterCategoryValue, CategoryConfig> = {
   [CharacterCategory.COMPANION]: {
     category: CharacterCategory.COMPANION,
     label: CharacterCategory.COMPANION,
@@ -90,8 +87,6 @@ export const CATEGORY_CONFIG: Record<
 /**
  * Get the primary task utility for a category
  */
-export function categoryToTask(
-  category: typeof CharacterCategoryValue,
-): ModelUtility {
+export function categoryToTask(category: typeof CharacterCategoryValue): ModelUtility {
   return CATEGORY_CONFIG[category].task;
 }

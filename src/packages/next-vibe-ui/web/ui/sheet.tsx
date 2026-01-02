@@ -86,10 +86,7 @@ export type SheetContentProps = {
 } & VariantProps<typeof sheetVariants> &
   StyleType;
 
-export function Sheet({
-  children,
-  ...props
-}: SheetRootProps): React.JSX.Element {
+export function Sheet({ children, ...props }: SheetRootProps): React.JSX.Element {
   return <SheetPrimitive.Root {...props}>{children}</SheetPrimitive.Root>;
 }
 Sheet.displayName = SheetPrimitive.Root.displayName;
@@ -107,11 +104,7 @@ export function SheetTrigger({
 }
 SheetTrigger.displayName = SheetPrimitive.Trigger.displayName;
 
-export function SheetClose({
-  children,
-  asChild,
-  ...props
-}: SheetCloseProps): React.JSX.Element {
+export function SheetClose({ children, asChild, ...props }: SheetCloseProps): React.JSX.Element {
   return (
     <SheetPrimitive.Close asChild={asChild} {...props}>
       {children}
@@ -133,10 +126,7 @@ export function SheetPortal({
 }
 SheetPortal.displayName = SheetPrimitive.Portal.displayName;
 
-export function SheetOverlay({
-  className,
-  ...props
-}: SheetOverlayProps): React.JSX.Element {
+export function SheetOverlay({ className, ...props }: SheetOverlayProps): React.JSX.Element {
   return (
     <SheetPrimitive.Overlay
       className={cn(
@@ -160,15 +150,10 @@ export function SheetContent({
   return (
     <SheetPortal>
       <SheetOverlay />
-      <SheetPrimitive.Content
-        className={cn(sheetVariants({ side }), className)}
-        {...props}
-      >
+      <SheetPrimitive.Content className={cn(sheetVariants({ side }), className)} {...props}>
         <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
           <Cross2Icon className="h-4 w-4" />
-          <span className="sr-only">
-            {t("app.common.accessibility.srOnly.close")}
-          </span>
+          <span className="sr-only">{t("app.common.accessibility.srOnly.close")}</span>
         </SheetPrimitive.Close>
         {children}
       </SheetPrimitive.Content>
@@ -183,13 +168,7 @@ export function SheetHeader({
   ...props
 }: SheetHeaderProps): React.JSX.Element {
   return (
-    <div
-      className={cn(
-        "flex flex-col space-y-2 text-center sm:text-left",
-        className,
-      )}
-      {...props}
-    >
+    <div className={cn("flex flex-col space-y-2 text-center sm:text-left", className)} {...props}>
       {children}
     </div>
   );
@@ -203,10 +182,7 @@ export function SheetFooter({
 }: SheetFooterProps): React.JSX.Element {
   return (
     <div
-      className={cn(
-        "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-        className,
-      )}
+      className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)}
       {...props}
     >
       {children}
@@ -215,11 +191,7 @@ export function SheetFooter({
 }
 SheetFooter.displayName = "SheetFooter";
 
-export function SheetTitle({
-  className,
-  children,
-  ...props
-}: SheetTitleProps): React.JSX.Element {
+export function SheetTitle({ className, children, ...props }: SheetTitleProps): React.JSX.Element {
   return (
     <SheetPrimitive.Title
       className={cn("text-lg font-semibold text-foreground", className)}

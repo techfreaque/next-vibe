@@ -18,11 +18,7 @@ export function AspectRatio({
   ...props
 }: AspectRatioRootProps): React.JSX.Element {
   return (
-    <AspectRatioPrimitive.Root
-      ratio={ratio}
-      className={cn(className)}
-      {...props}
-    >
+    <AspectRatioPrimitive.Root ratio={ratio} className={cn(className)} {...props}>
       {children}
     </AspectRatioPrimitive.Root>
   );

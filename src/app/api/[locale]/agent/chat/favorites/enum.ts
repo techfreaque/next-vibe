@@ -17,10 +17,7 @@ export const {
   MANUAL: "app.api.agent.chat.favorites.enums.mode.manual",
 });
 
-export const ModelSelectionModeDB = [
-  ModelSelectionMode.AUTO,
-  ModelSelectionMode.MANUAL,
-] as const;
+export const ModelSelectionModeDB = [ModelSelectionMode.AUTO, ModelSelectionMode.MANUAL] as const;
 
 /**
  * Intelligence Level Enum (actual model tiers, no ANY)
@@ -93,11 +90,7 @@ export const {
 /**
  * Database enum array for Drizzle (uses translation keys)
  */
-export const PriceLevelDB = [
-  PriceLevel.CHEAP,
-  PriceLevel.STANDARD,
-  PriceLevel.PREMIUM,
-] as const;
+export const PriceLevelDB = [PriceLevel.CHEAP, PriceLevel.STANDARD, PriceLevel.PREMIUM] as const;
 
 export const PriceLevelFilterDB = [
   PriceLevelFilter.ANY,
@@ -177,11 +170,7 @@ export const {
 /**
  * Database enum array for Drizzle
  */
-export const SpeedLevelDB = [
-  SpeedLevel.FAST,
-  SpeedLevel.BALANCED,
-  SpeedLevel.THOROUGH,
-] as const;
+export const SpeedLevelDB = [SpeedLevel.FAST, SpeedLevel.BALANCED, SpeedLevel.THOROUGH] as const;
 
 export const SpeedLevelFilterDB = [
   SpeedLevelFilter.ANY,

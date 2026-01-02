@@ -29,12 +29,7 @@ const { POST } = createEndpoint({
   category: "app.api.system.guard.category",
   tags: ["app.api.system.guard.start.tag"],
   icon: "lock",
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.PRODUCTION_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
   aliases: ["guard", "guard:start", "guard-start"],
 
   fields: objectField(
@@ -53,10 +48,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.system.guard.start.fields.projectPath.title",
-          description:
-            "app.api.system.guard.start.fields.projectPath.description",
-          placeholder:
-            "app.api.system.guard.start.fields.projectPath.placeholder",
+          description: "app.api.system.guard.start.fields.projectPath.description",
+          placeholder: "app.api.system.guard.start.fields.projectPath.placeholder",
           columns: 6,
         },
         z.string().optional(),
@@ -141,8 +134,7 @@ const { POST } = createEndpoint({
       username: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.guard.start.fields.startedGuards.columns.username",
+          content: "app.api.system.guard.start.fields.startedGuards.columns.username",
         },
         z.string(),
       ),
@@ -150,8 +142,7 @@ const { POST } = createEndpoint({
       guardProjectPath: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.guard.start.fields.startedGuards.columns.projectPath",
+          content: "app.api.system.guard.start.fields.startedGuards.columns.projectPath",
         },
         z.string(),
       ),

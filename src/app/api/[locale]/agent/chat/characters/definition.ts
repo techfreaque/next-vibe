@@ -28,11 +28,7 @@ import {
 } from "../favorites/enum";
 import { ModelId } from "../model-access/models";
 import { CharacterCategory } from "./enum";
-import {
-  CharacterCategoryDB,
-  CharacterSource,
-  CharacterSourceDB,
-} from "./enum";
+import { CharacterCategoryDB, CharacterSource, CharacterSourceDB } from "./enum";
 
 /**
  * Get Characters List Endpoint (GET)
@@ -53,8 +49,7 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.agent.chat.characters.get.container.title" as const,
-      description:
-        "app.api.agent.chat.characters.get.container.description" as const,
+      description: "app.api.agent.chat.characters.get.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { response: true },
@@ -67,8 +62,7 @@ const { GET } = createEndpoint({
         objectField(
           {
             type: WidgetType.CONTAINER,
-            title:
-              "app.api.agent.chat.characters.get.response.characters.character.title" as const,
+            title: "app.api.agent.chat.characters.get.response.characters.character.title" as const,
             layoutType: LayoutType.GRID,
             columns: 2,
           },
@@ -178,60 +172,46 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.characters.get.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.characters.get.errors.validation.description" as const,
+      title: "app.api.agent.chat.characters.get.errors.validation.title" as const,
+      description: "app.api.agent.chat.characters.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.chat.characters.get.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.characters.get.errors.network.description" as const,
+      description: "app.api.agent.chat.characters.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.characters.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.characters.get.errors.unauthorized.description" as const,
+      title: "app.api.agent.chat.characters.get.errors.unauthorized.title" as const,
+      description: "app.api.agent.chat.characters.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.characters.get.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.characters.get.errors.forbidden.description" as const,
+      title: "app.api.agent.chat.characters.get.errors.forbidden.title" as const,
+      description: "app.api.agent.chat.characters.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.characters.get.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.characters.get.errors.notFound.description" as const,
+      description: "app.api.agent.chat.characters.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.characters.get.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.characters.get.errors.server.description" as const,
+      description: "app.api.agent.chat.characters.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.agent.chat.characters.get.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.characters.get.errors.unknown.description" as const,
+      description: "app.api.agent.chat.characters.get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.characters.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.characters.get.errors.unsavedChanges.description" as const,
+      title: "app.api.agent.chat.characters.get.errors.unsavedChanges.title" as const,
+      description: "app.api.agent.chat.characters.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.characters.get.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.characters.get.errors.conflict.description" as const,
+      description: "app.api.agent.chat.characters.get.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
     title: "app.api.agent.chat.characters.get.success.title" as const,
-    description:
-      "app.api.agent.chat.characters.get.success.description" as const,
+    description: "app.api.agent.chat.characters.get.success.description" as const,
   },
 
   examples: {

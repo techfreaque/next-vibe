@@ -7,11 +7,7 @@
 import { count, desc, eq, sql } from "drizzle-orm";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "@/app/api/[locale]/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "@/app/api/[locale]/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -31,18 +27,9 @@ import { cronTaskExecutions, cronTasks, cronTaskSchedules } from "./db";
 export interface ICronTasksRepository {
   // Task management
   getAllTasks(logger: EndpointLogger): Promise<ResponseType<CronTask[]>>;
-  getTaskById(
-    id: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTask | null>>;
-  getTaskByName(
-    name: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTask | null>>;
-  createTask(
-    task: NewCronTask,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTask>>;
+  getTaskById(id: string, logger: EndpointLogger): Promise<ResponseType<CronTask | null>>;
+  getTaskByName(name: string, logger: EndpointLogger): Promise<ResponseType<CronTask | null>>;
+  createTask(task: NewCronTask, logger: EndpointLogger): Promise<ResponseType<CronTask>>;
   updateTask(
     id: string,
     updates: Partial<CronTask>,
@@ -71,9 +58,7 @@ export interface ICronTasksRepository {
   ): Promise<ResponseType<CronTaskExecution[]>>;
 
   // Schedule management
-  getTaskSchedules(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskSchedule[]>>;
+  getTaskSchedules(logger: EndpointLogger): Promise<ResponseType<CronTaskSchedule[]>>;
   updateSchedule(
     taskId: string,
     updates: Partial<CronTaskSchedule>,
@@ -98,10 +83,7 @@ export class CronTasksRepository implements ICronTasksRepository {
   async getAllTasks(logger: EndpointLogger): Promise<ResponseType<CronTask[]>> {
     try {
       logger.debug("Fetching all cron tasks");
-      const tasks = await db
-        .select()
-        .from(cronTasks)
-        .orderBy(desc(cronTasks.createdAt));
+      const tasks = await db.select().from(cronTasks).orderBy(desc(cronTasks.createdAt));
       logger.info(`Successfully fetched ${tasks.length} cron tasks`);
       return success(tasks as CronTask[]);
     } catch (error) {
@@ -117,17 +99,10 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async getTaskById(
-    id: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTask | null>> {
+  async getTaskById(id: string, logger: EndpointLogger): Promise<ResponseType<CronTask | null>> {
     try {
       logger.debug("Fetching cron task by ID", { id });
-      const task = await db
-        .select()
-        .from(cronTasks)
-        .where(eq(cronTasks.id, id))
-        .limit(1);
+      const task = await db.select().from(cronTasks).where(eq(cronTasks.id, id)).limit(1);
       const result: CronTask | null = (task[0] as CronTask) || null;
       logger.info(`Cron task ${result ? "found" : "not found"}`, { id });
       return success<CronTask | null>(result);
@@ -151,11 +126,7 @@ export class CronTasksRepository implements ICronTasksRepository {
   ): Promise<ResponseType<CronTask | null>> {
     try {
       logger.debug("Fetching cron task by name", { name });
-      const task = await db
-        .select()
-        .from(cronTasks)
-        .where(eq(cronTasks.name, name))
-        .limit(1);
+      const task = await db.select().from(cronTasks).where(eq(cronTasks.name, name)).limit(1);
       const result: CronTask | null = (task[0] as CronTask) || null;
       logger.info(`Cron task ${result ? "found" : "not found"}`, { name });
       return success<CronTask | null>(result);
@@ -173,10 +144,7 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async createTask(
-    task: NewCronTask,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTask>> {
+  async createTask(task: NewCronTask, logger: EndpointLogger): Promise<ResponseType<CronTask>> {
     try {
       logger.debug("Creating new cron task", { name: task.name });
       const [newTask] = await db.insert(cronTasks).values(task).returning();
@@ -227,18 +195,14 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryTaskUpdateFailed",
+        message: "app.api.system.unifiedInterface.tasks.common.cronRepositoryTaskUpdateFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, taskId: id },
       });
     }
   }
 
-  async deleteTask(
-    id: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<void>> {
+  async deleteTask(id: string, logger: EndpointLogger): Promise<ResponseType<void>> {
     try {
       logger.debug("Deleting cron task", { id });
       await db.delete(cronTasks).where(eq(cronTasks.id, id));
@@ -251,8 +215,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryTaskDeleteFailed",
+        message: "app.api.system.unifiedInterface.tasks.common.cronRepositoryTaskDeleteFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, taskId: id },
       });
@@ -267,10 +230,7 @@ export class CronTasksRepository implements ICronTasksRepository {
       logger.debug("Creating cron task execution", {
         taskId: execution.taskId,
       });
-      const [newExecution] = await db
-        .insert(cronTaskExecutions)
-        .values(execution)
-        .returning();
+      const [newExecution] = await db.insert(cronTaskExecutions).values(execution).returning();
       return success(newExecution as CronTaskExecution);
     } catch (error) {
       const parsedError = parseError(error);
@@ -279,8 +239,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryExecutionCreateFailed",
+        message: "app.api.system.unifiedInterface.tasks.common.cronRepositoryExecutionCreateFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, taskId: execution.taskId },
       });
@@ -318,8 +277,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryExecutionUpdateFailed",
+        message: "app.api.system.unifiedInterface.tasks.common.cronRepositoryExecutionUpdateFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, executionId: id },
       });
@@ -349,8 +307,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryExecutionsFetchFailed",
+        message: "app.api.system.unifiedInterface.tasks.common.cronRepositoryExecutionsFetchFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, taskId, limit },
       });
@@ -385,9 +342,7 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async getTaskSchedules(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskSchedule[]>> {
+  async getTaskSchedules(logger: EndpointLogger): Promise<ResponseType<CronTaskSchedule[]>> {
     try {
       logger.debug("Fetching task schedules");
       const schedules = await db
@@ -401,8 +356,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositorySchedulesFetchFailed",
+        message: "app.api.system.unifiedInterface.tasks.common.cronRepositorySchedulesFetchFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -440,8 +394,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryScheduleUpdateFailed",
+        message: "app.api.system.unifiedInterface.tasks.common.cronRepositoryScheduleUpdateFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, taskId },
       });
@@ -479,8 +432,7 @@ export class CronTasksRepository implements ICronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryStatisticsFetchFailed",
+        message: "app.api.system.unifiedInterface.tasks.common.cronRepositoryStatisticsFetchFailed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message },
       });

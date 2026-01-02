@@ -14,13 +14,11 @@ export const translations: typeof enTranslations = {
     },
     content: {
       label: "Erinnerungsinhalt",
-      description:
-        "Die zu merkende Tatsache (leer lassen, um aktuellen Wert zu behalten)",
+      description: "Die zu merkende Tatsache (leer lassen, um aktuellen Wert zu behalten)",
     },
     tags: {
       label: "Tags",
-      description:
-        "Tags zur Kategorisierung (leer lassen, um aktuellen Wert zu behalten)",
+      description: "Tags zur Kategorisierung (leer lassen, um aktuellen Wert zu behalten)",
     },
     priority: {
       label: "Priorität",
@@ -43,13 +41,11 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um Erinnerungen zu aktualisieren",
+        description: "Sie müssen angemeldet sein, um Erinnerungen zu aktualisieren",
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, diese Erinnerung zu aktualisieren",
+        description: "Sie haben keine Berechtigung, diese Erinnerung zu aktualisieren",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -57,8 +53,7 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description:
-          "Beim Aktualisieren der Erinnerung ist ein Fehler aufgetreten",
+        description: "Beim Aktualisieren der Erinnerung ist ein Fehler aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -70,8 +65,7 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt",
-        description:
-          "Beim Aktualisieren der Erinnerung ist ein Konflikt aufgetreten",
+        description: "Beim Aktualisieren der Erinnerung ist ein Konflikt aufgetreten",
       },
     },
     success: {
@@ -110,8 +104,7 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, diese Erinnerung zu löschen",
+        description: "Sie haben keine Berechtigung, diese Erinnerung zu löschen",
       },
       notFound: {
         title: "Nicht gefunden",

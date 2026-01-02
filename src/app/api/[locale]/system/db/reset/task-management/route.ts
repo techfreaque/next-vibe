@@ -13,7 +13,6 @@ import { resetTaskManagementRepository as repository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) =>
-      repository.executeTaskOperation(data, logger),
+    handler: ({ data, logger }) => repository.executeTaskOperation(data, logger),
   },
 });

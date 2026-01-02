@@ -39,15 +39,8 @@ function renderTableCellChildren(content: React.ReactNode): React.ReactNode {
   return content;
 }
 
-function Table({
-  className,
-  style,
-  children,
-  ...props
-}: TableProps): React.JSX.Element {
-  const nativeStyle: ViewStyle | undefined = style
-    ? convertCSSToViewStyle(style)
-    : undefined;
+function Table({ className, style, children, ...props }: TableProps): React.JSX.Element {
+  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <StyledView className="relative w-full overflow-auto">
@@ -71,9 +64,7 @@ function TableHeader({
   children,
   ...props
 }: TableHeaderProps): React.JSX.Element {
-  const nativeStyle: ViewStyle | undefined = style
-    ? convertCSSToViewStyle(style)
-    : undefined;
+  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <StyledTableHeader
@@ -89,15 +80,8 @@ function TableHeader({
 }
 TableHeader.displayName = "TableHeader";
 
-function TableBody({
-  className,
-  style,
-  children,
-  ...props
-}: TableBodyProps): React.JSX.Element {
-  const nativeStyle: ViewStyle | undefined = style
-    ? convertCSSToViewStyle(style)
-    : undefined;
+function TableBody({ className, style, children, ...props }: TableBodyProps): React.JSX.Element {
+  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <StyledTableBody
@@ -119,18 +103,13 @@ function TableFooter({
   children,
   ...props
 }: TableFooterProps): React.JSX.Element {
-  const nativeStyle: ViewStyle | undefined = style
-    ? convertCSSToViewStyle(style)
-    : undefined;
+  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <StyledTableFooter
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "border-t bg-accent font-medium [&>tr]:last:border-b-0",
-          className,
-        ),
+        className: cn("border-t bg-accent font-medium [&>tr]:last:border-b-0", className),
       })}
       {...props}
     >
@@ -151,9 +130,7 @@ function TableRow({
   tabIndex,
   ...props
 }: TableRowProps): React.JSX.Element {
-  const nativeStyle: ViewStyle | undefined = style
-    ? convertCSSToViewStyle(style)
-    : undefined;
+  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <StyledTableRow
@@ -208,9 +185,7 @@ function TableHead({
 }: TableHeadProps): React.JSX.Element {
   const computedStyle: ViewStyle = {
     ...(style ? convertCSSToViewStyle(style) : {}),
-    ...(width !== undefined
-      ? { width: typeof width === "number" ? width : undefined }
-      : {}),
+    ...(width !== undefined ? { width: typeof width === "number" ? width : undefined } : {}),
   };
 
   const isInteractive = onClick || onKeyDown;
@@ -271,15 +246,8 @@ function TableHead({
 }
 TableHead.displayName = "TableHead";
 
-function TableCell({
-  className,
-  style,
-  children,
-  ...props
-}: TableCellProps): React.JSX.Element {
-  const nativeStyle: ViewStyle | undefined = style
-    ? convertCSSToViewStyle(style)
-    : undefined;
+function TableCell({ className, style, children, ...props }: TableCellProps): React.JSX.Element {
+  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <StyledTableCell
@@ -298,14 +266,8 @@ function TableCell({
 }
 TableCell.displayName = "TableCell";
 
-function TableCaption({
-  className,
-  style,
-  children,
-}: TableCaptionProps): React.JSX.Element {
-  const nativeStyle: ViewStyle | undefined = style
-    ? convertCSSToViewStyle(style)
-    : undefined;
+function TableCaption({ className, style, children }: TableCaptionProps): React.JSX.Element {
+  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <RNText
@@ -320,13 +282,4 @@ function TableCaption({
 }
 TableCaption.displayName = "TableCaption";
 
-export {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-};
+export { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow };

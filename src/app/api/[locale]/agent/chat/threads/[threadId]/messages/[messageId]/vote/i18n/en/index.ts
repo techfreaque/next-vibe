@@ -57,8 +57,7 @@ export const translations = {
       forbidden: {
         title: "Forbidden",
         description: "You don't have permission to vote on this message",
-        incognitoNotAllowed:
-          "Incognito threads cannot be accessed on the server",
+        incognitoNotAllowed: "Incognito threads cannot be accessed on the server",
       },
       notFound: {
         title: "Not Found",

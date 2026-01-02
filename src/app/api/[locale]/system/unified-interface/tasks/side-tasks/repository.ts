@@ -6,11 +6,7 @@
 
 import { count, desc, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -46,13 +42,8 @@ type ActionRequestData = SideTasksRequestOutput;
  */
 export interface ISideTasksRepository {
   // Task management
-  getAllTasks(
-    logger: EndpointLogger,
-  ): ReturnType<SideTasksRepository["getAllTasks"]>;
-  getTaskById(
-    id: string,
-    logger: EndpointLogger,
-  ): ReturnType<SideTasksRepository["getTaskById"]>;
+  getAllTasks(logger: EndpointLogger): ReturnType<SideTasksRepository["getAllTasks"]>;
+  getTaskById(id: string, logger: EndpointLogger): ReturnType<SideTasksRepository["getTaskById"]>;
   getTaskByName(name: string): ReturnType<SideTasksRepository["getTaskByName"]>;
   createTask(
     task: NewSideTaskRecord,
@@ -76,17 +67,13 @@ export interface ISideTasksRepository {
     taskId: string,
     limit?: number,
   ): ReturnType<SideTasksRepository["getExecutionsByTaskId"]>;
-  getRecentExecutions(
-    limit?: number,
-  ): ReturnType<SideTasksRepository["getRecentExecutions"]>;
+  getRecentExecutions(limit?: number): ReturnType<SideTasksRepository["getRecentExecutions"]>;
 
   // Health check management
   createHealthCheck(
     healthCheck: NewSideTaskHealthCheckRecord,
   ): Promise<ResponseType<SideTaskHealthCheckRecord>>;
-  getLatestHealthCheck(
-    taskId: string,
-  ): ReturnType<SideTasksRepository["getLatestHealthCheck"]>;
+  getLatestHealthCheck(taskId: string): ReturnType<SideTasksRepository["getLatestHealthCheck"]>;
   getHealthCheckHistory(
     taskId: string,
     limit?: number,
@@ -117,10 +104,7 @@ export interface ISideTasksRepository {
 export class SideTasksRepository implements ISideTasksRepository {
   async getAllTasks(logger: EndpointLogger) {
     try {
-      const tasks = await db
-        .select()
-        .from(sideTasks)
-        .orderBy(desc(sideTasks.createdAt));
+      const tasks = await db.select().from(sideTasks).orderBy(desc(sideTasks.createdAt));
       logger.debug("Successfully fetched all side tasks", {
         count: tasks.length,
       });
@@ -141,11 +125,7 @@ export class SideTasksRepository implements ISideTasksRepository {
 
   async getTaskById(id: string, logger: EndpointLogger) {
     try {
-      const task = await db
-        .select()
-        .from(sideTasks)
-        .where(eq(sideTasks.id, id))
-        .limit(1);
+      const task = await db.select().from(sideTasks).where(eq(sideTasks.id, id)).limit(1);
       logger.debug("Successfully fetched side task by ID", {
         id,
         found: !!task[0],
@@ -168,11 +148,7 @@ export class SideTasksRepository implements ISideTasksRepository {
 
   async getTaskByName(name: string) {
     try {
-      const task = await db
-        .select()
-        .from(sideTasks)
-        .where(eq(sideTasks.name, name))
-        .limit(1);
+      const task = await db.select().from(sideTasks).where(eq(sideTasks.name, name)).limit(1);
       return success(task[0] || null);
     } catch (error) {
       const parsedError = parseError(error);
@@ -219,8 +195,7 @@ export class SideTasksRepository implements ISideTasksRepository {
 
       if (!updatedTask) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.tasks.sideTasks.errors.taskNotFound" as const,
+          message: "app.api.system.unifiedInterface.tasks.sideTasks.errors.taskNotFound" as const,
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -229,8 +204,7 @@ export class SideTasksRepository implements ISideTasksRepository {
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.sideTasks.errors.updateTaskFailed" as const,
+        message: "app.api.system.unifiedInterface.tasks.sideTasks.errors.updateTaskFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -244,8 +218,7 @@ export class SideTasksRepository implements ISideTasksRepository {
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.sideTasks.errors.deleteTaskFailed" as const,
+        message: "app.api.system.unifiedInterface.tasks.sideTasks.errors.deleteTaskFailed" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -256,10 +229,7 @@ export class SideTasksRepository implements ISideTasksRepository {
     execution: NewSideTaskExecutionRecord,
   ): Promise<ResponseType<SideTaskExecutionRecord>> {
     try {
-      const [newExecution] = await db
-        .insert(sideTaskExecutions)
-        .values(execution)
-        .returning();
+      const [newExecution] = await db.insert(sideTaskExecutions).values(execution).returning();
       return success(newExecution as SideTaskExecutionRecord);
     } catch (error) {
       const parsedError = parseError(error);

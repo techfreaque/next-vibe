@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  FormAlert,
-  type FormAlertState,
-} from "next-vibe-ui/ui/form/form-alert";
+import { FormAlert, type FormAlertState } from "next-vibe-ui/ui/form/form-alert";
 import type { JSX } from "react";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -31,21 +28,14 @@ export function FormAlertWidget<const TKey extends string>({
     };
   } else if (response && response.success === true) {
     const data = response.data;
-    if (
-      data &&
-      typeof data === "object" &&
-      "message" in data &&
-      typeof data.message === "string"
-    ) {
+    if (data && typeof data === "object" && "message" in data && typeof data.message === "string") {
       alert = {
         variant: "success",
         message: {
           message: data.message as TranslationKey,
           messageParams:
             "messageParams" in data
-              ? (data.messageParams as
-                  | Record<string, string | number>
-                  | undefined)
+              ? (data.messageParams as Record<string, string | number> | undefined)
               : undefined,
         },
       };

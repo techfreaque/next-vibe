@@ -5,10 +5,7 @@
 
 import "server-only";
 
-import {
-  createNextHandler,
-  type NextHandlerReturnType,
-} from "../../../next-api/handler";
+import { createNextHandler, type NextHandlerReturnType } from "../../../next-api/handler";
 import type { CreateApiEndpointAny } from "../../types/endpoint";
 import {
   type ApiHandlerOptions,

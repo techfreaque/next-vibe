@@ -26,9 +26,7 @@ export function CodeOutputWidget<const TKey extends string>({
   const data = extractCodeOutputData(value, context.theme ?? "light");
 
   if (!data) {
-    return (
-      <Div className={cn("italic p-4 text-muted-foreground", className)}>—</Div>
-    );
+    return <Div className={cn("italic p-4 text-muted-foreground", className)}>—</Div>;
   }
 
   const { code, language, showLineNumbers, highlightLines, theme } = data;
@@ -43,9 +41,7 @@ export function CodeOutputWidget<const TKey extends string>({
       )}
     >
       <Div className="flex items-center justify-between border-b border-border bg-accent px-4 py-2">
-        <Span className="font-mono text-xs uppercase text-muted-foreground">
-          {language}
-        </Span>
+        <Span className="font-mono text-xs uppercase text-muted-foreground">{language}</Span>
       </Div>
       <Pre
         className={cn(
@@ -61,10 +57,7 @@ export function CodeOutputWidget<const TKey extends string>({
             return (
               <Div
                 key={index}
-                className={cn(
-                  "flex",
-                  highlighted && "bg-yellow-200/20 dark:bg-yellow-500/10",
-                )}
+                className={cn("flex", highlighted && "bg-yellow-200/20 dark:bg-yellow-500/10")}
               >
                 {showLineNumbers && (
                   <Span className="inline-block w-12 select-none pr-4 text-right text-muted-foreground">

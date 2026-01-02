@@ -7,10 +7,7 @@ import type { JSX } from "react";
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import type { WidgetType } from "../../../shared/types/enums";
 import { extractDataCardsData } from "../../../shared/widgets/logic/data-cards";
-import type {
-  ReactWidgetProps,
-  WidgetData,
-} from "../../../shared/widgets/types";
+import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
 import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
 import { getGridClassName } from "../../../shared/widgets/utils/widget-helpers";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
@@ -50,10 +47,7 @@ export const DataCardsWidget = <const TKey extends string>({
   const gridCols = getGridClassName(finalColumns as 1 | 2 | 3);
 
   let fieldDefinitions: Record<string, UnifiedField<string>> = {};
-  if (
-    "type" in field &&
-    (field.type === "array" || field.type === "array-optional")
-  ) {
+  if ("type" in field && (field.type === "array" || field.type === "array-optional")) {
     if ("child" in field && field.child) {
       const childField = field.child as UnifiedField<string>;
       if (
@@ -61,10 +55,7 @@ export const DataCardsWidget = <const TKey extends string>({
         (childField.type === "object" || childField.type === "object-optional")
       ) {
         if ("children" in childField && childField.children) {
-          fieldDefinitions = childField.children as Record<
-            string,
-            UnifiedField<string>
-          >;
+          fieldDefinitions = childField.children as Record<string, UnifiedField<string>>;
         }
       }
     }
@@ -86,17 +77,12 @@ export const DataCardsWidget = <const TKey extends string>({
                     const fieldDef = fieldDefinitions[key];
                     const fieldUi = fieldDef?.ui;
                     const label =
-                      fieldUi &&
-                      "label" in fieldUi &&
-                      typeof fieldUi.label === "string"
+                      fieldUi && "label" in fieldUi && typeof fieldUi.label === "string"
                         ? t(fieldUi.label)
                         : key;
 
                     return (
-                      <Div
-                        key={key}
-                        className="flex justify-between gap-4 text-sm"
-                      >
+                      <Div key={key} className="flex justify-between gap-4 text-sm">
                         <Span className="font-medium text-gray-700 dark:text-gray-300">
                           {label}:
                         </Span>

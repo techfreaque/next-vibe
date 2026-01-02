@@ -46,8 +46,7 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description:
-        "An internal server error occurred while creating the new page",
+      description: "An internal server error occurred while creating the new page",
     },
     unknown: {
       title: "Unknown Error",

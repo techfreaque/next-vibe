@@ -77,11 +77,7 @@ export function EditableTextWidget<const TKey extends string>({
   };
 
   if (!context.isInteractive || readonly) {
-    return (
-      <Span className={cn("text-foreground", className)}>
-        {value || placeholder || "—"}
-      </Span>
-    );
+    return <Span className={cn("text-foreground", className)}>{value || placeholder || "—"}</Span>;
   }
 
   if (isEditing) {

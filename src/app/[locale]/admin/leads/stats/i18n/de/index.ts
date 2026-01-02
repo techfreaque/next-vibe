@@ -3,8 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   // Page metadata
   title: "Leads-Statistiken",
-  description:
-    "Ansicht und Analyse von Lead-Statistiken und Leistungskennzahlen",
+  description: "Ansicht und Analyse von Lead-Statistiken und Leistungskennzahlen",
   filter: "Filtern",
   refresh: "Aktualisieren",
 

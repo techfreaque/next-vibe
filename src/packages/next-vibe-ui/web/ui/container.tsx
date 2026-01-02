@@ -31,11 +31,7 @@ export function Container({
 }: ContainerProps): JSX.Element {
   return (
     <div
-      className={cn(
-        "mx-auto px-4 sm:px-6 lg:px-8 py-8",
-        sizeClasses[size],
-        className,
-      )}
+      className={cn("mx-auto px-4 sm:px-6 lg:px-8 py-8", sizeClasses[size], className)}
       style={style}
     >
       {children}

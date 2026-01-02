@@ -148,8 +148,7 @@ export const translations: typeof enTranslations = {
         step1Number: "1.",
         step1: "Nasz zespół przejrzy profil i cele Twojej firmy",
         step2Number: "2.",
-        step2:
-          "Otrzymasz spersonalizowaną propozycję konsultacji w ciągu 24 godzin",
+        step2: "Otrzymasz spersonalizowaną propozycję konsultacji w ciągu 24 godzin",
         step3Number: "3.",
         step3: "Umówimy rozmowę, aby omówić Twoje konkretne potrzeby i cele",
       },
@@ -159,8 +158,7 @@ export const translations: typeof enTranslations = {
       support:
         "Masz pytania? Odpowiedz na ten e-mail lub skontaktuj się z nami pod adresem {{supportEmail}}",
       error: {
-        noEmail:
-          "Nie można wysłać e-maila powitalnego - nie podano adresu e-mail",
+        noEmail: "Nie można wysłać e-maila powitalnego - nie podano adresu e-mail",
       },
     },
     admin: {
@@ -168,8 +166,7 @@ export const translations: typeof enTranslations = {
         subject: "Nowy lead: {{businessName}}",
         title: "Stworzono nowy lead",
         preview: "Nowy lead od {{businessName}} wymaga działania",
-        message:
-          "Nowy lead został stworzony w systemie od {{businessName}} i wymaga Twojej uwagi.",
+        message: "Nowy lead został stworzony w systemie od {{businessName}} i wymaga Twojej uwagi.",
         leadDetails: "Szczegóły leada",
         businessName: "Nazwa firmy",
         email: "E-mail",
@@ -182,8 +179,7 @@ export const translations: typeof enTranslations = {
         viewLead: "Zobacz szczegóły leada",
         viewAllLeads: "Zobacz wszystkie leady",
         error: {
-          noData:
-            "Nie można wysłać powiadomienia administracyjnego - nie podano danych leada",
+          noData: "Nie można wysłać powiadomienia administracyjnego - nie podano danych leada",
         },
         defaultName: "Nowy lead",
       },

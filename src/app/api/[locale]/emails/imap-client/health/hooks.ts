@@ -14,9 +14,7 @@ import definitions from "./definition";
 /**
  * Hook for fetching IMAP health status
  */
-export function useImapHealth(
-  logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
+export function useImapHealth(logger: EndpointLogger): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

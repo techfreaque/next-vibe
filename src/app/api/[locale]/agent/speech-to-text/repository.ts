@@ -6,11 +6,7 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
@@ -83,17 +79,14 @@ export class SpeechToTextRepository {
       });
 
       // Call Eden AI API
-      const response = await fetch(
-        "https://api.edenai.run/v2/audio/speech_to_text_async",
-        {
-          method: "POST",
-          headers: {
-            // eslint-disable-next-line i18next/no-literal-string
-            Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
-          },
-          body: formData,
+      const response = await fetch("https://api.edenai.run/v2/audio/speech_to_text_async", {
+        method: "POST",
+        headers: {
+          // eslint-disable-next-line i18next/no-literal-string
+          Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
         },
-      );
+        body: formData,
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -161,12 +154,7 @@ export class SpeechToTextRepository {
 
       // Deduct credits AFTER successful completion based on actual duration
       try {
-        await CreditRepository.deductCreditsForFeature(
-          user,
-          creditsNeeded,
-          "stt",
-          logger,
-        );
+        await CreditRepository.deductCreditsForFeature(user, creditsNeeded, "stt", logger);
       } catch (error) {
         const errorMessage = parseError(error).message;
         logger.error("Failed to deduct credits", {
@@ -290,8 +278,7 @@ export class SpeechToTextRepository {
               fullResponse: JSON.stringify(resultData),
             });
             return fail({
-              message:
-                "app.api.agent.speechToText.post.errors.transcriptionFailed",
+              message: "app.api.agent.speechToText.post.errors.transcriptionFailed",
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
               messageParams: {
                 error: `Provider ${provider} not found in results`,
@@ -300,10 +287,7 @@ export class SpeechToTextRepository {
           }
 
           // Check for provider-level errors
-          if (
-            providerResult.error ||
-            providerResult.final_status === "failed"
-          ) {
+          if (providerResult.error || providerResult.final_status === "failed") {
             // Handle both string and object error formats
             const errorMessage =
               typeof providerResult.error === "string"
@@ -314,9 +298,7 @@ export class SpeechToTextRepository {
               provider,
               error: errorMessage,
               errorType:
-                typeof providerResult.error === "object"
-                  ? providerResult.error?.type
-                  : undefined,
+                typeof providerResult.error === "object" ? providerResult.error?.type : undefined,
               finalStatus: providerResult.final_status,
               fullProviderResult: JSON.stringify(providerResult),
             });

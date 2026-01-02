@@ -30,10 +30,7 @@ function createEnumObjectWithKeyValues<T extends Record<string, string>>(
 
 export function createEnumOptions<
   const TTranslationKey extends string = TranslationKey,
-  const T extends Record<string, TTranslationKey> = Record<
-    string,
-    TTranslationKey
-  >,
+  const T extends Record<string, TTranslationKey> = Record<string, TTranslationKey>,
 >(
   enumMap: T,
 ): {

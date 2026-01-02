@@ -3,22 +3,16 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   authClient: {
     errors: {
-      status_save_failed:
-        "Authentifizierungsstatus konnte nicht gespeichert werden",
-      status_remove_failed:
-        "Authentifizierungsstatus konnte nicht entfernt werden",
-      status_check_failed:
-        "Authentifizierungsstatus konnte nicht überprüft werden",
-      token_save_failed:
-        "Authentifizierungstoken konnte nicht gespeichert werden",
+      status_save_failed: "Authentifizierungsstatus konnte nicht gespeichert werden",
+      status_remove_failed: "Authentifizierungsstatus konnte nicht entfernt werden",
+      status_check_failed: "Authentifizierungsstatus konnte nicht überprüft werden",
+      token_save_failed: "Authentifizierungstoken konnte nicht gespeichert werden",
       token_get_failed: "Authentifizierungstoken konnte nicht abgerufen werden",
-      token_remove_failed:
-        "Authentifizierungstoken konnte nicht entfernt werden",
+      token_remove_failed: "Authentifizierungstoken konnte nicht entfernt werden",
     },
   },
   errors: {
-    token_generation_failed:
-      "Authentifizierungs-Token konnte nicht generiert werden",
+    token_generation_failed: "Authentifizierungs-Token konnte nicht generiert werden",
     invalid_session: "Die Sitzung ist ungültig oder abgelaufen",
     missing_request_context: "Request-Kontext fehlt",
     missing_locale: "Locale fehlt in der Anfrage",
@@ -28,28 +22,22 @@ export const translations: typeof enTranslations = {
     invalid_token_signature: "Token-Signatur ist ungültig",
     jwt_payload_missing_id: "JWT-Payload fehlt Benutzer-ID",
     cookie_set_failed: "Authentifizierungs-Cookie konnte nicht gesetzt werden",
-    cookie_clear_failed:
-      "Authentifizierungs-Cookie konnte nicht gelöscht werden",
+    cookie_clear_failed: "Authentifizierungs-Cookie konnte nicht gelöscht werden",
     publicPayloadNotSupported:
       "Öffentlicher JWT-Payload wird für CLI-Authentifizierung nicht unterstützt",
     jwt_signing_failed: "JWT-Token konnte nicht signiert werden",
     authentication_failed: "Authentifizierung fehlgeschlagen",
     user_not_authenticated: "Benutzer ist nicht authentifiziert",
-    publicUserNotAllowed:
-      "Öffentlicher Benutzer ist für diesen Endpunkt nicht erlaubt",
+    publicUserNotAllowed: "Öffentlicher Benutzer ist für diesen Endpunkt nicht erlaubt",
     validation_failed: "Validierung fehlgeschlagen",
     failed_to_create_lead: "Lead konnte nicht erstellt werden",
     native: {
-      unsupported:
-        "Diese Authentifizierungsmethode wird in React Native nicht unterstützt",
-      storage_failed:
-        "Authentifizierungsdaten konnten nicht gespeichert werden",
+      unsupported: "Diese Authentifizierungsmethode wird in React Native nicht unterstützt",
+      storage_failed: "Authentifizierungsdaten konnten nicht gespeichert werden",
       clear_failed: "Authentifizierungsdaten konnten nicht gelöscht werden",
     },
-    not_implemented_native:
-      "Diese Funktion ist noch nicht für React Native implementiert",
-    unknownError:
-      "Ein unbekannter Fehler ist während der Authentifizierung aufgetreten",
+    not_implemented_native: "Diese Funktion ist noch nicht für React Native implementiert",
+    unknownError: "Ein unbekannter Fehler ist während der Authentifizierung aufgetreten",
   },
   post: {
     title: "Titel",
@@ -170,10 +158,8 @@ export const translations: typeof enTranslations = {
     getAuthMinimalUserNext: {
       start: "getAuthMinimalUserNext: Authentifizierung wird zuerst geprüft",
       result: "getAuthMinimalUserNext: getCurrentUserNext Ergebnis",
-      authenticated:
-        "getAuthMinimalUserNext: Benutzer ist authentifiziert, leadId wird abgerufen",
-      returningAuth:
-        "getAuthMinimalUserNext: Authentifizierter Benutzer wird zurückgegeben",
+      authenticated: "getAuthMinimalUserNext: Benutzer ist authentifiziert, leadId wird abgerufen",
+      returningAuth: "getAuthMinimalUserNext: Authentifizierter Benutzer wird zurückgegeben",
       notAuthenticated:
         "getAuthMinimalUserNext: Benutzer nicht authentifiziert, öffentlicher Benutzer wird zurückgegeben",
     },
@@ -191,37 +177,28 @@ export const translations: typeof enTranslations = {
     errorGettingUserRoles: "Fehler beim Abrufen der Benutzerrollen",
     errorCheckingUserAuth: "Fehler beim Prüfen der Benutzerauthentifizierung",
     gettingCurrentUserFromTrpc: "Aktueller Benutzer wird von tRPC abgerufen",
-    errorGettingAuthUserForTrpc:
-      "Fehler beim Abrufen des Auth-Benutzers für tRPC",
-    errorGettingUserRolesForTrpc:
-      "Fehler beim Abrufen der Benutzerrollen für tRPC",
-    authenticatingCliUserWithPayload:
-      "CLI-Benutzer wird mit Nutzdaten authentifiziert",
+    errorGettingAuthUserForTrpc: "Fehler beim Abrufen des Auth-Benutzers für tRPC",
+    errorGettingUserRolesForTrpc: "Fehler beim Abrufen der Benutzerrollen für tRPC",
+    authenticatingCliUserWithPayload: "CLI-Benutzer wird mit Nutzdaten authentifiziert",
     errorAuthenticatingCliUserWithPayload:
       "Fehler beim Authentifizieren des CLI-Benutzers mit Nutzdaten",
     creatingCliToken: "CLI-Token wird erstellt",
     errorCreatingCliToken: "Fehler beim Erstellen des CLI-Tokens",
     validatingCliToken: "CLI-Token wird validiert",
     errorValidatingCliToken: "Fehler beim Validieren des CLI-Tokens",
-    gettingCurrentUserFromNextjs:
-      "Aktueller Benutzer wird von Next.js abgerufen",
-    errorGettingAuthUserForNextjs:
-      "Fehler beim Abrufen des Auth-Benutzers für Next.js",
+    gettingCurrentUserFromNextjs: "Aktueller Benutzer wird von Next.js abgerufen",
+    errorGettingAuthUserForNextjs: "Fehler beim Abrufen des Auth-Benutzers für Next.js",
     settingNextjsAuthCookies: "Next.js Auth-Cookies werden gesetzt",
     clearingNextjsAuthCookies: "Next.js Auth-Cookies werden gelöscht",
     gettingCurrentUserFromToken: "Aktueller Benutzer wird von Token abgerufen",
-    errorGettingCurrentUserFromCli:
-      "Fehler beim Abrufen des aktuellen Benutzers von CLI",
-    errorGettingAuthUserForCli:
-      "Fehler beim Abrufen des Auth-Benutzers für CLI",
-    errorGettingUserRolesForCli:
-      "Fehler beim Abrufen der Benutzerrollen für CLI",
+    errorGettingCurrentUserFromCli: "Fehler beim Abrufen des aktuellen Benutzers von CLI",
+    errorGettingAuthUserForCli: "Fehler beim Abrufen des Auth-Benutzers für CLI",
+    errorGettingUserRolesForCli: "Fehler beim Abrufen der Benutzerrollen für CLI",
     tokenFromAuthHeader: "Token aus Auth-Header",
     tokenFromCookie: "Token aus Cookie",
     noTokenFound: "Kein Token gefunden",
     errorExtractingToken: "Fehler beim Extrahieren des Tokens",
     errorParsingCookies: "Fehler beim Parsen der Cookies",
-    errorGettingCurrentUserFromTrpc:
-      "Fehler beim Abrufen des aktuellen Benutzers von tRPC",
+    errorGettingCurrentUserFromTrpc: "Fehler beim Abrufen des aktuellen Benutzers von tRPC",
   },
 };

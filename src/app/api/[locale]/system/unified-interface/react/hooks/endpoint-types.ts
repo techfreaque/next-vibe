@@ -82,13 +82,9 @@ export type GetEndpointTypes<T> = "GET" extends keyof T
     : never
   : never;
 
-export type PostEndpointTypes<T> = "POST" extends keyof T
-  ? ExtractEndpointTypes<T["POST"]>
-  : never;
+export type PostEndpointTypes<T> = "POST" extends keyof T ? ExtractEndpointTypes<T["POST"]> : never;
 
-export type PutEndpointTypes<T> = "PUT" extends keyof T
-  ? ExtractEndpointTypes<T["PUT"]>
-  : never;
+export type PutEndpointTypes<T> = "PUT" extends keyof T ? ExtractEndpointTypes<T["PUT"]> : never;
 
 export type PatchEndpointTypes<T> = "PATCH" extends keyof T
   ? ExtractEndpointTypes<T["PATCH"]>
@@ -144,15 +140,9 @@ export interface UseEndpointOptions<T> {
     >;
     /** Query options for data fetching */
     queryOptions?: ApiQueryOptions<
-      GetEndpointTypes<T> extends never
-        ? never
-        : GetEndpointTypes<T>["request"],
-      GetEndpointTypes<T> extends never
-        ? never
-        : GetEndpointTypes<T>["response"],
-      GetEndpointTypes<T> extends never
-        ? never
-        : GetEndpointTypes<T>["urlPathParams"]
+      GetEndpointTypes<T> extends never ? never : GetEndpointTypes<T>["request"],
+      GetEndpointTypes<T> extends never ? never : GetEndpointTypes<T>["response"],
+      GetEndpointTypes<T> extends never ? never : GetEndpointTypes<T>["urlPathParams"]
     >;
     /** URL path parameters for the read endpoint */
     urlPathParams?: GetEndpointTypes<T> extends never
@@ -165,9 +155,7 @@ export interface UseEndpointOptions<T> {
       ? undefined
       : Partial<GetEndpointTypes<T>["request"]>;
     /** Initial data for the response (disables initial fetch when provided) */
-    initialData?: GetEndpointTypes<T> extends never
-      ? undefined
-      : GetEndpointTypes<T>["response"];
+    initialData?: GetEndpointTypes<T> extends never ? undefined : GetEndpointTypes<T>["response"];
   };
 
   /**
@@ -177,9 +165,7 @@ export interface UseEndpointOptions<T> {
   create?: {
     /** Form options for mutation forms */
     formOptions?: ApiFormOptions<
-      PrimaryMutationTypes<T> extends never
-        ? never
-        : PrimaryMutationTypes<T>["request"]
+      PrimaryMutationTypes<T> extends never ? never : PrimaryMutationTypes<T>["request"]
     >;
     /** Mutation options for create/update operations */
     mutationOptions?: UseEndpointMutationOptions<T>;
@@ -204,21 +190,13 @@ export interface UseEndpointOptions<T> {
   update?: {
     /** Form options for mutation forms */
     formOptions?: ApiFormOptions<
-      PatchEndpointTypes<T> extends never
-        ? never
-        : PatchEndpointTypes<T>["request"]
+      PatchEndpointTypes<T> extends never ? never : PatchEndpointTypes<T>["request"]
     >;
     /** Mutation options for update operations */
     mutationOptions?: ApiMutationOptions<
-      PatchEndpointTypes<T> extends never
-        ? never
-        : PatchEndpointTypes<T>["request"],
-      PatchEndpointTypes<T> extends never
-        ? never
-        : PatchEndpointTypes<T>["response"],
-      PatchEndpointTypes<T> extends never
-        ? never
-        : PatchEndpointTypes<T>["urlPathParams"]
+      PatchEndpointTypes<T> extends never ? never : PatchEndpointTypes<T>["request"],
+      PatchEndpointTypes<T> extends never ? never : PatchEndpointTypes<T>["response"],
+      PatchEndpointTypes<T> extends never ? never : PatchEndpointTypes<T>["urlPathParams"]
     >;
     /** URL path parameters for the update endpoint */
     urlPathParams?: PatchEndpointTypes<T> extends never
@@ -241,15 +219,9 @@ export interface UseEndpointOptions<T> {
   delete?: {
     /** Mutation options for delete operations */
     mutationOptions?: ApiMutationOptions<
-      DeleteEndpointTypes<T> extends never
-        ? never
-        : DeleteEndpointTypes<T>["request"],
-      DeleteEndpointTypes<T> extends never
-        ? never
-        : DeleteEndpointTypes<T>["response"],
-      DeleteEndpointTypes<T> extends never
-        ? never
-        : DeleteEndpointTypes<T>["urlPathParams"]
+      DeleteEndpointTypes<T> extends never ? never : DeleteEndpointTypes<T>["request"],
+      DeleteEndpointTypes<T> extends never ? never : DeleteEndpointTypes<T>["response"],
+      DeleteEndpointTypes<T> extends never ? never : DeleteEndpointTypes<T>["urlPathParams"]
     >;
     /** URL path parameters for the delete endpoint */
     urlPathParams?: DeleteEndpointTypes<T> extends never
@@ -292,9 +264,7 @@ export interface UseEndpointOptions<T> {
   /** @deprecated Use read.queryOptions instead */
   queryOptions?: {
     enabled?: boolean;
-    requestData?: GetEndpointTypes<T> extends never
-      ? undefined
-      : GetEndpointTypes<T>["request"];
+    requestData?: GetEndpointTypes<T> extends never ? undefined : GetEndpointTypes<T>["request"];
     urlPathParams?: EndpointUrlVariables<T>;
     staleTime?: number;
     refetchOnWindowFocus?: boolean;
@@ -330,15 +300,9 @@ export interface FormAlertState {
 }
 
 export type UseEndpointMutationOptions<T> = ApiMutationOptions<
-  PrimaryMutationTypes<T> extends never
-    ? never
-    : PrimaryMutationTypes<T>["request"],
-  PrimaryMutationTypes<T> extends never
-    ? never
-    : PrimaryMutationTypes<T>["response"],
-  PrimaryMutationTypes<T> extends never
-    ? never
-    : PrimaryMutationTypes<T>["urlPathParams"]
+  PrimaryMutationTypes<T> extends never ? never : PrimaryMutationTypes<T>["request"],
+  PrimaryMutationTypes<T> extends never ? never : PrimaryMutationTypes<T>["response"],
+  PrimaryMutationTypes<T> extends never ? never : PrimaryMutationTypes<T>["urlPathParams"]
 >;
 
 // Create operation return type
@@ -384,11 +348,7 @@ export type ReadOperationReturn<T> =
     : {
         form: UseFormReturn<
           GetEndpointTypes<T>["request"],
-          ZodType<
-            GetEndpointTypes<T>["request"],
-            ZodTypeDef,
-            GetEndpointTypes<T>["request"]
-          >
+          ZodType<GetEndpointTypes<T>["request"], ZodTypeDef, GetEndpointTypes<T>["request"]>
         >;
         /** The complete response including success/error state */
         response: ResponseType<GetEndpointTypes<T>["response"]> | undefined;
@@ -424,20 +384,12 @@ export type ReadOperationReturn<T> =
 
 // Delete operation return type
 export type DeleteOperationReturn<T> = T extends {
-  DELETE: CreateApiEndpoint<
-    string,
-    Methods,
-    readonly UserRoleValue[],
-    string,
-    infer TFields
-  >;
+  DELETE: CreateApiEndpoint<string, Methods, readonly UserRoleValue[], string, infer TFields>;
 }
   ? {
       /** The complete response including success/error state */
       response:
-        | ResponseType<
-            ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
-          >
+        | ResponseType<ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>>
         | undefined;
 
       // Backward compatibility properties
@@ -447,9 +399,7 @@ export type DeleteOperationReturn<T> = T extends {
       error: ErrorResponseType | null;
 
       submit: (
-        data?: ExtractOutput<
-          InferSchemaFromField<TFields, FieldUsage.RequestData>
-        >,
+        data?: ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
       ) => Promise<void>;
       isSubmitting: boolean;
     }
@@ -466,11 +416,7 @@ export type EndpointReturn<T> = Prettify<{
     : {
         form: UseFormReturn<
           GetEndpointTypes<T>["request"],
-          ZodType<
-            GetEndpointTypes<T>["request"],
-            ZodTypeDef,
-            GetEndpointTypes<T>["request"]
-          >
+          ZodType<GetEndpointTypes<T>["request"], ZodTypeDef, GetEndpointTypes<T>["request"]>
         >;
         /** The complete response including success/error state */
         response: ResponseType<GetEndpointTypes<T>["response"]> | undefined;
@@ -547,11 +493,7 @@ export type EndpointReturn<T> = Prettify<{
     : {
         form: UseFormReturn<
           PatchEndpointTypes<T>["request"],
-          ZodType<
-            PatchEndpointTypes<T>["request"],
-            ZodTypeDef,
-            PatchEndpointTypes<T>["request"]
-          >
+          ZodType<PatchEndpointTypes<T>["request"], ZodTypeDef, PatchEndpointTypes<T>["request"]>
         >;
         /** The complete response including success/error state */
         response: ResponseType<PatchEndpointTypes<T>["response"]> | undefined;
@@ -577,20 +519,12 @@ export type EndpointReturn<T> = Prettify<{
       };
 
   delete: T extends {
-    DELETE: CreateApiEndpoint<
-      string,
-      Methods,
-      readonly UserRoleValue[],
-      string,
-      infer TFields
-    >;
+    DELETE: CreateApiEndpoint<string, Methods, readonly UserRoleValue[], string, infer TFields>;
   }
     ? {
         /** The complete response including success/error state */
         response:
-          | ResponseType<
-              ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>
-            >
+          | ResponseType<ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>>
           | undefined;
 
         // Backward compatibility properties
@@ -600,9 +534,7 @@ export type EndpointReturn<T> = Prettify<{
         error: ErrorResponseType | null;
 
         submit: (
-          data?: ExtractOutput<
-            InferSchemaFromField<TFields, FieldUsage.RequestData>
-          >,
+          data?: ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
         ) => Promise<void>;
         isSubmitting: boolean;
       }
@@ -618,20 +550,12 @@ export type EndpointReturn<T> = Prettify<{
 // Options for individual hooks
 export interface UseEndpointCreateOptions<T> {
   formOptions?: ApiFormOptions<
-    PrimaryMutationTypes<T> extends never
-      ? never
-      : PrimaryMutationTypes<T>["request"]
+    PrimaryMutationTypes<T> extends never ? never : PrimaryMutationTypes<T>["request"]
   >;
   mutationOptions?: ApiMutationOptions<
-    PrimaryMutationTypes<T> extends never
-      ? never
-      : PrimaryMutationTypes<T>["request"],
-    PrimaryMutationTypes<T> extends never
-      ? never
-      : PrimaryMutationTypes<T>["response"],
-    PrimaryMutationTypes<T> extends never
-      ? never
-      : PrimaryMutationTypes<T>["urlPathParams"]
+    PrimaryMutationTypes<T> extends never ? never : PrimaryMutationTypes<T>["request"],
+    PrimaryMutationTypes<T> extends never ? never : PrimaryMutationTypes<T>["response"],
+    PrimaryMutationTypes<T> extends never ? never : PrimaryMutationTypes<T>["urlPathParams"]
   >;
   urlPathParams?: PrimaryMutationTypes<T> extends never
     ? undefined
@@ -648,9 +572,7 @@ export interface UseEndpointReadOptions<T> {
   queryOptions?: ApiQueryOptions<
     GetEndpointTypes<T> extends never ? never : GetEndpointTypes<T>["request"],
     GetEndpointTypes<T> extends never ? never : GetEndpointTypes<T>["response"],
-    GetEndpointTypes<T> extends never
-      ? never
-      : GetEndpointTypes<T>["urlPathParams"]
+    GetEndpointTypes<T> extends never ? never : GetEndpointTypes<T>["urlPathParams"]
   >;
   urlPathParams: GetEndpointTypes<T> extends never
     ? undefined
@@ -659,15 +581,9 @@ export interface UseEndpointReadOptions<T> {
 
 export interface UseEndpointDeleteOptions<T> {
   mutationOptions?: ApiMutationOptions<
-    DeleteEndpointTypes<T> extends never
-      ? never
-      : DeleteEndpointTypes<T>["request"],
-    DeleteEndpointTypes<T> extends never
-      ? never
-      : DeleteEndpointTypes<T>["response"],
-    DeleteEndpointTypes<T> extends never
-      ? never
-      : DeleteEndpointTypes<T>["urlPathParams"]
+    DeleteEndpointTypes<T> extends never ? never : DeleteEndpointTypes<T>["request"],
+    DeleteEndpointTypes<T> extends never ? never : DeleteEndpointTypes<T>["response"],
+    DeleteEndpointTypes<T> extends never ? never : DeleteEndpointTypes<T>["urlPathParams"]
   >;
   urlPathParams?: DeleteEndpointTypes<T> extends never
     ? undefined

@@ -3,10 +3,7 @@
 import { Button } from "next-vibe-ui/ui/button";
 import type { JSX } from "react";
 
-import {
-  getIconComponent,
-  type IconValue,
-} from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { getIconComponent, type IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { WidgetType } from "../../../shared/types/enums";
@@ -38,15 +35,11 @@ export function SubmitButtonWidget<const TKey extends string>({
 
   const buttonText = textKey
     ? t(textKey)
-    : globalT(
-        "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit",
-      );
+    : globalT("app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit");
 
   const loadingText = loadingTextKey
     ? t(loadingTextKey)
-    : globalT(
-        "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
-      );
+    : globalT("app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting");
 
   return (
     <Button

@@ -5,6 +5,7 @@
 
 "use client";
 
+import { RefreshCw, Settings2 } from "lucide-react";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
@@ -21,13 +22,12 @@ import {
 import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import { P } from "next-vibe-ui/ui/typography";
-import { RefreshCw, Settings2 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactElement } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { PreviewFieldConfig } from "@/app/api/[locale]/emails/registry/types";
-import type { TranslationKey } from "@/i18n/core/static-types";
 import { useTranslation } from "@/i18n/core/client";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 interface PreviewPropsFormProps {
   previewFields?: Record<string, PreviewFieldConfig>;
@@ -41,8 +41,7 @@ export function PreviewPropsForm({
   onPropsChange,
 }: PreviewPropsFormProps): ReactElement | null {
   const { t } = useTranslation();
-  const [props, setProps] =
-    useState<Record<string, string | number | boolean>>(defaultProps);
+  const [props, setProps] = useState<Record<string, string | number | boolean>>(defaultProps);
 
   // Update local state when default props change
   useEffect(() => {
@@ -81,14 +80,10 @@ export function PreviewPropsForm({
             <Div key={fieldName} className="flex flex-col gap-2">
               <Label htmlFor={fieldId} className="font-medium">
                 {labelText}
-                {config.required && (
-                  <Span className="text-red-500 ml-1">*</Span>
-                )}
+                {config.required && <Span className="text-red-500 ml-1">*</Span>}
               </Label>
               {descriptionText && (
-                <P className="text-xs text-gray-500 dark:text-gray-400">
-                  {descriptionText}
-                </P>
+                <P className="text-xs text-gray-500 dark:text-gray-400">{descriptionText}</P>
               )}
               <Input
                 id={fieldId}
@@ -108,14 +103,10 @@ export function PreviewPropsForm({
             <Div key={fieldName} className="flex flex-col gap-2">
               <Label htmlFor={fieldId} className="font-medium">
                 {labelText}
-                {config.required && (
-                  <Span className="text-red-500 ml-1">*</Span>
-                )}
+                {config.required && <Span className="text-red-500 ml-1">*</Span>}
               </Label>
               {descriptionText && (
-                <P className="text-xs text-gray-500 dark:text-gray-400">
-                  {descriptionText}
-                </P>
+                <P className="text-xs text-gray-500 dark:text-gray-400">{descriptionText}</P>
               )}
               <Textarea
                 id={fieldId}
@@ -135,14 +126,10 @@ export function PreviewPropsForm({
             <Div key={fieldName} className="flex flex-col gap-2">
               <Label htmlFor={fieldId} className="font-medium">
                 {labelText}
-                {config.required && (
-                  <Span className="text-red-500 ml-1">*</Span>
-                )}
+                {config.required && <Span className="text-red-500 ml-1">*</Span>}
               </Label>
               {descriptionText && (
-                <P className="text-xs text-gray-500 dark:text-gray-400">
-                  {descriptionText}
-                </P>
+                <P className="text-xs text-gray-500 dark:text-gray-400">{descriptionText}</P>
               )}
               <Input
                 id={fieldId}
@@ -161,10 +148,7 @@ export function PreviewPropsForm({
 
         case "boolean":
           return (
-            <Div
-              key={fieldName}
-              className="flex flex-row items-start gap-3 py-2"
-            >
+            <Div key={fieldName} className="flex flex-row items-start gap-3 py-2">
               <Checkbox
                 id={fieldId}
                 checked={(fieldValue as boolean) || false}
@@ -178,9 +162,7 @@ export function PreviewPropsForm({
                   {labelText}
                 </Label>
                 {descriptionText && (
-                  <P className="text-xs text-gray-500 dark:text-gray-400">
-                    {descriptionText}
-                  </P>
+                  <P className="text-xs text-gray-500 dark:text-gray-400">{descriptionText}</P>
                 )}
               </Div>
             </Div>
@@ -191,14 +173,10 @@ export function PreviewPropsForm({
             <Div key={fieldName} className="flex flex-col gap-2">
               <Label htmlFor={fieldId} className="font-medium">
                 {labelText}
-                {config.required && (
-                  <Span className="text-red-500 ml-1">*</Span>
-                )}
+                {config.required && <Span className="text-red-500 ml-1">*</Span>}
               </Label>
               {descriptionText && (
-                <P className="text-xs text-gray-500 dark:text-gray-400">
-                  {descriptionText}
-                </P>
+                <P className="text-xs text-gray-500 dark:text-gray-400">{descriptionText}</P>
               )}
               <Input
                 id={fieldId}
@@ -218,14 +196,10 @@ export function PreviewPropsForm({
             <Div key={fieldName} className="flex flex-col gap-2">
               <Label htmlFor={fieldId} className="font-medium">
                 {labelText}
-                {config.required && (
-                  <Span className="text-red-500 ml-1">*</Span>
-                )}
+                {config.required && <Span className="text-red-500 ml-1">*</Span>}
               </Label>
               {descriptionText && (
-                <P className="text-xs text-gray-500 dark:text-gray-400">
-                  {descriptionText}
-                </P>
+                <P className="text-xs text-gray-500 dark:text-gray-400">{descriptionText}</P>
               )}
               <Select
                 value={(fieldValue as string) || ""}
@@ -274,16 +248,9 @@ export function PreviewPropsForm({
         <Div className="flex items-center justify-between">
           <Div className="flex items-center gap-2">
             <Settings2 className="w-5 h-5" />
-            <CardTitle>
-              {t("app.admin.emails.templates.preview.form.title")}
-            </CardTitle>
+            <CardTitle>{t("app.admin.emails.templates.preview.form.title")}</CardTitle>
           </Div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleReset}
-            type="button"
-          >
+          <Button variant="outline" size="sm" onClick={handleReset} type="button">
             <RefreshCw className="w-4 h-4 mr-2" />
             {t("app.admin.emails.templates.preview.form.reset")}
           </Button>

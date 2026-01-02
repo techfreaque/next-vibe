@@ -33,8 +33,7 @@ const toggleTextVariants = cva("text-sm text-foreground font-medium", {
   variants: {
     variant: {
       default: "",
-      outline:
-        "web:group-hover:text-accent-foreground web:group-active:text-accent-foreground",
+      outline: "web:group-hover:text-accent-foreground web:group-active:text-accent-foreground",
     },
     size: {
       default: "",

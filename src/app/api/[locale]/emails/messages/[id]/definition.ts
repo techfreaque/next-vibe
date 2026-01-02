@@ -82,16 +82,14 @@ const { GET } = createEndpoint({
           recipientEmail: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.id.response.email.recipientEmail",
+              content: "app.api.emails.messages.id.response.email.recipientEmail",
             },
             z.email(),
           ),
           recipientName: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.id.response.email.recipientName",
+              content: "app.api.emails.messages.id.response.email.recipientName",
             },
             z.string().nullable(),
           ),
@@ -133,8 +131,7 @@ const { GET } = createEndpoint({
           emailProvider: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.id.response.email.emailProvider",
+              content: "app.api.emails.messages.id.response.email.emailProvider",
             },
             z.string().nullable(),
           ),
@@ -252,8 +249,7 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.emails.messages.id.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.messages.id.errors.unsavedChanges.description",
+      description: "app.api.emails.messages.id.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.messages.id.errors.unknown.title",

@@ -43,34 +43,20 @@ export function extractErrorData(value: WidgetData): ProcessedError | null {
 
   // Handle object value with error properties
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const title =
-      "title" in value && typeof value.title === "string"
-        ? value.title
-        : "Error";
+    const title = "title" in value && typeof value.title === "string" ? value.title : "Error";
     const message =
-      "message" in value && typeof value.message === "string"
-        ? value.message
-        : undefined;
-    const code =
-      "code" in value && typeof value.code === "string"
-        ? value.code
-        : undefined;
-    const stack =
-      "stack" in value && typeof value.stack === "string"
-        ? value.stack
-        : undefined;
+      "message" in value && typeof value.message === "string" ? value.message : undefined;
+    const code = "code" in value && typeof value.code === "string" ? value.code : undefined;
+    const stack = "stack" in value && typeof value.stack === "string" ? value.stack : undefined;
     const action =
-      "action" in value &&
-      typeof value.action === "object" &&
-      value.action !== null
+      "action" in value && typeof value.action === "object" && value.action !== null
         ? {
             label:
               "label" in value.action && typeof value.action.label === "string"
                 ? value.action.label
                 : "Retry",
             action:
-              "action" in value.action &&
-              typeof value.action.action === "string"
+              "action" in value.action && typeof value.action.action === "string"
                 ? value.action.action
                 : "",
           }

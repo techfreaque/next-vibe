@@ -8,19 +8,12 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type {
-  TRPCValidationRequestOutput,
-  TRPCValidationResponseOutput,
-} from "./definition";
+import type { TRPCValidationRequestOutput, TRPCValidationResponseOutput } from "./definition";
 
 /**
  * TRPC Validation Options interface
@@ -68,10 +61,7 @@ export interface TRPCValidationRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<TRPCValidationResponseOutput>>;
 
-  validateTRPCIntegration(
-    options: TRPCValidationOptions,
-    logger: EndpointLogger,
-  ): ValidationResult;
+  validateTRPCIntegration(options: TRPCValidationOptions, logger: EndpointLogger): ValidationResult;
 
   validateRouteFile(filePath: string, fix: boolean): RouteFileValidation;
 
@@ -129,10 +119,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
             // eslint-disable-next-line i18next/no-literal-string, oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
             throw new Error("File path is required for route file validation");
           }
-          const fileValidation = this.validateRouteFile(
-            filePath,
-            options.fix || false,
-          );
+          const fileValidation = this.validateRouteFile(filePath, options.fix || false);
           // Convert single file validation to ValidationResult format
           result = {
             success: fileValidation.errors.length === 0,
@@ -154,10 +141,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
             verbose: true,
             generateReport: true,
           };
-          const validationResult = this.validateTRPCIntegration(
-            reportOptions,
-            logger,
-          );
+          const validationResult = this.validateTRPCIntegration(reportOptions, logger);
           result = {
             ...validationResult,
             report: this.generateValidationReport(validationResult),
@@ -166,17 +150,12 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
         }
 
         case "FIX_ROUTES": {
-          result = await this.fixRoutes(
-            options.apiDir || "src/app/api",
-            logger,
-          );
+          result = await this.fixRoutes(options.apiDir || "src/app/api", logger);
           break;
         }
 
         case "CHECK_ROUTER_EXISTS": {
-          const routerExists = this.checkRouterExists(
-            options.apiDir || "src/app/api",
-          );
+          const routerExists = this.checkRouterExists(options.apiDir || "src/app/api");
           result = {
             success: routerExists,
             // eslint-disable-next-line i18next/no-literal-string
@@ -275,37 +254,21 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
 
       // Check for tRPC router file
       /* eslint-disable i18next/no-literal-string */
-      const routerFile = path.join(
-        resolvedApiDir,
-        "[locale]",
-        "trpc",
-        "[...trpc]",
-        "router.ts",
-      );
+      const routerFile = path.join(resolvedApiDir, "[locale]", "trpc", "[...trpc]", "router.ts");
       if (!fs.existsSync(routerFile)) {
-        result.warnings.push(
-          "tRPC router file not found. Run 'vibe generate-trpc' to create it.",
-        );
+        result.warnings.push("tRPC router file not found. Run 'vibe generate-trpc' to create it.");
       }
       /* eslint-enable i18next/no-literal-string */
 
       // Set summary stats
       result.totalFiles = routeFiles.length;
-      result.validFiles = result.routeFiles.filter(
-        (rf) => rf.errors.length === 0,
-      ).length;
-      result.filesWithIssues = result.routeFiles.filter(
-        (rf) => rf.errors.length > 0,
-      ).length;
+      result.validFiles = result.routeFiles.filter((rf) => rf.errors.length === 0).length;
+      result.filesWithIssues = result.routeFiles.filter((rf) => rf.errors.length > 0).length;
 
       // Summary
       if (verbose && logger) {
-        logger.info(
-          `Validation complete: ${result.success ? "PASSED" : "FAILED"}`,
-        );
-        logger.info(
-          `Errors: ${result.errors.length}, Warnings: ${result.warnings.length}`,
-        );
+        logger.info(`Validation complete: ${result.success ? "PASSED" : "FAILED"}`);
+        logger.info(`Errors: ${result.errors.length}, Warnings: ${result.warnings.length}`);
       }
     } catch (error) {
       const parsedError = parseError(error);
@@ -337,8 +300,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
       // Check for definition import
       /* eslint-disable i18next/no-literal-string */
       validation.hasDefinition =
-        content.includes('from "./definition"') ||
-        content.includes('from "./definition.ts"');
+        content.includes('from "./definition"') || content.includes('from "./definition.ts"');
 
       // Check for enhanced handler usage
       validation.hasEnhancedHandler = content.includes("endpointsHandler(");
@@ -347,15 +309,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
       validation.hasTRPCExport = content.includes("export const trpc");
 
       // Check for Next.js exports
-      const httpMethods = [
-        "GET",
-        "POST",
-        "PUT",
-        "PATCH",
-        "DELETE",
-        "HEAD",
-        "OPTIONS",
-      ];
+      const httpMethods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
       validation.hasNextExport = httpMethods.some((method) =>
         content.includes(`export const ${method}`),
       );
@@ -449,9 +403,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
       const relativePath = path.relative(process.cwd(), routeFile.filePath);
       lines.push(`### ${relativePath}`);
       lines.push(`- Definition: ${routeFile.hasDefinition ? "✅" : "❌"}`);
-      lines.push(
-        `- Enhanced Handler: ${routeFile.hasEnhancedHandler ? "✅" : "❌"}`,
-      );
+      lines.push(`- Enhanced Handler: ${routeFile.hasEnhancedHandler ? "✅" : "❌"}`);
       lines.push(`- tRPC Export: ${routeFile.hasTRPCExport ? "✅" : "❌"}`);
       lines.push(`- Next.js Export: ${routeFile.hasNextExport ? "✅" : "❌"}`);
 
@@ -462,9 +414,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
 
       if (routeFile.warnings.length > 0) {
         lines.push("**Warnings:**");
-        routeFile.warnings.forEach((warning) =>
-          lines.push(`  - ⚠️ ${warning}`),
-        );
+        routeFile.warnings.forEach((warning) => lines.push(`  - ⚠️ ${warning}`));
       }
 
       lines.push("");
@@ -481,13 +431,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
     /* eslint-disable i18next/no-literal-string */
     try {
       const resolvedApiDir = path.resolve(process.cwd(), apiDir);
-      const routerFile = path.join(
-        resolvedApiDir,
-        "[locale]",
-        "trpc",
-        "[...trpc]",
-        "router.ts",
-      );
+      const routerFile = path.join(resolvedApiDir, "[locale]", "trpc", "[...trpc]", "router.ts");
 
       const exists = fs.existsSync(routerFile);
 

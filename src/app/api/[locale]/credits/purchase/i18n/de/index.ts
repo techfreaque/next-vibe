@@ -73,8 +73,7 @@ export const translations: typeof enTranslations = {
       },
       noActiveSubscription: {
         title: "Aktives Abonnement erforderlich",
-        description:
-          "Sie müssen ein aktives Abonnement haben, um Credit-Pakete zu kaufen",
+        description: "Sie müssen ein aktives Abonnement haben, um Credit-Pakete zu kaufen",
       },
     },
   },
@@ -85,8 +84,7 @@ export const translations: typeof enTranslations = {
     },
     checkoutFailed: {
       title: "Checkout fehlgeschlagen",
-      description:
-        "Checkout-Sitzung für Credit-Kauf konnte nicht erstellt werden",
+      description: "Checkout-Sitzung für Credit-Kauf konnte nicht erstellt werden",
     },
   },
 };

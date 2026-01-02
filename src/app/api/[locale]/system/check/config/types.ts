@@ -35,13 +35,7 @@ export interface LintConfigObject {
 export type LintConfigElement = Record<string, LintConfigValue>;
 
 /** JSON-compatible value type for settings files */
-export type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonObject
-  | JsonArray;
+export type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
 export interface JsonObject {
   [key: string]: JsonValue;
 }
@@ -325,10 +319,7 @@ export interface EslintProcessor {
     text: string,
     filename: string,
   ) => Array<string | { text: string; filename: string }>;
-  postprocess?: (
-    messages: LintConfigElement[][],
-    filename: string,
-  ) => LintConfigElement[];
+  postprocess?: (messages: LintConfigElement[][], filename: string) => LintConfigElement[];
   supportsAutofix?: boolean;
 }
 
@@ -336,9 +327,7 @@ export interface EslintProcessor {
 export type EslintRule = EslintRuleFunction | EslintRuleModule;
 
 /** ESLint rule as a function */
-export type EslintRuleFunction = (
-  context: EslintRuleContext,
-) => EslintRuleListener;
+export type EslintRuleFunction = (context: EslintRuleContext) => EslintRuleListener;
 
 /** ESLint rule as a module with create function */
 export interface EslintRuleModule {

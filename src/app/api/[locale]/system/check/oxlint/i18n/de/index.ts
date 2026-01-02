@@ -109,8 +109,7 @@ export const translations: typeof enTranslations = {
       description: "Zugriff verboten",
     },
     configNotFound: "check.config.ts nicht im Projektstammverzeichnis gefunden",
-    configMissingExport:
-      "check.config.ts muss 'default' oder 'config' exportieren",
+    configMissingExport: "check.config.ts muss 'default' oder 'config' exportieren",
     oxlintFailed: "Oxlint fehlgeschlagen",
     prettierFailed: "Prettier fehlgeschlagen mit Exit-Code",
   },

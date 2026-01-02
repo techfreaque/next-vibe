@@ -4,13 +4,7 @@ import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import { MagnifyingGlassIcon } from "next-vibe-ui/ui/icons";
 import * as React from "react";
-import {
-  Pressable,
-  ScrollView,
-  Text as RNText,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, Text as RNText, TextInput, View } from "react-native";
 
 // Import all cross-platform type definitions from web (source of truth)
 import type {
@@ -62,10 +56,7 @@ function Command({
 }
 Command.displayName = "Command";
 
-const CommandDialog = ({
-  children,
-  ...props
-}: CommandDialogProps): React.JSX.Element => {
+const CommandDialog = ({ children, ...props }: CommandDialogProps): React.JSX.Element => {
   return (
     <Dialog {...props}>
       <DialogContent className="overflow-hidden p-0">
@@ -88,10 +79,7 @@ function CommandInput({
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
-    <StyledView
-      className="flex items-center border-b px-3"
-      data-cmdk-input-wrapper=""
-    >
+    <StyledView className="flex items-center border-b px-3" data-cmdk-input-wrapper="">
       <MagnifyingGlassIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
       <StyledTextInput
         {...applyStyleType({
@@ -111,21 +99,14 @@ function CommandInput({
 
 CommandInput.displayName = "CommandInput";
 
-function CommandList({
-  className,
-  style,
-  children,
-}: CommandListProps): React.JSX.Element {
+function CommandList({ className, style, children }: CommandListProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <StyledScrollView
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "max-h-[300px] overflow-y-auto overflow-x-hidden",
-          className,
-        ),
+        className: cn("max-h-[300px] overflow-y-auto overflow-x-hidden", className),
       })}
     >
       {children}
@@ -135,11 +116,7 @@ function CommandList({
 
 CommandList.displayName = "CommandList";
 
-function CommandEmpty({
-  className,
-  style,
-  children,
-}: CommandEmptyProps): React.JSX.Element {
+function CommandEmpty({ className, style, children }: CommandEmptyProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
@@ -186,10 +163,7 @@ function CommandGroup({
 
 CommandGroup.displayName = "CommandGroup";
 
-function CommandSeparator({
-  className,
-  style,
-}: CommandSeparatorProps): React.JSX.Element {
+function CommandSeparator({ className, style }: CommandSeparatorProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
@@ -256,10 +230,7 @@ const CommandShortcut = ({
     <RNText
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "ml-auto text-xs tracking-widest text-muted-foreground",
-          className,
-        ),
+        className: cn("ml-auto text-xs tracking-widest text-muted-foreground", className),
       })}
     >
       {children}

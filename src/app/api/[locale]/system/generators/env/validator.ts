@@ -91,10 +91,7 @@ export interface ValidationResult {
  * Validate that an env file exports the correct structure
  * Uses static analysis to avoid import side effects during generation
  */
-export function validateEnvFileExports(
-  filePath: string,
-  isClient: boolean,
-): ValidationResult {
+export function validateEnvFileExports(filePath: string, isClient: boolean): ValidationResult {
   const errors: EnvValidationError[] = [];
 
   try {
@@ -131,8 +128,7 @@ export function validateEnvFileExports(
 
     const envModule: EnvModuleInfo = {
       moduleName,
-      envExampleEntries:
-        envExampleEntries.length > 0 ? envExampleEntries : undefined,
+      envExampleEntries: envExampleEntries.length > 0 ? envExampleEntries : undefined,
     };
 
     return { isValid: true, errors: [], module: envModule, exportName };
@@ -155,9 +151,7 @@ export function formatValidationErrors(errors: EnvValidationError[]): string {
     .map((err) => {
       let msg = `\n[${err.type}] ${err.filePath}\n  ${err.message}`;
       if (err.details) {
-        const detailsStr = JSON.stringify(err.details, null, 2)
-          .split("\n")
-          .join("\n  ");
+        const detailsStr = JSON.stringify(err.details, null, 2).split("\n").join("\n  ");
         msg += `\n  Details: ${detailsStr}`;
       }
       return msg;

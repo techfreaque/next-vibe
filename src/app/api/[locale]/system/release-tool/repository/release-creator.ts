@@ -8,11 +8,7 @@ import { existsSync } from "node:fs";
 import { basename, resolve } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
@@ -76,9 +72,7 @@ export class ReleaseCreator implements IReleaseCreator {
     }
 
     if (repo.type !== "github") {
-      logger.warn(
-        `Git releases only supported for GitHub and GitLab (found: ${repo.type})`,
-      );
+      logger.warn(`Git releases only supported for GitHub and GitLab (found: ${repo.type})`);
       return success(undefined);
     }
 
@@ -157,9 +151,7 @@ export class ReleaseCreator implements IReleaseCreator {
         commandParts.push(`--target ${gitReleaseConfig.target}`);
       }
       if (gitReleaseConfig?.discussionCategory) {
-        commandParts.push(
-          `--discussion-category ${gitReleaseConfig.discussionCategory}`,
-        );
+        commandParts.push(`--discussion-category ${gitReleaseConfig.discussionCategory}`);
       }
 
       // Add assets
@@ -184,8 +176,7 @@ export class ReleaseCreator implements IReleaseCreator {
       logger.info(MESSAGES.GITHUB_RELEASE_SUCCESS, { tag: versionInfo.newTag });
 
       // Return the release URL
-      const releaseUrl =
-        output || `${repo.url}/releases/tag/${versionInfo.newTag}`;
+      const releaseUrl = output || `${repo.url}/releases/tag/${versionInfo.newTag}`;
       return success(releaseUrl);
     } catch (error) {
       logger.error(MESSAGES.GITHUB_RELEASE_FAILED, parseError(error));
@@ -275,8 +266,7 @@ export class ReleaseCreator implements IReleaseCreator {
       logger.info(MESSAGES.GITLAB_RELEASE_SUCCESS, { tag: versionInfo.newTag });
 
       // Return the release URL
-      const releaseUrl =
-        output || `${repo.url}/-/releases/${versionInfo.newTag}`;
+      const releaseUrl = output || `${repo.url}/-/releases/${versionInfo.newTag}`;
       return success(releaseUrl);
     } catch (error) {
       logger.error(MESSAGES.GITLAB_RELEASE_FAILED, parseError(error));

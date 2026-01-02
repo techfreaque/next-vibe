@@ -7,11 +7,7 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -45,8 +41,7 @@ export class SingleFavoriteRepository {
 
     if (!userId) {
       return fail({
-        message:
-          "app.api.agent.chat.favorites.id.get.errors.unauthorized.title",
+        message: "app.api.agent.chat.favorites.id.get.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -60,12 +55,7 @@ export class SingleFavoriteRepository {
       const [favorite] = await db
         .select()
         .from(chatFavorites)
-        .where(
-          and(
-            eq(chatFavorites.id, urlPathParams.id),
-            eq(chatFavorites.userId, userId),
-          ),
-        )
+        .where(and(eq(chatFavorites.id, urlPathParams.id), eq(chatFavorites.userId, userId)))
         .limit(1);
 
       if (!favorite) {
@@ -111,8 +101,7 @@ export class SingleFavoriteRepository {
 
     if (!userId) {
       return fail({
-        message:
-          "app.api.agent.chat.favorites.id.patch.errors.unauthorized.title",
+        message: "app.api.agent.chat.favorites.id.patch.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -125,18 +114,12 @@ export class SingleFavoriteRepository {
       const [existing] = await db
         .select()
         .from(chatFavorites)
-        .where(
-          and(
-            eq(chatFavorites.id, favoriteId),
-            eq(chatFavorites.userId, userId),
-          ),
-        )
+        .where(and(eq(chatFavorites.id, favoriteId), eq(chatFavorites.userId, userId)))
         .limit(1);
 
       if (!existing) {
         return fail({
-          message:
-            "app.api.agent.chat.favorites.id.patch.errors.notFound.title",
+          message: "app.api.agent.chat.favorites.id.patch.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -145,8 +128,7 @@ export class SingleFavoriteRepository {
       const newModelSettings: FavoriteModelSettings = {
         mode: data.mode ?? existing.modelSettings.mode,
         filters: {
-          intelligence:
-            data.intelligence ?? existing.modelSettings.filters.intelligence,
+          intelligence: data.intelligence ?? existing.modelSettings.filters.intelligence,
           maxPrice: data.maxPrice ?? existing.modelSettings.filters.maxPrice,
           content: data.content ?? existing.modelSettings.filters.content,
         },
@@ -173,22 +155,14 @@ export class SingleFavoriteRepository {
         .update(chatFavorites)
         .set({
           characterId: data.characterId ?? existing.characterId,
-          customName:
-            data.customName !== undefined
-              ? data.customName
-              : existing.customName,
+          customName: data.customName !== undefined ? data.customName : existing.customName,
           voice: data.voice !== undefined ? data.voice : existing.voice,
           modelSettings: newModelSettings,
           uiSettings: newUiSettings,
           isActive: data.isActive ?? existing.isActive,
           updatedAt: new Date(),
         })
-        .where(
-          and(
-            eq(chatFavorites.id, favoriteId),
-            eq(chatFavorites.userId, userId),
-          ),
-        )
+        .where(and(eq(chatFavorites.id, favoriteId), eq(chatFavorites.userId, userId)))
         .returning();
 
       if (!updated) {
@@ -220,8 +194,7 @@ export class SingleFavoriteRepository {
 
     if (!userId) {
       return fail({
-        message:
-          "app.api.agent.chat.favorites.id.delete.errors.unauthorized.title",
+        message: "app.api.agent.chat.favorites.id.delete.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -234,18 +207,12 @@ export class SingleFavoriteRepository {
 
       const result = await db
         .delete(chatFavorites)
-        .where(
-          and(
-            eq(chatFavorites.id, urlPathParams.id),
-            eq(chatFavorites.userId, userId),
-          ),
-        )
+        .where(and(eq(chatFavorites.id, urlPathParams.id), eq(chatFavorites.userId, userId)))
         .returning();
 
       if (result.length === 0) {
         return fail({
-          message:
-            "app.api.agent.chat.favorites.id.delete.errors.notFound.title",
+          message: "app.api.agent.chat.favorites.id.delete.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }

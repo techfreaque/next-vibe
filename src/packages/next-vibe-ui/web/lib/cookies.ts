@@ -63,9 +63,7 @@ export async function setCookie(name: string, value: string): Promise<void> {
 
     // Handle expires option
     const expiresDate = new Date();
-    expiresDate.setTime(
-      expiresDate.getTime() + AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS * 1000,
-    );
+    expiresDate.setTime(expiresDate.getTime() + AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS * 1000);
     // eslint-disable-next-line i18next/no-literal-string
     cookieString += `; expires=${expiresDate.toUTCString()}`;
 

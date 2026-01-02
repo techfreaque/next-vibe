@@ -34,12 +34,7 @@ export function UserMenu({ user, locale, logger }: UserMenuProps): JSX.Element {
       </Button>
     </Link>
   ) : (
-    <Button
-      variant="ghost"
-      size="sm"
-      className="w-full justify-start"
-      onClick={logout}
-    >
+    <Button variant="ghost" size="sm" className="w-full justify-start" onClick={logout}>
       <LogOut className="h-3.5 w-3.5 mr-2" />
       {t("app.api.agent.chat.components.sidebar.logout")}
     </Button>

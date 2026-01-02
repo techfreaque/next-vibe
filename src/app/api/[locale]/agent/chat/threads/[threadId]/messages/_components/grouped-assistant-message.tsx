@@ -72,9 +72,7 @@ export function GroupedAssistantMessage({
 
   // Get character for assistant messages
   const character =
-    primary.role === "assistant" || primary.role === "user"
-      ? primary.character
-      : null;
+    primary.role === "assistant" || primary.role === "user" ? primary.character : null;
 
   // Get display name for assistant
   const displayName = primary.model
@@ -82,18 +80,14 @@ export function GroupedAssistantMessage({
     : t("app.chat.messages.assistant");
 
   // Each message is already a separate entity (reasoning, text, tool, error)
-  const allMessages = React.useMemo(
-    () => [primary, ...continuations],
-    [primary, continuations],
-  );
+  const allMessages = React.useMemo(() => [primary, ...continuations], [primary, continuations]);
 
   // Check if there's any content
   const hasContent = allMessages.some((msg) => msg.content.trim().length > 0);
 
   // Check if any tool calls are waiting for confirmation
   const hasToolWaitingForConfirmation = allMessages.some(
-    (msg) =>
-      msg.role === "tool" && msg.metadata?.toolCall?.waitingForConfirmation,
+    (msg) => msg.role === "tool" && msg.metadata?.toolCall?.waitingForConfirmation,
   );
 
   // Show streaming placeholder when no content yet AND no tools waiting for confirmation
@@ -107,19 +101,13 @@ export function GroupedAssistantMessage({
 
   React.useEffect(() => {
     // Process for TTS (used by speech)
-    void processMessageGroupForTTS(allMessages, locale, logger).then(
-      setAllContent,
-    );
+    void processMessageGroupForTTS(allMessages, locale, logger).then(setAllContent);
 
     // Process for copying - markdown format (includes tool calls with formatting)
-    void processMessageGroupForCopy(allMessages, locale, true, logger).then(
-      setContentMarkdown,
-    );
+    void processMessageGroupForCopy(allMessages, locale, true, logger).then(setContentMarkdown);
 
     // Process for copying - plain text format (includes tool calls, strips markdown)
-    void processMessageGroupForCopy(allMessages, locale, false, logger).then(
-      setContentText,
-    );
+    void processMessageGroupForCopy(allMessages, locale, false, logger).then(setContentText);
   }, [allMessages, locale, logger]);
 
   return (
@@ -193,12 +181,9 @@ export function GroupedAssistantMessage({
                     collapseState={collapseState}
                   />
                   {/* File Attachments */}
-                  {message.metadata?.attachments &&
-                    message.metadata.attachments.length > 0 && (
-                      <FileAttachments
-                        attachments={message.metadata.attachments}
-                      />
-                    )}
+                  {message.metadata?.attachments && message.metadata.attachments.length > 0 && (
+                    <FileAttachments attachments={message.metadata.attachments} />
+                  )}
                 </Div>
               );
             }

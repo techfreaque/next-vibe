@@ -7,11 +7,7 @@ import "server-only";
 
 import { desc, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type Stripe from "stripe";
 
@@ -34,11 +30,7 @@ import type {
   SubscriptionPutRequestOutput,
   SubscriptionPutResponseOutput,
 } from "./definition";
-import type {
-  BillingIntervalDB,
-  SubscriptionPlanDB,
-  SubscriptionStatusValue,
-} from "./enum";
+import type { BillingIntervalDB, SubscriptionPlanDB, SubscriptionStatusValue } from "./enum";
 import { SubscriptionPlan, SubscriptionStatus } from "./enum";
 
 /**
@@ -112,8 +104,7 @@ export class SubscriptionRepository {
       if (subscription.providerSubscriptionId) {
         const needsSync =
           subscription.status === SubscriptionStatus.ACTIVE ||
-          (subscription.currentPeriodEnd &&
-            new Date(subscription.currentPeriodEnd) < new Date());
+          (subscription.currentPeriodEnd && new Date(subscription.currentPeriodEnd) < new Date());
 
         if (needsSync) {
           try {
@@ -145,8 +136,7 @@ export class SubscriptionRepository {
             // Update if status or period changed
             const periodChanged =
               subscription.currentPeriodEnd &&
-              currentPeriodEnd * 1000 !==
-                subscription.currentPeriodEnd.getTime();
+              currentPeriodEnd * 1000 !== subscription.currentPeriodEnd.getTime();
 
             if (newStatus !== subscription.status || periodChanged) {
               logger.info("Auto-syncing subscription from Stripe", {
@@ -179,13 +169,10 @@ export class SubscriptionRepository {
             const stripeError = error as { code?: string };
             // If subscription not found in Stripe, mark as canceled
             if (stripeError.code === "resource_missing") {
-              logger.warn(
-                "Subscription not found in Stripe - marking as canceled",
-                {
-                  userId,
-                  subscriptionId: subscription.providerSubscriptionId,
-                },
-              );
+              logger.warn("Subscription not found in Stripe - marking as canceled", {
+                userId,
+                subscriptionId: subscription.providerSubscriptionId,
+              });
 
               const [updated] = await db
                 .update(subscriptions)
@@ -219,18 +206,14 @@ export class SubscriptionRepository {
         billingInterval: subscription.billingInterval,
         status: subscription.status,
         currentPeriodStart:
-          subscription.currentPeriodStart?.toISOString() ||
-          new Date().toISOString(),
-        currentPeriodEnd:
-          subscription.currentPeriodEnd?.toISOString() ||
-          new Date().toISOString(),
+          subscription.currentPeriodStart?.toISOString() || new Date().toISOString(),
+        currentPeriodEnd: subscription.currentPeriodEnd?.toISOString() || new Date().toISOString(),
         cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
         cancelAt: subscription.cancelAt?.toISOString(),
         canceledAt: subscription.canceledAt?.toISOString(),
         endedAt: subscription.endedAt?.toISOString(),
         provider: subscription.provider,
-        providerSubscriptionId:
-          subscription.providerSubscriptionId || undefined,
+        providerSubscriptionId: subscription.providerSubscriptionId || undefined,
         createdAt: subscription.createdAt.toISOString(),
         updatedAt: subscription.updatedAt.toISOString(),
       });
@@ -324,11 +307,9 @@ export class SubscriptionRepository {
         responseBillingInterval: updatedSubscription.billingInterval,
         status: updatedSubscription.status,
         currentPeriodStart:
-          updatedSubscription.currentPeriodStart?.toISOString() ||
-          new Date().toISOString(),
+          updatedSubscription.currentPeriodStart?.toISOString() || new Date().toISOString(),
         currentPeriodEnd:
-          updatedSubscription.currentPeriodEnd?.toISOString() ||
-          new Date().toISOString(),
+          updatedSubscription.currentPeriodEnd?.toISOString() || new Date().toISOString(),
         responseCancelAtPeriodEnd: updatedSubscription.cancelAtPeriodEnd,
         createdAt: updatedSubscription.createdAt.toISOString(),
         updatedAt: updatedSubscription.updatedAt.toISOString(),
@@ -454,10 +435,8 @@ export class SubscriptionRepository {
       }
 
       const providerEnum =
-        (session.metadata?.provider as typeof PaymentProviderValue) ||
-        PaymentProvider.STRIPE;
-      const providerKey =
-        providerEnum === PaymentProvider.NOWPAYMENTS ? "nowpayments" : "stripe";
+        (session.metadata?.provider as typeof PaymentProviderValue) || PaymentProvider.STRIPE;
+      const providerKey = providerEnum === PaymentProvider.NOWPAYMENTS ? "nowpayments" : "stripe";
       const provider = getPaymentProvider(providerKey);
       const subscriptionResult = await provider.retrieveSubscription(
         providerSubscriptionId,
@@ -477,8 +456,7 @@ export class SubscriptionRepository {
         .values({
           userId: userId as string,
           planId: planId as (typeof SubscriptionPlanDB)[number],
-          billingInterval:
-            billingInterval as (typeof BillingIntervalDB)[number],
+          billingInterval: billingInterval as (typeof BillingIntervalDB)[number],
           status: SubscriptionStatus.ACTIVE,
           provider: providerEnum,
           providerSubscriptionId,
@@ -506,15 +484,10 @@ export class SubscriptionRepository {
 
       // Add subscription credits with expiration date
       const { CreditRepository } = await import("../credits/repository");
-      const { productsRepository, ProductIds } = await import(
-        "../products/repository-client"
-      );
+      const { productsRepository, ProductIds } = await import("../products/repository-client");
 
       // Map subscription plan to product ID
-      const productId =
-        planId === SubscriptionPlan.SUBSCRIPTION
-          ? ProductIds.SUBSCRIPTION
-          : null;
+      const productId = planId === SubscriptionPlan.SUBSCRIPTION ? ProductIds.SUBSCRIPTION : null;
 
       if (productId) {
         const product = productsRepository.getProduct(productId, "en-GLOBAL");
@@ -593,10 +566,7 @@ export class SubscriptionRepository {
 
       const providerName = subscription.provider || "stripe";
       const provider = getPaymentProvider(providerName);
-      const subscriptionResult = await provider.retrieveSubscription(
-        subscriptionId,
-        logger,
-      );
+      const subscriptionResult = await provider.retrieveSubscription(subscriptionId, logger);
 
       if (!subscriptionResult.success) {
         logger.error("Failed to retrieve subscription from provider", {
@@ -623,24 +593,16 @@ export class SubscriptionRepository {
 
       // Add monthly credits for renewal (skip if this is the first payment - handled by checkout)
       // Check if this is a renewal by looking at billing_reason
-      const billingReason = (
-        invoice as Stripe.Invoice & { billing_reason?: string }
-      ).billing_reason;
+      const billingReason = (invoice as Stripe.Invoice & { billing_reason?: string })
+        .billing_reason;
 
-      if (
-        billingReason === "subscription_cycle" ||
-        billingReason === "subscription_update"
-      ) {
+      if (billingReason === "subscription_cycle" || billingReason === "subscription_update") {
         // This is a renewal - add monthly credits with expiration
         const { CreditRepository } = await import("../credits/repository");
-        const { productsRepository, ProductIds } = await import(
-          "../products/repository-client"
-        );
+        const { productsRepository, ProductIds } = await import("../products/repository-client");
 
         const productId =
-          subscription.planId === SubscriptionPlan.SUBSCRIPTION
-            ? ProductIds.SUBSCRIPTION
-            : null;
+          subscription.planId === SubscriptionPlan.SUBSCRIPTION ? ProductIds.SUBSCRIPTION : null;
 
         if (productId) {
           const product = productsRepository.getProduct(productId, "en-GLOBAL");
@@ -766,9 +728,7 @@ export class SubscriptionRepository {
       }
 
       // Fetch full subscription from Stripe to get all fields (webhook events may not include all fields)
-      const fullSubscription = await getStripe.subscriptions.retrieve(
-        stripeSubscription.id,
-      );
+      const fullSubscription = await getStripe.subscriptions.retrieve(stripeSubscription.id);
 
       // Map Stripe status to our status
       let status: typeof SubscriptionStatusValue;
@@ -798,8 +758,7 @@ export class SubscriptionRepository {
 
       const oldPeriodEnd = subscription.currentPeriodEnd;
       const newPeriodEnd = new Date(currentPeriodEnd * 1000);
-      const periodRenewed =
-        oldPeriodEnd && newPeriodEnd.getTime() > oldPeriodEnd.getTime();
+      const periodRenewed = oldPeriodEnd && newPeriodEnd.getTime() > oldPeriodEnd.getTime();
 
       // Update subscription with proper period information
       await db
@@ -809,9 +768,7 @@ export class SubscriptionRepository {
           currentPeriodStart: new Date(currentPeriodStart * 1000),
           currentPeriodEnd: newPeriodEnd,
           cancelAtPeriodEnd: fullSubscription.cancel_at_period_end,
-          cancelAt: fullSubscription.cancel_at
-            ? new Date(fullSubscription.cancel_at * 1000)
-            : null,
+          cancelAt: fullSubscription.cancel_at ? new Date(fullSubscription.cancel_at * 1000) : null,
           updatedAt: new Date(),
         })
         .where(eq(subscriptions.providerSubscriptionId, fullSubscription.id));
@@ -825,14 +782,10 @@ export class SubscriptionRepository {
         });
 
         const { CreditRepository } = await import("../credits/repository");
-        const { productsRepository, ProductIds } = await import(
-          "../products/repository-client"
-        );
+        const { productsRepository, ProductIds } = await import("../products/repository-client");
 
         const productId =
-          subscription.planId === SubscriptionPlan.SUBSCRIPTION
-            ? ProductIds.SUBSCRIPTION
-            : null;
+          subscription.planId === SubscriptionPlan.SUBSCRIPTION ? ProductIds.SUBSCRIPTION : null;
 
         if (productId) {
           const product = productsRepository.getProduct(productId, "en-GLOBAL");
@@ -934,12 +887,9 @@ export class SubscriptionRepository {
       } catch (error) {
         const stripeError = error as { code?: string };
         if (stripeError.code === "resource_missing") {
-          logger.warn(
-            "Subscription not found in Stripe - marking as canceled",
-            {
-              subscriptionId: localSubscription.providerSubscriptionId,
-            },
-          );
+          logger.warn("Subscription not found in Stripe - marking as canceled", {
+            subscriptionId: localSubscription.providerSubscriptionId,
+          });
 
           // Subscription doesn't exist in Stripe - mark as canceled
           await db

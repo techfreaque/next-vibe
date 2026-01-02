@@ -1,11 +1,5 @@
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
@@ -110,21 +104,15 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
 
   // Check if the endpoint expects undefined for request data
   const isUndefinedSchema =
-    endpoint.requestSchema.safeParse().success &&
-    !endpoint.requestSchema.safeParse({}).success;
+    endpoint.requestSchema.safeParse().success && !endpoint.requestSchema.safeParse({}).success;
 
   // Check if the endpoint expects an empty object for request data (GET endpoints with no params)
   const requestSchema = endpoint.requestSchema as z.ZodTypeAny;
   const isEmptyObjectSchema =
-    requestSchema instanceof z.ZodObject &&
-    Object.keys(requestSchema.shape || {}).length === 0;
+    requestSchema instanceof z.ZodObject && Object.keys(requestSchema.shape || {}).length === 0;
 
   // If the schema expects undefined but we received an object, set requestData to undefined
-  if (
-    isUndefinedSchema &&
-    typeof requestData === "object" &&
-    requestData !== null
-  ) {
+  if (isUndefinedSchema && typeof requestData === "object" && requestData !== null) {
     requestData = undefined as TEndpoint["types"]["RequestOutput"];
   }
 
@@ -147,13 +135,10 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
       });
 
       // Use endpoint's VALIDATION_FAILED error type if available
-      const validationErrorConfig =
-        endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
+      const validationErrorConfig = endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
 
       const message = validationErrorConfig?.description
-        ? endpoint.scopedTranslation
-            .scopedT(locale)
-            .t(validationErrorConfig.description)
+        ? endpoint.scopedTranslation.scopedT(locale).t(validationErrorConfig.description)
         : ("app.api.shared.errors.validationFailed.description" satisfies TranslationKey);
 
       const errorResponse = fail({
@@ -200,13 +185,10 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
           });
 
           // Use endpoint's VALIDATION_FAILED error type if available
-          const validationErrorConfig =
-            endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
+          const validationErrorConfig = endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
 
           const message = validationErrorConfig?.description
-            ? endpoint.scopedTranslation
-                .scopedT(locale)
-                .t(validationErrorConfig.description)
+            ? endpoint.scopedTranslation.scopedT(locale).t(validationErrorConfig.description)
             : ("app.api.shared.errors.validationFailed.description" satisfies TranslationKey);
 
           const errorResponse = fail({
@@ -268,9 +250,7 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
             } else if (isJsonObject(value)) {
               // Handle nested objects
               const objEntries = Object.entries(value);
-              const hasNonNullValues = objEntries.some(
-                ([, v]) => v !== undefined && v !== null,
-              );
+              const hasNonNullValues = objEntries.some(([, v]) => v !== undefined && v !== null);
 
               if (!hasNonNullValues) {
                 // Empty object (all values are undefined/null) - add placeholder
@@ -354,10 +334,8 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
     const parsedError = parseError(err);
 
     // Use endpoint's SERVER_ERROR or NETWORK_ERROR error type if available
-    const serverErrorConfig =
-      endpoint.errorTypes?.[EndpointErrorTypes.SERVER_ERROR];
-    const networkErrorConfig =
-      endpoint.errorTypes?.[EndpointErrorTypes.NETWORK_ERROR];
+    const serverErrorConfig = endpoint.errorTypes?.[EndpointErrorTypes.SERVER_ERROR];
+    const networkErrorConfig = endpoint.errorTypes?.[EndpointErrorTypes.NETWORK_ERROR];
 
     // Prefer NETWORK_ERROR for network-related issues, otherwise SERVER_ERROR
     const isNetworkError =

@@ -16,8 +16,7 @@ export const translations: typeof enTranslations = {
       },
       pageIdx: {
         label: "Seitenindex",
-        description:
-          "Seitennummer zum Zurückgeben (0-basiert, weglassen für erste Seite)",
+        description: "Seitennummer zum Zurückgeben (0-basiert, weglassen für erste Seite)",
         placeholder: "Seitenindex eingeben",
       },
       pageSize: {
@@ -75,18 +74,15 @@ export const translations: typeof enTranslations = {
   errors: {
     validation: {
       title: "Validierungsfehler",
-      description:
-        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
     },
     network: {
       title: "Netzwerkfehler",
-      description:
-        "Ein Netzwerkfehler ist beim Auflisten der Konsolen-Nachrichten aufgetreten",
+      description: "Ein Netzwerkfehler ist beim Auflisten der Konsolen-Nachrichten aufgetreten",
     },
     unauthorized: {
       title: "Nicht autorisiert",
-      description:
-        "Sie sind nicht berechtigt, Konsolen-Nachrichten aufzulisten",
+      description: "Sie sind nicht berechtigt, Konsolen-Nachrichten aufzulisten",
     },
     forbidden: {
       title: "Verboten",
@@ -103,18 +99,15 @@ export const translations: typeof enTranslations = {
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description:
-        "Ein unbekannter Fehler ist beim Auflisten der Konsolen-Nachrichten aufgetreten",
+      description: "Ein unbekannter Fehler ist beim Auflisten der Konsolen-Nachrichten aufgetreten",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description:
-        "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
+      description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
     },
     conflict: {
       title: "Konflikt",
-      description:
-        "Ein Konflikt ist beim Auflisten der Konsolen-Nachrichten aufgetreten",
+      description: "Ein Konflikt ist beim Auflisten der Konsolen-Nachrichten aufgetreten",
     },
   },
   success: {

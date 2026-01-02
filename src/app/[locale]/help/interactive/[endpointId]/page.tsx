@@ -20,21 +20,14 @@ export default async function HelpInteractiveEndpointPage({
   const { locale, endpointId } = await params;
 
   // Get user for permission filtering
-  const user = await requireAdminUser(
-    locale,
-    `/${locale}/help/interactive/${endpointId}`,
-  );
+  const user = await requireAdminUser(locale, `/${locale}/help/interactive/${endpointId}`);
 
   // Decode the endpoint ID (format: path_parts_METHOD, e.g., users_list_GET)
   const decodedEndpointId = decodeURIComponent(endpointId);
 
   return (
     <PageLayout scrollable={true}>
-      <HelpInteractiveView
-        locale={locale}
-        user={user}
-        initialEndpointId={decodedEndpointId}
-      />
+      <HelpInteractiveView locale={locale} user={user} initialEndpointId={decodedEndpointId} />
     </PageLayout>
   );
 }

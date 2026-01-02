@@ -1,18 +1,11 @@
-import {
-  ErrorResponseTypes,
-  fail,
-  type ResponseType,
-  success,
-} from "../types/response.schema";
+import { ErrorResponseTypes, fail, type ResponseType, success } from "../types/response.schema";
 
 /**
  * Converts a time string in HH:MM format to seconds since midnight
  * @param timeStr - Time string in HH:MM format
  * @returns Success response with seconds or error response
  */
-export function timeToSeconds(
-  timeStr: `${number}:${number}`,
-): ResponseType<number> {
+export function timeToSeconds(timeStr: `${number}:${number}`): ResponseType<number> {
   const [hours, minutes] = timeStr.split(":").map(Number);
   if (hours === undefined || minutes === undefined) {
     return fail({

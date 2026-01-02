@@ -10,8 +10,6 @@ interface UsersStatsPageProps {
   locale: CountryLanguage;
 }
 
-export function UsersStatsClientPage({
-  locale,
-}: UsersStatsPageProps): JSX.Element {
+export function UsersStatsClientPage({ locale }: UsersStatsPageProps): JSX.Element {
   return <EndpointRenderer endpoint={GET} locale={locale} />;
 }

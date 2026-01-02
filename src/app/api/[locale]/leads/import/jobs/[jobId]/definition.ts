@@ -52,8 +52,7 @@ const { PATCH } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.leads.import.jobs.jobId.patch.jobId.label",
-          description:
-            "app.api.leads.import.jobs.jobId.patch.jobId.description",
+          description: "app.api.leads.import.jobs.jobId.patch.jobId.description",
           columns: 12,
         },
         z.uuid(),
@@ -64,8 +63,7 @@ const { PATCH } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.leads.import.jobs.jobId.patch.settings.title",
-          description:
-            "app.api.leads.import.jobs.jobId.patch.settings.description",
+          description: "app.api.leads.import.jobs.jobId.patch.settings.description",
           layoutType: LayoutType.GRID,
           columns: 2,
         },
@@ -76,10 +74,8 @@ const { PATCH } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
               label: "app.api.leads.import.jobs.jobId.patch.batchSize.label",
-              description:
-                "app.api.leads.import.jobs.jobId.patch.batchSize.description",
-              placeholder:
-                "app.api.leads.import.jobs.jobId.patch.batchSize.placeholder",
+              description: "app.api.leads.import.jobs.jobId.patch.batchSize.description",
+              placeholder: "app.api.leads.import.jobs.jobId.patch.batchSize.placeholder",
               columns: 6,
             },
             z.coerce.number().min(10).max(1000).optional(),
@@ -89,10 +85,8 @@ const { PATCH } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
               label: "app.api.leads.import.jobs.jobId.patch.maxRetries.label",
-              description:
-                "app.api.leads.import.jobs.jobId.patch.maxRetries.description",
-              placeholder:
-                "app.api.leads.import.jobs.jobId.patch.maxRetries.placeholder",
+              description: "app.api.leads.import.jobs.jobId.patch.maxRetries.description",
+              placeholder: "app.api.leads.import.jobs.jobId.patch.maxRetries.placeholder",
               columns: 6,
             },
             z.coerce.number().min(0).max(10).optional(),
@@ -105,8 +99,7 @@ const { PATCH } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.leads.import.jobs.jobId.patch.response.title",
-          description:
-            "app.api.leads.import.jobs.jobId.patch.response.description",
+          description: "app.api.leads.import.jobs.jobId.patch.response.description",
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -114,10 +107,8 @@ const { PATCH } = createEndpoint({
           info: objectField(
             {
               type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.import.jobs.jobId.patch.response.info.title",
-              description:
-                "app.api.leads.import.jobs.jobId.patch.response.info.description",
+              title: "app.api.leads.import.jobs.jobId.patch.response.info.title",
+              description: "app.api.leads.import.jobs.jobId.patch.response.info.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -126,16 +117,14 @@ const { PATCH } = createEndpoint({
               id: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.id.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.id.content",
                 },
                 z.uuid(),
               ),
               fileName: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.fileName.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.fileName.content",
                 },
                 z.string(),
               ),
@@ -152,10 +141,8 @@ const { PATCH } = createEndpoint({
           progress: objectField(
             {
               type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.import.jobs.jobId.patch.response.progress.title",
-              description:
-                "app.api.leads.import.jobs.jobId.patch.response.progress.description",
+              title: "app.api.leads.import.jobs.jobId.patch.response.progress.title",
+              description: "app.api.leads.import.jobs.jobId.patch.response.progress.description",
               layoutType: LayoutType.GRID,
               columns: 3,
             },
@@ -164,16 +151,14 @@ const { PATCH } = createEndpoint({
               totalRows: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.totalRows.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.totalRows.content",
                 },
                 z.coerce.number().nullable(),
               ),
               processedRows: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.processedRows.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.processedRows.content",
                 },
                 z.coerce.number(),
               ),
@@ -188,16 +173,14 @@ const { PATCH } = createEndpoint({
               failedImports: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.failedImports.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.failedImports.content",
                 },
                 z.coerce.number(),
               ),
               duplicateEmails: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.duplicateEmails.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.duplicateEmails.content",
                 },
                 z.coerce.number(),
               ),
@@ -207,8 +190,7 @@ const { PATCH } = createEndpoint({
           configuration: objectField(
             {
               type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.import.jobs.jobId.patch.response.configuration.title",
+              title: "app.api.leads.import.jobs.jobId.patch.response.configuration.title",
               description:
                 "app.api.leads.import.jobs.jobId.patch.response.configuration.description",
               layoutType: LayoutType.GRID,
@@ -227,32 +209,28 @@ const { PATCH } = createEndpoint({
               batchSize: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.batchSize.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.batchSize.content",
                 },
                 z.coerce.number(),
               ),
               retryCount: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.retryCount.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.retryCount.content",
                 },
                 z.coerce.number(),
               ),
               maxRetries: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.maxRetries.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.maxRetries.content",
                 },
                 z.coerce.number(),
               ),
               error: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.error.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.error.content",
                 },
                 z.string().nullable(),
               ),
@@ -262,10 +240,8 @@ const { PATCH } = createEndpoint({
           timestamps: objectField(
             {
               type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.import.jobs.jobId.patch.response.timestamps.title",
-              description:
-                "app.api.leads.import.jobs.jobId.patch.response.timestamps.description",
+              title: "app.api.leads.import.jobs.jobId.patch.response.timestamps.title",
+              description: "app.api.leads.import.jobs.jobId.patch.response.timestamps.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -274,32 +250,28 @@ const { PATCH } = createEndpoint({
               createdAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.createdAt.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.createdAt.content",
                 },
                 z.string(),
               ),
               updatedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.updatedAt.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.updatedAt.content",
                 },
                 z.string(),
               ),
               startedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.startedAt.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.startedAt.content",
                 },
                 z.string().nullable(),
               ),
               completedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.jobs.jobId.patch.response.completedAt.content",
+                  content: "app.api.leads.import.jobs.jobId.patch.response.completedAt.content",
                 },
                 z.string().nullable(),
               ),
@@ -313,49 +285,39 @@ const { PATCH } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.leads.import.jobs.jobId.patch.errors.validation.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.validation.description",
+      description: "app.api.leads.import.jobs.jobId.patch.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.leads.import.jobs.jobId.patch.errors.unauthorized.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.unauthorized.description",
+      description: "app.api.leads.import.jobs.jobId.patch.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.leads.import.jobs.jobId.patch.errors.forbidden.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.forbidden.description",
+      description: "app.api.leads.import.jobs.jobId.patch.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.leads.import.jobs.jobId.patch.errors.notFound.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.notFound.description",
+      description: "app.api.leads.import.jobs.jobId.patch.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.leads.import.jobs.jobId.patch.errors.server.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.server.description",
+      description: "app.api.leads.import.jobs.jobId.patch.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.leads.import.jobs.jobId.patch.errors.unknown.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.unknown.description",
+      description: "app.api.leads.import.jobs.jobId.patch.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.leads.import.jobs.jobId.patch.errors.network.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.network.description",
+      description: "app.api.leads.import.jobs.jobId.patch.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.leads.import.jobs.jobId.patch.errors.unsavedChanges.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.unsavedChanges.description",
+      title: "app.api.leads.import.jobs.jobId.patch.errors.unsavedChanges.title",
+      description: "app.api.leads.import.jobs.jobId.patch.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.leads.import.jobs.jobId.patch.errors.conflict.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.conflict.description",
+      description: "app.api.leads.import.jobs.jobId.patch.errors.conflict.description",
     },
   },
 
@@ -434,8 +396,7 @@ const { DELETE } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.leads.import.jobs.jobId.delete.jobId.label",
-          description:
-            "app.api.leads.import.jobs.jobId.delete.jobId.description",
+          description: "app.api.leads.import.jobs.jobId.delete.jobId.description",
           columns: 12,
         },
         z.uuid(),
@@ -446,8 +407,7 @@ const { DELETE } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.leads.import.jobs.jobId.delete.response.title",
-          description:
-            "app.api.leads.import.jobs.jobId.delete.response.description",
+          description: "app.api.leads.import.jobs.jobId.delete.response.description",
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -455,16 +415,14 @@ const { DELETE } = createEndpoint({
           success: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.leads.import.jobs.jobId.delete.response.success.content",
+              content: "app.api.leads.import.jobs.jobId.delete.response.success.content",
             },
             z.boolean(),
           ),
           message: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.leads.import.jobs.jobId.delete.response.message.content",
+              content: "app.api.leads.import.jobs.jobId.delete.response.message.content",
             },
             z.string(),
           ),
@@ -476,49 +434,39 @@ const { DELETE } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.leads.import.jobs.jobId.delete.errors.validation.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.validation.description",
+      description: "app.api.leads.import.jobs.jobId.delete.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.leads.import.jobs.jobId.delete.errors.unauthorized.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.unauthorized.description",
+      description: "app.api.leads.import.jobs.jobId.delete.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.leads.import.jobs.jobId.delete.errors.forbidden.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.forbidden.description",
+      description: "app.api.leads.import.jobs.jobId.delete.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.leads.import.jobs.jobId.delete.errors.notFound.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.notFound.description",
+      description: "app.api.leads.import.jobs.jobId.delete.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.leads.import.jobs.jobId.delete.errors.server.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.server.description",
+      description: "app.api.leads.import.jobs.jobId.delete.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.leads.import.jobs.jobId.delete.errors.unknown.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.unknown.description",
+      description: "app.api.leads.import.jobs.jobId.delete.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.leads.import.jobs.jobId.delete.errors.network.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.network.description",
+      description: "app.api.leads.import.jobs.jobId.delete.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.leads.import.jobs.jobId.delete.errors.unsavedChanges.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.unsavedChanges.description",
+      title: "app.api.leads.import.jobs.jobId.delete.errors.unsavedChanges.title",
+      description: "app.api.leads.import.jobs.jobId.delete.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.leads.import.jobs.jobId.delete.errors.conflict.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.conflict.description",
+      description: "app.api.leads.import.jobs.jobId.delete.errors.conflict.description",
     },
   },
 

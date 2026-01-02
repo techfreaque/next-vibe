@@ -16,9 +16,7 @@ export function serializeError(error: MessageResponseType): string {
  * Deserialize JSON string back to MessageResponseType
  * Returns null if parsing fails
  */
-export function deserializeError(
-  errorString: string,
-): MessageResponseType | null {
+export function deserializeError(errorString: string): MessageResponseType | null {
   try {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const parsed = JSON.parse(errorString);

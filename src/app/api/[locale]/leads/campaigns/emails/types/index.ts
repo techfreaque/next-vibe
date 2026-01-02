@@ -58,9 +58,7 @@ export interface EmailTemplateResult {
  * Email Template Function
  * Function signature for email template renderers
  */
-export type EmailTemplateFunction = (
-  context: EmailRenderContext,
-) => Promise<EmailTemplateResult>;
+export type EmailTemplateFunction = (context: EmailRenderContext) => Promise<EmailTemplateResult>;
 
 /**
  * Journey Template Map
@@ -147,13 +145,7 @@ export interface CampaignSchedulingOptions {
 export interface EmailTrackingData {
   leadId: string;
   campaignId: string;
-  eventType:
-    | "sent"
-    | "delivered"
-    | "opened"
-    | "clicked"
-    | "unsubscribed"
-    | "bounced";
+  eventType: "sent" | "delivered" | "opened" | "clicked" | "unsubscribed" | "bounced";
   timestamp: Date;
   metadata?: Record<string, string | number | boolean>;
   userAgent?: string;

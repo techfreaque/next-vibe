@@ -84,10 +84,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
               label: "app.api.user.public.login.fields.password.label",
-              description:
-                "app.api.user.public.login.fields.password.description",
-              placeholder:
-                "app.api.user.public.login.fields.password.placeholder",
+              description: "app.api.user.public.login.fields.password.description",
+              placeholder: "app.api.user.public.login.fields.password.placeholder",
               columns: 12,
               helpText: "app.api.user.public.login.fields.password.description",
               order: 2,
@@ -109,8 +107,7 @@ const { POST } = createEndpoint({
               fieldType: FieldDataType.BOOLEAN,
               label: "app.api.user.public.login.fields.rememberMe.label",
               columns: 12,
-              helpText:
-                "app.api.user.public.login.fields.rememberMe.description",
+              helpText: "app.api.user.public.login.fields.rememberMe.description",
               order: 3,
             },
             z.boolean().optional().default(true), // Default to true (30 days)
@@ -276,15 +273,13 @@ const { POST } = createEndpoint({
         message: "Welcome back! You have successfully logged in.",
       },
       failed: {
-        message:
-          "Invalid email or password. Please check your credentials and try again.",
+        message: "Invalid email or password. Please check your credentials and try again.",
       },
       withAdvanced: {
         message: "Welcome back! You have successfully logged in.",
       },
       accountLocked: {
-        message:
-          "Your account has been temporarily locked due to multiple failed login attempts.",
+        message: "Your account has been temporarily locked due to multiple failed login attempts.",
       },
     },
   },

@@ -6,21 +6,14 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type {
-  PulseExecuteRequestOutput,
-  PulseExecuteResponseOutput,
-} from "./definition";
+import type { PulseExecuteRequestOutput, PulseExecuteResponseOutput } from "./definition";
 /**
  * Pulse Execute Repository Implementation
  */
@@ -176,10 +169,7 @@ export class PulseExecuteRepository {
       wouldExecute: "Would execute",
     } as const;
 
-    const taskSimulations: Record<
-      string,
-      () => Promise<{ success: boolean; message?: string }>
-    > = {
+    const taskSimulations: Record<string, () => Promise<{ success: boolean; message?: string }>> = {
       "health-check": async () => {
         await this.delay(100);
         return {
@@ -193,9 +183,7 @@ export class PulseExecuteRepository {
         const success = force || Math.random() > 0.1;
         return {
           success,
-          message: success
-            ? TASK_MESSAGES.databaseSynced
-            : TASK_MESSAGES.databaseFailed,
+          message: success ? TASK_MESSAGES.databaseSynced : TASK_MESSAGES.databaseFailed,
         };
       },
       "cache-warmup": async () => {

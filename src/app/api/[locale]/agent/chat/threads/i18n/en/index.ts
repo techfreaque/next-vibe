@@ -8,8 +8,7 @@ export const translations = {
   },
   get: {
     title: "List Chat Threads",
-    description:
-      "Retrieve a paginated list of chat threads with filtering options",
+    description: "Retrieve a paginated list of chat threads with filtering options",
     container: {
       title: "Thread List",
       description: "Browse and filter chat threads",
@@ -266,8 +265,7 @@ export const translations = {
       forbidden: {
         title: "Forbidden",
         description: "You don't have permission to create threads",
-        incognitoNotAllowed:
-          "Incognito threads cannot be created on the server",
+        incognitoNotAllowed: "Incognito threads cannot be created on the server",
       },
       notFound: {
         title: "Not Found",

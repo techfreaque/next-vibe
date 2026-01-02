@@ -39,9 +39,7 @@ export function EditCharacterModal({
 }: EditCharacterModalProps): JSX.Element {
   const { t } = simpleT(locale);
 
-  const defaultValues = React.useMemo<
-    Partial<CharacterUpdateRequestOutput>
-  >(() => {
+  const defaultValues = React.useMemo<Partial<CharacterUpdateRequestOutput>>(() => {
     // For PATCH (partial update), only include fields that we want to pre-fill
     // All fields are optional in PATCH endpoint
     const result: Partial<CharacterUpdateRequestOutput> = {};
@@ -107,9 +105,7 @@ export function EditCharacterModal({
         </Button>
         <Div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5" />
-          <Span className="font-medium">
-            {t("app.chat.editCharacter.title")}
-          </Span>
+          <Span className="font-medium">{t("app.chat.editCharacter.title")}</Span>
         </Div>
       </Div>
 

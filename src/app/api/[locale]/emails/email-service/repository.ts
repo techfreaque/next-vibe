@@ -6,11 +6,7 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -20,10 +16,7 @@ import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { CampaignType } from "../smtp-client/enum";
 import { SmtpRepository } from "../smtp-client/repository";
-import type {
-  SmtpSelectionCriteria,
-  SmtpSendParams,
-} from "../smtp-client/sending/types";
+import type { SmtpSelectionCriteria, SmtpSendParams } from "../smtp-client/sending/types";
 import type {
   EmailServiceSendPostRequestOutput,
   EmailServiceSendPostResponseOutput,
@@ -52,8 +45,7 @@ export class EmailServiceRepository {
       const { language, country } = getLanguageAndCountryFromLocale(locale);
 
       const selectionCriteria: SmtpSelectionCriteria = {
-        campaignType:
-          data.campaignSettings.campaignType || CampaignType.NOTIFICATION,
+        campaignType: data.campaignSettings.campaignType || CampaignType.NOTIFICATION,
         emailJourneyVariant: data.campaignSettings.emailJourneyVariant || null,
         emailCampaignStage: data.campaignSettings.emailCampaignStage || null,
         country,
@@ -75,12 +67,7 @@ export class EmailServiceRepository {
         campaignId: data.campaignSettings.campaignId,
       };
 
-      const result = await SmtpRepository.sendEmail(
-        smtpSendData,
-        user,
-        locale,
-        logger,
-      );
+      const result = await SmtpRepository.sendEmail(smtpSendData, user, locale, logger);
 
       if (!result.success) {
         logger.error("Email service: SMTP send failed", {

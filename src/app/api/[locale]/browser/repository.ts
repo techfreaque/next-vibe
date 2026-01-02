@@ -9,11 +9,7 @@ import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -72,13 +68,7 @@ export interface BrowserRepository {
 /**
  * MCP JSON-RPC message types
  */
-type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonValue[]
-  | { [key: string]: JsonValue };
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
 interface MCPRequest {
   jsonrpc: "2.0";
@@ -148,14 +138,10 @@ export class BrowserRepositoryImpl implements BrowserRepository {
         } catch (parseError) {
           logger.warn("[Browser Repository] Failed to parse arguments", {
             arguments: data.arguments,
-            error:
-              parseError instanceof Error
-                ? parseError.message
-                : String(parseError),
+            error: parseError instanceof Error ? parseError.message : String(parseError),
           });
           return fail({
-            message:
-              "app.api.browser.repository.mcp.tool.call.invalidJsonArguments",
+            message: "app.api.browser.repository.mcp.tool.call.invalidJsonArguments",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -175,11 +161,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       return success({
         success: result.success,
         result: result.success ? result.result : result.error,
-        status: [
-          result.success
-            ? BrowserToolStatus.COMPLETED
-            : BrowserToolStatus.FAILED,
-        ],
+        status: [result.success ? BrowserToolStatus.COMPLETED : BrowserToolStatus.FAILED],
         executionId,
       });
     } catch (error) {
@@ -188,8 +170,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
         error: error instanceof Error ? error.message : String(error),
       });
 
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return fail({
         message: "app.api.browser.repository.mcp.tool.call.executionFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -341,10 +322,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
   /**
    * Send a request to the MCP server
    */
-  private sendRequest(
-    request: MCPRequest,
-    logger: EndpointLogger,
-  ): Promise<MCPResponse> {
+  private sendRequest(request: MCPRequest, logger: EndpointLogger): Promise<MCPResponse> {
     return new Promise((resolve, reject) => {
       if (!this.mcpProcess) {
         reject(new Error("MCP process not running"));

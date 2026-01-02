@@ -9,11 +9,7 @@ import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledSafeAreaView = styled(SafeAreaView, { className: "style" });
 
-export function Body({
-  children,
-  className,
-  style,
-}: BodyProps): React.JSX.Element {
+export function Body({ children, className, style }: BodyProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (

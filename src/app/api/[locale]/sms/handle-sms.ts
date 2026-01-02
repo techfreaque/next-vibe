@@ -2,14 +2,8 @@
 import { performance } from "node:perf_hooks";
 
 import type { UndefinedType } from "next-vibe/shared/types/common.schema";
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -19,12 +13,7 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import { smsEnv } from "./env";
 import { batchSendSms, sendSms } from "./send-sms";
-import type {
-  ProviderBaseOptions,
-  SendSmsParams,
-  SmsConfig,
-  SmsHandlerOptions,
-} from "./utils";
+import type { ProviderBaseOptions, SendSmsParams, SmsConfig, SmsHandlerOptions } from "./utils";
 
 /**
  * Processes and handles SMS messages triggered by API responses
@@ -96,8 +85,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
               const smsParams: SendSmsParams = {
                 to: msg.to,
                 message:
-                  options?.enableTruncation &&
-                  msg.message.length > maxMessageLength
+                  options?.enableTruncation && msg.message.length > maxMessageLength
                     ? `${msg.message.slice(0, maxMessageLength - 3)}...`
                     : msg.message,
                 // Only include 'from' if it exists
@@ -141,8 +129,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
             const smsParams: SendSmsParams = {
               ...result.data,
               message:
-                options?.enableTruncation &&
-                result.data.message.length > maxMessageLength
+                options?.enableTruncation && result.data.message.length > maxMessageLength
                   ? `${result.data.message.slice(0, maxMessageLength - 3)}...`
                   : result.data.message,
             };

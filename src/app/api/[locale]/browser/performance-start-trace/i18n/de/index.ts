@@ -6,8 +6,7 @@ export const translations: typeof enTranslations = {
     "Startet eine Leistungs-Trace-Aufzeichnung auf der ausgewählten Seite zur Analyse von Leistungsmetriken und Core Web Vitals",
   form: {
     label: "Leistungs-Trace starten",
-    description:
-      "Beginne mit der Aufzeichnung von Leistungsmetriken für die Browser-Seite",
+    description: "Beginne mit der Aufzeichnung von Leistungsmetriken für die Browser-Seite",
     fields: {
       reload: {
         label: "Seite neu laden",
@@ -17,8 +16,7 @@ export const translations: typeof enTranslations = {
       },
       autoStop: {
         label: "Automatisch stoppen",
-        description:
-          "Bestimmt, ob die Trace-Aufzeichnung automatisch gestoppt werden soll",
+        description: "Bestimmt, ob die Trace-Aufzeichnung automatisch gestoppt werden soll",
         placeholder: "true",
       },
     },
@@ -32,13 +30,11 @@ export const translations: typeof enTranslations = {
   errors: {
     validation: {
       title: "Validierungsfehler",
-      description:
-        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
     },
     network: {
       title: "Netzwerkfehler",
-      description:
-        "Ein Netzwerkfehler ist beim Starten des Leistungs-Traces aufgetreten",
+      description: "Ein Netzwerkfehler ist beim Starten des Leistungs-Traces aufgetreten",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -54,23 +50,19 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Serverfehler",
-      description:
-        "Ein interner Serverfehler ist beim Starten des Leistungs-Traces aufgetreten",
+      description: "Ein interner Serverfehler ist beim Starten des Leistungs-Traces aufgetreten",
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description:
-        "Ein unbekannter Fehler ist beim Starten des Leistungs-Traces aufgetreten",
+      description: "Ein unbekannter Fehler ist beim Starten des Leistungs-Traces aufgetreten",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description:
-        "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
+      description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
     },
     conflict: {
       title: "Konflikt",
-      description:
-        "Ein Konflikt ist beim Starten des Leistungs-Traces aufgetreten",
+      description: "Ein Konflikt ist beim Starten des Leistungs-Traces aufgetreten",
     },
   },
   success: {

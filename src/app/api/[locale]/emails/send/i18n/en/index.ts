@@ -172,8 +172,7 @@ export const translations = {
       title: "Validation Error",
       description: "Please check your input and try again",
       smsFields: "SMS notification fields",
-      smsRequired:
-        "SMS phone number and message are required when SMS notification is enabled",
+      smsRequired: "SMS phone number and message are required when SMS notification is enabled",
     },
     sms: {
       temporarilyUnavailable: "SMS service is temporarily unavailable",

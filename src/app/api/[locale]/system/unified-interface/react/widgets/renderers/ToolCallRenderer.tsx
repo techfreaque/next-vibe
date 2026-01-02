@@ -19,11 +19,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "next-vibe-ui/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "next-vibe-ui/ui/collapsible";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown, ChevronRight, Loader2 } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
@@ -112,14 +108,11 @@ export function ToolCallRenderer({
   };
   const [isOpen, setIsOpen] = useState(getIsOpen);
 
-  const [definition, setDefinition] = useState<CreateApiEndpointAny | null>(
-    null,
-  );
+  const [definition, setDefinition] = useState<CreateApiEndpointAny | null>(null);
 
   // Create a form for managing the tool parameters when waiting for confirmation
   const confirmationForm = useForm<FieldValues>({
-    defaultValues:
-      toolCall.args && typeof toolCall.args === "object" ? toolCall.args : {},
+    defaultValues: toolCall.args && typeof toolCall.args === "object" ? toolCall.args : {},
   });
 
   // Validate tool args against definition schema and show field-level errors
@@ -142,8 +135,7 @@ export function ToolCallRenderer({
 
     // Get the request data schema from the definition
     const requestDataSchema = definition.fields.requestData?.schema;
-    const requestUrlParamsSchema =
-      definition.fields.requestUrlPathParams?.schema;
+    const requestUrlParamsSchema = definition.fields.requestUrlPathParams?.schema;
 
     if (!requestDataSchema && !requestUrlParamsSchema) {
       return;
@@ -185,14 +177,7 @@ export function ToolCallRenderer({
         setHasValidated(true);
       }
     }
-  }, [
-    isOpen,
-    toolCall.error,
-    toolCall.args,
-    definition,
-    confirmationForm,
-    hasValidated,
-  ]);
+  }, [isOpen, toolCall.error, toolCall.args, definition, confirmationForm, hasValidated]);
 
   useEffect(() => {
     const loadDef = async (): Promise<void> => {
@@ -271,9 +256,8 @@ export function ToolCallRenderer({
   const hasError = Boolean(toolCall.error);
   const isLoading = !hasResult && !hasError && !isWaitingForConfirmation;
 
-  const [wasWaitingForConfirmation, setWasWaitingForConfirmation] = useState(
-    isWaitingForConfirmation,
-  );
+  const [wasWaitingForConfirmation, setWasWaitingForConfirmation] =
+    useState(isWaitingForConfirmation);
 
   // Update isOpen when waitingForConfirmation changes
   useEffect(() => {
@@ -310,9 +294,7 @@ export function ToolCallRenderer({
   const credits = definition?.credits ?? toolCall.creditsUsed ?? 0;
   const creditsDisplay = credits
     ? t(
-        credits === 1
-          ? "app.chat.toolCall.creditsUsed_one"
-          : "app.chat.toolCall.creditsUsed_other",
+        credits === 1 ? "app.chat.toolCall.creditsUsed_one" : "app.chat.toolCall.creditsUsed_other",
         { cost: credits },
       )
     : null;
@@ -345,23 +327,17 @@ export function ToolCallRenderer({
                 {icon &&
                   (() => {
                     const IconComponent = getIconComponent(icon);
-                    return (
-                      <IconComponent className="h-4 w-4 text-muted-foreground" />
-                    );
+                    return <IconComponent className="h-4 w-4 text-muted-foreground" />;
                   })()}
                 <Span className="font-medium text-sm">{displayName}</Span>
               </Div>
 
               {/* Loading Indicator */}
-              {isLoading && (
-                <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
-              )}
+              {isLoading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
 
               {/* Credits */}
               {creditsDisplay && (
-                <Span className="text-xs text-muted-foreground">
-                  {creditsDisplay}
-                </Span>
+                <Span className="text-xs text-muted-foreground">{creditsDisplay}</Span>
               )}
             </Div>
 
@@ -369,9 +345,7 @@ export function ToolCallRenderer({
             <Div className="flex items-center gap-2">
               {hasError && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
-                  {t(
-                    "app.api.system.unifiedInterface.react.widgets.toolCall.status.error",
-                  )}
+                  {t("app.api.system.unifiedInterface.react.widgets.toolCall.status.error")}
                 </Span>
               )}
               {isWaitingForConfirmation && (
@@ -383,16 +357,12 @@ export function ToolCallRenderer({
               )}
               {isLoading && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500">
-                  {t(
-                    "app.api.system.unifiedInterface.react.widgets.toolCall.status.executing",
-                  )}
+                  {t("app.api.system.unifiedInterface.react.widgets.toolCall.status.executing")}
                 </Span>
               )}
               {hasResult && !hasError && !isWaitingForConfirmation && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
-                  {t(
-                    "app.api.system.unifiedInterface.react.widgets.toolCall.status.complete",
-                  )}
+                  {t("app.api.system.unifiedInterface.react.widgets.toolCall.status.complete")}
                 </Span>
               )}
             </Div>
@@ -474,14 +444,10 @@ export function ToolCallRenderer({
                 // - Complete: read-only display
                 const isDeclined = Boolean(hasError && toolCall.args);
                 const isEditable = isWaitingForConfirmation && !isDeclined;
-                const needsConfirmation =
-                  isWaitingForConfirmation && !isDeclined;
+                const needsConfirmation = isWaitingForConfirmation && !isDeclined;
 
                 const handleConfirm = (formData: FieldValues): void => {
-                  const argsRecord: Record<
-                    string,
-                    string | number | boolean | null
-                  > = {};
+                  const argsRecord: Record<string, string | number | boolean | null> = {};
                   for (const [key, value] of Object.entries(formData)) {
                     if (
                       typeof value === "string" ||
@@ -520,10 +486,7 @@ export function ToolCallRenderer({
 
                 // Use EndpointRenderer for 100% definition-driven rendering
                 return (
-                  <Div
-                    className="p-4 space-y-4"
-                    data-tool-editable={isEditable}
-                  >
+                  <Div className="p-4 space-y-4" data-tool-editable={isEditable}>
                     {/* Show info banner when waiting for confirmation */}
                     {isWaitingForConfirmation && !isDeclined && (
                       <Div className="rounded-md bg-amber-500/10 border border-amber-500/20 p-3">
@@ -556,11 +519,7 @@ export function ToolCallRenderer({
                       locale={locale}
                       data={mergedData}
                       disabled={!isEditable || isDeclined}
-                      form={
-                        needsConfirmation || isDeclined
-                          ? confirmationForm
-                          : undefined
-                      }
+                      form={needsConfirmation || isDeclined ? confirmationForm : undefined}
                       onSubmit={needsConfirmation ? handleConfirm : undefined}
                       onCancel={needsConfirmation ? handleCancel : undefined}
                       submitButtonText={

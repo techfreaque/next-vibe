@@ -23,19 +23,9 @@ import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import {
-  DEFAULT_TTS_VOICE,
-  type TtsVoiceValue,
-} from "../../text-to-speech/enum";
-
 import { db } from "../../../system/db";
 import type { DefaultFolderId } from "../../chat/config";
-import {
-  type ChatMessage,
-  chatMessages,
-  type ToolCall,
-  type ToolCallResult,
-} from "../../chat/db";
+import { type ChatMessage, chatMessages, type ToolCall, type ToolCallResult } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
 import { getModelCost } from "../../chat/model-access/costs";
 import {
@@ -45,6 +35,7 @@ import {
 } from "../../chat/threads/[threadId]/messages/repository";
 import { ensureThread } from "../../chat/threads/repository";
 import { SpeechToTextRepository } from "../../speech-to-text/repository";
+import { DEFAULT_TTS_VOICE, type TtsVoiceValue } from "../../text-to-speech/enum";
 import { type AiStreamPostRequestOutput } from "../definition";
 import { createMetadataSystemMessage } from "../message-metadata-generator";
 import { buildSystemPrompt } from "../system-prompt-builder";
@@ -120,8 +111,7 @@ export async function setupAiStream(params: {
   ipAddress: string | undefined;
   t: TFunction;
 }): Promise<
-  | { success: false; error: ResponseType<never> }
-  | { success: true; data: StreamSetupResult }
+  { success: false; error: ResponseType<never> } | { success: true; data: StreamSetupResult }
 > {
   const { data, locale, logger, user, userId, leadId, ipAddress, t } = params;
   const isIncognito = data.rootFolderId === "incognito";
@@ -172,9 +162,7 @@ export async function setupAiStream(params: {
       return { success: false, error: confirmResult };
     }
 
-    logger.info(
-      "[Setup] Tool executed - continuing with AI stream to process result",
-    );
+    logger.info("[Setup] Tool executed - continuing with AI stream to process result");
     // Tool has been executed and message updated with result
     // Continue with the normal flow to start AI stream
     // The tool result is now in the message history and AI will process it
@@ -187,8 +175,7 @@ export async function setupAiStream(params: {
     return {
       success: false,
       error: fail({
-        message:
-          "app.api.agent.chat.aiStream.route.errors.authenticationRequired",
+        message: "app.api.agent.chat.aiStream.route.errors.authenticationRequired",
         errorType: ErrorResponseTypes.AUTH_ERROR,
       }),
     };
@@ -199,17 +186,9 @@ export async function setupAiStream(params: {
   let effectiveLeadId = leadId;
 
   if (userId) {
-    validationResult = await creditValidator.validateUserCredits(
-      userId,
-      data.model,
-      logger,
-    );
+    validationResult = await creditValidator.validateUserCredits(userId, data.model, logger);
   } else if (leadId) {
-    validationResult = await creditValidator.validateLeadCredits(
-      leadId,
-      data.model,
-      logger,
-    );
+    validationResult = await creditValidator.validateLeadCredits(leadId, data.model, logger);
   } else if (ipAddress) {
     const leadByIpResult = await creditValidator.validateLeadByIp(
       ipAddress,
@@ -222,8 +201,7 @@ export async function setupAiStream(params: {
       return {
         success: false,
         error: fail({
-          message:
-            "app.api.agent.chat.aiStream.route.errors.creditValidationFailed",
+          message: "app.api.agent.chat.aiStream.route.errors.creditValidationFailed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         }),
       };
@@ -249,8 +227,7 @@ export async function setupAiStream(params: {
     return {
       success: false,
       error: fail({
-        message:
-          "app.api.agent.chat.aiStream.route.errors.creditValidationFailed",
+        message: "app.api.agent.chat.aiStream.route.errors.creditValidationFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       }),
     };
@@ -307,13 +284,12 @@ export async function setupAiStream(params: {
           fileType: data.audioInput.file.type,
         });
 
-        const transcriptionResult =
-          await SpeechToTextRepository.transcribeAudio(
-            data.audioInput.file,
-            user,
-            locale,
-            logger,
-          );
+        const transcriptionResult = await SpeechToTextRepository.transcribeAudio(
+          data.audioInput.file,
+          user,
+          locale,
+          logger,
+        );
 
         if (!transcriptionResult.success) {
           logger.error("[Setup] Audio transcription failed", {
@@ -387,8 +363,7 @@ export async function setupAiStream(params: {
   } catch (error) {
     logger.error("Failed to ensure thread - RAW ERROR", parseError(error), {
       errorType: typeof error,
-      errorConstructor:
-        error instanceof Error ? error.constructor.name : "unknown",
+      errorConstructor: error instanceof Error ? error.constructor.name : "unknown",
     });
 
     const errorMessage = parseError(error).message;
@@ -415,10 +390,7 @@ export async function setupAiStream(params: {
     };
   }
 
-  const messageDepth = await calculateMessageDepth(
-    effectiveParentMessageId,
-    isIncognito,
-  );
+  const messageDepth = await calculateMessageDepth(effectiveParentMessageId, isIncognito);
 
   const userMessageId = crypto.randomUUID();
 
@@ -429,17 +401,11 @@ export async function setupAiStream(params: {
     content: data.content,
     contentLength: data.content?.length,
     willCreateMessage:
-      data.operation !== "answer-as-ai" &&
-      data.operation !== "retry" &&
-      !data.toolConfirmation,
+      data.operation !== "answer-as-ai" && data.operation !== "retry" && !data.toolConfirmation,
   });
 
   // Skip creating user message if this is a tool confirmation (content is empty)
-  if (
-    data.operation !== "answer-as-ai" &&
-    data.operation !== "retry" &&
-    !data.toolConfirmation
-  ) {
+  if (data.operation !== "answer-as-ai" && data.operation !== "retry" && !data.toolConfirmation) {
     logger.info("[Setup] Creating user message", {
       messageId: userMessageId,
       threadId: threadResult.threadId,
@@ -466,20 +432,14 @@ export async function setupAiStream(params: {
       });
     }
   } else if (data.toolConfirmation) {
-    logger.info(
-      "[Setup] ✅ SKIPPING user message creation for tool confirmation",
-      {
-        messageId: data.toolConfirmation.messageId,
-        operation: data.operation,
-      },
-    );
+    logger.info("[Setup] ✅ SKIPPING user message creation for tool confirmation", {
+      messageId: data.toolConfirmation.messageId,
+      operation: data.operation,
+    });
   } else {
     logger.info("[Setup] ✅ SKIPPING user message creation", {
       operation: data.operation,
-      reason:
-        data.operation === "answer-as-ai"
-          ? "answer-as-ai operation"
-          : "retry operation",
+      reason: data.operation === "answer-as-ai" ? "answer-as-ai operation" : "retry operation",
     });
   }
 
@@ -514,12 +474,7 @@ export async function setupAiStream(params: {
     upcomingResponseContext: { model: data.model, character: data.character },
   });
 
-  if (
-    !isIncognito &&
-    systemPrompt &&
-    messages.length > 0 &&
-    messages[0].role !== "system"
-  ) {
+  if (!isIncognito && systemPrompt && messages.length > 0 && messages[0].role !== "system") {
     messages.unshift({ role: "system", content: systemPrompt });
   }
 
@@ -571,8 +526,7 @@ export async function setupAiStream(params: {
         return {
           success: false,
           error: fail({
-            message:
-              "app.api.agent.chat.aiStream.route.errors.invalidRequestData",
+            message: "app.api.agent.chat.aiStream.route.errors.invalidRequestData",
             errorType: ErrorResponseTypes.INVALID_DATA_ERROR,
           }),
         };
@@ -679,14 +633,11 @@ async function buildMessageContext(params: {
   // SECURITY: Reject messageHistory for non-incognito threads
   // Non-incognito threads must fetch history from database to prevent manipulation
   if (!params.isIncognito && params.messageHistory) {
-    params.logger.error(
-      "Security violation: messageHistory provided for non-incognito thread",
-      {
-        operation: params.operation,
-        threadId: params.threadId,
-        isIncognito: params.isIncognito,
-      },
-    );
+    params.logger.error("Security violation: messageHistory provided for non-incognito thread", {
+      operation: params.operation,
+      threadId: params.threadId,
+      isIncognito: params.isIncognito,
+    });
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Security violation should throw immediately
     throw new Error(
       "messageHistory is only allowed for incognito mode. Server-side threads fetch history from database.",
@@ -702,21 +653,14 @@ async function buildMessageContext(params: {
       );
     }
 
-    if (
-      !params.isIncognito &&
-      params.userId &&
-      params.threadId &&
-      params.parentMessageId
-    ) {
+    if (!params.isIncognito && params.userId && params.threadId && params.parentMessageId) {
       const allMessages = await db
         .select()
         .from(chatMessages)
         .where(eq(chatMessages.threadId, params.threadId))
         .orderBy(chatMessages.createdAt);
 
-      const parentIndex = allMessages.findIndex(
-        (msg) => msg.id === params.parentMessageId,
-      );
+      const parentIndex = allMessages.findIndex((msg) => msg.id === params.parentMessageId);
 
       if (parentIndex !== -1) {
         const contextMessages = allMessages.slice(0, parentIndex + 1);
@@ -750,19 +694,13 @@ async function buildMessageContext(params: {
         for (const attachment of message.metadata.attachments) {
           // If attachment has URL but no base64 data, fetch from storage
           if (attachment.url && !attachment.data) {
-            const base64Data = await storage.readFileAsBase64(
-              attachment.id,
-              params.threadId,
-            );
+            const base64Data = await storage.readFileAsBase64(attachment.id, params.threadId);
             if (base64Data) {
               attachment.data = base64Data;
-              params.logger.debug(
-                "[BuildMessageContext] Fetched file data for attachment",
-                {
-                  attachmentId: attachment.id,
-                  filename: attachment.filename,
-                },
-              );
+              params.logger.debug("[BuildMessageContext] Fetched file data for attachment", {
+                attachmentId: attachment.id,
+                filename: attachment.filename,
+              });
             }
           }
         }
@@ -775,12 +713,9 @@ async function buildMessageContext(params: {
       params.rootFolderId,
       params.upcomingResponseContext,
     );
-    params.logger.debug(
-      "[BuildMessageContext] Returning history for server mode",
-      {
-        historyLength: historyMessages.length,
-      },
-    );
+    params.logger.debug("[BuildMessageContext] Returning history for server mode", {
+      historyLength: historyMessages.length,
+    });
     return historyMessages;
   } else if (params.isIncognito && params.messageHistory) {
     // Incognito mode: Return ONLY past messages - new message comes from content/attachments params
@@ -793,12 +728,9 @@ async function buildMessageContext(params: {
       params.rootFolderId,
       params.upcomingResponseContext,
     );
-    params.logger.debug(
-      "[BuildMessageContext] Returning history for incognito mode",
-      {
-        historyLength: historyMessages.length,
-      },
-    );
+    params.logger.debug("[BuildMessageContext] Returning history for incognito mode", {
+      historyLength: historyMessages.length,
+    });
     return historyMessages;
   }
 
@@ -888,23 +820,15 @@ async function handleToolConfirmationInSetup(params: {
   logger: EndpointLogger;
   user: JwtPayloadType;
 }): Promise<ResponseType<{ threadId: string; toolMessageId: string }>> {
-  const {
-    toolConfirmation,
-    messageHistory,
-    isIncognito,
-    userId,
-    locale,
-    logger,
-    user,
-  } = params;
+  const { toolConfirmation, messageHistory, isIncognito, userId, locale, logger, user } = params;
 
   // Find tool message in messageHistory (incognito) or DB
   let toolMessage: ChatMessage | undefined;
 
   if (isIncognito && messageHistory) {
-    toolMessage = messageHistory.find(
-      (msg) => msg.id === toolConfirmation.messageId,
-    ) as ChatMessage | undefined;
+    toolMessage = messageHistory.find((msg) => msg.id === toolConfirmation.messageId) as
+      | ChatMessage
+      | undefined;
   } else if (userId) {
     const [dbMessage] = await db
       .select()
@@ -920,8 +844,7 @@ async function handleToolConfirmationInSetup(params: {
       isIncognito,
     });
     return fail({
-      message:
-        "app.api.agent.chat.aiStream.post.toolConfirmation.errors.messageNotFound",
+      message: "app.api.agent.chat.aiStream.post.toolConfirmation.errors.messageNotFound",
       errorType: ErrorResponseTypes.NOT_FOUND,
     });
   }
@@ -930,8 +853,7 @@ async function handleToolConfirmationInSetup(params: {
   if (!toolCall) {
     logger.error("[Tool Confirmation] ToolCall metadata missing");
     return fail({
-      message:
-        "app.api.agent.chat.aiStream.post.toolConfirmation.errors.toolCallMissing",
+      message: "app.api.agent.chat.aiStream.post.toolConfirmation.errors.toolCallMissing",
       errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
@@ -940,10 +862,7 @@ async function handleToolConfirmationInSetup(params: {
     // Execute tool with updated args
     const finalArgs = toolConfirmation.updatedArgs
       ? {
-          ...(toolCall.args as Record<
-            string,
-            string | number | boolean | null
-          >),
+          ...(toolCall.args as Record<string, string | number | boolean | null>),
           ...toolConfirmation.updatedArgs,
         }
       : toolCall.args;
@@ -961,8 +880,7 @@ async function handleToolConfirmationInSetup(params: {
     });
 
     const toolEntry = Object.entries(toolsResult.tools ?? {}).find(
-      ([name]) =>
-        name === toolCall.toolName || name.endsWith(`/${toolCall.toolName}`),
+      ([name]) => name === toolCall.toolName || name.endsWith(`/${toolCall.toolName}`),
     );
 
     if (!toolEntry) {
@@ -970,8 +888,7 @@ async function handleToolConfirmationInSetup(params: {
         toolName: toolCall.toolName,
       });
       return fail({
-        message:
-          "app.api.agent.chat.aiStream.post.toolConfirmation.errors.toolNotFound",
+        message: "app.api.agent.chat.aiStream.post.toolConfirmation.errors.toolNotFound",
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -984,10 +901,7 @@ async function handleToolConfirmationInSetup(params: {
     const [, tool] = toolEntry as [
       string,
       {
-        execute?: (
-          args: ToolCallResult,
-          options: ToolExecuteOptions,
-        ) => Promise<ToolCallResult>;
+        execute?: (args: ToolCallResult, options: ToolExecuteOptions) => Promise<ToolCallResult>;
       },
     ];
     let toolResult: ToolCallResult | undefined;
@@ -1036,9 +950,7 @@ async function handleToolConfirmationInSetup(params: {
         .where(eq(chatMessages.id, toolConfirmation.messageId));
     } else if (isIncognito && messageHistory) {
       // Update in messageHistory array for incognito mode
-      const msgIndex = messageHistory.findIndex(
-        (msg) => msg.id === toolConfirmation.messageId,
-      );
+      const msgIndex = messageHistory.findIndex((msg) => msg.id === toolConfirmation.messageId);
       if (msgIndex >= 0) {
         messageHistory[msgIndex].metadata = { toolCall: updatedToolCall };
       }
@@ -1069,9 +981,7 @@ async function handleToolConfirmationInSetup(params: {
         })
         .where(eq(chatMessages.id, toolConfirmation.messageId));
     } else if (isIncognito && messageHistory) {
-      const msgIndex = messageHistory.findIndex(
-        (msg) => msg.id === toolConfirmation.messageId,
-      );
+      const msgIndex = messageHistory.findIndex((msg) => msg.id === toolConfirmation.messageId);
       if (msgIndex >= 0) {
         messageHistory[msgIndex].metadata = { toolCall: rejectedToolCall };
       }
@@ -1101,8 +1011,7 @@ function toAiSdkMessages(
     // Only for full ChatMessage objects (not simple { role, content } objects)
     if (
       isChatMessage(msg) &&
-      (msg.role === ChatMessageRole.USER ||
-        msg.role === ChatMessageRole.ASSISTANT)
+      (msg.role === ChatMessageRole.USER || msg.role === ChatMessageRole.ASSISTANT)
     ) {
       const metadataContent = createMetadataSystemMessage(msg, rootFolderId);
       result.push({

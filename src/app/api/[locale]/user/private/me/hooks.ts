@@ -5,10 +5,7 @@
  * Most of the implementation details are handled by the next-vibe package.
  */
 
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
+import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
 import { useToast } from "next-vibe-ui/hooks/use-toast";
 import { useEffect, useRef } from "react";
 
@@ -67,14 +64,8 @@ export interface UseUserReturn {
   error: ErrorResponseType | undefined;
 }
 
-export function useUser(
-  user: JwtPayloadType,
-  logger: EndpointLogger,
-): UseUserReturn {
-  const [queryEnabled, setQueryEnabled] = useCustomState(
-    queryEnabledKey,
-    !!user.isPublic,
-  );
+export function useUser(user: JwtPayloadType, logger: EndpointLogger): UseUserReturn {
+  const [queryEnabled, setQueryEnabled] = useCustomState(queryEnabledKey, !!user.isPublic);
   const {
     data: userResponse,
     isLoading,
@@ -160,11 +151,7 @@ export function useUpdateProfile(
  */
 export function useDeleteAccount(
   logger: EndpointLogger,
-): EnhancedMutationResult<
-  MeDeleteResponseOutput,
-  MeDeleteRequestOutput,
-  never
-> {
+): EnhancedMutationResult<MeDeleteResponseOutput, MeDeleteRequestOutput, never> {
   const { toast } = useToast();
   const { t } = useTranslation();
 

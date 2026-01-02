@@ -164,8 +164,7 @@ export const translations: typeof enTranslations = {
       nameRequired: "Bitte gib einen Namen ein",
       descriptionRequired: "Bitte gib eine Beschreibung ein",
       systemPromptRequired: "Bitte gib einen System-Prompt ein",
-      createFailed:
-        "Charakter konnte nicht erstellt werden. Bitte versuche es erneut.",
+      createFailed: "Charakter konnte nicht erstellt werden. Bitte versuche es erneut.",
     },
   },
 
@@ -269,10 +268,8 @@ export const translations: typeof enTranslations = {
   input: {
     placeholder: "Geben Sie Ihre Nachricht ein...",
     noPermission: "Sie haben keine Berechtigung, Nachrichten zu posten",
-    noPostPermission:
-      "Sie haben keine Berechtigung, Nachrichten in diesem Thread zu posten",
-    noCreateThreadPermission:
-      "Sie haben keine Berechtigung, Threads in diesem Ordner zu erstellen",
+    noPostPermission: "Sie haben keine Berechtigung, Nachrichten in diesem Thread zu posten",
+    noCreateThreadPermission: "Sie haben keine Berechtigung, Threads in diesem Ordner zu erstellen",
     noCreateThreadPermissionInRootFolder:
       "Sie haben keine Berechtigung, Threads in diesem Ordner zu erstellen. Bitte melden Sie sich an oder wählen Sie einen Unterordner.",
     keyboardShortcuts: {
@@ -481,8 +478,7 @@ export const translations: typeof enTranslations = {
     all: "Alle",
     noFavorites: "Noch keine Favoriten. Markiere welche mit einem Stern.",
     noModels: "Keine Modelle verfügbar",
-    filteredByCharacter:
-      "Zeige {{compatible}} von {{total}} Modellen (nach Character gefiltert)",
+    filteredByCharacter: "Zeige {{compatible}} von {{total}} Modellen (nach Character gefiltert)",
     selectCharacter: "Character auswählen",
     allCharacters: "Alle",
   },
@@ -514,8 +510,7 @@ export const translations: typeof enTranslations = {
     favorites: "Favoriten",
     suggested: "Vorgeschlagen",
     noFavorites: "Noch keine Favoriten",
-    noFavoritesHint:
-      "Speichere deine Lieblings-Characters für schnellen Zugriff",
+    noFavoritesHint: "Speichere deine Lieblings-Characters für schnellen Zugriff",
     browseAllCharacters: "Alle Characters durchsuchen...",
     customSetup: "Benutzerdefinierte Einrichtung...",
     selectCharacter: "Character auswählen",
@@ -567,8 +562,7 @@ export const translations: typeof enTranslations = {
     manualSelect: "Manuell auswählen...",
     best: "BESTE",
     noMatchingModels: "Keine Modelle entsprechen deinen Filtern",
-    noModelsWarning:
-      "Keine Modelle entsprechen diesen Filtern. Passe deine Einstellungen an.",
+    noModelsWarning: "Keine Modelle entsprechen diesen Filtern. Passe deine Einstellungen an.",
     allModelsCount: "{{count}} Modelle verfügbar",
     filteredModelsCount: "{{count}} passende Modelle",
     showAllModels: "Alle zeigen",
@@ -622,8 +616,7 @@ export const translations: typeof enTranslations = {
     modelSelection: "Modellauswahl",
     autoMode: "Auto",
     manualMode: "Manuell",
-    autoModeDescription:
-      "Das beste Modell wird basierend auf deinen Filtern ausgewählt",
+    autoModeDescription: "Das beste Modell wird basierend auf deinen Filtern ausgewählt",
     manualModeDescription: "Wähle ein bestimmtes Modell aus",
     customizeSettings: "Einstellungen vor dem Hinzufügen anpassen",
     useNow: "Jetzt verwenden",
@@ -652,8 +645,7 @@ export const translations: typeof enTranslations = {
     // Character switch modal
     characterSwitchModal: {
       title: "Character wechseln",
-      description:
-        "Wechsle zu einer anderen Character ohne deine Einstellungen zu verlieren",
+      description: "Wechsle zu einer anderen Character ohne deine Einstellungen zu verlieren",
       searchPlaceholder: "Characters durchsuchen...",
       noResults: "Keine Characters gefunden",
       keepSettings: "Aktuelle Modelleinstellungen beibehalten",
@@ -668,8 +660,7 @@ export const translations: typeof enTranslations = {
     // Screen 1: Story
     story: {
       title: "Sieh uns als dein Team.",
-      line1:
-        "Die meisten beginnen mit einem Begleiter — jemand für den täglichen Chat.",
+      line1: "Die meisten beginnen mit einem Begleiter — jemand für den täglichen Chat.",
       line2: "Wenn du spezielle Hilfe brauchst, wechsle zu einem Spezialisten.",
       line3: "Es ist wie Experten auf Kurzwahl zu haben.",
       continue: "Team kennenlernen",
@@ -762,8 +753,7 @@ export const translations: typeof enTranslations = {
     others: "Andere",
     searchPlaceholder: "{{item}} durchsuchen...",
     toggleFavorite: "Favorit umschalten",
-    noFavorites:
-      'Noch keine Favoriten. Klicken Sie auf "Alle anzeigen", um welche hinzuzufügen.',
+    noFavorites: 'Noch keine Favoriten. Klicken Sie auf "Alle anzeigen", um welche hinzuzufügen.',
     noRecommended: "Keine empfohlenen Optionen verfügbar.",
     showAll: "Alle anzeigen",
     groupByProvider: "Nach Anbieter gruppieren",
@@ -836,8 +826,7 @@ export const translations: typeof enTranslations = {
     capture: "Screenshot aufnehmen",
     failed: "Screenshot-Aufnahme fehlgeschlagen",
     failedWithMessage: "Screenshot-Aufnahme fehlgeschlagen: {{message}}",
-    tryAgain:
-      "Screenshot-Aufnahme fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    tryAgain: "Screenshot-Aufnahme fehlgeschlagen. Bitte versuchen Sie es erneut.",
     noMessages:
       "Chat-Nachrichtenbereich konnte nicht gefunden werden. Bitte stellen Sie sicher, dass Sie Nachrichten im Chat haben.",
     quotaExceeded: "Speicherkontingent überschritten. Screenshot ist zu groß.",
@@ -860,19 +849,15 @@ export const translations: typeof enTranslations = {
     messageNotInPath: "Nachricht nicht im aktuellen Pfad",
     requestAborted: "Anfrage wurde abgebrochen",
     requestCancelled: "Anfrage wurde abgebrochen",
-    requestTimeout:
-      "Zeitüberschreitung der Anfrage. Bitte versuchen Sie es erneut.",
+    requestTimeout: "Zeitüberschreitung der Anfrage. Bitte versuchen Sie es erneut.",
     networkError:
       "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
     apiError: "API-Fehler. Bitte versuchen Sie es später erneut.",
-    storageError:
-      "Speicherfehler. Ihr Browser-Speicher ist möglicherweise voll.",
-    unexpectedError:
-      "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+    storageError: "Speicherfehler. Ihr Browser-Speicher ist möglicherweise voll.",
+    unexpectedError: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     errorInContext: "Fehler in {{context}}: {{message}}",
     invalidRequestData: "Ungültige Anfragedaten: {{error}}",
-    streamAIResponse:
-      "KI-Antwort konnte nicht abgerufen werden. Bitte versuchen Sie es erneut.",
+    streamAIResponse: "KI-Antwort konnte nicht abgerufen werden. Bitte versuchen Sie es erneut.",
   },
   speech: {
     error: "Spracherkennungsfehler",
@@ -910,13 +895,10 @@ export const translations: typeof enTranslations = {
     threadNotFound: "Thread nicht gefunden",
   },
   storage: {
-    parsePreferencesFailed:
-      "Fehler beim Parsen der Benutzereinstellungen aus dem Speicher",
+    parsePreferencesFailed: "Fehler beim Parsen der Benutzereinstellungen aus dem Speicher",
     parseStateFailed: "Fehler beim Parsen des Chat-Status aus dem Speicher",
-    syncPreferencesFailed:
-      "Fehler beim Synchronisieren der Einstellungen mit dem Speicher",
-    syncStateFailed:
-      "Fehler beim Synchronisieren des Chat-Status mit dem Speicher",
+    syncPreferencesFailed: "Fehler beim Synchronisieren der Einstellungen mit dem Speicher",
+    syncStateFailed: "Fehler beim Synchronisieren des Chat-Status mit dem Speicher",
   },
   hooks: {
     stt: {
@@ -1053,62 +1035,45 @@ export const translations: typeof enTranslations = {
       claudeSonnet45: "Neuestes Claude-Modell mit hervorragender Leistung",
       gpt5: "Neuestes GPT-Modell mit hervorragender Leistung",
       gpt51: "Neuestes GPT 5.1-Modell mit verbessertem Denkvermögen",
-      gpt5Pro:
-        "Neuestes GPT-Modell mit hervorragender Leistung für Programmieraufgaben",
+      gpt5Pro: "Neuestes GPT-Modell mit hervorragender Leistung für Programmieraufgaben",
       gpt5Codex: "Neuestes GPT-Modell mit hervorragender Leistung",
       gpt51Codex: "Neuestes GPT 5.1 Codex-Modell optimiert für Programmierung",
-      gpt5Mini:
-        "Neuestes Mini-Modell mit hervorragendem Preis-Leistungs-Verhältnis",
-      gpt5Nano:
-        "Neuestes Nano-Modell mit hervorragendem Preis-Leistungs-Verhältnis",
+      gpt5Mini: "Neuestes Mini-Modell mit hervorragendem Preis-Leistungs-Verhältnis",
+      gpt5Nano: "Neuestes Nano-Modell mit hervorragendem Preis-Leistungs-Verhältnis",
       gptOss120b: "Open-Source-GPT-Modell mit 120B Parametern",
-      geminiFlash25Pro:
-        "Ultraschnelles und effizientes 14B-Modell mit großem Kontext",
-      geminiFlash25Flash:
-        "Ultraschnelles und effizientes 14B-Modell mit großem Kontext",
-      geminiFlash25Lite:
-        "Ultraschnelles und effizientes 14B-Modell mit großem Kontext",
-      mistralNemo:
-        "Europäisches KI-Modell mit starker Leistung und Datenschutzfokus",
+      geminiFlash25Pro: "Ultraschnelles und effizientes 14B-Modell mit großem Kontext",
+      geminiFlash25Flash: "Ultraschnelles und effizientes 14B-Modell mit großem Kontext",
+      geminiFlash25Lite: "Ultraschnelles und effizientes 14B-Modell mit großem Kontext",
+      mistralNemo: "Europäisches KI-Modell mit starker Leistung und Datenschutzfokus",
       kimiK2Free:
         "Kimi K2 Instruct ist ein großes Mixture-of-Experts (MoE) Sprachmodell, entwickelt von Moonshot AI.",
       kimiK2:
         "Kimi K2 - fortgeschrittenes Mixture-of-Experts (MoE) Modell von Moonshot AI mit großem Kontextfenster",
       kimiK2Thinking:
         "Kimi K2 Thinking - Reasoning-fokussierte Variante mit erweiterten analytischen Fähigkeiten",
-      deepseekV31Free:
-        "Leistungsstarkes 671B-Parameter-Modell - völlig kostenlos!",
-      deepseekV31:
-        "Leistungsstarkes 671B-Parameter-Modell mit erweiterten Fähigkeiten",
+      deepseekV31Free: "Leistungsstarkes 671B-Parameter-Modell - völlig kostenlos!",
+      deepseekV31: "Leistungsstarkes 671B-Parameter-Modell mit erweiterten Fähigkeiten",
       qwen3235bFree:
         "Mixture-of-Experts (MoE) Modell entwickelt von Qwen, unterstützt nahtloses Umschalten zwischen Modi.",
       deepseekR1Distill: "Destilliertes Reasoning-Modell mit starker Leistung",
-      deepseekR1:
-        "Fortgeschrittenes Reasoning-Modell mit tiefen Denkfähigkeiten",
+      deepseekR1: "Fortgeschrittenes Reasoning-Modell mit tiefen Denkfähigkeiten",
       qwen257b: "Effizientes 7B-Parameter-Modell",
       grok4: "X-AI Grok 4 - Premium-Modell",
       grok4Fast:
         "Grok 4 Fast ist xAIs neuestes multimodales Modell mit SOTA-Kosteneffizienz und einem 2M-Token-Kontextfenster. Es gibt zwei Varianten: ohne und mit Reasoning.",
-      glm46:
-        "GLM 4.6 - effizientes 7B-Parameter-Modell mit großem Kontextfenster",
-      glm45Air:
-        "GLM 4.5 AIR - ultraschnelles leichtgewichtiges Modell mit großem Kontextfenster",
-      glm45v:
-        "GLM 4.5v - visionsfähiges multimodales Modell mit großem Kontextfenster",
-      uncensoredLmV11:
-        "Unzensiertes Sprachmodell ohne Inhaltsfilterung - Premium-Modell",
+      glm46: "GLM 4.6 - effizientes 7B-Parameter-Modell mit großem Kontextfenster",
+      glm45Air: "GLM 4.5 AIR - ultraschnelles leichtgewichtiges Modell mit großem Kontextfenster",
+      glm45v: "GLM 4.5v - visionsfähiges multimodales Modell mit großem Kontextfenster",
+      uncensoredLmV11: "Unzensiertes Sprachmodell ohne Inhaltsfilterung - Premium-Modell",
       freedomgptLiberty:
         "FreedomGPT Liberty - Unzensiertes KI-Modell mit Fokus auf freie Meinungsäußerung und kreative Inhalte",
       gabAiArya:
         "Gab AI Arya - Unzensiertes Konversations-KI-Modell mit freier Meinungsäußerung und kreativen Fähigkeiten",
       gpt52Pro:
         "GPT 5.2 Pro - fortgeschrittenes Reasoning-Modell mit erweiterten Fähigkeiten für komplexe Aufgaben",
-      gpt52:
-        "GPT 5.2 - Modell der neuesten Generation mit verbesserter Leistung und Effizienz",
-      gpt52_chat:
-        "GPT 5.2 Chat - Konversationsvariante optimiert für Dialog und Interaktionen",
-      veniceUncensored:
-        "Venice Uncensored - Unzensiertes KI-Modell für uneingeschränkte Gespräche",
+      gpt52: "GPT 5.2 - Modell der neuesten Generation mit verbesserter Leistung und Effizienz",
+      gpt52_chat: "GPT 5.2 Chat - Konversationsvariante optimiert für Dialog und Interaktionen",
+      veniceUncensored: "Venice Uncensored - Unzensiertes KI-Modell für uneingeschränkte Gespräche",
       dolphinLlama3_70B:
         "Dolphin Llama 3 70B - Unzensiertes großes Sprachmodell basierend auf Llama 3",
       dolphin3_0_r1_mistral_24b:
@@ -1153,46 +1118,37 @@ export const translations: typeof enTranslations = {
       requiresHttps: "Spracherkennung erfordert HTTPS oder localhost",
       notAvailable: "Spracherkennung in diesem Browser nicht verfügbar",
       firefoxNotSupported: "Spracherkennung wird in Firefox nicht unterstützt",
-      safariVersionTooOld:
-        "Bitte aktualisieren Sie Safari auf Version 14.5 oder höher",
+      safariVersionTooOld: "Bitte aktualisieren Sie Safari auf Version 14.5 oder höher",
       microphoneNotAvailable: "Mikrofonzugriff nicht verfügbar",
       noSpeech: "Keine Sprache erkannt. Bitte versuchen Sie es erneut.",
-      audioCapture:
-        "Mikrofon nicht verfügbar. Bitte überprüfen Sie Ihre Einstellungen.",
+      audioCapture: "Mikrofon nicht verfügbar. Bitte überprüfen Sie Ihre Einstellungen.",
       notAllowed:
         "Mikrofonberechtigung verweigert. Bitte erlauben Sie den Mikrofonzugriff in Ihren Browsereinstellungen.",
       network: "Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.",
       serviceNotAllowed: "Spracherkennungsdienst nicht erlaubt.",
       badGrammar: "Spracherkennungsfehler. Bitte versuchen Sie es erneut.",
-      languageNotSupported:
-        "Diese Sprache wird für Spracherkennung nicht unterstützt.",
+      languageNotSupported: "Diese Sprache wird für Spracherkennung nicht unterstützt.",
       aborted: "Aufnahme abgebrochen.",
       unknown: "Spracherkennungsfehler: {{errorCode}}",
       apiNotFound: "Spracherkennungs-API nicht gefunden",
-      initializationFailed:
-        "Initialisierung der Spracherkennung fehlgeschlagen",
+      initializationFailed: "Initialisierung der Spracherkennung fehlgeschlagen",
       microphoneAccessDenied: "Mikrofonzugriff verweigert",
       microphonePermissionDenied:
         "Mikrofonberechtigung verweigert. Bitte erlauben Sie den Mikrofonzugriff.",
-      noMicrophoneFound:
-        "Kein Mikrofon gefunden. Bitte schließen Sie ein Mikrofon an.",
-      microphoneInUse:
-        "Mikrofon wird bereits von einer anderen Anwendung verwendet.",
-      startFailed:
-        "Aufnahme konnte nicht gestartet werden. Bitte versuchen Sie es erneut.",
+      noMicrophoneFound: "Kein Mikrofon gefunden. Bitte schließen Sie ein Mikrofon an.",
+      microphoneInUse: "Mikrofon wird bereits von einer anderen Anwendung verwendet.",
+      startFailed: "Aufnahme konnte nicht gestartet werden. Bitte versuchen Sie es erneut.",
     },
   },
   linearMessageView: {
     retryModal: {
       title: "Mit anderen Einstellungen wiederholen",
-      description:
-        "Wählen Sie ein Modell und eine Character, um die Antwort neu zu generieren",
+      description: "Wählen Sie ein Modell und eine Character, um die Antwort neu zu generieren",
       confirmLabel: "Wiederholen",
     },
     answerModal: {
       title: "Als KI-Modell antworten",
-      description:
-        "Wählen Sie ein Modell und eine Character, um eine KI-Antwort zu generieren",
+      description: "Wählen Sie ein Modell und eine Character, um eine KI-Antwort zu generieren",
       confirmLabel: "Generieren",
       inputPlaceholder:
         "Geben Sie eine Eingabeaufforderung für die KI ein (optional - leer lassen, damit die KI ihre eigene Antwort generiert)",
@@ -1201,22 +1157,18 @@ export const translations: typeof enTranslations = {
   debugView: {
     systemPrompt: "System-Prompt",
     systemPromptTitle: "System-Prompt (Generiert)",
-    systemPromptHint:
-      "Dies ist der System-Prompt für den gesamten Konversationsthread",
+    systemPromptHint: "Dies ist der System-Prompt für den gesamten Konversationsthread",
     systemMessage: "Systemnachricht",
-    systemMessageHint:
-      "Dies ist eine in die Konversation eingefügte Systemnachricht",
+    systemMessageHint: "Dies ist eine in die Konversation eingefügte Systemnachricht",
     copied: "Kopiert!",
     retryModal: {
       title: "Mit anderen Einstellungen wiederholen",
-      description:
-        "Wählen Sie ein Modell und eine Character, um die Antwort neu zu generieren",
+      description: "Wählen Sie ein Modell und eine Character, um die Antwort neu zu generieren",
       confirmLabel: "Wiederholen",
     },
     answerModal: {
       title: "Als KI-Modell antworten",
-      description:
-        "Wählen Sie ein Modell und eine Character, um eine KI-Antwort zu generieren",
+      description: "Wählen Sie ein Modell und eine Character, um eine KI-Antwort zu generieren",
       confirmLabel: "Generieren",
       inputPlaceholder:
         "Geben Sie eine Eingabeaufforderung für die KI ein (optional - leer lassen, damit die KI ihre eigene Antwort generiert)",
@@ -1252,8 +1204,7 @@ export const translations: typeof enTranslations = {
       brainstorm: "Ideen sammeln",
       brainstormPrompt: "Hilf mir, Ideen zu sammeln für...",
       writeDocument: "Dokument schreiben",
-      writeDocumentPrompt:
-        "Hilf mir, ein professionelles Dokument zu schreiben über...",
+      writeDocumentPrompt: "Hilf mir, ein professionelles Dokument zu schreiben über...",
       helpWithCode: "Hilfe mit Code",
       helpWithCodePrompt: "Ich brauche Hilfe mit diesem Code...",
       research: "Thema recherchieren",
@@ -1384,8 +1335,7 @@ export const translations: typeof enTranslations = {
     },
     visibility: {
       label: "Wer kann das sehen?",
-      description:
-        "Wählen Sie aus, welche Benutzerrollen diesen Ordner/Thread sehen können",
+      description: "Wählen Sie aus, welche Benutzerrollen diesen Ordner/Thread sehen können",
       public: "Öffentlich (Alle Benutzer)",
       customer: "Nur Kunden",
       admin: "Nur Administratoren",
@@ -1412,14 +1362,12 @@ export const translations: typeof enTranslations = {
     replies: "Antworten",
     retryModal: {
       title: "Mit anderen Einstellungen wiederholen",
-      description:
-        "Wählen Sie ein Modell und eine Character, um die Antwort neu zu generieren",
+      description: "Wählen Sie ein Modell und eine Character, um die Antwort neu zu generieren",
       confirmLabel: "Wiederholen",
     },
     answerModal: {
       title: "Als KI-Modell antworten",
-      description:
-        "Wählen Sie ein Modell und eine Character, um eine KI-Antwort zu generieren",
+      description: "Wählen Sie ein Modell und eine Character, um eine KI-Antwort zu generieren",
       confirmLabel: "Generieren",
       inputPlaceholder:
         "Geben Sie eine Eingabeaufforderung für die KI ein (optional - leer lassen, damit die KI ihre eigene Antwort generiert)",
@@ -1428,8 +1376,7 @@ export const translations: typeof enTranslations = {
       vote: "Abstimmen",
       upvote: "Upvote",
       downvote: "Downvote",
-      respondToAI:
-        "Auf diese KI-Nachricht mit einer anderen KI-Character antworten",
+      respondToAI: "Auf diese KI-Nachricht mit einer anderen KI-Character antworten",
       loadingAudio: "Audio wird geladen...",
       stopAudio: "Audio stoppen",
       playAudio: "Audio abspielen",
@@ -1474,19 +1421,16 @@ export const translations: typeof enTranslations = {
       thu: "Do",
       fri: "Fr",
       sat: "Sa",
-      format:
-        "{{month}}/{{day}}/{{year}}({{dayName}}){{hours}}:{{mins}}:{{secs}}",
+      format: "{{month}}/{{day}}/{{year}}({{dayName}}){{hours}}:{{mins}}:{{secs}}",
     },
     retryModal: {
       title: "Mit anderen Einstellungen wiederholen",
-      description:
-        "Wählen Sie ein Modell und eine Character, um die Antwort neu zu generieren",
+      description: "Wählen Sie ein Modell und eine Character, um die Antwort neu zu generieren",
       confirmLabel: "Wiederholen",
     },
     answerModal: {
       title: "Als KI-Modell antworten",
-      description:
-        "Wählen Sie ein Modell und eine Character, um eine KI-Antwort zu generieren",
+      description: "Wählen Sie ein Modell und eine Character, um eine KI-Antwort zu generieren",
       confirmLabel: "Generieren",
       inputPlaceholder:
         "Geben Sie eine Eingabeaufforderung für die KI ein (optional - leer lassen, damit die KI ihre eigene Antwort generiert)",
@@ -1568,11 +1512,9 @@ export const translations: typeof enTranslations = {
     linkLabel: "Link-Beschriftung (optional)",
     linkLabelPlaceholder: "z.B. Mit Team teilen",
     allowPosting: "Posten erlauben",
-    allowPostingDescription:
-      "Empfänger können antworten und im Thread interagieren",
+    allowPostingDescription: "Empfänger können antworten und im Thread interagieren",
     requireAuth: "Anmeldung erforderlich",
-    requireAuthDescription:
-      "Nur authentifizierte Benutzer können auf diesen Link zugreifen",
+    requireAuthDescription: "Nur authentifizierte Benutzer können auf diesen Link zugreifen",
     viewOnly: "Nur ansehen",
     accessCount: "{{count}} Zugriff",
     accessCount_other: "{{count}} Zugriffe",
@@ -1594,8 +1536,7 @@ export const translations: typeof enTranslations = {
   shared: {
     error: {
       title: "Teilen-Link-Fehler",
-      userError:
-        "Ihre Sitzung konnte nicht verifiziert werden. Bitte versuchen Sie es erneut.",
+      userError: "Ihre Sitzung konnte nicht verifiziert werden. Bitte versuchen Sie es erneut.",
       invalidToken:
         "Dieser Teilen-Link ist ungültig oder wurde widerrufen. Bitte kontaktieren Sie die Person, die diesen Link mit Ihnen geteilt hat.",
     },
@@ -1654,8 +1595,7 @@ export const translations: typeof enTranslations = {
     },
     characterSelectorFavorites: {
       title: "Markiere deine Characters",
-      description:
-        "Speichere deine Lieblings-Gesprächsstile für schnellen Zugriff.",
+      description: "Speichere deine Lieblings-Gesprächsstile für schnellen Zugriff.",
     },
     characterSelectorShowAll: {
       title: "Durchsuche alle Characters",
@@ -1673,8 +1613,7 @@ export const translations: typeof enTranslations = {
     },
     rootFolders: {
       title: "4 Wege zu chatten",
-      description:
-        "Wähle dein Privatsphäre-Level - von völlig anonym bis kollaborativ:",
+      description: "Wähle dein Privatsphäre-Level - von völlig anonym bis kollaborativ:",
       private: {
         name: "Privat",
         suffix: "Dein persönlicher Workspace",
@@ -1745,14 +1684,12 @@ export const translations: typeof enTranslations = {
     },
     chatInput: {
       title: "Nachricht eingeben",
-      description:
-        "Tippe im Textfeld und drücke Enter, um deine Nachricht an die KI zu senden.",
+      description: "Tippe im Textfeld und drücke Enter, um deine Nachricht an die KI zu senden.",
       tip: "Drücke Shift+Enter für eine neue Zeile ohne zu senden.",
     },
     voiceInput: {
       title: "Sprachaufnahme",
-      description:
-        "Klicke auf das Mikrofon, um die Aufnahme zu starten. Wenn fertig, wähle:",
+      description: "Klicke auf das Mikrofon, um die Aufnahme zu starten. Wenn fertig, wähle:",
       options: {
         transcribe: "In Text umwandeln - wandelt Sprache in bearbeitbaren Text",
         sendAudio: "Als Sprache senden - KI hört deine echte Stimme",

@@ -10,8 +10,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   _components: componentsTranslations,
   title: "Kontaktformular-Einreichung",
-  description:
-    "Kontaktformular senden und E-Mail-Benachrichtigungen verarbeiten",
+  description: "Kontaktformular senden und E-Mail-Benachrichtigungen verarbeiten",
   category: "Kern-API",
   summary: "Kontaktformular-Einreichungen mit Lead-Tracking verarbeiten",
   tags: {
@@ -23,8 +22,7 @@ export const translations: typeof enTranslations = {
 
   form: {
     label: "Kontaktformular",
-    description:
-      "Füllen Sie das Formular aus, um mit unserem Team in Kontakt zu treten",
+    description: "Füllen Sie das Formular aus, um mit unserem Team in Kontakt zu treten",
     fields: {
       name: {
         label: "Vollständiger Name",
@@ -49,8 +47,7 @@ export const translations: typeof enTranslations = {
       message: {
         label: "Nachricht",
         description: "Detaillierte Beschreibung Ihrer Anfrage",
-        placeholder:
-          "Bitte geben Sie weitere Details zu Ihren Bedürfnissen an...",
+        placeholder: "Bitte geben Sie weitere Details zu Ihren Bedürfnissen an...",
       },
       priority: {
         label: "Priorität",
@@ -126,12 +123,10 @@ export const translations: typeof enTranslations = {
     repositoryCreateFailed: "Kontaktanfrage konnte nicht erstellt werden",
     repositoryCreateDetails:
       "Ihr Kontaktformular kann derzeit nicht verarbeitet werden. Bitte versuchen Sie es später erneut.",
-    noContactReturned:
-      "Nach der Erstellung wurde kein Kontaktdatensatz zurückgegeben",
+    noContactReturned: "Nach der Erstellung wurde kein Kontaktdatensatz zurückgegeben",
     validation: {
       title: "Validierungsfehler",
-      description:
-        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
       nameMinLength: "Der Name muss mindestens 2 Zeichen lang sein",
       emailInvalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
       subjectRequired: "Betreff ist erforderlich",
@@ -141,8 +136,7 @@ export const translations: typeof enTranslations = {
     },
     network: {
       title: "Netzwerkfehler",
-      description:
-        "Ein Netzwerkfehler ist bei der Verarbeitung Ihrer Anfrage aufgetreten",
+      description: "Ein Netzwerkfehler ist bei der Verarbeitung Ihrer Anfrage aufgetreten",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -170,8 +164,7 @@ export const translations: typeof enTranslations = {
     },
     conflict: {
       title: "Konflikt",
-      description:
-        "Ein Konflikt ist bei der Verarbeitung Ihrer Anfrage aufgetreten",
+      description: "Ein Konflikt ist bei der Verarbeitung Ihrer Anfrage aufgetreten",
     },
   },
 
@@ -179,21 +172,17 @@ export const translations: typeof enTranslations = {
     admin: {
       notification: "Neue Kontaktanfrage: {name} ({email}) - {subject}",
       phone: {
-        missing:
-          "Keine Admin-Telefonnummer für Kontakt-Benachrichtigungen konfiguriert",
+        missing: "Keine Admin-Telefonnummer für Kontakt-Benachrichtigungen konfiguriert",
       },
       send: {
-        start:
-          "Admin-Benachrichtigungs-SMS für Kontakt-Einreichung wird gesendet",
+        start: "Admin-Benachrichtigungs-SMS für Kontakt-Einreichung wird gesendet",
         error: "Fehler beim Senden der Admin-Benachrichtigungs-SMS für Kontakt",
       },
     },
     confirmation: {
-      message:
-        "{name}, vielen Dank für Ihre Nachricht! Wir melden uns bald bei Ihnen.",
+      message: "{name}, vielen Dank für Ihre Nachricht! Wir melden uns bald bei Ihnen.",
       phone: {
-        missing:
-          "Keine Benutzer-Telefonnummer für Kontakt-Bestätigungs-SMS verfügbar",
+        missing: "Keine Benutzer-Telefonnummer für Kontakt-Bestätigungs-SMS verfügbar",
       },
       send: {
         start: "Bestätigungs-SMS an Kontaktformular-Absender wird gesendet",
@@ -226,8 +215,7 @@ export const translations: typeof enTranslations = {
   route: {
     sms: {
       admin: {
-        failed:
-          "Admin-Benachrichtigungs-SMS für Kontakt-Einreichung fehlgeschlagen",
+        failed: "Admin-Benachrichtigungs-SMS für Kontakt-Einreichung fehlgeschlagen",
       },
       confirmation: {
         failed: "Bestätigungs-SMS für Kontakt-Einreichung fehlgeschlagen",
@@ -240,10 +228,8 @@ export const translations: typeof enTranslations = {
       start: "Kontakt-Seeds für Entwicklungsumgebung werden gestartet",
       submission: {
         created: "Kontakt-Einreichung in Entwicklungs-Seeds erstellt",
-        failed:
-          "Fehler beim Erstellen der Kontakt-Einreichung in Entwicklungs-Seeds",
-        error:
-          "Fehler beim Erstellen der Kontakt-Einreichung in Entwicklungs-Seeds",
+        failed: "Fehler beim Erstellen der Kontakt-Einreichung in Entwicklungs-Seeds",
+        error: "Fehler beim Erstellen der Kontakt-Einreichung in Entwicklungs-Seeds",
       },
       complete: "Kontakt-Entwicklungs-Seeds abgeschlossen",
       error: "Fehler beim Seeden der Kontakt-Entwicklungsdaten",
@@ -274,8 +260,7 @@ export const translations: typeof enTranslations = {
       greeting: "Hallo",
       thankYou: "Vielen Dank für Ihre Kontaktaufnahme!",
       message: "Nachricht",
-      additionalInfo:
-        "Wir haben Ihre Anfrage erhalten und werden bald antworten.",
+      additionalInfo: "Wir haben Ihre Anfrage erhalten und werden bald antworten.",
       subject: "Kontaktformular-Einreichung",
     },
     company: {
@@ -290,8 +275,7 @@ export const translations: typeof enTranslations = {
     user_confirmation: {
       title: "Wir haben Ihre Nachricht erhalten!",
       subject: "Vielen Dank für Ihre Kontaktaufnahme mit {{appName}}",
-      previewText:
-        "Wir haben Ihre Nachricht erhalten und werden uns bald bei Ihnen melden.",
+      previewText: "Wir haben Ihre Nachricht erhalten und werden uns bald bei Ihnen melden.",
       greeting: "Hallo {{name}},",
       thankYou: "Vielen Dank, dass Sie sich an {{appName}} gewandt haben!",
       confirmation:
@@ -329,8 +313,7 @@ export const translations: typeof enTranslations = {
       leadId: "Lead-ID",
       status: "Status",
       actionRequired: "Aktion erforderlich",
-      actionInfo:
-        "Bitte prüfen und beantworten Sie diese Anfrage innerhalb von 24 Stunden.",
+      actionInfo: "Bitte prüfen und beantworten Sie diese Anfrage innerhalb von 24 Stunden.",
       viewInAdmin: "Im Admin-Panel anzeigen",
       replyToContact: "Auf Kontakt antworten",
       footer: "Dies ist eine automatische Benachrichtigung von {{appName}}",

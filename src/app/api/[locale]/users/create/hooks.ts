@@ -13,9 +13,7 @@ import definitions from "./definition";
  * Hook for creating users
  * Uses the enhanced useEndpoint library features for clean, minimal code
  */
-export function useUsersCreateEndpoint(
-  logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
+export function useUsersCreateEndpoint(logger: EndpointLogger): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

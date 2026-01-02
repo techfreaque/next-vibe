@@ -45,17 +45,9 @@ export function ChatScreenshotButton({
       onClick={handleClick}
       disabled={isCapturing}
       className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9 disabled:opacity-50 disabled:cursor-not-allowed"
-      title={
-        isCapturing
-          ? t("app.chat.screenshot.capturing")
-          : t("app.chat.screenshot.capture")
-      }
+      title={isCapturing ? t("app.chat.screenshot.capturing") : t("app.chat.screenshot.capture")}
     >
-      {isCapturing ? (
-        <Loader2 className="h-5 w-5 animate-spin" />
-      ) : (
-        <Camera className="h-5 w-5" />
-      )}
+      {isCapturing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
     </Button>
   );
 }

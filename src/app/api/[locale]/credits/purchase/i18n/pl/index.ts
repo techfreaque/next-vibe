@@ -72,8 +72,7 @@ export const translations: typeof enTranslations = {
       },
       noActiveSubscription: {
         title: "Wymagana aktywna subskrypcja",
-        description:
-          "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
+        description: "Musisz mieć aktywną subskrypcję, aby kupić pakiety kredytów",
       },
     },
   },

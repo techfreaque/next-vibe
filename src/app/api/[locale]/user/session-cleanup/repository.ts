@@ -16,10 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import {
-  AUTH_TOKEN_COOKIE_MAX_AGE_DAYS,
-  RESET_TOKEN_EXPIRY,
-} from "@/config/constants";
+import { AUTH_TOKEN_COOKIE_MAX_AGE_DAYS, RESET_TOKEN_EXPIRY } from "@/config/constants";
 
 import { sessions } from "../private/session/db";
 import { passwordResets } from "../public/reset-password/db";
@@ -64,14 +61,10 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
 
       // Calculate cutoff dates
       const sessionCutoffDate = new Date();
-      sessionCutoffDate.setDate(
-        sessionCutoffDate.getDate() - data.sessionRetentionDays,
-      );
+      sessionCutoffDate.setDate(sessionCutoffDate.getDate() - data.sessionRetentionDays);
 
       const tokenCutoffDate = new Date();
-      tokenCutoffDate.setDate(
-        tokenCutoffDate.getDate() - data.tokenRetentionDays,
-      );
+      tokenCutoffDate.setDate(tokenCutoffDate.getDate() - data.tokenRetentionDays);
 
       // Clean up expired sessions
       try {
@@ -201,13 +194,9 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
       await db.execute(sql`SELECT 1`);
 
       // Validate configuration values
-      if (
-        config.sessionRetentionDays < 1 ||
-        config.sessionRetentionDays > 365
-      ) {
+      if (config.sessionRetentionDays < 1 || config.sessionRetentionDays > 365) {
         return fail({
-          message:
-            "app.api.user.session-cleanup.errors.invalid_session_retention.title",
+          message: "app.api.user.session-cleanup.errors.invalid_session_retention.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { sessionRetentionDays: config.sessionRetentionDays },
         });
@@ -215,8 +204,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
 
       if (config.tokenRetentionDays < 1 || config.tokenRetentionDays > 365) {
         return fail({
-          message:
-            "app.api.user.session-cleanup.errors.invalid_token_retention.title",
+          message: "app.api.user.session-cleanup.errors.invalid_token_retention.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { tokenRetentionDays: config.tokenRetentionDays },
         });
@@ -224,8 +212,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
 
       if (config.batchSize < 1 || config.batchSize > 1000) {
         return fail({
-          message:
-            "app.api.user.session-cleanup.errors.invalid_batch_size.title",
+          message: "app.api.user.session-cleanup.errors.invalid_batch_size.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { batchSize: config.batchSize },
         });
@@ -234,10 +221,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
       logger.debug("Session cleanup configuration validation passed");
       return success(true);
     } catch (error) {
-      logger.error(
-        "Session cleanup configuration validation failed",
-        parseError(error),
-      );
+      logger.error("Session cleanup configuration validation failed", parseError(error));
       return fail({
         message: "app.api.user.session-cleanup.errors.validation_failed.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

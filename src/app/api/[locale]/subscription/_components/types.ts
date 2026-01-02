@@ -15,10 +15,7 @@ export interface SubscriptionClientContentProps {
   isAuthenticated: boolean;
 }
 
-export const formatDate = (
-  date: string | Date,
-  locale: CountryLanguage,
-): string => {
+export const formatDate = (date: string | Date, locale: CountryLanguage): string => {
   try {
     const dateObject = new Date(date);
     return formatSimpleDate(dateObject, locale);
@@ -27,10 +24,7 @@ export const formatDate = (
   }
 };
 
-export const formatPrice = (
-  amount: number,
-  locale: CountryLanguage,
-): string => {
+export const formatPrice = (amount: number, locale: CountryLanguage): string => {
   const country = getCountryFromLocale(locale);
   const currency = languageConfig.mappings.currencyByCountry[country];
   return new Intl.NumberFormat(locale, {

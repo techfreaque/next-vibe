@@ -43,8 +43,7 @@ export const textareaVariants = cva(
     variants: {
       variant: {
         default: "border-input",
-        ghost:
-          "border-none bg-transparent rounded-t-md rounded-b-none px-6 pb-4 border-b py-2",
+        ghost: "border-none bg-transparent rounded-t-md rounded-b-none px-6 pb-4 border-b py-2",
       },
     },
     defaultVariants: {

@@ -125,8 +125,7 @@ export const translations = {
       },
       forbidden: {
         title: "Forbidden",
-        description:
-          "Only threads in the Shared folder can be shared via links",
+        description: "Only threads in the Shared folder can be shared via links",
       },
       notFound: {
         title: "Not Found",

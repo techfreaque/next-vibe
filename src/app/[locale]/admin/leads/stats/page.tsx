@@ -19,9 +19,7 @@ interface LeadsStatsPageProps {
   }>;
 }
 
-export async function generateMetadata({
-  params,
-}: LeadsStatsPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: LeadsStatsPageProps): Promise<Metadata> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 

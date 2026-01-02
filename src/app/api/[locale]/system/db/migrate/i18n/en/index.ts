@@ -123,8 +123,7 @@ export const translations = {
       description: "Migration conflict detected",
     },
     generationFailed: "Failed to generate migrations: {{message}}",
-    generationFailedWithCode:
-      "Migration generation failed with code {{code}}: {{output}}",
+    generationFailedWithCode: "Migration generation failed with code {{code}}: {{output}}",
     migrationFailed: "Failed to run migrations: {{message}}",
   },
   success: {

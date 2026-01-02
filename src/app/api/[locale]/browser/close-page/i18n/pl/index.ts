@@ -6,8 +6,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Zamknij stronę",
-  description:
-    "Zamyka stronę według jej indeksu. Ostatnia otwarta strona nie może być zamknięta",
+  description: "Zamyka stronę według jej indeksu. Ostatnia otwarta strona nie może być zamknięta",
 
   form: {
     label: "Zamknij stronę",
@@ -15,8 +14,7 @@ export const translations: typeof enTranslations = {
     fields: {
       pageIdx: {
         label: "Indeks strony",
-        description:
-          "Indeks strony do zamknięcia. Wywołaj list_pages, aby wyświetlić strony",
+        description: "Indeks strony do zamknięcia. Wywołaj list_pages, aby wyświetlić strony",
         placeholder: "Wprowadź indeks strony (np. 0)",
       },
     },

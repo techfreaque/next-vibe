@@ -14,9 +14,7 @@ import definitions from "./definition";
 /**
  * Hook for fetching email statistics
  */
-export function useEmailMessagesStats(
-  logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
+export function useEmailMessagesStats(logger: EndpointLogger): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {
@@ -26,6 +24,4 @@ export function useEmailMessagesStats(
   );
 }
 
-export type EmailMessagesStatsEndpointReturn = EndpointReturn<
-  typeof definitions
->;
+export type EmailMessagesStatsEndpointReturn = EndpointReturn<typeof definitions>;

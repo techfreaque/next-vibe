@@ -19,7 +19,5 @@ export default async function SmtpAdminLayout({
 }: SmtpAdminLayoutProps): Promise<JSX.Element> {
   const { locale } = await params;
 
-  return (
-    <SmtpAdminLayoutClient locale={locale}>{children}</SmtpAdminLayoutClient>
-  );
+  return <SmtpAdminLayoutClient locale={locale}>{children}</SmtpAdminLayoutClient>;
 }

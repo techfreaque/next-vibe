@@ -46,14 +46,12 @@ export const translations: typeof enTranslations = {
       },
       benefit4: {
         title: "Exklusive Angebote",
-        description:
-          "Erhalten Sie spezielle Rabatte und frühen Zugang zu neuen Funktionen.",
+        description: "Erhalten Sie spezielle Rabatte und frühen Zugang zu neuen Funktionen.",
       },
     },
     frequency: {
       title: "E-Mail-Häufigkeit",
-      description:
-        "Wir versenden Newsletter wöchentlich. Sie können sich jederzeit abmelden.",
+      description: "Wir versenden Newsletter wöchentlich. Sie können sich jederzeit abmelden.",
     },
   },
   subscription: {
@@ -71,8 +69,7 @@ export const translations: typeof enTranslations = {
       subtitle: "Verwalten Sie Ihr Newsletter-Abonnement",
       emailProvided: {
         title: "Abmeldung bestätigen",
-        description:
-          "Sind Sie sicher, dass Sie sich von unserem Newsletter abmelden möchten?",
+        description: "Sind Sie sicher, dass Sie sich von unserem Newsletter abmelden möchten?",
       },
       unsubscribeButton: "Abmelden",
       subscribeText: "Haben Sie Ihre Meinung geändert?",
@@ -86,8 +83,7 @@ export const translations: typeof enTranslations = {
         },
         resubscribe: {
           title: "Einfach wieder abonnieren",
-          description:
-            "Sie können jederzeit wieder abonnieren, wenn Sie Ihre Meinung ändern.",
+          description: "Sie können jederzeit wieder abonnieren, wenn Sie Ihre Meinung ändern.",
         },
       },
       alternatives: {

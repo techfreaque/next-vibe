@@ -39,10 +39,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { EmailStatsChart } from "./email-stats-chart";
-import {
-  EmailStatsFilters,
-  EmailStatsFiltersContainer,
-} from "./email-stats-filters";
+import { EmailStatsFilters, EmailStatsFiltersContainer } from "./email-stats-filters";
 
 interface EmailsStatsClientProps {
   locale: CountryLanguage;
@@ -58,21 +55,14 @@ function formatNumber(value: number): string {
   return new Intl.NumberFormat("en-US").format(value);
 }
 
-export function EmailsStatsClient({
-  locale,
-}: EmailsStatsClientProps): JSX.Element {
+export function EmailsStatsClient({ locale }: EmailsStatsClientProps): JSX.Element {
   const { t } = simpleT(locale);
 
   // Create logger and endpoint
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
   const endpoint = useEmailMessagesStats(logger);
 
-  const stats = endpoint.read.response as
-    | EmailStatsGetResponseTypeOutput
-    | undefined;
+  const stats = endpoint.read.response as EmailStatsGetResponseTypeOutput | undefined;
   const isLoading = endpoint.read.isLoading;
   const form = endpoint.read.form;
   const alert = endpoint.alert;
@@ -159,9 +149,7 @@ export function EmailsStatsClient({
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Div className="text-2xl font-bold">
-              {formatNumber(stats?.totalEmails || 0)}
-            </Div>
+            <Div className="text-2xl font-bold">{formatNumber(stats?.totalEmails || 0)}</Div>
             <P className="text-xs text-muted-foreground">
               {formatNumber(stats?.sentEmails || 0)}{" "}
               {t("app.admin.emails.stats.admin.stats.metrics.sent")}
@@ -178,9 +166,7 @@ export function EmailsStatsClient({
             <Send className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Div className="text-2xl font-bold">
-              {formatNumber(stats?.deliveredEmails || 0)}
-            </Div>
+            <Div className="text-2xl font-bold">{formatNumber(stats?.deliveredEmails || 0)}</Div>
             <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.deliveryRate || 0)}{" "}
               {t("app.admin.emails.stats.admin.stats.metrics.deliveryRate")}
@@ -197,9 +183,7 @@ export function EmailsStatsClient({
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Div className="text-2xl font-bold">
-              {formatNumber(stats?.openedEmails || 0)}
-            </Div>
+            <Div className="text-2xl font-bold">{formatNumber(stats?.openedEmails || 0)}</Div>
             <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.openRate || 0)}{" "}
               {t("app.admin.emails.stats.admin.stats.openRate")}
@@ -216,9 +200,7 @@ export function EmailsStatsClient({
             <MousePointer className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Div className="text-2xl font-bold">
-              {formatNumber(stats?.clickedEmails || 0)}
-            </Div>
+            <Div className="text-2xl font-bold">{formatNumber(stats?.clickedEmails || 0)}</Div>
             <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.clickRate || 0)}{" "}
               {t("app.admin.emails.stats.admin.stats.clickRate")}
@@ -235,9 +217,7 @@ export function EmailsStatsClient({
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Div className="text-2xl font-bold">
-              {formatNumber(stats?.bouncedEmails || 0)}
-            </Div>
+            <Div className="text-2xl font-bold">{formatNumber(stats?.bouncedEmails || 0)}</Div>
             <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.bounceRate || 0)}{" "}
               {t("app.admin.emails.stats.admin.stats.bounceRate")}
@@ -254,9 +234,7 @@ export function EmailsStatsClient({
             <UserX className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Div className="text-2xl font-bold">
-              {formatNumber(stats?.failedEmails || 0)}
-            </Div>
+            <Div className="text-2xl font-bold">{formatNumber(stats?.failedEmails || 0)}</Div>
             <P className="text-xs text-muted-foreground">
               {formatPercentage(stats?.failureRate || 0)}{" "}
               {t("app.admin.emails.stats.admin.stats.failureRate")}
@@ -273,9 +251,7 @@ export function EmailsStatsClient({
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Div className="text-2xl font-bold">
-              {formatNumber(stats?.draftEmails || 0)}
-            </Div>
+            <Div className="text-2xl font-bold">{formatNumber(stats?.draftEmails || 0)}</Div>
             <P className="text-xs text-muted-foreground">
               {t("app.admin.emails.stats.admin.stats.pendingToSend")}
             </P>
@@ -294,14 +270,10 @@ export function EmailsStatsClient({
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Div className="text-2xl font-bold">
-              {formatNumber(stats?.emailsWithUserId || 0)}
-            </Div>
+            <Div className="text-2xl font-bold">{formatNumber(stats?.emailsWithUserId || 0)}</Div>
             <P className="text-xs text-muted-foreground">
               {formatNumber(stats?.emailsWithoutUserId || 0)}{" "}
-              {t(
-                "app.admin.emails.stats.admin.stats.metrics.emailsWithoutUserId",
-              )}
+              {t("app.admin.emails.stats.admin.stats.metrics.emailsWithoutUserId")}
             </P>
           </CardContent>
         </Card>
@@ -315,14 +287,10 @@ export function EmailsStatsClient({
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Div className="text-2xl font-bold">
-              {formatNumber(stats?.emailsWithLeadId || 0)}
-            </Div>
+            <Div className="text-2xl font-bold">{formatNumber(stats?.emailsWithLeadId || 0)}</Div>
             <P className="text-xs text-muted-foreground">
               {formatNumber(stats?.emailsWithoutLeadId || 0)}{" "}
-              {t(
-                "app.admin.emails.stats.admin.stats.metrics.emailsWithoutLeadId",
-              )}
+              {t("app.admin.emails.stats.admin.stats.metrics.emailsWithoutLeadId")}
             </P>
           </CardContent>
         </Card>
@@ -336,14 +304,10 @@ export function EmailsStatsClient({
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Div className="text-2xl font-bold">
-              {formatNumber(stats?.emailsWithErrors || 0)}
-            </Div>
+            <Div className="text-2xl font-bold">{formatNumber(stats?.emailsWithErrors || 0)}</Div>
             <P className="text-xs text-muted-foreground">
               {formatNumber(stats?.emailsWithoutErrors || 0)}{" "}
-              {t(
-                "app.admin.emails.stats.admin.stats.metrics.emailsWithoutErrors",
-              )}
+              {t("app.admin.emails.stats.admin.stats.metrics.emailsWithoutErrors")}
             </P>
           </CardContent>
         </Card>
@@ -352,16 +316,12 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t(
-                "app.admin.emails.stats.admin.stats.metrics.averageRetryCount",
-              )}
+              {t("app.admin.emails.stats.admin.stats.metrics.averageRetryCount")}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Div className="text-2xl font-bold">
-              {(stats?.averageRetryCount || 0).toFixed(1)}
-            </Div>
+            <Div className="text-2xl font-bold">{(stats?.averageRetryCount || 0).toFixed(1)}</Div>
             <P className="text-xs text-muted-foreground">
               {t("app.admin.emails.stats.admin.stats.metrics.maxRetryCount")}:{" "}
               {stats?.maxRetryCount || 0}
@@ -376,9 +336,7 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t(
-                "app.admin.emails.stats.admin.stats.metrics.averageProcessingTime",
-              )}
+              {t("app.admin.emails.stats.admin.stats.metrics.averageProcessingTime")}
             </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -387,9 +345,7 @@ export function EmailsStatsClient({
               {(stats?.averageProcessingTime || 0).toFixed(2)}ms
             </Div>
             <P className="text-xs text-muted-foreground">
-              {t(
-                "app.admin.emails.stats.admin.stats.metrics.processingTimeDescription",
-              )}
+              {t("app.admin.emails.stats.admin.stats.metrics.processingTimeDescription")}
             </P>
           </CardContent>
         </Card>
@@ -398,9 +354,7 @@ export function EmailsStatsClient({
         <Card>
           <CardHeader className="items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t(
-                "app.admin.emails.stats.admin.stats.metrics.averageDeliveryTime",
-              )}
+              {t("app.admin.emails.stats.admin.stats.metrics.averageDeliveryTime")}
             </CardTitle>
             <Send className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -409,9 +363,7 @@ export function EmailsStatsClient({
               {(stats?.averageDeliveryTime || 0).toFixed(2)}ms
             </Div>
             <P className="text-xs text-muted-foreground">
-              {t(
-                "app.admin.emails.stats.admin.stats.metrics.deliveryTimeDescription",
-              )}
+              {t("app.admin.emails.stats.admin.stats.metrics.deliveryTimeDescription")}
             </P>
           </CardContent>
         </Card>
@@ -460,9 +412,7 @@ export function EmailsStatsClient({
                 <Div className="flex flex-col gap-3">
                   <Div className="flex items-center justify-between">
                     <Span className="text-sm font-medium">
-                      {t(
-                        "app.admin.emails.stats.admin.stats.performance.deliveryRate",
-                      )}
+                      {t("app.admin.emails.stats.admin.stats.performance.deliveryRate")}
                     </Span>
                     <Span className="text-sm text-muted-foreground">
                       {formatPercentage(stats?.deliveryRate || 0)}
@@ -470,9 +420,7 @@ export function EmailsStatsClient({
                   </Div>
                   <Div className="flex items-center justify-between">
                     <Span className="text-sm font-medium">
-                      {t(
-                        "app.admin.emails.stats.admin.stats.performance.openRate",
-                      )}
+                      {t("app.admin.emails.stats.admin.stats.performance.openRate")}
                     </Span>
                     <Span className="text-sm text-muted-foreground">
                       {formatPercentage(stats?.openRate || 0)}
@@ -480,9 +428,7 @@ export function EmailsStatsClient({
                   </Div>
                   <Div className="flex items-center justify-between">
                     <Span className="text-sm font-medium">
-                      {t(
-                        "app.admin.emails.stats.admin.stats.performance.clickRate",
-                      )}
+                      {t("app.admin.emails.stats.admin.stats.performance.clickRate")}
                     </Span>
                     <Span className="text-sm text-muted-foreground">
                       {formatPercentage(stats?.clickRate || 0)}
@@ -490,9 +436,7 @@ export function EmailsStatsClient({
                   </Div>
                   <Div className="flex items-center justify-between">
                     <Span className="text-sm font-medium">
-                      {t(
-                        "app.admin.emails.stats.admin.stats.performance.bounceRate",
-                      )}
+                      {t("app.admin.emails.stats.admin.stats.performance.bounceRate")}
                     </Span>
                     <Span className="text-sm text-muted-foreground">
                       {formatPercentage(stats?.bounceRate || 0)}
@@ -507,9 +451,7 @@ export function EmailsStatsClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  {t(
-                    "app.admin.emails.stats.admin.stats.topPerformingTemplates",
-                  )}
+                  {t("app.admin.emails.stats.admin.stats.topPerformingTemplates")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -529,9 +471,7 @@ export function EmailsStatsClient({
                       ) => (
                         <Div key={index} className="flex flex-col gap-2">
                           <Div className="flex items-center justify-between">
-                            <Span className="text-sm font-medium">
-                              {template.templateName}
-                            </Span>
+                            <Span className="text-sm font-medium">{template.templateName}</Span>
                             <Badge variant="secondary">
                               {formatNumber(template.emailsSent)}{" "}
                               {t("app.admin.emails.stats.admin.stats.sent")}
@@ -539,20 +479,15 @@ export function EmailsStatsClient({
                           </Div>
                           <Div className="flex items-center justify-between text-xs text-muted-foreground">
                             <Span>
-                              {t("app.admin.emails.stats.admin.stats.openRate")}
-                              : {formatPercentage(template.openRate)}
+                              {t("app.admin.emails.stats.admin.stats.openRate")}:{" "}
+                              {formatPercentage(template.openRate)}
                             </Span>
                             <Span>
-                              {t(
-                                "app.admin.emails.stats.admin.stats.clickRate",
-                              )}
-                              : {formatPercentage(template.clickRate)}
+                              {t("app.admin.emails.stats.admin.stats.clickRate")}:{" "}
+                              {formatPercentage(template.clickRate)}
                             </Span>
                           </Div>
-                          <Progress
-                            value={template.openRate * 100}
-                            className="h-1"
-                          />
+                          <Progress value={template.openRate * 100} className="h-1" />
                         </Div>
                       ),
                     )
@@ -582,73 +517,50 @@ export function EmailsStatsClient({
                   {stats?.emailsByStatus &&
                   typeof stats.emailsByStatus === "object" &&
                   Object.keys(stats.emailsByStatus).length > 0 ? (
-                    Object.entries(stats.emailsByStatus).map(
-                      ([status, count], index) => (
-                        <Div key={index} className="flex flex-col gap-2">
-                          <Div className="flex items-center justify-between">
-                            <Span className="text-sm font-medium capitalize">
-                              {((): string => {
-                                const statusKey = status.toLowerCase();
-                                const statusTranslations = {
-                                  sent: t(
-                                    "app.admin.emails.stats.admin.stats.statuses.sent",
-                                  ),
-                                  delivered: t(
-                                    "app.admin.emails.stats.admin.stats.statuses.delivered",
-                                  ),
-                                  opened: t(
-                                    "app.admin.emails.stats.admin.stats.statuses.opened",
-                                  ),
-                                  clicked: t(
-                                    "app.admin.emails.stats.admin.stats.statuses.clicked",
-                                  ),
-                                  bounced: t(
-                                    "app.admin.emails.stats.admin.stats.statuses.bounced",
-                                  ),
-                                  failed: t(
-                                    "app.admin.emails.stats.admin.stats.statuses.failed",
-                                  ),
-                                  queued: t(
-                                    "app.admin.emails.stats.admin.stats.statuses.queued",
-                                  ),
-                                  processing: t(
-                                    "app.admin.emails.stats.admin.stats.statuses.processing",
-                                  ),
-                                  scheduled: t(
-                                    "app.admin.emails.stats.admin.stats.statuses.scheduled",
-                                  ),
-                                  pending: t(
-                                    "app.admin.emails.stats.admin.stats.statuses.pending",
-                                  ),
-                                  unsubscribed: t(
-                                    "app.admin.emails.stats.admin.stats.statuses.unsubscribed",
-                                  ),
-                                  draft: t(
-                                    "app.admin.emails.stats.admin.stats.statuses.draft",
-                                  ),
-                                };
-                                return (
-                                  statusTranslations[
-                                    statusKey as keyof typeof statusTranslations
-                                  ] || status
-                                );
-                              })()}
-                            </Span>
-                            <Span className="text-sm text-muted-foreground">
-                              {formatNumber(count)}
-                            </Span>
-                          </Div>
-                          <Progress
-                            value={
-                              stats.totalEmails
-                                ? (count / stats.totalEmails) * 100
-                                : 0
-                            }
-                            className="h-2"
-                          />
+                    Object.entries(stats.emailsByStatus).map(([status, count], index) => (
+                      <Div key={index} className="flex flex-col gap-2">
+                        <Div className="flex items-center justify-between">
+                          <Span className="text-sm font-medium capitalize">
+                            {((): string => {
+                              const statusKey = status.toLowerCase();
+                              const statusTranslations = {
+                                sent: t("app.admin.emails.stats.admin.stats.statuses.sent"),
+                                delivered: t(
+                                  "app.admin.emails.stats.admin.stats.statuses.delivered",
+                                ),
+                                opened: t("app.admin.emails.stats.admin.stats.statuses.opened"),
+                                clicked: t("app.admin.emails.stats.admin.stats.statuses.clicked"),
+                                bounced: t("app.admin.emails.stats.admin.stats.statuses.bounced"),
+                                failed: t("app.admin.emails.stats.admin.stats.statuses.failed"),
+                                queued: t("app.admin.emails.stats.admin.stats.statuses.queued"),
+                                processing: t(
+                                  "app.admin.emails.stats.admin.stats.statuses.processing",
+                                ),
+                                scheduled: t(
+                                  "app.admin.emails.stats.admin.stats.statuses.scheduled",
+                                ),
+                                pending: t("app.admin.emails.stats.admin.stats.statuses.pending"),
+                                unsubscribed: t(
+                                  "app.admin.emails.stats.admin.stats.statuses.unsubscribed",
+                                ),
+                                draft: t("app.admin.emails.stats.admin.stats.statuses.draft"),
+                              };
+                              return (
+                                statusTranslations[statusKey as keyof typeof statusTranslations] ||
+                                status
+                              );
+                            })()}
+                          </Span>
+                          <Span className="text-sm text-muted-foreground">
+                            {formatNumber(count)}
+                          </Span>
                         </Div>
-                      ),
-                    )
+                        <Progress
+                          value={stats.totalEmails ? (count / stats.totalEmails) * 100 : 0}
+                          className="h-2"
+                        />
+                      </Div>
+                    ))
                   ) : (
                     <P className="text-sm text-muted-foreground">
                       {t("app.admin.emails.stats.admin.stats.noStatusData")}
@@ -671,55 +583,43 @@ export function EmailsStatsClient({
                   {stats?.emailsByType &&
                   typeof stats.emailsByType === "object" &&
                   Object.keys(stats.emailsByType).length > 0 ? (
-                    Object.entries(stats.emailsByType).map(
-                      ([type, count], index) => (
-                        <Div key={index} className="flex flex-col gap-2">
-                          <Div className="flex items-center justify-between">
-                            <Span className="text-sm font-medium capitalize">
-                              {((): string => {
-                                const typeKey = type.toLowerCase();
-                                const typeTranslations = {
-                                  transactional: t(
-                                    "app.admin.emails.stats.admin.stats.types.transactional",
-                                  ),
-                                  marketing: t(
-                                    "app.admin.emails.stats.admin.stats.types.marketing",
-                                  ),
-                                  notification: t(
-                                    "app.admin.emails.stats.admin.stats.types.notification",
-                                  ),
-                                  system: t(
-                                    "app.admin.emails.stats.admin.stats.types.system",
-                                  ),
-                                  lead_campaign: t(
-                                    "app.admin.emails.stats.admin.stats.types.lead_campaign",
-                                  ),
-                                  user_communication: t(
-                                    "app.admin.emails.stats.admin.stats.types.user_communication",
-                                  ),
-                                };
-                                return (
-                                  typeTranslations[
-                                    typeKey as keyof typeof typeTranslations
-                                  ] || type
-                                );
-                              })()}
-                            </Span>
-                            <Span className="text-sm text-muted-foreground">
-                              {formatNumber(count)}
-                            </Span>
-                          </Div>
-                          <Progress
-                            value={
-                              stats.totalEmails
-                                ? (count / stats.totalEmails) * 100
-                                : 0
-                            }
-                            className="h-2"
-                          />
+                    Object.entries(stats.emailsByType).map(([type, count], index) => (
+                      <Div key={index} className="flex flex-col gap-2">
+                        <Div className="flex items-center justify-between">
+                          <Span className="text-sm font-medium capitalize">
+                            {((): string => {
+                              const typeKey = type.toLowerCase();
+                              const typeTranslations = {
+                                transactional: t(
+                                  "app.admin.emails.stats.admin.stats.types.transactional",
+                                ),
+                                marketing: t("app.admin.emails.stats.admin.stats.types.marketing"),
+                                notification: t(
+                                  "app.admin.emails.stats.admin.stats.types.notification",
+                                ),
+                                system: t("app.admin.emails.stats.admin.stats.types.system"),
+                                lead_campaign: t(
+                                  "app.admin.emails.stats.admin.stats.types.lead_campaign",
+                                ),
+                                user_communication: t(
+                                  "app.admin.emails.stats.admin.stats.types.user_communication",
+                                ),
+                              };
+                              return (
+                                typeTranslations[typeKey as keyof typeof typeTranslations] || type
+                              );
+                            })()}
+                          </Span>
+                          <Span className="text-sm text-muted-foreground">
+                            {formatNumber(count)}
+                          </Span>
                         </Div>
-                      ),
-                    )
+                        <Progress
+                          value={stats.totalEmails ? (count / stats.totalEmails) * 100 : 0}
+                          className="h-2"
+                        />
+                      </Div>
+                    ))
                   ) : (
                     <P className="text-sm text-muted-foreground">
                       {t("app.admin.emails.stats.admin.stats.noTypeData")}
@@ -770,8 +670,8 @@ export function EmailsStatsClient({
                           </Div>
                           <Div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
                             <Span>
-                              {t("app.admin.emails.stats.admin.stats.delivery")}
-                              : {formatPercentage(provider.deliveryRate)}
+                              {t("app.admin.emails.stats.admin.stats.delivery")}:{" "}
+                              {formatPercentage(provider.deliveryRate)}
                             </Span>
                             <Span>
                               {t("app.admin.emails.stats.admin.stats.open")}:{" "}
@@ -782,10 +682,7 @@ export function EmailsStatsClient({
                               {formatPercentage(provider.clickRate)}
                             </Span>
                           </Div>
-                          <Progress
-                            value={provider.reliability * 100}
-                            className="h-1"
-                          />
+                          <Progress value={provider.reliability * 100} className="h-1" />
                         </Div>
                       ),
                     )
@@ -821,17 +718,12 @@ export function EmailsStatsClient({
                         },
                         index: number,
                       ) => (
-                        <Div
-                          key={index}
-                          className="flex items-center justify-between"
-                        >
+                        <Div key={index} className="flex items-center justify-between">
                           <Div className="flex flex-col gap-1">
                             <P className="text-sm font-medium">
                               {(activity.details?.subject as string) ||
                                 activity.templateName ||
-                                t(
-                                  "app.admin.emails.stats.admin.stats.noSubject",
-                                )}
+                                t("app.admin.emails.stats.admin.stats.noSubject")}
                             </P>
                             <P className="text-xs text-muted-foreground">
                               {activity.recipientEmail} • {activity.type}
@@ -855,9 +747,7 @@ export function EmailsStatsClient({
                                 lead_updated: t(
                                   "app.admin.emails.stats.admin.stats.statuses.pending",
                                 ),
-                                email_sent: t(
-                                  "app.admin.emails.stats.admin.stats.statuses.sent",
-                                ),
+                                email_sent: t("app.admin.emails.stats.admin.stats.statuses.sent"),
                                 email_opened: t(
                                   "app.admin.emails.stats.admin.stats.statuses.opened",
                                 ),

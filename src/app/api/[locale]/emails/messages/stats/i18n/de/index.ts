@@ -185,8 +185,7 @@ export const translations: typeof enTranslations = {
     errors: {
       unauthorized: {
         title: "Nicht Autorisiert",
-        description:
-          "Authentifizierung erforderlich für Zugriff auf E-Mail-Statistiken",
+        description: "Authentifizierung erforderlich für Zugriff auf E-Mail-Statistiken",
       },
       validation: {
         title: "Validierungsfehler",
@@ -214,8 +213,7 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Ungespeicherte Änderungen",
-        description:
-          "Es gibt ungespeicherte Änderungen, die zuerst gespeichert werden müssen",
+        description: "Es gibt ungespeicherte Änderungen, die zuerst gespeichert werden müssen",
       },
       conflict: {
         title: "Konflikt",

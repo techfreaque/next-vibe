@@ -14,9 +14,7 @@ import definitions from "./definition";
 /**
  * Hook for import job operations (update and delete)
  */
-export function useImapJobEndpoint(
-  logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
+export function useImapJobEndpoint(logger: EndpointLogger): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

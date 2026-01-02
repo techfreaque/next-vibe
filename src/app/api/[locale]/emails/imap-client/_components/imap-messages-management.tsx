@@ -51,14 +51,11 @@ export function ImapMessagesManagement(): JSX.Element {
 
   // Get accounts data for the dropdown
   const accountsResponse = accountsEndpoint.read.response;
-  const accounts = accountsResponse?.success
-    ? accountsResponse.data.accounts
-    : [];
+  const accounts = accountsResponse?.success ? accountsResponse.data.accounts : [];
 
   // Get current form values for pagination display
   const currentPage: number = messagesEndpoint.read.form.getValues("page") || 1;
-  const currentLimit: number =
-    messagesEndpoint.read.form.getValues("limit") || 20;
+  const currentLimit: number = messagesEndpoint.read.form.getValues("limit") || 20;
 
   const handleClearFilters = (): void => {
     messagesEndpoint.read.form.reset({
@@ -93,12 +90,7 @@ export function ImapMessagesManagement(): JSX.Element {
                 <Span>{t("app.admin.emails.imap.admin.messages.filters")}</Span>
               </CardTitle>
               <Div className="flex items-center flex flex-row gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleClearFilters}
-                >
+                <Button type="button" variant="outline" size="sm" onClick={handleClearFilters}>
                   {t("app.admin.emails.imap.common.clearFilters")}
                 </Button>
                 <Button
@@ -134,8 +126,7 @@ export function ImapMessagesManagement(): JSX.Element {
                       },
                       ...accounts.map((account) => ({
                         value: account.id,
-                        label:
-                          "app.admin.emails.imap.common.accountEmail" as const,
+                        label: "app.admin.emails.imap.common.accountEmail" as const,
                         labelParams: { email: account.email },
                       })),
                     ],
@@ -260,14 +251,10 @@ export function ImapMessagesManagement(): JSX.Element {
                 <Div className="flex items-center justify-between">
                   <Div className="text-sm text-muted-foreground">
                     {t("app.admin.emails.imap.common.showing")}{" "}
-                    {(currentPage - 1) * currentLimit + 1}{" "}
-                    {t("app.admin.emails.imap.common.to")}{" "}
+                    {(currentPage - 1) * currentLimit + 1} {t("app.admin.emails.imap.common.to")}{" "}
                     {Math.min(currentPage * currentLimit, totalMessages)}{" "}
-                    {t("app.admin.emails.imap.common.of")}{" "}
-                    {totalMessages.toLocaleString()}{" "}
-                    {t(
-                      "app.admin.emails.imap.admin.messages.title",
-                    ).toLowerCase()}
+                    {t("app.admin.emails.imap.common.of")} {totalMessages.toLocaleString()}{" "}
+                    {t("app.admin.emails.imap.admin.messages.title").toLowerCase()}
                   </Div>
                   <Div className="flex items-center flex-row gap-2">
                     <Button
@@ -275,10 +262,7 @@ export function ImapMessagesManagement(): JSX.Element {
                       size="sm"
                       disabled={currentPage <= 1 || queryLoading}
                       onClick={() => {
-                        messagesEndpoint.read.form.setValue(
-                          "page",
-                          currentPage - 1,
-                        );
+                        messagesEndpoint.read.form.setValue("page", currentPage - 1);
                       }}
                     >
                       {t("app.admin.emails.imap.common.previous")}
@@ -291,10 +275,7 @@ export function ImapMessagesManagement(): JSX.Element {
                       size="sm"
                       disabled={currentPage >= totalPages || queryLoading}
                       onClick={() => {
-                        messagesEndpoint.read.form.setValue(
-                          "page",
-                          currentPage + 1,
-                        );
+                        messagesEndpoint.read.form.setValue("page", currentPage + 1);
                       }}
                     >
                       {t("app.admin.emails.imap.common.next")}
@@ -309,25 +290,19 @@ export function ImapMessagesManagement(): JSX.Element {
         {/* Message Statistics */}
         <Card>
           <CardHeader>
-            <CardTitle>
-              {t("app.admin.emails.imap.admin.messages.statistics")}
-            </CardTitle>
+            <CardTitle>{t("app.admin.emails.imap.admin.messages.statistics")}</CardTitle>
           </CardHeader>
           <CardContent>
             <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Div className="text-center">
-                <Div className="text-2xl font-bold">
-                  {totalMessages.toLocaleString()}
-                </Div>
+                <Div className="text-2xl font-bold">{totalMessages.toLocaleString()}</Div>
                 <Div className="text-sm text-gray-600">
                   {t("app.admin.emails.imap.dashboard.totalMessages")}
                 </Div>
               </Div>
               <Div className="text-center">
                 <Div className="text-2xl font-bold text-blue-600">
-                  {messages
-                    .filter((msg) => !msg.isRead)
-                    .length.toLocaleString()}
+                  {messages.filter((msg) => !msg.isRead).length.toLocaleString()}
                 </Div>
                 <Div className="text-sm text-gray-600">
                   {t("app.admin.emails.imap.messages.unread")}
@@ -335,9 +310,7 @@ export function ImapMessagesManagement(): JSX.Element {
               </Div>
               <Div className="text-center">
                 <Div className="text-2xl font-bold text-yellow-600">
-                  {messages
-                    .filter((msg) => msg.isFlagged)
-                    .length.toLocaleString()}
+                  {messages.filter((msg) => msg.isFlagged).length.toLocaleString()}
                 </Div>
                 <Div className="text-sm text-gray-600">
                   {t("app.admin.emails.imap.messages.flagged")}
@@ -345,9 +318,7 @@ export function ImapMessagesManagement(): JSX.Element {
               </Div>
               <Div className="text-center">
                 <Div className="text-2xl font-bold text-green-600">
-                  {messages
-                    .filter((msg) => msg.hasAttachments)
-                    .length.toLocaleString()}
+                  {messages.filter((msg) => msg.hasAttachments).length.toLocaleString()}
                 </Div>
                 <Div className="text-sm text-gray-600">
                   {t("app.admin.emails.imap.messages.withAttachments")}

@@ -33,9 +33,7 @@ export function extractTabsData(value: WidgetData): ProcessedTabs | null {
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
     const tabs = "tabs" in value && Array.isArray(value.tabs) ? value.tabs : [];
     const activeTab =
-      "activeTab" in value && typeof value.activeTab === "string"
-        ? value.activeTab
-        : undefined;
+      "activeTab" in value && typeof value.activeTab === "string" ? value.activeTab : undefined;
     const variant =
       "variant" in value && typeof value.variant === "string"
         ? (value.variant as "default" | "pills" | "underline")
@@ -48,10 +46,7 @@ export function extractTabsData(value: WidgetData): ProcessedTabs | null {
         id: "id" in t && typeof t.id === "string" ? t.id : "",
         label: "label" in t && typeof t.label === "string" ? t.label : "",
         content: "content" in t ? t.content : null,
-        disabled:
-          "disabled" in t && typeof t.disabled === "boolean"
-            ? t.disabled
-            : false,
+        disabled: "disabled" in t && typeof t.disabled === "boolean" ? t.disabled : false,
       }))
       .filter((t) => t.id && t.label);
 
@@ -74,7 +69,5 @@ export function extractTabsData(value: WidgetData): ProcessedTabs | null {
  * Get active tab from tabs
  */
 export function getActiveTab(data: ProcessedTabs): TabItem | null {
-  return (
-    data.tabs.find((tab) => tab.id === data.activeTab) || data.tabs[0] || null
-  );
+  return data.tabs.find((tab) => tab.id === data.activeTab) || data.tabs[0] || null;
 }

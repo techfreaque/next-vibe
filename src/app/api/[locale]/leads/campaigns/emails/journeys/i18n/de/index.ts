@@ -13,8 +13,7 @@ export const translations: typeof enTranslations = {
       journeyInfo: {
         personalApproach: {
           name: "Persönlicher Ansatz",
-          description:
-            "Echte Verbindungen durch personalisierte Nachrichten aufbauen",
+          description: "Echte Verbindungen durch personalisierte Nachrichten aufbauen",
         },
         resultsFocused: {
           name: "Ergebnisorientiert",
@@ -22,8 +21,7 @@ export const translations: typeof enTranslations = {
         },
         personalResults: {
           name: "Persönlich + Ergebnisse",
-          description:
-            "Persönliche Note mit ergebnisorientierten Nachrichten kombinieren",
+          description: "Persönliche Note mit ergebnisorientierten Nachrichten kombinieren",
         },
       },
     },
@@ -40,8 +38,7 @@ export const translations: typeof enTranslations = {
               "Was mich an Ihrem Unternehmen fasziniert hat, ist das Potenzial für Wachstum und Wirkung, das ich sehe.",
             practicalTransition:
               "Aber lassen Sie mich praktisch sein - Sie fragen sich wahrscheinlich, was das tatsächlich für Sie bedeutet.",
-            plansBridge:
-              "Hier ist, was ich mir in Bezug auf konkrete nächste Schritte vorstelle:",
+            plansBridge: "Hier ist, was ich mir in Bezug auf konkrete nächste Schritte vorstelle:",
             ctaText: "Lassen Sie uns über Ihre Ziele sprechen",
             signature: "Ich freue mich auf den Austausch,",
             signatureClosing: "Mit freundlichen Grüßen",
@@ -117,8 +114,7 @@ export const translations: typeof enTranslations = {
               "Also hier ist mein praktisches Angebot: Wenn Sie jemals ein druckloses Gespräch über Ihre Geschäftsziele führen möchten, bin ich hier.",
             noHighPressure:
               "Kein Verkaufsgespräch. Kein harter Verkauf. Nur ein echtes Gespräch darüber, wohin Sie Ihr Unternehmen führen möchten und ob wir helfen können.",
-            finalCTA:
-              "Die Tür steht offen, wann immer Sie bereit sind, hindurchzugehen.",
+            finalCTA: "Die Tür steht offen, wann immer Sie bereit sind, hindurchzugehen.",
             ctaText: "Lassen Sie uns dieses Gespräch führen",
             signature: "Ich wünsche Ihnen alles Gute,",
             postScript:
@@ -187,8 +183,7 @@ export const translations: typeof enTranslations = {
             previewText: "Nachfrage zu Ihrer Erfahrung",
             greeting: "Hallo {{businessName}},",
             intro: "Ich wollte nachfragen, wie es läuft.",
-            empathy:
-              "Ich weiß, dass der Einstieg in etwas Neues herausfordernd sein kann.",
+            empathy: "Ich weiß, dass der Einstieg in etwas Neues herausfordernd sein kann.",
             question: "Wie war Ihre Erfahrung bisher?",
             socialProof: {
               quote:
@@ -202,8 +197,7 @@ export const translations: typeof enTranslations = {
             subject: "Unsere Geschichte und Mission",
             previewText: "Warum wir tun, was wir tun",
             greeting: "Hallo {{businessName}},",
-            intro:
-              "Ich wollte ein wenig darüber erzählen, warum wir tun, was wir tun.",
+            intro: "Ich wollte ein wenig darüber erzählen, warum wir tun, was wir tun.",
             mission:
               "Unsere Mission ist es, professionelle Dienstleistungen für alle zugänglich zu machen.",
             story1:
@@ -222,19 +216,16 @@ export const translations: typeof enTranslations = {
               "Dies ist meine letzte Nachricht, es sei denn, Sie möchten weiterhin von uns hören.",
             reflection:
               "Ich habe mich gemeldet, weil ich wirklich glaube, dass wir Ihrem Unternehmen helfen könnten.",
-            noPressure:
-              "Aber ich respektiere Ihre Zeit und möchte nicht lästig sein.",
+            noPressure: "Aber ich respektiere Ihre Zeit und möchte nicht lästig sein.",
             ctaText: "In Verbindung bleiben",
             signature: "Alles Gute,",
-            closing:
-              "Die Tür steht immer offen, falls Sie später Ihre Meinung ändern.",
+            closing: "Die Tür steht immer offen, falls Sie später Ihre Meinung ändern.",
           },
           nurture: {
             subject: "Kurzer Tipp für Sie",
             previewText: "Eine hilfreiche Einsicht",
             greeting: "Hallo {{businessName}},",
-            intro:
-              "Ich bin auf etwas gestoßen, das Sie wertvoll finden könnten.",
+            intro: "Ich bin auf etwas gestoßen, das Sie wertvoll finden könnten.",
             tip: "Hier ist ein kurzer Tipp, der einen echten Unterschied machen kann:",
             value:
               "Kleine Änderungen können im Laufe der Zeit zu erheblichen Verbesserungen führen.",
@@ -247,8 +238,7 @@ export const translations: typeof enTranslations = {
             greeting: "Hallo {{businessName}},",
             intro: "Es ist eine Weile her - ich wollte mich melden.",
             checkIn: "Wie läuft es mit Ihrem Unternehmen?",
-            offer:
-              "Wir haben einige neue Angebote, die Sie interessieren könnten.",
+            offer: "Wir haben einige neue Angebote, die Sie interessieren könnten.",
             ctaText: "Entdecken Sie, was neu ist",
             signature: "Hoffe, bald von Ihnen zu hören,",
             closing: "Freue mich darauf, von Ihnen zu hören.",

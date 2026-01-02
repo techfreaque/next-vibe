@@ -130,19 +130,13 @@ function PathTreeAccordion({
   const hasEndpoints = node.endpoints.length > 0;
 
   return (
-    <Div
-      className={
-        depth > 0 ? "pl-3 border-l border-gray-200 dark:border-gray-700" : ""
-      }
-    >
+    <Div className={depth > 0 ? "pl-3 border-l border-gray-200 dark:border-gray-700" : ""}>
       {/* Render endpoints at this level */}
       {hasEndpoints && (
         <Div className="space-y-1 mb-2">
           {node.endpoints.map((ep) => {
             const endpointId = getEndpointId(ep);
-            const isSelected =
-              selectedEndpoint &&
-              getEndpointId(selectedEndpoint) === endpointId;
+            const isSelected = selectedEndpoint && getEndpointId(selectedEndpoint) === endpointId;
 
             return (
               <Link
@@ -162,9 +156,7 @@ function PathTreeAccordion({
                   <Span className="font-mono text-xs text-gray-500 dark:text-gray-400 w-12">
                     {ep.method}
                   </Span>
-                  <Span className="font-medium truncate text-xs">
-                    {ep.path.at(-1)}
-                  </Span>
+                  <Span className="font-medium truncate text-xs">{ep.path.at(-1)}</Span>
                 </Div>
               </Link>
             );
@@ -180,16 +172,10 @@ function PathTreeAccordion({
             const childCount = countEndpoints(child);
 
             return (
-              <AccordionItem
-                key={childKey}
-                value={childKey}
-                className="border-b-0"
-              >
+              <AccordionItem key={childKey} value={childKey} className="border-b-0">
                 <AccordionTrigger className="py-1.5 text-sm hover:no-underline">
                   <Div className="flex items-center gap-2">
-                    <Span className="font-medium text-gray-700 dark:text-gray-300">
-                      {childKey}
-                    </Span>
+                    <Span className="font-medium text-gray-700 dark:text-gray-300">{childKey}</Span>
                     <Span className="text-xs font-normal text-gray-400 dark:text-gray-500">
                       ({childCount})
                     </Span>
@@ -231,23 +217,12 @@ export function HelpInteractiveView({
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [groupingMode, setGroupingMode] = useState<GroupingMode>("path");
-  const [selectedEndpoint, setSelectedEndpoint] =
-    useState<CreateApiEndpointAny | null>(null);
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const [selectedEndpoint, setSelectedEndpoint] = useState<CreateApiEndpointAny | null>(null);
+  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
 
   // Fetch endpoints server-side with user permissions
   const endpoints = useMemo(
-    () =>
-      user
-        ? definitionsRegistry.getEndpointsForUser(
-            Platform.NEXT_PAGE,
-            user,
-            logger,
-          )
-        : [],
+    () => (user ? definitionsRegistry.getEndpointsForUser(Platform.NEXT_PAGE, user, logger) : []),
     [user, logger],
   );
 
@@ -275,12 +250,9 @@ export function HelpInteractiveView({
     (ep: CreateApiEndpointAny) => {
       setSelectedEndpoint(ep);
       const endpointId = getEndpointId(ep);
-      router.push(
-        `/${locale}/help/interactive/${encodeURIComponent(endpointId)}`,
-        {
-          scroll: false,
-        },
-      );
+      router.push(`/${locale}/help/interactive/${encodeURIComponent(endpointId)}`, {
+        scroll: false,
+      });
     },
     [locale, router],
   );
@@ -386,8 +358,7 @@ export function HelpInteractiveView({
       switch (groupingMode) {
         case "tags":
           // Group by first tag, or "Uncategorized" if no tags
-          groupKey =
-            ep.tags && ep.tags.length > 0 ? ep.tags[0] : "Uncategorized";
+          groupKey = ep.tags && ep.tags.length > 0 ? ep.tags[0] : "Uncategorized";
           break;
         case "category":
         default:
@@ -419,8 +390,7 @@ export function HelpInteractiveView({
             {t("app.api.system.help.interactive.ui.title")}
           </H1>
           <P className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            {t("app.api.system.help.interactive.ui.description")}{" "}
-            {endpoints.length}{" "}
+            {t("app.api.system.help.interactive.ui.description")} {endpoints.length}{" "}
             {t("app.api.system.help.interactive.ui.availableEndpoints")}
           </P>
         </Div>
@@ -483,17 +453,9 @@ export function HelpInteractiveView({
                     />
                   ) : (
                     /* Category/Tags flat accordion view */
-                    <Accordion
-                      type="multiple"
-                      defaultValue={[]}
-                      className="w-full"
-                    >
+                    <Accordion type="multiple" defaultValue={[]} className="w-full">
                       {Object.entries(groupedEndpoints).map(([group, eps]) => (
-                        <AccordionItem
-                          key={group}
-                          value={group}
-                          className="border-b-0"
-                        >
+                        <AccordionItem key={group} value={group} className="border-b-0">
                           <AccordionTrigger className="py-2 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:no-underline">
                             <Div className="flex items-center gap-2">
                               <Span>
@@ -512,8 +474,7 @@ export function HelpInteractiveView({
                                 const toolName = ep.path.join("_");
                                 const isSelected =
                                   selectedEndpoint &&
-                                  getEndpointId(selectedEndpoint) ===
-                                    endpointId;
+                                  getEndpointId(selectedEndpoint) === endpointId;
 
                                 return (
                                   <Link
@@ -537,9 +498,7 @@ export function HelpInteractiveView({
                                     </Div>
                                     {ep.aliases && ep.aliases.length > 0 && (
                                       <Div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        {t(
-                                          "app.api.system.help.interactive.ui.aliasesLabel",
-                                        )}{" "}
+                                        {t("app.api.system.help.interactive.ui.aliasesLabel")}{" "}
                                         {ep.aliases.join(", ")}
                                       </Div>
                                     )}

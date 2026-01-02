@@ -2,8 +2,7 @@ export const translations = {
   task: {
     description: "Clean up expired user sessions to maintain system security",
     purpose: "Removes expired sessions to maintain security and performance",
-    impact:
-      "Improves system performance and security by removing stale session data",
+    impact: "Improves system performance and security by removing stale session data",
     rollback: "Rollback not applicable for cleanup operations",
   },
   errors: {

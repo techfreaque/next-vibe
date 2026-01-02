@@ -71,8 +71,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.check.typecheck.fields.disableFilter.label",
-          description:
-            "app.api.system.check.typecheck.fields.disableFilter.description",
+          description: "app.api.system.check.typecheck.fields.disableFilter.description",
           columns: 4,
         },
         z.boolean().default(false),
@@ -83,8 +82,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.system.check.typecheck.fields.timeout.label",
-          description:
-            "app.api.system.check.typecheck.fields.timeout.description",
+          description: "app.api.system.check.typecheck.fields.timeout.description",
           columns: 4,
         },
         z.coerce.number().min(1).max(3600).default(900),
@@ -95,8 +93,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.system.check.typecheck.fields.limit.label",
-          description:
-            "app.api.system.check.typecheck.fields.limit.description",
+          description: "app.api.system.check.typecheck.fields.limit.description",
           columns: 4,
         },
         z.coerce.number().min(1).optional().default(200),
@@ -117,10 +114,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label:
-            "app.api.system.check.typecheck.fields.maxFilesInSummary.label",
-          description:
-            "app.api.system.check.typecheck.fields.maxFilesInSummary.description",
+          label: "app.api.system.check.typecheck.fields.maxFilesInSummary.label",
+          description: "app.api.system.check.typecheck.fields.maxFilesInSummary.description",
           columns: 4,
         },
         z.coerce.number().min(1).default(50),
@@ -131,8 +126,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.check.typecheck.fields.skipSorting.label",
-          description:
-            "app.api.system.check.typecheck.fields.skipSorting.description",
+          description: "app.api.system.check.typecheck.fields.skipSorting.description",
           columns: 3,
         },
         z.boolean().default(false),
@@ -154,8 +148,7 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.system.check.typecheck.response.issues.title",
-              description:
-                "app.api.system.check.typecheck.response.issues.emptyState.description",
+              description: "app.api.system.check.typecheck.response.issues.emptyState.description",
               layoutType: LayoutType.GRID,
               columns: 12,
             },
@@ -173,48 +166,42 @@ const { POST } = createEndpoint({
                 file: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.typecheck.response.issues.title",
+                    content: "app.api.system.check.typecheck.response.issues.title",
                   },
                   z.string(),
                 ),
                 line: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.typecheck.response.issues.title",
+                    content: "app.api.system.check.typecheck.response.issues.title",
                   },
                   z.coerce.number().optional(),
                 ),
                 column: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.typecheck.response.issues.title",
+                    content: "app.api.system.check.typecheck.response.issues.title",
                   },
                   z.coerce.number().optional(),
                 ),
                 rule: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.typecheck.response.issues.title",
+                    content: "app.api.system.check.typecheck.response.issues.title",
                   },
                   z.string().optional(),
                 ),
                 code: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.typecheck.response.issues.title",
+                    content: "app.api.system.check.typecheck.response.issues.title",
                   },
                   z.string().optional(),
                 ),
                 severity: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.typecheck.response.issues.title",
+                    content: "app.api.system.check.typecheck.response.issues.title",
                   },
                   z.enum(["error", "warning", "info"]),
                 ),
@@ -228,8 +215,7 @@ const { POST } = createEndpoint({
                 type: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.check.typecheck.response.issues.title",
+                    content: "app.api.system.check.typecheck.response.issues.title",
                   },
                   z.enum(["oxlint", "lint", "type"]),
                 ),
@@ -274,8 +260,7 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.check.typecheck.errors.validation.title",
-      description:
-        "app.api.system.check.typecheck.errors.validation.description",
+      description: "app.api.system.check.typecheck.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.check.typecheck.errors.internal.title",
@@ -283,13 +268,11 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.check.typecheck.errors.unauthorized.title",
-      description:
-        "app.api.system.check.typecheck.errors.unauthorized.description",
+      description: "app.api.system.check.typecheck.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.check.typecheck.errors.forbidden.title",
-      description:
-        "app.api.system.check.typecheck.errors.forbidden.description",
+      description: "app.api.system.check.typecheck.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.check.typecheck.errors.notFound.title",

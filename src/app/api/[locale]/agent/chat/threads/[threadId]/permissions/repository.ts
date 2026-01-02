@@ -2,11 +2,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 
 import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { canManageThreadPermissions } from "@/app/api/[locale]/agent/chat/permissions/permissions";
@@ -33,8 +29,7 @@ export async function getThreadPermissions(
 ): Promise<ResponseType<ThreadPermissionsGetResponseOutput>> {
   if (user.isPublic) {
     return fail({
-      message:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.unauthorized.title",
+      message: "app.api.agent.chat.threads.threadId.permissions.get.errors.unauthorized.title",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
@@ -48,23 +43,16 @@ export async function getThreadPermissions(
 
     if (!thread) {
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.permissions.get.errors.notFound.title",
+        message: "app.api.agent.chat.threads.threadId.permissions.get.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
     // Check if user can manage this thread's permissions
-    const canManage = await canManageThreadPermissions(
-      user,
-      thread,
-      null,
-      logger,
-    );
+    const canManage = await canManageThreadPermissions(user, thread, null, logger);
     if (!canManage) {
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.permissions.get.errors.forbidden.title",
+        message: "app.api.agent.chat.threads.threadId.permissions.get.errors.forbidden.title",
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -79,8 +67,7 @@ export async function getThreadPermissions(
     });
   } catch {
     return fail({
-      message:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.server.title",
+      message: "app.api.agent.chat.threads.threadId.permissions.get.errors.server.title",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -98,21 +85,13 @@ export async function updateThreadPermissions(
 ): Promise<ResponseType<ThreadPermissionsUpdateResponseOutput>> {
   if (user.isPublic) {
     return fail({
-      message:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.unauthorized.title",
+      message: "app.api.agent.chat.threads.threadId.permissions.patch.errors.unauthorized.title",
       errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
 
   try {
-    const {
-      threadId,
-      rolesView,
-      rolesEdit,
-      rolesPost,
-      rolesModerate,
-      rolesAdmin,
-    } = data;
+    const { threadId, rolesView, rolesEdit, rolesPost, rolesModerate, rolesAdmin } = data;
 
     // Verify thread exists
     const [existingThread] = await db
@@ -123,23 +102,16 @@ export async function updateThreadPermissions(
 
     if (!existingThread) {
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.permissions.patch.errors.notFound.title",
+        message: "app.api.agent.chat.threads.threadId.permissions.patch.errors.notFound.title",
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
     // Check if user can manage this thread's permissions
-    const canManage = await canManageThreadPermissions(
-      user,
-      existingThread,
-      null,
-      logger,
-    );
+    const canManage = await canManageThreadPermissions(user, existingThread, null, logger);
     if (!canManage) {
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.permissions.patch.errors.forbidden.title",
+        message: "app.api.agent.chat.threads.threadId.permissions.patch.errors.forbidden.title",
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -177,10 +149,7 @@ export async function updateThreadPermissions(
     }
 
     // Update the permissions
-    await db
-      .update(chatThreads)
-      .set(updateData)
-      .where(eq(chatThreads.id, threadId));
+    await db.update(chatThreads).set(updateData).where(eq(chatThreads.id, threadId));
 
     logger.info("Thread permissions updated", {
       threadId,
@@ -203,8 +172,7 @@ export async function updateThreadPermissions(
     });
   } catch {
     return fail({
-      message:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.server.title",
+      message: "app.api.agent.chat.threads.threadId.permissions.patch.errors.server.title",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

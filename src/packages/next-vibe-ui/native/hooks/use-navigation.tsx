@@ -2,10 +2,7 @@
  * React Native implementation of Next.js navigation hooks
  * Uses Expo Router for navigation
  */
-import {
-  usePathname as useExpoPathname,
-  useRouter as useExpoRouter,
-} from "expo-router";
+import { usePathname as useExpoPathname, useRouter as useExpoRouter } from "expo-router";
 
 /**
  * Get the current pathname

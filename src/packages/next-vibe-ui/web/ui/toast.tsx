@@ -67,13 +67,8 @@ export const toastVariants = cva(
   },
 );
 
-export function ToastProvider({
-  children,
-  ...props
-}: ToastProviderProps): React.JSX.Element {
-  return (
-    <ToastPrimitives.Provider {...props}>{children}</ToastPrimitives.Provider>
-  );
+export function ToastProvider({ children, ...props }: ToastProviderProps): React.JSX.Element {
+  return <ToastPrimitives.Provider {...props}>{children}</ToastPrimitives.Provider>;
 }
 ToastProvider.displayName = ToastPrimitives.Provider.displayName;
 
@@ -147,11 +142,7 @@ export function ToastAction({
 }
 ToastAction.displayName = ToastPrimitives.Action.displayName;
 
-export function ToastClose({
-  className,
-  style,
-  children,
-}: ToastCloseProps): React.JSX.Element {
+export function ToastClose({ className, style, children }: ToastCloseProps): React.JSX.Element {
   const isTouchDevice = useIsMobile();
 
   return (
@@ -170,16 +161,9 @@ export function ToastClose({
 }
 ToastClose.displayName = ToastPrimitives.Close.displayName;
 
-export function ToastTitle({
-  className,
-  style,
-  children,
-}: ToastTitleProps): React.JSX.Element {
+export function ToastTitle({ className, style, children }: ToastTitleProps): React.JSX.Element {
   return (
-    <ToastPrimitives.Title
-      className={cn("text-sm font-semibold", className)}
-      style={style}
-    >
+    <ToastPrimitives.Title className={cn("text-sm font-semibold", className)} style={style}>
       {children}
     </ToastPrimitives.Title>
   );
@@ -192,10 +176,7 @@ export function ToastDescription({
   children,
 }: ToastDescriptionProps): React.JSX.Element {
   return (
-    <ToastPrimitives.Description
-      className={cn("text-sm opacity-90", className)}
-      style={style}
-    >
+    <ToastPrimitives.Description className={cn("text-sm opacity-90", className)} style={style}>
       {children}
     </ToastPrimitives.Description>
   );

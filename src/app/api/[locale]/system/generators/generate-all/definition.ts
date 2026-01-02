@@ -51,10 +51,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.generators.generateAll.post.fields.rootDir.label",
-          description:
-            "app.api.system.generators.generateAll.post.fields.rootDir.description",
+          label: "app.api.system.generators.generateAll.post.fields.rootDir.label",
+          description: "app.api.system.generators.generateAll.post.fields.rootDir.description",
           columns: 6,
         },
         z.string().optional(),
@@ -64,10 +62,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.generators.generateAll.post.fields.outputDir.label",
-          description:
-            "app.api.system.generators.generateAll.post.fields.outputDir.description",
+          label: "app.api.system.generators.generateAll.post.fields.outputDir.label",
+          description: "app.api.system.generators.generateAll.post.fields.outputDir.description",
           columns: 6,
         },
         z.string().optional().default("src/app/api/[locale]/system/generated"),
@@ -77,10 +73,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.generators.generateAll.post.fields.verbose.label",
-          description:
-            "app.api.system.generators.generateAll.post.fields.verbose.description",
+          label: "app.api.system.generators.generateAll.post.fields.verbose.label",
+          description: "app.api.system.generators.generateAll.post.fields.verbose.description",
           columns: 4,
         },
         z.boolean().optional().default(false),
@@ -90,8 +84,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.generators.generateAll.post.fields.skipEndpoints.label",
+          label: "app.api.system.generators.generateAll.post.fields.skipEndpoints.label",
           description:
             "app.api.system.generators.generateAll.post.fields.skipEndpoints.description",
           columns: 4,
@@ -103,10 +96,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.generators.generateAll.post.fields.skipSeeds.label",
-          description:
-            "app.api.system.generators.generateAll.post.fields.skipSeeds.description",
+          label: "app.api.system.generators.generateAll.post.fields.skipSeeds.label",
+          description: "app.api.system.generators.generateAll.post.fields.skipSeeds.description",
           columns: 4,
         },
         z.boolean().optional().default(false),
@@ -116,8 +107,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.generators.generateAll.post.fields.skipTaskIndex.label",
+          label: "app.api.system.generators.generateAll.post.fields.skipTaskIndex.label",
           description:
             "app.api.system.generators.generateAll.post.fields.skipTaskIndex.description",
           columns: 4,
@@ -129,10 +119,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.generators.generateAll.post.fields.skipTrpc.label",
-          description:
-            "app.api.system.generators.generateAll.post.fields.skipTrpc.description",
+          label: "app.api.system.generators.generateAll.post.fields.skipTrpc.label",
+          description: "app.api.system.generators.generateAll.post.fields.skipTrpc.description",
           columns: 4,
         },
         z.boolean().optional().default(false),
@@ -142,8 +130,7 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.generateAll.post.fields.success.title",
+          content: "app.api.system.generators.generateAll.post.fields.success.title",
         },
         z.boolean(),
       ),
@@ -151,8 +138,7 @@ const { POST } = createEndpoint({
       generationCompleted: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.generateAll.post.fields.generationCompleted.title",
+          content: "app.api.system.generators.generateAll.post.fields.generationCompleted.title",
         },
         z.boolean(),
       ),
@@ -160,8 +146,7 @@ const { POST } = createEndpoint({
       output: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.generateAll.post.fields.output.title",
+          content: "app.api.system.generators.generateAll.post.fields.output.title",
         },
         z.string(),
       ),
@@ -169,8 +154,7 @@ const { POST } = createEndpoint({
       generationStats: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.generateAll.post.fields.generationStats.title",
+          content: "app.api.system.generators.generateAll.post.fields.generationStats.title",
         },
         z.object({
           totalGenerators: z.coerce.number(),
@@ -186,60 +170,47 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.generators.generateAll.post.errors.validation.title",
-      description:
-        "app.api.system.generators.generateAll.post.errors.validation.description",
+      title: "app.api.system.generators.generateAll.post.errors.validation.title",
+      description: "app.api.system.generators.generateAll.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.generators.generateAll.post.errors.network.title",
-      description:
-        "app.api.system.generators.generateAll.post.errors.network.description",
+      description: "app.api.system.generators.generateAll.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.generators.generateAll.post.errors.unauthorized.title",
-      description:
-        "app.api.system.generators.generateAll.post.errors.unauthorized.description",
+      title: "app.api.system.generators.generateAll.post.errors.unauthorized.title",
+      description: "app.api.system.generators.generateAll.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.generators.generateAll.post.errors.forbidden.title",
-      description:
-        "app.api.system.generators.generateAll.post.errors.forbidden.description",
+      title: "app.api.system.generators.generateAll.post.errors.forbidden.title",
+      description: "app.api.system.generators.generateAll.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.generators.generateAll.post.errors.notFound.title",
-      description:
-        "app.api.system.generators.generateAll.post.errors.notFound.description",
+      description: "app.api.system.generators.generateAll.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.generators.generateAll.post.errors.internal.title",
-      description:
-        "app.api.system.generators.generateAll.post.errors.internal.description",
+      description: "app.api.system.generators.generateAll.post.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.generators.generateAll.post.errors.unknown.title",
-      description:
-        "app.api.system.generators.generateAll.post.errors.unknown.description",
+      description: "app.api.system.generators.generateAll.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.generators.generateAll.post.errors.internal.title",
-      description:
-        "app.api.system.generators.generateAll.post.errors.internal.description",
+      description: "app.api.system.generators.generateAll.post.errors.internal.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.generators.generateAll.post.errors.conflict.title",
-      description:
-        "app.api.system.generators.generateAll.post.errors.conflict.description",
+      description: "app.api.system.generators.generateAll.post.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
     title: "app.api.system.generators.generateAll.post.success.title",
-    description:
-      "app.api.system.generators.generateAll.post.success.description",
+    description: "app.api.system.generators.generateAll.post.success.description",
   },
 
   // === EXAMPLES ===

@@ -58,8 +58,7 @@ export const translations = {
   },
   docker: {
     executing_command: "Executing Docker command: {{command}}",
-    command_timeout:
-      "Docker command timed out after {{timeout}}ms: {{command}}",
+    command_timeout: "Docker command timed out after {{timeout}}ms: {{command}}",
     command_failed: "Docker command failed with code {{code}}: {{command}}",
     execution_failed: "Failed to execute Docker command: {{command}}",
     command_error: "Docker command error: {{error}}",

@@ -4,15 +4,7 @@
  */
 
 import { relations } from "drizzle-orm";
-import {
-  boolean,
-  integer,
-  jsonb,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { boolean, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
@@ -83,9 +75,7 @@ export const chatFavorites = pgTable("chat_favorites", {
   voice: text("voice").$type<typeof TtsVoiceValue>(),
 
   // Model settings (mode, filters, manual model id)
-  modelSettings: jsonb("model_settings")
-    .$type<FavoriteModelSettings>()
-    .notNull(),
+  modelSettings: jsonb("model_settings").$type<FavoriteModelSettings>().notNull(),
 
   // UI settings (position, color)
   uiSettings: jsonb("ui_settings").$type<FavoriteUISettings>().notNull(),

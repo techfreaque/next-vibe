@@ -91,8 +91,7 @@ export const translations: typeof enTranslations = {
     },
     unauthorized: {
       title: "Brak autoryzacji",
-      description:
-        "Musisz być uwierzytelniony, aby uzyskać dostęp do tego zasobu",
+      description: "Musisz być uwierzytelniony, aby uzyskać dostęp do tego zasobu",
     },
     forbidden: {
       title: "Zabronione",

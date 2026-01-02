@@ -15,12 +15,7 @@ import type {
 import { Span } from "./span";
 
 // Re-export types for consistency
-export type {
-  AlertDescriptionProps,
-  AlertProps,
-  AlertTitleProps,
-  AlertVariant,
-};
+export type { AlertDescriptionProps, AlertProps, AlertTitleProps, AlertVariant };
 
 const StyledView = styled(View, { className: "style" });
 
@@ -50,17 +45,12 @@ function Alert({
 }: AlertProps): React.JSX.Element {
   const { colors } = useTheme();
   return (
-    <StyledView
-      role="alert"
-      className={cn(alertVariants({ variant }), className)}
-    >
+    <StyledView role="alert" className={cn(alertVariants({ variant }), className)}>
       {Icon && (
         <StyledView className="absolute left-3.5 top-4 -translate-y-0.5">
           <Icon
             size={iconSize}
-            color={
-              variant === "destructive" ? colors.notification : colors.text
-            }
+            color={variant === "destructive" ? colors.notification : colors.text}
           />
         </StyledView>
       )}
@@ -70,10 +60,7 @@ function Alert({
 }
 Alert.displayName = "Alert";
 
-function AlertTitle({
-  className,
-  children,
-}: AlertTitleProps): React.JSX.Element {
+function AlertTitle({ className, children }: AlertTitleProps): React.JSX.Element {
   return (
     <Span
       className={cn(
@@ -87,14 +74,9 @@ function AlertTitle({
 }
 AlertTitle.displayName = "AlertTitle";
 
-function AlertDescription({
-  className,
-  children,
-}: AlertDescriptionProps): React.JSX.Element {
+function AlertDescription({ className, children }: AlertDescriptionProps): React.JSX.Element {
   return (
-    <Span
-      className={cn("pl-7 text-sm leading-relaxed text-foreground", className)}
-    >
+    <Span className={cn("pl-7 text-sm leading-relaxed text-foreground", className)}>
       {children}
     </Span>
   );

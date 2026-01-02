@@ -41,8 +41,7 @@ export const translations: typeof enTranslations = {
       label: "Benutzer-ID",
       description: "Zugehörige Benutzerkennung",
       placeholder: "Benutzer-ID eingeben",
-      helpText:
-        "Optionale Benutzer-ID, falls Lead mit einem Benutzer verknüpft ist",
+      helpText: "Optionale Benutzer-ID, falls Lead mit einem Benutzer verknüpft ist",
     },
     response: {
       id: "Engagement-ID",

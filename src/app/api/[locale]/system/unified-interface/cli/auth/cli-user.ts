@@ -10,10 +10,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import {
-  UserPermissionRole,
-  type UserRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
+import { UserPermissionRole, type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cliEnv } from "../env";
@@ -35,9 +32,7 @@ export function getCliUserEmail(): string | null {
  * Create a default CLI user payload for auth bypass scenarios
  * Used for commands that don't require authenticated user (e.g., seed, dev)
  */
-export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<
-  readonly UserRoleValue[]
-> {
+export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> {
   return {
     isPublic: false,
     id: DEFAULT_CLI_USER_ID,
@@ -49,9 +44,7 @@ export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<
  * Create a public CLI user payload
  * Used when VIBE_CLI_USER_EMAIL is not configured
  */
-export function createPublicCliUser(): InferJwtPayloadTypeFromRoles<
-  readonly UserRoleValue[]
-> {
+export function createPublicCliUser(): InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> {
   return {
     isPublic: true,
     leadId: DEFAULT_CLI_USER_ID,
@@ -106,9 +99,7 @@ export function createMockUser(): {
 export async function getCliUser(
   logger: EndpointLogger,
   locale: CountryLanguage,
-): Promise<
-  ResponseType<InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>>
-> {
+): Promise<ResponseType<InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>>> {
   // Enhanced debugging: Log authentication flow entry point
   const authFlowData = {
     locale,
@@ -116,10 +107,7 @@ export async function getCliUser(
     nodeEnv: process.env.NODE_ENV,
     vibeProjectRoot: process.env.VIBE_PROJECT_ROOT,
   };
-  logger.debug(
-    "[CLI AUTH] Starting CLI user authentication flow",
-    authFlowData,
-  );
+  logger.debug("[CLI AUTH] Starting CLI user authentication flow", authFlowData);
 
   // Step 1: Check for existing session from .vibe.session file
   try {
@@ -134,13 +122,8 @@ export async function getCliUser(
       });
 
       // Verify the token is still valid
-      const { AuthRepository } = await import(
-        "@/app/api/[locale]/user/auth/repository"
-      );
-      const verifyResult = await AuthRepository.verifyJwt(
-        sessionResult.data.token,
-        logger,
-      );
+      const { AuthRepository } = await import("@/app/api/[locale]/user/auth/repository");
+      const verifyResult = await AuthRepository.verifyJwt(sessionResult.data.token, logger);
 
       if (verifyResult.success && verifyResult.data) {
         logger.debug("[CLI AUTH] Session token is valid, using session user", {
@@ -156,29 +139,21 @@ export async function getCliUser(
           ),
         };
       }
-      logger.debug(
-        "[CLI AUTH] Session token is invalid or expired, falling back to email auth",
-        {
-          verifySuccess: verifyResult.success,
-          verifyMessage: verifyResult.message,
-        },
-      );
+      logger.debug("[CLI AUTH] Session token is invalid or expired, falling back to email auth", {
+        verifySuccess: verifyResult.success,
+        verifyMessage: verifyResult.message,
+      });
     } else {
       logger.debug("[CLI AUTH] No session data found in session file");
     }
   } catch (error) {
-    logger.debug(
-      "[CLI AUTH] No valid session found, falling back to email auth",
-      {
-        error: parseError(error).message,
-      },
-    );
+    logger.debug("[CLI AUTH] No valid session found, falling back to email auth", {
+      error: parseError(error).message,
+    });
   }
 
   // Step 2: Check VIBE_CLI_USER_EMAIL environment variable
-  logger.debug(
-    "[CLI AUTH] Step 2: Checking VIBE_CLI_USER_EMAIL environment variable",
-  );
+  logger.debug("[CLI AUTH] Step 2: Checking VIBE_CLI_USER_EMAIL environment variable");
   const cliUserEmail = getCliUserEmail();
 
   logger.debug("[CLI AUTH] VIBE_CLI_USER_EMAIL result", {
@@ -189,25 +164,18 @@ export async function getCliUser(
 
   // Step 3: If VIBE_CLI_USER_EMAIL is not set, return public user
   if (!cliUserEmail) {
-    logger.debug(
-      "[CLI AUTH] Step 3: CLI user email not configured, creating public user",
-      {
-        envVar: "VIBE_CLI_USER_EMAIL",
-      },
-    );
+    logger.debug("[CLI AUTH] Step 3: CLI user email not configured, creating public user", {
+      envVar: "VIBE_CLI_USER_EMAIL",
+    });
 
     // Create a public user with a new lead directly from database
     // We can't use getLeadIdFromDb() here because it tries to access cookies
     try {
-      const { getLanguageAndCountryFromLocale } = await import(
-        "@/i18n/core/language-utils"
-      );
+      const { getLanguageAndCountryFromLocale } = await import("@/i18n/core/language-utils");
       const { language, country } = getLanguageAndCountryFromLocale(locale);
       const { db } = await import("@/app/api/[locale]/system/db");
       const { leads } = await import("@/app/api/[locale]/leads/db");
-      const { LeadStatus, LeadSource } = await import(
-        "@/app/api/[locale]/leads/enum"
-      );
+      const { LeadStatus, LeadSource } = await import("@/app/api/[locale]/leads/enum");
 
       const [newLead] = await db
         .insert(leads)
@@ -253,28 +221,19 @@ export async function getCliUser(
   });
 
   try {
-    const { AuthRepository } = await import(
-      "@/app/api/[locale]/user/auth/repository"
-    );
+    const { AuthRepository } = await import("@/app/api/[locale]/user/auth/repository");
 
-    const authResult = await AuthRepository.authenticateUserByEmail(
-      cliUserEmail,
-      locale,
-      logger,
-    );
+    const authResult = await AuthRepository.authenticateUserByEmail(cliUserEmail, locale, logger);
 
     if (authResult.success && authResult.data) {
       const user = authResult.data;
 
-      logger.debug(
-        "[CLI AUTH] CLI user found in database - authentication successful",
-        {
-          id: user.id,
-          leadId: user.leadId,
-          roles: user.roles,
-          email: cliUserEmail,
-        },
-      );
+      logger.debug("[CLI AUTH] CLI user found in database - authentication successful", {
+        id: user.id,
+        leadId: user.leadId,
+        roles: user.roles,
+        email: cliUserEmail,
+      });
 
       return {
         success: true,

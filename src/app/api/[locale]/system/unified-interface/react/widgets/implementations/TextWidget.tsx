@@ -11,10 +11,7 @@ import type { JSX } from "react";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { FieldDataType, type WidgetType } from "../../../shared/types/enums";
-import {
-  extractTextData,
-  formatText,
-} from "../../../shared/widgets/logic/text";
+import { extractTextData, formatText } from "../../../shared/widgets/logic/text";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
 import { getTextFormatClassName } from "../../../shared/widgets/utils/widget-helpers";
@@ -47,23 +44,12 @@ export function TextWidget<const TKey extends string>({
   className,
 }: ReactWidgetProps<typeof WidgetType.TEXT, TKey>): JSX.Element {
   const { t } = getTranslator(context);
-  const {
-    fieldType,
-    label: labelKey,
-    format,
-    href,
-    content,
-    textAlign,
-  } = field.ui;
+  const { fieldType, label: labelKey, format, href, content, textAlign } = field.ui;
   const label = labelKey ? t(labelKey as TranslationKey) : undefined;
 
   // Text alignment classes
   const alignmentClass =
-    textAlign === "center"
-      ? "text-center"
-      : textAlign === "right"
-        ? "text-right"
-        : "";
+    textAlign === "center" ? "text-center" : textAlign === "right" ? "text-right" : "";
 
   // Handle format="link" with href from field.ui config
   if (format === "link" && href && content) {
@@ -87,10 +73,7 @@ export function TextWidget<const TKey extends string>({
 
   const renderTextValue = (): JSX.Element => {
     if (fieldType === FieldDataType.DATETIME && value) {
-      const dateValue =
-        typeof value === "string" || value instanceof Date
-          ? value
-          : String(value);
+      const dateValue = typeof value === "string" || value instanceof Date ? value : String(value);
       const formattedDate = formatDate(dateValue, context.locale);
       return <Span className="font-mono text-sm">{formattedDate}</Span>;
     }
@@ -140,9 +123,7 @@ export function TextWidget<const TKey extends string>({
     );
   }
 
-  return (
-    <Div className={cn(alignmentClass, className)}>{renderTextValue()}</Div>
-  );
+  return <Div className={cn(alignmentClass, className)}>{renderTextValue()}</Div>;
 }
 
 TextWidget.displayName = "TextWidget";

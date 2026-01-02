@@ -47,8 +47,7 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.agent.chat.memories.get.container.title" as const,
-      description:
-        "app.api.agent.chat.memories.get.container.description" as const,
+      description: "app.api.agent.chat.memories.get.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { response: true },
@@ -65,8 +64,7 @@ const { GET } = createEndpoint({
         objectField(
           {
             type: WidgetType.CONTAINER,
-            title:
-              "app.api.agent.chat.memories.get.response.memories.memory.title" as const,
+            title: "app.api.agent.chat.memories.get.response.memories.memory.title" as const,
             layoutType: LayoutType.STACKED,
             columns: 12,
           },
@@ -122,50 +120,39 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.chat.memories.get.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.memories.get.errors.validation.description" as const,
+      description: "app.api.agent.chat.memories.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.chat.memories.get.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.memories.get.errors.network.description" as const,
+      description: "app.api.agent.chat.memories.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.memories.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.memories.get.errors.unauthorized.description" as const,
+      title: "app.api.agent.chat.memories.get.errors.unauthorized.title" as const,
+      description: "app.api.agent.chat.memories.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.memories.get.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.memories.get.errors.forbidden.description" as const,
+      description: "app.api.agent.chat.memories.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.memories.get.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.memories.get.errors.notFound.description" as const,
+      description: "app.api.agent.chat.memories.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.memories.get.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.memories.get.errors.server.description" as const,
+      description: "app.api.agent.chat.memories.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.agent.chat.memories.get.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.memories.get.errors.unknown.description" as const,
+      description: "app.api.agent.chat.memories.get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.memories.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.memories.get.errors.unsavedChanges.description" as const,
+      title: "app.api.agent.chat.memories.get.errors.unsavedChanges.title" as const,
+      description: "app.api.agent.chat.memories.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.memories.get.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.memories.get.errors.conflict.description" as const,
+      description: "app.api.agent.chat.memories.get.errors.conflict.description" as const,
     },
   },
 
@@ -220,8 +207,7 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.agent.chat.memories.post.container.title" as const,
-      description:
-        "app.api.agent.chat.memories.post.container.description" as const,
+      description: "app.api.agent.chat.memories.post.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
@@ -232,8 +218,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
           label: "app.api.agent.chat.memories.post.content.label" as const,
-          description:
-            "app.api.agent.chat.memories.post.content.description" as const,
+          description: "app.api.agent.chat.memories.post.content.description" as const,
           columns: 12,
         },
         z.string().min(1).max(1000),
@@ -243,8 +228,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.agent.chat.memories.post.tags.label" as const,
-          description:
-            "app.api.agent.chat.memories.post.tags.description" as const,
+          description: "app.api.agent.chat.memories.post.tags.description" as const,
           columns: 6,
         },
         z.array(z.string()).optional(),
@@ -254,8 +238,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.agent.chat.memories.post.priority.label" as const,
-          description:
-            "app.api.agent.chat.memories.post.priority.description" as const,
+          description: "app.api.agent.chat.memories.post.priority.description" as const,
           columns: 6,
         },
         z.coerce.number().min(0).max(100).optional(),
@@ -265,8 +248,7 @@ const { POST } = createEndpoint({
       id: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.agent.chat.memories.post.response.id.content" as const,
+          content: "app.api.agent.chat.memories.post.response.id.content" as const,
         },
         z.coerce.number().int(),
       ),
@@ -275,59 +257,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.memories.post.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.memories.post.errors.validation.description" as const,
+      title: "app.api.agent.chat.memories.post.errors.validation.title" as const,
+      description: "app.api.agent.chat.memories.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.chat.memories.post.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.memories.post.errors.network.description" as const,
+      description: "app.api.agent.chat.memories.post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.memories.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.memories.post.errors.unauthorized.description" as const,
+      title: "app.api.agent.chat.memories.post.errors.unauthorized.title" as const,
+      description: "app.api.agent.chat.memories.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.memories.post.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.memories.post.errors.forbidden.description" as const,
+      description: "app.api.agent.chat.memories.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.memories.post.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.memories.post.errors.notFound.description" as const,
+      description: "app.api.agent.chat.memories.post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.memories.post.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.memories.post.errors.server.description" as const,
+      description: "app.api.agent.chat.memories.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.agent.chat.memories.post.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.memories.post.errors.unknown.description" as const,
+      description: "app.api.agent.chat.memories.post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.memories.post.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.memories.post.errors.unsavedChanges.description" as const,
+      title: "app.api.agent.chat.memories.post.errors.unsavedChanges.title" as const,
+      description: "app.api.agent.chat.memories.post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.memories.post.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.memories.post.errors.conflict.description" as const,
+      description: "app.api.agent.chat.memories.post.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
     title: "app.api.agent.chat.memories.post.success.title" as const,
-    description:
-      "app.api.agent.chat.memories.post.success.description" as const,
+    description: "app.api.agent.chat.memories.post.success.description" as const,
   },
 
   examples: {

@@ -19,6 +19,4 @@ import { createLayoutWrapperWithImport } from "@/app/api/[locale]/system/unified
  * Wrapper component that dynamically imports and converts Expo Router's synchronous params
  * to Next.js 15's async params format
  */
-export default createLayoutWrapperWithImport(
-  () => import("@/app/[locale]/admin/emails/layout"),
-);
+export default createLayoutWrapperWithImport(() => import("@/app/[locale]/admin/emails/layout"));

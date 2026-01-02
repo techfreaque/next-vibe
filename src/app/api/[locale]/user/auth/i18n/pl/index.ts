@@ -12,8 +12,7 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
-    token_generation_failed:
-      "Nie udało się wygenerować tokenu uwierzytelniania",
+    token_generation_failed: "Nie udało się wygenerować tokenu uwierzytelniania",
     invalid_session: "Sesja jest nieprawidłowa lub wygasła",
     missing_request_context: "Kontekst żądania jest brakujący",
     missing_locale: "Brak locale w żądaniu",
@@ -29,18 +28,15 @@ export const translations: typeof enTranslations = {
     jwt_signing_failed: "Nie udało się podpisać tokenu JWT",
     authentication_failed: "Uwierzytelnianie nie powiodło się",
     user_not_authenticated: "Użytkownik nie jest uwierzytelniony",
-    publicUserNotAllowed:
-      "Użytkownik publiczny nie jest dozwolony dla tego endpointu",
+    publicUserNotAllowed: "Użytkownik publiczny nie jest dozwolony dla tego endpointu",
     validation_failed: "Walidacja nie powiodła się",
     failed_to_create_lead: "Nie udało się utworzyć leada",
     native: {
-      unsupported:
-        "Ta metoda uwierzytelniania nie jest obsługiwana w React Native",
+      unsupported: "Ta metoda uwierzytelniania nie jest obsługiwana w React Native",
       storage_failed: "Nie udało się zapisać danych uwierzytelniania",
       clear_failed: "Nie udało się wyczyścić danych uwierzytelniania",
     },
-    not_implemented_native:
-      "Ta funkcja nie jest jeszcze zaimplementowana dla React Native",
+    not_implemented_native: "Ta funkcja nie jest jeszcze zaimplementowana dla React Native",
     unknownError: "Wystąpił nieznany błąd podczas uwierzytelniania",
   },
   post: {
@@ -162,10 +158,8 @@ export const translations: typeof enTranslations = {
     getAuthMinimalUserNext: {
       start: "getAuthMinimalUserNext: - Sprawdzanie autentykacji jako pierwsze",
       result: "getAuthMinimalUserNext: wynik getCurrentUserNext",
-      authenticated:
-        "getAuthMinimalUserNext: Użytkownik jest uwierzytelniony, pobieranie leadId",
-      returningAuth:
-        "getAuthMinimalUserNext: Zwracanie uwierzytelnionego użytkownika",
+      authenticated: "getAuthMinimalUserNext: Użytkownik jest uwierzytelniony, pobieranie leadId",
+      returningAuth: "getAuthMinimalUserNext: Zwracanie uwierzytelnionego użytkownika",
       notAuthenticated:
         "getAuthMinimalUserNext: Użytkownik nie uwierzytelniony, zwracanie użytkownika publicznego",
     },
@@ -181,39 +175,29 @@ export const translations: typeof enTranslations = {
     sessionExpired: "Sesja wygasła",
     errorValidatingUserSession: "Błąd podczas walidacji sesji użytkownika",
     errorGettingUserRoles: "Błąd podczas pobierania ról użytkownika",
-    errorCheckingUserAuth:
-      "Błąd podczas sprawdzania uwierzytelniania użytkownika",
+    errorCheckingUserAuth: "Błąd podczas sprawdzania uwierzytelniania użytkownika",
     gettingCurrentUserFromTrpc: "Pobieranie bieżącego użytkownika z tRPC",
-    errorGettingAuthUserForTrpc:
-      "Błąd podczas pobierania użytkownika auth dla tRPC",
-    errorGettingUserRolesForTrpc:
-      "Błąd podczas pobierania ról użytkownika dla tRPC",
-    authenticatingCliUserWithPayload:
-      "Uwierzytelnianie użytkownika CLI z danymi",
-    errorAuthenticatingCliUserWithPayload:
-      "Błąd podczas uwierzytelniania użytkownika CLI z danymi",
+    errorGettingAuthUserForTrpc: "Błąd podczas pobierania użytkownika auth dla tRPC",
+    errorGettingUserRolesForTrpc: "Błąd podczas pobierania ról użytkownika dla tRPC",
+    authenticatingCliUserWithPayload: "Uwierzytelnianie użytkownika CLI z danymi",
+    errorAuthenticatingCliUserWithPayload: "Błąd podczas uwierzytelniania użytkownika CLI z danymi",
     creatingCliToken: "Tworzenie tokenu CLI",
     errorCreatingCliToken: "Błąd podczas tworzenia tokenu CLI",
     validatingCliToken: "Walidacja tokenu CLI",
     errorValidatingCliToken: "Błąd podczas walidacji tokenu CLI",
     gettingCurrentUserFromNextjs: "Pobieranie bieżącego użytkownika z Next.js",
-    errorGettingAuthUserForNextjs:
-      "Błąd podczas pobierania użytkownika auth dla Next.js",
+    errorGettingAuthUserForNextjs: "Błąd podczas pobierania użytkownika auth dla Next.js",
     settingNextjsAuthCookies: "Ustawianie cookies auth Next.js",
     clearingNextjsAuthCookies: "Czyszczenie cookies auth Next.js",
     gettingCurrentUserFromToken: "Pobieranie bieżącego użytkownika z tokenu",
-    errorGettingCurrentUserFromCli:
-      "Błąd podczas pobierania bieżącego użytkownika z CLI",
-    errorGettingAuthUserForCli:
-      "Błąd podczas pobierania użytkownika auth dla CLI",
-    errorGettingUserRolesForCli:
-      "Błąd podczas pobierania ról użytkownika dla CLI",
+    errorGettingCurrentUserFromCli: "Błąd podczas pobierania bieżącego użytkownika z CLI",
+    errorGettingAuthUserForCli: "Błąd podczas pobierania użytkownika auth dla CLI",
+    errorGettingUserRolesForCli: "Błąd podczas pobierania ról użytkownika dla CLI",
     tokenFromAuthHeader: "Token z nagłówka auth",
     tokenFromCookie: "Token z cookie",
     noTokenFound: "Nie znaleziono tokenu",
     errorExtractingToken: "Błąd podczas wyodrębniania tokenu",
     errorParsingCookies: "Błąd podczas parsowania cookies",
-    errorGettingCurrentUserFromTrpc:
-      "Błąd podczas pobierania bieżącego użytkownika z tRPC",
+    errorGettingCurrentUserFromTrpc: "Błąd podczas pobierania bieżącego użytkownika z tRPC",
   },
 };

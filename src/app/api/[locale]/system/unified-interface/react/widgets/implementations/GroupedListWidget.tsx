@@ -27,8 +27,7 @@ export function GroupedListWidget<const TKey extends string>({
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
   const { groupBy, sortBy } = field.ui;
-  const config =
-    field.type === "array" && groupBy ? { groupBy, sortBy } : undefined;
+  const config = field.type === "array" && groupBy ? { groupBy, sortBy } : undefined;
 
   const data = extractGroupedListData(value, config);
   const prevGroupCount = useRef<number | undefined>(undefined);
@@ -36,11 +35,7 @@ export function GroupedListWidget<const TKey extends string>({
   useEffect(() => {
     const currentGroupCount = data?.groups.length ?? 0;
     // Only update expanded groups when the count actually changes
-    if (
-      prevGroupCount.current !== currentGroupCount &&
-      data &&
-      data.groups.length > 0
-    ) {
+    if (prevGroupCount.current !== currentGroupCount && data && data.groups.length > 0) {
       prevGroupCount.current = currentGroupCount;
       const groupKeys = data.groups.map((g) => g.key).join(",");
       setExpandedGroups(new Set(groupKeys.split(",")));
@@ -75,15 +70,8 @@ export function GroupedListWidget<const TKey extends string>({
 
         const isExpanded = expandedGroups.has(groupKey);
         const itemCount = groupItems.length;
-        const displayItems = getDisplayItems(
-          groupItems,
-          maxItemsPerGroup,
-          isExpanded,
-        );
-        const remainingCount = getRemainingItemsCount(
-          itemCount,
-          maxItemsPerGroup,
-        );
+        const displayItems = getDisplayItems(groupItems, maxItemsPerGroup, isExpanded);
+        const remainingCount = getRemainingItemsCount(itemCount, maxItemsPerGroup);
 
         return (
           <Div
@@ -116,9 +104,7 @@ export function GroupedListWidget<const TKey extends string>({
                 <Div className="flex flex-wrap gap-4">
                   {Object.entries(groupSummary).map(([key, value]) => (
                     <Div key={key} className="text-sm">
-                      <Span className="font-medium text-gray-700 dark:text-gray-300">
-                        {key}:
-                      </Span>{" "}
+                      <Span className="font-medium text-gray-700 dark:text-gray-300">{key}:</Span>{" "}
                       <Span className="text-gray-600 dark:text-gray-400">
                         {formatDisplayValue(value)}
                       </Span>

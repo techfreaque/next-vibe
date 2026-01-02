@@ -90,8 +90,7 @@ export const translations: typeof enTranslations = {
     contentFilter: "Treść",
     maxPrice: "Maksymalna cena",
     modelSelection: "Wybór modelu",
-    autoModeDescription:
-      "Najlepszy model jest wybierany na podstawie Twoich filtrów",
+    autoModeDescription: "Najlepszy model jest wybierany na podstawie Twoich filtrów",
     manualModeDescription: "Wybierz konkretny model ręcznie",
     autoMode: "Auto",
     manualMode: "Ręczny",
@@ -201,8 +200,7 @@ export const translations: typeof enTranslations = {
           },
           suggestedPrompts: {
             label: "Sugerowane prompty (opcjonalne)",
-            description:
-              "Dodaj do 4 przykładowych promptów, aby pomóc użytkownikom rozpocząć",
+            description: "Dodaj do 4 przykładowych promptów, aby pomóc użytkownikom rozpocząć",
             placeholder: "Przykładowy prompt {{number}}",
           },
         },
@@ -246,8 +244,7 @@ export const translations: typeof enTranslations = {
   dialogs: {
     searchAndCreate: "Szukaj i utwórz",
     deleteChat: 'Usunąć czat "{{title}}"?',
-    deleteFolderConfirm:
-      'Usunąć folder "{{name}}" i przenieść {{count}} czat(ów) do Ogólne?',
+    deleteFolderConfirm: 'Usunąć folder "{{name}}" i przenieść {{count}} czat(ów) do Ogólne?',
   },
   views: {
     linearView: "Widok liniowy (styl ChatGPT)",
@@ -264,14 +261,12 @@ export const translations: typeof enTranslations = {
     noMessages:
       "Nie można znaleźć obszaru wiadomości czatu. Upewnij się, że masz wiadomości w czacie.",
     quotaExceeded: "Przekroczono limit miejsca. Zrzut ekranu jest za duży.",
-    canvasError:
-      "Nie udało się przekonwertować zrzutu ekranu na format obrazu.",
+    canvasError: "Nie udało się przekonwertować zrzutu ekranu na format obrazu.",
   },
   errors: {
     noResponse:
       "Nie otrzymano odpowiedzi od AI. Żądanie zostało zakończone, ale zwróciło pustą treść. Spróbuj ponownie.",
-    noStream:
-      "Nie udało się przesłać strumieniowo odpowiedzi: Brak dostępnego czytnika",
+    noStream: "Nie udało się przesłać strumieniowo odpowiedzi: Brak dostępnego czytnika",
     saveFailed: "Nie udało się zapisać edycji",
     branchFailed: "Nie udało się rozgałęzić",
     retryFailed: "Nie udało się ponowić",
@@ -316,8 +311,7 @@ export const translations: typeof enTranslations = {
   },
   models: {
     descriptions: {
-      uncensoredLmV11:
-        "Niecenzurowany model AI dla kreatywnych i nieograniczonych rozmów",
+      uncensoredLmV11: "Niecenzurowany model AI dla kreatywnych i nieograniczonych rozmów",
       freedomgptLiberty:
         "FreedomGPT Liberty - Niecenzurowany model AI skoncentrowany na wolności wypowiedzi i treściach kreatywnych",
       gabAiArya:
@@ -328,16 +322,13 @@ export const translations: typeof enTranslations = {
         "DeepSeek V3.2 - Wysokowydajny model rozumowania z zaawansowanymi możliwościami kodowania",
       gpt52Pro:
         "GPT-5.2 Pro - Zaawansowany model OpenAI z ulepszonymi możliwościami rozumowania i kodowania",
-      gpt52:
-        "GPT-5.2 - Wysokowydajny model OpenAI do złożonych zadań i analizy",
-      gpt52_chat:
-        "GPT-5.2 Chat - Zoptymalizowany model OpenAI dla interakcji konwersacyjnych",
+      gpt52: "GPT-5.2 - Wysokowydajny model OpenAI do złożonych zadań i analizy",
+      gpt52_chat: "GPT-5.2 Chat - Zoptymalizowany model OpenAI dla interakcji konwersacyjnych",
       dolphin3_0_r1_mistral_24b:
         "Dolphin 3.0 R1 Mistral 24B - Niecenzurowany duży model językowy oparty na Mistral",
       dolphinLlama3_70B:
         "Dolphin Llama 3 70B - Niecenzurowany duży model językowy oparty na Llama 3",
-      veniceUncensored:
-        "Venice Uncensored - Niecenzurowany model AI dla nieograniczonych rozmów",
+      veniceUncensored: "Venice Uncensored - Niecenzurowany model AI dla nieograniczonych rozmów",
     },
   },
   modelUtilities: {

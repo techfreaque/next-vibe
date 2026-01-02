@@ -1,9 +1,6 @@
 import { parse } from "jsonc-parser";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
 
 /**
  * JSON Parser with Comment Support
@@ -28,15 +25,12 @@ export interface JsonWithComments {
  * @param jsonString - JSON string potentially containing comments
  * @returns Parsed JSON object or error response
  */
-export function parseJsonWithComments(
-  jsonString: string,
-): ResponseType<JsonWithComments> {
+export function parseJsonWithComments(jsonString: string): ResponseType<JsonWithComments> {
   try {
     const result = parse(jsonString);
     if (typeof result !== "object" || result === null) {
       return fail({
-        message:
-          "app.api.shared.utils.parseJsonWithComments.errors.invalid_json",
+        message: "app.api.shared.utils.parseJsonWithComments.errors.invalid_json",
         errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
       });
     }
@@ -62,9 +56,7 @@ export function parseJsonWithComments(
  * @param jsonString - JSON string potentially containing comments
  * @returns Parsed JSON object or null if parsing fails
  */
-export function tryParseJsonWithComments(
-  jsonString: string,
-): JsonWithComments | null {
+export function tryParseJsonWithComments(jsonString: string): JsonWithComments | null {
   const result = parseJsonWithComments(jsonString);
   return result.success ? result.data : null;
 }

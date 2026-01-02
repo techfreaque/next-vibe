@@ -4,11 +4,7 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -35,9 +31,7 @@ export interface SchemaVerifyRepositoryInterface {
 /**
  * Verify database schema Repository Implementation
  */
-export class SchemaVerifyRepositoryImpl
-  implements SchemaVerifyRepositoryInterface
-{
+export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterface {
   async execute(
     data: RequestType,
     locale: CountryLanguage,
@@ -91,8 +85,7 @@ export class SchemaVerifyRepositoryImpl
         }
       }
 
-      const finalValid =
-        schemaValid || (data.fixIssues && fixedIssues.length === issues.length);
+      const finalValid = schemaValid || (data.fixIssues && fixedIssues.length === issues.length);
 
       if (!data.silent && finalValid) {
         const { t } = simpleT(locale);

@@ -7,11 +7,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
@@ -27,10 +23,7 @@ export interface IPackageService {
   /**
    * Get package.json from a directory
    */
-  getPackageJson(
-    cwd: string,
-    logger: EndpointLogger,
-  ): ResponseType<PackageJson>;
+  getPackageJson(cwd: string, logger: EndpointLogger): ResponseType<PackageJson>;
 
   /**
    * Update package version in package.json
@@ -49,10 +42,7 @@ export interface IPackageService {
 // ============================================================================
 
 export class PackageService implements IPackageService {
-  getPackageJson(
-    cwd: string,
-    logger: EndpointLogger,
-  ): ResponseType<PackageJson> {
+  getPackageJson(cwd: string, logger: EndpointLogger): ResponseType<PackageJson> {
     const packageJsonPath = join(cwd, "package.json");
     if (!existsSync(packageJsonPath)) {
       logger.error(MESSAGES.PACKAGE_JSON_NOT_FOUND, { path: packageJsonPath });
@@ -64,9 +54,7 @@ export class PackageService implements IPackageService {
     }
 
     try {
-      const parsedPkg = parsePackageJson(
-        safeJsonParse(readFileSync(packageJsonPath, "utf8")),
-      );
+      const parsedPkg = parsePackageJson(safeJsonParse(readFileSync(packageJsonPath, "utf8")));
       if (!parsedPkg) {
         logger.error(MESSAGES.PACKAGE_JSON_INVALID, { path: packageJsonPath });
         return fail({
@@ -109,11 +97,7 @@ export class PackageService implements IPackageService {
       const rawContent = readFileSync(packageJsonPath, "utf8");
       const rawParsed = safeJsonParse(rawContent);
 
-      if (
-        typeof rawParsed !== "object" ||
-        rawParsed === null ||
-        Array.isArray(rawParsed)
-      ) {
+      if (typeof rawParsed !== "object" || rawParsed === null || Array.isArray(rawParsed)) {
         logger.error(MESSAGES.PACKAGE_JSON_INVALID, { path: packageJsonPath });
         return fail({
           message: "app.api.system.releaseTool.packageJson.invalidFormat",
@@ -125,10 +109,7 @@ export class PackageService implements IPackageService {
       // Update only the version field, preserving everything else
       const updatedPackageJson = { ...rawParsed, version: newVersion };
 
-      writeFileSync(
-        packageJsonPath,
-        `${JSON.stringify(updatedPackageJson, null, 2)}\n`,
-      );
+      writeFileSync(packageJsonPath, `${JSON.stringify(updatedPackageJson, null, 2)}\n`);
 
       logger.debug(MESSAGES.VERSION_BUMPED, {
         directory: pkg.directory,

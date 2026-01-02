@@ -29,10 +29,7 @@ import {
   Methods,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetConfig } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
-import {
-  UserRole,
-  type UserRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
+import { UserRole, type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { simpleT } from "@/i18n/core/shared";
@@ -86,11 +83,7 @@ export interface CachedMethodSchemas<
  * Build examples structure from cached schemas
  */
 export interface MethodExamples<
-  TSchemas extends CachedMethodSchemas<
-    string,
-    UnifiedField<string, z.ZodTypeAny>,
-    Methods
-  >,
+  TSchemas extends CachedMethodSchemas<string, UnifiedField<string, z.ZodTypeAny>, Methods>,
   TExampleKey extends string,
 > {
   requests?: ExtractInput<TSchemas["requestData"]> extends never
@@ -386,9 +379,7 @@ export interface CreateFormEndpointConfig<
   };
 
   // Method-specific examples
-  readonly examples: NoInfer<
-    FormExamples<TScopedTranslationKey, TFields, TExampleKey, TMethods>
-  >;
+  readonly examples: NoInfer<FormExamples<TScopedTranslationKey, TFields, TExampleKey, TMethods>>;
 
   // Scoped translation
   readonly scopedTranslation?: {
@@ -460,11 +451,7 @@ export type FilterSchemaForMethod<
     TScopedTranslationKey,
     WidgetConfig<TScopedTranslationKey>
   >
-    ? SupportsMethodAndUsage<
-        TFields["usage"],
-        TMethod,
-        TTargetUsage
-      > extends true
+    ? SupportsMethodAndUsage<TFields["usage"], TMethod, TTargetUsage> extends true
       ? TSchema
       : z.ZodNever
     : TFields extends ObjectField<
@@ -473,11 +460,7 @@ export type FilterSchemaForMethod<
           TScopedTranslationKey,
           WidgetConfig<TScopedTranslationKey>
         >
-      ? SupportsMethodAndUsage<
-          TFields["usage"],
-          TMethod,
-          TTargetUsage
-        > extends true
+      ? SupportsMethodAndUsage<TFields["usage"], TMethod, TTargetUsage> extends true
         ? z.ZodObject<{
             [K in keyof TChildren as FilterSchemaForMethod<
               TScopedTranslationKey,
@@ -513,30 +496,10 @@ export type MethodSpecificEndpoint<
   TScopedTranslationKey,
   TFields,
   // Override type parameters with method-specific inference
-  InferInputFromFieldForMethod<
-    TScopedTranslationKey,
-    TFields,
-    TMethod,
-    FieldUsage.RequestData
-  >,
-  InferOutputFromFieldForMethod<
-    TScopedTranslationKey,
-    TFields,
-    TMethod,
-    FieldUsage.RequestData
-  >,
-  InferInputFromFieldForMethod<
-    TScopedTranslationKey,
-    TFields,
-    TMethod,
-    FieldUsage.Response
-  >,
-  InferOutputFromFieldForMethod<
-    TScopedTranslationKey,
-    TFields,
-    TMethod,
-    FieldUsage.Response
-  >,
+  InferInputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.RequestData>,
+  InferOutputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.RequestData>,
+  InferInputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.Response>,
+  InferOutputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.Response>,
   InferInputFromFieldForMethod<
     TScopedTranslationKey,
     TFields,
@@ -584,12 +547,7 @@ export type GetResponseSchemaFromFields<
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
   TMethod extends Methods,
-> = InferSchemaFromFieldForMethod<
-  TScopedTranslationKey,
-  TFields,
-  TMethod,
-  FieldUsage.Response
->;
+> = InferSchemaFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.Response>;
 
 /**
  * Return type for createFormEndpoint - provides GET, POST, PATCH, and DELETE endpoints
@@ -848,10 +806,7 @@ function transformFieldForMethod<F>(field: F, method: Methods): F {
     }
 
     // Transform all children recursively
-    const transformedChildren: Record<
-      string,
-      UnifiedField<string, z.ZodTypeAny>
-    > = {};
+    const transformedChildren: Record<string, UnifiedField<string, z.ZodTypeAny>> = {};
     if (typedField.children) {
       for (const [key, childField] of Object.entries(typedField.children)) {
         transformedChildren[key] = transformFieldForMethod(childField, method);
@@ -919,9 +874,7 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
   }
 
   const typedField = field as F & FieldWithType;
-  const hasMethodSpecificUsage = (
-    usage: FieldUsageConfig | undefined,
-  ): boolean => {
+  const hasMethodSpecificUsage = (usage: FieldUsageConfig | undefined): boolean => {
     if (!usage) {
       return false;
     }
@@ -1007,14 +960,12 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
         return "response" in usage && usage.response === true;
       case FieldUsage.RequestData:
         return (
-          "request" in usage &&
-          (usage.request === "data" || usage.request === "data&urlPathParams")
+          "request" in usage && (usage.request === "data" || usage.request === "data&urlPathParams")
         );
       case FieldUsage.RequestUrlParams:
         return (
           "request" in usage &&
-          (usage.request === "urlPathParams" ||
-            usage.request === "data&urlPathParams")
+          (usage.request === "urlPathParams" || usage.request === "data&urlPathParams")
         );
       default:
         return false;
@@ -1036,11 +987,7 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
 
     if (typedField.children) {
       for (const [key, childField] of Object.entries(typedField.children)) {
-        const childSchema = generateSchemaForMethodAndUsage(
-          childField,
-          method,
-          targetUsage,
-        );
+        const childSchema = generateSchemaForMethodAndUsage(childField, method, targetUsage);
         if (!(childSchema instanceof z.ZodNever)) {
           shape[key] = childSchema;
         }
@@ -1065,14 +1012,8 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
   if (typedField.type === "array") {
     const methodUsage = getUsageForMethod(typedField.usage, method);
     if (methodUsage && hasTargetUsage(methodUsage) && typedField.child) {
-      const childSchema = generateSchemaForMethodAndUsage(
-        typedField.child,
-        method,
-        targetUsage,
-      );
-      return childSchema instanceof z.ZodNever
-        ? z.never()
-        : z.array(childSchema);
+      const childSchema = generateSchemaForMethodAndUsage(typedField.child, method, targetUsage);
+      return childSchema instanceof z.ZodNever ? z.never() : z.array(childSchema);
     }
     return z.never();
   }
@@ -1083,35 +1024,22 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
 /**
  * Generate request data schema for a specific HTTP method using proper method-specific filtering
  */
-export function generateRequestDataSchemaForMethod<F>(
-  field: F,
-  method: Methods,
-): z.ZodTypeAny {
+export function generateRequestDataSchemaForMethod<F>(field: F, method: Methods): z.ZodTypeAny {
   return generateSchemaForMethodAndUsage(field, method, FieldUsage.RequestData);
 }
 
 /**
  * Generate response schema for a specific HTTP method using proper method-specific filtering
  */
-export function generateResponseSchemaForMethod<F>(
-  field: F,
-  method: Methods,
-): z.ZodTypeAny {
+export function generateResponseSchemaForMethod<F>(field: F, method: Methods): z.ZodTypeAny {
   return generateSchemaForMethodAndUsage(field, method, FieldUsage.Response);
 }
 
 /**
  * Generate request URL params schema for a specific HTTP method using proper method-specific filtering
  */
-export function generateRequestUrlSchemaForMethod<F>(
-  field: F,
-  method: Methods,
-): z.ZodTypeAny {
-  return generateSchemaForMethodAndUsage(
-    field,
-    method,
-    FieldUsage.RequestUrlParams,
-  );
+export function generateRequestUrlSchemaForMethod<F>(field: F, method: Methods): z.ZodTypeAny {
+  return generateSchemaForMethodAndUsage(field, method, FieldUsage.RequestUrlParams);
 }
 
 /**
@@ -1142,13 +1070,7 @@ export function createFormEndpoint<
     TFields,
     TMethods
   >,
-): CreateFormEndpointReturn<
-  TExampleKey,
-  TUserRoleValue,
-  TScopedTranslationKey,
-  TFields,
-  TMethods
-> {
+): CreateFormEndpointReturn<TExampleKey, TUserRoleValue, TScopedTranslationKey, TFields, TMethods> {
   // Generate schemas directly from the original fields with method-specific filtering
 
   // Default scopedTranslation when none provided - uses global TranslationKey with simpleT
@@ -1192,12 +1114,7 @@ export function createFormEndpoint<
       FieldUsage.RequestUrlParams
     >,
     examples: (ExtractInput<
-      InferSchemaFromFieldForMethod<
-        TScopedTranslationKey,
-        TFields,
-        TMethod,
-        FieldUsage.RequestData
-      >
+      InferSchemaFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.RequestData>
     > extends undefined
       ? { requests?: undefined }
       : ExtractInput<
@@ -1346,28 +1263,19 @@ export function createFormEndpoint<
     ? createMethodEndpoint(
         Methods.GET,
         config.methods.GET as FormMethodConfig<TScopedTranslationKey>,
-        generateRequestDataSchemaForMethod(
-          fields,
-          Methods.GET,
-        ) as InferSchemaFromFieldForMethod<
+        generateRequestDataSchemaForMethod(fields, Methods.GET) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.GET,
           FieldUsage.RequestData
         >,
-        generateResponseSchemaForMethod(
-          fields,
-          Methods.GET,
-        ) as InferSchemaFromFieldForMethod<
+        generateResponseSchemaForMethod(fields, Methods.GET) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.GET,
           FieldUsage.Response
         >,
-        generateRequestUrlSchemaForMethod(
-          fields,
-          Methods.GET,
-        ) as InferSchemaFromFieldForMethod<
+        generateRequestUrlSchemaForMethod(fields, Methods.GET) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.GET,
@@ -1385,28 +1293,19 @@ export function createFormEndpoint<
     ? createMethodEndpoint(
         Methods.POST,
         config.methods.POST as FormMethodConfig<TScopedTranslationKey>,
-        generateRequestDataSchemaForMethod(
-          fields,
-          Methods.POST,
-        ) as InferSchemaFromFieldForMethod<
+        generateRequestDataSchemaForMethod(fields, Methods.POST) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.POST,
           FieldUsage.RequestData
         >,
-        generateResponseSchemaForMethod(
-          fields,
-          Methods.POST,
-        ) as InferSchemaFromFieldForMethod<
+        generateResponseSchemaForMethod(fields, Methods.POST) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.POST,
           FieldUsage.Response
         >,
-        generateRequestUrlSchemaForMethod(
-          fields,
-          Methods.POST,
-        ) as InferSchemaFromFieldForMethod<
+        generateRequestUrlSchemaForMethod(fields, Methods.POST) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.POST,
@@ -1424,28 +1323,19 @@ export function createFormEndpoint<
     ? createMethodEndpoint(
         Methods.PATCH,
         config.methods.PATCH as FormMethodConfig<TScopedTranslationKey>,
-        generateRequestDataSchemaForMethod(
-          fields,
-          Methods.PATCH,
-        ) as InferSchemaFromFieldForMethod<
+        generateRequestDataSchemaForMethod(fields, Methods.PATCH) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.PATCH,
           FieldUsage.RequestData
         >,
-        generateResponseSchemaForMethod(
-          fields,
-          Methods.PATCH,
-        ) as InferSchemaFromFieldForMethod<
+        generateResponseSchemaForMethod(fields, Methods.PATCH) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.PATCH,
           FieldUsage.Response
         >,
-        generateRequestUrlSchemaForMethod(
-          fields,
-          Methods.PATCH,
-        ) as InferSchemaFromFieldForMethod<
+        generateRequestUrlSchemaForMethod(fields, Methods.PATCH) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.PATCH,
@@ -1463,28 +1353,19 @@ export function createFormEndpoint<
     ? createMethodEndpoint(
         Methods.DELETE,
         config.methods.DELETE as FormMethodConfig<TScopedTranslationKey>,
-        generateRequestDataSchemaForMethod(
-          fields,
-          Methods.DELETE,
-        ) as InferSchemaFromFieldForMethod<
+        generateRequestDataSchemaForMethod(fields, Methods.DELETE) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.DELETE,
           FieldUsage.RequestData
         >,
-        generateResponseSchemaForMethod(
-          fields,
-          Methods.DELETE,
-        ) as InferSchemaFromFieldForMethod<
+        generateResponseSchemaForMethod(fields, Methods.DELETE) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.DELETE,
           FieldUsage.Response
         >,
-        generateRequestUrlSchemaForMethod(
-          fields,
-          Methods.DELETE,
-        ) as InferSchemaFromFieldForMethod<
+        generateRequestUrlSchemaForMethod(fields, Methods.DELETE) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.DELETE,

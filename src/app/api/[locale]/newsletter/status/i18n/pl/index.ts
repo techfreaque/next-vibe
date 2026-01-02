@@ -9,13 +9,11 @@ export const translations: typeof enTranslations = {
   },
   form: {
     title: "Sprawdź status newslettera",
-    description:
-      "Wprowadź adres e-mail, aby sprawdzić status subskrypcji newslettera",
+    description: "Wprowadź adres e-mail, aby sprawdzić status subskrypcji newslettera",
   },
   email: {
     label: "Adres e-mail",
-    description:
-      "Adres e-mail, dla którego chcesz sprawdzić status subskrypcji",
+    description: "Adres e-mail, dla którego chcesz sprawdzić status subskrypcji",
     placeholder: "użytkownik@przykład.pl",
     helpText: "Wprowadź adres e-mail, który chcesz sprawdzić",
   },

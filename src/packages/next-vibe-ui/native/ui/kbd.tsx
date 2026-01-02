@@ -4,23 +4,14 @@ import * as React from "react";
 import type { TextStyle } from "react-native";
 import { Text } from "react-native";
 
-import type {
-  KbdMouseEvent,
-  KbdProps,
-} from "@/packages/next-vibe-ui/web/ui/kbd";
+import type { KbdMouseEvent, KbdProps } from "@/packages/next-vibe-ui/web/ui/kbd";
 
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToTextStyle } from "../utils/style-converter";
 
 const StyledText = styled(Text, { className: "style" });
 
-function Kbd({
-  className,
-  children,
-  style,
-  onClick,
-  ...props
-}: KbdProps): React.JSX.Element {
+function Kbd({ className, children, style, onClick, ...props }: KbdProps): React.JSX.Element {
   const handlePress = onClick
     ? (): void => {
         const event: KbdMouseEvent = {
@@ -35,9 +26,7 @@ function Kbd({
       }
     : undefined;
 
-  const nativeStyle: TextStyle | undefined = style
-    ? convertCSSToTextStyle(style)
-    : undefined;
+  const nativeStyle: TextStyle | undefined = style ? convertCSSToTextStyle(style) : undefined;
 
   return (
     <StyledText

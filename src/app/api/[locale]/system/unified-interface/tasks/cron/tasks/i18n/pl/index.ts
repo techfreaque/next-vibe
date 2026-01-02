@@ -73,8 +73,7 @@ export const translations: typeof enTranslations = {
     errors: {
       internal: {
         title: "Wystąpił błąd wewnętrzny serwera podczas pobierania zadań",
-        description:
-          "Wystąpił nieoczekiwany błąd podczas pobierania listy zadań",
+        description: "Wystąpił nieoczekiwany błąd podczas pobierania listy zadań",
       },
       unauthorized: {
         title: "Nieautoryzowany dostęp do listy zadań",

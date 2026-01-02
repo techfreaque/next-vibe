@@ -16,18 +16,15 @@ export const translations: typeof enTranslations = {
       },
       network: {
         title: "Błąd Sieci",
-        description:
-          "Nie udało się połączyć z bazą danych w celu migracji produkcyjnej",
+        description: "Nie udało się połączyć z bazą danych w celu migracji produkcyjnej",
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description:
-          "Nie jesteś upoważniony do wykonywania operacji migracji produkcyjnej",
+        description: "Nie jesteś upoważniony do wykonywania operacji migracji produkcyjnej",
       },
       forbidden: {
         title: "Zabronione",
-        description:
-          "Operacje migracji produkcyjnej nie są dozwolone dla Twojej roli",
+        description: "Operacje migracji produkcyjnej nie są dozwolone dla Twojej roli",
       },
       notFound: {
         title: "Nie Znaleziono",
@@ -35,13 +32,11 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd Serwera",
-        description:
-          "Wystąpił wewnętrzny błąd serwera podczas migracji produkcyjnej",
+        description: "Wystąpił wewnętrzny błąd serwera podczas migracji produkcyjnej",
       },
       unknown: {
         title: "Nieznany Błąd",
-        description:
-          "Wystąpił nieoczekiwany błąd podczas migracji produkcyjnej",
+        description: "Wystąpił nieoczekiwany błąd podczas migracji produkcyjnej",
       },
       conflict: {
         title: "Konflikt",
@@ -64,8 +59,7 @@ export const translations: typeof enTranslations = {
     },
     dryRun: {
       title: "Próbny Przebieg",
-      description:
-        "Pokaż co zostałoby zrobione bez faktycznego wykonywania zmian",
+      description: "Pokaż co zostałoby zrobione bez faktycznego wykonywania zmian",
     },
     success: {
       title: "Sukces",
@@ -91,17 +85,14 @@ export const translations: typeof enTranslations = {
   },
   messages: {
     dryRunComplete: "✅ Próbny przebieg zakończony - nie wprowadzono zmian",
-    successWithSeeding:
-      "✅ Migracja produkcyjna zakończona pomyślnie! 🚀 Gotowe do wdrożenia",
+    successWithSeeding: "✅ Migracja produkcyjna zakończona pomyślnie! 🚀 Gotowe do wdrożenia",
     successWithoutSeeding:
       "✅ Migracja produkcyjna zakończona pomyślnie (seeding pominięty)! 🚀 Gotowe do wdrożenia",
   },
   errors: {
-    notProduction:
-      "❌ NODE_ENV nie jest ustawione na 'production'. Użyj --force aby nadpisać.",
+    notProduction: "❌ NODE_ENV nie jest ustawione na 'production'. Użyj --force aby nadpisać.",
     noDatabaseUrl: "❌ Zmienna środowiskowa DATABASE_URL jest wymagana",
-    localhostDatabase:
-      "❌ DATABASE_URL wygląda na localhost. Użyj --force aby nadpisać.",
+    localhostDatabase: "❌ DATABASE_URL wygląda na localhost. Użyj --force aby nadpisać.",
   },
   tag: "Baza Danych",
 };

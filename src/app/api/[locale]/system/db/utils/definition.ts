@@ -32,12 +32,7 @@ const { GET } = createEndpoint({
   category: "app.api.system.db.category",
   tags: ["app.api.system.db.utils.tag"],
   icon: "database",
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.PRODUCTION_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
   aliases: ["db:utils", "dbutils"],
   method: Methods.GET,
   path: ["system", "db", "utils"],

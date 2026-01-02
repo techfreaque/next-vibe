@@ -20,9 +20,7 @@ interface CronStatsPageProps {
 /**
  * Generate metadata for the cron stats page
  */
-export async function generateMetadata({
-  params,
-}: CronStatsPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: CronStatsPageProps): Promise<Metadata> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 

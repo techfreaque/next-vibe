@@ -35,12 +35,7 @@ export interface IntersectionResult {
 export function useIntersectionObserver<T extends Element>(
   options: IntersectionOptions = {},
 ): [RefObject<T | null>, IntersectionResult] {
-  const {
-    root = null,
-    rootMargin = "0px",
-    threshold = 0,
-    triggerOnce = false,
-  } = options;
+  const { root = null, rootMargin = "0px", threshold = 0, triggerOnce = false } = options;
 
   const ref = useRef<T>(null);
   const [result, setResult] = useState<IntersectionResult>({

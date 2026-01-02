@@ -5,6 +5,7 @@
 
 "use client";
 
+import { Send } from "lucide-react";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
@@ -12,15 +13,14 @@ import { Form } from "next-vibe-ui/ui/form/form";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { P } from "next-vibe-ui/ui/typography";
-import { Send } from "lucide-react";
-import { useMemo, useState } from "react";
 import type { ReactElement } from "react";
+import { useMemo, useState } from "react";
 
 import { useEmailPreviewSendTest } from "@/app/api/[locale]/emails/preview/send-test/hooks/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
-import { useTranslation } from "@/i18n/core/client";
 
 interface TestEmailFormProps {
   locale: CountryLanguage;
@@ -28,17 +28,10 @@ interface TestEmailFormProps {
   onSuccess?: () => void;
 }
 
-export function TestEmailForm({
-  locale,
-  templateId,
-  onSuccess,
-}: TestEmailFormProps): ReactElement {
+export function TestEmailForm({ locale, templateId, onSuccess }: TestEmailFormProps): ReactElement {
   const { t } = useTranslation();
   const [recipientEmail, setRecipientEmail] = useState("");
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
+  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
 
   const { language, country } = getLanguageAndCountryFromLocale(locale);
 

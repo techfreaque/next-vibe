@@ -36,9 +36,7 @@ interface ImapFoldersManagementProps {
  * IMAP Folders Management Component
  * Uses useEndpoint for all state management following leads/cron patterns
  */
-export function ImapFoldersManagement({
-  logger,
-}: ImapFoldersManagementProps): JSX.Element {
+export function ImapFoldersManagement({ logger }: ImapFoldersManagementProps): JSX.Element {
   const { t } = useTranslation();
 
   // Use endpoints for data management - no local useState
@@ -46,9 +44,7 @@ export function ImapFoldersManagement({
 
   // Get accounts data for the dropdown
   const accountsResponse = accountsEndpoint.read?.response;
-  const accounts = accountsResponse?.success
-    ? accountsResponse.data.accounts
-    : [];
+  const accounts = accountsResponse?.success ? accountsResponse.data.accounts : [];
 
   // Use the first available account ID or a default
   const selectedAccountId = accounts.length > 0 ? accounts[0].id : "";
@@ -61,10 +57,7 @@ export function ImapFoldersManagement({
     <Div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>
-            {" "}
-            {t("app.admin.emails.imap.admin.folders.title")}
-          </CardTitle>
+          <CardTitle> {t("app.admin.emails.imap.admin.folders.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Div className="flex flex-col gap-6">
@@ -85,11 +78,7 @@ export function ImapFoldersManagement({
                     }}
                   >
                     <SelectTrigger className="w-[250px]">
-                      <SelectValue
-                        placeholder={t(
-                          "app.admin.emails.imap.common.selectAccount",
-                        )}
-                      />
+                      <SelectValue placeholder={t("app.admin.emails.imap.common.selectAccount")} />
                     </SelectTrigger>
                     <SelectContent>
                       {accounts.map((account) => (
@@ -114,11 +103,7 @@ export function ImapFoldersManagement({
                     ? t("app.admin.emails.imap.common.syncing")
                     : t("app.admin.emails.imap.common.sync")}
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={foldersEndpoint.read.refetch}
-                >
+                <Button type="button" variant="outline" onClick={foldersEndpoint.read.refetch}>
                   {t("app.admin.emails.imap.common.refresh")}
                 </Button>
               </Div>
@@ -135,10 +120,7 @@ export function ImapFoldersManagement({
       {/* Folder Statistics */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            {" "}
-            {t("app.admin.emails.imap.admin.folders.stats.title")}
-          </CardTitle>
+          <CardTitle> {t("app.admin.emails.imap.admin.folders.stats.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Div className="grid grid-cols-1 md:grid-cols-4 gap-4">

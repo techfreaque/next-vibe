@@ -4,9 +4,7 @@ import { defaultLocaleConfig } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 // Use default locale for API error messages
-const { t } = simpleT(
-  `${defaultLocaleConfig.language}-${defaultLocaleConfig.country}`,
-);
+const { t } = simpleT(`${defaultLocaleConfig.language}-${defaultLocaleConfig.country}`);
 
 export function GET(): NextResponse {
   return new NextResponse(t("app.api.[...slug].not_found"), { status: 404 });

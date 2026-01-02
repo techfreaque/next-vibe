@@ -97,16 +97,13 @@ export const translations = {
         failedTaskRunner: "Failed to start production task runner",
         taskRunnerStarted: "✅ Production task runner started with ",
         taskRunnerStartedSuffix: " tasks",
-        taskRunnerSkipped:
-          "Production task runner skipped (--skip-task-runner flag used)",
-        skipNextStart:
-          "Skipping Next.js start (will be handled by package.json)",
+        taskRunnerSkipped: "Production task runner skipped (--skip-task-runner flag used)",
+        skipNextStart: "Skipping Next.js start (will be handled by package.json)",
         serverWillStart: "Production server will be started by package.json",
         serverAvailable: "Server will be available at http://localhost:",
         startupPrepared: "✅ Production server startup prepared successfully",
         failedStart: "❌ Failed to start production server: ",
-        gracefulShutdown:
-          "Graceful shutdown requested for production task runner",
+        gracefulShutdown: "Graceful shutdown requested for production task runner",
       },
     },
   },

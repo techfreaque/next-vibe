@@ -17,10 +17,7 @@ import type { z } from "zod";
 
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import {
-  UserPermissionRole,
-  type UserRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
+import { UserPermissionRole, type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -33,10 +30,7 @@ import { schemaUIHandler } from "../../unified-interface/cli/widgets/renderers/s
 import { definitionsRegistry } from "../../unified-interface/shared/endpoints/definitions/registry";
 import type { CreateApiEndpointAny } from "../../unified-interface/shared/types/endpoint";
 import { Platform } from "../../unified-interface/shared/types/platform";
-import {
-  endpointToToolName,
-  splitPath,
-} from "../../unified-interface/shared/utils/path";
+import { endpointToToolName, splitPath } from "../../unified-interface/shared/utils/path";
 
 /**
  * Interactive session state
@@ -117,23 +111,15 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
 
       // Show welcome message with better formatting
       logger.info(`\n${"═".repeat(60)}`);
-      logger.info(
-        `  ${t("app.api.system.unifiedInterface.cli.vibe.interactive.welcome")}`,
-      );
+      logger.info(`  ${t("app.api.system.unifiedInterface.cli.vibe.interactive.welcome")}`);
       logger.info("═".repeat(60));
-      logger.info(
-        `  ${t("app.api.system.unifiedInterface.cli.vibe.help.description")}`,
-      );
+      logger.info(`  ${t("app.api.system.unifiedInterface.cli.vibe.help.description")}`);
       logger.info(`${"═".repeat(60)}\n`);
 
       // Build route tree for file explorer navigation
       // Use centralized endpoint adapter to get all platform-accessible endpoints
       // (filtered by user permissions from JWT)
-      const discoveredEndpoints = definitionsRegistry.getEndpointsForUser(
-        platform,
-        user,
-        logger,
-      );
+      const discoveredEndpoints = definitionsRegistry.getEndpointsForUser(platform, user, logger);
 
       this.buildRouteTree(discoveredEndpoints);
 
@@ -211,9 +197,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     const { t } = simpleT(this.getSession().locale);
 
     this.routeTree = {
-      name: t(
-        "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.rootName",
-      ),
+      name: t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.rootName"),
       path: "/",
       type: "directory",
       children: [],
@@ -238,9 +222,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
 
     for (let i = 0; i < pathParts.length; i++) {
       const part = pathParts[i];
-      let childNode = currentNode.children?.find(
-        (child) => child.name === part,
-      );
+      let childNode = currentNode.children?.find((child) => child.name === part);
 
       if (!childNode) {
         const isLastPart = i === pathParts.length - 1;
@@ -305,12 +287,8 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     const choices: Array<{ name: string; value: string }> = [];
 
     if (this.currentNode.parent) {
-      const upIcon = t(
-        "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.upIcon",
-      );
-      const goUpText = t(
-        "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.goUp",
-      );
+      const upIcon = t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.upIcon");
+      const goUpText = t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.goUp");
       const upName = `${upIcon} ${goUpText}`;
       choices.push({
         name: upName,
@@ -328,9 +306,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       const routesText = t(
         "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.routes",
       );
-      const noDescriptionText = t(
-        "app.api.system.unifiedInterface.cli.vibe.errors.routeNotFound",
-      );
+      const noDescriptionText = t("app.api.system.unifiedInterface.cli.vibe.errors.routeNotFound");
 
       for (const child of this.currentNode.children) {
         if (child.type === "directory") {
@@ -343,15 +319,11 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
         } else if (child.type === "route" && child.route) {
           const route = child.route;
           const { t: routeT } = this.getTranslatorForRoute(route);
-          const description = route.description
-            ? routeT(route.description)
-            : noDescriptionText;
+          const description = route.description ? routeT(route.description) : noDescriptionText;
 
           // Use first alias if available, otherwise use the route name
           const displayName =
-            route.aliases && route.aliases.length > 0
-              ? route.aliases[0]
-              : child.name;
+            route.aliases && route.aliases.length > 0 ? route.aliases[0] : child.name;
 
           // Show additional aliases if available
           const additionalAliases =
@@ -387,12 +359,8 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     const settingsText = t(
       "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.settings",
     );
-    const exitIcon = t(
-      "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.exitIcon",
-    );
-    const exitText = t(
-      "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.exit",
-    );
+    const exitIcon = t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.exitIcon");
+    const exitText = t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.exit");
     const navigateMessage = t(
       "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.navigate",
     );
@@ -469,23 +437,15 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
 
       // Sort routes by display name
       const sortedRoutes = routes.toSorted((a, b) => {
-        const nameA =
-          a.aliases && a.aliases.length > 0
-            ? a.aliases[0]
-            : endpointToToolName(a);
-        const nameB =
-          b.aliases && b.aliases.length > 0
-            ? b.aliases[0]
-            : endpointToToolName(b);
+        const nameA = a.aliases && a.aliases.length > 0 ? a.aliases[0] : endpointToToolName(a);
+        const nameB = b.aliases && b.aliases.length > 0 ? b.aliases[0] : endpointToToolName(b);
         return nameA.localeCompare(nameB);
       });
 
       for (const route of sortedRoutes) {
         const { t: routeT } = this.getTranslatorForRoute(route);
         const displayName =
-          route.aliases && route.aliases.length > 0
-            ? route.aliases[0]
-            : endpointToToolName(route);
+          route.aliases && route.aliases.length > 0 ? route.aliases[0] : endpointToToolName(route);
 
         const description = route.description ? routeT(route.description) : "";
 
@@ -511,9 +471,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     });
 
     const action = await select({
-      message: t(
-        "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.selectRoute",
-      ),
+      message: t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.selectRoute"),
       choices,
       pageSize: 20,
     });
@@ -576,10 +534,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     }
   }
 
-  private findNodeByPath(
-    node: DirectoryNode,
-    path: string,
-  ): DirectoryNode | null {
+  private findNodeByPath(node: DirectoryNode, path: string): DirectoryNode | null {
     if (node.path === path) {
       return node;
     }
@@ -594,10 +549,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     return null;
   }
 
-  private async executeRouteByPath(
-    routePath: string,
-    logger: EndpointLogger,
-  ): Promise<void> {
+  private async executeRouteByPath(routePath: string, logger: EndpointLogger): Promise<void> {
     if (!this.routeTree) {
       return;
     }
@@ -608,15 +560,10 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     }
   }
 
-  private findRouteByPath(
-    node: DirectoryNode,
-    path: string,
-  ): CreateApiEndpointAny | null {
+  private findRouteByPath(node: DirectoryNode, path: string): CreateApiEndpointAny | null {
     if (node.route) {
       const pathArray = node.route.path;
-      const routePath = Array.isArray(pathArray)
-        ? pathArray.join("/")
-        : pathArray;
+      const routePath = Array.isArray(pathArray) ? pathArray.join("/") : pathArray;
       if (routePath === path) {
         return node.route;
       }
@@ -638,25 +585,16 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
   ): Promise<void> {
     const { t } = simpleT(this.getSession().locale);
 
-    const executingText = t(
-      "app.api.system.unifiedInterface.cli.vibe.executing",
-    );
-    const routeText = t(
-      "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.route",
-    );
-    const methodText = t(
-      "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.method",
-    );
+    const executingText = t("app.api.system.unifiedInterface.cli.vibe.executing");
+    const routeText = t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.route");
+    const methodText = t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.method");
     const descriptionText = t(
       "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.description",
     );
 
     const pathArray = route.path;
-    const routePath = Array.isArray(pathArray)
-      ? pathArray.join("/")
-      : pathArray;
-    const alias =
-      route.aliases && route.aliases.length > 0 ? route.aliases[0] : undefined;
+    const routePath = Array.isArray(pathArray) ? pathArray.join("/") : pathArray;
+    const alias = route.aliases && route.aliases.length > 0 ? route.aliases[0] : undefined;
 
     // Better visual formatting for route execution
     logger.info(`\n${"─".repeat(60)}`);
@@ -723,17 +661,13 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
 
     const sessionLocale = this.getSession().locale;
     // Only use as default if it's one of the available options
-    const defaultLocale = localeOptions.some(
-      (opt) => opt.value === sessionLocale,
-    )
+    const defaultLocale = localeOptions.some((opt) => opt.value === sessionLocale)
       ? sessionLocale
       : undefined;
     const locale = await select({
       message: selectLocaleText,
       choices: localeOptions,
-      default: defaultLocale as
-        | (typeof localeOptions)[number]["value"]
-        | undefined,
+      default: defaultLocale as (typeof localeOptions)[number]["value"] | undefined,
     });
 
     return locale as CountryLanguage;
@@ -744,10 +678,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     logger: EndpointLogger,
   ): Promise<void> {
     const routePath = endpoint.path.join("/");
-    const alias =
-      endpoint.aliases && endpoint.aliases.length > 0
-        ? endpoint.aliases[0]
-        : undefined;
+    const alias = endpoint.aliases && endpoint.aliases.length > 0 ? endpoint.aliases[0] : undefined;
     const title = endpoint.title || alias || routePath;
 
     logger.info(title);
@@ -791,10 +722,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       );
     }
 
-    if (
-      Object.keys(requestData).length > 0 ||
-      Object.keys(urlPathParams).length > 0
-    ) {
+    if (Object.keys(requestData).length > 0 || Object.keys(urlPathParams).length > 0) {
       const previewText = tSelected(
         "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.preview",
       );
@@ -831,12 +759,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       }
     }
 
-    await this.executeRouteWithData(
-      endpoint,
-      requestData,
-      urlPathParams,
-      logger,
-    );
+    await this.executeRouteWithData(endpoint, requestData, urlPathParams, logger);
   }
 
   private async generateFormFromSchema(
@@ -886,13 +809,11 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     route: CreateApiEndpointAny,
     logger: EndpointLogger,
   ): Promise<CreateApiEndpointAny | null> {
-    const { definitionLoader } = await import(
-      "../../unified-interface/shared/endpoints/definition/loader"
-    );
+    const { definitionLoader } =
+      await import("../../unified-interface/shared/endpoints/definition/loader");
 
     const routePath = route.path.join("/");
-    const alias =
-      route.aliases && route.aliases.length > 0 ? route.aliases[0] : undefined;
+    const alias = route.aliases && route.aliases.length > 0 ? route.aliases[0] : undefined;
     const resolvedCommand = alias || routePath;
     const result = await definitionLoader.load({
       identifier: resolvedCommand,
@@ -1017,9 +938,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
 
         if (action === InteractiveRepositoryImpl.EXIT_ACTION) {
           const { t } = simpleT(this.getSession().locale);
-          const goodbyeText = t(
-            "app.api.system.unifiedInterface.cli.vibe.interactive.goodbye",
-          );
+          const goodbyeText = t("app.api.system.unifiedInterface.cli.vibe.interactive.goodbye");
           logger.info(`\n${goodbyeText}\n`);
           break;
         } else if (action === "separator") {
@@ -1031,16 +950,10 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
         } else if (action === InteractiveRepositoryImpl.UP_ACTION) {
           this.navigateUp();
         } else if (action.startsWith(InteractiveRepositoryImpl.NAV_PREFIX)) {
-          const targetPath = action.replace(
-            InteractiveRepositoryImpl.NAV_PREFIX,
-            "",
-          );
+          const targetPath = action.replace(InteractiveRepositoryImpl.NAV_PREFIX, "");
           this.navigateToPath(targetPath);
         } else if (action.startsWith(InteractiveRepositoryImpl.EXEC_PREFIX)) {
-          const routePath = action.replace(
-            InteractiveRepositoryImpl.EXEC_PREFIX,
-            "",
-          );
+          const routePath = action.replace(InteractiveRepositoryImpl.EXEC_PREFIX, "");
           await this.executeRouteByPath(routePath, logger);
         }
       } catch (error) {
@@ -1063,10 +976,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
       if (action === "back" || action === "separator") {
         break;
       } else if (action.startsWith(InteractiveRepositoryImpl.EXEC_PREFIX)) {
-        const routePath = action.replace(
-          InteractiveRepositoryImpl.EXEC_PREFIX,
-          "",
-        );
+        const routePath = action.replace(InteractiveRepositoryImpl.EXEC_PREFIX, "");
         await this.executeRouteByPath(routePath, logger);
         break;
       }
@@ -1128,10 +1038,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
     await this.updateSetting(setting, logger);
   }
 
-  private async updateSetting(
-    setting: string,
-    logger: EndpointLogger,
-  ): Promise<void> {
+  private async updateSetting(setting: string, logger: EndpointLogger): Promise<void> {
     const session = this.getSession();
 
     switch (setting) {
@@ -1200,17 +1107,13 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
           { name: polishText, value: "pl-PL" },
         ] satisfies Array<{ name: string; value: CountryLanguage }>;
         // Only use as default if it's one of the available options
-        const defaultLocale = localeChoices.some(
-          (opt) => opt.value === session.locale,
-        )
+        const defaultLocale = localeChoices.some((opt) => opt.value === session.locale)
           ? session.locale
           : undefined;
         const locale = await select({
           message: chooseLocaleText,
           choices: localeChoices,
-          default: defaultLocale as
-            | (typeof localeChoices)[number]["value"]
-            | undefined,
+          default: defaultLocale as (typeof localeChoices)[number]["value"] | undefined,
         });
         session.locale = locale as CountryLanguage;
         break;
@@ -1225,5 +1128,4 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
   }
 }
 
-export const interactiveRepository: InteractiveRepository =
-  new InteractiveRepositoryImpl();
+export const interactiveRepository: InteractiveRepository = new InteractiveRepositoryImpl();

@@ -6,13 +6,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { Link } from "next-vibe-ui/ui/link";
 import { Environment } from "next-vibe/shared/utils/env-util";
 import { Button } from "next-vibe-ui/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "next-vibe-ui/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
@@ -49,33 +43,20 @@ export default function ResetPasswordConfirmForm({
     locale,
   );
 
-  const {
-    form,
-    submitForm,
-    isSubmitting,
-    passwordValue,
-    tokenValid,
-    alert,
-    isSuccess,
-  } = useResetPasswordConfirm(token, tokenValidationResponse, logger);
+  const { form, submitForm, isSubmitting, passwordValue, tokenValid, alert, isSuccess } =
+    useResetPasswordConfirm(token, tokenValidationResponse, logger);
 
   // If the token is invalid
   if (tokenValid === false) {
     return (
-      <MotionDiv
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
+      <MotionDiv initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
         <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
           <CardContent className="pt-6">
             {alert && <FormAlert alert={alert} className="mb-6" />}
             <Div className="text-center">
               <Button asChild>
                 <Link href={`/${locale}/user/reset-password`}>
-                  {t(
-                    "app.user.other.resetPassword.auth.resetPassword.requestNewLink",
-                  )}
+                  {t("app.user.other.resetPassword.auth.resetPassword.requestNewLink")}
                 </Link>
               </Button>
             </Div>
@@ -88,19 +69,12 @@ export default function ResetPasswordConfirmForm({
   // If password reset was successful
   if (isSuccess) {
     return (
-      <MotionDiv
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
+      <MotionDiv initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
         <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
           <CardContent className="pt-6">
             {alert && <FormAlert alert={alert} className="mb-6" />}
             <Div className="text-center">
-              <Button
-                asChild
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
+              <Button asChild className="bg-green-600 hover:bg-green-700 text-white">
                 <Link href={`/${locale}/user/login`}>
                   {t("app.user.other.login.auth.login.signInButton")}
                 </Link>
@@ -122,25 +96,17 @@ export default function ResetPasswordConfirmForm({
       <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
         <CardHeader className="flex flex-col gap-1 pb-2">
           <CardTitle className="text-2xl font-bold text-center">
-            {t(
-              "app.user.other.resetPassword.auth.resetPassword.createNewPasswordTitle",
-            )}
+            {t("app.user.other.resetPassword.auth.resetPassword.createNewPasswordTitle")}
           </CardTitle>
           <CardDescription className="text-center">
-            {t(
-              "app.user.other.resetPassword.auth.resetPassword.createNewPasswordSubtitle",
-            )}
+            {t("app.user.other.resetPassword.auth.resetPassword.createNewPasswordSubtitle")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {/* Show form alert if any */}
           {alert && <FormAlert alert={alert} className="mb-6" />}
 
-          <Form
-            form={form}
-            onSubmit={submitForm}
-            className="flex flex-col gap-6"
-          >
+          <Form form={form} onSubmit={submitForm} className="flex flex-col gap-6">
             <EndpointFormField
               name="verification.email"
               control={form.control}
@@ -163,10 +129,7 @@ export default function ResetPasswordConfirmForm({
                 }}
                 locale={locale}
               />
-              <PasswordStrengthIndicator
-                password={passwordValue}
-                locale={locale}
-              />
+              <PasswordStrengthIndicator password={passwordValue} locale={locale} />
             </FormItem>
 
             <EndpointFormField
@@ -187,9 +150,7 @@ export default function ResetPasswordConfirmForm({
                   {t("app.user.common.loading")}
                 </>
               ) : (
-                t(
-                  "app.user.other.resetPassword.auth.resetPassword.resetPasswordButton",
-                )
+                t("app.user.other.resetPassword.auth.resetPassword.resetPasswordButton")
               )}
             </Button>
           </Form>

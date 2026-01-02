@@ -13,12 +13,7 @@ type TextProps = SlottableTextPropsWithClassName & {
   style?: React.CSSProperties;
 };
 
-function Text({
-  className,
-  style,
-  asChild = false,
-  ...props
-}: TextProps): React.JSX.Element {
+function Text({ className, style, asChild = false, ...props }: TextProps): React.JSX.Element {
   const textClass = React.useContext(TextClassContext);
   const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
 
@@ -27,11 +22,7 @@ function Text({
       <Slot.Text
         {...applyStyleType({
           nativeStyle,
-          className: cn(
-            "text-base text-foreground select-text",
-            textClass,
-            className,
-          ),
+          className: cn("text-base text-foreground select-text", textClass, className),
         })}
         {...props}
       />
@@ -41,11 +32,7 @@ function Text({
     <RNText
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "text-base text-foreground select-text",
-          textClass,
-          className,
-        ),
+        className: cn("text-base text-foreground select-text", textClass, className),
       })}
       {...props}
     />

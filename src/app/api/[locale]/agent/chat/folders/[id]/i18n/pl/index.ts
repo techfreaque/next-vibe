@@ -128,8 +128,7 @@ export const translations: typeof enTranslations = {
     },
     parentId: {
       label: "Folder nadrzędny",
-      description:
-        "Przenieś folder do innego folderu nadrzędnego (null dla głównego)",
+      description: "Przenieś folder do innego folderu nadrzędnego (null dla głównego)",
     },
     expanded: {
       label: "Rozwinięty",
@@ -211,8 +210,7 @@ export const translations: typeof enTranslations = {
       validation: {
         title: "Błąd walidacji",
         description: "Podane dane są nieprawidłowe",
-        circularReference:
-          "Nie można ustawić folderu jako własnego folderu nadrzędnego",
+        circularReference: "Nie można ustawić folderu jako własnego folderu nadrzędnego",
       },
       unauthorized: {
         title: "Nieautoryzowany",

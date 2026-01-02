@@ -18,9 +18,7 @@ import { formatCamelCaseLabel } from "@/app/api/[locale]/system/unified-interfac
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class ContainerWidgetRenderer extends BaseWidgetRenderer<
-  typeof WidgetType.CONTAINER
-> {
+export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.CONTAINER> {
   readonly widgetType = WidgetType.CONTAINER;
 
   render(props: CLIWidgetProps<typeof WidgetType.CONTAINER, string>): string {
@@ -41,8 +39,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
     }
 
     const label = this.formatLabel(field, context);
-    const valueStr =
-      typeof value === "object" ? JSON.stringify(value) : String(value);
+    const valueStr = typeof value === "object" ? JSON.stringify(value) : String(value);
     return `${label}: ${valueStr}`;
   }
 
@@ -97,11 +94,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
 
       if (field?.type === "object" && field.children?.[key]) {
         const childField = field.children[key];
-        const rendered = context.renderWidget(
-          childField.ui.type,
-          childField,
-          value,
-        );
+        const rendered = context.renderWidget(childField.ui.type, childField, value);
         if (rendered) {
           result.push(rendered);
         }
@@ -149,11 +142,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<
     context: WidgetRenderContext,
   ): string {
     // Handle primitive values
-    if (
-      typeof value === "string" ||
-      typeof value === "number" ||
-      typeof value === "boolean"
-    ) {
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
       const icon = this.getMetricIcon(context);
       // Use shared formatting utility
       const label = formatCamelCaseLabel(key);

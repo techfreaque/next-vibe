@@ -29,12 +29,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import {
-  Countries,
-  CountriesOptions,
-  Languages,
-  LanguagesOptions,
-} from "@/i18n/core/config";
+import { Countries, CountriesOptions, Languages, LanguagesOptions } from "@/i18n/core/config";
 
 import {
   PaymentMethodFilter,
@@ -102,10 +97,8 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.users.stats.fields.search.label" as const,
-              description:
-                "app.api.users.stats.fields.search.description" as const,
-              placeholder:
-                "app.api.users.stats.fields.search.placeholder" as const,
+              description: "app.api.users.stats.fields.search.description" as const,
+              placeholder: "app.api.users.stats.fields.search.placeholder" as const,
               columns: 12,
             },
             z.string().optional(),
@@ -115,8 +108,7 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.users.stats.fields.status.label" as const,
-              description:
-                "app.api.users.stats.fields.status.description" as const,
+              description: "app.api.users.stats.fields.status.description" as const,
               options: UserStatusFilterOptions,
               columns: 6,
             },
@@ -127,8 +119,7 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.users.stats.fields.role.label" as const,
-              description:
-                "app.api.users.stats.fields.role.description" as const,
+              description: "app.api.users.stats.fields.role.description" as const,
               options: UserRoleFilterOptions,
               columns: 6,
             },
@@ -142,8 +133,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.users.stats.subscriptionFilters.title" as const,
-          description:
-            "app.api.users.stats.subscriptionFilters.description" as const,
+          description: "app.api.users.stats.subscriptionFilters.description" as const,
           layoutType: LayoutType.GRID_2_COLUMNS,
           order: 1.5,
           showFormAlert: false,
@@ -155,24 +145,19 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.users.stats.fields.subscriptionStatus.label" as const,
-              description:
-                "app.api.users.stats.fields.subscriptionStatus.description" as const,
+              label: "app.api.users.stats.fields.subscriptionStatus.label" as const,
+              description: "app.api.users.stats.fields.subscriptionStatus.description" as const,
               options: SubscriptionStatusFilterOptions,
               columns: 6,
             },
-            z
-              .enum(SubscriptionStatusFilter)
-              .default(SubscriptionStatusFilter.ALL),
+            z.enum(SubscriptionStatusFilter).default(SubscriptionStatusFilter.ALL),
           ),
           paymentMethod: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.users.stats.fields.paymentMethod.label" as const,
-              description:
-                "app.api.users.stats.fields.paymentMethod.description" as const,
+              description: "app.api.users.stats.fields.paymentMethod.description" as const,
               options: PaymentMethodFilterOptions,
               columns: 6,
             },
@@ -186,8 +171,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.users.stats.locationFilters.title" as const,
-          description:
-            "app.api.users.stats.locationFilters.description" as const,
+          description: "app.api.users.stats.locationFilters.description" as const,
           layoutType: LayoutType.GRID_2_COLUMNS,
           order: 2,
           showFormAlert: false,
@@ -200,10 +184,8 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.users.stats.fields.country.label" as const,
-              description:
-                "app.api.users.stats.fields.country.description" as const,
-              placeholder:
-                "app.api.users.stats.fields.country.placeholder" as const,
+              description: "app.api.users.stats.fields.country.description" as const,
+              placeholder: "app.api.users.stats.fields.country.placeholder" as const,
               options: CountriesOptions,
               columns: 6,
             },
@@ -214,10 +196,8 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.users.stats.fields.language.label" as const,
-              description:
-                "app.api.users.stats.fields.language.description" as const,
-              placeholder:
-                "app.api.users.stats.fields.language.placeholder" as const,
+              description: "app.api.users.stats.fields.language.description" as const,
+              placeholder: "app.api.users.stats.fields.language.placeholder" as const,
               options: LanguagesOptions,
               columns: 6,
             },
@@ -231,8 +211,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.users.stats.timePeriodOptions.title" as const,
-          description:
-            "app.api.users.stats.timePeriodOptions.description" as const,
+          description: "app.api.users.stats.timePeriodOptions.description" as const,
           layoutType: LayoutType.GRID,
           columns: 4,
           order: 3,
@@ -246,8 +225,7 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.users.stats.fields.timePeriod.label" as const,
-              description:
-                "app.api.users.stats.fields.timePeriod.description" as const,
+              description: "app.api.users.stats.fields.timePeriod.description" as const,
               options: TimePeriodOptions,
               columns: 3,
             },
@@ -257,10 +235,8 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.users.stats.fields.dateRangePreset.label" as const,
-              description:
-                "app.api.users.stats.fields.dateRangePreset.description" as const,
+              label: "app.api.users.stats.fields.dateRangePreset.label" as const,
+              description: "app.api.users.stats.fields.dateRangePreset.description" as const,
               options: DateRangePresetOptions,
               columns: 3,
             },
@@ -271,8 +247,7 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.users.stats.fields.chartType.label" as const,
-              description:
-                "app.api.users.stats.fields.chartType.description" as const,
+              description: "app.api.users.stats.fields.chartType.description" as const,
               options: ChartTypeOptions,
               columns: 3,
             },
@@ -282,10 +257,8 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label:
-                "app.api.users.stats.fields.includeComparison.label" as const,
-              description:
-                "app.api.users.stats.fields.includeComparison.description" as const,
+              label: "app.api.users.stats.fields.includeComparison.label" as const,
+              description: "app.api.users.stats.fields.includeComparison.description" as const,
               columns: 3,
             },
             z.coerce.boolean().default(false),
@@ -298,8 +271,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.users.stats.response.overviewStats.title" as const,
-          description:
-            "app.api.users.stats.response.overviewStats.description" as const,
+          description: "app.api.users.stats.response.overviewStats.description" as const,
           layoutType: LayoutType.GRID,
           columns: 4,
           order: 4,
@@ -311,8 +283,7 @@ const { GET } = createEndpoint({
           totalUsers: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.overviewStats.totalUsers.label" as const,
+              label: "app.api.users.stats.response.overviewStats.totalUsers.label" as const,
               icon: "users",
               variant: "default",
               format: "compact",
@@ -322,8 +293,7 @@ const { GET } = createEndpoint({
           activeUsers: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.overviewStats.activeUsers.label" as const,
+              label: "app.api.users.stats.response.overviewStats.activeUsers.label" as const,
               icon: "check",
               variant: "success",
               format: "compact",
@@ -333,8 +303,7 @@ const { GET } = createEndpoint({
           inactiveUsers: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.overviewStats.inactiveUsers.label" as const,
+              label: "app.api.users.stats.response.overviewStats.inactiveUsers.label" as const,
               icon: "error",
               variant: "muted",
               format: "compact",
@@ -344,8 +313,7 @@ const { GET } = createEndpoint({
           newUsers: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.overviewStats.newUsers.label" as const,
+              label: "app.api.users.stats.response.overviewStats.newUsers.label" as const,
               icon: "growth",
               variant: "info",
               format: "compact",
@@ -360,8 +328,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.users.stats.response.emailStats.title" as const,
-          description:
-            "app.api.users.stats.response.emailStats.description" as const,
+          description: "app.api.users.stats.response.emailStats.description" as const,
           layoutType: LayoutType.GRID,
           columns: 3,
           order: 5,
@@ -373,8 +340,7 @@ const { GET } = createEndpoint({
           emailVerifiedUsers: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.emailStats.emailVerifiedUsers.label" as const,
+              label: "app.api.users.stats.response.emailStats.emailVerifiedUsers.label" as const,
               icon: "verified",
               variant: "success",
               format: "compact",
@@ -384,8 +350,7 @@ const { GET } = createEndpoint({
           emailUnverifiedUsers: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.emailStats.emailUnverifiedUsers.label" as const,
+              label: "app.api.users.stats.response.emailStats.emailUnverifiedUsers.label" as const,
               icon: "unverified",
               variant: "warning",
               format: "compact",
@@ -395,8 +360,7 @@ const { GET } = createEndpoint({
           verificationRate: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.emailStats.verificationRate.label" as const,
+              label: "app.api.users.stats.response.emailStats.verificationRate.label" as const,
               icon: "rate",
               variant: "info",
               format: "percentage",
@@ -410,10 +374,8 @@ const { GET } = createEndpoint({
       subscriptionStats: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.users.stats.response.subscriptionStats.title" as const,
-          description:
-            "app.api.users.stats.response.subscriptionStats.description" as const,
+          title: "app.api.users.stats.response.subscriptionStats.title" as const,
+          description: "app.api.users.stats.response.subscriptionStats.description" as const,
           layoutType: LayoutType.GRID,
           columns: 4,
           order: 6,
@@ -458,8 +420,7 @@ const { GET } = createEndpoint({
           noSubscription: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.subscriptionStats.noSubscription.label" as const,
+              label: "app.api.users.stats.response.subscriptionStats.noSubscription.label" as const,
               icon: "users",
               variant: "muted",
               format: "compact",
@@ -496,8 +457,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.users.stats.response.paymentStats.title" as const,
-          description:
-            "app.api.users.stats.response.paymentStats.description" as const,
+          description: "app.api.users.stats.response.paymentStats.description" as const,
           layoutType: LayoutType.GRID,
           columns: 4,
           order: 6.5,
@@ -509,8 +469,7 @@ const { GET } = createEndpoint({
           totalRevenue: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.paymentStats.totalRevenue.label" as const,
+              label: "app.api.users.stats.response.paymentStats.totalRevenue.label" as const,
               icon: "currency",
               variant: "success",
               format: "currency",
@@ -520,8 +479,7 @@ const { GET } = createEndpoint({
           transactionCount: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.paymentStats.transactionCount.label" as const,
+              label: "app.api.users.stats.response.paymentStats.transactionCount.label" as const,
               icon: "receipt",
               variant: "info",
               format: "compact",
@@ -531,8 +489,7 @@ const { GET } = createEndpoint({
           averageOrderValue: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.paymentStats.averageOrderValue.label" as const,
+              label: "app.api.users.stats.response.paymentStats.averageOrderValue.label" as const,
               icon: "trending-up",
               variant: "info",
               format: "currency",
@@ -542,8 +499,7 @@ const { GET } = createEndpoint({
           refundRate: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.paymentStats.refundRate.label" as const,
+              label: "app.api.users.stats.response.paymentStats.refundRate.label" as const,
               icon: "refresh-cw",
               variant: "warning",
               format: "percentage",
@@ -558,8 +514,7 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.users.stats.response.roleStats.title" as const,
-          description:
-            "app.api.users.stats.response.roleStats.description" as const,
+          description: "app.api.users.stats.response.roleStats.description" as const,
           layoutType: LayoutType.GRID,
           columns: 3,
           order: 7,
@@ -571,8 +526,7 @@ const { GET } = createEndpoint({
           publicUsers: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.roleStats.publicUsers.label" as const,
+              label: "app.api.users.stats.response.roleStats.publicUsers.label" as const,
               icon: "users",
               variant: "muted",
               size: "sm",
@@ -582,8 +536,7 @@ const { GET } = createEndpoint({
           customerUsers: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.roleStats.customerUsers.label" as const,
+              label: "app.api.users.stats.response.roleStats.customerUsers.label" as const,
               icon: "users",
               variant: "success",
               size: "sm",
@@ -593,8 +546,7 @@ const { GET } = createEndpoint({
           partnerAdminUsers: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.roleStats.partnerAdminUsers.label" as const,
+              label: "app.api.users.stats.response.roleStats.partnerAdminUsers.label" as const,
               icon: "users",
               variant: "info",
               size: "sm",
@@ -604,8 +556,7 @@ const { GET } = createEndpoint({
           partnerEmployeeUsers: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.roleStats.partnerEmployeeUsers.label" as const,
+              label: "app.api.users.stats.response.roleStats.partnerEmployeeUsers.label" as const,
               icon: "users",
               variant: "info",
               size: "sm",
@@ -615,8 +566,7 @@ const { GET } = createEndpoint({
           adminUsers: responseField(
             {
               type: WidgetType.STAT,
-              label:
-                "app.api.users.stats.response.roleStats.adminUsers.label" as const,
+              label: "app.api.users.stats.response.roleStats.adminUsers.label" as const,
               icon: "star",
               variant: "warning",
               size: "sm",
@@ -627,10 +577,8 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.CHART,
               chartType: "pie",
-              label:
-                "app.api.users.stats.response.roleStats.roleChart.label" as const,
-              description:
-                "app.api.users.stats.response.roleStats.roleChart.description" as const,
+              label: "app.api.users.stats.response.roleStats.roleChart.label" as const,
+              description: "app.api.users.stats.response.roleStats.roleChart.description" as const,
               height: 280,
               showLegend: true,
               columns: 12,
@@ -652,8 +600,7 @@ const { GET } = createEndpoint({
       growthMetrics: objectField(
         {
           title: "app.api.users.stats.response.growthMetrics.title" as const,
-          description:
-            "app.api.users.stats.response.growthMetrics.description" as const,
+          description: "app.api.users.stats.response.growthMetrics.description" as const,
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID_2_COLUMNS,
           order: 8,
@@ -666,8 +613,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.users.stats.response.timeStats.title" as const,
-              description:
-                "app.api.users.stats.response.timeStats.description" as const,
+              description: "app.api.users.stats.response.timeStats.description" as const,
               layoutType: LayoutType.GRID,
               columns: 4,
               showFormAlert: false,
@@ -678,8 +624,7 @@ const { GET } = createEndpoint({
               usersCreatedToday: responseField(
                 {
                   type: WidgetType.STAT,
-                  label:
-                    "app.api.users.stats.response.timeStats.usersCreatedToday.label" as const,
+                  label: "app.api.users.stats.response.timeStats.usersCreatedToday.label" as const,
                   icon: "time",
                   variant: "info",
                   size: "sm",
@@ -724,10 +669,8 @@ const { GET } = createEndpoint({
           performanceRates: objectField(
             {
               type: WidgetType.CONTAINER,
-              title:
-                "app.api.users.stats.response.performanceRates.title" as const,
-              description:
-                "app.api.users.stats.response.performanceRates.description" as const,
+              title: "app.api.users.stats.response.performanceRates.title" as const,
+              description: "app.api.users.stats.response.performanceRates.description" as const,
               layoutType: LayoutType.GRID,
               columns: 3,
               showFormAlert: false,
@@ -738,8 +681,7 @@ const { GET } = createEndpoint({
               growthRate: responseField(
                 {
                   type: WidgetType.STAT,
-                  label:
-                    "app.api.users.stats.response.performanceRates.growthRate.label" as const,
+                  label: "app.api.users.stats.response.performanceRates.growthRate.label" as const,
                   icon: "growth",
                   variant: "success",
                   format: "percentage",
@@ -755,9 +697,7 @@ const { GET } = createEndpoint({
                   variant: "info",
                   format: "percentage",
                 },
-                z.coerce
-                  .number()
-                  .describe("Lead to user conversion rate (0-1)"),
+                z.coerce.number().describe("Lead to user conversion rate (0-1)"),
               ),
               retentionRate: responseField(
                 {
@@ -776,8 +716,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.CHART,
               chartType: "bar",
-              label:
-                "app.api.users.stats.response.growthMetrics.growthChart.label" as const,
+              label: "app.api.users.stats.response.growthMetrics.growthChart.label" as const,
               description:
                 "app.api.users.stats.response.growthMetrics.growthChart.description" as const,
               height: 280,
@@ -803,8 +742,7 @@ const { GET } = createEndpoint({
       businessInsights: objectField(
         {
           title: "app.api.users.stats.response.businessInsights.title" as const,
-          description:
-            "app.api.users.stats.response.businessInsights.description" as const,
+          description: "app.api.users.stats.response.businessInsights.description" as const,
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.STACKED,
           order: 9,
@@ -817,15 +755,10 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.TEXT,
               fieldType: FieldDataType.DATETIME,
-              label:
-                "app.api.users.stats.response.businessInsights.generatedAt.label" as const,
-              content:
-                "app.api.users.stats.response.businessInsights.generatedAt.label" as const,
+              label: "app.api.users.stats.response.businessInsights.generatedAt.label" as const,
+              content: "app.api.users.stats.response.businessInsights.generatedAt.label" as const,
             },
-            z
-              .string()
-              .datetime()
-              .describe("When these statistics were generated"),
+            z.string().datetime().describe("When these statistics were generated"),
           ),
         },
       ),
@@ -839,8 +772,7 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.users.stats.errors.unauthorized.title" as const,
-      description:
-        "app.api.users.stats.errors.unauthorized.description" as const,
+      description: "app.api.users.stats.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.users.stats.errors.server.title" as const,
@@ -852,8 +784,7 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.users.stats.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.users.stats.errors.unsavedChanges.description" as const,
+      description: "app.api.users.stats.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.users.stats.errors.conflict.title" as const,
@@ -902,26 +833,22 @@ const { GET } = createEndpoint({
             {
               x: "Active",
               y: 850,
-              label:
-                "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
+              label: "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
             },
             {
               x: "Canceled",
               y: 120,
-              label:
-                "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
+              label: "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
             },
             {
               x: "Expired",
               y: 230,
-              label:
-                "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
+              label: "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
             },
             {
               x: "None",
               y: 1250,
-              label:
-                "app.api.users.stats.response.subscriptionStats.noSubscription.label",
+              label: "app.api.users.stats.response.subscriptionStats.noSubscription.label",
             },
           ],
         },

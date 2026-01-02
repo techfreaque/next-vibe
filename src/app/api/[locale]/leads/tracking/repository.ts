@@ -8,21 +8,14 @@ import "server-only";
 import { and, eq, gt, isNull, sql } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 // Removed unused import - using direct database operations instead
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import {
-  getCountryFromLocale,
-  getLanguageFromLocale,
-} from "@/i18n/core/language-utils";
+import { getCountryFromLocale, getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import { emails } from "../../emails/messages/db";
 import { ReferralRepository } from "../../referral/repository";
@@ -87,12 +80,7 @@ const getMetadataNumber = (
 export class LeadTrackingRepository {
   private static readonly UUID_REGEX =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  private static readonly VALID_SOURCES = [
-    "email",
-    "social",
-    "website",
-    "referral",
-  ];
+  private static readonly VALID_SOURCES = ["email", "social", "website", "referral"];
 
   /**
    * Extract client information from request
@@ -110,9 +98,7 @@ export class LeadTrackingRepository {
     const userAgent = request.headers.get("user-agent") || "";
     const referer = request.headers.get("referer") || "";
     const ip =
-      request.headers.get("x-forwarded-for") ||
-      request.headers.get("x-real-ip") ||
-      "unknown";
+      request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
 
     return {
       userAgent,
@@ -130,8 +116,7 @@ export class LeadTrackingRepository {
     campaignId?: string;
     error?: string;
   } {
-    const leadId =
-      searchParams.get("leadId") || searchParams.get("id") || undefined;
+    const leadId = searchParams.get("leadId") || searchParams.get("id") || undefined;
     const campaignId = searchParams.get("campaignId");
 
     if (!leadId) {
@@ -206,20 +191,13 @@ export class LeadTrackingRepository {
 
       // Also update the email engagement in the emails table if campaign is present
       if (data.campaignId) {
-        await this.updateEmailEngagementRecord(
-          data.campaignId,
-          data.engagementType,
-          logger,
-        );
+        await this.updateEmailEngagementRecord(data.campaignId, data.engagementType, logger);
       }
 
       // Transition lead status based on engagement type
       // Note: Not all engagement types trigger status transitions (e.g., LEAD_ATTRIBUTION)
       const actionMap: Partial<
-        Record<
-          EngagementType,
-          "website_visit" | "email_open" | "email_click" | "form_submit"
-        >
+        Record<EngagementType, "website_visit" | "email_open" | "email_click" | "form_submit">
       > = {
         [EngagementTypes.WEBSITE_VISIT]: "website_visit",
         [EngagementTypes.EMAIL_OPEN]: "email_open",
@@ -257,10 +235,7 @@ export class LeadTrackingRepository {
         createdAt: engagementData.createdAt,
       });
     } catch (error) {
-      logger.error(
-        "app.api.leads.tracking.engagement.record.error",
-        parseError(error).message,
-      );
+      logger.error("app.api.leads.tracking.engagement.record.error", parseError(error).message);
       return fail({
         message: "app.api.leads.tracking.errors.default",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -366,10 +341,7 @@ export class LeadTrackingRepository {
         leadStatusUpdated: true,
       });
     } catch (error) {
-      logger.error(
-        "app.api.leads.tracking.consultation.failed",
-        parseError(error).message,
-      );
+      logger.error("app.api.leads.tracking.consultation.failed", parseError(error).message);
       return fail({
         message: "app.api.leads.tracking.errors.default",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -407,10 +379,7 @@ export class LeadTrackingRepository {
         leadStatusUpdated: true,
       });
     } catch (error) {
-      logger.error(
-        "app.api.leads.tracking.subscription.failed",
-        parseError(error).message,
-      );
+      logger.error("app.api.leads.tracking.subscription.failed", parseError(error).message);
       return fail({
         message: "app.api.leads.tracking.errors.default",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -510,10 +479,7 @@ export class LeadTrackingRepository {
         leadId: createdLead.id,
       });
     } catch (error) {
-      logger.error(
-        "app.api.leads.tracking.anonymous.error",
-        parseError(error).message,
-      );
+      logger.error("app.api.leads.tracking.anonymous.error", parseError(error).message);
       return fail({
         message: "app.api.leads.tracking.errors.default",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -526,10 +492,7 @@ export class LeadTrackingRepository {
    */
   static createTrackingPixelResponse(): Response {
     // 1x1 transparent GIF in base64
-    const pixel = Buffer.from(
-      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-      "base64",
-    );
+    const pixel = Buffer.from("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", "base64");
 
     return new Response(pixel, {
       status: 200,
@@ -575,10 +538,7 @@ export class LeadTrackingRepository {
       });
 
       // Get current lead
-      const leadResult = await LeadsRepository.getLeadByIdInternal(
-        leadId,
-        logger,
-      );
+      const leadResult = await LeadsRepository.getLeadByIdInternal(leadId, logger);
       if (!leadResult.success || !leadResult.data) {
         return fail({
           message: "app.api.leads.tracking.errors.default",
@@ -592,10 +552,7 @@ export class LeadTrackingRepository {
       let statusChanged = false;
 
       // Define target status for each action
-      const actionTargetStatus: Record<
-        string,
-        (typeof LeadStatus)[keyof typeof LeadStatus]
-      > = {
+      const actionTargetStatus: Record<string, (typeof LeadStatus)[keyof typeof LeadStatus]> = {
         website_visit: LeadStatus.WEBSITE_USER, // Website visitors become WEBSITE_USER
         email_open: LeadStatus.WEBSITE_USER, // Email engagement keeps them as WEBSITE_USER
         email_click: LeadStatus.WEBSITE_USER, // Email engagement keeps them as WEBSITE_USER
@@ -606,9 +563,8 @@ export class LeadTrackingRepository {
       };
 
       // Get target status for this action
-      const targetStatus:
-        | (typeof LeadStatus)[keyof typeof LeadStatus]
-        | undefined = actionTargetStatus[action];
+      const targetStatus: (typeof LeadStatus)[keyof typeof LeadStatus] | undefined =
+        actionTargetStatus[action];
       if (targetStatus !== undefined) {
         // Check if transition is allowed using centralized validation
         if (isStatusTransitionAllowed(currentStatus, targetStatus)) {
@@ -624,20 +580,17 @@ export class LeadTrackingRepository {
             });
 
             // Build properly typed metadata - filter existing metadata to only include valid types
-            const filteredMetadata: Record<string, string | number | boolean> =
-              {};
+            const filteredMetadata: Record<string, string | number | boolean> = {};
             if (leadDetail.metadata.metadata) {
-              Object.entries(leadDetail.metadata.metadata).forEach(
-                ([key, value]) => {
-                  if (
-                    typeof value === "string" ||
-                    typeof value === "number" ||
-                    typeof value === "boolean"
-                  ) {
-                    filteredMetadata[key] = value;
-                  }
-                },
-              );
+              Object.entries(leadDetail.metadata.metadata).forEach(([key, value]) => {
+                if (
+                  typeof value === "string" ||
+                  typeof value === "number" ||
+                  typeof value === "boolean"
+                ) {
+                  filteredMetadata[key] = value;
+                }
+              });
             }
 
             const updatedMetadata: Record<string, string | number | boolean> = {
@@ -645,8 +598,7 @@ export class LeadTrackingRepository {
               lastAction: action,
               lastActionAt: new Date().toISOString(),
               statusTransitionCount:
-                getMetadataNumber(filteredMetadata, "statusTransitionCount") +
-                1,
+                getMetadataNumber(filteredMetadata, "statusTransitionCount") + 1,
               lastTransition: [currentStatus, "to", newStatus].join("_"),
             };
 
@@ -755,10 +707,7 @@ export class LeadTrackingRepository {
 
       // Validate existing lead ID if provided
       if (leadId) {
-        const leadResult = await LeadsRepository.getLeadByIdInternal(
-          leadId,
-          logger,
-        );
+        const leadResult = await LeadsRepository.getLeadByIdInternal(leadId, logger);
         if (!leadResult.success) {
           logger.debug("app.api.leads.tracking.engagement.invalidLeadId", {
             invalidLeadId: leadId,
@@ -770,11 +719,7 @@ export class LeadTrackingRepository {
       // Create anonymous lead if leadId is missing or invalid
       // This should rarely happen since leadAuthService ensures leadId in JWT
       if (!leadId) {
-        const anonymousLeadResult = await this.createAnonymousLead(
-          clientInfo,
-          locale,
-          logger,
-        );
+        const anonymousLeadResult = await this.createAnonymousLead(clientInfo, locale, logger);
 
         if (anonymousLeadResult.success && anonymousLeadResult.data) {
           leadId = anonymousLeadResult.data.leadId;
@@ -800,15 +745,11 @@ export class LeadTrackingRepository {
 
       // Establish lead-user relationship if user is logged in
       // Check if relationship already exists before attempting conversion
-      const currentUserId =
-        data.userId || (user.isPublic ? undefined : user.id);
+      const currentUserId = data.userId || (user.isPublic ? undefined : user.id);
       if (currentUserId && !user.isPublic) {
         try {
           // First check if lead is already converted to avoid unnecessary conversion attempts
-          const leadResult = await LeadsRepository.getLeadByIdInternal(
-            leadId,
-            logger,
-          );
+          const leadResult = await LeadsRepository.getLeadByIdInternal(leadId, logger);
 
           if (
             leadResult.success &&
@@ -829,13 +770,10 @@ export class LeadTrackingRepository {
             );
             if (convertResult.success) {
               relationshipEstablished = true;
-              logger.debug(
-                "app.api.leads.tracking.engagement.relationshipEstablished",
-                {
-                  leadId,
-                  userId: currentUserId,
-                },
-              );
+              logger.debug("app.api.leads.tracking.engagement.relationshipEstablished", {
+                leadId,
+                userId: currentUserId,
+              });
             }
           }
         } catch (error) {
@@ -985,10 +923,7 @@ export class LeadTrackingRepository {
         engagementRecorded,
       });
     } catch (error) {
-      logger.error(
-        "app.api.leads.tracking.pixel.failed",
-        parseError(error).message,
-      );
+      logger.error("app.api.leads.tracking.pixel.failed", parseError(error).message);
       return fail({
         message: "app.api.leads.tracking.errors.default",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -1063,11 +998,7 @@ export class LeadTrackingRepository {
       if (trackingLeadId !== currentLeadId && currentLeadId) {
         try {
           if (isLoggedIn && user.id) {
-            await LeadAuthRepository.linkLeadToUser(
-              trackingLeadId,
-              user.id,
-              logger,
-            );
+            await LeadAuthRepository.linkLeadToUser(trackingLeadId, user.id, logger);
             leadsLinked = true;
             logger.debug("app.api.leads.tracking.click.linkedToUser", {
               trackingLeadId,
@@ -1090,10 +1021,7 @@ export class LeadTrackingRepository {
             });
           }
         } catch (error) {
-          logger.error(
-            "app.api.leads.tracking.click.linkFailed",
-            parseError(error).message,
-          );
+          logger.error("app.api.leads.tracking.click.linkFailed", parseError(error).message);
         }
       }
 
@@ -1121,10 +1049,7 @@ export class LeadTrackingRepository {
       // Update lead status if user is logged in
       if (isLoggedIn) {
         try {
-          const leadResult = await LeadsRepository.getLeadByIdInternal(
-            trackingLeadId,
-            logger,
-          );
+          const leadResult = await LeadsRepository.getLeadByIdInternal(trackingLeadId, logger);
           if (leadResult.success) {
             await LeadsRepository.updateLeadInternal(
               trackingLeadId,
@@ -1134,10 +1059,7 @@ export class LeadTrackingRepository {
             leadStatusUpdated = true;
           }
         } catch (error) {
-          logger.error(
-            "app.api.leads.tracking.click.status.failed",
-            parseError(error).message,
-          );
+          logger.error("app.api.leads.tracking.click.status.failed", parseError(error).message);
         }
       }
 
@@ -1248,8 +1170,7 @@ export class LeadTrackingRepository {
     // Prevent nested tracking URLs
     if (
       finalDestinationUrl.includes("/track?") ||
-      (finalDestinationUrl.includes("/api/") &&
-        finalDestinationUrl.includes("/tracking/"))
+      (finalDestinationUrl.includes("/api/") && finalDestinationUrl.includes("/tracking/"))
     ) {
       return finalDestinationUrl;
     }
@@ -1294,11 +1215,7 @@ export class LeadTrackingRepository {
     const telPrefix = "tel:";
     const anchorPrefix = "#";
 
-    if (
-      url.startsWith(mailtoPrefix) ||
-      url.startsWith(telPrefix) ||
-      url.startsWith(anchorPrefix)
-    ) {
+    if (url.startsWith(mailtoPrefix) || url.startsWith(telPrefix) || url.startsWith(anchorPrefix)) {
       return url;
     }
 
@@ -1334,10 +1251,7 @@ export class LeadTrackingRepository {
       url: string;
     },
   ): string {
-    const apiUrl = new URL(
-      `/api/${locale}/v1/leads/tracking/engagement`,
-      baseUrl,
-    );
+    const apiUrl = new URL(`/api/${locale}/v1/leads/tracking/engagement`, baseUrl);
 
     apiUrl.searchParams.set("id", params.id);
     if (params.campaignId) {

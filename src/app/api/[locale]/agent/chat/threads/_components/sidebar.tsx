@@ -93,19 +93,14 @@ export function ChatSidebar({
   // Hook handles null case internally - called unconditionally per React rules
   const endpoint = useCredits(logger, initialCredits ?? null);
   const readState = endpoint?.read;
-  const credits = readState?.response?.success
-    ? readState.response.data
-    : initialCredits;
+  const credits = readState?.response?.success ? readState.response.data : initialCredits;
   const [searchQuery, setSearchQuery] = useState("");
   const [newFolderDialogOpen, setNewFolderDialogOpen] = useState(false);
   const searchInputRef = useRef<InputRefObject>(null);
 
   // Use server-provided user prop to determine authentication status immediately
   // This prevents hydration mismatch - no client-side delay
-  const isAuthenticated = useMemo(
-    () => user !== undefined && !user.isPublic,
-    [user],
-  );
+  const isAuthenticated = useMemo(() => user !== undefined && !user.isPublic, [user]);
 
   // Get color for the active root folder - using simple color mapping
   const rootFolderColor = useMemo(
@@ -182,9 +177,7 @@ export function ChatSidebar({
   // Sort by pinned status (pinned first) and then by updatedAt (newest first)
   const filteredSearchThreads = useMemo(
     () =>
-      (
-        searchResults.map((result) => threads[result.id]).filter(Boolean) || []
-      ).toSorted((a, b) => {
+      (searchResults.map((result) => threads[result.id]).filter(Boolean) || []).toSorted((a, b) => {
         // Pinned threads come first
         if (a.pinned !== b.pinned) {
           return a.pinned ? -1 : 1;
@@ -299,12 +292,7 @@ export function ChatSidebar({
       </Div>
 
       {/* Compact Footer with Credits and User Menu */}
-      <SidebarFooter
-        locale={locale}
-        credits={credits}
-        user={user}
-        logger={logger}
-      />
+      <SidebarFooter locale={locale} credits={credits} user={user} logger={logger} />
 
       <NewFolderDialog
         open={newFolderDialogOpen}

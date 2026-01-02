@@ -39,10 +39,7 @@ export interface CLIWidgetRenderContext extends SharedWidgetRenderContext {
   options: CLIRenderingOptions;
   depth: number;
   t: TFunction;
-  formatValue: <const TKey extends string>(
-    field: UnifiedField<TKey>,
-    value: WidgetData,
-  ) => string;
+  formatValue: <const TKey extends string>(field: UnifiedField<TKey>, value: WidgetData) => string;
   getFieldIcon: (type: FieldDataType) => string;
   renderEmptyState: (message: string) => string;
   getRenderer: (widgetType: WidgetType) => AnyWidgetRenderer;
@@ -99,8 +96,7 @@ export type CLIWidgetPropsMap<TKey extends string> = {
 /**
  * Union of all CLI widget props - TypeScript narrows this in switch statements.
  */
-export type CLIWidgetPropsUnion<TKey extends string> =
-  CLIWidgetPropsMap<TKey>[WidgetType];
+export type CLIWidgetPropsUnion<TKey extends string> = CLIWidgetPropsMap<TKey>[WidgetType];
 
 /**
  * Data formatting utilities for CLI output
@@ -114,13 +110,7 @@ export interface DataFormatter {
   ): string;
   formatBoolean(value: boolean): string;
   formatDate(value: Date | string, locale: CountryLanguage): string;
-  formatArray(
-    value: WidgetData[],
-    options?: { separator?: string; maxItems?: number },
-  ): string;
-  formatObject(
-    value: Record<string, WidgetData>,
-    options?: { maxDepth?: number },
-  ): string;
+  formatArray(value: WidgetData[], options?: { separator?: string; maxItems?: number }): string;
+  formatObject(value: Record<string, WidgetData>, options?: { maxDepth?: number }): string;
   formatDuration(milliseconds: number): string;
 }

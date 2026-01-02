@@ -12,12 +12,7 @@ import { Form } from "next-vibe-ui/ui/form/form";
 import { GitBranch, Mic, Phone, X } from "next-vibe-ui/ui/icons";
 import { Kbd } from "next-vibe-ui/ui/kbd";
 import { Textarea } from "next-vibe-ui/ui/textarea";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "next-vibe-ui/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
@@ -29,12 +24,12 @@ import { useVoiceRecording } from "@/app/api/[locale]/agent/chat/threads/_compon
 import { RecordingModal } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/recording-modal";
 import { Selector } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/selector";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { useCallMode } from "../../../_components/chat-input/hooks/use-call-mode";
 import { useMessageEditor } from "./hooks/use-message-editor";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 interface MessageEditorProps {
   message: ChatMessage;
@@ -97,8 +92,7 @@ export function MessageEditor({
   });
 
   // UI state
-  const showMicButton =
-    !voice.isRecording && !voice.isProcessing && !editor.isLoading;
+  const showMicButton = !voice.isRecording && !voice.isProcessing && !editor.isLoading;
   const showTextarea = !voice.isRecording && !voice.isProcessing;
 
   return (
@@ -239,9 +233,7 @@ export function MessageEditor({
                       <Mic className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>
-                    {t("app.chat.voiceMode.tapToRecord")}
-                  </TooltipContent>
+                  <TooltipContent>{t("app.chat.voiceMode.tapToRecord")}</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             )}

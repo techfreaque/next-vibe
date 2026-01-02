@@ -14,8 +14,7 @@ export const {
   EMAIL_CLICK: "app.api.leads.enums.engagementTypes.emailClick" as const,
   WEBSITE_VISIT: "app.api.leads.enums.engagementTypes.websiteVisit" as const,
   FORM_SUBMIT: "app.api.leads.enums.engagementTypes.formSubmit" as const,
-  LEAD_ATTRIBUTION:
-    "app.api.leads.enums.engagementTypes.leadAttribution" as const,
+  LEAD_ATTRIBUTION: "app.api.leads.enums.engagementTypes.leadAttribution" as const,
 });
 
 /**
@@ -31,13 +30,11 @@ export const {
   PENDING: "app.api.leads.enums.leadStatus.pending",
   CAMPAIGN_RUNNING: "app.api.leads.enums.leadStatus.campaignRunning", // Changed from CONTACTED
   WEBSITE_USER: "app.api.leads.enums.leadStatus.websiteUser", // For leads created through website engagement tracking
-  NEWSLETTER_SUBSCRIBER:
-    "app.api.leads.enums.leadStatus.newsletterSubscriber" as const, // For website users who subscribed to newsletter
+  NEWSLETTER_SUBSCRIBER: "app.api.leads.enums.leadStatus.newsletterSubscriber" as const, // For website users who subscribed to newsletter
   IN_CONTACT: "app.api.leads.enums.leadStatus.inContact", // For leads who have contacted us and are in the process of being contacted but not yet converted
   SIGNED_UP: "app.api.leads.enums.leadStatus.signedUp", // User created account (what CONVERTED currently means)
   CONSULTATION_BOOKED: "app.api.leads.enums.leadStatus.consultationBooked", // User booked consultation call
-  SUBSCRIPTION_CONFIRMED:
-    "app.api.leads.enums.leadStatus.subscriptionConfirmed", // True conversion - subscription confirmed
+  SUBSCRIPTION_CONFIRMED: "app.api.leads.enums.leadStatus.subscriptionConfirmed", // True conversion - subscription confirmed
   UNSUBSCRIBED: "app.api.leads.enums.leadStatus.unsubscribed",
   BOUNCED: "app.api.leads.enums.leadStatus.bounced",
   INVALID: "app.api.leads.enums.leadStatus.invalid",
@@ -81,12 +78,9 @@ export const {
   Value: EmailJourneyVariantFilterValues,
 } = createEnumOptions({
   ALL: "app.api.leads.enums.emailJourneyVariantFilter.all",
-  PERSONAL_APPROACH:
-    "app.api.leads.enums.emailJourneyVariantFilter.personalApproach",
-  RESULTS_FOCUSED:
-    "app.api.leads.enums.emailJourneyVariantFilter.resultsFocused",
-  PERSONAL_RESULTS:
-    "app.api.leads.enums.emailJourneyVariantFilter.personalResults",
+  PERSONAL_APPROACH: "app.api.leads.enums.emailJourneyVariantFilter.personalApproach",
+  RESULTS_FOCUSED: "app.api.leads.enums.emailJourneyVariantFilter.resultsFocused",
+  PERSONAL_RESULTS: "app.api.leads.enums.emailJourneyVariantFilter.personalResults",
 });
 
 /**
@@ -232,14 +226,11 @@ export const {
   PENDING: "app.api.leads.enums.leadStatusFilter.pending",
   CAMPAIGN_RUNNING: "app.api.leads.enums.leadStatusFilter.campaignRunning",
   WEBSITE_USER: "app.api.leads.enums.leadStatusFilter.websiteUser",
-  NEWSLETTER_SUBSCRIBER:
-    "app.api.leads.enums.leadStatusFilter.newsletterSubscriber" as const,
+  NEWSLETTER_SUBSCRIBER: "app.api.leads.enums.leadStatusFilter.newsletterSubscriber" as const,
   IN_CONTACT: "app.api.leads.enums.leadStatusFilter.inContact",
   SIGNED_UP: "app.api.leads.enums.leadStatusFilter.signedUp",
-  CONSULTATION_BOOKED:
-    "app.api.leads.enums.leadStatusFilter.consultationBooked",
-  SUBSCRIPTION_CONFIRMED:
-    "app.api.leads.enums.leadStatusFilter.subscriptionConfirmed",
+  CONSULTATION_BOOKED: "app.api.leads.enums.leadStatusFilter.consultationBooked",
+  SUBSCRIPTION_CONFIRMED: "app.api.leads.enums.leadStatusFilter.subscriptionConfirmed",
   UNSUBSCRIBED: "app.api.leads.enums.leadStatusFilter.unsubscribed",
   BOUNCED: "app.api.leads.enums.leadStatusFilter.bounced",
   INVALID: "app.api.leads.enums.leadStatusFilter.invalid",
@@ -359,9 +350,7 @@ export function mapSourceFilter(
  * Map campaign stage filter to actual stage
  */
 export function mapCampaignStageFilter(
-  filter:
-    | (typeof EmailCampaignStageFilter)[keyof typeof EmailCampaignStageFilter]
-    | undefined,
+  filter: (typeof EmailCampaignStageFilter)[keyof typeof EmailCampaignStageFilter] | undefined,
 ): (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage] | null {
   switch (filter) {
     case EmailCampaignStageFilter.NOT_STARTED:
@@ -430,14 +419,13 @@ export function isStatusTransitionAllowed(
   switch (currentStatus) {
     case LeadStatus.IN_CONTACT: {
       // IN_CONTACT cannot go back to: NEW, PENDING, CAMPAIGN_RUNNING, WEBSITE_USER, NEWSLETTER_SUBSCRIBER
-      const inContactForbidden: (typeof LeadStatus)[keyof typeof LeadStatus][] =
-        [
-          LeadStatus.NEW,
-          LeadStatus.PENDING,
-          LeadStatus.CAMPAIGN_RUNNING,
-          LeadStatus.WEBSITE_USER,
-          LeadStatus.NEWSLETTER_SUBSCRIBER,
-        ];
+      const inContactForbidden: (typeof LeadStatus)[keyof typeof LeadStatus][] = [
+        LeadStatus.NEW,
+        LeadStatus.PENDING,
+        LeadStatus.CAMPAIGN_RUNNING,
+        LeadStatus.WEBSITE_USER,
+        LeadStatus.NEWSLETTER_SUBSCRIBER,
+      ];
       return !inContactForbidden.includes(newStatus);
     }
 
@@ -453,8 +441,11 @@ export function isStatusTransitionAllowed(
 
     case LeadStatus.NEWSLETTER_SUBSCRIBER: {
       // NEWSLETTER_SUBSCRIBER can transition to IN_CONTACT or other final statuses
-      const newsletterForbidden: (typeof LeadStatus)[keyof typeof LeadStatus][] =
-        [LeadStatus.NEW, LeadStatus.PENDING, LeadStatus.CAMPAIGN_RUNNING];
+      const newsletterForbidden: (typeof LeadStatus)[keyof typeof LeadStatus][] = [
+        LeadStatus.NEW,
+        LeadStatus.PENDING,
+        LeadStatus.CAMPAIGN_RUNNING,
+      ];
       return !newsletterForbidden.includes(newStatus);
     }
 
@@ -465,16 +456,15 @@ export function isStatusTransitionAllowed(
     case LeadStatus.BOUNCED:
     case LeadStatus.INVALID: {
       // These final statuses can only transition to other final statuses
-      const allowedTransitions: (typeof LeadStatus)[keyof typeof LeadStatus][] =
-        [
-          LeadStatus.IN_CONTACT,
-          LeadStatus.SIGNED_UP,
-          LeadStatus.CONSULTATION_BOOKED,
-          LeadStatus.SUBSCRIPTION_CONFIRMED,
-          LeadStatus.UNSUBSCRIBED,
-          LeadStatus.BOUNCED,
-          LeadStatus.INVALID,
-        ];
+      const allowedTransitions: (typeof LeadStatus)[keyof typeof LeadStatus][] = [
+        LeadStatus.IN_CONTACT,
+        LeadStatus.SIGNED_UP,
+        LeadStatus.CONSULTATION_BOOKED,
+        LeadStatus.SUBSCRIPTION_CONFIRMED,
+        LeadStatus.UNSUBSCRIBED,
+        LeadStatus.BOUNCED,
+        LeadStatus.INVALID,
+      ];
       return allowedTransitions.includes(newStatus);
     }
 
@@ -521,16 +511,15 @@ export function getNewsletterSubscriptionStatus(
   currentStatus: (typeof LeadStatus)[keyof typeof LeadStatus],
 ): (typeof LeadStatus)[keyof typeof LeadStatus] {
   // If already IN_CONTACT or higher, keep current status
-  const higherNewsletterStatuses: (typeof LeadStatus)[keyof typeof LeadStatus][] =
-    [
-      LeadStatus.IN_CONTACT,
-      LeadStatus.SIGNED_UP,
-      LeadStatus.CONSULTATION_BOOKED,
-      LeadStatus.SUBSCRIPTION_CONFIRMED,
-      LeadStatus.UNSUBSCRIBED,
-      LeadStatus.BOUNCED,
-      LeadStatus.INVALID,
-    ];
+  const higherNewsletterStatuses: (typeof LeadStatus)[keyof typeof LeadStatus][] = [
+    LeadStatus.IN_CONTACT,
+    LeadStatus.SIGNED_UP,
+    LeadStatus.CONSULTATION_BOOKED,
+    LeadStatus.SUBSCRIPTION_CONFIRMED,
+    LeadStatus.UNSUBSCRIBED,
+    LeadStatus.BOUNCED,
+    LeadStatus.INVALID,
+  ];
   const isHigherStatus = higherNewsletterStatuses.includes(currentStatus);
 
   if (isHigherStatus) {
@@ -555,8 +544,7 @@ export function getWebsiteUserStatus(
     LeadStatus.PENDING,
     LeadStatus.CAMPAIGN_RUNNING,
   ];
-  const isBasicStatus =
-    currentStatus && basicUserStatuses.includes(currentStatus);
+  const isBasicStatus = currentStatus && basicUserStatuses.includes(currentStatus);
 
   if (!currentStatus || isBasicStatus) {
     return LeadStatus.WEBSITE_USER;

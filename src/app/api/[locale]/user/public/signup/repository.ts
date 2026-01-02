@@ -7,11 +7,7 @@ import "server-only";
 
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  fail,
-  success,
-  ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
+import { fail, success, ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
@@ -35,10 +31,7 @@ import {
   isUserPermissionRole,
 } from "../../user-roles/enum";
 import { UserRolesRepository } from "../../user-roles/repository";
-import type {
-  SignupPostRequestOutput,
-  SignupPostResponseOutput,
-} from "./definition";
+import type { SignupPostRequestOutput, SignupPostResponseOutput } from "./definition";
 
 /**
  * Signup repository interface
@@ -110,19 +103,13 @@ export class SignupRepositoryImpl implements SignupRepository {
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             field: "confirmPassword",
-            message: t(
-              "app.api.user.public.signup.fields.confirmPassword.validation.mismatch",
-            ),
+            message: t("app.api.user.public.signup.fields.confirmPassword.validation.mismatch"),
           },
         });
       }
 
       // Check if email already exists
-      const emailCheckResponse = await this.checkEmailAvailabilityInternal(
-        email,
-        locale,
-        logger,
-      );
+      const emailCheckResponse = await this.checkEmailAvailabilityInternal(email, locale, logger);
       if (!emailCheckResponse.success) {
         return emailCheckResponse;
       }
@@ -165,27 +152,17 @@ export class SignupRepositoryImpl implements SignupRepository {
       await LeadAuthRepository.linkLeadToUser(user.leadId, userData.id, logger);
 
       // Link referral code if provided manually in form
-      const { ReferralRepository } = await import(
-        "../../../referral/repository"
-      );
+      const { ReferralRepository } = await import("../../../referral/repository");
       if (referralCode) {
         logger.debug("Linking manual referral code to lead", {
           referralCode,
           leadId: user.leadId,
         });
-        await ReferralRepository.linkReferralToLead(
-          user.leadId,
-          referralCode,
-          logger,
-        );
+        await ReferralRepository.linkReferralToLead(user.leadId, referralCode, logger);
       }
 
       // Convert lead referral to user referral (Phase 2: make referral permanent)
-      await ReferralRepository.convertLeadReferralToUser(
-        userData.id,
-        user.leadId,
-        logger,
-      );
+      await ReferralRepository.convertLeadReferralToUser(userData.id, user.leadId, logger);
 
       // Merge lead wallet into user wallet immediately (not lazy)
       // This ensures user gets their pre-signup credits right away
@@ -203,8 +180,7 @@ export class SignupRepositoryImpl implements SignupRepository {
           userId: userData.id,
           leadId: user.leadId,
           error: mergeResult.message,
-          action:
-            "User registered but credits may be missing - requires manual intervention",
+          action: "User registered but credits may be missing - requires manual intervention",
         });
       }
 
@@ -217,14 +193,9 @@ export class SignupRepositoryImpl implements SignupRepository {
       );
 
       // Fetch user roles from DB to include in JWT
-      const rolesResult = await UserRolesRepository.getUserRoles(
-        userData.id,
-        logger,
-      );
+      const rolesResult = await UserRolesRepository.getUserRoles(userData.id, logger);
       // Default to CUSTOMER role if roles fetch fails
-      const roles = rolesResult.success
-        ? rolesResult.data
-        : [UserPermissionRole.CUSTOMER];
+      const roles = rolesResult.success ? rolesResult.data : [UserPermissionRole.CUSTOMER];
 
       if (!rolesResult.success) {
         logger.warn(
@@ -274,22 +245,16 @@ export class SignupRepositoryImpl implements SignupRepository {
             userId: userData.id,
           });
         } else {
-          logger.error(
-            "Error storing auth token after signup",
-            parseError(storeResult),
-          );
+          logger.error("Error storing auth token after signup", parseError(storeResult));
           // Continue even if token storage fails
         }
       }
 
       // Log warning if credit merge failed - user should contact support
       if (creditMergeFailed) {
-        logger.warn(
-          "User registered but credit merge failed - manual intervention may be needed",
-          {
-            userId: userData.id,
-          },
-        );
+        logger.warn("User registered but credit merge failed - manual intervention may be needed", {
+          userId: userData.id,
+        });
       }
 
       // Return simple message response
@@ -333,13 +298,7 @@ export class SignupRepositoryImpl implements SignupRepository {
     role: UserRoleValue = UserRole.CUSTOMER,
   ): Promise<ResponseType<StandardUserType>> {
     try {
-      const {
-        email,
-        password,
-        privateName,
-        publicName,
-        subscribeToNewsletter,
-      } = userInput;
+      const { email, password, privateName, publicName, subscribeToNewsletter } = userInput;
 
       // Create user data object
       const userData = {
@@ -353,10 +312,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       // Create new user with generated ID
       logger.debug("Creating new user", { email });
 
-      const userResponse = await UserRepository.createWithHashedPassword(
-        userData,
-        logger,
-      );
+      const userResponse = await UserRepository.createWithHashedPassword(userData, logger);
       if (!userResponse.success) {
         return userResponse;
       }
@@ -372,12 +328,9 @@ export class SignupRepositoryImpl implements SignupRepository {
           logger,
         );
       } else {
-        logger.debug(
-          "Skipping platform marker assignment - markers are never stored in database",
-          {
-            role,
-          },
-        );
+        logger.debug("Skipping platform marker assignment - markers are never stored in database", {
+          role,
+        });
       }
 
       // Note: Free credits are automatically created for the lead when it's first accessed
@@ -391,10 +344,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       });
 
       // Fetch user roles for lead conversion tracking
-      const userRolesResult = await UserRolesRepository.getUserRoles(
-        userResponse.data.id,
-        logger,
-      );
+      const userRolesResult = await UserRolesRepository.getUserRoles(userResponse.data.id, logger);
       const userRoles = userRolesResult.success
         ? userRolesResult.data
         : [UserPermissionRole.CUSTOMER];
@@ -412,10 +362,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       // Handle newsletter subscription if user opted in
       if (subscribeToNewsletter) {
         // Newsletter subscription temporarily disabled during repository migration
-        logger.debug(
-          "Newsletter subscription requested but temporarily disabled",
-          { email },
-        );
+        logger.debug("Newsletter subscription requested but temporarily disabled", { email });
       }
 
       return success(userResponse.data);
@@ -484,11 +431,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       });
 
       // Convert lead with both email (for anonymous leads) and userId (for user relationship)
-      const convertResult = await LeadsRepository.convertLead(
-        leadId,
-        { email, userId },
-        logger,
-      );
+      const convertResult = await LeadsRepository.convertLead(leadId, { email, userId }, logger);
 
       if (convertResult.success) {
         logger.debug("Lead conversion completed successfully", {

@@ -17,13 +17,11 @@ export const translations: typeof enTranslations = {
     sideTasksNameLabel: "Task-Name",
     sideTasksNameDescription: "Der Name des Tasks",
     sideTasksLimitLabel: "Limit",
-    sideTasksLimitDescription:
-      "Maximale Anzahl der zurückzugebenden Ergebnisse",
+    sideTasksLimitDescription: "Maximale Anzahl der zurückzugebenden Ergebnisse",
     sideTasksDataLabel: "Task-Daten",
     sideTasksDataDescription: "Zusätzliche Daten für den Task",
     sideTasksRepositoryFetchAllFailed: "Fehler beim Abrufen aller Side Tasks",
-    sideTasksRepositoryFetchByIdFailed:
-      "Fehler beim Abrufen der Side Task nach ID",
+    sideTasksRepositoryFetchByIdFailed: "Fehler beim Abrufen der Side Task nach ID",
     sideTasksRepositoryCreateFailed: "Fehler beim Erstellen der Side Task",
   },
   post: {
@@ -128,14 +126,10 @@ export const translations: typeof enTranslations = {
     createExecutionFailed: "Fehler beim Erstellen der Side Task Ausführung",
     updateExecutionFailed: "Fehler beim Aktualisieren der Side Task Ausführung",
     fetchExecutionsFailed: "Fehler beim Abrufen der Side Task Ausführungen",
-    fetchRecentExecutionsFailed:
-      "Fehler beim Abrufen der letzten Side Task Ausführungen",
-    createHealthCheckFailed:
-      "Fehler beim Erstellen des Side Task Health Checks",
-    fetchLatestHealthCheckFailed:
-      "Fehler beim Abrufen des letzten Health Checks",
-    fetchHealthCheckHistoryFailed:
-      "Fehler beim Abrufen der Health Check Historie",
+    fetchRecentExecutionsFailed: "Fehler beim Abrufen der letzten Side Task Ausführungen",
+    createHealthCheckFailed: "Fehler beim Erstellen des Side Task Health Checks",
+    fetchLatestHealthCheckFailed: "Fehler beim Abrufen des letzten Health Checks",
+    fetchHealthCheckHistoryFailed: "Fehler beim Abrufen der Health Check Historie",
     fetchStatisticsFailed: "Fehler beim Abrufen der Side Task Statistiken",
     taskNotFound: "Side Task nicht gefunden",
     executionNotFound: "Side Task Ausführung nicht gefunden",

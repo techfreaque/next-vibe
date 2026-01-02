@@ -6,11 +6,7 @@
 import { execSync } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { GitInfo, GitOpsConfig, RepoInfo } from "../definition";
@@ -34,11 +30,7 @@ export interface IGitService {
   /**
    * Check if there are new commits since a tag
    */
-  hasNewCommitsSinceTag(
-    tag: string,
-    cwd: string,
-    logger: EndpointLogger,
-  ): boolean;
+  hasNewCommitsSinceTag(tag: string, cwd: string, logger: EndpointLogger): boolean;
 
   /**
    * Get the current branch name
@@ -141,11 +133,7 @@ export class GitService implements IGitService {
     }
   }
 
-  hasNewCommitsSinceTag(
-    tag: string,
-    cwd: string,
-    logger: EndpointLogger,
-  ): boolean {
+  hasNewCommitsSinceTag(tag: string, cwd: string, logger: EndpointLogger): boolean {
     if (!tag || tag === "v0.0.0") {
       return true;
     }
@@ -272,9 +260,7 @@ export class GitService implements IGitService {
         logger.debug("git add successful", { cwd });
       } catch (err) {
         const error = err as { stderr?: Buffer | string; message?: string };
-        const stderr = error.stderr
-          ? error.stderr.toString()
-          : error.message || String(err);
+        const stderr = error.stderr ? error.stderr.toString() : error.message || String(err);
         logger.error("git add failed", { stderr, cwd });
         return fail({
           message: "app.api.system.releaseTool.errors.gitOperationFailed",
@@ -298,20 +284,15 @@ export class GitService implements IGitService {
     } else {
       const commitFlags = signCommit ? "-S" : "";
       try {
-        execSync(
-          `git commit ${commitFlags} -m "${finalMessage}" --allow-empty`,
-          {
-            cwd,
-            encoding: "utf8",
-          },
-        );
+        execSync(`git commit ${commitFlags} -m "${finalMessage}" --allow-empty`, {
+          cwd,
+          encoding: "utf8",
+        });
         logger.debug("git commit successful", { message: finalMessage });
       } catch (err) {
         // May fail if nothing to commit - that's OK
         const error = err as { stderr?: Buffer | string; message?: string };
-        const stderr = error.stderr
-          ? error.stderr.toString()
-          : error.message || String(err);
+        const stderr = error.stderr ? error.stderr.toString() : error.message || String(err);
         logger.debug("git commit had no changes or failed (continuing)", {
           stderr,
         });
@@ -332,9 +313,7 @@ export class GitService implements IGitService {
           logger.info(MESSAGES.GIT_TAG_CREATED, { tag });
         } catch (err) {
           const error = err as { stderr?: Buffer | string; message?: string };
-          const stderr = error.stderr
-            ? error.stderr.toString()
-            : error.message || String(err);
+          const stderr = error.stderr ? error.stderr.toString() : error.message || String(err);
           logger.error("git tag failed", { stderr, tag, cwd });
           return fail({
             message: "app.api.system.releaseTool.git.tagFailed",
@@ -358,9 +337,7 @@ export class GitService implements IGitService {
           logger.debug("git push successful", { remote });
         } catch (err) {
           const error = err as { stderr?: Buffer | string; message?: string };
-          const stderr = error.stderr
-            ? error.stderr.toString()
-            : error.message || String(err);
+          const stderr = error.stderr ? error.stderr.toString() : error.message || String(err);
           logger.error("git push failed", { stderr, remote, cwd });
           return fail({
             message: "app.api.system.releaseTool.git.pushFailed",
@@ -379,9 +356,7 @@ export class GitService implements IGitService {
               stderr?: Buffer | string;
               message?: string;
             };
-            const stderr = error.stderr
-              ? error.stderr.toString()
-              : error.message || String(err);
+            const stderr = error.stderr ? error.stderr.toString() : error.message || String(err);
             logger.error("git push tag failed", { stderr, remote, tag, cwd });
             return fail({
               message: "app.api.system.releaseTool.git.pushFailed",

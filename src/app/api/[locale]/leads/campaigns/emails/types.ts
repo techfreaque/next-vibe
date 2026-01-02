@@ -9,12 +9,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import type { TrackingContext } from "../../../emails/smtp-client/components/tracking_context.email";
-import type {
-  EmailCampaignStage,
-  EmailJourneyVariant,
-  LeadSource,
-  LeadStatus,
-} from "../../enum";
+import type { EmailCampaignStage, EmailJourneyVariant, LeadSource, LeadStatus } from "../../enum";
 
 // Local type definition to avoid deprecated schema.ts imports
 interface LeadWithEmailType {
@@ -35,9 +30,7 @@ interface LeadWithEmailType {
   consultationBookedAt?: Date | null;
   subscriptionConfirmedAt?: Date | null;
   currentCampaignStage?: string | null;
-  emailJourneyVariant?:
-    | (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]
-    | null;
+  emailJourneyVariant?: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant] | null;
   emailsSent: number;
   lastEmailSentAt?: Date | null;
   unsubscribedAt?: Date | null;
@@ -169,13 +162,7 @@ export interface CampaignSchedulingOptions {
 export interface EmailTrackingData {
   leadId: string;
   campaignId: string;
-  eventType:
-    | "sent"
-    | "delivered"
-    | "opened"
-    | "clicked"
-    | "unsubscribed"
-    | "bounced";
+  eventType: "sent" | "delivered" | "opened" | "clicked" | "unsubscribed" | "bounced";
   timestamp: Date;
   metadata?: Record<string, string | number | boolean>;
   userAgent?: string;

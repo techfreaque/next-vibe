@@ -6,11 +6,7 @@
 /* eslint-disable i18next/no-literal-string */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -85,10 +81,7 @@ export interface ResetTaskManagementRepository {
 
   stopAutoReset(logger: EndpointLogger, taskName?: string): Promise<TaskResult>;
 
-  stopBackupVerification(
-    logger: EndpointLogger,
-    taskName?: string,
-  ): Promise<TaskResult>;
+  stopBackupVerification(logger: EndpointLogger, taskName?: string): Promise<TaskResult>;
 
   getTaskStatus(taskName: string, logger: EndpointLogger): Promise<TaskResult>;
 
@@ -98,9 +91,7 @@ export interface ResetTaskManagementRepository {
 /**
  * Database Reset Task Management Repository Implementation
  */
-export class ResetTaskManagementRepositoryImpl
-  implements ResetTaskManagementRepository
-{
+export class ResetTaskManagementRepositoryImpl implements ResetTaskManagementRepository {
   private tasks: Map<string, Task> = new Map();
   private runningTasks: Map<string, AbortController> = new Map();
 
@@ -121,9 +112,7 @@ export class ResetTaskManagementRepositoryImpl
       });
 
       // For multi-select operations, execute the first one (in real implementation, might execute all)
-      const operations = Array.isArray(data.operation)
-        ? data.operation
-        : [data.operation];
+      const operations = Array.isArray(data.operation) ? data.operation : [data.operation];
       const operation = operations[0];
       const options = data.options || {};
 
@@ -137,11 +126,7 @@ export class ResetTaskManagementRepositoryImpl
           result = await this.startAutoReset(logger, undefined, options);
           break;
         case "START_BACKUP_VERIFICATION":
-          result = await this.startBackupVerification(
-            logger,
-            undefined,
-            options,
-          );
+          result = await this.startBackupVerification(logger, undefined, options);
           break;
         case "STOP_AUTO_RESET":
           result = await this.stopAutoReset(logger);
@@ -157,8 +142,7 @@ export class ResetTaskManagementRepositoryImpl
           break;
         default:
           return fail({
-            message:
-              "app.api.system.db.reset.taskManagement.errors.validation.title",
+            message: "app.api.system.db.reset.taskManagement.errors.validation.title",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { operation },
           });
@@ -359,10 +343,7 @@ export class ResetTaskManagementRepositoryImpl
   /**
    * Stop auto-reset task
    */
-  async stopAutoReset(
-    logger: EndpointLogger,
-    taskName?: string,
-  ): Promise<TaskResult> {
+  async stopAutoReset(logger: EndpointLogger, taskName?: string): Promise<TaskResult> {
     logger.info("Stopping auto reset", { taskName });
     await new Promise<void>((resolve) => {
       setTimeout(() => resolve(), 10);
@@ -393,10 +374,7 @@ export class ResetTaskManagementRepositoryImpl
   /**
    * Stop backup verification task
    */
-  async stopBackupVerification(
-    logger: EndpointLogger,
-    taskName?: string,
-  ): Promise<TaskResult> {
+  async stopBackupVerification(logger: EndpointLogger, taskName?: string): Promise<TaskResult> {
     logger.info("Stopping backup verification", { taskName });
     await new Promise<void>((resolve) => {
       setTimeout(() => resolve(), 10);
@@ -433,10 +411,7 @@ export class ResetTaskManagementRepositoryImpl
   /**
    * Get status of a specific task
    */
-  async getTaskStatus(
-    taskName: string,
-    logger: EndpointLogger,
-  ): Promise<TaskResult> {
+  async getTaskStatus(taskName: string, logger: EndpointLogger): Promise<TaskResult> {
     logger.info("Getting task status", { taskName });
     await new Promise<void>((resolve) => {
       setTimeout(() => resolve(), 10);
@@ -599,5 +574,4 @@ export class ResetTaskManagementRepositoryImpl
 /**
  * Database Reset Task Management Repository Instance
  */
-export const resetTaskManagementRepository =
-  new ResetTaskManagementRepositoryImpl();
+export const resetTaskManagementRepository = new ResetTaskManagementRepositoryImpl();

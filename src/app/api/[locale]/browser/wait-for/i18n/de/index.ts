@@ -2,8 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Warten auf",
-  description:
-    "Warten, bis der angegebene Text auf der ausgewählten Seite erscheint",
+  description: "Warten, bis der angegebene Text auf der ausgewählten Seite erscheint",
 
   form: {
     label: "Auf Text warten",
@@ -33,13 +32,11 @@ export const translations: typeof enTranslations = {
   errors: {
     validation: {
       title: "Validierungsfehler",
-      description:
-        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
     },
     network: {
       title: "Netzwerkfehler",
-      description:
-        "Ein Netzwerkfehler ist während des Wartevorgangs aufgetreten",
+      description: "Ein Netzwerkfehler ist während des Wartevorgangs aufgetreten",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -55,18 +52,15 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Serverfehler",
-      description:
-        "Ein interner Serverfehler ist während des Wartevorgangs aufgetreten",
+      description: "Ein interner Serverfehler ist während des Wartevorgangs aufgetreten",
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description:
-        "Ein unbekannter Fehler ist während des Wartevorgangs aufgetreten",
+      description: "Ein unbekannter Fehler ist während des Wartevorgangs aufgetreten",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description:
-        "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
+      description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
     },
     conflict: {
       title: "Konflikt",

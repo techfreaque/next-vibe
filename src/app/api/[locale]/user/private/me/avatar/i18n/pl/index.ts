@@ -20,11 +20,9 @@ export const translations: typeof enTranslations = {
     deleted: "Awatar usunięty pomyślnie",
     nextSteps: {
       visible: "Twój awatar jest teraz widoczny w Twoim profilu",
-      update:
-        "Możesz go zaktualizować w dowolnym momencie w ustawieniach profilu",
+      update: "Możesz go zaktualizować w dowolnym momencie w ustawieniach profilu",
       default: "Twój profil teraz pokazuje domyślny awatar",
-      uploadNew:
-        "Możesz przesłać nowy awatar w dowolnym momencie w ustawieniach profilu",
+      uploadNew: "Możesz przesłać nowy awatar w dowolnym momencie w ustawieniach profilu",
     },
   },
   upload: {

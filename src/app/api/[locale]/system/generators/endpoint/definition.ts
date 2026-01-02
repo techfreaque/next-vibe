@@ -49,8 +49,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.generators.endpoint.post.fields.outputFile.label" as const,
+          label: "app.api.system.generators.endpoint.post.fields.outputFile.label" as const,
           description:
             "app.api.system.generators.endpoint.post.fields.outputFile.description" as const,
           columns: 12,
@@ -62,10 +61,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.generators.endpoint.post.fields.dryRun.label" as const,
-          description:
-            "app.api.system.generators.endpoint.post.fields.dryRun.description" as const,
+          label: "app.api.system.generators.endpoint.post.fields.dryRun.label" as const,
+          description: "app.api.system.generators.endpoint.post.fields.dryRun.description" as const,
           columns: 6,
         },
         z.boolean().optional().default(false),
@@ -75,32 +72,28 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.endpoint.post.fields.success.title" as const,
+          content: "app.api.system.generators.endpoint.post.fields.success.title" as const,
         },
         z.boolean(),
       ),
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.endpoint.post.fields.message.title" as const,
+          content: "app.api.system.generators.endpoint.post.fields.message.title" as const,
         },
         z.string(),
       ),
       endpointsFound: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.endpoint.post.fields.endpointsFound.title" as const,
+          content: "app.api.system.generators.endpoint.post.fields.endpointsFound.title" as const,
         },
         z.coerce.number(),
       ),
       duration: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.endpoint.post.fields.duration.title" as const,
+          content: "app.api.system.generators.endpoint.post.fields.duration.title" as const,
         },
         z.coerce.number(),
       ),
@@ -127,65 +120,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.generators.endpoint.post.errors.validation.title" as const,
-      description:
-        "app.api.system.generators.endpoint.post.errors.validation.description" as const,
+      title: "app.api.system.generators.endpoint.post.errors.validation.title" as const,
+      description: "app.api.system.generators.endpoint.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.generators.endpoint.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.endpoint.post.errors.server.description" as const,
+      title: "app.api.system.generators.endpoint.post.errors.server.title" as const,
+      description: "app.api.system.generators.endpoint.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.generators.endpoint.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.endpoint.post.errors.server.description" as const,
+      title: "app.api.system.generators.endpoint.post.errors.server.title" as const,
+      description: "app.api.system.generators.endpoint.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.generators.endpoint.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.endpoint.post.errors.server.description" as const,
+      title: "app.api.system.generators.endpoint.post.errors.server.title" as const,
+      description: "app.api.system.generators.endpoint.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.generators.endpoint.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.endpoint.post.errors.server.description" as const,
+      title: "app.api.system.generators.endpoint.post.errors.server.title" as const,
+      description: "app.api.system.generators.endpoint.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.generators.endpoint.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.endpoint.post.errors.server.description" as const,
+      title: "app.api.system.generators.endpoint.post.errors.server.title" as const,
+      description: "app.api.system.generators.endpoint.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.generators.endpoint.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.endpoint.post.errors.server.description" as const,
+      title: "app.api.system.generators.endpoint.post.errors.server.title" as const,
+      description: "app.api.system.generators.endpoint.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.generators.endpoint.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.endpoint.post.errors.server.description" as const,
+      title: "app.api.system.generators.endpoint.post.errors.server.title" as const,
+      description: "app.api.system.generators.endpoint.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.generators.endpoint.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.endpoint.post.errors.server.description" as const,
+      title: "app.api.system.generators.endpoint.post.errors.server.title" as const,
+      description: "app.api.system.generators.endpoint.post.errors.server.description" as const,
     },
   },
 
   successTypes: {
     title: "app.api.system.generators.endpoint.post.success.title" as const,
-    description:
-      "app.api.system.generators.endpoint.post.success.description" as const,
+    description: "app.api.system.generators.endpoint.post.success.description" as const,
   },
 });
 

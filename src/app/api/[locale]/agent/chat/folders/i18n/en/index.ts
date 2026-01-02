@@ -162,8 +162,7 @@ export const translations = {
       forbidden: {
         title: "Forbidden",
         description: "You don't have permission to create folders",
-        incognitoNotAllowed:
-          "Incognito folders cannot be created on the server",
+        incognitoNotAllowed: "Incognito folders cannot be created on the server",
       },
       notFound: {
         title: "Not Found",

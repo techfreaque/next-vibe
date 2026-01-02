@@ -27,16 +27,9 @@ export type ScrollAreaCornerProps = StyleType;
 export type ScrollAreaProps = ScrollAreaRootProps;
 export type ScrollBarProps = ScrollAreaBarProps;
 
-export function ScrollArea({
-  className,
-  style,
-  children,
-}: ScrollAreaRootProps): React.JSX.Element {
+export function ScrollArea({ className, style, children }: ScrollAreaRootProps): React.JSX.Element {
   return (
-    <ScrollAreaPrimitive.Root
-      className={cn("relative overflow-hidden", className)}
-      style={style}
-    >
+    <ScrollAreaPrimitive.Root className={cn("relative overflow-hidden", className)} style={style}>
       <div
         className="h-full w-full rounded-[inherit]"
         data-radix-scroll-area-viewport=""
@@ -63,10 +56,8 @@ export function ScrollBar({
       className={cn(
         "flex touch-none select-none transition-colors",
         "data-[state=hidden]:hidden",
-        orientation === "vertical" &&
-          "h-full w-1.5 border-l border-l-transparent p-px",
-        orientation === "horizontal" &&
-          "h-1.5 flex-col border-t border-t-transparent p-px",
+        orientation === "vertical" && "h-full w-1.5 border-l border-l-transparent p-px",
+        orientation === "horizontal" && "h-1.5 flex-col border-t border-t-transparent p-px",
         className,
       )}
       style={style}

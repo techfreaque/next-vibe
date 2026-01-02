@@ -66,8 +66,7 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.user.auth.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.auth.post.errors.unauthorized.description" as const,
+      description: "app.api.user.auth.post.errors.unauthorized.description" as const,
     },
   } as Record<
     EndpointErrorTypes,

@@ -13,15 +13,13 @@ export const translations: typeof enTranslations = {
       preview: "Willkommen zu unserem Newsletter! Danke für Ihr Abonnement",
       greeting: "Hallo",
       greeting_with_name: "Hallo {{name}}",
-      message:
-        "Willkommen zum {{appName}} Newsletter! Vielen Dank für Ihr Abonnement.",
+      message: "Willkommen zum {{appName}} Newsletter! Vielen Dank für Ihr Abonnement.",
       what_to_expect: "Das können Sie von unserem Newsletter erwarten:",
       benefit_1: "Neueste Produktupdates und Features",
       benefit_2: "Brancheneinblicke und Trends",
       benefit_3: "Exklusive Inhalte und Tipps",
       benefit_4: "Spezielle Angebote und Aktionen",
-      frequency:
-        "Wir senden Ihnen wöchentlich Newsletter mit den neuesten Updates.",
+      frequency: "Wir senden Ihnen wöchentlich Newsletter mit den neuesten Updates.",
       unsubscribe_text: "Sie können sich jederzeit abmelden, indem Sie",
       unsubscribe_link: "hier",
       subject: "Willkommen zu unserem Newsletter!",
@@ -41,8 +39,7 @@ export const translations: typeof enTranslations = {
       title: "Vom Newsletter abmelden",
       preview: "Sie haben sich erfolgreich von unserem Newsletter abgemeldet",
       greeting: "Hallo",
-      confirmation:
-        "Wir haben {{email}} erfolgreich von unserem Newsletter abgemeldet",
+      confirmation: "Wir haben {{email}} erfolgreich von unserem Newsletter abgemeldet",
       resubscribe_info:
         "Falls Sie Ihre Meinung ändern, können Sie sich jederzeit auf unserer Website wieder anmelden",
       resubscribe_button: "Wieder anmelden",

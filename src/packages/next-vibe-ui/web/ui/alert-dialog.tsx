@@ -69,13 +69,8 @@ export type AlertDialogCancelProps = {
   onClick?: () => void;
 } & StyleType;
 
-export function AlertDialog({
-  children,
-  ...props
-}: AlertDialogRootProps): React.JSX.Element {
-  return (
-    <AlertDialogPrimitive.Root {...props}>{children}</AlertDialogPrimitive.Root>
-  );
+export function AlertDialog({ children, ...props }: AlertDialogRootProps): React.JSX.Element {
+  return <AlertDialogPrimitive.Root {...props}>{children}</AlertDialogPrimitive.Root>;
 }
 AlertDialog.displayName = AlertDialogPrimitive.Root.displayName;
 
@@ -151,10 +146,7 @@ export function AlertDialogHeader({
 }: AlertDialogHeaderProps): React.JSX.Element {
   return (
     <div
-      className={cn(
-        "flex flex-col space-y-2 text-center sm:text-left",
-        className,
-      )}
+      className={cn("flex flex-col space-y-2 text-center sm:text-left", className)}
       style={style}
     >
       {children}
@@ -170,10 +162,7 @@ export function AlertDialogFooter({
 }: AlertDialogFooterProps): React.JSX.Element {
   return (
     <div
-      className={cn(
-        "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-        className,
-      )}
+      className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)}
       style={style}
     >
       {children}
@@ -210,8 +199,7 @@ export function AlertDialogDescription({
     />
   );
 }
-AlertDialogDescription.displayName =
-  AlertDialogPrimitive.Description.displayName;
+AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName;
 
 export function AlertDialogAction({
   className,
@@ -235,11 +223,7 @@ export function AlertDialogCancel({
 }: AlertDialogCancelProps): React.JSX.Element {
   return (
     <AlertDialogPrimitive.Cancel
-      className={cn(
-        buttonVariants({ variant: "outline" }),
-        "mt-2 sm:mt-0",
-        className,
-      )}
+      className={cn(buttonVariants({ variant: "outline" }), "mt-2 sm:mt-0", className)}
       style={style}
       {...props}
     />

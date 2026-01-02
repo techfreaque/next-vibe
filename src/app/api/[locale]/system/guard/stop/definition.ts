@@ -29,12 +29,7 @@ const { POST } = createEndpoint({
   category: "app.api.system.guard.category",
   tags: ["app.api.system.guard.stop.tag"],
   icon: "shield",
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.AI_TOOL_OFF,
-    UserRole.WEB_OFF,
-    UserRole.PRODUCTION_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF, UserRole.WEB_OFF, UserRole.PRODUCTION_OFF],
   aliases: ["guard:stop", "guard-stop"],
 
   fields: objectField(
@@ -53,10 +48,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.system.guard.stop.fields.projectPath.title",
-          description:
-            "app.api.system.guard.stop.fields.projectPath.description",
-          placeholder:
-            "app.api.system.guard.stop.fields.projectPath.placeholder",
+          description: "app.api.system.guard.stop.fields.projectPath.description",
+          placeholder: "app.api.system.guard.stop.fields.projectPath.placeholder",
           columns: 6,
         },
         z.string().optional(),

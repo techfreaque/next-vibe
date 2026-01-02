@@ -21,11 +21,7 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
   [Methods.PUT]: {
     email: undefined,
     handler: ({ data, urlPathParams, user, logger }) =>
-      imapAccountsRepository.updateAccount(
-        { ...data, id: urlPathParams.id },
-        user,
-        logger,
-      ),
+      imapAccountsRepository.updateAccount({ ...data, id: urlPathParams.id }, user, logger),
   },
   [Methods.DELETE]: {
     email: undefined,

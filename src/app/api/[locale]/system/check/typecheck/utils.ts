@@ -65,10 +65,7 @@ export function determinePathType(path: string | undefined): PathType {
  * @param pathType - Type of path (file, folder, or no path)
  * @param targetPath - Target path to generate key for
  */
-export function generateCacheKey(
-  pathType: PathType,
-  targetPath?: string,
-): string {
+export function generateCacheKey(pathType: PathType, targetPath?: string): string {
   // eslint-disable-next-line i18next/no-literal-string
   const baseKey = `typecheck_${pathType}`;
 
@@ -78,10 +75,7 @@ export function generateCacheKey(
 
   // Create hash of the path for consistent cache keys
   // eslint-disable-next-line i18next/no-literal-string
-  const pathHash = createHash("md5")
-    .update(targetPath)
-    .digest("hex")
-    .slice(0, 8);
+  const pathHash = createHash("md5").update(targetPath).digest("hex").slice(0, 8);
 
   if (pathType === PathType.SINGLE_FILE) {
     return `${baseKey}_file_${pathHash}`;
@@ -114,9 +108,7 @@ export function createTypecheckConfig(
     buildInfoFile: join(
       pathType === PathType.NO_PATH ? "." : cachePath,
       // eslint-disable-next-line i18next/no-literal-string
-      pathType === PathType.NO_PATH
-        ? "tsconfig.tsbuildinfo"
-        : `tsconfig.${cacheKey}.tsbuildinfo`,
+      pathType === PathType.NO_PATH ? "tsconfig.tsbuildinfo" : `tsconfig.${cacheKey}.tsbuildinfo`,
     ),
   };
 

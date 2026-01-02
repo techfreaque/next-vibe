@@ -26,10 +26,7 @@ export type LoggerMetadata =
  * Dynamically import and use file logging
  * Only imports when actually needed (in MCP mode)
  */
-async function writeToFile(
-  message: string,
-  data?: Record<string, LoggerMetadata>,
-): Promise<void> {
+async function writeToFile(message: string, data?: Record<string, LoggerMetadata>): Promise<void> {
   try {
     const { fileLog } = await import("./file-logger");
     fileLog(message, data);
@@ -52,11 +49,7 @@ export interface EndpointLogger {
   /**
    * Log an error message - always runs
    */
-  error(
-    message: string,
-    error?: LoggerMetadata,
-    ...metadata: LoggerMetadata[]
-  ): void;
+  error(message: string, error?: LoggerMetadata, ...metadata: LoggerMetadata[]): void;
 
   /**
    * Log a warning message - always runs
@@ -107,11 +100,7 @@ export function createEndpointLogger(
       }
     },
 
-    error(
-      message: string,
-      error?: LoggerMetadata,
-      ...metadata: LoggerMetadata[]
-    ): void {
+    error(message: string, error?: LoggerMetadata, ...metadata: LoggerMetadata[]): void {
       if (mcpSilentMode) {
         // In MCP mode, dynamically import and log to file instead of console
         const typedError = error ? parseError(error) : undefined;
@@ -131,10 +120,7 @@ export function createEndpointLogger(
       if (mcpSilentMode) {
         // In MCP mode, dynamically import and log to file instead of console
         const metadataObj = metadata.length > 0 ? { metadata } : undefined;
-        void writeToFile(
-          `[VIBE] [${getElapsedTime()}] ${message}`,
-          metadataObj,
-        );
+        void writeToFile(`[VIBE] [${getElapsedTime()}] ${message}`, metadataObj);
       } else {
         // Special vibe formatting - messages are plain strings
         // oxlint-disable-next-line no-console

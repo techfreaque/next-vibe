@@ -14,9 +14,7 @@ import { endpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cro
 /**
  * Hook for fetching cron tasks list
  */
-export function useCronTasksList(
-  logger: EndpointLogger,
-): EndpointReturn<typeof endpoints> {
+export function useCronTasksList(logger: EndpointLogger): EndpointReturn<typeof endpoints> {
   return useEndpoint(endpoints, {}, logger);
 }
 
@@ -49,9 +47,7 @@ export function useCronTaskEndpoint(
  * Hook for creating new cron tasks
  * Provides form handling and mutation capabilities for task creation
  */
-export function useCreateCronTask(
-  logger: EndpointLogger,
-): EndpointReturn<typeof endpoints> {
+export function useCreateCronTask(logger: EndpointLogger): EndpointReturn<typeof endpoints> {
   return useEndpoint(endpoints, {}, logger);
 }
 

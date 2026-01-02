@@ -4,10 +4,7 @@ import * as React from "react";
 import { Text as RNText, View } from "react-native";
 
 // Import ALL types from web version (web is source of truth)
-import type {
-  CalendarProps,
-  DateRange,
-} from "@/packages/next-vibe-ui/web/ui/calendar";
+import type { CalendarProps, DateRange } from "@/packages/next-vibe-ui/web/ui/calendar";
 
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
@@ -78,10 +75,7 @@ export function Calendar({
     <StyledView
       {...applyStyleType({
         nativeStyle,
-        className: cn(
-          "p-3 rounded-md border border-border bg-background",
-          className,
-        ),
+        className: cn("p-3 rounded-md border border-border bg-background", className),
       })}
     >
       <StyledText className="text-sm text-muted-foreground text-center">

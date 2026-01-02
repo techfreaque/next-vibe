@@ -26,12 +26,7 @@ const { POST } = createEndpoint({
   category: "app.api.system.generators.category",
   tags: ["app.api.system.generators.taskIndex.post.title"],
   icon: "wand",
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.PRODUCTION_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
 
   fields: objectField(
     {
@@ -47,25 +42,19 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.generators.taskIndex.post.fields.outputDir.label",
-          description:
-            "app.api.system.generators.taskIndex.post.fields.outputDir.description",
+          label: "app.api.system.generators.taskIndex.post.fields.outputDir.label",
+          description: "app.api.system.generators.taskIndex.post.fields.outputDir.description",
           columns: 12,
         },
-        z
-          .string()
-          .default("src/app/api/[locale]/system/generated/tasks-index.ts"),
+        z.string().default("src/app/api/[locale]/system/generated/tasks-index.ts"),
       ),
 
       dryRun: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.generators.taskIndex.post.fields.verbose.label",
-          description:
-            "app.api.system.generators.taskIndex.post.fields.verbose.description",
+          label: "app.api.system.generators.taskIndex.post.fields.verbose.label",
+          description: "app.api.system.generators.taskIndex.post.fields.verbose.description",
           columns: 6,
         },
         z.boolean().optional().default(false),
@@ -75,32 +64,28 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.taskIndex.post.fields.success.title",
+          content: "app.api.system.generators.taskIndex.post.fields.success.title",
         },
         z.boolean(),
       ),
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.taskIndex.post.fields.message.title",
+          content: "app.api.system.generators.taskIndex.post.fields.message.title",
         },
         z.string(),
       ),
       tasksFound: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.taskIndex.post.fields.tasksFound.title",
+          content: "app.api.system.generators.taskIndex.post.fields.tasksFound.title",
         },
         z.coerce.number(),
       ),
       duration: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.taskIndex.post.fields.duration.title",
+          content: "app.api.system.generators.taskIndex.post.fields.duration.title",
         },
         z.coerce.number(),
       ),
@@ -128,49 +113,39 @@ const { POST } = createEndpoint({
   errorTypes: {
     validation_failed: {
       title: "app.api.system.generators.taskIndex.post.errors.validation.title",
-      description:
-        "app.api.system.generators.taskIndex.post.errors.validation.description",
+      description: "app.api.system.generators.taskIndex.post.errors.validation.description",
     },
     unauthorized: {
-      title:
-        "app.api.system.generators.taskIndex.post.errors.unauthorized.title",
-      description:
-        "app.api.system.generators.taskIndex.post.errors.unauthorized.description",
+      title: "app.api.system.generators.taskIndex.post.errors.unauthorized.title",
+      description: "app.api.system.generators.taskIndex.post.errors.unauthorized.description",
     },
     server_error: {
       title: "app.api.system.generators.taskIndex.post.errors.internal.title",
-      description:
-        "app.api.system.generators.taskIndex.post.errors.internal.description",
+      description: "app.api.system.generators.taskIndex.post.errors.internal.description",
     },
     unknown_error: {
       title: "app.api.system.generators.taskIndex.post.errors.unknown.title",
-      description:
-        "app.api.system.generators.taskIndex.post.errors.unknown.description",
+      description: "app.api.system.generators.taskIndex.post.errors.unknown.description",
     },
     network_error: {
       title: "app.api.system.generators.taskIndex.post.errors.network.title",
-      description:
-        "app.api.system.generators.taskIndex.post.errors.network.description",
+      description: "app.api.system.generators.taskIndex.post.errors.network.description",
     },
     forbidden: {
       title: "app.api.system.generators.taskIndex.post.errors.forbidden.title",
-      description:
-        "app.api.system.generators.taskIndex.post.errors.forbidden.description",
+      description: "app.api.system.generators.taskIndex.post.errors.forbidden.description",
     },
     not_found: {
       title: "app.api.system.generators.taskIndex.post.errors.notFound.title",
-      description:
-        "app.api.system.generators.taskIndex.post.errors.notFound.description",
+      description: "app.api.system.generators.taskIndex.post.errors.notFound.description",
     },
     conflict: {
       title: "app.api.system.generators.taskIndex.post.errors.conflict.title",
-      description:
-        "app.api.system.generators.taskIndex.post.errors.conflict.description",
+      description: "app.api.system.generators.taskIndex.post.errors.conflict.description",
     },
     unsaved_changes: {
       title: "app.api.system.generators.taskIndex.post.errors.unsaved.title",
-      description:
-        "app.api.system.generators.taskIndex.post.errors.unsaved.description",
+      description: "app.api.system.generators.taskIndex.post.errors.unsaved.description",
     },
   },
 

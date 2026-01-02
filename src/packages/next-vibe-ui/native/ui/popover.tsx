@@ -25,11 +25,7 @@ function Popover({ children, ...props }: PopoverRootProps): React.JSX.Element {
 }
 Popover.displayName = PopoverPrimitive.Root.displayName;
 
-function PopoverTrigger({
-  children,
-  asChild,
-  ...props
-}: PopoverTriggerProps): React.JSX.Element {
+function PopoverTrigger({ children, asChild, ...props }: PopoverTriggerProps): React.JSX.Element {
   return (
     <PopoverPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -38,11 +34,7 @@ function PopoverTrigger({
 }
 PopoverTrigger.displayName = PopoverPrimitive.Trigger.displayName;
 
-function PopoverAnchor({
-  children,
-  asChild,
-  ...props
-}: PopoverAnchorProps): React.JSX.Element {
+function PopoverAnchor({ children, asChild, ...props }: PopoverAnchorProps): React.JSX.Element {
   return (
     <PopoverPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -139,11 +131,4 @@ function PopoverClose({
 }
 PopoverClose.displayName = "PopoverClose";
 
-export {
-  Popover,
-  PopoverAnchor,
-  PopoverClose,
-  PopoverContent,
-  PopoverPortal,
-  PopoverTrigger,
-};
+export { Popover, PopoverAnchor, PopoverClose, PopoverContent, PopoverPortal, PopoverTrigger };

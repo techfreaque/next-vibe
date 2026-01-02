@@ -9,23 +9,20 @@ export const translations = {
     step1Body:
       "Generuj unikalne kody dla różnych odbiorców — znajomych, social media czy kampanii.",
     step2Title: "Udostępnij link",
-    step2Body:
-      "Gdy ktoś zarejestruje się przez Twój link i subskrybuje, zarabiasz prowizję.",
+    step2Body: "Gdy ktoś zarejestruje się przez Twój link i subskrybuje, zarabiasz prowizję.",
     step3Title: "Odbierz wypłatę",
     step3Body:
       "Zarobki są natychmiastowe. Użyj ich jako kredytów czatu lub wypłać w kryptowalucie.",
   },
   overview: {
     title: "Twoje zarobki",
-    subtitle:
-      "Statystyki w czasie rzeczywistym, aktualizowane przy każdym zakupie.",
+    subtitle: "Statystyki w czasie rzeczywistym, aktualizowane przy każdym zakupie.",
   },
   payout: {
     title: "Wypłać zarobki",
     description: "Wiele sposobów wykorzystania zarobków z poleceń",
     useAsCredits: "Użyj jako kredyty czatu",
-    useAsCreditsDesc:
-      "Natychmiast zamień zarobki na kredyty czatu do rozmów z AI.",
+    useAsCreditsDesc: "Natychmiast zamień zarobki na kredyty czatu do rozmów z AI.",
     cryptoPayout: "Wypłata w kryptowalucie",
     cryptoPayoutDesc: "Poproś o wypłatę w BTC lub USDC na swój portfel.",
     minimumNote:

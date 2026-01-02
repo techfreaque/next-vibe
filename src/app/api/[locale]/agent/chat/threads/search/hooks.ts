@@ -26,9 +26,7 @@ import { definitions } from "./definition";
  *
  * @param logger - Endpoint logger instance
  */
-export function useThreadSearch(
-  logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
+export function useThreadSearch(logger: EndpointLogger): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

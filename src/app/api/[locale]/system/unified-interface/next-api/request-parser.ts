@@ -14,13 +14,7 @@ import type { EndpointLogger } from "../shared/logger/endpoint";
 /**
  * Parsed JSON value type - recursive type for any JSON-compatible structure
  */
-type ParsedValue =
-  | string
-  | number
-  | boolean
-  | null
-  | ParsedObject
-  | readonly ParsedValue[];
+type ParsedValue = string | number | boolean | null | ParsedObject | readonly ParsedValue[];
 interface ParsedObject {
   [key: string]: ParsedValue;
 }
@@ -116,12 +110,7 @@ function parseFormData(
   formData: any,
 ): Record<
   string,
-  | string
-  | number
-  | boolean
-  | null
-  | File
-  | Record<string, string | number | boolean | null | File>
+  string | number | boolean | null | File | Record<string, string | number | boolean | null | File>
 > {
   const result: Record<
     string,
@@ -153,22 +142,14 @@ function parseFormData(
           if (!(part in current)) {
             current[part] = {};
           }
-          current = current[part] as Record<
-            string,
-            string | number | boolean | null | File
-          >;
+          current = current[part] as Record<string, string | number | boolean | null | File>;
         }
       }
 
       const lastPart = parts.at(-1);
       if (lastPart) {
         // Keep File objects as-is, convert strings to appropriate types
-        if (
-          typeof value === "object" &&
-          value !== null &&
-          "name" in value &&
-          "size" in value
-        ) {
+        if (typeof value === "object" && value !== null && "name" in value && "size" in value) {
           current[lastPart] = value;
         } else {
           current[lastPart] = value;
@@ -176,12 +157,7 @@ function parseFormData(
       }
     } else {
       // Simple key-value pair
-      if (
-        typeof value === "object" &&
-        value !== null &&
-        "name" in value &&
-        "size" in value
-      ) {
+      if (typeof value === "object" && value !== null && "name" in value && "size" in value) {
         result[key] = value;
       } else {
         result[key] = value;
@@ -195,14 +171,7 @@ function parseFormData(
 /**
  * Merged value type - extends ParsedValue to include File
  */
-type MergedValue =
-  | string
-  | number
-  | boolean
-  | null
-  | File
-  | MergedObject
-  | readonly MergedValue[];
+type MergedValue = string | number | boolean | null | File | MergedObject | readonly MergedValue[];
 interface MergedObject {
   [key: string]: MergedValue;
 }
@@ -229,10 +198,7 @@ function deepMerge(target: MergedObject, source: MergedObject): MergedObject {
       !(targetValue instanceof File)
     ) {
       // Recursively merge nested objects
-      result[key] = deepMerge(
-        targetValue as MergedObject,
-        sourceValue as MergedObject,
-      );
+      result[key] = deepMerge(targetValue as MergedObject, sourceValue as MergedObject);
     } else {
       // Overwrite with source value
       result[key] = sourceValue;
@@ -316,11 +282,7 @@ export async function parseRequestBody(
     // Parse the JSON body
     const body = JSON.parse(bodyText) as Record<
       string,
-      | string
-      | number
-      | boolean
-      | null
-      | Record<string, string | number | boolean | null>
+      string | number | boolean | null | Record<string, string | number | boolean | null>
     >;
     return body;
   } catch (error) {

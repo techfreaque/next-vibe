@@ -209,10 +209,7 @@ export class S3StorageAdapter implements StorageAdapter {
         }
 
         // Check if this is a metadata file for our fileId
-        if (
-          obj.Key.includes("/.metadata/") &&
-          obj.Key.endsWith(`${fileId}.json`)
-        ) {
+        if (obj.Key.includes("/.metadata/") && obj.Key.endsWith(`${fileId}.json`)) {
           try {
             const getCommand = new GetObjectCommand({
               Bucket: this.bucket,
@@ -266,10 +263,7 @@ export class S3StorageAdapter implements StorageAdapter {
     }
   }
 
-  async readFileAsBase64(
-    fileId: string,
-    threadId: string,
-  ): Promise<string | null> {
+  async readFileAsBase64(fileId: string, threadId: string): Promise<string | null> {
     if (agentEnv.CHAT_STORAGE_TYPE !== "s3") {
       return null;
     }

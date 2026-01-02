@@ -4,12 +4,7 @@
  * Imports types from web version using relative paths to ensure type safety
  */
 
-import {
-  AlertCircle,
-  AlertTriangle,
-  CheckCircle,
-  Info,
-} from "lucide-react-native";
+import { AlertCircle, AlertTriangle, CheckCircle, Info } from "lucide-react-native";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
@@ -28,11 +23,7 @@ import { Alert, AlertDescription, AlertTitle } from "../alert";
  * 1. New alert prop from useEndpoint: <FormAlert alert={endpoint.alert} />
  * 2. Legacy individual props: <FormAlert variant="success" title="..." message="..." />
  */
-export function FormAlert({
-  alert,
-  className,
-  style,
-}: FormAlertProps): JSX.Element | null {
+export function FormAlert({ alert, className, style }: FormAlertProps): JSX.Element | null {
   const { t } = useTranslation();
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
@@ -66,20 +57,10 @@ export function FormAlert({
   // Alert uses className for styling via NativeWind (either style OR className, not both)
   void nativeStyle; // Acknowledge nativeStyle is intentionally unused for Alert
   return (
-    <Alert
-      variant={alert.variant}
-      icon={Icon}
-      className={cn("my-4", className)}
-    >
-      {alert.title && (
-        <AlertTitle>
-          {t(alert.title.message, alert.title.messageParams)}
-        </AlertTitle>
-      )}
+    <Alert variant={alert.variant} icon={Icon} className={cn("my-4", className)}>
+      {alert.title && <AlertTitle>{t(alert.title.message, alert.title.messageParams)}</AlertTitle>}
       {alert.message.message && (
-        <AlertDescription>
-          {t(alert.message.message, alert.message.messageParams)}
-        </AlertDescription>
+        <AlertDescription>{t(alert.message.message, alert.message.messageParams)}</AlertDescription>
       )}
     </Alert>
   );

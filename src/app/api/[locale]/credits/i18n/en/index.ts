@@ -48,8 +48,7 @@ export const translations = {
     getOrCreateLeadFailed: "Failed to get or create lead",
     addCreditsFailed: "Failed to add credits",
     deductCreditsFailed: "Failed to deduct credits",
-    insufficientCredits:
-      "Insufficient credits. You need {{cost}} credits to use this feature.",
+    insufficientCredits: "Insufficient credits. You need {{cost}} credits to use this feature.",
     deductionFailed: "Failed to deduct {{cost}} credits. Please try again.",
     getTransactionsFailed: "Failed to get credit transactions",
     invalidIdentifier: "Invalid user or lead identifier",
@@ -138,8 +137,7 @@ export const translations = {
       },
       noActiveSubscription: {
         title: "Active Subscription Required",
-        description:
-          "You must have an active subscription to purchase credit packs",
+        description: "You must have an active subscription to purchase credit packs",
       },
       unsavedChanges: {
         title: "Unsaved Changes",
@@ -151,8 +149,7 @@ export const translations = {
       },
       no_active_subscription: {
         title: "Active Subscription Required",
-        description:
-          "You must have an active subscription to purchase credit packs",
+        description: "You must have an active subscription to purchase credit packs",
       },
     },
   },
@@ -329,8 +326,7 @@ export const translations = {
         },
         noActiveSubscription: {
           title: "Active Subscription Required",
-          description:
-            "You must have an active subscription to purchase credit packs",
+          description: "You must have an active subscription to purchase credit packs",
         },
       },
     },

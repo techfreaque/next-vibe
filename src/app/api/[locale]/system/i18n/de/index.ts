@@ -51,13 +51,11 @@ export const translations: typeof enTranslations = {
           },
           internal: {
             title: "Interner Fehler",
-            description:
-              "Bei der tRPC-Router-Generierung ist ein Fehler aufgetreten",
+            description: "Bei der tRPC-Router-Generierung ist ein Fehler aufgetreten",
           },
           unauthorized: {
             title: "Nicht autorisiert",
-            description:
-              "Sie haben keine Berechtigung, tRPC-Router zu generieren",
+            description: "Sie haben keine Berechtigung, tRPC-Router zu generieren",
           },
         },
         success: {

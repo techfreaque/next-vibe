@@ -54,9 +54,7 @@ interface BatchOperationsDialogProps {
     email: string;
     businessName: string;
     currentStatus: (typeof LeadStatus)[keyof typeof LeadStatus];
-    currentCampaignStage:
-      | (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]
-      | null;
+    currentCampaignStage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage] | null;
   }>;
   updates?: {
     status?: typeof LeadStatusValues;
@@ -94,9 +92,7 @@ export function BatchOperationsDialog({
 
   const renderPreviewContent = (): React.JSX.Element => (
     <Div className="flex flex-col gap-4">
-      {description && (
-        <P className="text-sm text-muted-foreground">{description}</P>
-      )}
+      {description && <P className="text-sm text-muted-foreground">{description}</P>}
 
       <Alert>
         <Eye className="h-4 w-4" />
@@ -142,40 +138,26 @@ export function BatchOperationsDialog({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>
-                {t("app.admin.leads.leads.admin.table.business")}
-              </TableHead>
-              <TableHead>
-                {t("app.admin.leads.leads.admin.table.email")}
-              </TableHead>
-              <TableHead>
-                {t("app.admin.leads.leads.admin.table.status")}
-              </TableHead>
-              <TableHead>
-                {t("app.admin.leads.leads.admin.table.campaign_stage")}
-              </TableHead>
+              <TableHead>{t("app.admin.leads.leads.admin.table.business")}</TableHead>
+              <TableHead>{t("app.admin.leads.leads.admin.table.email")}</TableHead>
+              <TableHead>{t("app.admin.leads.leads.admin.table.status")}</TableHead>
+              <TableHead>{t("app.admin.leads.leads.admin.table.campaign_stage")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {leads.map((lead) => (
               <TableRow key={lead.id}>
-                <TableCell className="font-medium">
-                  {lead.businessName}
-                </TableCell>
+                <TableCell className="font-medium">{lead.businessName}</TableCell>
                 <TableCell>{lead.email}</TableCell>
                 <TableCell>
                   <Badge variant="outline">{t(lead.currentStatus)}</Badge>
                 </TableCell>
                 <TableCell>
                   {lead.currentCampaignStage ? (
-                    <Badge variant="outline">
-                      {t(lead.currentCampaignStage)}
-                    </Badge>
+                    <Badge variant="outline">{t(lead.currentCampaignStage)}</Badge>
                   ) : (
                     <Span className="text-muted-foreground">
-                      {t(
-                        "app.admin.leads.leads.admin.formatting.fallbacks.notAvailable",
-                      )}
+                      {t("app.admin.leads.leads.admin.formatting.fallbacks.notAvailable")}
                     </Span>
                   )}
                 </TableCell>
@@ -270,9 +252,7 @@ export function BatchOperationsDialog({
             </>
           )}
           {mode === "result" && (
-            <Button onClick={onClose}>
-              {t("app.admin.leads.leads.admin.batch.close")}
-            </Button>
+            <Button onClick={onClose}>{t("app.admin.leads.leads.admin.batch.close")}</Button>
           )}
         </DialogFooter>
       </DialogContent>

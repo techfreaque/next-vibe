@@ -47,16 +47,7 @@ export async function buildSystemPrompt(params: {
   subFolderId: string | null;
   callMode: boolean | null | undefined;
 }): Promise<string> {
-  const {
-    characterId,
-    userId,
-    logger,
-    t,
-    locale,
-    rootFolderId,
-    subFolderId,
-    callMode,
-  } = params;
+  const { characterId, userId, logger, t, locale, rootFolderId, subFolderId, callMode } = params;
 
   logger.debug("Building system prompt", {
     hasCharacterId: !!characterId,
@@ -107,9 +98,7 @@ export async function buildSystemPrompt(params: {
         if (character.systemPrompt && character.systemPrompt.trim()) {
           characterPrompt = character.systemPrompt.trim();
         } else {
-          logger.debug(
-            "Character has empty system prompt, using default behavior",
-          );
+          logger.debug("Character has empty system prompt, using default behavior");
         }
       } else {
         logger.warn("Character not found, using default", { characterId });

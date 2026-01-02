@@ -10,11 +10,7 @@ import { ChartType } from "next-vibe/shared/types/stats-filtering.schema";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Area, Axis, Bar, Chart, Line } from "next-vibe-ui/ui/chart";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  BarChart3Icon,
-  LineChartIcon,
-  TrendingUpIcon,
-} from "next-vibe-ui/ui/icons";
+import { BarChart3Icon, LineChartIcon, TrendingUpIcon } from "next-vibe-ui/ui/icons";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
@@ -160,16 +156,13 @@ export function EmailStatsChart({
       <Chart {...commonProps}>
         <Axis
           tickFormat={(t: number | string) => {
-            return typeof t === "string"
-              ? formatDateForChart(t, locale)
-              : String(t);
+            return typeof t === "string" ? formatDateForChart(t, locale) : String(t);
           }}
         />
         <Axis
           dependentAxis
           tickFormat={(value: number | string) => {
-            const val =
-              typeof value === "string" ? Number.parseFloat(value) : value;
+            const val = typeof value === "string" ? Number.parseFloat(value) : value;
             if (val >= 1000) {
               return `${(val / 1000).toFixed(1)}K`;
             }
@@ -188,14 +181,10 @@ export function EmailStatsChart({
           {getChartIcon()}
           {data.title || t("app.admin.emails.stats.admin.stats.chart.title")}
         </CardTitle>
-        {data.subtitle && (
-          <P className="text-sm text-muted-foreground">{data.subtitle}</P>
-        )}
+        {data.subtitle && <P className="text-sm text-muted-foreground">{data.subtitle}</P>}
       </CardHeader>
       <CardContent>
-        <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>
-          {renderChart()}
-        </Div>
+        <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>{renderChart()}</Div>
       </CardContent>
     </Card>
   );
@@ -249,20 +238,14 @@ function transformDataForChart(data: ChartDataType): ChartDataPoint[] {
  */
 function getSeriesColor(series: { color?: string }, index: number): string {
   return (
-    series.color ||
-    CHART_CONSTANTS.DEFAULT_COLORS[
-      index % CHART_CONSTANTS.DEFAULT_COLORS.length
-    ]
+    series.color || CHART_CONSTANTS.DEFAULT_COLORS[index % CHART_CONSTANTS.DEFAULT_COLORS.length]
   );
 }
 
 /**
  * Format date for chart display
  */
-function formatDateForChart(
-  dateString: string,
-  locale: CountryLanguage,
-): string {
+function formatDateForChart(dateString: string, locale: CountryLanguage): string {
   try {
     const date = new Date(dateString);
     return date.toLocaleDateString(locale, {

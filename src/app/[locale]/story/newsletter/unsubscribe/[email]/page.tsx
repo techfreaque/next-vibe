@@ -24,9 +24,7 @@ function isValidEmail(email: string): boolean {
   return emailRegex.test(decodeURIComponent(email));
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, email } = await params;
   const { t } = simpleT(locale);
 
@@ -40,22 +38,16 @@ export async function generateMetadata({
 
   return {
     title: t("app.story.newsletter.unsubscribe.page.emailProvided.title"),
-    description: t(
-      "app.story.newsletter.unsubscribe.page.emailProvided.description",
-    ),
+    description: t("app.story.newsletter.unsubscribe.page.emailProvided.description"),
     openGraph: {
       title: t("app.story.newsletter.unsubscribe.page.emailProvided.title"),
-      description: t(
-        "app.story.newsletter.unsubscribe.page.emailProvided.description",
-      ),
+      description: t("app.story.newsletter.unsubscribe.page.emailProvided.description"),
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
       title: t("app.story.newsletter.unsubscribe.page.emailProvided.title"),
-      description: t(
-        "app.story.newsletter.unsubscribe.page.emailProvided.description",
-      ),
+      description: t("app.story.newsletter.unsubscribe.page.emailProvided.description"),
     },
   };
 }
@@ -86,11 +78,5 @@ export default async function NewsletterUnsubscribeWithEmail({
     notFound();
   }
 
-  return (
-    <UnsubscribePage
-      locale={locale}
-      prefilledEmail={decodedEmail}
-      user={user}
-    />
-  );
+  return <UnsubscribePage locale={locale} prefilledEmail={decodedEmail} user={user} />;
 }

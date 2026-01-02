@@ -2,8 +2,7 @@ export const translations = {
   // UI translations for list page
   admin: {
     title: "Email Management",
-    description:
-      "Monitor email campaigns, track performance, and analyze engagement",
+    description: "Monitor email campaigns, track performance, and analyze engagement",
     filters: {
       title: "Filters",
       search: "Search emails...",
@@ -60,8 +59,7 @@ export const translations = {
     },
     messages: {
       noEmails: "No emails found",
-      noEmailsDescription:
-        "Try adjusting your filters or create a new email campaign",
+      noEmailsDescription: "Try adjusting your filters or create a new email campaign",
     },
   },
 

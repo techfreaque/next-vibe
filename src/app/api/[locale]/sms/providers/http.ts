@@ -1,8 +1,5 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
 import { z } from "zod";
 
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
@@ -81,19 +78,16 @@ export function getHttpProvider(): SmsProvider {
       try {
         if (smsEnv.SMS_HTTP_PHONE_REGEX) {
           pattern = new RegExp(smsEnv.SMS_HTTP_PHONE_REGEX);
-          const customSchema = z
-            .string()
-            .refine((value) => pattern.test(value), {
-              message: "app.api.sms.sms.error.invalid_phone_format",
-            });
+          const customSchema = z.string().refine((value) => pattern.test(value), {
+            message: "app.api.sms.sms.error.invalid_phone_format",
+          });
 
           const result = customSchema.safeParse(phoneNumber);
           if (!result.success) {
             return {
               valid: false,
               reason:
-                result.error.issues[0]?.message ??
-                "app.api.sms.sms.error.invalid_phone_format",
+                result.error.issues[0]?.message ?? "app.api.sms.sms.error.invalid_phone_format",
             };
           }
           return { valid: true };
@@ -115,10 +109,7 @@ export function getHttpProvider(): SmsProvider {
       return { valid: true };
     },
 
-    async sendSms(
-      params: SendSmsParams,
-      logger: EndpointLogger,
-    ): Promise<ResponseType<SmsResult>> {
+    async sendSms(params: SendSmsParams, logger: EndpointLogger): Promise<ResponseType<SmsResult>> {
       try {
         logger.debug("Sending SMS via HTTP provider", { to: params.to });
 
@@ -273,13 +264,9 @@ export function getHttpProvider(): SmsProvider {
 
         // Extract message ID from response based on configuration
         let messageId: string;
-        const extractNestedValue = (
-          obj: HttpResponseData,
-          path: string[],
-        ): string | undefined => {
+        const extractNestedValue = (obj: HttpResponseData, path: string[]): string | undefined => {
           // Start with the object and handle type narrowing
-          let current: string | number | boolean | null | HttpResponseData =
-            obj;
+          let current: string | number | boolean | null | HttpResponseData = obj;
 
           for (const segment of path) {
             // Safety check for type

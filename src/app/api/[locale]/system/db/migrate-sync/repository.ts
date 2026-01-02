@@ -9,11 +9,7 @@ import path from "node:path";
 import { sql } from "drizzle-orm";
 import { migrate as drizzleMigrate } from "drizzle-orm/node-postgres/migrator";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -30,10 +26,8 @@ const TRACKING_COMMENT = `-- Migration tracking only - original backed up
 SELECT 1; -- No-op for tracking
 `;
 
-type MigrateSyncRequestType =
-  typeof migrateSyncEndpoints.POST.types.RequestOutput;
-type MigrateSyncResponseType =
-  typeof migrateSyncEndpoints.POST.types.ResponseOutput;
+type MigrateSyncRequestType = typeof migrateSyncEndpoints.POST.types.RequestOutput;
+type MigrateSyncResponseType = typeof migrateSyncEndpoints.POST.types.ResponseOutput;
 
 /**
  * Migration file interface
@@ -57,9 +51,7 @@ export interface DatabaseMigrateSyncRepository {
 /**
  * Database Migration Sync Repository Implementation
  */
-export class DatabaseMigrateSyncRepositoryImpl
-  implements DatabaseMigrateSyncRepository
-{
+export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRepository {
   async syncMigrations(
     data: MigrateSyncRequestType,
     locale: CountryLanguage,
@@ -81,9 +73,7 @@ export class DatabaseMigrateSyncRepositoryImpl
 
         // Count migration files for dry run
         const migrationFiles = this.getMigrationFiles();
-        const output = t(
-          "app.api.system.db.migrateSync.messages.dryRunComplete",
-        );
+        const output = t("app.api.system.db.migrateSync.messages.dryRunComplete");
 
         return success({
           success: true,
@@ -147,9 +137,7 @@ export class DatabaseMigrateSyncRepositoryImpl
   private async clearMigrationTracking(logger: EndpointLogger): Promise<void> {
     try {
       // Drop and recreate the migration table to start fresh
-      await db.execute(
-        sql`DROP TABLE IF EXISTS drizzle.__drizzle_migrations__`,
-      );
+      await db.execute(sql`DROP TABLE IF EXISTS drizzle.__drizzle_migrations__`);
       logger.debug("Cleared existing migration tracking");
     } catch (error) {
       logger.error("Error clearing migration tracking", {
@@ -200,11 +188,7 @@ export class DatabaseMigrateSyncRepositoryImpl
         // Create tracking-only version (empty SQL with just a comment)
         const trackingContent = TRACKING_COMMENT;
 
-        await fs.writeFile(
-          path.join(migrationsFolder, filename),
-          trackingContent,
-          "utf-8",
-        );
+        await fs.writeFile(path.join(migrationsFolder, filename), trackingContent, "utf-8");
       }
 
       logger.debug("Created tracking-only versions of migration files", {
@@ -273,5 +257,4 @@ export class DatabaseMigrateSyncRepositoryImpl
 /**
  * Export repository instance
  */
-export const databaseMigrateSyncRepository =
-  new DatabaseMigrateSyncRepositoryImpl();
+export const databaseMigrateSyncRepository = new DatabaseMigrateSyncRepositoryImpl();

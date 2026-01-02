@@ -25,14 +25,9 @@ function hasInteractiveChildren(children: ReactNode): boolean {
     if (isValidElement(child)) {
       // Check if it's a Button or other pressable component
       const componentType = child.type;
-      if (
-        typeof componentType === "function" ||
-        typeof componentType === "object"
-      ) {
+      if (typeof componentType === "function" || typeof componentType === "object") {
         const displayName =
-          ("displayName" in componentType
-            ? componentType.displayName
-            : undefined) ??
+          ("displayName" in componentType ? componentType.displayName : undefined) ??
           ("name" in componentType ? componentType.name : undefined);
         if (displayName === "Button" || displayName === "Pressable") {
           hasInteractive = true;
@@ -47,23 +42,14 @@ function hasInteractiveChildren(children: ReactNode): boolean {
   return hasInteractive;
 }
 
-export function Link({
-  className,
-  children,
-  href,
-  target,
-  rel,
-  onClick,
-}: LinkProps): JSX.Element {
+export function Link({ className, children, href, target, rel, onClick }: LinkProps): JSX.Element {
   // If children contain interactive elements, use View instead of Text
   const useView = hasInteractiveChildren(children);
 
   if (useView) {
     return (
       <ExpoLink href={href} asChild target={target} rel={rel} onPress={onClick}>
-        <StyledView className={cn(className, "self-start")}>
-          {children}
-        </StyledView>
+        <StyledView className={cn(className, "self-start")}>{children}</StyledView>
       </ExpoLink>
     );
   }

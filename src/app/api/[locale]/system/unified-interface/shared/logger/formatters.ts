@@ -78,10 +78,7 @@ export function formatSkip(message: string, icon = "⏭️"): string {
 /**
  * Format a config/settings message
  */
-export function formatConfig(
-  key: string,
-  value: string | number | boolean,
-): string {
+export function formatConfig(key: string, value: string | number | boolean): string {
   const formattedKey = key ? `${key}` : "";
   const formattedValue = maybeColorize(bold(String(value)), semantic.success);
   return key ? `${formattedKey}: ${formattedValue}` : formattedValue;
@@ -101,11 +98,7 @@ export function formatDuration(ms: number): string {
 /**
  * Format a count
  */
-export function formatCount(
-  count: number,
-  singular: string,
-  plural?: string,
-): string {
+export function formatCount(count: number, singular: string, plural?: string): string {
   const label = count === 1 ? singular : plural || `${singular}s`;
   return `${maybeColorize(bold(String(count)), semantic.highlight)} ${maybeColorize(label, semantic.muted)}`;
 }
@@ -141,10 +134,7 @@ export function formatSection(title: string): string {
 /**
  * Format a key-value pair
  */
-export function formatKeyValue(
-  key: string,
-  value: string | number | boolean,
-): string {
+export function formatKeyValue(key: string, value: string | number | boolean): string {
   return `${maybeColorize(key, semantic.muted)}: ${maybeColorize(bold(String(value)), semantic.highlight)}`;
 }
 

@@ -37,13 +37,11 @@ export const translations = {
               "What caught my attention about your business is the potential I see for growth and impact.",
             practicalTransition:
               "But let me be practical - you're probably wondering what this actually means for you.",
-            plansBridge:
-              "Here's what I'm thinking in terms of concrete next steps:",
+            plansBridge: "Here's what I'm thinking in terms of concrete next steps:",
             ctaText: "Let's Talk About Your Goals",
             signature: "Looking forward to connecting,",
             signatureClosing: "Best regards",
-            postScript:
-              "P.S. No pressure - if the timing isn't right, I completely understand.",
+            postScript: "P.S. No pressure - if the timing isn't right, I completely understand.",
           },
           followup1: {
             subject: "Your roadmap for the next 90 days",
@@ -61,14 +59,12 @@ export const translations = {
             month2Title: "Month 2: Implementation",
             month2Content: "This is where we start seeing real momentum build.",
             week3Title: "Week 3-4: Quick Wins",
-            week3Content:
-              "You'll see the first tangible results - usually faster than expected.",
+            week3Content: "You'll see the first tangible results - usually faster than expected.",
             roadmapIntro:
               "What I like about this approach is that you're not waiting 6 months to see if things are working.",
             personalCommitment:
               "Here's something I want you to know: I'm personally invested in your success. This isn't just another client relationship for me.",
-            nextSteps:
-              "If this resonates with you, let's have a real conversation about it.",
+            nextSteps: "If this resonates with you, let's have a real conversation about it.",
             ctaText: "Schedule Your Strategy Call",
             signature: "Excited about the possibilities,",
             signatureClosing: "Warm regards",
@@ -114,8 +110,7 @@ export const translations = {
               "So here's my practical offer: If you ever want to have a no-pressure conversation about your business goals, I'm here.",
             noHighPressure:
               "No sales pitch. No hard sell. Just a genuine conversation about where you want to take your business and whether we might be able to help.",
-            finalCTA:
-              "The door's open whenever you're ready to walk through it.",
+            finalCTA: "The door's open whenever you're ready to walk through it.",
             ctaText: "Let's Have That Conversation",
             signature: "Wishing you all the best,",
             postScript:
@@ -184,12 +179,10 @@ export const translations = {
             previewText: "Checking in on your experience",
             greeting: "Hi {{businessName}},",
             intro: "I wanted to check in and see how things are going.",
-            empathy:
-              "I know getting started with something new can be challenging.",
+            empathy: "I know getting started with something new can be challenging.",
             question: "How has your experience been so far?",
             socialProof: {
-              quote:
-                "This service has transformed how we work - couldn't be happier!",
+              quote: "This service has transformed how we work - couldn't be happier!",
               author: "Happy Customer",
             },
             ctaText: "Share Your Feedback",
@@ -200,12 +193,9 @@ export const translations = {
             previewText: "Why we do what we do",
             greeting: "Hi {{businessName}},",
             intro: "I wanted to share a bit about why we do what we do.",
-            mission:
-              "Our mission is to make professional services accessible to everyone.",
-            story1:
-              "We started because we saw businesses struggling with outdated solutions.",
-            story2:
-              "Today, we're proud to help hundreds of businesses succeed.",
+            mission: "Our mission is to make professional services accessible to everyone.",
+            story1: "We started because we saw businesses struggling with outdated solutions.",
+            story2: "Today, we're proud to help hundreds of businesses succeed.",
             ctaText: "Learn More About Us",
             signature: "With purpose,",
             closing: "Thank you for being part of our journey.",
@@ -214,12 +204,9 @@ export const translations = {
             subject: "Final check-in",
             previewText: "One last message from us",
             greeting: "Hi {{businessName}},",
-            intro:
-              "This is my last message unless you'd like to continue hearing from us.",
-            reflection:
-              "I've reached out because I genuinely believe we could help your business.",
-            noPressure:
-              "But I respect your time and don't want to be a bother.",
+            intro: "This is my last message unless you'd like to continue hearing from us.",
+            reflection: "I've reached out because I genuinely believe we could help your business.",
+            noPressure: "But I respect your time and don't want to be a bother.",
             ctaText: "Stay Connected",
             signature: "Best wishes,",
             closing: "The door is always open if you change your mind later.",
@@ -230,8 +217,7 @@ export const translations = {
             greeting: "Hi {{businessName}},",
             intro: "I came across something I thought you'd find valuable.",
             tip: "Here's a quick tip that can make a real difference:",
-            value:
-              "Small changes can lead to significant improvements over time.",
+            value: "Small changes can lead to significant improvements over time.",
             ctaText: "Learn More",
             signature: "To your success,",
           },

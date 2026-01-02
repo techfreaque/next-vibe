@@ -11,14 +11,10 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground hover:bg-primary/90 dark:hover:text-blue-400",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input text-foreground hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 dark:hover:text-blue-400",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline: "border border-input text-foreground hover:bg-accent hover:text-accent-foreground",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost:
           "text-foreground hover:bg-accent hover:text-accent-foreground dark:hover:text-blue-400",
         link: "text-primary underline-offset-4 hover:underline",
@@ -44,8 +40,7 @@ export const buttonTextVariants = cva("text-sm font-medium text-foreground", {
       default: "text-primary-foreground",
       destructive: "text-destructive-foreground",
       outline: "group-active:text-accent-foreground",
-      secondary:
-        "text-secondary-foreground group-active:text-secondary-foreground",
+      secondary: "text-secondary-foreground group-active:text-secondary-foreground",
       ghost: "group-active:text-accent-foreground",
       link: "text-primary group-active:underline",
     },
@@ -76,22 +71,12 @@ export type ButtonProps = {
   size?: ButtonSize;
   disabled?: boolean;
   children?: ReactNode;
-  onClick?:
-    | ((e: ButtonMouseEvent) => void)
-    | ((e: ButtonMouseEvent) => Promise<void>);
+  onClick?: ((e: ButtonMouseEvent) => void) | ((e: ButtonMouseEvent) => Promise<void>);
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
   type?: "button" | "submit" | "reset";
   title?: string;
-  role?:
-    | "button"
-    | "link"
-    | "menuitem"
-    | "tab"
-    | "switch"
-    | "checkbox"
-    | "radio"
-    | "combobox";
+  role?: "button" | "link" | "menuitem" | "tab" | "switch" | "checkbox" | "radio" | "combobox";
   tabIndex?: number;
   asChild?: boolean;
   key?: React.Key;
@@ -112,10 +97,7 @@ export function Button({
   return (
     <Comp
       {...(suppressHydrationWarning ? { suppressHydrationWarning: true } : {})}
-      className={cn(
-        buttonVariants({ variant, size, className }),
-        "cursor-pointer",
-      )}
+      className={cn(buttonVariants({ variant, size, className }), "cursor-pointer")}
       style={style}
       onClick={onClick}
       {...props}

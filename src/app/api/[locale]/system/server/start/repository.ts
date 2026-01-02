@@ -12,10 +12,7 @@ import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
@@ -24,10 +21,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { databaseMigrationRepository } from "../../db/migrate/repository";
-import type {
-  ServerStartRequestOutput,
-  ServerStartResponseOutput,
-} from "./definition";
+import type { ServerStartRequestOutput, ServerStartResponseOutput } from "./definition";
 
 /**
  * Server Start Repository Interface
@@ -60,16 +54,11 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
     const errors: string[] = [];
 
     // Convert string port to number if needed (CLI compatibility)
-    const port =
-      typeof data.port === "string"
-        ? parseInt(data.port, 10)
-        : data.port || 3000;
+    const port = typeof data.port === "string" ? parseInt(data.port, 10) : data.port || 3000;
 
     try {
       output.push("🚀 Starting Vibe Production Server");
-      output.push(
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-      );
+      output.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
       // Ensure production environment (NODE_ENV should be set externally)
       const currentEnv = process.env["NODE_ENV"] || "production";
@@ -83,15 +72,12 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       // Initialize single unified task runner for production environment
       if (!data.skipTaskRunner) {
         logger.info("Starting unified task runner for production");
-        output.push(
-          "   🔄 Initializing unified task runner for production environment...",
-        );
+        output.push("   🔄 Initializing unified task runner for production environment...");
 
         try {
           // Import and start the unified task runner
-          const { unifiedTaskRunnerRepository } = await import(
-            "../../unified-interface/tasks/unified-runner/repository"
-          );
+          const { unifiedTaskRunnerRepository } =
+            await import("../../unified-interface/tasks/unified-runner/repository");
 
           // Set environment to production
           unifiedTaskRunnerRepository.environment = "production";
@@ -108,9 +94,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           if (startResult.success) {
             this.taskRunnerStarted = true;
             output.push("   ✅ Unified task runner started successfully");
-            output.push(
-              "   📊 Environment: production | Side tasks: disabled (cron only)",
-            );
+            output.push("   📊 Environment: production | Side tasks: disabled (cron only)");
             logger.info("Task runner started successfully", {
               environment: "production",
               supportsSideTasks: false,
@@ -215,9 +199,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
           try {
             // Import task registry (this will auto-generate if needed)
-            const { taskRegistry } = await import(
-              "../../generated/tasks-index"
-            );
+            const { taskRegistry } = await import("../../generated/tasks-index");
 
             logger.info("Task registry loaded successfully", {
               cronTasks: taskRegistry.cronTasks.length,
@@ -229,14 +211,11 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             output.push(
               `   📊 Found ${taskRegistry.cronTasks.length} cron tasks (side tasks disabled in production)`,
             );
-            output.push(
-              `   🎯 Total tasks available: ${taskRegistry.allTasks.length}`,
-            );
+            output.push(`   🎯 Total tasks available: ${taskRegistry.allTasks.length}`);
 
             // Get task runner status
-            const { unifiedTaskRunnerRepository } = await import(
-              "../../unified-interface/tasks/unified-runner/repository"
-            );
+            const { unifiedTaskRunnerRepository } =
+              await import("../../unified-interface/tasks/unified-runner/repository");
             const status = unifiedTaskRunnerRepository.getStatus();
 
             logger.info("Task runner system operational", {
@@ -247,16 +226,11 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             });
 
             output.push("   ✅ Production task runner system is operational");
-            output.push(
-              `   🔄 Active cron tasks: ${status.activeTasks.length}`,
-            );
+            output.push(`   🔄 Active cron tasks: ${status.activeTasks.length}`);
           } catch (registryError) {
-            logger.warn(
-              "Task registry not available, task runner will start without tasks",
-              {
-                error: parseError(registryError).message,
-              },
-            );
+            logger.warn("Task registry not available, task runner will start without tasks", {
+              error: parseError(registryError).message,
+            });
             output.push("   ⚠️ Task registry not available");
             output.push("   🔄 Task runner starting without predefined tasks");
           }
@@ -280,9 +254,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
       // Check if we should skip running Next.js commands
       if (data.skipNextCommand) {
-        output.push(
-          "   ⏭️ Next.js server startup skipped (--skip-next-command flag used)",
-        );
+        output.push("   ⏭️ Next.js server startup skipped (--skip-next-command flag used)");
       } else {
         output.push("   🚀 Starting Next.js production server in parallel...");
         output.push(`   🌐 Target port: ${port}`);
@@ -315,9 +287,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
       // Add summary section
       output.push("");
-      output.push(
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-      );
+      output.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
       output.push("🎉 Production Server Setup Complete");
       output.push("");
 
@@ -357,9 +327,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         output.push(`⚠️  Setup completed with ${errors.length} warning(s)`);
       }
 
-      output.push(
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-      );
+      output.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
       output.push("");
       output.push("🔄 Production server is running...");
       output.push("💡 Press Ctrl+C to stop");
@@ -370,9 +338,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
       // Set up signal handlers for graceful shutdown
       const handleShutdown = (signal: string): void => {
-        process.stdout.write(
-          `\n🛑 Received ${signal}, shutting down gracefully...\n`,
-        );
+        process.stdout.write(`\n🛑 Received ${signal}, shutting down gracefully...\n`);
         this.stopAllProcesses();
         process.stdout.write("✅ All processes stopped. Goodbye! 👋\n");
         process.exit(0);
@@ -400,10 +366,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           if (this.nextServerProcess?.killed) {
             logger.warn("Next.js server process died, attempting restart...");
             this.startNextServer(port, logger).catch((error) => {
-              logger.error(
-                "Failed to restart Next.js server",
-                parseError(error),
-              );
+              logger.error("Failed to restart Next.js server", parseError(error));
             });
           }
         }
@@ -418,9 +381,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       const duration = Date.now() - startTime;
       const parsedError = parseError(error);
 
-      errors.push(
-        `❌ Failed to start production server: ${parsedError.message}`,
-      );
+      errors.push(`❌ Failed to start production server: ${parsedError.message}`);
 
       logger.error("Production server startup failed", {
         output: output.join("\n"),
@@ -444,17 +405,13 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         logger.info("Starting Next.js production server", { port });
 
         // Spawn Next.js production server using bun
-        const nextProcess = spawn(
-          "bun",
-          ["run", "next", "start", "--port", port.toString()],
-          {
-            stdio: ["pipe", "pipe", "pipe"],
-            env: {
-              ...process.env,
-              NODE_ENV: "production",
-            },
+        const nextProcess = spawn("bun", ["run", "next", "start", "--port", port.toString()], {
+          stdio: ["pipe", "pipe", "pipe"],
+          env: {
+            ...process.env,
+            NODE_ENV: "production",
           },
-        );
+        });
 
         this.nextServerProcess = nextProcess;
         this.runningProcesses.set("next-start", nextProcess);

@@ -35,12 +35,7 @@ const { POST } = createEndpoint({
     "app.api.stripe.tags.cli" as const,
     "app.api.stripe.tags.webhook" as const,
   ],
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.PRODUCTION_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
   aliases: ["stripe", "stripe-cli"],
 
   cli: {
@@ -63,10 +58,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.stripe.form.fields.operation.label" as const,
-          description:
-            "app.api.stripe.form.fields.operation.description" as const,
-          placeholder:
-            "app.api.stripe.form.fields.operation.placeholder" as const,
+          description: "app.api.stripe.form.fields.operation.description" as const,
+          placeholder: "app.api.stripe.form.fields.operation.placeholder" as const,
           columns: 6,
           options: [
             {
@@ -117,33 +110,27 @@ const { POST } = createEndpoint({
           options: [
             {
               value: "payment_intent.succeeded",
-              label:
-                "app.api.stripe.form.fields.events.paymentIntentSucceeded" as const,
+              label: "app.api.stripe.form.fields.events.paymentIntentSucceeded" as const,
             },
             {
               value: "payment_intent.payment_failed",
-              label:
-                "app.api.stripe.form.fields.events.paymentIntentFailed" as const,
+              label: "app.api.stripe.form.fields.events.paymentIntentFailed" as const,
             },
             {
               value: "customer.subscription.created",
-              label:
-                "app.api.stripe.form.fields.events.subscriptionCreated" as const,
+              label: "app.api.stripe.form.fields.events.subscriptionCreated" as const,
             },
             {
               value: "customer.subscription.updated",
-              label:
-                "app.api.stripe.form.fields.events.subscriptionUpdated" as const,
+              label: "app.api.stripe.form.fields.events.subscriptionUpdated" as const,
             },
             {
               value: "invoice.payment_succeeded",
-              label:
-                "app.api.stripe.form.fields.events.invoicePaymentSucceeded" as const,
+              label: "app.api.stripe.form.fields.events.invoicePaymentSucceeded" as const,
             },
             {
               value: "invoice.payment_failed",
-              label:
-                "app.api.stripe.form.fields.events.invoicePaymentFailed" as const,
+              label: "app.api.stripe.form.fields.events.invoicePaymentFailed" as const,
             },
           ],
         },
@@ -155,10 +142,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.stripe.form.fields.forwardTo.label" as const,
-          description:
-            "app.api.stripe.form.fields.forwardTo.description" as const,
-          placeholder:
-            "app.api.stripe.form.fields.forwardTo.placeholder" as const,
+          description: "app.api.stripe.form.fields.forwardTo.description" as const,
+          placeholder: "app.api.stripe.form.fields.forwardTo.placeholder" as const,
           columns: 6,
         },
         z.string().optional(),
@@ -169,8 +154,7 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.stripe.form.fields.skipSslVerify.label" as const,
-          description:
-            "app.api.stripe.form.fields.skipSslVerify.description" as const,
+          description: "app.api.stripe.form.fields.skipSslVerify.description" as const,
           columns: 6,
         },
         z.boolean().default(false),

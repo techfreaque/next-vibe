@@ -14,9 +14,7 @@ import definitions from "./definition";
 /**
  * Hook for creating SMTP accounts
  */
-export function useSmtpAccountCreate(
-  logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
+export function useSmtpAccountCreate(logger: EndpointLogger): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {
@@ -29,6 +27,4 @@ export function useSmtpAccountCreate(
 // Export with alternative name for compatibility
 export const useSmtpAccountCreateEndpoint = useSmtpAccountCreate;
 
-export type SmtpAccountCreateEndpointReturn = EndpointReturn<
-  typeof definitions
->;
+export type SmtpAccountCreateEndpointReturn = EndpointReturn<typeof definitions>;

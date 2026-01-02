@@ -7,11 +7,7 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -28,10 +24,7 @@ import {
 } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
 import type { ModelId } from "../../../model-access/models";
-import {
-  canPostInThread,
-  canViewThread,
-} from "../../../permissions/permissions";
+import { canPostInThread, canViewThread } from "../../../permissions/permissions";
 import { validateNotIncognito } from "../../../validation";
 import type {
   MessageCreateRequestOutput,
@@ -268,11 +261,7 @@ export async function createErrorMessage(params: {
 }): Promise<void> {
   const metadata: Record<
     string,
-    | string
-    | number
-    | boolean
-    | null
-    | Record<string, string | number | boolean | null>
+    string | number | boolean | null | Record<string, string | number | boolean | null>
   > = {
     errorType: params.errorType,
   };
@@ -344,8 +333,7 @@ export async function createTextMessage(params: {
       model: params.model,
     });
     return fail({
-      message:
-        "app.api.agent.chat.threads.messages.post.errors.createFailed.title",
+      message: "app.api.agent.chat.threads.messages.post.errors.createFailed.title",
       errorType: ErrorResponseTypes.DATABASE_ERROR,
     });
   }
@@ -381,12 +369,7 @@ export async function createToolMessage(params: {
 }): Promise<void> {
   const metadata: Record<
     string,
-    | string
-    | number
-    | boolean
-    | null
-    | Record<string, string | number | boolean | null>
-    | ToolCall
+    string | number | boolean | null | Record<string, string | number | boolean | null> | ToolCall
   > = {
     toolCall: params.toolCall,
   };
@@ -538,8 +521,7 @@ export class MessagesRepository {
     } catch (error) {
       logger.error("Error listing messages", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.messages.get.errors.server.title" as const,
+        message: "app.api.agent.chat.threads.threadId.messages.get.errors.server.title" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -609,8 +591,7 @@ export class MessagesRepository {
 
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.post.errors.notFound.title",
+          message: "app.api.agent.chat.threads.threadId.messages.post.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -660,8 +641,7 @@ export class MessagesRepository {
 
         if (!parentMessage) {
           return fail({
-            message:
-              "app.api.agent.chat.threads.threadId.messages.post.errors.validation.title",
+            message: "app.api.agent.chat.threads.threadId.messages.post.errors.validation.title",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: {
               error:
@@ -675,8 +655,7 @@ export class MessagesRepository {
 
       if (!data.message?.id) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.post.errors.validation.title",
+          message: "app.api.agent.chat.threads.threadId.messages.post.errors.validation.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             message: "Message ID must be provided by client",
@@ -705,8 +684,7 @@ export class MessagesRepository {
 
       if (!message) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.post.errors.server.title",
+          message: "app.api.agent.chat.threads.threadId.messages.post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -729,8 +707,7 @@ export class MessagesRepository {
     } catch (error) {
       logger.error("Error creating message", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.messages.post.errors.server.title",
+        message: "app.api.agent.chat.threads.threadId.messages.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

@@ -51,13 +51,7 @@ export function testEndpoint<
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
 >(
-  endpoint: CreateApiEndpoint<
-    TExampleKey,
-    TMethod,
-    TUserRoleValue,
-    TScopedTranslationKey,
-    TFields
-  >,
+  endpoint: CreateApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TScopedTranslationKey, TFields>,
   options: TestEndpointOptions<
     TExampleKey,
     TMethod,
@@ -116,16 +110,12 @@ export function testEndpoint<
     if (payloads) {
       describe("Payload Examples", () => {
         // Test each example payload
-        const payloadEntries = Object.entries(
-          payloads,
-        ) as ExampleEntry<TRequestOutput>[];
+        const payloadEntries = Object.entries(payloads) as ExampleEntry<TRequestOutput>[];
 
         payloadEntries.forEach(([exampleName, payload]) => {
           it(`should handle ${exampleName} example`, async () => {
             const exampleUrlPathParams = urlPathParams
-              ? (urlPathParams as Record<string, TUrlVariablesOutput>)[
-                  exampleName
-                ]
+              ? (urlPathParams as Record<string, TUrlVariablesOutput>)[exampleName]
               : undefined;
 
             // Test with a user that has the endpoint's allowed roles
@@ -174,9 +164,7 @@ export function testEndpoint<
 
             // Validate response data against schema when successful
             if (response.success && response.data) {
-              const validation = endpoint.responseSchema.safeParse(
-                response.data,
-              );
+              const validation = endpoint.responseSchema.safeParse(response.data);
               expect(validation.success).toBe(true);
             }
           });
@@ -230,9 +218,7 @@ export function testEndpoint<
         if (endpoint.allowedRoles.length > 0) {
           it("should accept users with valid roles", async () => {
             // Use a user with the first allowed role that's not PUBLIC
-            const validRoles = endpoint.allowedRoles.filter(
-              (role) => role !== UserRole.PUBLIC,
-            );
+            const validRoles = endpoint.allowedRoles.filter((role) => role !== UserRole.PUBLIC);
 
             if (validRoles.length > 0) {
               // Test is only relevant if there are non-public roles

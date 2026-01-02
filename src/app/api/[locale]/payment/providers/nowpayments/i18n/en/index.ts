@@ -62,8 +62,7 @@ export const translations = {
     },
     paymentStatusFailed: {
       title: "Payment Status Retrieval Failed",
-      description:
-        "Failed to retrieve payment status from NOWPayments: {error}",
+      description: "Failed to retrieve payment status from NOWPayments: {error}",
     },
   },
 

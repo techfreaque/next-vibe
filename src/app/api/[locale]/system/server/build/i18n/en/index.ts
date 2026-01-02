@@ -117,35 +117,29 @@ export const translations = {
         generatingEndpoints: "Generating API endpoints...",
         generationSuccess: "✅ Code generation completed successfully",
         generationFailed: "Code generation failed",
-        skipNextBuild:
-          "Skipping Next.js build (will be handled by package.json)",
+        skipNextBuild: "Skipping Next.js build (will be handled by package.json)",
         buildingNextjs: "Building Next.js application...",
         nextjsBuildSuccess: "✅ Next.js build completed successfully",
         nextjsBuildFailed: "Next.js build failed",
-        skipProdDb:
-          "Skipping production database operations (--run-prod-database=false)",
+        skipProdDb: "Skipping production database operations (--run-prod-database=false)",
         buildFailed: "❌ Build failed",
         schemaGenerationStart: "Generating database schema...",
         schemaGenerationSuccess: "✅ Database schema generation completed",
         schemaGenerationFailed: "Database schema generation failed",
-        skipSchemaGeneration:
-          "Skipping database schema generation (--run-prod-database=false)",
+        skipSchemaGeneration: "Skipping database schema generation (--run-prod-database=false)",
         reportsGenerationStart: "Generating all reports...",
         reportsGenerationSuccess: "✅ All reports generated successfully",
         reportsGenerationFailed: "Report generation failed",
         prodDbStart: "🚀 Running production database operations...",
-        prodDbSuccess:
-          "🎉 Production database operations completed successfully",
+        prodDbSuccess: "🎉 Production database operations completed successfully",
         prodDbFailed: "❌ Production build failed during database operations",
         prodDbNotReady: "💡 This build is NOT ready for production deployment",
-        deploymentReady:
-          "🚀 Your application is ready for production deployment!",
+        deploymentReady: "🚀 Your application is ready for production deployment!",
         dbConnectionError:
           "Database connection failed. Please ensure the database is running and accessible.",
         dbStartSuggestion:
           "Try running 'docker compose -f docker-compose-dev.yml up -d' to start the database",
-        nextBuildHandled:
-          "✅ Next.js build will be handled by yarn build command",
+        nextBuildHandled: "✅ Next.js build will be handled by yarn build command",
         failedProdMigrations: "Failed to run production migrations",
       },
     },

@@ -33,9 +33,7 @@ export function Title({
   level,
 }: TitleProps): React.JSX.Element {
   const levelKey = level as 1 | 2 | 3 | 4 | 5 | 6;
-  const nativeStyle: TextStyle | undefined = style
-    ? convertCSSToTextStyle(style)
-    : undefined;
+  const nativeStyle: TextStyle | undefined = style ? convertCSSToTextStyle(style) : undefined;
 
   return (
     <RNText

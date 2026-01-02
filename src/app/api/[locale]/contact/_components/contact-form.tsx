@@ -25,10 +25,7 @@ interface ContactFormProps {
  * Contact form component
  * Handles form submission and validation
  */
-export default function ContactForm({
-  locale,
-  user,
-}: ContactFormProps): JSX.Element {
+export default function ContactForm({ locale, user }: ContactFormProps): JSX.Element {
   const logger = createEndpointLogger(false, Date.now(), locale);
   const contactResult = useContactWithEngagement(logger, user);
   const { t } = simpleT(locale);
@@ -121,11 +118,7 @@ export default function ContactForm({
           locale={locale}
         />
 
-        <Button
-          type="submit"
-          className="w-full bg-blue-600"
-          disabled={isSubmitting}
-        >
+        <Button type="submit" className="w-full bg-blue-600" disabled={isSubmitting}>
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

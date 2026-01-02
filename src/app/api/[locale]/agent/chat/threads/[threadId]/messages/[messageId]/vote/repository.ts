@@ -113,11 +113,8 @@ export const voteRepository = {
         : [];
 
       // Find existing vote by this user
-      const existingVoteIndex = voteDetails.findIndex(
-        (v) => v.userId === userId,
-      );
-      const existingVote =
-        existingVoteIndex >= 0 ? voteDetails[existingVoteIndex] : null;
+      const existingVoteIndex = voteDetails.findIndex((v) => v.userId === userId);
+      const existingVote = existingVoteIndex >= 0 ? voteDetails[existingVoteIndex] : null;
 
       // Calculate new vote counts
       let upvotes = message.upvotes;

@@ -58,11 +58,9 @@ export const translations: typeof enTranslations = {
   "take-snapshot": takeSnapshotTranslations,
   "wait-for": waitForTranslations,
   title: "Chrome DevTools MCP Tools",
-  description:
-    "Wykonaj narzędzia Chrome DevTools MCP dla automatyzacji przeglądarki i debugowania",
+  description: "Wykonaj narzędzia Chrome DevTools MCP dla automatyzacji przeglądarki i debugowania",
   category: "Core API",
-  summary:
-    "Dostęp do narzędzi Chrome DevTools Protocol przez MCP dla automatyzacji webowej",
+  summary: "Dostęp do narzędzi Chrome DevTools Protocol przez MCP dla automatyzacji webowej",
   tags: {
     browserAutomation: "Automatyzacja przeglądarki",
     chromeDevTools: "Chrome DevTools",
@@ -83,8 +81,7 @@ export const translations: typeof enTranslations = {
 
   form: {
     label: "Wykonanie narzędzia przeglądarki",
-    description:
-      "Wykonaj narzędzia Chrome DevTools MCP dla sterowania przeglądarką i analizy",
+    description: "Wykonaj narzędzia Chrome DevTools MCP dla sterowania przeglądarką i analizy",
     fields: {
       tool: {
         label: "Narzędzie",
@@ -242,8 +239,7 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description:
-        "Wystąpił wewnętrzny błąd serwera podczas wykonywania narzędzia",
+      description: "Wystąpił wewnętrzny błąd serwera podczas wykonywania narzędzia",
     },
     unknown: {
       title: "Nieznany błąd",
@@ -275,8 +271,7 @@ export const translations: typeof enTranslations = {
         start: "Łączenie z serwerem Chrome DevTools MCP",
         success: "Pomyślnie połączono z serwerem MCP",
         error: "Błąd podczas łączenia z serwerem MCP",
-        failedToInitialize:
-          "Nie udało się zainicjować serwera Chrome DevTools MCP",
+        failedToInitialize: "Nie udało się zainicjować serwera Chrome DevTools MCP",
       },
       tool: {
         call: {

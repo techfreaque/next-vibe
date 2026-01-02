@@ -90,9 +90,7 @@ export interface FormDatePickerProps {
   onChange?: (value: string) => void;
 }
 
-export function Form<TRequest extends FieldValues>(
-  props: FormProps<TRequest>,
-): React.JSX.Element {
+export function Form<TRequest extends FieldValues>(props: FormProps<TRequest>): React.JSX.Element {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     e.stopPropagation();
@@ -122,10 +120,7 @@ const FormFieldContext = React.createContext<
   FormFieldContextValue<FieldValues, FieldPath<FieldValues>> | undefined
 >(undefined);
 
-export const FormField = <
-  TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>,
->({
+export const FormField = <TFieldValues extends FieldValues, TName extends FieldPath<TFieldValues>>({
   ...props
 }: FormFieldProps<TFieldValues, TName>): React.JSX.Element => {
   return (
@@ -135,9 +130,7 @@ export const FormField = <
   );
 };
 
-const FormItemContext = React.createContext<FormItemContextValue | undefined>(
-  undefined,
-);
+const FormItemContext = React.createContext<FormItemContextValue | undefined>(undefined);
 
 export const useFormField = (): UseFormFieldReturn => {
   const fieldContext = React.useContext(FormFieldContext);
@@ -170,10 +163,7 @@ export const useFormField = (): UseFormFieldReturn => {
   };
 };
 
-export function FormItem({
-  className,
-  ...props
-}: FormItemProps): React.JSX.Element {
+export function FormItem({ className, ...props }: FormItemProps): React.JSX.Element {
   const id = React.useId();
 
   return (
@@ -184,10 +174,7 @@ export function FormItem({
 }
 FormItem.displayName = "FormItem";
 
-export function FormLabel({
-  className,
-  ...props
-}: FormLabelProps): React.JSX.Element {
+export function FormLabel({ className, ...props }: FormLabelProps): React.JSX.Element {
   const { error, formItemId } = useFormField();
 
   return (
@@ -201,15 +188,12 @@ export function FormLabel({
 FormLabel.displayName = "FormLabel";
 
 export function FormControl({ ...props }: FormControlProps): React.JSX.Element {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField();
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
 
   return (
     <Slot
       id={formItemId}
-      aria-describedby={
-        error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`
-      }
+      aria-describedby={error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`}
       aria-invalid={!!error}
       {...props}
     />
@@ -217,10 +201,7 @@ export function FormControl({ ...props }: FormControlProps): React.JSX.Element {
 }
 FormControl.displayName = "FormControl";
 
-export function FormDescription({
-  className,
-  ...props
-}: FormDescriptionProps): React.JSX.Element {
+export function FormDescription({ className, ...props }: FormDescriptionProps): React.JSX.Element {
   const { formDescriptionId } = useFormField();
 
   return (
@@ -248,10 +229,7 @@ export function FormMessage({
   return (
     <p
       id={formMessageId}
-      className={cn(
-        "text-[0.8rem] font-medium text-red-600 dark:text-red-400",
-        className,
-      )}
+      className={cn("text-[0.8rem] font-medium text-red-600 dark:text-red-400", className)}
       {...props}
     >
       {t(body as TranslationKey)}

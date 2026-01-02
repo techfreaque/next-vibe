@@ -6,11 +6,7 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -118,8 +114,7 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
       convertedAt: lead.convertedAt?.toISOString() ?? null,
       signedUpAt: lead.signedUpAt?.toISOString() ?? null,
       consultationBookedAt: lead.consultationBookedAt?.toISOString() ?? null,
-      subscriptionConfirmedAt:
-        lead.subscriptionConfirmedAt?.toISOString() ?? null,
+      subscriptionConfirmedAt: lead.subscriptionConfirmedAt?.toISOString() ?? null,
       currentCampaignStage: lead.currentCampaignStage,
       emailsSent: lead.emailsSent,
       lastEmailSentAt: lead.lastEmailSentAt?.toISOString() ?? null,

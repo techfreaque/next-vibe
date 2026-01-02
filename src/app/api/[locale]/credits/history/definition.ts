@@ -43,8 +43,7 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.agent.chat.credits.history.get.container.title",
-      description:
-        "app.api.agent.chat.credits.history.get.container.description",
+      description: "app.api.agent.chat.credits.history.get.container.description",
       layoutType: LayoutType.STACKED,
       getCount: (data) => data.response?.paginationInfo?.total,
       submitButton: {
@@ -82,16 +81,14 @@ const { GET } = createEndpoint({
             amount: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.credits.history.get.amount" as const,
+                content: "app.api.agent.chat.credits.history.get.amount" as const,
               },
               z.coerce.number(),
             ),
             balanceAfter: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.subscription.subscription.history.balance" as const,
+                content: "app.subscription.subscription.history.balance" as const,
               },
               z.coerce.number(),
             ),
@@ -112,16 +109,14 @@ const { GET } = createEndpoint({
             messageId: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.credits.history.get.messageId" as const,
+                content: "app.api.agent.chat.credits.history.get.messageId" as const,
               },
               z.string().nullable(),
             ),
             createdAt: responseField(
               {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.credits.history.get.createdAt" as const,
+                content: "app.api.agent.chat.credits.history.get.createdAt" as const,
               },
               dateSchema,
             ),
@@ -155,16 +150,14 @@ const { GET } = createEndpoint({
           total: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.credits.history.get.paginationInfo.total" as const,
+              content: "app.api.agent.chat.credits.history.get.paginationInfo.total" as const,
             },
             z.coerce.number(),
           ),
           totalPages: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.credits.history.get.paginationInfo.totalPages" as const,
+              content: "app.api.agent.chat.credits.history.get.paginationInfo.totalPages" as const,
             },
             z.coerce.number(),
           ),
@@ -183,49 +176,39 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.chat.credits.history.get.errors.validation.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.validation.description",
+      description: "app.api.agent.chat.credits.history.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.chat.credits.history.get.errors.network.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.network.description",
+      description: "app.api.agent.chat.credits.history.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.agent.chat.credits.history.get.errors.unauthorized.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.unauthorized.description",
+      description: "app.api.agent.chat.credits.history.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.credits.history.get.errors.forbidden.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.forbidden.description",
+      description: "app.api.agent.chat.credits.history.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.credits.history.get.errors.notFound.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.notFound.description",
+      description: "app.api.agent.chat.credits.history.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.credits.history.get.errors.server.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.server.description",
+      description: "app.api.agent.chat.credits.history.get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.agent.chat.credits.history.get.errors.unknown.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.unknown.description",
+      description: "app.api.agent.chat.credits.history.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.credits.history.get.errors.unsavedChanges.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.unsavedChanges.description",
+      title: "app.api.agent.chat.credits.history.get.errors.unsavedChanges.title",
+      description: "app.api.agent.chat.credits.history.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.credits.history.get.errors.conflict.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.conflict.description",
+      description: "app.api.agent.chat.credits.history.get.errors.conflict.description",
     },
   },
 

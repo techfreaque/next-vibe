@@ -38,9 +38,7 @@ export const { POST, tools } = endpointsHandler({
             response: {
               success: true,
               message: result.data,
-              nextSteps: [
-                "app.api.user.public.resetPassword.confirm.nextSteps.login",
-              ],
+              nextSteps: ["app.api.user.public.resetPassword.confirm.nextSteps.login"],
             },
           },
         };

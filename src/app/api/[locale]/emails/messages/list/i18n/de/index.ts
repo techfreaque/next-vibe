@@ -2,12 +2,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "E-Mails auflisten",
-  description:
-    "Eine paginierte Liste von E-Mails mit Filterung und Paginierung abrufen",
+  description: "Eine paginierte Liste von E-Mails mit Filterung und Paginierung abrufen",
   container: {
     title: "E-Mail-Liste",
-    description:
-      "E-Mail-Listen-Parameter konfigurieren und Ergebnisse anzeigen",
+    description: "E-Mail-Listen-Parameter konfigurieren und Ergebnisse anzeigen",
   },
   filters: {
     title: "Filter",
@@ -145,13 +143,11 @@ export const translations: typeof enTranslations = {
     },
     unauthorized: {
       title: "Nicht autorisiert",
-      description:
-        "Sie müssen authentifiziert sein, um auf diese Ressource zuzugreifen",
+      description: "Sie müssen authentifiziert sein, um auf diese Ressource zuzugreifen",
     },
     forbidden: {
       title: "Verboten",
-      description:
-        "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
+      description: "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
     },
     notFound: {
       title: "Nicht gefunden",

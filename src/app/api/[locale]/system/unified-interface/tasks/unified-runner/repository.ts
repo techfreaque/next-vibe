@@ -9,18 +9,11 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type {
-  JwtPayloadType,
-  JwtPrivatePayloadType,
-} from "@/app/api/[locale]/user/auth/types";
+import type { JwtPayloadType, JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -33,10 +26,7 @@ import type {
   TaskRunnerManager,
   TaskStatus,
 } from "../types/repository";
-import type {
-  UnifiedRunnerRequestOutput,
-  UnifiedRunnerResponseOutput,
-} from "./definition";
+import type { UnifiedRunnerRequestOutput, UnifiedRunnerResponseOutput } from "./definition";
 
 // System user for cron task execution
 const CRON_SYSTEM_USER: JwtPrivatePayloadType = {
@@ -63,12 +53,9 @@ export interface UnifiedTaskRunnerRepository extends TaskRunnerManager {
  * Unified Task Runner Repository Implementation
  * Implements the complete unified task runner as per spec.md
  */
-export class UnifiedTaskRunnerRepositoryImpl
-  implements UnifiedTaskRunnerRepository
-{
+export class UnifiedTaskRunnerRepositoryImpl implements UnifiedTaskRunnerRepository {
   name = "unified-task-runner" as const;
-  description =
-    "app.api.system.unifiedInterface.tasks.unifiedRunner.description" as const;
+  description = "app.api.system.unifiedInterface.tasks.unifiedRunner.description" as const;
   environment: "development" | "production" | "serverless" = "development";
   supportsSideTasks = true;
 
@@ -107,8 +94,7 @@ export class UnifiedTaskRunnerRepositoryImpl
           return success({
             success: true,
             actionResult: data.action,
-            message:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
+            message: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
             timestamp,
           });
 
@@ -117,8 +103,7 @@ export class UnifiedTaskRunnerRepositoryImpl
           return success({
             success: true,
             actionResult: data.action,
-            message:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
+            message: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
             timestamp,
           });
 
@@ -127,8 +112,7 @@ export class UnifiedTaskRunnerRepositoryImpl
           return success({
             success: true,
             actionResult: data.action,
-            message:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
+            message: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
             timestamp,
           });
 
@@ -138,8 +122,7 @@ export class UnifiedTaskRunnerRepositoryImpl
           return success({
             success: true,
             actionResult: data.action,
-            message:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
+            message: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
             timestamp,
           });
 
@@ -158,8 +141,7 @@ export class UnifiedTaskRunnerRepositoryImpl
       });
 
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+        message: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -178,8 +160,7 @@ export class UnifiedTaskRunnerRepositoryImpl
         status: CronTaskStatus.SKIPPED,
         reason:
           "app.api.system.unifiedInterface.tasks.unifiedRunner.reasons.previousInstanceRunning",
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.messages.taskSkipped",
+        message: "app.api.system.unifiedInterface.tasks.unifiedRunner.messages.taskSkipped",
       });
     }
 
@@ -192,8 +173,7 @@ export class UnifiedTaskRunnerRepositoryImpl
         const errorMsg = "Task runner not properly initialized with logger";
         this.markTaskAsFailed(taskName, errorMsg);
         return fail({
-          message:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+          message: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: errorMsg, taskName },
         });
@@ -208,12 +188,10 @@ export class UnifiedTaskRunnerRepositoryImpl
 
       // Check if task returned an error
       if (result && typeof result === "object" && "error" in result) {
-        const errorMsg =
-          typeof result.error === "string" ? result.error : "Task failed";
+        const errorMsg = typeof result.error === "string" ? result.error : "Task failed";
         this.markTaskAsFailed(taskName, errorMsg);
         return fail({
-          message:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+          message: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: errorMsg, taskName },
         });
@@ -222,31 +200,25 @@ export class UnifiedTaskRunnerRepositoryImpl
       this.markTaskAsCompleted(taskName);
       return success({
         status: CronTaskStatus.COMPLETED,
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.messages.taskCompleted",
+        message: "app.api.system.unifiedInterface.tasks.unifiedRunner.messages.taskCompleted",
       });
     } catch (error) {
       const errorMsg = parseError(error).message;
       this.markTaskAsFailed(taskName, errorMsg);
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+        message: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMsg, taskName },
       });
     }
   }
 
-  async startSideTask(
-    task: SideTask,
-    signal: AbortSignal,
-  ): Promise<ResponseType<void>> {
+  async startSideTask(task: SideTask, signal: AbortSignal): Promise<ResponseType<void>> {
     const taskName = task.name;
 
     if (this.isTaskRunning(taskName)) {
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.validation.title",
+        message: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.validation.title",
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: { taskName },
       });
@@ -275,8 +247,7 @@ export class UnifiedTaskRunnerRepositoryImpl
         });
       }
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+        message: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorObj.message, taskName },
       });
@@ -311,9 +282,7 @@ export class UnifiedTaskRunnerRepositoryImpl
   }
 
   getRunningTasks(): string[] {
-    return [...this.runningTasks.keys()].filter((taskName) =>
-      this.isTaskRunning(taskName),
-    );
+    return [...this.runningTasks.keys()].filter((taskName) => this.isTaskRunning(taskName));
   }
 
   start(
@@ -352,8 +321,7 @@ export class UnifiedTaskRunnerRepositoryImpl
       }
 
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+        message: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMsg },
       });
@@ -395,10 +363,7 @@ export class UnifiedTaskRunnerRepositoryImpl
           this.runningProcesses.set(task.name, taskController);
 
           // Mark task as running
-          this.markTaskAsRunning(
-            task.name,
-            task.type === "task-runner" ? "side" : "side",
-          );
+          this.markTaskAsRunning(task.name, task.type === "task-runner" ? "side" : "side");
 
           // Start the task
           await task.run({
@@ -437,9 +402,7 @@ export class UnifiedTaskRunnerRepositoryImpl
         });
 
       // Set up cron task scheduler for cron tasks
-      const cronTasks = tasks.filter(
-        (task): task is CronTask => task.type === "cron",
-      );
+      const cronTasks = tasks.filter((task): task is CronTask => task.type === "cron");
       if (cronTasks.length > 0) {
         this.logger.debug("Setting up cron task scheduler", {
           cronTaskCount: cronTasks.length,
@@ -561,5 +524,4 @@ export class UnifiedTaskRunnerRepositoryImpl
 }
 
 // Export singleton instance
-export const unifiedTaskRunnerRepository =
-  new UnifiedTaskRunnerRepositoryImpl();
+export const unifiedTaskRunnerRepository = new UnifiedTaskRunnerRepositoryImpl();

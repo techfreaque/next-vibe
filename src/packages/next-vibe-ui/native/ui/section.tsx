@@ -16,12 +16,7 @@ const StyledView = styled(View);
  * Provides consistent API across platforms
  * Supports both className (via NativeWind) and style (via React.CSSProperties)
  */
-export function Section({
-  children,
-  className,
-  style,
-  id,
-}: SectionProps): React.JSX.Element {
+export function Section({ children, className, style, id }: SectionProps): React.JSX.Element {
   // Convert CSS style to React Native ViewStyle if provided
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 

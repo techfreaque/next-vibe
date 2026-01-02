@@ -171,8 +171,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.emails.send.groups.campaignTracking.title",
-          description:
-            "app.api.emails.send.groups.campaignTracking.description",
+          description: "app.api.emails.send.groups.campaignTracking.description",
           layoutType: LayoutType.GRID_2_COLUMNS,
         },
         { request: "data" },
@@ -209,8 +208,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.emails.send.groups.smsNotifications.title",
-          description:
-            "app.api.emails.send.groups.smsNotifications.description",
+          description: "app.api.emails.send.groups.smsNotifications.description",
           layoutType: LayoutType.STACKED,
         },
         { request: "data" },
@@ -220,8 +218,7 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "app.api.emails.send.sendSmsNotification.label",
-              description:
-                "app.api.emails.send.sendSmsNotification.description",
+              description: "app.api.emails.send.sendSmsNotification.description",
               columns: 12,
             },
             z.boolean().default(false),
@@ -375,16 +372,14 @@ const { POST } = createEndpoint({
               messageId: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.send.response.smsResult.messageId.label",
+                  content: "app.api.emails.send.response.smsResult.messageId.label",
                 },
                 z.string().optional(),
               ),
               sentAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.send.response.smsResult.sentAt.label",
+                  content: "app.api.emails.send.response.smsResult.sentAt.label",
                 },
                 z.string().optional(),
               ),

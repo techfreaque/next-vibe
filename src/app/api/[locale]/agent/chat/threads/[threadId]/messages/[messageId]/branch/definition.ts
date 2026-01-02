@@ -30,19 +30,10 @@ import { ModelId } from "../../../../../model-access/models";
  */
 const { POST } = createEndpoint({
   method: Methods.POST,
-  path: [
-    "agent",
-    "chat",
-    "threads",
-    "[threadId]",
-    "messages",
-    "[messageId]",
-    "branch",
-  ],
+  path: ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]", "branch"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title:
-    "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.title" as const,
+  title: "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.title" as const,
   description:
     "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.description" as const,
   icon: "git-branch",
@@ -290,8 +281,7 @@ const { POST } = createEndpoint({
   ),
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.success.title",
+    title: "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.success.title",
     description:
       "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.success.description",
   },

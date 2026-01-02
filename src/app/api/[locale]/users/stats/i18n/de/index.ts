@@ -369,13 +369,11 @@ export const translations: typeof enTranslations = {
     },
     notFound: {
       title: "Statistiken nicht gefunden",
-      description:
-        "Die angeforderten Statistiken konnten nicht gefunden werden",
+      description: "Die angeforderten Statistiken konnten nicht gefunden werden",
     },
     conflict: {
       title: "Konfliktfehler",
-      description:
-        "Statistiken können aufgrund bestehender Konflikte nicht generiert werden",
+      description: "Statistiken können aufgrund bestehender Konflikte nicht generiert werden",
     },
     network: {
       title: "Netzwerkfehler",
@@ -387,13 +385,11 @@ export const translations: typeof enTranslations = {
     },
     server: {
       title: "Serverfehler",
-      description:
-        "Statistiken können aufgrund eines Serverfehlers nicht generiert werden",
+      description: "Statistiken können aufgrund eines Serverfehlers nicht generiert werden",
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description:
-        "Ein unerwarteter Fehler ist beim Generieren der Statistiken aufgetreten",
+      description: "Ein unerwarteter Fehler ist beim Generieren der Statistiken aufgetreten",
     },
   },
   enums: {

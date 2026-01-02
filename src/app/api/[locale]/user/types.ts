@@ -10,12 +10,7 @@ import { z } from "zod";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "./auth/types";
-import {
-  Language,
-  Theme,
-  type UserDetailLevel,
-  type UserDetailLevelValue,
-} from "./enum";
+import { Language, Theme, type UserDetailLevel, type UserDetailLevelValue } from "./enum";
 import type { UserRoleValue } from "./user-roles/enum";
 import { userRoleResponseSchema } from "./user-roles/types";
 
@@ -89,24 +84,22 @@ export interface UserFetchOptions {
 /**
  * User type mapping
  */
-export type UserType<
-  T extends UserDetailLevelType = typeof UserDetailLevel.STANDARD,
-> = T extends typeof UserDetailLevel.MINIMAL
-  ? JwtPayloadType
-  : T extends ExtendedUserDetailLevel
-    ? ExtendedUserType<T>
-    : never;
+export type UserType<T extends UserDetailLevelType = typeof UserDetailLevel.STANDARD> =
+  T extends typeof UserDetailLevel.MINIMAL
+    ? JwtPayloadType
+    : T extends ExtendedUserDetailLevel
+      ? ExtendedUserType<T>
+      : never;
 
 /**
  * Extended user type mapping
  */
-export type ExtendedUserType<
-  T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD,
-> = T extends typeof UserDetailLevel.STANDARD
-  ? StandardUserType
-  : T extends typeof UserDetailLevel.COMPLETE
-    ? CompleteUserType
-    : StandardUserType;
+export type ExtendedUserType<T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD> =
+  T extends typeof UserDetailLevel.STANDARD
+    ? StandardUserType
+    : T extends typeof UserDetailLevel.COMPLETE
+      ? CompleteUserType
+      : StandardUserType;
 
 /**
  * User search options

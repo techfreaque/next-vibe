@@ -17,8 +17,7 @@ import { convertCSSToViewStyle, styledNative } from "../utils/style-converter";
 export type { SwitchRootProps };
 
 /* eslint-disable i18next/no-literal-string -- CSS classNames */
-const THUMB_CLASSNAME =
-  "h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0";
+const THUMB_CLASSNAME = "h-7 w-7 rounded-full bg-background shadow-md shadow-foreground/25 ring-0";
 /* eslint-enable i18next/no-literal-string */
 
 const StyledAnimatedView = styledNative(Animated.View);
@@ -52,9 +51,7 @@ export function Switch({
   const { colorScheme } = useColorScheme();
 
   // Handle controlled/uncontrolled state with defaultChecked
-  const [internalChecked, setInternalChecked] = React.useState(
-    defaultChecked ?? false,
-  );
+  const [internalChecked, setInternalChecked] = React.useState(defaultChecked ?? false);
   const isControlled = checked !== undefined;
   const isChecked = isControlled ? (checked ?? false) : internalChecked;
 
@@ -80,19 +77,13 @@ export function Switch({
     };
   });
   const animatedThumbStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: withTiming(translateX.value, { duration: 200 }) },
-    ],
+    transform: [{ translateX: withTiming(translateX.value, { duration: 200 }) }],
   }));
 
   return (
     <StyledAnimatedView
       style={[animatedRootStyle, nativeStyle]}
-      className={cn(
-        "h-8 w-[46px] rounded-full",
-        disabled && "opacity-50",
-        className,
-      )}
+      className={cn("h-8 w-[46px] rounded-full", disabled && "opacity-50", className)}
       nativeID={id}
     >
       <StyledSwitchRoot

@@ -114,8 +114,7 @@ export const translations = {
   errors: {
     createFailed: {
       title: "Contact submission failed",
-      description:
-        "Unable to process your contact form at this time. Please try again later.",
+      description: "Unable to process your contact form at this time. Please try again later.",
     },
     repositoryCreateFailed: "Failed to create contact request",
     repositoryCreateDetails:
@@ -177,8 +176,7 @@ export const translations = {
       },
     },
     confirmation: {
-      message:
-        "{name}, thank you for your message! We'll get back to you soon.",
+      message: "{name}, thank you for your message! We'll get back to you soon.",
       phone: {
         missing: "No user phone number available for contact confirmation SMS",
       },
@@ -289,8 +287,7 @@ export const translations = {
       urgentHelpInfo:
         "If your inquiry is urgent, you can also reach us via live chat on our website or check our help center for instant answers.",
       helpCenterButton: "Visit Help Center",
-      signoff:
-        "Thank you for choosing {{appName}},\nThe {{appName}} Support Team",
+      signoff: "Thank you for choosing {{appName}},\nThe {{appName}} Support Team",
       footer: "This is an automated confirmation from {{appName}}",
     },
     // Admin notification email

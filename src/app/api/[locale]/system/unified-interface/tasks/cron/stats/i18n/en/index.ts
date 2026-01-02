@@ -87,8 +87,7 @@ export const translations = {
     errors: {
       server: {
         title: "Server Error",
-        description:
-          "An internal server error occurred while retrieving statistics",
+        description: "An internal server error occurred while retrieving statistics",
       },
       validation: {
         title: "Validation Error",

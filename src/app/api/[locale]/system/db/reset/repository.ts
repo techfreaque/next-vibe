@@ -5,11 +5,7 @@
 
 import { sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -318,9 +314,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
   /**
    * Run database migrations
    */
-  private runMigrations(
-    locale: CountryLanguage,
-  ): Promise<{ output: string; count: number }> {
+  private runMigrations(locale: CountryLanguage): Promise<{ output: string; count: number }> {
     const { t } = simpleT(locale);
     // This would integrate with the migration repository
     // For now, returning realistic placeholder
@@ -335,9 +329,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
   /**
    * Run database seeds
    */
-  private runSeeds(
-    locale: CountryLanguage,
-  ): Promise<{ output: string; count: number }> {
+  private runSeeds(locale: CountryLanguage): Promise<{ output: string; count: number }> {
     const { t } = simpleT(locale);
     // This would integrate with the seed system
     // For now, returning realistic placeholder

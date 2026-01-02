@@ -17,9 +17,7 @@ interface CronTasksPageProps {
   }>;
 }
 
-export async function generateMetadata({
-  params,
-}: CronTasksPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: CronTasksPageProps): Promise<Metadata> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 
@@ -29,9 +27,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function CronTasksPage({
-  params,
-}: CronTasksPageProps): Promise<JSX.Element> {
+export default async function CronTasksPage({ params }: CronTasksPageProps): Promise<JSX.Element> {
   const { locale } = await params;
 
   return (

@@ -67,10 +67,7 @@ export class LinuxX11FfmpegPulseRecorder extends BaseRecorder {
   }
 
   protected override handleStderrLine(line: string): void {
-    if (
-      line.toLowerCase().includes("error") ||
-      line.toLowerCase().includes("fatal")
-    ) {
+    if (line.toLowerCase().includes("error") || line.toLowerCase().includes("fatal")) {
       // Error will be handled by the session/repository logger
       // Storing for potential error reporting
     }
@@ -133,10 +130,7 @@ export class LinuxX11FfmpegAlsaRecorder extends BaseRecorder {
   }
 
   protected override handleStderrLine(line: string): void {
-    if (
-      line.toLowerCase().includes("error") ||
-      line.toLowerCase().includes("fatal")
-    ) {
+    if (line.toLowerCase().includes("error") || line.toLowerCase().includes("fatal")) {
       // Error will be handled by the session/repository logger
       // Storing for potential error reporting
     }

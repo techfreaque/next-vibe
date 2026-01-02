@@ -173,6 +173,4 @@ export function useLeadsImportEndpoint(
   };
 }
 
-export type LeadsImportEndpointReturn = ReturnType<
-  typeof useLeadsImportEndpoint
->;
+export type LeadsImportEndpointReturn = ReturnType<typeof useLeadsImportEndpoint>;

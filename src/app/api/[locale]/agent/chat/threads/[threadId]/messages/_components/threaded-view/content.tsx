@@ -30,10 +30,7 @@ interface ThreadedMessageContentProps {
   user: JwtPayloadType;
   collapseState?: ReturnType<typeof useCollapseState>;
   currentUserId?: string;
-  onUserIdHover?: (
-    userId: string | null,
-    position: { x: number; y: number } | null,
-  ) => void;
+  onUserIdHover?: (userId: string | null, position: { x: number; y: number } | null) => void;
 }
 
 export function ThreadedMessageContent({

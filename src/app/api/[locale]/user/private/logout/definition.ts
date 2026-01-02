@@ -61,8 +61,7 @@ const { POST } = createEndpoint({
       sessionsCleaned: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.user.private.logout.response.sessionsCleaned" as const,
+          content: "app.api.user.private.logout.response.sessionsCleaned" as const,
         },
         z.coerce.number(),
       ),
@@ -80,49 +79,39 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.user.private.logout.errors.validation.title" as const,
-      description:
-        "app.api.user.private.logout.errors.validation.description" as const,
+      description: "app.api.user.private.logout.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.user.private.logout.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.private.logout.errors.unauthorized.description" as const,
+      description: "app.api.user.private.logout.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.user.private.logout.errors.internal.title" as const,
-      description:
-        "app.api.user.private.logout.errors.internal.description" as const,
+      description: "app.api.user.private.logout.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.user.private.logout.errors.unknown.title" as const,
-      description:
-        "app.api.user.private.logout.errors.unknown.description" as const,
+      description: "app.api.user.private.logout.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.user.private.logout.errors.conflict.title" as const,
-      description:
-        "app.api.user.private.logout.errors.conflict.description" as const,
+      description: "app.api.user.private.logout.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.user.private.logout.errors.forbidden.title" as const,
-      description:
-        "app.api.user.private.logout.errors.forbidden.description" as const,
+      description: "app.api.user.private.logout.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.user.private.logout.errors.network_error.title" as const,
-      description:
-        "app.api.user.private.logout.errors.network_error.description" as const,
+      description: "app.api.user.private.logout.errors.network_error.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.user.private.logout.errors.not_found.title" as const,
-      description:
-        "app.api.user.private.logout.errors.not_found.description" as const,
+      description: "app.api.user.private.logout.errors.not_found.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.private.logout.errors.unsaved_changes.title" as const,
-      description:
-        "app.api.user.private.logout.errors.unsaved_changes.description" as const,
+      title: "app.api.user.private.logout.errors.unsaved_changes.title" as const,
+      description: "app.api.user.private.logout.errors.unsaved_changes.description" as const,
     },
   },
 

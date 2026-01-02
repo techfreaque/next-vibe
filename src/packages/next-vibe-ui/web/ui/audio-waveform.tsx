@@ -32,9 +32,7 @@ export function AudioWaveform({
   height = 32,
   maxBarHeight = 32,
 }: AudioWaveformProps): JSX.Element {
-  const [audioLevels, setAudioLevels] = React.useState<number[]>(
-    Array(barCount).fill(0),
-  );
+  const [audioLevels, setAudioLevels] = React.useState<number[]>(Array(barCount).fill(0));
   const animationFrameRef = React.useRef<number | undefined>(undefined);
   const audioContextRef = React.useRef<AudioContext | null>(null);
   const analyserRef = React.useRef<AnalyserNode | null>(null);
@@ -82,10 +80,7 @@ export function AudioWaveform({
 
         if (fullHistory.length <= barCount) {
           // Not enough samples yet, pad with zeros
-          return [
-            ...fullHistory,
-            ...Array(barCount - fullHistory.length).fill(0),
-          ];
+          return [...fullHistory, ...Array(barCount - fullHistory.length).fill(0)];
         }
 
         // Downsample: divide history into barCount chunks and take the max peak in each
@@ -160,10 +155,7 @@ export function AudioWaveform({
         // Compress history
         const fullHistory = fullHistoryRef.current;
         if (fullHistory.length <= barCount) {
-          setAudioLevels([
-            ...fullHistory,
-            ...Array(barCount - fullHistory.length).fill(0),
-          ]);
+          setAudioLevels([...fullHistory, ...Array(barCount - fullHistory.length).fill(0)]);
         } else {
           const chunkSize = fullHistory.length / barCount;
           const compressed: number[] = [];

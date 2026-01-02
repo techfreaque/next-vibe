@@ -19,11 +19,7 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   [Methods.PATCH]: {
     email: undefined,
     handler: ({ data, urlPathParams, user, logger }) =>
-      FolderRepository.updateFolder(
-        user,
-        { ...data, id: urlPathParams.id },
-        logger,
-      ),
+      FolderRepository.updateFolder(user, { ...data, id: urlPathParams.id }, logger),
   },
   [Methods.DELETE]: {
     email: undefined,

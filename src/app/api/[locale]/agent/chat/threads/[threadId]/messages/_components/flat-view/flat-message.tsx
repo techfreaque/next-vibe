@@ -19,6 +19,7 @@ import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/ico
 import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
 import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -29,7 +30,6 @@ import type { groupMessagesBySequence } from "../message-grouping";
 import { ModelCharacterSelectorModal } from "../model-character-selector-modal";
 import { ToolDisplay } from "../tool-display";
 import { countPostsByUserId, countReplies, getDirectReplies } from "./helpers";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 export interface FlatMessageProps {
   message: ChatMessage;
@@ -42,14 +42,8 @@ export interface FlatMessageProps {
   messageActions: ReturnType<typeof useMessageActions>;
   isTouch: boolean;
   hoveredRef: string | null;
-  onSetHoveredRef: (
-    ref: string | null,
-    position: { x: number; y: number } | null,
-  ) => void;
-  onSetHoveredUserId: (
-    userId: string | null,
-    position: { x: number; y: number } | null,
-  ) => void;
+  onSetHoveredRef: (ref: string | null, position: { x: number; y: number } | null) => void;
+  onSetHoveredUserId: (userId: string | null, position: { x: number; y: number } | null) => void;
   onInsertQuote?: () => void;
   /** Collapse state management callbacks */
   collapseState?: ReturnType<typeof useCollapseState>;
@@ -107,15 +101,11 @@ export function FlatMessage({
 
   // Get display names
   const modelData =
-    message.role === "assistant" && message.model
-      ? getModelById(message.model)
-      : null;
-  const modelDisplayName =
-    modelData?.name || t("app.chat.flatView.assistantFallback");
+    message.role === "assistant" && message.model ? getModelById(message.model) : null;
+  const modelDisplayName = modelData?.name || t("app.chat.flatView.assistantFallback");
   // Get character name from characters map (fetched from server)
   const characterDisplayName =
-    (message.role === "user" || message.role === "assistant") &&
-    message.character
+    (message.role === "user" || message.role === "assistant") && message.character
       ? characters[message.character]?.name || message.character
       : t("app.chat.flatView.anonymous");
 
@@ -296,11 +286,7 @@ export function FlatMessage({
             onBranch={
               onBranchMessage
                 ? (id, content): Promise<void> =>
-                    messageActions.handleBranchEdit(
-                      id,
-                      content,
-                      onBranchMessage,
-                    )
+                    messageActions.handleBranchEdit(id, content, onBranchMessage)
                 : (): Promise<void> => {
                     logger.warn(
                       "FlatMessageView",
@@ -326,23 +312,15 @@ export function FlatMessage({
             onModelChange={
               onModelChange ||
               ((model: ModelId): void => {
-                logger.debug(
-                  "FlatMessageView",
-                  "Model selection changed (no handler)",
-                  { model },
-                );
+                logger.debug("FlatMessageView", "Model selection changed (no handler)", { model });
               })
             }
             onCharacterChange={
               onCharacterChange ||
               ((character: string): void => {
-                logger.debug(
-                  "FlatMessageView",
-                  "Character selection changed (no handler)",
-                  {
-                    character,
-                  },
-                );
+                logger.debug("FlatMessageView", "Character selection changed (no handler)", {
+                  character,
+                });
               })
             }
             onConfirm={(): Promise<void> =>
@@ -475,23 +453,15 @@ export function FlatMessage({
             onModelChange={
               onModelChange ||
               ((model: ModelId): void => {
-                logger.debug(
-                  "FlatMessageView",
-                  "Model selection changed (no handler)",
-                  { model },
-                );
+                logger.debug("FlatMessageView", "Model selection changed (no handler)", { model });
               })
             }
             onCharacterChange={
               onCharacterChange ||
               ((character: string): void => {
-                logger.debug(
-                  "FlatMessageView",
-                  "Character selection changed (no handler)",
-                  {
-                    character,
-                  },
-                );
+                logger.debug("FlatMessageView", "Character selection changed (no handler)", {
+                  character,
+                });
               })
             }
             showInput={true}

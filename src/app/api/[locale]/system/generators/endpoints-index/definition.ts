@@ -48,25 +48,20 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label:
-            "app.api.system.generators.endpointsIndex.post.fields.outputFile.label",
+          label: "app.api.system.generators.endpointsIndex.post.fields.outputFile.label",
           description:
             "app.api.system.generators.endpointsIndex.post.fields.outputFile.description",
           columns: 12,
         },
-        z
-          .string()
-          .default("src/app/api/[locale]/system/generated/endpoints.ts"),
+        z.string().default("src/app/api/[locale]/system/generated/endpoints.ts"),
       ),
 
       dryRun: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label:
-            "app.api.system.generators.endpointsIndex.post.fields.dryRun.label",
-          description:
-            "app.api.system.generators.endpointsIndex.post.fields.dryRun.description",
+          label: "app.api.system.generators.endpointsIndex.post.fields.dryRun.label",
+          description: "app.api.system.generators.endpointsIndex.post.fields.dryRun.description",
           columns: 6,
         },
         z.boolean().optional().default(false),
@@ -76,32 +71,28 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.endpointsIndex.post.fields.success.title",
+          content: "app.api.system.generators.endpointsIndex.post.fields.success.title",
         },
         z.boolean(),
       ),
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.endpointsIndex.post.fields.message.title",
+          content: "app.api.system.generators.endpointsIndex.post.fields.message.title",
         },
         z.string(),
       ),
       endpointsFound: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.endpointsIndex.post.fields.endpointsFound.title",
+          content: "app.api.system.generators.endpointsIndex.post.fields.endpointsFound.title",
         },
         z.coerce.number(),
       ),
       duration: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.generators.endpointsIndex.post.fields.duration.title",
+          content: "app.api.system.generators.endpointsIndex.post.fields.duration.title",
         },
         z.coerce.number(),
       ),
@@ -128,65 +119,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     validation_failed: {
-      title:
-        "app.api.system.generators.endpointsIndex.post.errors.validation.title",
-      description:
-        "app.api.system.generators.endpointsIndex.post.errors.validation.description",
+      title: "app.api.system.generators.endpointsIndex.post.errors.validation.title",
+      description: "app.api.system.generators.endpointsIndex.post.errors.validation.description",
     },
     unauthorized: {
-      title:
-        "app.api.system.generators.endpointsIndex.post.errors.unauthorized.title",
-      description:
-        "app.api.system.generators.endpointsIndex.post.errors.unauthorized.description",
+      title: "app.api.system.generators.endpointsIndex.post.errors.unauthorized.title",
+      description: "app.api.system.generators.endpointsIndex.post.errors.unauthorized.description",
     },
     server_error: {
-      title:
-        "app.api.system.generators.endpointsIndex.post.errors.server.title",
-      description:
-        "app.api.system.generators.endpointsIndex.post.errors.server.description",
+      title: "app.api.system.generators.endpointsIndex.post.errors.server.title",
+      description: "app.api.system.generators.endpointsIndex.post.errors.server.description",
     },
     unknown_error: {
-      title:
-        "app.api.system.generators.endpointsIndex.post.errors.unknown.title",
-      description:
-        "app.api.system.generators.endpointsIndex.post.errors.unknown.description",
+      title: "app.api.system.generators.endpointsIndex.post.errors.unknown.title",
+      description: "app.api.system.generators.endpointsIndex.post.errors.unknown.description",
     },
     network_error: {
-      title:
-        "app.api.system.generators.endpointsIndex.post.errors.network.title",
-      description:
-        "app.api.system.generators.endpointsIndex.post.errors.network.description",
+      title: "app.api.system.generators.endpointsIndex.post.errors.network.title",
+      description: "app.api.system.generators.endpointsIndex.post.errors.network.description",
     },
     forbidden: {
-      title:
-        "app.api.system.generators.endpointsIndex.post.errors.forbidden.title",
-      description:
-        "app.api.system.generators.endpointsIndex.post.errors.forbidden.description",
+      title: "app.api.system.generators.endpointsIndex.post.errors.forbidden.title",
+      description: "app.api.system.generators.endpointsIndex.post.errors.forbidden.description",
     },
     not_found: {
-      title:
-        "app.api.system.generators.endpointsIndex.post.errors.notFound.title",
-      description:
-        "app.api.system.generators.endpointsIndex.post.errors.notFound.description",
+      title: "app.api.system.generators.endpointsIndex.post.errors.notFound.title",
+      description: "app.api.system.generators.endpointsIndex.post.errors.notFound.description",
     },
     conflict: {
-      title:
-        "app.api.system.generators.endpointsIndex.post.errors.conflict.title",
-      description:
-        "app.api.system.generators.endpointsIndex.post.errors.conflict.description",
+      title: "app.api.system.generators.endpointsIndex.post.errors.conflict.title",
+      description: "app.api.system.generators.endpointsIndex.post.errors.conflict.description",
     },
     unsaved_changes: {
-      title:
-        "app.api.system.generators.endpointsIndex.post.errors.conflict.title",
-      description:
-        "app.api.system.generators.endpointsIndex.post.errors.conflict.description",
+      title: "app.api.system.generators.endpointsIndex.post.errors.conflict.title",
+      description: "app.api.system.generators.endpointsIndex.post.errors.conflict.description",
     },
   },
 
   successTypes: {
     title: "app.api.system.generators.endpointsIndex.post.success.title",
-    description:
-      "app.api.system.generators.endpointsIndex.post.success.description",
+    description: "app.api.system.generators.endpointsIndex.post.success.description",
   },
 });
 

@@ -32,17 +32,12 @@ export function useMessageActions({
   // Count children of a message (recursively)
   const countMessageChildren = useCallback(
     (messageId: string): number => {
-      const children = Object.values(messagesRecord).filter(
-        (msg) => msg.parentId === messageId,
-      );
+      const children = Object.values(messagesRecord).filter((msg) => msg.parentId === messageId);
       if (children.length === 0) {
         return 0;
       }
       // Count direct children + all descendants
-      return children.reduce(
-        (total, child) => total + 1 + countMessageChildren(child.id),
-        0,
-      );
+      return children.reduce((total, child) => total + 1 + countMessageChildren(child.id), 0);
     },
     [messagesRecord],
   );

@@ -61,11 +61,7 @@ function Tabs({
 }
 Tabs.displayName = TabsPrimitive.Root.displayName;
 
-function TabsList({
-  className,
-  style,
-  children,
-}: TabsListProps): React.JSX.Element {
+function TabsList({ className, style, children }: TabsListProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
@@ -121,12 +117,7 @@ function TabsTrigger({
 }
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
-function TabsContent({
-  className,
-  style,
-  value,
-  children,
-}: TabsContentProps): React.JSX.Element {
+function TabsContent({ className, style, value, children }: TabsContentProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (

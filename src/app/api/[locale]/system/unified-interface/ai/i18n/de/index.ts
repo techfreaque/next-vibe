@@ -6,8 +6,7 @@ export const translations: typeof enTranslations = {
   executor: {
     errors: {
       toolNotFound: "Tool nicht gefunden: {{toolName}}",
-      parameterValidationFailed:
-        "Parametervalidierung fehlgeschlagen: {{errors}}",
+      parameterValidationFailed: "Parametervalidierung fehlgeschlagen: {{errors}}",
       executionFailed: "Tool-Ausführung fehlgeschlagen",
     },
   },
@@ -16,8 +15,7 @@ export const translations: typeof enTranslations = {
       executionFailed: "Tool-Ausführung fehlgeschlagen",
     },
     descriptions: {
-      noParametersRequired:
-        "Keine erforderlichen Parameter für diesen Endpunkt",
+      noParametersRequired: "Keine erforderlichen Parameter für diesen Endpunkt",
     },
   },
   converter: {

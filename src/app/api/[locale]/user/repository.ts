@@ -53,9 +53,8 @@ export class UserRepository {
    * Get authenticated user with specified detail level
    */
   static async getUserByAuth<
-    T extends
-      | typeof UserDetailLevel.MINIMAL
-      | ExtendedUserDetailLevel = typeof UserDetailLevel.MINIMAL,
+    T extends typeof UserDetailLevel.MINIMAL | ExtendedUserDetailLevel =
+      typeof UserDetailLevel.MINIMAL,
   >(
     options: Omit<UserFetchOptions, "detailLevel"> & { detailLevel?: T },
     locale: CountryLanguage,
@@ -90,11 +89,7 @@ export class UserRepository {
         return success(verifiedUser) as ResponseType<UserType<T>>;
       }
 
-      if (
-        verifiedUser.isPublic ||
-        !("id" in verifiedUser) ||
-        !verifiedUser.id
-      ) {
+      if (verifiedUser.isPublic || !("id" in verifiedUser) || !verifiedUser.id) {
         logger.debug("No user ID in JWT payload (public user)", {
           isPublic: verifiedUser.isPublic,
         });
@@ -123,9 +118,7 @@ export class UserRepository {
   /**
    * Get user by ID with specified detail level
    */
-  static async getUserById<
-    T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD,
-  >(
+  static async getUserById<T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD>(
     userId: DbId,
     detailLevel: T = UserDetailLevel.STANDARD as T,
     locale: CountryLanguage,
@@ -146,10 +139,7 @@ export class UserRepository {
 
       const user = results[0];
 
-      const userRolesResponse = await UserRolesRepository.findByUserId(
-        userId,
-        logger,
-      );
+      const userRolesResponse = await UserRolesRepository.findByUserId(userId, logger);
       if (!userRolesResponse.success) {
         return fail({
           message: "app.api.user.errors.roles_lookup_failed",
@@ -206,9 +196,7 @@ export class UserRepository {
   /**
    * Get user by email with specified detail level
    */
-  static async getUserByEmail<
-    T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD,
-  >(
+  static async getUserByEmail<T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD>(
     email: string,
     detailLevel: T = UserDetailLevel.STANDARD as T,
     locale: CountryLanguage,
@@ -217,10 +205,7 @@ export class UserRepository {
     try {
       logger.debug("Getting user by email", { email, detailLevel });
 
-      const results = await db
-        .select({ id: users.id })
-        .from(users)
-        .where(eq(users.email, email));
+      const results = await db.select({ id: users.id }).from(users).where(eq(users.email, email));
 
       if (results.length === 0) {
         return fail({
@@ -230,12 +215,7 @@ export class UserRepository {
         });
       }
 
-      return await UserRepository.getUserById(
-        results[0].id,
-        detailLevel,
-        locale,
-        logger,
-      );
+      return await UserRepository.getUserById(results[0].id, detailLevel, locale, logger);
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Error getting user by email", parseError(error));
@@ -250,10 +230,7 @@ export class UserRepository {
   /**
    * Check if user exists by ID
    */
-  static async exists(
-    userId: DbId,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<boolean>> {
+  static async exists(userId: DbId, logger: EndpointLogger): Promise<ResponseType<boolean>> {
     try {
       const results = await db
         .select({ id: users.id })
@@ -274,10 +251,7 @@ export class UserRepository {
   /**
    * Check if an email is already registered
    */
-  static async emailExists(
-    email: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<boolean>> {
+  static async emailExists(email: string, logger: EndpointLogger): Promise<ResponseType<boolean>> {
     try {
       const results = await db
         .select({ id: users.id })
@@ -312,10 +286,7 @@ export class UserRepository {
 
       return success(results.length > 0);
     } catch (error) {
-      logger.error(
-        "Error checking if email exists by other user",
-        parseError(error),
-      );
+      logger.error("Error checking if email exists by other user", parseError(error));
       return fail({
         message: "app.api.user.errors.email_duplicate_check_failed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
@@ -371,10 +342,7 @@ export class UserRepository {
       }
 
       const userIds = searchResults.map((u) => u.id);
-      const rolesMapResponse = await UserRolesRepository.findByUserIds(
-        userIds,
-        logger,
-      );
+      const rolesMapResponse = await UserRolesRepository.findByUserIds(userIds, logger);
 
       if (!rolesMapResponse.success) {
         return fail({
@@ -441,10 +409,7 @@ export class UserRepository {
         .orderBy(users.privateName, users.publicName);
 
       const userIds = allUsers.map((u) => u.id);
-      const rolesMapResponse = await UserRolesRepository.findByUserIds(
-        userIds,
-        logger,
-      );
+      const rolesMapResponse = await UserRolesRepository.findByUserIds(userIds, logger);
 
       if (!rolesMapResponse.success) {
         return fail({
@@ -581,10 +546,7 @@ export class UserRepository {
 
       return success(standardUser);
     } catch (error) {
-      logger.error(
-        "Error creating user with hashed password",
-        parseError(error),
-      );
+      logger.error("Error creating user with hashed password", parseError(error));
       return fail({
         message: "app.api.user.errors.password_hashing_failed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
@@ -636,10 +598,7 @@ export class UserRepository {
       return searchResult;
     }
 
-    const totalCountResult = await UserRepository.getUserSearchCount(
-      searchTerm,
-      logger,
-    );
+    const totalCountResult = await UserRepository.getUserSearchCount(searchTerm, logger);
 
     if (!totalCountResult.success) {
       return totalCountResult;
@@ -688,16 +647,11 @@ export class UserRepository {
   /**
    * Get total count of active users with 24h caching
    */
-  static async getActiveUserCount(
-    logger: EndpointLogger,
-  ): Promise<ResponseType<number>> {
+  static async getActiveUserCount(logger: EndpointLogger): Promise<ResponseType<number>> {
     try {
       const now = Date.now();
 
-      if (
-        activeUserCountCache &&
-        now - activeUserCountCache.timestamp < CACHE_DURATION_MS
-      ) {
+      if (activeUserCountCache && now - activeUserCountCache.timestamp < CACHE_DURATION_MS) {
         logger.debug("Returning cached active user count", {
           count: activeUserCountCache.count,
           age: `${Math.floor((now - activeUserCountCache.timestamp) / 1000 / 60 / 60)}h`,

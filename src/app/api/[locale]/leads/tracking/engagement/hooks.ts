@@ -5,6 +5,5 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import definitions from "./definition";
 
-export const useEngagementTracking = (
-  logger: EndpointLogger,
-): ReturnType<typeof useEndpoint> => useEndpoint(definitions, {}, logger);
+export const useEngagementTracking = (logger: EndpointLogger): ReturnType<typeof useEndpoint> =>
+  useEndpoint(definitions, {}, logger);

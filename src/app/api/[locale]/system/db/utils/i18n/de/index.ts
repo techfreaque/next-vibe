@@ -59,10 +59,8 @@ export const translations: typeof enTranslations = {
   },
   docker: {
     executing_command: "Docker-Befehl ausführen: {{command}}",
-    command_timeout:
-      "Docker-Befehl nach {{timeout}}ms abgebrochen: {{command}}",
-    command_failed:
-      "Docker-Befehl fehlgeschlagen mit Code {{code}}: {{command}}",
+    command_timeout: "Docker-Befehl nach {{timeout}}ms abgebrochen: {{command}}",
+    command_failed: "Docker-Befehl fehlgeschlagen mit Code {{code}}: {{command}}",
     execution_failed: "Fehler beim Ausführen des Docker-Befehls: {{command}}",
     command_error: "Docker-Befehlsfehler: {{error}}",
     stopping_containers: "Docker-Container werden gestoppt...",

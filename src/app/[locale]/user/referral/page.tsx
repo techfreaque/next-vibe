@@ -6,13 +6,7 @@
 import type { Metadata } from "next";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "next-vibe-ui/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import {
   ArrowLeft,
@@ -45,9 +39,7 @@ interface ReferralPageProps {
   }>;
 }
 
-export async function generateMetadata({
-  params,
-}: ReferralPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: ReferralPageProps): Promise<Metadata> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 
@@ -108,9 +100,7 @@ export default async function ReferralPage({
         {/* Stats Section - Only for authenticated users */}
         {isAuthenticated && (
           <Div className="mb-12">
-            <H2 className="text-xl font-semibold mb-4">
-              {t("app.user.referral.overview.title")}
-            </H2>
+            <H2 className="text-xl font-semibold mb-4">{t("app.user.referral.overview.title")}</H2>
             <ReferralStats locale={locale} />
           </Div>
         )}
@@ -131,9 +121,7 @@ export default async function ReferralPage({
                   1
                 </Div>
                 <Div>
-                  <P className="font-medium">
-                    {t("app.user.referral.howItWorks.step1Title")}
-                  </P>
+                  <P className="font-medium">{t("app.user.referral.howItWorks.step1Title")}</P>
                   <P className="text-sm text-muted-foreground">
                     {t("app.user.referral.howItWorks.step1Body")}
                   </P>
@@ -144,9 +132,7 @@ export default async function ReferralPage({
                   2
                 </Div>
                 <Div>
-                  <P className="font-medium">
-                    {t("app.user.referral.howItWorks.step2Title")}
-                  </P>
+                  <P className="font-medium">{t("app.user.referral.howItWorks.step2Title")}</P>
                   <P className="text-sm text-muted-foreground">
                     {t("app.user.referral.howItWorks.step2Body")}
                   </P>
@@ -157,9 +143,7 @@ export default async function ReferralPage({
                   3
                 </Div>
                 <Div>
-                  <P className="font-medium">
-                    {t("app.user.referral.howItWorks.step3Title")}
-                  </P>
+                  <P className="font-medium">{t("app.user.referral.howItWorks.step3Title")}</P>
                   <P className="text-sm text-muted-foreground">
                     {t("app.user.referral.howItWorks.step3Body")}
                   </P>
@@ -175,9 +159,7 @@ export default async function ReferralPage({
                 <Wallet className="h-5 w-5 text-emerald-500" />
                 {t("app.user.referral.payout.title")}
               </CardTitle>
-              <CardDescription>
-                {t("app.user.referral.payout.description")}
-              </CardDescription>
+              <CardDescription>{t("app.user.referral.payout.description")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
@@ -241,9 +223,7 @@ export default async function ReferralPage({
                   <Link2 className="h-5 w-5" />
                   {t("app.user.referral.myCodes.title")}
                 </CardTitle>
-                <CardDescription>
-                  {t("app.user.referral.manage.codesSubtitle")}
-                </CardDescription>
+                <CardDescription>{t("app.user.referral.manage.codesSubtitle")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ReferralCodesList locale={locale} />
@@ -259,9 +239,7 @@ export default async function ReferralPage({
                   <Gift className="h-8 w-8 text-violet-600 dark:text-violet-400" />
                 </Div>
                 <Div className="space-y-2">
-                  <H3 className="text-xl font-semibold">
-                    {t("app.user.referral.cta.title")}
-                  </H3>
+                  <H3 className="text-xl font-semibold">{t("app.user.referral.cta.title")}</H3>
                   <P className="text-muted-foreground max-w-md mx-auto">
                     {t("app.user.referral.cta.description")}
                   </P>

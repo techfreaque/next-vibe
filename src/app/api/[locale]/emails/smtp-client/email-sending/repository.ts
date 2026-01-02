@@ -7,11 +7,7 @@ import "server-only";
 
 import { render } from "@react-email/render";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -20,10 +16,7 @@ import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 import { CampaignType } from "../enum";
 import { SmtpSendingRepository } from "../sending/repository";
 import type { SmtpSelectionCriteria } from "../sending/types";
-import type {
-  SendEmailRequestTypeOutput,
-  SendEmailResponseTypeOutput,
-} from "./types";
+import type { SendEmailRequestTypeOutput, SendEmailResponseTypeOutput } from "./types";
 
 /**
  * Type guard to validate if a string is a valid Languages type
@@ -100,8 +93,7 @@ export class EmailSendingRepository {
       if (!localeMapping) {
         logger.error("Invalid locale format", { locale: data.params.locale });
         return fail({
-          message:
-            "app.api.emails.smtpClient.emailSending.email.errors.sending_failed",
+          message: "app.api.emails.smtpClient.emailSending.email.errors.sending_failed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             recipient: data.params.toEmail,
@@ -113,8 +105,7 @@ export class EmailSendingRepository {
       const { country, language } = localeMapping;
 
       // 3) Build comprehensive selection criteria
-      const selectionCriteria: SmtpSelectionCriteria = data.params
-        .selectionCriteriaOverride || {
+      const selectionCriteria: SmtpSelectionCriteria = data.params.selectionCriteriaOverride || {
         campaignType: data.params.campaignType || CampaignType.SYSTEM,
         emailJourneyVariant: data.params.emailJourneyVariant ?? null,
         emailCampaignStage: data.params.emailCampaignStage ?? null,
@@ -183,8 +174,7 @@ export class EmailSendingRepository {
         campaignType: data.params.campaignType,
       });
       return fail({
-        message:
-          "app.api.emails.smtpClient.emailSending.email.errors.sending_failed",
+        message: "app.api.emails.smtpClient.emailSending.email.errors.sending_failed",
         errorType: ErrorResponseTypes.EMAIL_ERROR,
         messageParams: {
           recipient: data.params.toEmail,

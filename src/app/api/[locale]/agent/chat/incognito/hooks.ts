@@ -61,10 +61,7 @@ export interface UseIncognitoChatReturn {
   deleteMessage: (messageId: string) => void;
 
   // Folder operations
-  setCurrentFolder: (
-    rootFolderId: DefaultFolderId,
-    subFolderId: string | null,
-  ) => void;
+  setCurrentFolder: (rootFolderId: DefaultFolderId, subFolderId: string | null) => void;
 
   // AI operations (client-side only - no server)
   sendMessage: (content: string, model: ModelId) => Promise<void>;
@@ -102,14 +99,10 @@ export function useIncognitoChat(
   }, [currentRootFolderId, currentSubFolderId]);
 
   // Get active thread
-  const activeThread = state.activeThreadId
-    ? state.threads[state.activeThreadId] || null
-    : null;
+  const activeThread = state.activeThreadId ? state.threads[state.activeThreadId] || null : null;
 
   // Get active thread messages
-  const [activeThreadMessages, setActiveThreadMessages] = useState<
-    ChatMessage[]
-  >([]);
+  const [activeThreadMessages, setActiveThreadMessages] = useState<ChatMessage[]>([]);
 
   useEffect(() => {
     async function loadMessages(): Promise<void> {
@@ -211,8 +204,7 @@ export function useIncognitoChat(
         return {
           ...prev,
           threads: remainingThreads,
-          activeThreadId:
-            prev.activeThreadId === threadId ? null : prev.activeThreadId,
+          activeThreadId: prev.activeThreadId === threadId ? null : prev.activeThreadId,
         };
       });
     },

@@ -315,8 +315,7 @@ export const translations: typeof enTranslations = {
     },
     masterWriter: {
       name: "Meister-Schriftsteller",
-      description:
-        "Literarischer Handwerker für außergewöhnliche, publikationsreife Texte",
+      description: "Literarischer Handwerker für außergewöhnliche, publikationsreife Texte",
       tagline: "Literarische Exzellenz",
       shortDesc: "Fortgeschrittenes Schreiben und literarische Analyse",
       suggestedPrompts: {
@@ -388,8 +387,7 @@ export const translations: typeof enTranslations = {
     },
     editor: {
       name: "Redakteur",
-      description:
-        "Professioneller Redakteur zum Polieren und Verfeinern von Texten",
+      description: "Professioneller Redakteur zum Polieren und Verfeinern von Texten",
       tagline: "Polieren & Perfektionieren",
       shortDesc: "Inhaltsbearbeitung und Verfeinerung",
       suggestedPrompts: {
@@ -595,8 +593,7 @@ export const translations: typeof enTranslations = {
       name: "Unzensierter Autor",
       description: "Kreatives Schreiben ohne künstliche Einschränkungen",
       tagline: "Frei schreiben",
-      shortDesc:
-        "Uneingeschränktes kreatives Schreiben und Geschichtenerzählen",
+      shortDesc: "Uneingeschränktes kreatives Schreiben und Geschichtenerzählen",
       suggestedPrompts: {
         0: "Schreibe einen dunklen psychologischen Thriller",
         1: "Erstelle eine reife Romanze-Szene",
@@ -619,8 +616,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Charaktere auflisten",
-    description:
-      "Alle verfügbaren Charaktere abrufen (Standard + benutzerdefiniert)",
+    description: "Alle verfügbaren Charaktere abrufen (Standard + benutzerdefiniert)",
     container: {
       title: "Charaktere-Liste",
       description: "Alle verfügbaren Charaktere für den Benutzer",
@@ -654,13 +650,11 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um auf benutzerdefinierte Charaktere zuzugreifen",
+        description: "Sie müssen angemeldet sein, um auf benutzerdefinierte Charaktere zuzugreifen",
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
+        description: "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -709,8 +703,7 @@ export const translations: typeof enTranslations = {
     },
     systemPrompt: {
       label: "System-Prompt",
-      description:
-        "Der System-Prompt, der das Verhalten des Charakters definiert",
+      description: "Der System-Prompt, der das Verhalten des Charakters definiert",
     },
     category: {
       label: "Kategorie",
@@ -730,13 +723,11 @@ export const translations: typeof enTranslations = {
       label: "Bevorzugtes Modell",
       description:
         "Wählen Sie ein bestimmtes KI-Modell, das immer mit diesem Charakter verwendet werden soll",
-      helpText:
-        "Die Auswahl eines bestimmten Modells sperrt diesen Charakter auf dieses Modell",
+      helpText: "Die Auswahl eines bestimmten Modells sperrt diesen Charakter auf dieses Modell",
     },
     intelligence: {
       label: "Intelligenzstufe",
-      description:
-        "Minimale Intelligenz-/Fähigkeitsstufe, die für das Modell erforderlich ist",
+      description: "Minimale Intelligenz-/Fähigkeitsstufe, die für das Modell erforderlich ist",
     },
     maxPrice: {
       label: "Maximaler Preis",
@@ -745,8 +736,7 @@ export const translations: typeof enTranslations = {
     },
     contentLevel: {
       label: "Inhaltsebene",
-      description:
-        "Inhaltsfilterungsstufe für das Modell (Mainstream, offen oder unzensiert)",
+      description: "Inhaltsfilterungsstufe für das Modell (Mainstream, offen oder unzensiert)",
     },
     voice: {
       label: "Stimme",
@@ -800,8 +790,7 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Charakter erstellt",
-      description:
-        "Ihr benutzerdefinierter Charakter wurde erfolgreich erstellt",
+      description: "Ihr benutzerdefinierter Charakter wurde erfolgreich erstellt",
     },
   },
 };

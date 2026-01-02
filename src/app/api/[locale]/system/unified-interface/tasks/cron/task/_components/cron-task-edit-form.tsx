@@ -54,60 +54,42 @@ export function CronTaskEditForm({
       <Card>
         <CardHeader>
           <CardTitle>
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.get.container.title",
-            )}
+            {t("app.api.system.unifiedInterface.tasks.cronSystem.task.get.container.title")}
           </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Div>
             <Label className="text-sm font-medium text-muted-foreground">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.get.fields.id.label",
-              )}
+              {t("app.api.system.unifiedInterface.tasks.cronSystem.task.get.fields.id.label")}
             </Label>
             <P className="text-sm font-mono">{task.id}</P>
           </Div>
           <Div>
             <Label className="text-sm font-medium text-muted-foreground">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.label",
-              )}
+              {t("app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.name.label")}
             </Label>
             <P className="text-sm">{task.version}</P>
           </Div>
           <Div>
             <Label className="text-sm font-medium text-muted-foreground">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.list.columns.createdAt",
-              )}
+              {t("app.api.system.unifiedInterface.tasks.cronSystem.tasks.list.columns.createdAt")}
             </Label>
-            <P className="text-sm">
-              {new Date(task.createdAt).toLocaleString()}
-            </P>
+            <P className="text-sm">{new Date(task.createdAt).toLocaleString()}</P>
           </Div>
           <Div>
             <Label className="text-sm font-medium text-muted-foreground">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.list.columns.updatedAt",
-              )}
+              {t("app.api.system.unifiedInterface.tasks.cronSystem.tasks.list.columns.updatedAt")}
             </Label>
-            <P className="text-sm">
-              {new Date(task.updatedAt).toLocaleString()}
-            </P>
+            <P className="text-sm">{new Date(task.updatedAt).toLocaleString()}</P>
           </Div>
           <Div className="md:col-span-2">
             <Label className="text-sm font-medium text-muted-foreground">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.label",
-              )}
+              {t("app.api.system.unifiedInterface.tasks.cronSystem.task.put.fields.schedule.label")}
             </Label>
             <P className="text-sm">
               {formatCronSchedule(task.schedule, userTimezone, locale, logger)}
             </P>
-            <P className="text-xs text-muted-foreground font-mono">
-              {task.schedule}
-            </P>
+            <P className="text-xs text-muted-foreground font-mono">{task.schedule}</P>
           </Div>
         </CardContent>
       </Card>
@@ -116,9 +98,7 @@ export function CronTaskEditForm({
       <Card>
         <CardHeader>
           <CardTitle>
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.put.container.title",
-            )}
+            {t("app.api.system.unifiedInterface.tasks.cronSystem.task.put.container.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -128,9 +108,7 @@ export function CronTaskEditForm({
             className="flex flex-col gap-6"
           >
             <FormFieldGroup
-              title={
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.put.container.title"
-              }
+              title={"app.api.system.unifiedInterface.tasks.cronSystem.task.put.container.title"}
               description={
                 "app.api.system.unifiedInterface.tasks.cronSystem.task.put.container.description"
               }
@@ -178,9 +156,7 @@ export function CronTaskEditForm({
             >
               <ScheduleAutocomplete
                 value={endpoint.create?.form.watch("schedule") ?? ""}
-                onChange={(value): void =>
-                  endpoint.create?.form.setValue("schedule", value)
-                }
+                onChange={(value): void => endpoint.create?.form.setValue("schedule", value)}
                 onBlur={(): void => {
                   void endpoint.create?.form.trigger("schedule");
                 }}
@@ -196,9 +172,7 @@ export function CronTaskEditForm({
             </FormFieldGroup>
 
             <FormFieldGroup
-              title={
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.put.container.title"
-              }
+              title={"app.api.system.unifiedInterface.tasks.cronSystem.task.put.container.title"}
               description={
                 "app.api.system.unifiedInterface.tasks.cronSystem.task.put.container.description"
               }
@@ -263,9 +237,7 @@ export function CronTaskEditForm({
                   )}
                 </>
               ) : (
-                t(
-                  "app.api.system.unifiedInterface.tasks.cronSystem.task.put.title",
-                )
+                t("app.api.system.unifiedInterface.tasks.cronSystem.task.put.title")
               )}
             </Button>
           </Form>

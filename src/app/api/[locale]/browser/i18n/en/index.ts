@@ -57,11 +57,9 @@ export const translations = {
   "take-snapshot": takeSnapshotTranslations,
   "wait-for": waitForTranslations,
   title: "Chrome DevTools MCP Tools",
-  description:
-    "Execute Chrome DevTools MCP tools for browser automation and debugging",
+  description: "Execute Chrome DevTools MCP tools for browser automation and debugging",
   category: "Core API",
-  summary:
-    "Access Chrome DevTools Protocol tools through MCP for web automation",
+  summary: "Access Chrome DevTools Protocol tools through MCP for web automation",
   tags: {
     browserAutomation: "Browser Automation",
     chromeDevTools: "Chrome DevTools",
@@ -82,8 +80,7 @@ export const translations = {
 
   form: {
     label: "Browser Tool Execution",
-    description:
-      "Execute Chrome DevTools MCP tools for browser control and analysis",
+    description: "Execute Chrome DevTools MCP tools for browser control and analysis",
     fields: {
       tool: {
         label: "Tool",

@@ -37,25 +37,17 @@ const { GET } = createEndpoint({
   path: ["system", "unified-interface", "ai", "tools"],
   aliases: ["ai-tools", "tools:list"],
   title: "app.api.system.unifiedInterface.ai.tools.get.title" as const,
-  description:
-    "app.api.system.unifiedInterface.ai.tools.get.description" as const,
+  description: "app.api.system.unifiedInterface.ai.tools.get.description" as const,
   icon: "wand",
   category: "app.api.system.unifiedInterface.ai.tools.category" as const,
   tags: ["app.api.system.unifiedInterface.ai.tools.tags.tools" as const],
-  allowedRoles: [
-    UserRole.PUBLIC,
-    UserRole.CUSTOMER,
-    UserRole.ADMIN,
-    UserRole.AI_TOOL_OFF,
-  ] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN, UserRole.AI_TOOL_OFF] as const,
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.ai.tools.get.response.title" as const,
-      description:
-        "app.api.system.unifiedInterface.ai.tools.get.response.description" as const,
+      title: "app.api.system.unifiedInterface.ai.tools.get.response.title" as const,
+      description: "app.api.system.unifiedInterface.ai.tools.get.response.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -64,8 +56,7 @@ const { GET } = createEndpoint({
       tools: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.system.unifiedInterface.ai.tools.get.fields.tools.title" as const,
+          content: "app.api.system.unifiedInterface.ai.tools.get.fields.tools.title" as const,
         },
         z.array(aiToolMetadataSchema),
       ),
@@ -75,65 +66,47 @@ const { GET } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.validation.title",
-      description:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.validation.description",
+      title: "app.api.system.unifiedInterface.ai.tools.get.errors.validation.title",
+      description: "app.api.system.unifiedInterface.ai.tools.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.network.title",
-      description:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.network.description",
+      title: "app.api.system.unifiedInterface.ai.tools.get.errors.network.title",
+      description: "app.api.system.unifiedInterface.ai.tools.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.unauthorized.title",
-      description:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.unauthorized.description",
+      title: "app.api.system.unifiedInterface.ai.tools.get.errors.unauthorized.title",
+      description: "app.api.system.unifiedInterface.ai.tools.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.forbidden.title",
-      description:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.forbidden.description",
+      title: "app.api.system.unifiedInterface.ai.tools.get.errors.forbidden.title",
+      description: "app.api.system.unifiedInterface.ai.tools.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.notFound.title",
-      description:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.notFound.description",
+      title: "app.api.system.unifiedInterface.ai.tools.get.errors.notFound.title",
+      description: "app.api.system.unifiedInterface.ai.tools.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.unifiedInterface.ai.tools.get.errors.server.title",
-      description:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.server.description",
+      description: "app.api.system.unifiedInterface.ai.tools.get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.unknown.title",
-      description:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.unknown.description",
+      title: "app.api.system.unifiedInterface.ai.tools.get.errors.unknown.title",
+      description: "app.api.system.unifiedInterface.ai.tools.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.unsavedChanges.title",
-      description:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.unsavedChanges.description",
+      title: "app.api.system.unifiedInterface.ai.tools.get.errors.unsavedChanges.title",
+      description: "app.api.system.unifiedInterface.ai.tools.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.conflict.title",
-      description:
-        "app.api.system.unifiedInterface.ai.tools.get.errors.conflict.description",
+      title: "app.api.system.unifiedInterface.ai.tools.get.errors.conflict.title",
+      description: "app.api.system.unifiedInterface.ai.tools.get.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
     title: "app.api.system.unifiedInterface.ai.tools.get.success.title",
-    description:
-      "app.api.system.unifiedInterface.ai.tools.get.success.description",
+    description: "app.api.system.unifiedInterface.ai.tools.get.success.description",
   },
 
   // === EXAMPLES ===

@@ -64,10 +64,7 @@ export function GoogleFonts(): React.ReactElement {
   return (
     <>
       {/* nextjs/google-font-display - Missing font-display */}
-      <link
-        href="https://fonts.googleapis.com/css2?family=Roboto"
-        rel="stylesheet"
-      />
+      <link href="https://fonts.googleapis.com/css2?family=Roboto" rel="stylesheet" />
       {/* nextjs/google-font-preconnect - Missing preconnect */}
       <link
         href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap"

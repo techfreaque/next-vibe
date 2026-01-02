@@ -6,10 +6,7 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { useCallback } from "react";
 
-import {
-  getModelById,
-  type ModelId,
-} from "@/app/api/[locale]/agent/chat/model-access/models";
+import { getModelById, type ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type {
@@ -44,18 +41,12 @@ interface UseInputHandlersProps {
       /** File attachments */
       attachments: File[];
     },
-    onNewThread?: (
-      threadId: string,
-      rootFolderId: string,
-      subFolderId: string | null,
-    ) => void,
+    onNewThread?: (threadId: string, rootFolderId: string, subFolderId: string | null) => void,
   ) => Promise<void>;
   setInput: (input: string) => void;
   setSelectedModel: (modelId: ModelId) => void;
   setSelectedCharacter: (characterId: string) => void;
-  setEnabledTools: (
-    tools: Array<{ id: string; requiresConfirmation: boolean }>,
-  ) => void;
+  setEnabledTools: (tools: Array<{ id: string; requiresConfirmation: boolean }>) => void;
   inputRef: React.RefObject<TextareaRefObject | null>;
   locale: CountryLanguage;
   logger: EndpointLogger;
@@ -71,11 +62,7 @@ interface UseInputHandlersReturn {
   handleSubmit: () => Promise<void>;
   handleKeyDown: (e: TextareaKeyboardEvent) => void;
   handleModelChange: (modelId: ModelId) => void;
-  handleFillInputWithPrompt: (
-    prompt: string,
-    characterId: string,
-    modelId?: ModelId,
-  ) => void;
+  handleFillInputWithPrompt: (prompt: string, characterId: string, modelId?: ModelId) => void;
   handleScreenshot: () => Promise<void>;
 }
 
@@ -106,22 +93,19 @@ export function useInputHandlers({
 
     if (isValidInput(input) && !isLoading) {
       logger.debug("Chat", "submitMessage calling sendMessage");
-      await sendMessage(
-        { content: input, attachments },
-        (threadId, rootFolderId, subFolderId) => {
-          // Navigate to the newly created thread
-          logger.debug("Chat", "Navigating to newly created thread", {
-            threadId,
-            rootFolderId,
-            subFolderId,
-          });
-          // Build URL with proper subfolder path if present
-          const url = subFolderId
-            ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
-            : `/${locale}/threads/${rootFolderId}/${threadId}`;
-          router.push(url);
-        },
-      );
+      await sendMessage({ content: input, attachments }, (threadId, rootFolderId, subFolderId) => {
+        // Navigate to the newly created thread
+        logger.debug("Chat", "Navigating to newly created thread", {
+          threadId,
+          rootFolderId,
+          subFolderId,
+        });
+        // Build URL with proper subfolder path if present
+        const url = subFolderId
+          ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
+          : `/${locale}/threads/${rootFolderId}/${threadId}`;
+        router.push(url);
+      });
       // Clear the draft after successful send
       logger.debug("Chat", "submitMessage completed, clearing draft");
       await clearDraft(draftKey, logger);
@@ -129,16 +113,7 @@ export function useInputHandlers({
     } else {
       logger.debug("Chat", "submitMessage blocked");
     }
-  }, [
-    input,
-    attachments,
-    isLoading,
-    sendMessage,
-    logger,
-    locale,
-    router,
-    draftKey,
-  ]);
+  }, [input, attachments, isLoading, sendMessage, logger, locale, router, draftKey]);
 
   /**
    * Submit with explicit content - bypasses async state issues
@@ -156,20 +131,17 @@ export function useInputHandlers({
         logger.debug("Chat", "submitWithContent calling sendMessage");
         // Also update the input state for UI consistency
         setInput(content);
-        await sendMessage(
-          { content, attachments },
-          (threadId, rootFolderId, subFolderId) => {
-            logger.debug("Chat", "Navigating to newly created thread", {
-              threadId,
-              rootFolderId,
-              subFolderId,
-            });
-            const url = subFolderId
-              ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
-              : `/${locale}/threads/${rootFolderId}/${threadId}`;
-            router.push(url);
-          },
-        );
+        await sendMessage({ content, attachments }, (threadId, rootFolderId, subFolderId) => {
+          logger.debug("Chat", "Navigating to newly created thread", {
+            threadId,
+            rootFolderId,
+            subFolderId,
+          });
+          const url = subFolderId
+            ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
+            : `/${locale}/threads/${rootFolderId}/${threadId}`;
+          router.push(url);
+        });
         await clearDraft(draftKey, logger);
         // Clear input after send
         setInput("");
@@ -177,16 +149,7 @@ export function useInputHandlers({
         logger.debug("Chat", "submitWithContent blocked", { isLoading });
       }
     },
-    [
-      isLoading,
-      attachments,
-      sendMessage,
-      setInput,
-      logger,
-      locale,
-      router,
-      draftKey,
-    ],
+    [isLoading, attachments, sendMessage, setInput, logger, locale, router, draftKey],
   );
 
   /**
@@ -248,10 +211,7 @@ export function useInputHandlers({
 
       // Auto-remove search tool if the new model doesn't support tools
       const SEARCH_TOOL_ID = "get_v1_core_agent_brave-search";
-      if (
-        !model.supportsTools &&
-        enabledTools.some((t) => t.id === SEARCH_TOOL_ID)
-      ) {
+      if (!model.supportsTools && enabledTools.some((t) => t.id === SEARCH_TOOL_ID)) {
         setEnabledTools(enabledTools.filter((t) => t.id !== SEARCH_TOOL_ID));
         logger.info("Auto-disabled search tool - model doesn't support tools", {
           modelId,

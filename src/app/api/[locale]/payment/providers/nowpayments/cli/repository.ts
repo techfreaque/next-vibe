@@ -3,11 +3,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 
 import type { RequestSchema, ResponseSchema } from "./definition";
 
@@ -21,17 +17,11 @@ interface NgrokApiResponse {
 }
 
 export interface CliNowpaymentsRepository {
-  execute(
-    params: RequestSchema,
-    locale: string,
-  ): Promise<ResponseType<ResponseSchema>>;
+  execute(params: RequestSchema, locale: string): Promise<ResponseType<ResponseSchema>>;
 }
 
 export class CliNowpaymentsRepositoryImpl implements CliNowpaymentsRepository {
-  async execute(
-    params: RequestSchema,
-    locale: string,
-  ): Promise<ResponseType<ResponseSchema>> {
+  async execute(params: RequestSchema, locale: string): Promise<ResponseType<ResponseSchema>> {
     const { operation, port = 3000 } = params;
 
     switch (operation) {
@@ -133,8 +123,7 @@ Or use package managers:
 
     if (!tunnelUrl) {
       return fail({
-        message:
-          "app.api.payment.providers.nowpayments.cli.post.errors.serverError.title" as const,
+        message: "app.api.payment.providers.nowpayments.cli.post.errors.serverError.title" as const,
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: "Failed to get ngrok tunnel URL" },
       });
@@ -149,9 +138,7 @@ Or use package managers:
     process.stdout.write(`📍 Tunnel URL: ${tunnelUrl}\n`);
     process.stdout.write(`🔗 Webhook URL: ${webhookUrl}\n\n`);
     process.stdout.write(`⚙️  Configuration:\n`);
-    process.stdout.write(
-      `   1. Go to https://nowpayments.io/app/settings/api\n`,
-    );
+    process.stdout.write(`   1. Go to https://nowpayments.io/app/settings/api\n`);
     process.stdout.write(`   2. Set IPN Callback URL to: ${webhookUrl}\n`);
     process.stdout.write(`   3. Save your settings\n\n`);
     process.stdout.write(`🔄 Press Ctrl+C to stop the tunnel\n\n`);

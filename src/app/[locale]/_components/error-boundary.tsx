@@ -26,11 +26,7 @@ interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?:
     | ReactNode
-    | ((
-        error: Error,
-        errorInfo: ErrorInfo | null,
-        reset: () => void,
-      ) => ReactNode);
+    | ((error: Error, errorInfo: ErrorInfo | null, reset: () => void) => ReactNode);
   locale: CountryLanguage;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
@@ -61,28 +57,19 @@ export function DefaultErrorFallback({
 
   // Get full stack trace if available
   const stackTrace = error.stack || "No stack trace available";
-  const componentStack =
-    errorInfo?.componentStack || "No component stack available";
+  const componentStack = errorInfo?.componentStack || "No component stack available";
 
   return (
     <Card className="border-destructive max-w-4xl mx-auto my-4">
       <CardContent className="pt-6">
         <Div className="flex flex-col items-center text-center mb-6">
           <Info className="h-12 w-12 text-destructive mb-4" />
-          <H3 className="text-xl font-semibold mb-2">
-            {t("app.common.error.title")}
-          </H3>
-          <P className="text-muted-foreground mb-4">
-            {t("app.common.error.message")}
-          </P>
+          <H3 className="text-xl font-semibold mb-2">{t("app.common.error.title")}</H3>
+          <P className="text-muted-foreground mb-4">{t("app.common.error.message")}</P>
           <P className="text-sm text-destructive font-medium mb-4">
             {error.message || t("app.common.errors.unknown")}
           </P>
-          <Button
-            onClick={reset}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
+          <Button onClick={reset} variant="outline" className="flex items-center gap-2">
             <RotateCcw className="h-4 w-4" />
             {t("app.common.error.tryAgain")}
           </Button>
@@ -119,9 +106,7 @@ export function DefaultErrorFallback({
             <AccordionContent>
               <Div className="mt-2 p-4 bg-muted rounded-md text-xs space-y-2 border border-border">
                 <Div>
-                  <Span className="font-semibold">
-                    {t("app.common.error.boundary.name")}
-                  </Span>{" "}
+                  <Span className="font-semibold">{t("app.common.error.boundary.name")}</Span>{" "}
                   {error.name}
                 </Div>
                 <Div>
@@ -132,9 +117,7 @@ export function DefaultErrorFallback({
                 </Div>
                 {error.cause !== undefined && (
                   <Div>
-                    <Span className="font-semibold">
-                      {t("app.common.error.boundary.cause")}
-                    </Span>{" "}
+                    <Span className="font-semibold">{t("app.common.error.boundary.cause")}</Span>{" "}
                     {String(error.cause)}
                   </Div>
                 )}
@@ -151,10 +134,7 @@ export function DefaultErrorFallback({
  * Proper React Error Boundary component
  * Catches errors in React component tree and displays a fallback UI
  */
-export class ErrorBoundary extends Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -208,11 +188,7 @@ export class ErrorBoundary extends Component<
       if (this.props.fallback) {
         // Check if fallback is a function or ReactNode
         if (typeof this.props.fallback === "function") {
-          return this.props.fallback(
-            this.state.error,
-            this.state.errorInfo,
-            this.reset,
-          );
+          return this.props.fallback(this.state.error, this.state.errorInfo, this.reset);
         }
         // If it's a ReactNode, just return it
         return this.props.fallback;

@@ -4,11 +4,7 @@
  */
 
 import { Button, Section, Text } from "@react-email/components";
-import {
-  fail,
-  success,
-  ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
+import { fail, success, ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import type { ReactElement } from "react";
 import React from "react";
 import { z } from "zod";
@@ -22,10 +18,7 @@ import type { TFunction } from "@/i18n/core/static-types";
 import { contactClientRepository } from "../../../contact/repository-client";
 import { UserDetailLevel } from "../../enum";
 import { UserRepository } from "../../repository";
-import {
-  type SignupPostRequestOutput,
-  type SignupPostResponseOutput,
-} from "./definition";
+import { type SignupPostRequestOutput, type SignupPostResponseOutput } from "./definition";
 import {
   createTrackingContext,
   type TrackingContext,
@@ -264,17 +257,14 @@ const signupWelcomeTemplate: EmailTemplateDefinition<SignupWelcomeProps> = {
     id: "signup-welcome",
     version: "1.0.0",
     name: "app.admin.emails.templates.templates.signup.welcome.meta.name",
-    description:
-      "app.admin.emails.templates.templates.signup.welcome.meta.description",
+    description: "app.admin.emails.templates.templates.signup.welcome.meta.description",
     category: "auth",
     path: "/user/public/signup/email.tsx",
-    defaultSubject: (t) =>
-      t("app.api.user.public.signup.email.subject", { appName: "" }),
+    defaultSubject: (t) => t("app.api.user.public.signup.email.subject", { appName: "" }),
     previewFields: {
       privateName: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.signup.welcome.preview.privateName.label",
+        label: "app.admin.emails.templates.templates.signup.welcome.preview.privateName.label",
         description:
           "app.admin.emails.templates.templates.signup.welcome.preview.privateName.description",
         defaultValue: "Max",
@@ -282,8 +272,7 @@ const signupWelcomeTemplate: EmailTemplateDefinition<SignupWelcomeProps> = {
       },
       userId: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.signup.welcome.preview.userId.label",
+        label: "app.admin.emails.templates.templates.signup.welcome.preview.userId.label",
         description:
           "app.admin.emails.templates.templates.signup.welcome.preview.userId.description",
         defaultValue: "example-user-id-123",
@@ -291,8 +280,7 @@ const signupWelcomeTemplate: EmailTemplateDefinition<SignupWelcomeProps> = {
       },
       leadId: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.signup.welcome.preview.leadId.label",
+        label: "app.admin.emails.templates.templates.signup.welcome.preview.leadId.label",
         description:
           "app.admin.emails.templates.templates.signup.welcome.preview.leadId.description",
         defaultValue: "example-lead-id-456",
@@ -461,9 +449,7 @@ function renderAdminNotificationEmailContent(
               fontWeight: "600",
             }}
           >
-            {t(
-              "app.api.user.public.signup.admin_notification.basic_information",
-            )}
+            {t("app.api.user.public.signup.admin_notification.basic_information")}
           </Text>
 
           <div style={{ paddingLeft: "16px" }}>
@@ -476,8 +462,7 @@ function renderAdminNotificationEmailContent(
               }}
             >
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                {t("app.api.user.public.signup.admin_notification.privateName")}
-                :
+                {t("app.api.user.public.signup.admin_notification.privateName")}:
               </Text>{" "}
               {user.privateName}
             </Text>
@@ -507,10 +492,7 @@ function renderAdminNotificationEmailContent(
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
                 {t("app.api.user.public.signup.admin_notification.email")}:
               </Text>{" "}
-              <a
-                href={`mailto:${user.email}`}
-                style={{ color: "#3b82f6", textDecoration: "none" }}
-              >
+              <a href={`mailto:${user.email}`} style={{ color: "#3b82f6", textDecoration: "none" }}>
                 {user.email}
               </a>
             </Text>
@@ -527,9 +509,7 @@ function renderAdminNotificationEmailContent(
               fontWeight: "600",
             }}
           >
-            {t(
-              "app.api.user.public.signup.admin_notification.signup_preferences",
-            )}
+            {t("app.api.user.public.signup.admin_notification.signup_preferences")}
           </Text>
 
           {requestData.subscribeToNewsletter !== undefined && (
@@ -546,12 +526,8 @@ function renderAdminNotificationEmailContent(
               </Text>{" "}
               <span
                 style={{
-                  backgroundColor: requestData.subscribeToNewsletter
-                    ? "#dcfce7"
-                    : "#fee2e2",
-                  color: requestData.subscribeToNewsletter
-                    ? "#166534"
-                    : "#991b1b",
+                  backgroundColor: requestData.subscribeToNewsletter ? "#dcfce7" : "#fee2e2",
+                  color: requestData.subscribeToNewsletter ? "#166534" : "#991b1b",
                   padding: "2px 8px",
                   borderRadius: "4px",
                   fontSize: "12px",
@@ -559,12 +535,8 @@ function renderAdminNotificationEmailContent(
                 }}
               >
                 {requestData.subscribeToNewsletter
-                  ? t(
-                      "app.api.user.public.signup.admin_notification.subscribed",
-                    )
-                  : t(
-                      "app.api.user.public.signup.admin_notification.not_subscribed",
-                    )}
+                  ? t("app.api.user.public.signup.admin_notification.subscribed")
+                  : t("app.api.user.public.signup.admin_notification.not_subscribed")}
               </span>
             </Text>
           )}
@@ -593,8 +565,7 @@ function renderAdminNotificationEmailContent(
               }}
             >
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                {t("app.api.user.public.signup.admin_notification.signup_date")}
-                :
+                {t("app.api.user.public.signup.admin_notification.signup_date")}:
               </Text>{" "}
               {new Date(user.createdAt).toLocaleDateString(locale, {
                 year: "numeric",

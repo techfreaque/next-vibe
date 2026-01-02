@@ -13,12 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: async ({ data, user, locale, logger }) => {
-      return await CreditPurchaseRepository.createCheckoutSession(
-        data,
-        user.id,
-        locale,
-        logger,
-      );
+      return await CreditPurchaseRepository.createCheckoutSession(data, user.id, locale, logger);
     },
   },
 });

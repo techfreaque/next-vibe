@@ -17,11 +17,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { createEndpoint } from "../../endpoints/definition/create";
-import {
-  objectField,
-  requestDataField,
-  requestResponseField,
-} from "../../field/utils";
+import { objectField, requestDataField, requestResponseField } from "../../field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -331,52 +327,47 @@ const globalEndpointInvalidFieldLabel = createEndpoint({
 /**
  * Test 8B: Test requestDataField standalone with contextual typing
  */
-const test8b_requestDataFieldStandalone: UnifiedField<
-  TranslationKey,
-  z.ZodTypeAny
-> = requestDataField(
-  {
-    type: WidgetType.FORM_FIELD,
-    fieldType: FieldDataType.TEXT,
-    // @ts-expect-error - Invalid global key in field label
-    label: "invalid.field.label.key",
-    columns: 12,
-  },
-  z.string(),
-);
+const test8b_requestDataFieldStandalone: UnifiedField<TranslationKey, z.ZodTypeAny> =
+  requestDataField(
+    {
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      // @ts-expect-error - Invalid global key in field label
+      label: "invalid.field.label.key",
+      columns: 12,
+    },
+    z.string(),
+  );
 
 /**
  * Test 8C: Test requestResponseField standalone with contextual typing
  */
-const test8c_requestResponseFieldStandalone: UnifiedField<
-  TranslationKey,
-  z.ZodTypeAny
-> = requestResponseField(
-  {
-    type: WidgetType.FORM_FIELD,
-    fieldType: FieldDataType.TEXT,
-    // @ts-expect-error - Invalid global key in field label
-    label: "invalid.field.label.key",
-    columns: 12,
-  },
-  z.string(),
-);
+const test8c_requestResponseFieldStandalone: UnifiedField<TranslationKey, z.ZodTypeAny> =
+  requestResponseField(
+    {
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      // @ts-expect-error - Invalid global key in field label
+      label: "invalid.field.label.key",
+      columns: 12,
+    },
+    z.string(),
+  );
 
 /**
  * Test 8D: Test objectField standalone with contextual typing
  */
-const test8d_objectFieldStandalone: UnifiedField<TranslationKey, z.ZodTypeAny> =
-  objectField(
-    {
-      type: WidgetType.CONTAINER,
-      // @ts-expect-error - Invalid global key in container title
-      title: "invalid.container.title.key",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {},
-  );
+const test8d_objectFieldStandalone: UnifiedField<TranslationKey, z.ZodTypeAny> = objectField(
+  {
+    type: WidgetType.CONTAINER,
+    // @ts-expect-error - Invalid global key in container title
+    title: "invalid.container.title.key",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+  },
+  { request: "data", response: true },
+  {},
+);
 
 /**
  * Test 9A: Invalid container title key should be rejected (without children)
@@ -435,18 +426,17 @@ const globalEndpointInvalidContainerTitleSimple = createEndpoint({
 /**
  * Test 9B: Invalid container title key should be rejected (with children)
  */
-const test9b_invalidContainerTitle: UnifiedField<TranslationKey, z.ZodTypeAny> =
-  objectField(
-    {
-      type: WidgetType.CONTAINER,
-      // @ts-expect-error - Invalid global key in container title
-      title: "invalid.container.title.key",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {},
-  );
+const test9b_invalidContainerTitle: UnifiedField<TranslationKey, z.ZodTypeAny> = objectField(
+  {
+    type: WidgetType.CONTAINER,
+    // @ts-expect-error - Invalid global key in container title
+    title: "invalid.container.title.key",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+  },
+  { request: "data", response: true },
+  {},
+);
 
 /**
  * Test 9B: Invalid container title key should be rejected (with children)

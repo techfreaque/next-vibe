@@ -10,11 +10,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import type { AutoPrefillConfig, FormDataSources } from "./endpoint-types";
 import { determineFormDataPriority } from "./endpoint-utils";
-import type {
-  ApiQueryFormOptions,
-  ApiQueryFormReturn,
-  ApiQueryOptions,
-} from "./types";
+import type { ApiQueryFormOptions, ApiQueryFormReturn, ApiQueryOptions } from "./types";
 import { useApiQueryForm } from "./use-api-query-form";
 
 /**
@@ -76,21 +72,14 @@ export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
   const enhancedFormOptions = useMemo(() => {
     // Prepare data sources
     const dataSources: FormDataSources<TEndpoint["types"]["ResponseOutput"]> = {
-      defaultValues: formOptions.defaultValues as Partial<
-        TEndpoint["types"]["ResponseOutput"]
-      >,
+      defaultValues: formOptions.defaultValues as Partial<TEndpoint["types"]["ResponseOutput"]>,
       serverData: autoPrefillData as TEndpoint["types"]["ResponseOutput"],
       localStorageData: undefined,
-      initialState: initialState as Partial<
-        TEndpoint["types"]["ResponseOutput"]
-      >,
+      initialState: initialState as Partial<TEndpoint["types"]["ResponseOutput"]>,
     };
 
     // Determine final data with proper priority
-    const { finalData } = determineFormDataPriority(
-      dataSources,
-      autoPrefillConfig,
-    );
+    const { finalData } = determineFormDataPriority(dataSources, autoPrefillConfig);
 
     return {
       ...formOptions,
@@ -122,8 +111,7 @@ export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
   // Use the existing query form hook with enhanced options
   const queryFormResult = useApiQueryForm({
     endpoint: primaryEndpoint,
-    urlPathParams:
-      urlPathParams || ({} as TEndpoint["types"]["UrlVariablesOutput"]),
+    urlPathParams: urlPathParams || ({} as TEndpoint["types"]["UrlVariablesOutput"]),
     formOptions: enhancedFormOptions,
     queryOptions: enhancedQueryOptions,
     logger,

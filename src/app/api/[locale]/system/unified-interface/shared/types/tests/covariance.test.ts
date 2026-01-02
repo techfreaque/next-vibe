@@ -13,16 +13,10 @@
 
 import type { z } from "zod";
 
-import {
-  type UserRole,
-  type UserRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
+import { type UserRole, type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type {
-  ApiEndpoint,
-  CreateApiEndpoint,
-} from "../../endpoints/definition/create";
+import type { ApiEndpoint, CreateApiEndpoint } from "../../endpoints/definition/create";
 import type {
   ArrayField,
   CreateApiEndpointAny,
@@ -46,9 +40,7 @@ type Test1_2_ObjectField = ObjectField<
   WidgetConfig<TranslationKey>
 >;
 type Test1_2_Result =
-  Test1_2_ObjectField extends UnifiedField<TranslationKey, z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  Test1_2_ObjectField extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test1_2: Test1_2_Result = "✓ PASS";
 
 // Test 1.3: ObjectField with specific children extends UnifiedField
@@ -66,9 +58,7 @@ type Test1_3_ObjectField = ObjectField<
   WidgetConfig<TranslationKey>
 >;
 type Test1_3_Result =
-  Test1_3_ObjectField extends UnifiedField<TranslationKey, z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  Test1_3_ObjectField extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test1_3: Test1_3_Result = "✓ PASS";
 
 // Test 1.4: ObjectField with flexible usage extends UnifiedField
@@ -81,34 +71,23 @@ type Test1_4_ObjectField = ObjectField<
       WidgetConfig<TranslationKey>
     >;
   },
-  | { request: "data" }
-  | { response: true }
-  | { request: "data"; response: true },
+  { request: "data" } | { response: true } | { request: "data"; response: true },
   TranslationKey,
   WidgetConfig<TranslationKey>
 >;
 type Test1_4_Result =
-  Test1_4_ObjectField extends UnifiedField<TranslationKey, z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  Test1_4_ObjectField extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test1_4: Test1_4_Result = "✓ PASS";
 
 // Test 1.5: ArrayField extends UnifiedField
 type Test1_5_ArrayField = ArrayField<
-  PrimitiveField<
-    z.ZodString,
-    { request: "data" },
-    TranslationKey,
-    WidgetConfig<TranslationKey>
-  >,
+  PrimitiveField<z.ZodString, { request: "data" }, TranslationKey, WidgetConfig<TranslationKey>>,
   { request: "data" },
   TranslationKey,
   WidgetConfig<TranslationKey>
 >;
 type Test1_5_Result =
-  Test1_5_ArrayField extends UnifiedField<TranslationKey, z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  Test1_5_ArrayField extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test1_5: Test1_5_Result = "✓ PASS";
 
 // ============================================================================
@@ -326,9 +305,7 @@ type Test5_1_LoginFields = ObjectField<
 >;
 
 type Test5_1_Result =
-  Test5_1_LoginFields extends UnifiedField<TranslationKey, z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  Test5_1_LoginFields extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test5_1: Test5_1_Result = "✓ PASS";
 
 // Test 5.2: CreateApiEndpoint with login fields
@@ -357,26 +334,16 @@ const test5_2: Test5_2_Result = "✓ PASS";
 // ============================================================================
 
 // Test 6.1: Direct constraint check
-type Test6_1_DirectCheck<T extends UnifiedField<TranslationKey, z.ZodTypeAny>> =
-  T;
+type Test6_1_DirectCheck<T extends UnifiedField<TranslationKey, z.ZodTypeAny>> = T;
 type Test6_1_Result =
-  Test6_1_DirectCheck<Test5_1_LoginFields> extends UnifiedField<
-    TranslationKey,
-    z.ZodTypeAny
-  >
+  Test6_1_DirectCheck<Test5_1_LoginFields> extends UnifiedField<TranslationKey, z.ZodTypeAny>
     ? "✓ PASS"
     : "✗ FAIL";
 const test6_1: Test6_1_Result = "✓ PASS";
 
 // Test 6.2: Constraint in function parameter position
-type Test6_2_FunctionParam = <
-  T extends UnifiedField<TranslationKey, z.ZodTypeAny>,
->(
-  fields: T,
-) => T;
-type Test6_2_Result = Test6_2_FunctionParam extends (
-  fields: Test5_1_LoginFields,
-) => any
+type Test6_2_FunctionParam = <T extends UnifiedField<TranslationKey, z.ZodTypeAny>>(fields: T) => T;
+type Test6_2_Result = Test6_2_FunctionParam extends (fields: Test5_1_LoginFields) => any
   ? "✓ PASS"
   : "✗ FAIL";
 // This might fail - let's see
@@ -390,10 +357,7 @@ type Test6_3_NestedGeneric<
 > = TEndpoint;
 
 type Test6_3_Result =
-  Test6_3_NestedGeneric<
-    Test5_1_LoginFields,
-    Test5_2_LoginEndpoint
-  > extends CreateApiEndpointAny
+  Test6_3_NestedGeneric<Test5_1_LoginFields, Test5_2_LoginEndpoint> extends CreateApiEndpointAny
     ? "✓ PASS"
     : "✗ FAIL";
 const test6_3: Test6_3_Result = "✓ PASS";
@@ -403,14 +367,10 @@ const test6_3: Test6_3_Result = "✓ PASS";
 // ============================================================================
 
 // Test 7.1: Simplified useApiForm signature (with any instead of UnifiedField)
-type Test7_1_UseApiForm = <TEndpoint extends CreateApiEndpointAny>(
-  endpoint: TEndpoint,
-) => void;
+type Test7_1_UseApiForm = <TEndpoint extends CreateApiEndpointAny>(endpoint: TEndpoint) => void;
 
 // Can we call it with the login endpoint?
-type Test7_1_Result = Test7_1_UseApiForm extends (
-  endpoint: Test5_2_LoginEndpoint,
-) => void
+type Test7_1_Result = Test7_1_UseApiForm extends (endpoint: Test5_2_LoginEndpoint) => void
   ? "✓ PASS"
   : "✗ FAIL";
 const test7_1: Test7_1_Result = "✓ PASS";
@@ -427,10 +387,9 @@ type Test7_2_AcceptsAnyEndpoint = (
 ) => void;
 
 // Can we pass the login endpoint to it?
-type Test7_2_Result =
-  Test5_2_LoginEndpoint extends Parameters<Test7_2_AcceptsAnyEndpoint>[0]
-    ? "✓ PASS"
-    : "✗ FAIL";
+type Test7_2_Result = Test5_2_LoginEndpoint extends Parameters<Test7_2_AcceptsAnyEndpoint>[0]
+  ? "✓ PASS"
+  : "✗ FAIL";
 const test7_2: Test7_2_Result = "✗ FAIL";
 
 // ============================================================================
@@ -442,9 +401,7 @@ type Test8_1_UseApiFormCurrent = <TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
 ) => void;
 
-type Test8_1_Result = Test8_1_UseApiFormCurrent extends (
-  endpoint: Test5_2_LoginEndpoint,
-) => void
+type Test8_1_Result = Test8_1_UseApiFormCurrent extends (endpoint: Test5_2_LoginEndpoint) => void
   ? "✓ PASS"
   : "✗ FAIL";
 const test8_1: Test8_1_Result = "✓ PASS";
@@ -453,9 +410,7 @@ const test8_1: Test8_1_Result = "✓ PASS";
 type Test8_2_InferredRequest = Test5_2_LoginEndpoint["types"]["RequestOutput"];
 
 // Check that inferred types are not 'never'
-type Test8_2_RequestResult = Test8_2_InferredRequest extends never
-  ? "✗ FAIL"
-  : "✓ PASS";
+type Test8_2_RequestResult = Test8_2_InferredRequest extends never ? "✗ FAIL" : "✓ PASS";
 const test8_2: Test8_2_RequestResult = "✓ PASS";
 
 // ============================================================================
@@ -532,9 +487,7 @@ type Test10_1_ArrayOfObjects = ArrayField<
   WidgetConfig<TranslationKey>
 >;
 type Test10_1_Result =
-  Test10_1_ArrayOfObjects extends UnifiedField<TranslationKey, z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  Test10_1_ArrayOfObjects extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test10_1: Test10_1_Result = "✓ PASS";
 
 // Test 10.2: Deeply nested ObjectFields (3 levels)
@@ -566,9 +519,7 @@ type Test10_2_DeeplyNested = ObjectField<
   WidgetConfig<TranslationKey>
 >;
 type Test10_2_Result =
-  Test10_2_DeeplyNested extends UnifiedField<TranslationKey, z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  Test10_2_DeeplyNested extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test10_2: Test10_2_Result = "✓ PASS";
 
 // Test 10.3: Mixed usage configurations
@@ -598,20 +549,13 @@ type Test10_3_MixedUsage = ObjectField<
   WidgetConfig<TranslationKey>
 >;
 type Test10_3_Result =
-  Test10_3_MixedUsage extends UnifiedField<TranslationKey, z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  Test10_3_MixedUsage extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test10_3: Test10_3_Result = "✓ PASS";
 
 // Test 10.4: ArrayField with nested arrays
 type Test10_4_NestedArrays = ArrayField<
   ArrayField<
-    PrimitiveField<
-      z.ZodString,
-      { request: "data" },
-      TranslationKey,
-      WidgetConfig<TranslationKey>
-    >,
+    PrimitiveField<z.ZodString, { request: "data" }, TranslationKey, WidgetConfig<TranslationKey>>,
     { request: "data" },
     TranslationKey,
     WidgetConfig<TranslationKey>
@@ -621,9 +565,7 @@ type Test10_4_NestedArrays = ArrayField<
   WidgetConfig<TranslationKey>
 >;
 type Test10_4_Result =
-  Test10_4_NestedArrays extends UnifiedField<TranslationKey, z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  Test10_4_NestedArrays extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test10_4: Test10_4_Result = "✓ PASS";
 
 // ============================================================================
@@ -649,31 +591,21 @@ interface Test11_1_LoginEndpoints {
 }
 
 // Test 11.1: Verify the record type is valid (structural check)
-type Test11_1_Result = keyof Test11_1_LoginEndpoints extends "POST" | "GET"
-  ? "✓ PASS"
-  : "✗ FAIL";
+type Test11_1_Result = keyof Test11_1_LoginEndpoints extends "POST" | "GET" ? "✓ PASS" : "✗ FAIL";
 const test11_1: Test11_1_Result = "✓ PASS";
 
 // Test 11.2: Verify we can pass the endpoints to a generic function
 type Test11_2_UseEndpoint = <
   T extends Record<
     string,
-    CreateApiEndpoint<
-      string,
-      Methods,
-      readonly UserRoleValue[],
-      TranslationKey,
-      any
-    >
+    CreateApiEndpoint<string, Methods, readonly UserRoleValue[], TranslationKey, any>
   >,
 >(
   endpoints: T,
 ) => void;
 
 // Just verify the function type is valid
-type Test11_2_Result = Test11_2_UseEndpoint extends (...args: any[]) => void
-  ? "✓ PASS"
-  : "✗ FAIL";
+type Test11_2_Result = Test11_2_UseEndpoint extends (...args: any[]) => void ? "✓ PASS" : "✗ FAIL";
 const test11_2: Test11_2_Result = "✓ PASS";
 
 // ============================================================================
@@ -770,9 +702,7 @@ type Test13_1_OptionalFields = ObjectField<
   WidgetConfig<TranslationKey>
 >;
 type Test13_1_Result =
-  Test13_1_OptionalFields extends UnifiedField<TranslationKey, z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  Test13_1_OptionalFields extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test13_1: Test13_1_Result = "✓ PASS";
 
 // Test 13.2: Endpoint with optional fields
@@ -1019,9 +949,7 @@ type Test16_1_UseApiFormSignature = <
 
 // Verify we can call it with login endpoint
 type Test16_1_CanCall = Parameters<Test16_1_UseApiFormSignature>[0];
-type Test16_1_Result = Test5_2_LoginEndpoint extends Test16_1_CanCall
-  ? "✓ PASS"
-  : "✗ FAIL";
+type Test16_1_Result = Test5_2_LoginEndpoint extends Test16_1_CanCall ? "✓ PASS" : "✗ FAIL";
 const test16_1: Test16_1_Result = "✓ PASS";
 
 // Test 16.2: useEndpoint with Record of endpoints
@@ -1044,9 +972,7 @@ interface Test16_2_TestRecord {
 }
 
 // Verify the record has the right structure
-type Test16_2_Result = keyof Test16_2_TestRecord extends "login" | "logout"
-  ? "✓ PASS"
-  : "✗ FAIL";
+type Test16_2_Result = keyof Test16_2_TestRecord extends "login" | "logout" ? "✓ PASS" : "✗ FAIL";
 const test16_2: Test16_2_Result = "✓ PASS";
 
 // ============================================================================
@@ -1065,9 +991,7 @@ const test17_1: Test17_1_Result = "✓ PASS";
 
 // Test 17.2: Verify response type is not never
 type Test17_2_LoginResponse = Test5_2_LoginEndpoint["types"]["ResponseOutput"];
-type Test17_2_HasUser = Test17_2_LoginResponse extends never
-  ? "✗ FAIL"
-  : "✓ PASS";
+type Test17_2_HasUser = Test17_2_LoginResponse extends never ? "✗ FAIL" : "✓ PASS";
 const test17_2: Test17_2_HasUser = "✓ PASS";
 
 // ============================================================================
@@ -1076,9 +1000,7 @@ const test17_2: Test17_2_HasUser = "✓ PASS";
 
 // Test 18.1: Readonly array types are preserved
 type Test18_1_RolesType = Test5_2_LoginEndpoint["allowedRoles"];
-type Test18_1_IsReadonly = Test18_1_RolesType extends readonly any[]
-  ? "✓ PASS"
-  : "✗ FAIL";
+type Test18_1_IsReadonly = Test18_1_RolesType extends readonly any[] ? "✓ PASS" : "✗ FAIL";
 const test18_1: Test18_1_IsReadonly = "✓ PASS";
 
 // Test 18.2: Readonly object properties are preserved
@@ -1108,21 +1030,14 @@ type Test19_1_EmptyField = ObjectField<
   WidgetConfig<TranslationKey>
 >;
 type Test19_1_Result =
-  Test19_1_EmptyField extends UnifiedField<TranslationKey, z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  Test19_1_EmptyField extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test19_1: Test19_1_Result = "✓ PASS";
 
 // Test 19.2: Deeply nested arrays
 type Test19_2_DeepArray = ArrayField<
   ArrayField<
     ArrayField<
-      PrimitiveField<
-        z.ZodString,
-        { response: true },
-        TranslationKey,
-        WidgetConfig<TranslationKey>
-      >,
+      PrimitiveField<z.ZodString, { response: true }, TranslationKey, WidgetConfig<TranslationKey>>,
       { response: true },
       TranslationKey,
       WidgetConfig<TranslationKey>
@@ -1136,9 +1051,7 @@ type Test19_2_DeepArray = ArrayField<
   WidgetConfig<TranslationKey>
 >;
 type Test19_2_Result =
-  Test19_2_DeepArray extends UnifiedField<TranslationKey, z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  Test19_2_DeepArray extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test19_2: Test19_2_Result = "✓ PASS";
 
 // Test 19.3: Mixed usage configs
@@ -1162,9 +1075,7 @@ type Test19_3_MixedField = ObjectField<
   WidgetConfig<TranslationKey>
 >;
 type Test19_3_Result =
-  Test19_3_MixedField extends UnifiedField<TranslationKey, z.ZodTypeAny>
-    ? "✓ PASS"
-    : "✗ FAIL";
+  Test19_3_MixedField extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test19_3: Test19_3_Result = "✓ PASS";
 
 // ============================================================================
@@ -1239,10 +1150,7 @@ type Test20_1_DefaultValid =
 const test20_1: Test20_1_DefaultValid = "✓ PASS";
 
 // Test 20.2: Verify the record has all expected keys
-type Test20_2_RecordValid = keyof Test20_1_MultiEndpoint extends
-  | "default"
-  | "verify"
-  | "resend"
+type Test20_2_RecordValid = keyof Test20_1_MultiEndpoint extends "default" | "verify" | "resend"
   ? "✓ PASS"
   : "✗ FAIL";
 const test20_2: Test20_2_RecordValid = "✓ PASS";

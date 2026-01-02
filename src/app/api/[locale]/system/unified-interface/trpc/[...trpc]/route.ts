@@ -33,9 +33,7 @@ async function handler(
     z.string(),
     logger,
   ) as ResponseType<CountryLanguage>;
-  const locale = localeValidation.success
-    ? localeValidation.data
-    : defaultLocale;
+  const locale = localeValidation.success ? localeValidation.data : defaultLocale;
 
   if (!localeValidation.success) {
     logger.error("Invalid locale in tRPC request, using default", {

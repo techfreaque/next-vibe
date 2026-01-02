@@ -15,19 +15,11 @@ import { z } from "zod";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "../../../shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "../../../shared/types/response.schema";
 import { parseError } from "../../../shared/utils/parse-error";
 import { parseJsonWithComments } from "../../../shared/utils/parse-json";
 import { ensureConfigReady } from "../config/repository";
-import type {
-  TypecheckIssue,
-  TypecheckRequestOutput,
-  TypecheckResponseOutput,
-} from "./definition";
+import type { TypecheckIssue, TypecheckRequestOutput, TypecheckResponseOutput } from "./definition";
 import {
   createTypecheckConfig,
   getDisplayPath,
@@ -172,10 +164,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
    * Parse a single output line for TypeScript errors/warnings.
    * Tries both tsc and tsgo patterns.
    */
-  private static parseOutputLine(
-    line: string,
-    useTsgo: boolean,
-  ): ParsedIssue | null {
+  private static parseOutputLine(line: string, useTsgo: boolean): ParsedIssue | null {
     // Try patterns in order based on which tool is being used
     const primaryPattern = useTsgo
       ? TypecheckRepositoryImpl.getTsgoErrorPattern()
@@ -293,9 +282,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
    * Adjust file paths to be relative to temp config location.
    */
   private static adjustFilePaths(files: string[], prefix: string): string[] {
-    return files.map((file) =>
-      TypecheckRepositoryImpl.adjustPath(file, prefix),
-    );
+    return files.map((file) => TypecheckRepositoryImpl.adjustPath(file, prefix));
   }
 
   /**
@@ -330,21 +317,14 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       return undefined;
     }
 
-    return typeRoots.map((root) =>
-      TypecheckRepositoryImpl.adjustPath(root, prefix),
-    );
+    return typeRoots.map((root) => TypecheckRepositoryImpl.adjustPath(root, prefix));
   }
 
   /**
    * Adjust general include patterns to account for temp config location.
    */
-  private static adjustIncludePatterns(
-    patterns: string[],
-    prefix: string,
-  ): string[] {
-    return patterns.map((pattern) =>
-      TypecheckRepositoryImpl.adjustPath(pattern, prefix),
-    );
+  private static adjustIncludePatterns(patterns: string[], prefix: string): string[] {
+    return patterns.map((pattern) => TypecheckRepositoryImpl.adjustPath(pattern, prefix));
   }
 
   /**
@@ -361,10 +341,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   /**
    * Adjust exclude patterns to account for temp config location.
    */
-  private static adjustExcludePatterns(
-    excludes: string[] | undefined,
-    prefix: string,
-  ): string[] {
+  private static adjustExcludePatterns(excludes: string[] | undefined, prefix: string): string[] {
     if (!excludes) {
       return [];
     }
@@ -407,23 +384,16 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     }
 
     // Filter out wildcard patterns and adjust paths for temp config location
-    const generalFilesToInclude = (mainTsConfig.include || []).filter(
-      (includePattern) =>
-        WILDCARD_INCLUDE_PATTERNS.includes(includePattern)
-          ? undefined
-          : includePattern,
+    const generalFilesToInclude = (mainTsConfig.include || []).filter((includePattern) =>
+      WILDCARD_INCLUDE_PATTERNS.includes(includePattern) ? undefined : includePattern,
     );
-    const adjustedGeneralIncludes =
-      TypecheckRepositoryImpl.adjustIncludePatterns(
-        generalFilesToInclude,
-        prefix,
-      );
-
-    // Adjust paths for temp config location
-    const adjustedFiles = TypecheckRepositoryImpl.adjustFilePaths(
-      filesToCheck,
+    const adjustedGeneralIncludes = TypecheckRepositoryImpl.adjustIncludePatterns(
+      generalFilesToInclude,
       prefix,
     );
+
+    // Adjust paths for temp config location
+    const adjustedFiles = TypecheckRepositoryImpl.adjustFilePaths(filesToCheck, prefix);
     const adjustedPaths = TypecheckRepositoryImpl.adjustPathMappings(
       mainTsConfig.compilerOptions?.paths,
       prefix,
@@ -542,12 +512,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       config = createTypecheckConfig(data.path, typecheckConfig.cachePath);
 
       // Build the command based on path type
-      const command = this.buildCommand(
-        baseCommand,
-        config,
-        typecheckConfig.cachePath,
-        logger,
-      );
+      const command = this.buildCommand(baseCommand, config, typecheckConfig.cachePath, logger);
 
       if (!command) {
         return fail({
@@ -562,11 +527,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
       logger.debug("Executing TypeScript command:", command);
 
       // Execute the typecheck command
-      const execResult = await this.executeCommand(
-        command,
-        data.timeout,
-        logger,
-      );
+      const execResult = await this.executeCommand(command, data.timeout, logger);
 
       if (!execResult.success && !execResult.output) {
         return fail({
@@ -609,14 +570,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
       return success(this.buildResponse(issues, data));
     } catch (error) {
-      return this.handleError(
-        error as Error,
-        output,
-        config,
-        data,
-        startTime,
-        logger,
-      );
+      return this.handleError(error as Error, output, config, data, startTime, logger);
     }
   }
 
@@ -630,10 +584,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   private static buildFileStats(
     issues: TypecheckIssue[],
   ): Map<string, { errors: number; warnings: number; total: number }> {
-    const fileStats = new Map<
-      string,
-      { errors: number; warnings: number; total: number }
-    >();
+    const fileStats = new Map<string, { errors: number; warnings: number; total: number }>();
 
     for (const issue of issues) {
       const stats = fileStats.get(issue.file) || {
@@ -679,9 +630,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   ): TypecheckResponseOutput {
     const totalIssues = allIssues.length;
     const totalFiles = new Set(allIssues.map((issue) => issue.file)).size;
-    const totalErrors = allIssues.filter(
-      (issue) => issue.severity === "error",
-    ).length;
+    const totalErrors = allIssues.filter((issue) => issue.severity === "error").length;
 
     const fileStats = TypecheckRepositoryImpl.buildFileStats(allIssues);
     const allFiles = TypecheckRepositoryImpl.formatFileStats(fileStats);
@@ -697,8 +646,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     const limitedIssues = allIssues.slice(startIndex, endIndex);
 
     const displayedIssues = limitedIssues.length;
-    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file))
-      .size;
+    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file)).size;
 
     return {
       issues: {
@@ -798,10 +746,8 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         (execError.code === 1 || execError.code === 2);
 
       if (hasTypeErrors && "stdout" in execError && "stderr" in execError) {
-        const stdout =
-          typeof execError.stdout === "string" ? execError.stdout : "";
-        const stderr =
-          typeof execError.stderr === "string" ? execError.stderr : "";
+        const stdout = typeof execError.stdout === "string" ? execError.stdout : "";
+        const stderr = typeof execError.stderr === "string" ? execError.stderr : "";
         return {
           success: false,
           output: [stdout, stderr].filter(Boolean).join("\n"),
@@ -810,10 +756,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
       // Other errors are unexpected
       const parsedError = parseError(execError);
-      logger.error(
-        "Unexpected error executing TypeScript command",
-        parsedError,
-      );
+      logger.error("Unexpected error executing TypeScript command", parsedError);
       return {
         success: false,
         output: "",
@@ -895,8 +838,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
     // For TypeScript errors (exit code 2) or when we have parsed errors,
     // return success with error details for UI display
-    const errorCode =
-      hasCode && typeof error.code === "number" ? error.code : 0;
+    const errorCode = hasCode && typeof error.code === "number" ? error.code : 0;
     if (errorCode === 2 || issues.length > 0) {
       return success(this.buildResponse(issues, data));
     }

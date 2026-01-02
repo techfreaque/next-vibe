@@ -7,11 +7,7 @@ import "server-only";
 
 import { and, avg, count, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -21,10 +17,7 @@ import { simpleT } from "@/i18n/core/shared";
 
 import { cronTaskExecutions, cronTasks } from "../../cron/db";
 import { CronTaskPriority, CronTaskStatus } from "../../enum";
-import type {
-  CronHistoryRequestOutput,
-  CronHistoryResponseOutput,
-} from "./definition";
+import type { CronHistoryRequestOutput, CronHistoryResponseOutput } from "./definition";
 
 /**
  * Repository implementation
@@ -55,12 +48,9 @@ export class CronHistoryRepository {
         // Handle string status filter
         const statusStrings = data.status.split(",").map((s) => s.trim());
         // Validate each status string is a valid CronTaskStatus
-        const validStatuses: (typeof CronTaskStatus)[keyof typeof CronTaskStatus][] =
-          [];
+        const validStatuses: (typeof CronTaskStatus)[keyof typeof CronTaskStatus][] = [];
         for (const statusStr of statusStrings) {
-          const statusEnum = Object.values(CronTaskStatus).find(
-            (val) => val === statusStr,
-          );
+          const statusEnum = Object.values(CronTaskStatus).find((val) => val === statusStr);
           if (statusEnum) {
             validStatuses.push(statusEnum);
           }
@@ -71,15 +61,11 @@ export class CronHistoryRepository {
       }
 
       if (data?.startDate) {
-        conditions.push(
-          gte(cronTaskExecutions.startedAt, new Date(data.startDate)),
-        );
+        conditions.push(gte(cronTaskExecutions.startedAt, new Date(data.startDate)));
       }
 
       if (data?.endDate) {
-        conditions.push(
-          lte(cronTaskExecutions.startedAt, new Date(data.endDate)),
-        );
+        conditions.push(lte(cronTaskExecutions.startedAt, new Date(data.endDate)));
       }
 
       // Query executions with task info
@@ -153,19 +139,15 @@ export class CronHistoryRepository {
       const successRate =
         statsResult && statsResult.totalExecutions > 0
           ? Math.round(
-              (Number(statsResult.successfulExecutions) /
-                Number(statsResult.totalExecutions)) *
+              (Number(statsResult.successfulExecutions) / Number(statsResult.totalExecutions)) *
                 100,
             )
           : 0;
 
       logger.info(
-        t(
-          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.log.fetchSuccess",
-          {
-            count: executions.length.toString(),
-          },
-        ),
+        t("app.api.system.unifiedInterface.tasks.cronSystem.history.get.log.fetchSuccess", {
+          count: executions.length.toString(),
+        }),
       );
 
       // Database already returns correct enum types, no parsing needed
@@ -176,9 +158,7 @@ export class CronHistoryRepository {
             taskId: exec.taskId,
             taskName:
               exec.taskName ??
-              t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.history.get.unknownTask",
-              ),
+              t("app.api.system.unifiedInterface.tasks.cronSystem.history.get.unknownTask"),
             status: exec.status,
             priority: exec.priority ?? CronTaskPriority.MEDIUM,
             startedAt: exec.startedAt.toISOString(),
@@ -187,11 +167,9 @@ export class CronHistoryRepository {
             error: exec.error
               ? {
                   message: (exec.error as { message: string }).message,
-                  messageParams: (
-                    exec.error as { messageParams?: Record<string, string> }
-                  ).messageParams,
-                  errorType: (exec.error as { errorType: { errorKey: string } })
-                    .errorType.errorKey,
+                  messageParams: (exec.error as { messageParams?: Record<string, string> })
+                    .messageParams,
+                  errorType: (exec.error as { errorType: { errorKey: string } }).errorType.errorKey,
                 }
               : null,
             environment: exec.environment,

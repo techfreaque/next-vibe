@@ -21,11 +21,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { BillingInterval, SubscriptionPlan } from "../../subscription/enum";
-import {
-  PaymentProvider,
-  PaymentProviderDB,
-  PaymentProviderOptions,
-} from "../enum";
+import { PaymentProvider, PaymentProviderDB, PaymentProviderOptions } from "../enum";
 
 /**
  * POST endpoint for creating subscription checkout sessions
@@ -64,12 +60,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.subscription.checkout.form.fields.planId.label" as const,
-          description:
-            "app.api.subscription.checkout.form.fields.planId.description" as const,
-          placeholder:
-            "app.api.subscription.checkout.form.fields.planId.placeholder" as const,
+          label: "app.api.subscription.checkout.form.fields.planId.label" as const,
+          description: "app.api.subscription.checkout.form.fields.planId.description" as const,
+          placeholder: "app.api.subscription.checkout.form.fields.planId.placeholder" as const,
           columns: 6,
           options: [
             {
@@ -85,8 +78,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.subscription.checkout.form.fields.billingInterval.label" as const,
+          label: "app.api.subscription.checkout.form.fields.billingInterval.label" as const,
           description:
             "app.api.subscription.checkout.form.fields.billingInterval.description" as const,
           placeholder:
@@ -110,12 +102,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.subscription.checkout.form.fields.provider.label" as const,
-          description:
-            "app.api.subscription.checkout.form.fields.provider.description" as const,
-          placeholder:
-            "app.api.subscription.checkout.form.fields.provider.placeholder" as const,
+          label: "app.api.subscription.checkout.form.fields.provider.label" as const,
+          description: "app.api.subscription.checkout.form.fields.provider.description" as const,
+          placeholder: "app.api.subscription.checkout.form.fields.provider.placeholder" as const,
           columns: 12,
           options: PaymentProviderOptions,
         },
@@ -126,12 +115,9 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.JSON,
-          label:
-            "app.api.subscription.checkout.form.fields.metadata.label" as const,
-          description:
-            "app.api.subscription.checkout.form.fields.metadata.description" as const,
-          placeholder:
-            "app.api.subscription.checkout.form.fields.metadata.placeholder" as const,
+          label: "app.api.subscription.checkout.form.fields.metadata.label" as const,
+          description: "app.api.subscription.checkout.form.fields.metadata.description" as const,
+          placeholder: "app.api.subscription.checkout.form.fields.metadata.placeholder" as const,
           columns: 12,
         },
         z.record(z.string(), z.string()).optional(),
@@ -157,8 +143,7 @@ const { POST } = createEndpoint({
       checkoutUrl: responseField(
         {
           type: WidgetType.TEXT,
-          content:
-            "app.api.subscription.checkout.response.checkoutUrl" as const,
+          content: "app.api.subscription.checkout.response.checkoutUrl" as const,
         },
         z.string().url(),
       ),
@@ -215,49 +200,39 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.subscription.checkout.errors.validation.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.validation.description" as const,
+      description: "app.api.subscription.checkout.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.subscription.checkout.errors.network.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.network.description" as const,
+      description: "app.api.subscription.checkout.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.subscription.checkout.errors.unauthorized.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.unauthorized.description" as const,
+      description: "app.api.subscription.checkout.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.subscription.checkout.errors.forbidden.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.forbidden.description" as const,
+      description: "app.api.subscription.checkout.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.subscription.checkout.errors.notFound.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.notFound.description" as const,
+      description: "app.api.subscription.checkout.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.subscription.checkout.errors.serverError.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.serverError.description" as const,
+      description: "app.api.subscription.checkout.errors.serverError.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.subscription.checkout.errors.unknown.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.unknown.description" as const,
+      description: "app.api.subscription.checkout.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.subscription.checkout.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.unsavedChanges.description" as const,
+      title: "app.api.subscription.checkout.errors.unsavedChanges.title" as const,
+      description: "app.api.subscription.checkout.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.subscription.checkout.errors.conflict.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.conflict.description" as const,
+      description: "app.api.subscription.checkout.errors.conflict.description" as const,
     },
   },
 

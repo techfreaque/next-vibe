@@ -81,8 +81,7 @@ export const translations: typeof enTranslations = {
     },
     maxFilesInSummary: {
       label: "Max. Dateien in Zusammenfassung",
-      description:
-        "Maximale Anzahl der Dateien in der betroffenen Dateiliste (1-1000)",
+      description: "Maximale Anzahl der Dateien in der betroffenen Dateiliste (1-1000)",
     },
   },
 
@@ -149,8 +148,7 @@ export const translations: typeof enTranslations = {
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description:
-        "Ein unbekannter Fehler ist während des Vibe Check aufgetreten",
+      description: "Ein unbekannter Fehler ist während des Vibe Check aufgetreten",
     },
     unsaved: {
       title: "Ungespeicherte Änderungen",

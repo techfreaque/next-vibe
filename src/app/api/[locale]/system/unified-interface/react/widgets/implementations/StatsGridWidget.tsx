@@ -22,22 +22,15 @@ export function StatsGridWidget<const TKey extends string>({
 
   // Handle null case
   if (!data) {
-    return (
-      <Div className={cn("py-8 text-center text-muted-foreground", className)}>
-        —
-      </Div>
-    );
+    return <Div className={cn("py-8 text-center text-muted-foreground", className)}>—</Div>;
   }
 
   const { stats, columns } = data;
 
   // Extract additional widget-specific properties
-  const isObject =
-    typeof value === "object" && value !== null && !Array.isArray(value);
+  const isObject = typeof value === "object" && value !== null && !Array.isArray(value);
   const layout =
-    isObject && "layout" in value && typeof value.layout === "string"
-      ? value.layout
-      : "grid";
+    isObject && "layout" in value && typeof value.layout === "string" ? value.layout : "grid";
 
   /* eslint-disable i18next/no-literal-string */
   const gridClassMap: Record<number, string> = {
@@ -46,18 +39,11 @@ export function StatsGridWidget<const TKey extends string>({
     3: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
     4: "grid-cols-1 md:grid-cols-2 lg:grid-cols-4",
   };
-  const gridClass =
-    gridClassMap[columns] ?? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+  const gridClass = gridClassMap[columns] ?? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
   /* eslint-enable i18next/no-literal-string */
 
   return (
-    <Div
-      className={cn(
-        "grid gap-4",
-        layout === "grid" ? gridClass : "flex flex-wrap",
-        className,
-      )}
-    >
+    <Div className={cn("grid gap-4", layout === "grid" ? gridClass : "flex flex-wrap", className)}>
       {stats.map((stat, index: number) => {
         // Convert ProcessedMetricCard back to WidgetData format
         const widgetData = {

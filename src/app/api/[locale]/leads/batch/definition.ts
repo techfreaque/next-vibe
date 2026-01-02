@@ -51,10 +51,7 @@ const { PATCH } = createEndpoint({
   title: "app.api.leads.batch.patch.title" as const,
   description: "app.api.leads.batch.patch.description" as const,
   category: "app.api.leads.category" as const,
-  tags: [
-    "app.api.leads.tags.leads" as const,
-    "app.api.leads.tags.batch" as const,
-  ],
+  tags: ["app.api.leads.tags.leads" as const, "app.api.leads.tags.batch" as const],
 
   fields: objectField(
     {
@@ -90,16 +87,11 @@ const { PATCH } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label:
-            "app.api.leads.batch.patch.currentCampaignStage.label" as const,
-          description:
-            "app.api.leads.batch.patch.currentCampaignStage.description" as const,
+          label: "app.api.leads.batch.patch.currentCampaignStage.label" as const,
+          description: "app.api.leads.batch.patch.currentCampaignStage.description" as const,
           options: EmailCampaignStageFilterOptions,
         },
-        z
-          .nativeEnum(EmailCampaignStageFilter)
-          .optional()
-          .default(EmailCampaignStageFilter.ALL),
+        z.nativeEnum(EmailCampaignStageFilter).optional().default(EmailCampaignStageFilter.ALL),
       ),
       source: requestDataField(
         {
@@ -119,10 +111,7 @@ const { PATCH } = createEndpoint({
           description: "app.api.leads.batch.patch.scope.description" as const,
           options: BatchOperationScopeOptions,
         },
-        z
-          .nativeEnum(BatchOperationScope)
-          .optional()
-          .default(BatchOperationScope.ALL_PAGES),
+        z.nativeEnum(BatchOperationScope).optional().default(BatchOperationScope.ALL_PAGES),
       ),
       dryRun: requestDataField(
         {
@@ -138,8 +127,7 @@ const { PATCH } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.leads.batch.patch.maxRecords.label" as const,
-          description:
-            "app.api.leads.batch.patch.maxRecords.description" as const,
+          description: "app.api.leads.batch.patch.maxRecords.description" as const,
         },
         z.coerce.number().min(1).max(10000).optional().default(1000),
       ),
@@ -158,8 +146,7 @@ const { PATCH } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.leads.batch.patch.updates.status.label" as const,
-              description:
-                "app.api.leads.batch.patch.updates.status.description" as const,
+              description: "app.api.leads.batch.patch.updates.status.description" as const,
               options: LeadStatusOptions,
             },
             z.enum(LeadStatus).optional(),
@@ -168,8 +155,7 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.leads.batch.patch.updates.currentCampaignStage.label" as const,
+              label: "app.api.leads.batch.patch.updates.currentCampaignStage.label" as const,
               description:
                 "app.api.leads.batch.patch.updates.currentCampaignStage.description" as const,
               options: EmailCampaignStageOptions,
@@ -181,8 +167,7 @@ const { PATCH } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.leads.batch.patch.updates.source.label" as const,
-              description:
-                "app.api.leads.batch.patch.updates.source.description" as const,
+              description: "app.api.leads.batch.patch.updates.source.description" as const,
               options: LeadSourceOptions,
             },
             z.enum(LeadSource).optional(),
@@ -192,8 +177,7 @@ const { PATCH } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.leads.batch.patch.updates.notes.label" as const,
-              description:
-                "app.api.leads.batch.patch.updates.notes.description" as const,
+              description: "app.api.leads.batch.patch.updates.notes.description" as const,
             },
             z.string().optional(),
           ),
@@ -204,8 +188,7 @@ const { PATCH } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.leads.batch.patch.response.title" as const,
-          description:
-            "app.api.leads.batch.patch.response.description" as const,
+          description: "app.api.leads.batch.patch.response.description" as const,
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -220,24 +203,21 @@ const { PATCH } = createEndpoint({
           totalMatched: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.leads.batch.patch.response.totalMatched" as const,
+              content: "app.api.leads.batch.patch.response.totalMatched" as const,
             },
             z.coerce.number(),
           ),
           totalProcessed: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.leads.batch.patch.response.totalProcessed" as const,
+              content: "app.api.leads.batch.patch.response.totalProcessed" as const,
             },
             z.coerce.number(),
           ),
           totalUpdated: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.leads.batch.patch.response.totalUpdated" as const,
+              content: "app.api.leads.batch.patch.response.totalUpdated" as const,
             },
             z.coerce.number(),
           ),
@@ -245,8 +225,7 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.DATA_LIST,
               title: "app.api.leads.batch.patch.response.preview" as const,
-              description:
-                "app.api.leads.batch.patch.response.preview" as const,
+              description: "app.api.leads.batch.patch.response.preview" as const,
             },
             objectField(
               {
@@ -260,24 +239,21 @@ const { PATCH } = createEndpoint({
                 id: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.patch.response.preview" as const,
+                    content: "app.api.leads.batch.patch.response.preview" as const,
                   },
                   z.string(),
                 ),
                 email: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.patch.response.preview" as const,
+                    content: "app.api.leads.batch.patch.response.preview" as const,
                   },
                   z.string().nullable(),
                 ),
                 businessName: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.patch.response.preview" as const,
+                    content: "app.api.leads.batch.patch.response.preview" as const,
                   },
                   z.string(),
                 ),
@@ -316,16 +292,14 @@ const { PATCH } = createEndpoint({
                 leadId: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.patch.response.errors" as const,
+                    content: "app.api.leads.batch.patch.response.errors" as const,
                   },
                   z.string(),
                 ),
                 error: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.patch.response.errors" as const,
+                    content: "app.api.leads.batch.patch.response.errors" as const,
                   },
                   z.string(),
                 ),
@@ -340,48 +314,39 @@ const { PATCH } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.leads.batch.patch.errors.validation.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.validation.description" as const,
+      description: "app.api.leads.batch.patch.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.leads.batch.patch.errors.unauthorized.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.unauthorized.description" as const,
+      description: "app.api.leads.batch.patch.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.leads.batch.patch.errors.forbidden.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.forbidden.description" as const,
+      description: "app.api.leads.batch.patch.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.leads.batch.patch.errors.notFound.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.notFound.description" as const,
+      description: "app.api.leads.batch.patch.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.leads.batch.patch.errors.conflict.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.conflict.description" as const,
+      description: "app.api.leads.batch.patch.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.leads.batch.patch.errors.server.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.server.description" as const,
+      description: "app.api.leads.batch.patch.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.leads.batch.patch.errors.network.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.network.description" as const,
+      description: "app.api.leads.batch.patch.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.leads.batch.patch.errors.unknown.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.unknown.description" as const,
+      description: "app.api.leads.batch.patch.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.leads.batch.patch.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.unsavedChanges.description" as const,
+      description: "app.api.leads.batch.patch.errors.unsavedChanges.description" as const,
     },
   },
 
@@ -435,10 +400,7 @@ const { DELETE } = createEndpoint({
   description: "app.api.leads.batch.delete.description" as const,
   icon: "user-x" as const,
   category: "app.api.leads.category" as const,
-  tags: [
-    "app.api.leads.tags.leads" as const,
-    "app.api.leads.tags.batch" as const,
-  ],
+  tags: ["app.api.leads.tags.leads" as const, "app.api.leads.tags.batch" as const],
 
   fields: objectField(
     {
@@ -474,8 +436,7 @@ const { DELETE } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.leads.batch.delete.confirmDelete.label" as const,
-          description:
-            "app.api.leads.batch.delete.confirmDelete.description" as const,
+          description: "app.api.leads.batch.delete.confirmDelete.description" as const,
         },
         z.boolean().refine((val) => val === true, {
           message: "Delete confirmation required",
@@ -495,8 +456,7 @@ const { DELETE } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.leads.batch.delete.maxRecords.label" as const,
-          description:
-            "app.api.leads.batch.delete.maxRecords.description" as const,
+          description: "app.api.leads.batch.delete.maxRecords.description" as const,
         },
         z.coerce.number().min(1).max(10000).optional().default(1000),
       ),
@@ -505,8 +465,7 @@ const { DELETE } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.leads.batch.delete.response.title" as const,
-          description:
-            "app.api.leads.batch.delete.response.description" as const,
+          description: "app.api.leads.batch.delete.response.description" as const,
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -521,24 +480,21 @@ const { DELETE } = createEndpoint({
           totalMatched: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.leads.batch.delete.response.totalMatched" as const,
+              content: "app.api.leads.batch.delete.response.totalMatched" as const,
             },
             z.coerce.number(),
           ),
           totalProcessed: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.leads.batch.delete.response.totalProcessed" as const,
+              content: "app.api.leads.batch.delete.response.totalProcessed" as const,
             },
             z.coerce.number(),
           ),
           totalDeleted: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.leads.batch.delete.response.totalDeleted" as const,
+              content: "app.api.leads.batch.delete.response.totalDeleted" as const,
             },
             z.coerce.number(),
           ),
@@ -546,8 +502,7 @@ const { DELETE } = createEndpoint({
             {
               type: WidgetType.DATA_LIST,
               title: "app.api.leads.batch.delete.response.preview" as const,
-              description:
-                "app.api.leads.batch.delete.response.preview" as const,
+              description: "app.api.leads.batch.delete.response.preview" as const,
             },
             objectField(
               {
@@ -561,24 +516,21 @@ const { DELETE } = createEndpoint({
                 id: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.delete.response.preview" as const,
+                    content: "app.api.leads.batch.delete.response.preview" as const,
                   },
                   z.string(),
                 ),
                 email: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.delete.response.preview" as const,
+                    content: "app.api.leads.batch.delete.response.preview" as const,
                   },
                   z.string().nullable(),
                 ),
                 businessName: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.delete.response.preview" as const,
+                    content: "app.api.leads.batch.delete.response.preview" as const,
                   },
                   z.string(),
                 ),
@@ -603,8 +555,7 @@ const { DELETE } = createEndpoint({
             {
               type: WidgetType.DATA_LIST,
               title: "app.api.leads.batch.delete.response.errors" as const,
-              description:
-                "app.api.leads.batch.delete.response.errors" as const,
+              description: "app.api.leads.batch.delete.response.errors" as const,
             },
             objectField(
               {
@@ -618,16 +569,14 @@ const { DELETE } = createEndpoint({
                 leadId: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.delete.response.errors" as const,
+                    content: "app.api.leads.batch.delete.response.errors" as const,
                   },
                   z.string(),
                 ),
                 error: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.leads.batch.delete.response.errors" as const,
+                    content: "app.api.leads.batch.delete.response.errors" as const,
                   },
                   z.string(),
                 ),
@@ -642,48 +591,39 @@ const { DELETE } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.leads.batch.delete.errors.validation.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.validation.description" as const,
+      description: "app.api.leads.batch.delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.leads.batch.delete.errors.unauthorized.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.unauthorized.description" as const,
+      description: "app.api.leads.batch.delete.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.leads.batch.delete.errors.forbidden.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.forbidden.description" as const,
+      description: "app.api.leads.batch.delete.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.leads.batch.delete.errors.notFound.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.notFound.description" as const,
+      description: "app.api.leads.batch.delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.leads.batch.delete.errors.conflict.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.conflict.description" as const,
+      description: "app.api.leads.batch.delete.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.leads.batch.delete.errors.server.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.server.description" as const,
+      description: "app.api.leads.batch.delete.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.leads.batch.delete.errors.network.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.network.description" as const,
+      description: "app.api.leads.batch.delete.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.leads.batch.delete.errors.unknown.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.unknown.description" as const,
+      description: "app.api.leads.batch.delete.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.leads.batch.delete.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.unsavedChanges.description" as const,
+      description: "app.api.leads.batch.delete.errors.unsavedChanges.description" as const,
     },
   },
 

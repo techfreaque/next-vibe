@@ -47,8 +47,7 @@ export const translations: typeof enTranslations = {
       message: {
         label: "Wiadomość",
         description: "Szczegółowy opis Twojego zapytania",
-        placeholder:
-          "Proszę podać więcej szczegółów dotyczących Twoich potrzeb...",
+        placeholder: "Proszę podać więcej szczegółów dotyczących Twoich potrzeb...",
       },
       priority: {
         label: "Priorytet",
@@ -177,21 +176,17 @@ export const translations: typeof enTranslations = {
           "Brak skonfigurowanego numeru telefonu administratora dla powiadomień kontaktowych",
       },
       send: {
-        start:
-          "Wysyłanie SMS z powiadomieniem administratora o przesłaniu kontaktu",
-        error:
-          "Błąd wysyłania SMS z powiadomieniem administratora dla kontaktu",
+        start: "Wysyłanie SMS z powiadomieniem administratora o przesłaniu kontaktu",
+        error: "Błąd wysyłania SMS z powiadomieniem administratora dla kontaktu",
       },
     },
     confirmation: {
       message: "{name}, dziękujemy za wiadomość! Skontaktujemy się wkrótce.",
       phone: {
-        missing:
-          "Brak numeru telefonu użytkownika dla SMS z potwierdzeniem kontaktu",
+        missing: "Brak numeru telefonu użytkownika dla SMS z potwierdzeniem kontaktu",
       },
       send: {
-        start:
-          "Wysyłanie SMS z potwierdzeniem do osoby przesyłającej formularz",
+        start: "Wysyłanie SMS z potwierdzeniem do osoby przesyłającej formularz",
         error: "Błąd wysyłania SMS z potwierdzeniem dla kontaktu",
       },
     },
@@ -221,8 +216,7 @@ export const translations: typeof enTranslations = {
   route: {
     sms: {
       admin: {
-        failed:
-          "SMS z powiadomieniem administratora nie powiódł się dla przesłania kontaktu",
+        failed: "SMS z powiadomieniem administratora nie powiódł się dla przesłania kontaktu",
       },
       confirmation: {
         failed: "SMS z potwierdzeniem nie powiódł się dla przesłania kontaktu",
@@ -235,8 +229,7 @@ export const translations: typeof enTranslations = {
       start: "Rozpoczynanie seed-ów kontaktu dla środowiska deweloperskiego",
       submission: {
         created: "Przesłanie kontaktu utworzone w seed-ach deweloperskich",
-        failed:
-          "Nie udało się utworzyć przesłania kontaktu w seed-ach deweloperskich",
+        failed: "Nie udało się utworzyć przesłania kontaktu w seed-ach deweloperskich",
         error: "Błąd tworzenia przesłania kontaktu w seed-ach deweloperskich",
       },
       complete: "Seed-y deweloperskie kontaktu zakończone",
@@ -246,8 +239,7 @@ export const translations: typeof enTranslations = {
       start: "Rozpoczynanie seed-ów kontaktu dla środowiska testowego",
       submission: {
         created: "Przesłanie kontaktu utworzone w seed-ach testowych",
-        failed:
-          "Nie udało się utworzyć przesłania kontaktu w seed-ach testowych",
+        failed: "Nie udało się utworzyć przesłania kontaktu w seed-ach testowych",
       },
       error: "Błąd seed-owania danych testowych kontaktu",
     },
@@ -284,8 +276,7 @@ export const translations: typeof enTranslations = {
     user_confirmation: {
       title: "Otrzymaliśmy Twoją wiadomość!",
       subject: "Dziękujemy za kontakt z {{appName}}",
-      previewText:
-        "Otrzymaliśmy Twoją wiadomość i wkrótce się z Tobą skontaktujemy.",
+      previewText: "Otrzymaliśmy Twoją wiadomość i wkrótce się z Tobą skontaktujemy.",
       greeting: "Cześć {{name}},",
       thankYou: "Dziękujemy za skontaktowanie się z {{appName}}!",
       confirmation:
@@ -322,8 +313,7 @@ export const translations: typeof enTranslations = {
       leadId: "ID leada",
       status: "Status",
       actionRequired: "Wymagana akcja",
-      actionInfo:
-        "Proszę przejrzeć i odpowiedzieć na to zapytanie w ciągu 24 godzin.",
+      actionInfo: "Proszę przejrzeć i odpowiedzieć na to zapytanie w ciągu 24 godzin.",
       viewInAdmin: "Zobacz w panelu administracyjnym",
       replyToContact: "Odpowiedz na kontakt",
       footer: "To jest automatyczne powiadomienie z {{appName}}",

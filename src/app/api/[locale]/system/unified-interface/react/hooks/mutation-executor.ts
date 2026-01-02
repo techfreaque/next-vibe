@@ -1,11 +1,5 @@
-import type {
-  ErrorResponseType,
-  ResponseType,
-} from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-} from "next-vibe/shared/types/response.schema";
+import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
@@ -78,19 +72,13 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
   const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
   const isUndefinedSchema =
-    requestSchema.safeParse(undefined).success &&
-    !requestSchema.safeParse({}).success;
+    requestSchema.safeParse(undefined).success && !requestSchema.safeParse({}).success;
 
   const isEmptyObjectSchema =
-    requestSchema instanceof z.ZodObject &&
-    Object.keys(requestSchema.shape).length === 0;
+    requestSchema instanceof z.ZodObject && Object.keys(requestSchema.shape).length === 0;
 
   // Handle schema conversions
-  if (
-    isUndefinedSchema &&
-    typeof requestData === "object" &&
-    requestData !== null
-  ) {
+  if (isUndefinedSchema && typeof requestData === "object" && requestData !== null) {
     logger.debug(
       "Converting object to undefined for endpoint with undefinedSchema",
       endpoint.path.join("/"),
@@ -127,8 +115,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
         });
 
         const errorResponse = fail({
-          message:
-            "app.api.system.unifiedInterface.reactNative.errors.missingUrlParam",
+          message: "app.api.system.unifiedInterface.reactNative.errors.missingUrlParam",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { paramName, endpoint: endpoint.path.join("/") },
         });
@@ -178,9 +165,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
 
       // If callback returns an error, return it
       if (callbackResult) {
-        return callbackResult as ResponseType<
-          TEndpoint["types"]["ResponseOutput"]
-        >;
+        return callbackResult as ResponseType<TEndpoint["types"]["ResponseOutput"]>;
       }
     }
 
@@ -189,8 +174,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
     const parsedError = parseError(error);
 
     // Use endpoint's SERVER_ERROR error type if available
-    const serverErrorConfig =
-      endpoint.errorTypes?.[EndpointErrorTypes.SERVER_ERROR];
+    const serverErrorConfig = endpoint.errorTypes?.[EndpointErrorTypes.SERVER_ERROR];
     const { t } = endpoint.scopedTranslation.scopedT(locale);
     const errorMessage = t(serverErrorConfig?.description);
 

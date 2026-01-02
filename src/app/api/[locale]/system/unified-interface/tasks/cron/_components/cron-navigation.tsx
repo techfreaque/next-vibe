@@ -71,9 +71,7 @@ export function CronNavigation({
                     variant={isActive ? "default" : "outline"}
                     className={cn(
                       "h-auto p-4 flex flex-col items-start gap-2 w-full",
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-accent",
+                      isActive ? "bg-primary text-primary-foreground" : "hover:bg-accent",
                     )}
                   >
                     <Div className="flex items-center flex flex-row gap-2 w-full">
@@ -85,9 +83,7 @@ export function CronNavigation({
                         </Badge>
                       )}
                     </Div>
-                    <P className="text-sm text-left opacity-80">
-                      {item.description}
-                    </P>
+                    <P className="text-sm text-left opacity-80">{item.description}</P>
                   </Button>
                 </Link>
               );

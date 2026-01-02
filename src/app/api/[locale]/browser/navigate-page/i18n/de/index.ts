@@ -5,13 +5,11 @@ export const translations: typeof enTranslations = {
   description: "Die aktuell ausgewählte Seite navigieren",
   form: {
     label: "Seite navigieren",
-    description:
-      "Die aktuell ausgewählte Seite zu einer URL oder durch die Historie navigieren",
+    description: "Die aktuell ausgewählte Seite zu einer URL oder durch die Historie navigieren",
     fields: {
       type: {
         label: "Navigationstyp",
-        description:
-          "Navigieren nach URL, zurück oder vorwärts in der Historie, oder neu laden",
+        description: "Navigieren nach URL, zurück oder vorwärts in der Historie, oder neu laden",
         placeholder: "Navigationstyp auswählen",
         options: {
           url: "URL",
@@ -46,8 +44,7 @@ export const translations: typeof enTranslations = {
   errors: {
     validation: {
       title: "Validierungsfehler",
-      description:
-        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
     },
     network: {
       title: "Netzwerkfehler",
@@ -67,18 +64,15 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Serverfehler",
-      description:
-        "Ein interner Serverfehler ist während der Navigation aufgetreten",
+      description: "Ein interner Serverfehler ist während der Navigation aufgetreten",
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description:
-        "Ein unbekannter Fehler ist während der Navigation aufgetreten",
+      description: "Ein unbekannter Fehler ist während der Navigation aufgetreten",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description:
-        "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
+      description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
     },
     conflict: {
       title: "Konflikt",

@@ -22,9 +22,7 @@ export interface ProcessedEmptyState {
 /**
  * Extract and validate empty state data from WidgetData
  */
-export function extractEmptyStateData(
-  value: WidgetData,
-): ProcessedEmptyState | null {
+export function extractEmptyStateData(value: WidgetData): ProcessedEmptyState | null {
   // Handle string value directly (simple message)
   if (typeof value === "string") {
     return {
@@ -34,30 +32,21 @@ export function extractEmptyStateData(
 
   // Handle object value with empty state properties
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const title =
-      "title" in value && typeof value.title === "string"
-        ? value.title
-        : "No data";
+    const title = "title" in value && typeof value.title === "string" ? value.title : "No data";
     const description =
       "description" in value && typeof value.description === "string"
         ? value.description
         : undefined;
-    const icon =
-      "icon" in value && typeof value.icon === "string"
-        ? value.icon
-        : undefined;
+    const icon = "icon" in value && typeof value.icon === "string" ? value.icon : undefined;
     const action =
-      "action" in value &&
-      typeof value.action === "object" &&
-      value.action !== null
+      "action" in value && typeof value.action === "object" && value.action !== null
         ? {
             label:
               "label" in value.action && typeof value.action.label === "string"
                 ? value.action.label
                 : "Action",
             action:
-              "action" in value.action &&
-              typeof value.action.action === "string"
+              "action" in value.action && typeof value.action.action === "string"
                 ? value.action.action
                 : "",
           }

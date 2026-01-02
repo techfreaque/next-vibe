@@ -79,8 +79,7 @@ export const translations = {
           title: "Unknown Error",
           description: "An unexpected error occurred",
         },
-        dependenciesMissing:
-          "Required dependencies not available: {missing}. {recommendations}",
+        dependenciesMissing: "Required dependencies not available: {missing}. {recommendations}",
         invalidAction: "Invalid action: {action}",
         actionFailed: "Failed to perform action: {error}",
         alreadyRecording: "Recording already in progress",

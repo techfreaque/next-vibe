@@ -31,11 +31,7 @@ function formatCount(count: number): string {
   return count.toString();
 }
 
-const Hero = ({
-  locale,
-  activeUserCount,
-  totalConversations,
-}: HeroProps): JSX.Element => {
+const Hero = ({ locale, activeUserCount, totalConversations }: HeroProps): JSX.Element => {
   const { t } = simpleT(locale);
 
   const formattedUsers = formatCount(activeUserCount);
@@ -70,11 +66,7 @@ const Hero = ({
 
           {/* CTA buttons */}
           <Div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button
-              size="lg"
-              className="text-base h-12 px-8 w-full sm:w-auto"
-              asChild
-            >
+            <Button size="lg" className="text-base h-12 px-8 w-full sm:w-auto" asChild>
               <Link href={`/${locale}`}>
                 <MessageSquare className="mr-2 h-5 w-5" />
                 {t("app.story._components.home.hero.cta")}

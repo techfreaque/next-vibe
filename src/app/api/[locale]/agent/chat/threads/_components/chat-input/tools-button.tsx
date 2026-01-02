@@ -21,10 +21,7 @@ interface ToolsButtonProps {
  * Tools Button Component
  * Shows the number of active tools and opens the tool selector modal
  */
-export function ToolsButton({
-  disabled = false,
-  locale,
-}: ToolsButtonProps): JSX.Element {
+export function ToolsButton({ disabled = false, locale }: ToolsButtonProps): JSX.Element {
   const { enabledTools, openToolsModal: onOpenToolsModal } = useChatContext();
   const activeToolCount = enabledTools.length;
   const { t } = simpleT(locale);
@@ -43,9 +40,7 @@ export function ToolsButton({
       title={t("app.chat.toolsButton.title")}
     >
       <Wrench className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
-      <Span className="hidden @2xl:inline text-xs">
-        {t("app.chat.toolsButton.tools")}
-      </Span>
+      <Span className="hidden @2xl:inline text-xs">{t("app.chat.toolsButton.tools")}</Span>
       {activeToolCount > 0 && (
         <Badge
           variant="default"

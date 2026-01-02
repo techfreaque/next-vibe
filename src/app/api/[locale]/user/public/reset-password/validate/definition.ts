@@ -28,8 +28,7 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["user", "public", "reset-password", "validate"],
   title: "app.api.user.public.resetPassword.validate.title" as const,
-  description:
-    "app.api.user.public.resetPassword.validate.description" as const,
+  description: "app.api.user.public.resetPassword.validate.description" as const,
   icon: "shield",
   category: "app.api.user.category" as const,
   tags: ["app.api.user.public.resetPassword.validate.tag" as const],
@@ -38,8 +37,7 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.user.public.resetPassword.validate.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.description" as const,
+      description: "app.api.user.public.resetPassword.validate.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -49,8 +47,7 @@ const { GET } = createEndpoint({
       tokenInput: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.public.resetPassword.validate.groups.tokenInput.title" as const,
+          title: "app.api.user.public.resetPassword.validate.groups.tokenInput.title" as const,
           description:
             "app.api.user.public.resetPassword.validate.groups.tokenInput.description" as const,
           layoutType: LayoutType.GRID,
@@ -62,15 +59,13 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.user.public.resetPassword.validate.fields.token.label" as const,
+              label: "app.api.user.public.resetPassword.validate.fields.token.label" as const,
               description:
                 "app.api.user.public.resetPassword.validate.fields.token.description" as const,
               placeholder:
                 "app.api.user.public.resetPassword.validate.fields.token.placeholder" as const,
               columns: 12,
-              helpText:
-                "app.api.user.public.resetPassword.validate.fields.token.help" as const,
+              helpText: "app.api.user.public.resetPassword.validate.fields.token.help" as const,
             },
             z.string().min(1, {
               message:
@@ -84,10 +79,8 @@ const { GET } = createEndpoint({
       response: objectField(
         {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.public.resetPassword.validate.response.title" as const,
-          description:
-            "app.api.user.public.resetPassword.validate.response.description" as const,
+          title: "app.api.user.public.resetPassword.validate.response.title" as const,
+          description: "app.api.user.public.resetPassword.validate.response.description" as const,
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -96,32 +89,28 @@ const { GET } = createEndpoint({
           valid: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.resetPassword.validate.response.valid" as const,
+              content: "app.api.user.public.resetPassword.validate.response.valid" as const,
             },
             z.boolean(),
           ),
           message: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.resetPassword.validate.response.message" as const,
+              content: "app.api.user.public.resetPassword.validate.response.message" as const,
             },
             z.string(),
           ),
           userId: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.resetPassword.validate.response.userId" as const,
+              content: "app.api.user.public.resetPassword.validate.response.userId" as const,
             },
             z.uuid().optional(),
           ),
           expiresAt: responseField(
             {
               type: WidgetType.TEXT,
-              content:
-                "app.api.user.public.resetPassword.validate.response.expiresAt" as const,
+              content: "app.api.user.public.resetPassword.validate.response.expiresAt" as const,
             },
             z.string().optional(),
           ),
@@ -141,56 +130,44 @@ const { GET } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.validation.title" as const,
+      title: "app.api.user.public.resetPassword.validate.errors.validation.title" as const,
       description:
         "app.api.user.public.resetPassword.validate.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.unauthorized.title" as const,
+      title: "app.api.user.public.resetPassword.validate.errors.unauthorized.title" as const,
       description:
         "app.api.user.public.resetPassword.validate.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.internal.title" as const,
+      title: "app.api.user.public.resetPassword.validate.errors.internal.title" as const,
       description:
         "app.api.user.public.resetPassword.validate.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.unknown.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.errors.unknown.description" as const,
+      title: "app.api.user.public.resetPassword.validate.errors.unknown.title" as const,
+      description: "app.api.user.public.resetPassword.validate.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.network.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.errors.network.description" as const,
+      title: "app.api.user.public.resetPassword.validate.errors.network.title" as const,
+      description: "app.api.user.public.resetPassword.validate.errors.network.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.forbidden.title" as const,
+      title: "app.api.user.public.resetPassword.validate.errors.forbidden.title" as const,
       description:
         "app.api.user.public.resetPassword.validate.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.notFound.title" as const,
+      title: "app.api.user.public.resetPassword.validate.errors.notFound.title" as const,
       description:
         "app.api.user.public.resetPassword.validate.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.unsaved.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.errors.unsaved.description" as const,
+      title: "app.api.user.public.resetPassword.validate.errors.unsaved.title" as const,
+      description: "app.api.user.public.resetPassword.validate.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.conflict.title" as const,
+      title: "app.api.user.public.resetPassword.validate.errors.conflict.title" as const,
       description:
         "app.api.user.public.resetPassword.validate.errors.conflict.description" as const,
     },
@@ -199,8 +176,7 @@ const { GET } = createEndpoint({
   // === SUCCESS HANDLING ===
   successTypes: {
     title: "app.api.user.public.resetPassword.validate.success.title" as const,
-    description:
-      "app.api.user.public.resetPassword.validate.success.description" as const,
+    description: "app.api.user.public.resetPassword.validate.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -230,10 +206,7 @@ const { GET } = createEndpoint({
           message: "Reset token is valid and ready to use",
           userId: "123e4567-e89b-12d3-a456-426614174000",
           expiresAt: "15 minutes from now",
-          nextSteps: [
-            "Proceed to set your new password",
-            "Choose a strong, unique password",
-          ],
+          nextSteps: ["Proceed to set your new password", "Choose a strong, unique password"],
         },
       },
       invalidToken: {
@@ -275,11 +248,7 @@ export const resetPasswordValidateEndpoint = resetPasswordValidateEndpoints;
 export default resetPasswordValidateEndpoints;
 
 // Export types as required by migration guide
-export type ResetPasswordValidateGetRequestInput =
-  typeof GET.types.RequestInput;
-export type ResetPasswordValidateGetRequestOutput =
-  typeof GET.types.RequestOutput;
-export type ResetPasswordValidateGetResponseInput =
-  typeof GET.types.ResponseInput;
-export type ResetPasswordValidateGetResponseOutput =
-  typeof GET.types.ResponseOutput;
+export type ResetPasswordValidateGetRequestInput = typeof GET.types.RequestInput;
+export type ResetPasswordValidateGetRequestOutput = typeof GET.types.RequestOutput;
+export type ResetPasswordValidateGetResponseInput = typeof GET.types.ResponseInput;
+export type ResetPasswordValidateGetResponseOutput = typeof GET.types.ResponseOutput;

@@ -23,9 +23,7 @@ import { endpointHandler } from "./single";
  * Base constraint for endpoint definitions
  * All endpoint objects must be a partial record of Methods to CreateApiEndpoint
  */
-export type EndpointDefinitionsConstraint = Partial<
-  Record<Methods, CreateApiEndpointAny>
->;
+export type EndpointDefinitionsConstraint = Partial<Record<Methods, CreateApiEndpointAny>>;
 
 /**
  * Type-safe configuration that enforces handler types match endpoint types
@@ -80,10 +78,7 @@ type EndpointsHandlerReturn<T extends EndpointDefinitionsConstraint> = {
         },
       ) => Promise<
         | NextResponse<
-            | ResponseType<T[K]["types"]["ResponseOutput"]>
-            | Buffer
-            | ReadableStream
-            | Blob
+            ResponseType<T[K]["types"]["ResponseOutput"]> | Buffer | ReadableStream | Blob
           >
         | Response
       >
@@ -150,12 +145,8 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
+        email: methodConfig.email ? { afterHandlerEmails: methodConfig.email } : undefined,
+        sms: methodConfig.sms ? { afterHandlerSms: methodConfig.sms } : undefined,
       });
       result[Methods.GET] = handler[Methods.GET];
       result.tools[Methods.GET] = handler.tools[Methods.GET];
@@ -170,12 +161,8 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
+        email: methodConfig.email ? { afterHandlerEmails: methodConfig.email } : undefined,
+        sms: methodConfig.sms ? { afterHandlerSms: methodConfig.sms } : undefined,
       });
       result[Methods.POST] = handler[Methods.POST];
       result.tools[Methods.POST] = handler.tools[Methods.POST];
@@ -190,12 +177,8 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
+        email: methodConfig.email ? { afterHandlerEmails: methodConfig.email } : undefined,
+        sms: methodConfig.sms ? { afterHandlerSms: methodConfig.sms } : undefined,
       });
       result[Methods.PUT] = handler[Methods.PUT];
       result.tools[Methods.PUT] = handler.tools[Methods.PUT];
@@ -210,12 +193,8 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
+        email: methodConfig.email ? { afterHandlerEmails: methodConfig.email } : undefined,
+        sms: methodConfig.sms ? { afterHandlerSms: methodConfig.sms } : undefined,
       });
       result[Methods.PATCH] = handler[Methods.PATCH];
       result.tools[Methods.PATCH] = handler.tools[Methods.PATCH];
@@ -230,12 +209,8 @@ export function endpointsHandler<const T extends EndpointDefinitionsConstraint>(
       const handler = endpointHandler({
         endpoint,
         handler: methodConfig.handler,
-        email: methodConfig.email
-          ? { afterHandlerEmails: methodConfig.email }
-          : undefined,
-        sms: methodConfig.sms
-          ? { afterHandlerSms: methodConfig.sms }
-          : undefined,
+        email: methodConfig.email ? { afterHandlerEmails: methodConfig.email } : undefined,
+        sms: methodConfig.sms ? { afterHandlerSms: methodConfig.sms } : undefined,
       });
       result[Methods.DELETE] = handler[Methods.DELETE];
       result.tools[Methods.DELETE] = handler.tools[Methods.DELETE];

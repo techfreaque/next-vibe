@@ -8,11 +8,7 @@ import "server-only";
 import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -22,11 +18,7 @@ import {
   formatGenerator,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
-import {
-  findFilesRecursively,
-  generateFileHeader,
-  writeGeneratedFile,
-} from "../shared/utils";
+import { findFilesRecursively, generateFileHeader, writeGeneratedFile } from "../shared/utils";
 
 // Type definitions
 interface EmailTemplateRequestType {
@@ -64,9 +56,7 @@ interface EmailTemplateGeneratorRepository {
 /**
  * Email Template Generator Repository Implementation
  */
-class EmailTemplateGeneratorRepositoryImpl
-  implements EmailTemplateGeneratorRepository
-{
+class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepository {
   async generateEmailTemplates(
     data: EmailTemplateRequestType,
     logger: EndpointLogger,
@@ -86,10 +76,7 @@ class EmailTemplateGeneratorRepositoryImpl
 
       // Find both email.tsx and *.email.tsx files recursively
       const emailTsxFiles = findFilesRecursively(startDir, "email.tsx");
-      const emailDotTsxFiles = findFilesRecursively(
-        startDir,
-        ".email.tsx",
-      ).filter(
+      const emailDotTsxFiles = findFilesRecursively(startDir, ".email.tsx").filter(
         (file) => !file.endsWith("/email.tsx"), // Exclude already found email.tsx
       );
 
@@ -150,8 +137,7 @@ class EmailTemplateGeneratorRepositoryImpl
       });
 
       return fail({
-        message:
-          "app.api.system.generators.emailTemplates.post.errors.server.title",
+        message: "app.api.system.generators.emailTemplates.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           duration,
@@ -217,9 +203,7 @@ class EmailTemplateGeneratorRepositoryImpl
    */
   private generateServerContent(templates: TemplateInfo[]): string {
     // Sort templates by ID for consistent output
-    const sortedTemplates = templates.toSorted((a, b) =>
-      a.id.localeCompare(b.id),
-    );
+    const sortedTemplates = templates.toSorted((a, b) => a.id.localeCompare(b.id));
 
     // Generate individual imports for each template (not type imports - we need the value)
     const importStatements = sortedTemplates
@@ -358,9 +342,7 @@ export function hasTemplate(id: string): boolean {
    */
   private generateClientContent(templates: TemplateInfo[]): string {
     // Sort templates by ID for consistent output
-    const sortedTemplates = templates.toSorted((a, b) =>
-      a.id.localeCompare(b.id),
-    );
+    const sortedTemplates = templates.toSorted((a, b) => a.id.localeCompare(b.id));
 
     // Generate metadata map (same as server version)
     const metadataEntries = sortedTemplates
@@ -428,5 +410,4 @@ export function getTemplatesByCategory(
   }
 }
 
-export const emailTemplateGeneratorRepository =
-  new EmailTemplateGeneratorRepositoryImpl();
+export const emailTemplateGeneratorRepository = new EmailTemplateGeneratorRepositoryImpl();

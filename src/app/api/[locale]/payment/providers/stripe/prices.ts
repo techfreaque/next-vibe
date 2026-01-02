@@ -6,11 +6,7 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type Stripe from "stripe";
 
@@ -52,11 +48,7 @@ export class StripePriceManager {
   ): Promise<ResponseType<StripePriceResult>> {
     try {
       // Get product definition from code with correct interval
-      const product = productsRepository.getProduct(
-        productId,
-        locale,
-        interval,
-      );
+      const product = productsRepository.getProduct(productId, locale, interval);
 
       const { t } = simpleT(locale);
 
@@ -130,8 +122,7 @@ export class StripePriceManager {
         interval,
       });
       return fail({
-        message:
-          "app.api.payment.providers.stripe.errors.priceCreationFailed.title",
+        message: "app.api.payment.providers.stripe.errors.priceCreationFailed.title",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message, productId },
       });

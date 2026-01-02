@@ -20,12 +20,9 @@ export const translations: typeof enTranslations = {
     sideTasksLimitDescription: "Maksymalna liczba wyników do zwrócenia",
     sideTasksDataLabel: "Dane zadania",
     sideTasksDataDescription: "Dodatkowe dane dla zadania",
-    sideTasksRepositoryFetchAllFailed:
-      "Nie udało się pobrać wszystkich zadań pobocznych",
-    sideTasksRepositoryFetchByIdFailed:
-      "Nie udało się pobrać zadania pobocznego według ID",
-    sideTasksRepositoryCreateFailed:
-      "Nie udało się utworzyć zadania pobocznego",
+    sideTasksRepositoryFetchAllFailed: "Nie udało się pobrać wszystkich zadań pobocznych",
+    sideTasksRepositoryFetchByIdFailed: "Nie udało się pobrać zadania pobocznego według ID",
+    sideTasksRepositoryCreateFailed: "Nie udało się utworzyć zadania pobocznego",
   },
   post: {
     title: "Zarządzanie zadaniami pobocznymi",
@@ -126,19 +123,13 @@ export const translations: typeof enTranslations = {
     fetchByNameFailed: "Nie udało się pobrać zadania pobocznego według nazwy",
     updateTaskFailed: "Nie udało się zaktualizować zadania pobocznego",
     deleteTaskFailed: "Nie udało się usunąć zadania pobocznego",
-    createExecutionFailed:
-      "Nie udało się utworzyć wykonania zadania pobocznego",
-    updateExecutionFailed:
-      "Nie udało się zaktualizować wykonania zadania pobocznego",
+    createExecutionFailed: "Nie udało się utworzyć wykonania zadania pobocznego",
+    updateExecutionFailed: "Nie udało się zaktualizować wykonania zadania pobocznego",
     fetchExecutionsFailed: "Nie udało się pobrać wykonań zadań pobocznych",
-    fetchRecentExecutionsFailed:
-      "Nie udało się pobrać ostatnich wykonań zadań pobocznych",
-    createHealthCheckFailed:
-      "Nie udało się utworzyć sprawdzenia zdrowia zadania pobocznego",
-    fetchLatestHealthCheckFailed:
-      "Nie udało się pobrać ostatniego sprawdzenia zdrowia",
-    fetchHealthCheckHistoryFailed:
-      "Nie udało się pobrać historii sprawdzeń zdrowia",
+    fetchRecentExecutionsFailed: "Nie udało się pobrać ostatnich wykonań zadań pobocznych",
+    createHealthCheckFailed: "Nie udało się utworzyć sprawdzenia zdrowia zadania pobocznego",
+    fetchLatestHealthCheckFailed: "Nie udało się pobrać ostatniego sprawdzenia zdrowia",
+    fetchHealthCheckHistoryFailed: "Nie udało się pobrać historii sprawdzeń zdrowia",
     fetchStatisticsFailed: "Nie udało się pobrać statystyk zadań pobocznych",
     taskNotFound: "Zadanie poboczne nie zostało znalezione",
     executionNotFound: "Wykonanie zadania pobocznego nie zostało znalezione",

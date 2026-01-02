@@ -23,8 +23,7 @@ export const translations: typeof enTranslations = {
       },
       force: {
         label: "Erzwungene Ausführung",
-        description:
-          "Ausführung erzwingen, auch wenn Aufgaben nicht fällig sind",
+        description: "Ausführung erzwingen, auch wenn Aufgaben nicht fällig sind",
       },
       success: {
         title: "Erfolg",

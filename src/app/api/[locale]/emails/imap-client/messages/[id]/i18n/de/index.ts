@@ -28,18 +28,15 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nachricht nicht gefunden",
-        description:
-          "Die angeforderte IMAP-Nachricht konnte nicht gefunden werden",
+        description: "Die angeforderte IMAP-Nachricht konnte nicht gefunden werden",
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Authentifizierung erforderlich für den Zugriff auf IMAP-Nachrichten",
+        description: "Authentifizierung erforderlich für den Zugriff auf IMAP-Nachrichten",
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, auf diese IMAP-Nachricht zuzugreifen",
+        description: "Sie haben keine Berechtigung, auf diese IMAP-Nachricht zuzugreifen",
       },
       server: {
         title: "Serverfehler",
@@ -59,8 +56,7 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Ungespeicherte Änderungen",
-        description:
-          "Es gibt ungespeicherte Änderungen, die zuerst gespeichert werden müssen",
+        description: "Es gibt ungespeicherte Änderungen, die zuerst gespeichert werden müssen",
       },
     },
     success: {
@@ -72,16 +68,14 @@ export const translations: typeof enTranslations = {
   // PATCH endpoint translations
   patch: {
     title: "IMAP-Nachricht aktualisieren",
-    description:
-      "IMAP-Nachrichteneigenschaften aktualisieren (Gelesen-Status, Markierungen, etc.)",
+    description: "IMAP-Nachrichteneigenschaften aktualisieren (Gelesen-Status, Markierungen, etc.)",
     container: {
       title: "Nachricht aktualisieren",
       description: "IMAP-Nachrichteneigenschaften ändern",
     },
     id: {
       label: "Nachrichten-ID",
-      description:
-        "Eindeutige Kennung für die zu aktualisierende IMAP-Nachricht",
+      description: "Eindeutige Kennung für die zu aktualisierende IMAP-Nachricht",
       placeholder: "Nachrichten-UUID eingeben",
     },
     isRead: {
@@ -108,18 +102,15 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nachricht nicht gefunden",
-        description:
-          "Die zu aktualisierende IMAP-Nachricht konnte nicht gefunden werden",
+        description: "Die zu aktualisierende IMAP-Nachricht konnte nicht gefunden werden",
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Authentifizierung erforderlich zum Aktualisieren von IMAP-Nachrichten",
+        description: "Authentifizierung erforderlich zum Aktualisieren von IMAP-Nachrichten",
       },
       forbidden: {
         title: "Verboten",
-        description:
-          "Sie haben keine Berechtigung, diese IMAP-Nachricht zu aktualisieren",
+        description: "Sie haben keine Berechtigung, diese IMAP-Nachricht zu aktualisieren",
       },
       server: {
         title: "Serverfehler",
@@ -131,8 +122,7 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konfliktfehler",
-        description:
-          "Nachrichtenaktualisierung steht im Konflikt mit vorhandenen Daten",
+        description: "Nachrichtenaktualisierung steht im Konflikt mit vorhandenen Daten",
       },
       network: {
         title: "Netzwerkfehler",
@@ -140,8 +130,7 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Ungespeicherte Änderungen",
-        description:
-          "Es gibt ungespeicherte Änderungen, die zuerst gespeichert werden müssen",
+        description: "Es gibt ungespeicherte Änderungen, die zuerst gespeichert werden müssen",
       },
     },
     success: {

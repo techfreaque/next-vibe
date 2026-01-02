@@ -43,9 +43,7 @@ const locale = defaultLocale;
 
 program
   .name("launchpad")
-  .description(
-    "Tool for managing and orchestrating multiple packages in a monorepo",
-  )
+  .description("Tool for managing and orchestrating multiple packages in a monorepo")
   .version("1.0.0");
 
 // Legacy interactive mode (default behavior)
@@ -63,10 +61,7 @@ program
   .command("ci-release")
   .description("CI release mode - release package based on git tag")
   .option("-t, --target <directory>", "Target directory to release")
-  .option(
-    "--tag <tag>",
-    "Git tag to determine target (overrides auto-detection)",
-  )
+  .option("--tag <tag>", "Git tag to determine target (overrides auto-detection)")
   .action(async (options: CIReleaseOptions) => {
     const logger = createEndpointLogger(false, Date.now(), defaultLocale);
     try {
@@ -106,10 +101,7 @@ program
 program
   .command("force-release")
   .description("Force release all packages with version bump")
-  .option(
-    "-v, --version-bump <type>",
-    "Version bump type (patch|minor|major|init)",
-  )
+  .option("-v, --version-bump <type>", "Version bump type (patch|minor|major|init)")
   .action(async (options: ForceReleaseOptions) => {
     const logger = createEndpointLogger(false, Date.now(), defaultLocale);
     try {

@@ -16,7 +16,5 @@ export function applyStyleType<
   style?: ViewStyle | TextStyle | ImageStyle;
   className?: string;
 } {
-  return props.className
-    ? { className: props.className }
-    : { style: props.nativeStyle };
+  return props.className ? { className: props.className } : { style: props.nativeStyle };
 }

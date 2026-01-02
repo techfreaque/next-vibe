@@ -2,8 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Interaktiver API-Explorer",
-  description:
-    "Durchsuchen und testen Sie alle Endpunktdefinitionen interaktiv",
+  description: "Durchsuchen und testen Sie alle Endpunktdefinitionen interaktiv",
   grouping: {
     category: "Kategorie",
     tags: "Tags",

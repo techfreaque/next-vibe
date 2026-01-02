@@ -37,12 +37,10 @@ export const translations = {
       defaultMessage: "An error occurred while rendering this widget",
     },
     formField: {
-      requiresContext:
-        "Form field requires form context and field configuration",
+      requiresContext: "Form field requires form context and field configuration",
     },
     filterPills: {
-      requiresContext:
-        "Filter pills widget requires form context and field name",
+      requiresContext: "Filter pills widget requires form context and field name",
     },
     toolCall: {
       status: {
@@ -60,10 +58,8 @@ export const translations = {
         errorLabel: "Error:",
         noArguments: "No arguments",
         noResult: "No result",
-        metadataNotAvailable:
-          "Widget metadata not available. Showing raw result.",
-        confirmationRequired:
-          "Review and edit parameters, then confirm to execute.",
+        metadataNotAvailable: "Widget metadata not available. Showing raw result.",
+        confirmationRequired: "Review and edit parameters, then confirm to execute.",
       },
       actions: {
         confirm: "Confirm",

@@ -115,11 +115,7 @@ function getTypeColor(value: ToolCallResult): string {
 /**
  * Render a single field
  */
-function renderField(
-  key: string,
-  value: ToolCallResult,
-  depth = 0,
-): JSX.Element {
+function renderField(key: string, value: ToolCallResult, depth = 0): JSX.Element {
   const isComplex = typeof value === "object" && value !== null;
   const indent = depth * 16; // 16px per level
 
@@ -133,15 +129,11 @@ function renderField(
           </Span>
 
           {/* Field Label */}
-          <Span className="text-sm font-medium text-foreground min-w-[100px]">
-            {key}:
-          </Span>
+          <Span className="text-sm font-medium text-foreground min-w-[100px]">{key}:</Span>
 
           {/* Field Value */}
           {!isComplex ? (
-            <Span className="text-sm text-muted-foreground flex-1">
-              {formatValue(value)}
-            </Span>
+            <Span className="text-sm text-muted-foreground flex-1">{formatValue(value)}</Span>
           ) : null}
         </Div>
 
@@ -150,9 +142,7 @@ function renderField(
           <Div className="flex flex-col gap-1">
             {Array.isArray(value)
               ? // Render array items
-                value.map((item, index) =>
-                  renderField(`[${index}]`, item, depth + 1),
-                )
+                value.map((item, index) => renderField(`[${index}]`, item, depth + 1))
               : // Render object fields
                 Object.entries(value).map(([nestedKey, nestedValue]) =>
                   renderField(nestedKey, nestedValue, depth + 1),
@@ -168,19 +158,14 @@ function renderField(
  * Request Fields Renderer Component
  * Renders tool arguments as read-only display
  */
-export function RequestFieldsRenderer({
-  args,
-  locale,
-}: RequestFieldsRendererProps): JSX.Element {
+export function RequestFieldsRenderer({ args, locale }: RequestFieldsRendererProps): JSX.Element {
   const { t } = simpleT(locale);
 
   // Handle empty args
   if (!args || typeof args !== "object" || Object.keys(args).length === 0) {
     return (
       <Div className="text-sm text-muted-foreground italic py-2">
-        {t(
-          "app.api.system.unifiedInterface.react.widgets.toolCall.messages.noArguments",
-        )}
+        {t("app.api.system.unifiedInterface.react.widgets.toolCall.messages.noArguments")}
       </Div>
     );
   }

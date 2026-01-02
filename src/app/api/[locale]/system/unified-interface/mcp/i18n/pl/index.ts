@@ -8,8 +8,7 @@ export const translations: typeof enTranslations = {
     },
     get: {
       title: "Lista narzędzi MCP",
-      description:
-        "Pobierz wszystkie dostępne narzędzia MCP dla bieżącego użytkownika",
+      description: "Pobierz wszystkie dostępne narzędzia MCP dla bieżącego użytkownika",
       fields: {
         name: "Nazwa narzędzia",
         description: "Opis",

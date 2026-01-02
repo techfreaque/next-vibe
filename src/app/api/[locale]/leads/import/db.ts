@@ -4,15 +4,7 @@
  */
 
 import { relations } from "drizzle-orm";
-import {
-  boolean,
-  integer,
-  jsonb,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { boolean, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
@@ -45,9 +37,7 @@ export const csvImportJobs = pgTable("csv_import_jobs", {
   updateExisting: boolean("update_existing").notNull().default(false),
   defaultCountry: text("default_country", { enum: CountriesArr }).notNull(),
   defaultLanguage: text("default_language", { enum: LanguagesArr }).notNull(),
-  defaultStatus: text("default_status", { enum: LeadStatusDB })
-    .notNull()
-    .default(LeadStatus.NEW),
+  defaultStatus: text("default_status", { enum: LeadStatusDB }).notNull().default(LeadStatus.NEW),
   defaultCampaignStage: text("default_campaign_stage", {
     enum: EmailCampaignStageDB,
   })

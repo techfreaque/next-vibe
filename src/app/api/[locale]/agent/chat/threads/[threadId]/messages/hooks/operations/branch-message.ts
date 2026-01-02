@@ -9,7 +9,6 @@ import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai
 import type { DefaultFolderId } from "../../../../../config";
 import type { ChatMessage } from "../../../../../db";
 import type { ModelId } from "../../../../../model-access/models";
-
 import { createAndSendUserMessage } from "./shared";
 
 export interface BranchMessageDeps {

@@ -14,8 +14,7 @@ export const translations = {
       },
       autoStop: {
         label: "Auto Stop",
-        description:
-          "Determines if the trace recording should be automatically stopped",
+        description: "Determines if the trace recording should be automatically stopped",
         placeholder: "true",
       },
     },
@@ -33,8 +32,7 @@ export const translations = {
     },
     network: {
       title: "Network Error",
-      description:
-        "A network error occurred while starting the performance trace",
+      description: "A network error occurred while starting the performance trace",
     },
     unauthorized: {
       title: "Unauthorized",
@@ -50,13 +48,11 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description:
-        "An internal server error occurred while starting the performance trace",
+      description: "An internal server error occurred while starting the performance trace",
     },
     unknown: {
       title: "Unknown Error",
-      description:
-        "An unknown error occurred while starting the performance trace",
+      description: "An unknown error occurred while starting the performance trace",
     },
     unsavedChanges: {
       title: "Unsaved Changes",

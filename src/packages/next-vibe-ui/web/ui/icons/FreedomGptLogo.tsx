@@ -5,11 +5,7 @@ import type { JSX } from "react";
  * Original SVG converted to React component with currentColor for dark/light mode support
  */
 
-export function FreedomGptLogo({
-  className,
-}: {
-  className?: string;
-}): JSX.Element {
+export function FreedomGptLogo({ className }: { className?: string }): JSX.Element {
   return (
     <svg
       width="48"

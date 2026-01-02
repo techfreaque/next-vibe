@@ -39,10 +39,7 @@ export function executorReturn(): Promise<number> {
 
 // unicorn/no-await-in-promise-methods - Await in Promise.all
 export async function awaitInPromiseAll(): Promise<string[]> {
-  const results = await Promise.all([
-    await Promise.resolve("a"),
-    await Promise.resolve("b"),
-  ]);
+  const results = await Promise.all([await Promise.resolve("a"), await Promise.resolve("b")]);
   return results;
 }
 

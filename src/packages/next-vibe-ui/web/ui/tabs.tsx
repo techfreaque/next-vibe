@@ -27,11 +27,7 @@ export type TabsListProps = {
   children?: React.ReactNode;
 } & StyleType;
 
-export function TabsList({
-  className,
-  children,
-  ...props
-}: TabsListProps): React.JSX.Element {
+export function TabsList({ className, children, ...props }: TabsListProps): React.JSX.Element {
   return (
     <TabsPrimitive.List
       className={cn(

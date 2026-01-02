@@ -140,8 +140,7 @@ export const translations = {
       },
       requiresConfirmation: {
         label: "Requires Confirmation",
-        description:
-          "Whether this tool requires user confirmation before execution",
+        description: "Whether this tool requires user confirmation before execution",
       },
     },
     enabledToolIds: {

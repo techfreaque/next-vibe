@@ -59,10 +59,7 @@ export class LinuxWaylandRecorder extends BaseRecorder {
   }
 
   protected override handleStderrLine(line: string): void {
-    if (
-      line.toLowerCase().includes("error") ||
-      line.toLowerCase().includes("failed")
-    ) {
+    if (line.toLowerCase().includes("error") || line.toLowerCase().includes("failed")) {
       // Error will be handled by the session/repository logger
       // Storing for potential error reporting
     }
@@ -125,10 +122,7 @@ export class LinuxWaylandFfmpegRecorder extends BaseRecorder {
   }
 
   protected override handleStderrLine(line: string): void {
-    if (
-      line.toLowerCase().includes("error") ||
-      line.toLowerCase().includes("fatal")
-    ) {
+    if (line.toLowerCase().includes("error") || line.toLowerCase().includes("fatal")) {
       // Error will be handled by the session/repository logger
       // Storing for potential error reporting
     }
