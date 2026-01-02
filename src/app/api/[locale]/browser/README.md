@@ -5,6 +5,7 @@ This directory contains a typesafe wrapper around the Chrome DevTools MCP server
 ## Architecture
 
 The wrapper is designed to match the Chrome MCP tools exactly, with each tool having its own:
+
 - **definition.ts**: Typesafe endpoint definition with Zod validation and UI metadata
 - **route.ts**: Route handler that calls the MCP tool via the Vibe MCP bridge
 
@@ -29,6 +30,7 @@ browser/
 ## Available Tools
 
 ### Input Automation (8 tools)
+
 - **click** - Click on an element (single or double click)
 - **drag** - Drag an element onto another element
 - **fill** - Type text into an input or textarea
@@ -39,6 +41,7 @@ browser/
 - **upload_file** - Upload a file through a file input
 
 ### Navigation (6 tools)
+
 - **close_page** - Close a page by index
 - **list_pages** - Get list of open browser pages
 - **navigate_page** - Navigate to URL or back/forward/reload
@@ -47,19 +50,23 @@ browser/
 - **wait_for** - Wait for text to appear on page
 
 ### Emulation (2 tools)
+
 - **emulate** - Emulate CPU throttling and network conditions
 - **resize_page** - Resize the page viewport
 
 ### Performance (3 tools)
+
 - **performance_analyze_insight** - Get detailed performance insight information
 - **performance_start_trace** - Start performance trace recording
 - **performance_stop_trace** - Stop performance trace recording
 
 ### Network (2 tools)
+
 - **get_network_request** - Get a specific network request by ID
 - **list_network_requests** - List all network requests
 
 ### Debugging (5 tools)
+
 - **evaluate_script** - Execute JavaScript in the page context
 - **get_console_message** - Get a console message by ID
 - **list_console_messages** - List all console messages
@@ -166,6 +173,7 @@ The tool specifications are now managed in TypeScript (`shared/tool-specs.ts`) f
 ## Type Safety
 
 All endpoints are fully typesafe with:
+
 - Zod validation for request/response
 - TypeScript types exported from definitions
 - UI metadata for automatic form generation

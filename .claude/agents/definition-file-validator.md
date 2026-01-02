@@ -29,6 +29,7 @@ You are an expert validator for data-driven interface definition files. Your rol
 **PRIMARY SOURCE:** Read the complete documentation file for all patterns:
 
 `/docs/patterns/definition.md` - Complete definition patterns including:
+
 - Field function patterns (objectField, requestDataField, responseField, optional variants)
 - Widget metadata requirements and types
 - UI/UX optimization for all 5 interfaces (CLI, React Web, React Native, AI Tools, MCP)

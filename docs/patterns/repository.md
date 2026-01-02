@@ -9,7 +9,10 @@ Repositories (`repository.ts`) contain all business logic and data access. Imple
 ```typescript
 // ✅ CORRECT
 export class UserRepository {
-  static async getById(id: string, logger: EndpointLogger): Promise<ResponseType<UserGetResponseOutput>> {
+  static async getById(
+    id: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<UserGetResponseOutput>> {
     // ...
   }
 }
@@ -25,17 +28,27 @@ Internal methods marked `private static`:
 
 ```typescript
 export class AuthRepository {
-  static async login(data: LoginRequestOutput, user: JwtPayloadType, logger: EndpointLogger): Promise<ResponseType<LoginResponseOutput>> {
+  static async login(
+    data: LoginRequestOutput,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LoginResponseOutput>> {
     const validationResult = await this.validateCredentials(data, logger);
     if (!validationResult.success) return validationResult;
     return await this.createSession(validationResult.data, logger);
   }
 
-  private static async validateCredentials(data: LoginRequestOutput, logger: EndpointLogger): Promise<ResponseType<ValidatedUser>> {
+  private static async validateCredentials(
+    data: LoginRequestOutput,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ValidatedUser>> {
     // Internal logic
   }
 
-  private static async createSession(user: ValidatedUser, logger: EndpointLogger): Promise<ResponseType<LoginResponseOutput>> {
+  private static async createSession(
+    user: ValidatedUser,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<LoginResponseOutput>> {
     // Internal logic
   }
 }
@@ -47,24 +60,53 @@ export class AuthRepository {
 
 ```typescript
 export class ItemRepository {
-  static async getById(urlPathParams: ItemGetUrlVariablesOutput, user: JwtPayloadType, logger: EndpointLogger): Promise<ResponseType<ItemGetResponseOutput>> {
-    const ownershipCheck = await this.validateOwnership(urlPathParams.id, user, logger);
+  static async getById(
+    urlPathParams: ItemGetUrlVariablesOutput,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ItemGetResponseOutput>> {
+    const ownershipCheck = await this.validateOwnership(
+      urlPathParams.id,
+      user,
+      logger,
+    );
     if (!ownershipCheck.success) return ownershipCheck; // Propagate failure
 
-    const [item] = await db.select().from(items).where(eq(items.id, urlPathParams.id)).limit(1);
+    const [item] = await db
+      .select()
+      .from(items)
+      .where(eq(items.id, urlPathParams.id))
+      .limit(1);
     if (!item) {
-      return fail({ message: "app.api.items.errors.notFound", errorType: ErrorResponseTypes.NOT_FOUND });
+      return fail({
+        message: "app.api.items.errors.notFound",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
     }
     return success({ id: item.id, name: item.name });
   }
 
-  private static async validateOwnership(itemId: string, user: JwtPayloadType, logger: EndpointLogger): Promise<ResponseType<{ ownerId: string }>> {
-    const [item] = await db.select({ userId: items.userId }).from(items).where(eq(items.id, itemId)).limit(1);
+  private static async validateOwnership(
+    itemId: string,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ ownerId: string }>> {
+    const [item] = await db
+      .select({ userId: items.userId })
+      .from(items)
+      .where(eq(items.id, itemId))
+      .limit(1);
     if (!item) {
-      return fail({ message: "app.api.items.errors.notFound", errorType: ErrorResponseTypes.NOT_FOUND });
+      return fail({
+        message: "app.api.items.errors.notFound",
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
     }
     if (item.userId !== user.id) {
-      return fail({ message: "app.api.items.errors.forbidden", errorType: ErrorResponseTypes.FORBIDDEN });
+      return fail({
+        message: "app.api.items.errors.forbidden",
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
     }
     return success({ ownerId: item.userId });
   }
@@ -87,13 +129,13 @@ const { GET } = createEndpoint({
       // Request
       id: requestUrlPathParamsField(
         { type: WidgetType.FORM_FIELD, fieldType: FieldDataType.TEXT },
-        z.string()
+        z.string(),
       ),
       // Response
       id: responseField({ type: WidgetType.TEXT }, z.string()),
       name: responseField({ type: WidgetType.TEXT }, z.string()),
       email: responseField({ type: WidgetType.TEXT }, z.string()),
-    }
+    },
   ),
 });
 
@@ -107,11 +149,15 @@ export class UserRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<UserGetResponseOutput>> {
     try {
-      const [user] = await db.select().from(users).where(eq(users.id, urlPathParams.id)).limit(1);
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, urlPathParams.id))
+        .limit(1);
       if (!user) {
         return fail({
           message: "app.api.users.errors.notFound",
-          errorType: ErrorResponseTypes.NOT_FOUND
+          errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
@@ -119,7 +165,7 @@ export class UserRepository {
       return success({
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
       });
     } catch (error) {
       logger.error("Failed to get user by ID", { error: parseError(error) });
@@ -154,9 +200,9 @@ export class UserRepository {
           transformed: options.someField,
           nested: {
             // ... complex transformation
-          }
-        }
-      }
+          },
+        },
+      },
     });
   }
 }
@@ -229,6 +275,7 @@ static async getById(
 ```
 
 **Key Rules:**
+
 1. Repository methods that are called from routes MUST return types from `definition.ts`
 2. NO transformations, translations, or data massage in repository
 3. If definition expects `{ id, name }`, repository returns exactly `{ id, name }`
@@ -245,26 +292,47 @@ For simple repositories:
 import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { myTable } from "./db";
-import type { MyGetResponseOutput, MyGetUrlVariablesOutput } from "./definition";
+import type {
+  MyGetResponseOutput,
+  MyGetUrlVariablesOutput,
+} from "./definition";
 
 export class MyRepository {
-  static async getById(urlPathParams: MyGetUrlVariablesOutput, user: JwtPayloadType, logger: EndpointLogger): Promise<ResponseType<MyGetResponseOutput>> {
+  static async getById(
+    urlPathParams: MyGetUrlVariablesOutput,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<MyGetResponseOutput>> {
     try {
       logger.debug("Getting item by ID", { id: urlPathParams.id });
-      const [item] = await db.select().from(myTable).where(eq(myTable.id, urlPathParams.id)).limit(1);
+      const [item] = await db
+        .select()
+        .from(myTable)
+        .where(eq(myTable.id, urlPathParams.id))
+        .limit(1);
       if (!item) {
-        return fail({ message: "app.api.my.errors.notFound", errorType: ErrorResponseTypes.NOT_FOUND });
+        return fail({
+          message: "app.api.my.errors.notFound",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
       return success({ id: item.id, name: item.name });
     } catch (error) {
       logger.error("Failed to fetch item", parseError(error));
-      return fail({ message: "app.api.my.errors.server", errorType: ErrorResponseTypes.INTERNAL_ERROR });
+      return fail({
+        message: "app.api.my.errors.server",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 }
@@ -293,16 +361,29 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { OrderGetResponseOutput, OrderGetUrlVariablesOutput, OrderCreateRequestOutput, OrderCreateResponseOutput } from "../definition";
+import type {
+  OrderGetResponseOutput,
+  OrderGetUrlVariablesOutput,
+  OrderCreateRequestOutput,
+  OrderCreateResponseOutput,
+} from "../definition";
 import { OrderQueries } from "./queries";
 import { OrderValidation } from "./validation";
 
 export class OrderRepository {
-  static async getById(urlPathParams: OrderGetUrlVariablesOutput, user: JwtPayloadType, logger: EndpointLogger): Promise<ResponseType<OrderGetResponseOutput>> {
+  static async getById(
+    urlPathParams: OrderGetUrlVariablesOutput,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<OrderGetResponseOutput>> {
     const orderResult = await OrderQueries.findById(urlPathParams.id, logger);
     if (!orderResult.success) return orderResult;
 
-    const accessResult = await OrderValidation.checkAccess(orderResult.data, user, logger);
+    const accessResult = await OrderValidation.checkAccess(
+      orderResult.data,
+      user,
+      logger,
+    );
     if (!accessResult.success) return accessResult;
 
     const order = orderResult.data;
@@ -314,17 +395,27 @@ export class OrderRepository {
     });
   }
 
-  static async create(data: OrderCreateRequestOutput, user: JwtPayloadType, logger: EndpointLogger): Promise<ResponseType<OrderCreateResponseOutput>> {
+  static async create(
+    data: OrderCreateRequestOutput,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<OrderCreateResponseOutput>> {
     const validationResult = await OrderValidation.validateCreate(data, logger);
     if (!validationResult.success) return validationResult;
 
-    const total = data.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const insertResult = await OrderQueries.insert({
-      userId: user.id!,
-      status: "pending",
-      items: data.items,
-      total,
-    }, logger);
+    const total = data.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
+    const insertResult = await OrderQueries.insert(
+      {
+        userId: user.id!,
+        status: "pending",
+        items: data.items,
+        total,
+      },
+      logger,
+    );
     if (!insertResult.success) return insertResult;
 
     return success({ id: insertResult.data.id });
@@ -338,38 +429,64 @@ export class OrderRepository {
 import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { success, fail, ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import {
+  success,
+  fail,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { orders, type Order, type NewOrder } from "../db";
 
 export class OrderQueries {
-  static async findById(id: string, logger: EndpointLogger): Promise<ResponseType<Order>> {
+  static async findById(
+    id: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<Order>> {
     try {
       logger.debug("Finding order by ID", { id });
-      const [order] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+      const [order] = await db
+        .select()
+        .from(orders)
+        .where(eq(orders.id, id))
+        .limit(1);
       if (!order) {
-        return fail({ message: "app.api.orders.errors.notFound", errorType: ErrorResponseTypes.NOT_FOUND });
+        return fail({
+          message: "app.api.orders.errors.notFound",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
       }
       return success(order);
     } catch (error) {
       logger.error("Failed to find order", parseError(error));
-      return fail({ message: "app.api.orders.errors.server", errorType: ErrorResponseTypes.INTERNAL_ERROR });
+      return fail({
+        message: "app.api.orders.errors.server",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
-  static async insert(data: NewOrder, logger: EndpointLogger): Promise<ResponseType<Order>> {
+  static async insert(
+    data: NewOrder,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<Order>> {
     try {
       logger.debug("Inserting order", { userId: data.userId });
       const [order] = await db.insert(orders).values(data).returning();
       if (!order) {
-        return fail({ message: "app.api.orders.errors.insertFailed", errorType: ErrorResponseTypes.DATABASE_ERROR });
+        return fail({
+          message: "app.api.orders.errors.insertFailed",
+          errorType: ErrorResponseTypes.DATABASE_ERROR,
+        });
       }
       return success(order);
     } catch (error) {
       logger.error("Failed to insert order", parseError(error));
-      return fail({ message: "app.api.orders.errors.server", errorType: ErrorResponseTypes.INTERNAL_ERROR });
+      return fail({
+        message: "app.api.orders.errors.server",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 }
@@ -380,23 +497,43 @@ export class OrderQueries {
 ```typescript
 import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { success, fail, ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import {
+  success,
+  fail,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { Order } from "../db";
 import type { OrderCreateRequestOutput } from "../definition";
 
 export class OrderValidation {
-  static async checkAccess(order: Order, user: JwtPayloadType, logger: EndpointLogger): Promise<ResponseType<{ hasAccess: true }>> {
-    logger.debug("Checking order access", { orderId: order.id, userId: user.id });
+  static async checkAccess(
+    order: Order,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ hasAccess: true }>> {
+    logger.debug("Checking order access", {
+      orderId: order.id,
+      userId: user.id,
+    });
     if (order.userId === user.id) return success({ hasAccess: true });
     if (user.roles?.includes("admin")) return success({ hasAccess: true });
-    return fail({ message: "app.api.orders.errors.forbidden", errorType: ErrorResponseTypes.FORBIDDEN });
+    return fail({
+      message: "app.api.orders.errors.forbidden",
+      errorType: ErrorResponseTypes.FORBIDDEN,
+    });
   }
 
-  static async validateCreate(data: OrderCreateRequestOutput, logger: EndpointLogger): Promise<ResponseType<{ validated: true }>> {
+  static async validateCreate(
+    data: OrderCreateRequestOutput,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ validated: true }>> {
     if (!data.items?.length) {
-      return fail({ message: "app.api.orders.errors.emptyOrder", errorType: ErrorResponseTypes.VALIDATION_FAILED });
+      return fail({
+        message: "app.api.orders.errors.emptyOrder",
+        errorType: ErrorResponseTypes.VALIDATION_FAILED,
+      });
     }
     return success({ validated: true });
   }
@@ -465,8 +602,16 @@ logger.error("Failed to create item", parseError(error));
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 
 export class OrderRepository {
-  static async create(data: OrderCreateRequestOutput, user: JwtPayloadType, logger: EndpointLogger): Promise<ResponseType<OrderCreateResponseOutput>> {
-    const creditCheck = await CreditRepository.checkBalance(user.id, data.amount, logger);
+  static async create(
+    data: OrderCreateRequestOutput,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<OrderCreateResponseOutput>> {
+    const creditCheck = await CreditRepository.checkBalance(
+      user.id,
+      data.amount,
+      logger,
+    );
     if (!creditCheck.success) return creditCheck;
     // ...
   }

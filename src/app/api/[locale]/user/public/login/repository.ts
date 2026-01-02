@@ -518,7 +518,9 @@ export class LoginRepository {
                 enabled: provider.enabled,
                 description: t(
                   "app.api.user.public.login.options.messages.continueWithProvider",
-                  { provider: t(provider.name) },
+                  {
+                    provider: t(provider.name),
+                  },
                 ),
               })) || [],
           },

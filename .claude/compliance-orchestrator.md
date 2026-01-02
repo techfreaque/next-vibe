@@ -108,9 +108,9 @@ vibe check src/app/api/[locale]/{domain}/{subdomain}
 
 **Expected Outcomes:**
 
-- All services/*.ts files → repository.ts pattern
-- All utils/*.ts files with business logic → repository.ts
-- All helpers/*.ts files → repository.ts
+- All services/\*.ts files → repository.ts pattern
+- All utils/\*.ts files with business logic → repository.ts
+- All helpers/\*.ts files → repository.ts
 - Proper interface/implementation patterns created
 - Business logic properly encapsulated
 

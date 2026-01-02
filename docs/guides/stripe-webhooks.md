@@ -41,6 +41,7 @@ vibe stripe listen --events=payment_intent.succeeded,customer.subscription.updat
 ```
 
 This command:
+
 - ✅ Forwards Stripe webhooks to your local server
 - ✅ Automatically updates `STRIPE_WEBHOOK_SECRET` in your `.env` file
 - ✅ Displays webhook events in real-time
@@ -100,12 +101,14 @@ POST /api/en-GLOBAL/payment/providers/stripe/webhooks
 ```
 
 The endpoint:
+
 - ✅ Verifies webhook signatures
 - ✅ Handles event processing
 - ✅ Returns proper HTTP status codes
 - ✅ Logs all webhook events
 
 **See implementation:**
+
 - `src/app/api/[locale]/payment/providers/stripe/webhooks/route.ts`
 
 ---
@@ -137,6 +140,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ### Webhooks Not Received
 
 **Local Development:**
+
 ```bash
 # 1. Ensure stripe listen is running
 vibe stripe listen
@@ -149,6 +153,7 @@ vibe dev
 ```
 
 **Production:**
+
 ```bash
 # 1. Check endpoint URL in Stripe Dashboard
 # Should be: https://yourdomain.com/api/en-GLOBAL/payment/providers/stripe/webhooks
@@ -190,20 +195,20 @@ Common Stripe webhook events:
 
 ```typescript
 // Payment events
-payment_intent.succeeded
-payment_intent.payment_failed
+payment_intent.succeeded;
+payment_intent.payment_failed;
 
 // Subscription events
-customer.subscription.created
-customer.subscription.updated
-customer.subscription.deleted
+customer.subscription.created;
+customer.subscription.updated;
+customer.subscription.deleted;
 
 // Invoice events
-invoice.payment_succeeded
-invoice.payment_failed
+invoice.payment_succeeded;
+invoice.payment_failed;
 
 // Refund events
-charge.refunded
+charge.refunded;
 ```
 
 ---
@@ -250,6 +255,7 @@ vibe stripe listen --skip-ssl-verify
 ## Quick Checklist
 
 **Local Development:**
+
 - [ ] Stripe CLI installed (`vibe stripe check`)
 - [ ] Logged in to Stripe (`vibe stripe login`)
 - [ ] Webhook forwarding active (`vibe stripe listen`)
@@ -257,6 +263,7 @@ vibe stripe listen --skip-ssl-verify
 - [ ] `.env` has `STRIPE_WEBHOOK_SECRET`
 
 **Production:**
+
 - [ ] Webhook endpoint created in Stripe Dashboard
 - [ ] Production URL is HTTPS
 - [ ] Environment variable `STRIPE_WEBHOOK_SECRET` set

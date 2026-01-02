@@ -18,7 +18,7 @@ This document defines strict logger patterns for the codebase. The `EndpointLogg
 
 ```typescript
 // route.ts
-import { endpointsHandler } from '@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi';
+import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 
 export const { GET, POST } = endpointsHandler({
   endpoint: definitions,

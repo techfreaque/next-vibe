@@ -7,14 +7,14 @@
 
 import type { TemplateCachedMetadata } from "./types";
 
-import type emailTemplate0 from "@/app/api/[locale]/contact/email";
-import type emailTemplate1 from "@/app/api/[locale]/newsletter/unsubscribe/email";
-import type emailTemplate2 from "@/app/api/[locale]/newsletter/subscribe/email";
-import type emailTemplate3 from "@/app/api/[locale]/user/public/reset-password/confirm/email";
-import type emailTemplate4 from "@/app/api/[locale]/user/public/reset-password/request/email";
-import type emailTemplate5 from "@/app/api/[locale]/user/public/signup/email";
-import type emailTemplate6 from "@/app/api/[locale]/subscription/email";
-import type emailTemplate7 from "@/app/api/[locale]/users/create/email";
+import emailTemplate0 from "@/app/api/[locale]/contact/email";
+import emailTemplate1 from "@/app/api/[locale]/newsletter/unsubscribe/email";
+import emailTemplate2 from "@/app/api/[locale]/newsletter/subscribe/email";
+import emailTemplate3 from "@/app/api/[locale]/user/public/reset-password/confirm/email";
+import emailTemplate4 from "@/app/api/[locale]/user/public/reset-password/request/email";
+import emailTemplate5 from "@/app/api/[locale]/user/public/signup/email";
+import emailTemplate6 from "@/app/api/[locale]/subscription/email";
+import emailTemplate7 from "@/app/api/[locale]/users/create/email";
 
 /**
  * Union type of all email template definitions

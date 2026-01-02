@@ -1,38 +1,22 @@
 {
   "name": "next-vibe",
   "version": "2.0.0",
-  "main": "./.dist/bin/vibe-runtime.js",
-  "author": "Max Brandstätter",
   "description": "Full-stack TypeScript framework with unified CLI, React, and API interfaces",
-  "license": "GPL-3.0-only",
-  "type": "module",
-  "packageManager": "bun@1.3.4",
-  "files": [
-    ".dist/**/*",
-    "src/app/api/[locale]/**/*",
-    "src/i18n/**/*",
-    "src/config/**/*",
-    "src/hooks/**/*",
-    "src/packages/**/*",
-    "check.config.ts"
+  "keywords": [
+    "api",
+    "cli",
+    "framework",
+    "fullstack",
+    "nextjs",
+    "react",
+    "typescript"
   ],
-  "scripts": {
-    "postinstall": "bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts setup --force || echo 'Vibe setup failed - run manually if needed'",
-    "vibe": "vibe",
-    "dev": "vibe dev",
-    "build": "vibe build",
-    "start": "vibe start",
-    "test": "vibe test",
-    "check": "vibe check",
-    "lint": "echo redirecting to check && vibe check",
-    "studio": "vibe studio",
-    "typecheck": "echo redirecting to check && vibe check",
-    "mcp:test": "bunx @modelcontextprotocol/inspector -e PROJECT_ROOT=$PWD bun $PWD/src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts mcp",
-    "native": "expo start",
-    "native:android": "expo run:android",
-    "native:ios": "expo run:ios",
-    "native:reset": "expo start --clear"
+  "homepage": "https://github.com/maxbrandstatter/next-vibe#readme",
+  "bugs": {
+    "url": "https://github.com/maxbrandstatter/next-vibe/issues"
   },
+  "license": "GPL-3.0-only",
+  "author": "Max Brandstätter",
   "contributors": [
     {
       "name": "Max Brandstaetter",
@@ -63,6 +47,57 @@
       "name": "Cursor"
     }
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maxbrandstatter/next-vibe.git"
+  },
+  "bin": {
+    "vibe": "./dist/bin/vibe-runtime.js"
+  },
+  "workspaces": [
+    "src/app/api/*/system/guard",
+    "src/app/api/*/system/launchpad",
+    "src/app/api/*/system/release-tool"
+  ],
+  "files": [
+    "check.config.ts",
+    ".dist/**/*",
+    "src/config/**/*",
+    "src/hooks/**/*",
+    "src/i18n/**/*",
+    "src/packages/**/*",
+    "src/app/api/[locale]/**/*"
+  ],
+  "type": "module",
+  "main": "./.dist/bin/vibe-runtime.js",
+  "exports": {
+    ".": {
+      "import": "./dist/bin/vibe-runtime.js",
+      "default": "./dist/bin/vibe-runtime.js"
+    },
+    "./*": {
+      "types": "./src/app/api/[locale]/*",
+      "import": "./src/app/api/[locale]/*",
+      "default": "./src/app/api/[locale]/*"
+    }
+  },
+  "scripts": {
+    "postinstall": "bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts setup --force || echo 'Vibe setup failed - run manually if needed'",
+    "vibe": "vibe",
+    "dev": "vibe dev",
+    "build": "vibe build",
+    "start": "vibe start",
+    "test": "vibe test",
+    "check": "vibe check",
+    "lint": "echo redirecting to check && vibe check",
+    "studio": "vibe studio",
+    "typecheck": "echo redirecting to check && vibe check",
+    "mcp:test": "bunx @modelcontextprotocol/inspector -e PROJECT_ROOT=$PWD bun $PWD/src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts mcp",
+    "native": "expo start",
+    "native:android": "expo run:android",
+    "native:ios": "expo run:ios",
+    "native:reset": "expo start --clear"
+  },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "3.0.70",
     "@ai-sdk/azure": "2.0.90",
@@ -283,43 +318,8 @@
   "overrides": {
     "lightningcss": "1.30.1"
   },
-  "workspaces": [
-    "src/app/api/*/system/guard",
-    "src/app/api/*/system/launchpad",
-    "src/app/api/*/system/release-tool"
-  ],
-  "bin": {
-    "vibe": "./dist/bin/vibe-runtime.js"
-  },
-  "exports": {
-    ".": {
-      "import": "./dist/bin/vibe-runtime.js",
-      "default": "./dist/bin/vibe-runtime.js"
-    },
-    "./*": {
-      "import": "./src/app/api/[locale]/*",
-      "types": "./src/app/api/[locale]/*",
-      "default": "./src/app/api/[locale]/*"
-    }
-  },
-  "keywords": [
-    "cli",
-    "typescript",
-    "react",
-    "nextjs",
-    "api",
-    "fullstack",
-    "framework"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/maxbrandstatter/next-vibe.git"
-  },
-  "bugs": {
-    "url": "https://github.com/maxbrandstatter/next-vibe/issues"
-  },
-  "homepage": "https://github.com/maxbrandstatter/next-vibe#readme",
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "packageManager": "bun@1.3.4"
 }

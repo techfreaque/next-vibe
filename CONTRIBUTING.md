@@ -48,6 +48,7 @@ vibe dev
 ### Before Making Changes
 
 1. **Create a feature branch**
+
    ```bash
    git checkout -b feature/my-feature
    # or
@@ -69,6 +70,7 @@ vibe dev
 ### Before Committing
 
 1. **Run full validation**
+
    ```bash
    vibe check   # Must pass with 0 errors, 0 warnings
    vibe test    # All tests must pass
@@ -96,6 +98,7 @@ vibe dev
 ### Quick Rules
 
 ✅ **Required:**
+
 - Use types from `definition.ts` only (never manual type definitions)
 - Use translation keys everywhere (no hardcoded strings)
 - Pass logger as parameter to repositories
@@ -103,6 +106,7 @@ vibe dev
 - Add `"server-only"` import to repository files
 
 ❌ **Forbidden:**
+
 - Type assertions (`as`, `!`, `<Type>`)
 - `@ts-ignore` or `@ts-expect-error`
 - `console.log` (use logger instead)
@@ -164,6 +168,7 @@ git push origin feature/my-feature
 ### 2. Create Pull Request
 
 **Include in PR description:**
+
 - What changes were made
 - Why the changes were needed
 - How to test the changes
@@ -173,6 +178,7 @@ git push origin feature/my-feature
 ### 3. Review Process
 
 Your PR will be reviewed for:
+
 - **Code quality** - Follows framework patterns
 - **Type safety** - No workarounds or type assertions
 - **Testing** - Adequate test coverage
@@ -184,12 +190,14 @@ Your PR will be reviewed for:
 ## 📚 Resources
 
 **Essential Documentation:**
+
 - [Quick Start](docs/guides/quickstart.md) - Get up and running
 - [Debugging Guide](docs/guides/debugging.md) - Debugging tips
 - [All Patterns](docs/patterns/) - Complete pattern documentation
 - [Unbottled.ai Example](docs/examples/unbottled-ai/UNBOTTLED_AI.md) - Reference application
 
 **Community:**
+
 - [GitHub Discussions](https://github.com/techfreaque/next-vibe/discussions) - Ask questions
 - [GitHub Issues](https://github.com/techfreaque/next-vibe/issues) - Report bugs
 - **Email**: max@a42.ch
@@ -199,6 +207,7 @@ Your PR will be reviewed for:
 ## 📄 License
 
 By contributing, you agree that your contributions will be licensed under:
+
 - **GPL-3.0** for framework core (`src/app/api/[locale]/` and `src/packages/`)
 - **MIT** for everything else
 

@@ -91,6 +91,7 @@ void _typeCheck;
 ### 3. Same Class Name
 
 Both files export the same class name. The bundler resolves which to use based on platform:
+
 - Server/Web: Uses `repository.ts` (direct DB access)
 - React Native: Uses `repository.native.ts` (HTTP calls)
 
@@ -136,6 +137,7 @@ static async adminOnlyMethod(
 ```
 
 **Important:**
+
 - Use `throw new Error("methodName is not implemented on native")` - NOT `fail()` or `throwErrorResponse`
 - Add `// oxlint-disable-next-line restricted-syntax` before the throw statement
 - Add `// oxlint-disable-next-line no-unused-vars` before each unused parameter

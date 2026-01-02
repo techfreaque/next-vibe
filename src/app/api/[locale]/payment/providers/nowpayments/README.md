@@ -204,7 +204,7 @@ Webhooks are automatically processed through the unified payment repository:
 
 ```typescript
 // Webhook route automatically calls paymentRepository.handleWebhook()
-POST /api/[locale]/payment/providers/nowpayments/webhook
+POST / api / [locale] / payment / providers / nowpayments / webhook;
 ```
 
 The webhook handler:
@@ -475,14 +475,14 @@ const session = await provider.createCheckoutSession(
 | Feature                 | Stripe                                | NOWPayments                 |
 | ----------------------- | ------------------------------------- | --------------------------- |
 | Payment Methods         | Cards, Bank Transfer, Digital Wallets | Cryptocurrency (150+ coins) |
-| Recurring Subscriptions | ✅ Yes (Automatic)                     | ✅ Yes (Email-based)         |
-| One-Time Payments       | ✅ Yes                                 | ✅ Yes                       |
-| Subscription Management | ✅ Full API                            | ✅ Full API                  |
-| Customer Portal         | ✅ Yes                                 | ❌ No (Email links)          |
-| Refunds                 | ✅ Yes                                 | ⚠️ Manual                    |
-| Invoice Creation        | ✅ Yes                                 | ✅ Yes                       |
-| Webhook Support         | ✅ Yes                                 | ✅ Yes (IPN)                 |
-| Multi-Currency          | ✅ Yes (Fiat)                          | ✅ Yes (Crypto + Fiat)       |
+| Recurring Subscriptions | ✅ Yes (Automatic)                    | ✅ Yes (Email-based)        |
+| One-Time Payments       | ✅ Yes                                | ✅ Yes                      |
+| Subscription Management | ✅ Full API                           | ✅ Full API                 |
+| Customer Portal         | ✅ Yes                                | ❌ No (Email links)         |
+| Refunds                 | ✅ Yes                                | ⚠️ Manual                   |
+| Invoice Creation        | ✅ Yes                                | ✅ Yes                      |
+| Webhook Support         | ✅ Yes                                | ✅ Yes (IPN)                |
+| Multi-Currency          | ✅ Yes (Fiat)                         | ✅ Yes (Crypto + Fiat)      |
 | Transaction Fees        | 2.9% + $0.30                          | 0.4% - 1.0%                 |
 | Settlement Time         | 2-7 days                              | Same day (< 5 min avg)      |
 | Payment Flow            | On-site checkout                      | Invoice URL or Email link   |

@@ -1,13 +1,7 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "types": [
-      "bun-types"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["bun-types"],
     "rootDir": ".",
     "allowJs": true,
     "target": "ES6",
@@ -20,37 +14,24 @@
     "resolveJsonModule": true,
     "resolvePackageJsonExports": true,
     "resolvePackageJsonImports": true,
-    "customConditions": [
-      "react-native"
-    ],
+    "customConditions": ["react-native"],
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "typeRoots": [
-      "./types",
-      "./node_modules/@types"
-    ],
+    "typeRoots": ["./types", "./node_modules/@types"],
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "next-vibe/*": [
-        "./src/app/api/[locale]/*"
-      ],
+      "@/*": ["./src/*"],
+      "next-vibe/*": ["./src/app/api/[locale]/*"],
       "@next-vibe/checker/oxlint-plugins/*": [
         "./src/app/api/[locale]/system/check/oxlint/plugins/*/src/index"
       ],
-      "@next-vibe/checker/*": [
-        "./src/app/api/[locale]/*"
-      ],
-      "next-vibe-ui/*": [
-        "./src/packages/next-vibe-ui/web/*"
-      ],
+      "@next-vibe/checker/*": ["./src/app/api/[locale]/*"],
+      "next-vibe-ui/*": ["./src/packages/next-vibe-ui/web/*"],
       "server-only": [
         "./src/app/api/[locale]/system/unified-interface/shared/server-only/server-only.ts"
       ]

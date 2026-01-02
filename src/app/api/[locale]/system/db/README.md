@@ -132,7 +132,6 @@ Example:
 ```typescript
 import { cliDebugLogger } from "next-vibe/shared/utils/logger";
 
-
 // Export priority value
 export const priority = 50;
 

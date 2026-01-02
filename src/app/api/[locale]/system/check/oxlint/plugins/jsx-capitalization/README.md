@@ -23,9 +23,7 @@ The plugin is configured in the oxlint configuration file:
 
 ```json
 {
-  "jsPlugins": [
-    "oxlint-plugin-jsx-capitalization"
-  ],
+  "jsPlugins": ["oxlint-plugin-jsx-capitalization"],
   "rules": {
     "oxlint-plugin-jsx-capitalization/jsx-capitalization": "error"
   }
@@ -37,6 +35,7 @@ The plugin is configured in the oxlint configuration file:
 ### Common UI Components
 
 #### ❌ Bad
+
 ```tsx
 function MyComponent() {
   return <div>Hello World</div>;
@@ -44,12 +43,14 @@ function MyComponent() {
 ```
 
 **Error message:**
+
 ```
 Use platform-independent <Div> component instead of <div>.
 import { Div } from "next-vibe-ui/ui/div";
 ```
 
 #### ✅ Good
+
 ```tsx
 import { Div } from "next-vibe-ui/ui/div";
 
@@ -61,6 +62,7 @@ function MyComponent() {
 ### Typography Components
 
 #### ❌ Bad
+
 ```tsx
 function Article() {
   return (
@@ -73,6 +75,7 @@ function Article() {
 ```
 
 **Error messages:**
+
 ```
 Use typography component <H2> instead of <h2>.
 import { H2 } from "next-vibe-ui/ui/typography";
@@ -82,6 +85,7 @@ import { P } from "next-vibe-ui/ui/typography";
 ```
 
 #### ✅ Good
+
 ```tsx
 import { H2, P } from "next-vibe-ui/ui/typography";
 
@@ -98,6 +102,7 @@ function Article() {
 ### Image Components
 
 #### ❌ Bad
+
 ```tsx
 function Avatar() {
   return <img src="/avatar.png" alt="User" />;
@@ -105,12 +110,14 @@ function Avatar() {
 ```
 
 **Error message:**
+
 ```
 Use platform-independent <Image> component instead of <img>.
 import { Image } from "next-vibe-ui/ui/image";
 ```
 
 #### ✅ Good
+
 ```tsx
 import { Image } from "next-vibe-ui/ui/image";
 
@@ -122,6 +129,7 @@ function Avatar() {
 ### SVG Elements
 
 #### ❌ Bad
+
 ```tsx
 function Icon() {
   return (
@@ -133,6 +141,7 @@ function Icon() {
 ```
 
 **Error message:**
+
 ```
 SVG element <svg> detected. For icons, use components from
 next-vibe-ui/ui/icons instead. For custom SVG, create
@@ -141,6 +150,7 @@ work on both web and native.
 ```
 
 #### ✅ Good
+
 ```tsx
 // Option 1: Use existing icon components
 import { CheckIcon } from "next-vibe-ui/ui/icons/Check";
@@ -164,6 +174,7 @@ function CustomIcon() {
 ## Excluded Paths
 
 Files in the following directory are automatically excluded:
+
 - `/src/packages/next-vibe-ui/web/`
 
 ## Disable Comments
@@ -183,19 +194,25 @@ You can disable the rule for specific lines using comments:
 The plugin checks for **ALL lowercase JSX elements** and provides context-specific error messages:
 
 ### 1. Typography Components
+
 Import from `next-vibe-ui/ui/typography`:
+
 - **Headings:** h1, h2, h3, h4 → H1, H2, H3, H4
 - **Text:** p → P
 - **Quotes:** blockquote → BlockQuote
 - **Code:** code → Code
 
 ### 2. Standalone UI Components
+
 Import individually from `next-vibe-ui/ui/{component}`:
+
 - **Text:** span → Span (from `next-vibe-ui/ui/span`)
 - **Code blocks:** pre → Pre (from `next-vibe-ui/ui/pre`)
 
 ### 3. Common UI Components
+
 Import from `next-vibe-ui/ui/{element}`:
+
 - **Containers:** div, section, article, aside, header, footer, main, nav
 - **Interactive:** button, input, textarea, select, label, form
 - **Lists:** ul, ol, li
@@ -204,17 +221,23 @@ Import from `next-vibe-ui/ui/{element}`:
 - **And many more...**
 
 ### 4. Image Components
+
 Import from `next-vibe-ui/ui/image`:
+
 - **Images:** img, picture → Image
 
 ### 5. SVG Elements
+
 **Suggests using icon components or react-native-svg:**
+
 - svg, path, circle, rect, polygon, etc.
 - For icons: Use components from `next-vibe-ui/ui/icons`
 - For custom SVG: Use `react-native-svg` for platform independence
 
 ### 6. Unknown Elements
+
 For any element without a known wrapper component, the plugin suggests:
+
 1. Creating `next-vibe-ui/web/ui/{element}.tsx` for web
 2. Creating `next-vibe-ui/native/ui/{element}.tsx` for React Native
 3. Or using an existing component if available

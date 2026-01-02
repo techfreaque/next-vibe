@@ -169,7 +169,7 @@ cd src/app/api/[locale]/hello/world
 ```typescript
 // src/app/api/[locale]/hello/world/definition.ts
 import { z } from "zod";
-import { createEndpoint } from '@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   requestDataField,
@@ -197,13 +197,10 @@ const { POST } = createEndpoint({
           fieldType: FieldDataType.TEXT,
           label: "app.api.hello.world.post.name.label",
         },
-        z.string().min(1)
+        z.string().min(1),
       ),
-      message: responseField(
-        { type: WidgetType.TEXT },
-        z.string()
-      ),
-    }
+      message: responseField({ type: WidgetType.TEXT }, z.string()),
+    },
   ),
 });
 
@@ -347,7 +344,6 @@ netstat -ano | findstr :3000    # Windows (find PID, then taskkill)
 ```bash
 vibe check
 ```
-
 
 ---
 

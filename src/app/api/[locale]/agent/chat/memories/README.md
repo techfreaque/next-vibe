@@ -5,17 +5,20 @@ Persistent memory system where curated memories are always in the system prompt.
 ## Quick Start
 
 ### Add a Memory
+
 ```bash
 vibe post /agent/chat/memories \
   --data '{"content": "Profession: Software Engineer", "tags": ["profession"]}'
 ```
 
 ### List Memories
+
 ```bash
 vibe get /agent/chat/memories
 ```
 
 ### AI Usage
+
 ```
 User: "Remember that I prefer dark mode"
 AI: [Uses add_memory tool]
@@ -93,6 +96,7 @@ const MEMORY_LIMITS = {
 ## Integration Points
 
 ### System Prompt Builder
+
 Location: `src/app/api/[locale]/agent/ai-stream/system-prompt-builder.ts`
 
 ```typescript
@@ -104,6 +108,7 @@ const memorySummary = await generateMemorySummary({
 ```
 
 ### Chat DB Export
+
 Location: `src/app/api/[locale]/agent/chat/db.ts`
 
 ```typescript

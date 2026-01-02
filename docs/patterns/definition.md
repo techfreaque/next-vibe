@@ -81,8 +81,8 @@ preferredModel: requestDataField(
     options: ModelIdOptions,
     columns: 6,
   },
-  z.enum(ModelId).optional()  // ✅ Use .optional() on schema
-)
+  z.enum(ModelId).optional(), // ✅ Use .optional() on schema
+);
 ```
 
 **For objects**, use `objectOptionalField()` when the entire object can be absent:
@@ -119,11 +119,17 @@ attachments: responseArrayOptionalField(
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 2 },
     { response: true },
     {
-      filename: responseField({ type: WidgetType.TEXT, content: "..." }, z.string()),
-      size: responseField({ type: WidgetType.TEXT, content: "..." }, z.coerce.number()),
-    }
-  )
-)
+      filename: responseField(
+        { type: WidgetType.TEXT, content: "..." },
+        z.string(),
+      ),
+      size: responseField(
+        { type: WidgetType.TEXT, content: "..." },
+        z.coerce.number(),
+      ),
+    },
+  ),
+);
 
 // ✅ CORRECT - Optional request array
 tags: requestDataArrayOptionalField(
@@ -133,8 +139,8 @@ tags: requestDataArrayOptionalField(
     label: "app.api.tags.label",
     columns: 12,
   },
-  z.string()
-)
+  z.string(),
+);
 ```
 
 ### Specialized Field Functions
@@ -298,17 +304,17 @@ FieldDataType.TEXT |
 **For Containers (CONTAINER, SECTION):**
 
 ```typescript
-layoutType: LayoutType.STACKED        // Vertical stack
-layoutType: LayoutType.GRID           // Grid layout (use with columns)
-layoutType: LayoutType.GRID_2_COLUMNS // 2-column grid
-layoutType: LayoutType.VERTICAL       // Vertical layout
-columns: 12                           // Total grid columns (for GRID layoutType)
+layoutType: LayoutType.STACKED; // Vertical stack
+layoutType: LayoutType.GRID; // Grid layout (use with columns)
+layoutType: LayoutType.GRID_2_COLUMNS; // 2-column grid
+layoutType: LayoutType.VERTICAL; // Vertical layout
+columns: 12; // Total grid columns (for GRID layoutType)
 ```
 
 **For Form Fields:**
 
 ```typescript
-columns: 6  // Column width within parent grid (1-12)
+columns: 6; // Column width within parent grid (1-12)
 ```
 
 ### Container Widgets
@@ -440,10 +446,11 @@ Response fields display data (not for user input):
 responseField(
   {
     type: WidgetType.TEXT,
-    content: "app.api.agent.chat.characters.get.response.characters.persona.name.content",
+    content:
+      "app.api.agent.chat.characters.get.response.characters.persona.name.content",
   },
-  z.string()
-)
+  z.string(),
+);
 
 // ✅ CORRECT - Response array with DATA_CARDS widget
 responseArrayField(
@@ -453,17 +460,21 @@ responseArrayField(
   objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.characters.get.response.characters.persona.title",
+      title:
+        "app.api.agent.chat.characters.get.response.characters.persona.title",
       layoutType: LayoutType.GRID,
       columns: 2,
     },
     { response: true },
     {
       id: responseField({ type: WidgetType.TEXT, content: "..." }, z.string()),
-      name: responseField({ type: WidgetType.TEXT, content: "..." }, z.string()),
-    }
-  )
-)
+      name: responseField(
+        { type: WidgetType.TEXT, content: "..." },
+        z.string(),
+      ),
+    },
+  ),
+);
 ```
 
 **Note:** Response fields use `content` property for translation keys, not `label`.
@@ -475,6 +486,7 @@ responseArrayField(
 NextVibe generates interfaces from endpoint definitions for **five contexts**:
 
 **CLI Interface:**
+
 - Clear, human-readable prompts and responses
 - Logical field grouping and ordering
 - Intuitive parameter names and descriptions
@@ -482,6 +494,7 @@ NextVibe generates interfaces from endpoint definitions for **five contexts**:
 - Error messages that guide users to solutions
 
 **React Web Interface:**
+
 - Responsive layout configurations with shadcn/ui
 - Proper form field types and validations
 - Accessible labels and descriptions (ARIA)
@@ -490,6 +503,7 @@ NextVibe generates interfaces from endpoint definitions for **five contexts**:
 - Tailwind CSS styling
 
 **React Native Interface:**
+
 - Native mobile components with NativeWind
 - Touch-optimized interactions
 - Platform-specific patterns (iOS/Android)
@@ -497,6 +511,7 @@ NextVibe generates interfaces from endpoint definitions for **five contexts**:
 - Native keyboard handling
 
 **AI Tools Interface:**
+
 - Natural language field descriptions
 - Structured schemas for function calling
 - Clear parameter types and constraints
@@ -504,6 +519,7 @@ NextVibe generates interfaces from endpoint definitions for **five contexts**:
 - Human-readable field relationships
 
 **MCP Interface:**
+
 - Model Context Protocol tool definitions
 - Structured input/output schemas
 - Clear tool descriptions and parameters
@@ -514,32 +530,32 @@ NextVibe generates interfaces from endpoint definitions for **five contexts**:
 Choose appropriate layout types for field context:
 
 ```typescript
-LayoutType.GRID              // Grid with custom columns (use with columns property)
-LayoutType.GRID_2_COLUMNS    // 2-column grid for field pairs
-LayoutType.FULL_WIDTH        // Full width for text areas
-LayoutType.STACKED           // Vertical stack for mobile-first
-LayoutType.VERTICAL          // Simple vertical layout
-LayoutType.HORIZONTAL        // Horizontal layout
-LayoutType.FLEX              // Flex layout
-LayoutType.COLLAPSIBLE       // Collapsible sections
-LayoutType.GRID_ITEM         // Grid item positioning
+LayoutType.GRID; // Grid with custom columns (use with columns property)
+LayoutType.GRID_2_COLUMNS; // 2-column grid for field pairs
+LayoutType.FULL_WIDTH; // Full width for text areas
+LayoutType.STACKED; // Vertical stack for mobile-first
+LayoutType.VERTICAL; // Simple vertical layout
+LayoutType.HORIZONTAL; // Horizontal layout
+LayoutType.FLEX; // Flex layout
+LayoutType.COLLAPSIBLE; // Collapsible sections
+LayoutType.GRID_ITEM; // Grid item positioning
 ```
 
 **Layout Examples:**
 
 ```typescript
 // Related field pairs (email/phone)
-layoutType: LayoutType.GRID_2_COLUMNS
+layoutType: LayoutType.GRID_2_COLUMNS;
 
 // Text areas and descriptions
-layoutType: LayoutType.FULL_WIDTH
+layoutType: LayoutType.FULL_WIDTH;
 
 // Mobile-first forms
-layoutType: LayoutType.STACKED
+layoutType: LayoutType.STACKED;
 
 // Custom grid with column specification
-layoutType: LayoutType.GRID
-columns: 12  // Specify number of columns for GRID layout
+layoutType: LayoutType.GRID;
+columns: 12; // Specify number of columns for GRID layout
 ```
 
 ### Field Grouping Strategy
@@ -597,10 +613,10 @@ email: requestDataField(
     fieldType: FieldDataType.EMAIL,
     label: "...",
     description: "...",
-    columns: 12,  // Full width
+    columns: 12, // Full width
   },
-  z.string().email()
-)
+  z.string().email(),
+);
 ```
 
 **Phone fields:**
@@ -614,8 +630,8 @@ phone: requestDataField(
     description: "...",
     columns: 6,
   },
-  z.string()
-)
+  z.string(),
+);
 ```
 
 **Text areas:**
@@ -627,10 +643,10 @@ description: requestDataField(
     fieldType: FieldDataType.TEXTAREA,
     label: "...",
     description: "...",
-    columns: 12,  // Full width
+    columns: 12, // Full width
   },
-  z.string()
-)
+  z.string(),
+);
 ```
 
 **Select fields with enums:**
@@ -642,11 +658,11 @@ status: requestDataField(
     fieldType: FieldDataType.SELECT,
     label: "...",
     description: "...",
-    options: StatusOptions,  // From enum.ts
+    options: StatusOptions, // From enum.ts
     columns: 6,
   },
-  z.enum(Status)
-)
+  z.enum(Status),
+);
 ```
 
 ## Translation Keys
@@ -716,7 +732,7 @@ export const { enum: LeadStatus, options: LeadStatusOptions } =
 ```typescript
 import { z } from "zod";
 
-import { createEndpoint } from '@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create';
+import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   requestDataField,

@@ -286,7 +286,9 @@ export class SignupRepositoryImpl implements SignupRepository {
       if (creditMergeFailed) {
         logger.warn(
           "User registered but credit merge failed - manual intervention may be needed",
-          { userId: userData.id },
+          {
+            userId: userData.id,
+          },
         );
       }
 
@@ -372,7 +374,9 @@ export class SignupRepositoryImpl implements SignupRepository {
       } else {
         logger.debug(
           "Skipping platform marker assignment - markers are never stored in database",
-          { role },
+          {
+            role,
+          },
         );
       }
 

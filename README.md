@@ -76,6 +76,7 @@ vibe dev
 ```
 
 That's it! NextVibe automatically:
+
 - ✅ Starts PostgreSQL in Docker (if not running)
 - ✅ Creates database and runs migrations
 - ✅ Seeds development data
@@ -129,7 +130,7 @@ const { POST } = createEndpoint({
               fieldType: FieldDataType.EMAIL,
               label: "app.api.user.public.login.fields.email.label",
             },
-            z.string().email()
+            z.string().email(),
           ),
           password: requestDataField(
             {
@@ -137,20 +138,14 @@ const { POST } = createEndpoint({
               fieldType: FieldDataType.PASSWORD,
               label: "app.api.user.public.login.fields.password.label",
             },
-            z.string().min(1)
+            z.string().min(1),
           ),
-        }
+        },
       ),
 
       // Response fields
-      success: responseField(
-        { type: WidgetType.BADGE },
-        z.boolean()
-      ),
-      message: responseField(
-        { type: WidgetType.TEXT },
-        z.string()
-      ),
+      success: responseField({ type: WidgetType.BADGE }, z.boolean()),
+      message: responseField({ type: WidgetType.TEXT }, z.string()),
       user: objectField(
         { type: WidgetType.CONTAINER },
         { response: true },
@@ -158,9 +153,9 @@ const { POST } = createEndpoint({
           id: responseField({ type: WidgetType.TEXT }, z.string()),
           email: responseField({ type: WidgetType.TEXT }, z.string()),
           privateName: responseField({ type: WidgetType.TEXT }, z.string()),
-        }
+        },
       ),
-    }
+    },
   ),
 });
 
@@ -170,6 +165,7 @@ export default { POST };
 ### What This Automatically Generates
 
 #### 1. 🌐 Next.js API Endpoint
+
 ```bash
 POST /api/en-GLOBAL/user/public/login
 ```
@@ -226,12 +222,14 @@ export function LoginForm({ locale }) {
 ```
 
 **Key points:**
+
 - `next-vibe-ui/ui/*` components work on **both Web (Next.js) and React Native**
 - Platform resolution happens via TypeScript path mapping in `tsconfig.json`
 - `EndpointRenderer` automatically generates the entire form from the definition
 - Same JSX code runs on web and mobile with zero changes
 
 #### 3. 💻 CLI Command
+
 ```bash
 vibe user:public:login \
   --credentials.email="test@example.com" \
@@ -247,20 +245,22 @@ vibe user:public:login \
 ```
 
 #### 4. 🔌 tRPC Procedure
+
 ```typescript
 // Automatic type-safe RPC
 const result = await trpc.user.public.login.mutate({
   credentials: {
     email: "test@example.com",
-    password: "password123"
+    password: "password123",
   },
   options: {
-    rememberMe: true
-  }
+    rememberMe: true,
+  },
 });
 ```
 
 #### 5. 🤖 AI Tool (Function Calling)
+
 ```typescript
 // Automatic AI tool schema for chat integration
 {
@@ -282,6 +282,7 @@ const result = await trpc.user.public.login.mutate({
 ```
 
 #### 6. 🔧 MCP Tool
+
 ```typescript
 // Model Context Protocol tool for AI development
 {
@@ -304,6 +305,7 @@ const result = await trpc.user.public.login.mutate({
 ### Live Features
 
 🤖 **AI Chat Platform**
+
 - Multi-model AI chat (Claude, GPT, Gemini, DeepSeek, and 30+ models)
 - AI agent chat with function calling
 - Branching conversations with message trees
@@ -312,6 +314,7 @@ const result = await trpc.user.public.login.mutate({
 - MCP (Model Context Protocol) tool integration
 
 💼 **Lead Generation System**
+
 - Automated email campaigns with journey-based workflows
 - CSV import with batch processing
 - Lead tracking and engagement analytics
@@ -319,6 +322,7 @@ const result = await trpc.user.public.login.mutate({
 - SMS notifications via Twilio
 
 👥 **User Management**
+
 - Authentication with JWT + NextAuth
 - Role-based access control (public, customer, admin)
 - User profiles with avatar uploads
@@ -326,18 +330,21 @@ const result = await trpc.user.public.login.mutate({
 - Password reset flows
 
 💳 **Payment Processing**
+
 - Subscription management with Stripe and NowPayments
 - Credit system for AI usage
 - Referral program with earnings tracking
 - Invoice generation
 
 📧 **Communication**
+
 - React Email templates with tracking pixels
 - SMTP client with multiple account support
 - IMAP email reading and folder management
 - Email campaign automation
 
 🔧 **Admin Tools**
+
 - Data-driven admin panels
 - Database studio (Drizzle Studio integration)
 - System health monitoring
@@ -347,6 +354,7 @@ const result = await trpc.user.public.login.mutate({
 ### Technical Implementation
 
 **Generated Interfaces:**
+
 - **200+ API endpoints** each generating 7+ platform interfaces
 - **Web app** running on Next.js with full SSR
 - **CLI tools** for database management, email sending, user creation
@@ -356,12 +364,14 @@ const result = await trpc.user.public.login.mutate({
 - **MCP tools** for AI development workflow
 
 **Database Architecture:**
+
 - PostgreSQL with Drizzle ORM
 - 50+ tables with proper relationships
 - Automatic migrations from schema changes
 - Seed data for development/testing
 
 **Codebase Stats:**
+
 - Single Next.js-like codebase
 - Full type safety across 200,000+ lines
 - Zero runtime type errors
@@ -420,6 +430,7 @@ import { Link } from "next-vibe-ui/ui/link";
 ```
 
 **The same JSX works everywhere:**
+
 ```typescript
 // This exact code runs on Next.js AND React Native
 export function MyComponent() {
@@ -440,8 +451,8 @@ export function MyComponent() {
 **Even your translations are type-checked:**
 
 ```typescript
-t("app.api.user.public.login.title");     // ✅ Valid
-t("app.invalid.key");                      // ❌ TypeScript error at compile time
+t("app.api.user.public.login.title"); // ✅ Valid
+t("app.invalid.key"); // ❌ TypeScript error at compile time
 ```
 
 ESLint enforces translation usage - no hardcoded strings allowed.
@@ -463,7 +474,7 @@ export class LoginRepository {
   async login(
     data: { credentials: { email: string; password: string } },
     locale: CountryLanguage,
-    logger: EndpointLogger
+    logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean; message: string; user: User }>> {
     logger.info("Login attempt", { email: data.credentials.email });
 
@@ -472,7 +483,9 @@ export class LoginRepository {
     return success({
       success: true,
       message: "Welcome back!",
-      user: { /* user data */ }
+      user: {
+        /* user data */
+      },
     });
   }
 }
@@ -483,12 +496,14 @@ export class LoginRepository {
 ### 5. AI-Optimized Tooling
 
 Traditional approach (AI might skip one):
+
 ```bash
 npm run lint      # AI might skip
 npm run typecheck # Or skip this
 ```
 
 NextVibe approach (AI can't ignore):
+
 ```bash
 vibe check
 vibe check src/path/to/folder/or/file
@@ -558,6 +573,7 @@ vibe start                  # Start production server
 ## 🏗️ Tech Stack
 
 **Frontend:**
+
 - Next.js 16 (App Router)
 - React 19
 - TypeScript 7 / TSGO
@@ -565,12 +581,14 @@ vibe start                  # Start production server
 - shadcn/ui + react-native-reusables
 
 **Backend:**
+
 - Next.js API Routes
 - tRPC 11 (auto-generated)
 - PostgreSQL + Drizzle ORM
 - Zod validation
 
 **Developer Experience:**
+
 - Bun runtime
 - Vibe CLI (custom tooling)
 - ESLint with custom rules
@@ -593,17 +611,20 @@ vibe start                  # Start production server
 ## 🗺️ Roadmap
 
 ### ✅ Milestone 1: Core Framework (Complete)
+
 - ✅ Recursive API architecture
 - ✅ Type-safe translations
 - ✅ Vibe CLI tooling
 - ✅ Auto-managed database
 
 ### 🔄 Milestone 2: Developer Experience (In Progress)
+
 - ✅ Endpoint generators
 - ✅ Migration helpers
 - 🔄 Better error messages
 
 ### 📋 Milestone 3: React Native Support (In Progress)
+
 - 🔄 Single codebase for Web + Native
 - ✅ NativeWind integration
 - ✅ Expo Router auto-generation
@@ -618,6 +639,7 @@ vibe start                  # Start production server
 ### Framework Core (GPL-3.0)
 
 `src/app/api/[locale]/` + `src/packages/` are GPL-3.0:
+
 - ✅ Use freely in any project
 - ✅ Fork and modify as needed
 - ⚠️ Distribute modifications under GPL-3.0
@@ -625,6 +647,7 @@ vibe start                  # Start production server
 ### Everything Else (MIT)
 
 All other code is MIT licensed:
+
 - ✅ Full freedom - use commercially
 - ✅ Modify without restrictions
 - ✅ Keep changes private
@@ -654,6 +677,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 Marcus Brandstätter ([max@a42.ch](mailto:max@a42.ch))
 
 **AI Development Contributors:**
+
 - Augment
 - Claude Code
 - Cursor

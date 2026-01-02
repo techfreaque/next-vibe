@@ -1,6 +1,6 @@
 /**
- * Run Oxlint Repository (Parallel)
- * Handles parallel oxlint operations using child_process.spawn with resource management
+ * Run Oxlint Repository
+ * Handles oxlint operations using child_process.spawn
  */
 
 import { existsSync, promises as fs } from "node:fs";
@@ -12,51 +12,13 @@ import type { ResponseType as ApiResponseType } from "../../../shared/types/resp
 import { success } from "../../../shared/types/response.schema";
 import { parseError } from "../../../shared/utils/parse-error";
 import { ensureConfigReady } from "../config/repository";
-import {
-  createWorkerExitCodeMessage,
-  createWorkerFailedMessage,
-  createWorkerTimeoutMessage,
-  discoverFiles,
-  distributeFilesAcrossWorkers,
-  sortIssuesByLocation,
-} from "../config/shared";
-import type { CheckConfig, PrettierConfig } from "../config/types";
-import { getSystemResources } from "../config/utils";
+import { sortIssuesByLocation } from "../config/shared";
+import type { CheckConfig } from "../config/types";
 import type {
   OxlintIssue,
   OxlintRequestOutput,
   OxlintResponseOutput,
 } from "./definition";
-
-/**
- * Worker task for parallel processing
- */
-interface WorkerTask {
-  id: number;
-  files: string[];
-  fix: boolean;
-  timeout: number;
-}
-
-/**
- * Worker result from parallel processing
- */
-interface WorkerResult {
-  id: number;
-  success: boolean;
-  issues: Array<{
-    file: string;
-    line?: number;
-    column?: number;
-    rule?: string;
-    code?: string;
-    severity: "error" | "warning" | "info";
-    message: string;
-    type: "oxlint" | "lint" | "type";
-  }>;
-  duration: number;
-  error?: string;
-}
 
 /**
  * Run Oxlint Repository Interface
@@ -69,7 +31,7 @@ export interface OxlintRepositoryInterface {
 }
 
 /**
- * Run Oxlint Repository Implementation (Parallel)
+ * Run Oxlint Repository Implementation
  */
 export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   private config: CheckConfig | null = null;
@@ -79,10 +41,10 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<ApiResponseType<OxlintResponseOutput>> {
     try {
-      logger.debug("Starting parallel Oxlint execution", {
-        path: data.path,
-        fix: data.fix,
-      });
+      // eslint-disable-next-line i18next/no-literal-string
+      logger.debug(
+        `Starting Oxlint execution (path: ${data.path || "./"}, fix: ${data.fix})`,
+      );
 
       // Use unified config management
       const configResult = await ensureConfigReady(logger, false);
@@ -146,80 +108,42 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       const cacheDir = this.config.oxlint.cachePath;
       await fs.mkdir(cacheDir, { recursive: true });
 
-      // Get system resources and determine optimal worker count
-      const resources = getSystemResources();
-      logger.debug("System resources detected", {
-        cpus: resources.cpuCores,
-        memory: resources.availableMemoryMB,
-      });
-
-      // Handle multiple paths
+      // Handle multiple paths - support files, folders, or mixed
       const targetPaths = data.path
         ? Array.isArray(data.path)
           ? data.path
           : [data.path]
         : ["./"];
 
-      logger.debug("Resolving target paths", { targetPaths });
-
-      // Discover files to lint from all paths
-      const filesToLint: string[] = [];
-      for (const targetPath of targetPaths) {
-        const pathFiles = await discoverFiles(targetPath, logger, {
-          extensions: this.config.oxlint.lintableExtensions,
-          ignores: this.config.oxlint.ignorePatterns || [],
-        });
-        filesToLint.push(...pathFiles);
-      }
-
-      logger.debug(`Found ${filesToLint.length} files to lint`);
-
-      if (filesToLint.length === 0) {
-        return success({
-          issues: {
-            items: [],
-            files: [],
-            summary: {
-              totalIssues: 0,
-              totalFiles: 0,
-              totalErrors: 0,
-              displayedIssues: 0,
-              displayedFiles: 0,
-              currentPage: 1,
-              totalPages: 1,
-            },
-          },
-        });
-      }
-
-      // Distribute files across workers
-      const workerTasks = this.distributeFiles(
-        filesToLint,
-        resources.maxWorkers,
-        data,
+      // eslint-disable-next-line i18next/no-literal-string
+      logger.debug(
+        `Running oxlint on ${targetPaths.length} path(s): ${targetPaths.join(", ")}`,
       );
-      logger.debug(`Distributing work across ${workerTasks.length} workers`);
 
-      // Pre-create all cache directories in parallel
-      await this.createCacheDirectories(workerTasks, logger);
-
-      // Execute workers in parallel
-      const workerResults = await this.executeWorkersInParallel(
-        workerTasks,
+      // Run oxlint on paths (folders and/or files)
+      // Oxlint will handle file discovery based on ignore patterns in config
+      const result = await this.runOxlint(
+        targetPaths,
+        data.fix,
+        data.timeout,
         logger,
       );
 
-      // Merge results from all workers
-      const mergedResult = this.mergeWorkerResults(workerResults, data, logger);
+      // Build response with pagination
+      const response = this.buildResponse(
+        data.skipSorting ? result.issues : sortIssuesByLocation(result.issues),
+        data,
+      );
 
-      logger.debug("Parallel Oxlint execution completed", {
-        totalIssues: mergedResult.issues.items.length,
-      });
+      // eslint-disable-next-line i18next/no-literal-string
+      logger.debug(
+        `Oxlint execution completed (${response.issues.items.length} issues found)`,
+      );
 
-      return success(mergedResult);
+      return success(response);
     } catch (error) {
       const errorMessage = parseError(error).message;
-      logger.error("Parallel Oxlint execution failed", { error: errorMessage });
+      logger.error("Oxlint execution failed", { error: errorMessage });
 
       return success({
         issues: {
@@ -254,214 +178,130 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   }
 
   /**
-   * Distribute files across workers evenly
+   * Run oxlint on paths (files and/or folders)
    */
-  private distributeFiles(
-    files: string[],
-    workerCount: number,
-    data: OxlintRequestOutput,
-  ): WorkerTask[] {
-    const distributed = distributeFilesAcrossWorkers(files, workerCount);
+  private async runOxlint(
+    paths: string[],
+    fix: boolean,
+    timeout: number,
+    logger: EndpointLogger,
+  ): Promise<{ issues: OxlintIssue[] }> {
+    logger.debug(`Running oxlint on ${paths.length} path(s)`);
 
-    return distributed.map((workerFiles, index) => ({
-      id: index,
-      files: workerFiles,
-      fix: data.fix,
-      timeout: data.timeout,
-    }));
+    // Build oxlint command arguments
+    if (!this.config?.oxlint.enabled) {
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+      throw new Error("Oxlint config not available");
+    }
+    const oxlintConfigPath = resolve(this.config.oxlint.configPath);
+
+    // Check if config exists, if not use default settings
+    const configExists = existsSync(oxlintConfigPath);
+
+    /* eslint-disable i18next/no-literal-string */
+    const baseArgs = configExists
+      ? [
+          "oxlint",
+          "--format=json",
+          "--config",
+          oxlintConfigPath,
+          "--tsconfig",
+          "./tsconfig.json",
+          ...paths,
+        ]
+      : [
+          "oxlint",
+          "--format=json",
+          // Fallback: Enable plugins manually if no config
+          "--tsconfig",
+          "./tsconfig.json",
+          "--react-plugin",
+          "--jsx-a11y-plugin",
+          "--nextjs-plugin",
+          "-D",
+          "all",
+          ...paths,
+        ];
+    /* eslint-enable i18next/no-literal-string */
+
+    // If fix is requested, run oxlint --fix and oxfmt in parallel
+    if (fix) {
+      const fixArgs = [...baseArgs, "--fix"];
+
+      // Run both oxlint --fix and oxfmt in parallel
+      const [oxlintResult, oxfmtResult] = await Promise.allSettled([
+        this.runOxlintCommand(fixArgs, timeout, logger),
+        this.runOxfmt(paths, logger),
+      ]);
+
+      // Handle oxlint result
+      if (oxlintResult.status === "fulfilled") {
+        // Log oxfmt result if it failed
+        if (oxfmtResult.status === "rejected") {
+          logger.warn("Oxfmt formatting failed", {
+            error: String(oxfmtResult.reason),
+          });
+        }
+        return oxlintResult.value;
+      } else {
+        logger.error("Oxlint fix failed", {
+          error: String(oxlintResult.reason),
+        });
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+        throw oxlintResult.reason;
+      }
+    }
+
+    // Just run normal check
+    return await this.runOxlintCommand(baseArgs, timeout, logger);
   }
 
   /**
-   * Create global cache directory
+   * Run oxfmt on paths (files and/or folders) for formatting
    */
-  private async createCacheDirectories(
-    tasks: WorkerTask[],
+  private async runOxfmt(
+    paths: string[],
     logger: EndpointLogger,
   ): Promise<void> {
-    if (tasks.length === 0) {
+    if (paths.length === 0) {
       return;
     }
 
-    try {
-      // oxlint is guaranteed to be enabled when this method is called
-      // (this method is only invoked after config validation in execute())
-      if (this.config?.oxlint.enabled) {
-        await fs.mkdir(this.config.oxlint.cachePath, { recursive: true });
-      }
-    } catch (error) {
-      logger.warn("Failed to create global cache directory", {
-        error: parseError(error).message,
-      });
-    }
-  }
+    /* eslint-disable i18next/no-literal-string */
+    logger.debug(`Executing Oxfmt command: bunx oxfmt ${paths.join(" ")}`);
+    /* eslint-enable i18next/no-literal-string */
 
-  /**
-   * Execute workers in parallel using Bun.spawn
-   */
-  private async executeWorkersInParallel(
-    tasks: WorkerTask[],
-    logger: EndpointLogger,
-  ): Promise<WorkerResult[]> {
-    const results: WorkerResult[] = [];
+    const { spawn } = await import("node:child_process");
 
-    // Execute all workers in parallel
-    const workerPromises = tasks.map((task) =>
-      this.executeWorker(task, logger),
-    );
-
-    const workerResults = await Promise.allSettled(workerPromises);
-
-    for (let i = 0; i < workerResults.length; i++) {
-      const result = workerResults[i];
-      if (result.status === "fulfilled") {
-        results.push(result.value);
-      } else {
-        // Handle failed worker
-        results.push({
-          id: tasks[i].id,
-          success: false,
-          issues: [
-            {
-              file: "worker-error",
-              severity: "error" as const,
-              message: createWorkerFailedMessage(
-                tasks[i].id,
-                String(result.reason),
-              ),
-              type: "oxlint" as const,
-            },
-          ],
-          duration: 0,
-          error: String(result.reason),
-        });
-      }
-    }
-
-    return results;
-  }
-
-  /**
-   * Execute a single worker using Bun.spawn
-   */
-  private async executeWorker(
-    task: WorkerTask,
-    logger: EndpointLogger,
-  ): Promise<WorkerResult> {
-    const startTime = Date.now();
-
-    try {
-      // Cache directory already created in parallel during setup
-
-      // Build oxlint command arguments
-      // oxlint is guaranteed to be enabled when this method is called
-      // (this method is only invoked after config validation in execute())
-      if (!this.config?.oxlint.enabled) {
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-        throw new Error("Oxlint config not available");
-      }
-      const oxlintConfigPath = resolve(this.config.oxlint.configPath);
-
-      // Check if config exists, if not use default settings
-      const configExists = existsSync(oxlintConfigPath);
-
+    return await new Promise((resolve, reject) => {
       /* eslint-disable i18next/no-literal-string */
-      const baseArgs = configExists
-        ? [
-            "oxlint",
-            "--format=json",
-            "--config",
-            oxlintConfigPath,
-            "--tsconfig",
-            "./tsconfig.json",
-            ...task.files,
-          ]
-        : [
-            "oxlint",
-            "--format=json",
-            // Fallback: Enable plugins manually if no config
-            "--tsconfig",
-            "./tsconfig.json",
-            "--react-plugin",
-            "--jsx-a11y-plugin",
-            "--nextjs-plugin",
-            "-D",
-            "all",
-            ...task.files,
-          ];
+      const child = spawn("bunx", ["oxfmt", ...paths], {
+        cwd: process.cwd(),
+        stdio: ["ignore", "pipe", "pipe"],
+        shell: false,
+      });
       /* eslint-enable i18next/no-literal-string */
 
-      // If fix is requested, run oxlint --fix and prettier in parallel
-      if (task.fix) {
-        const fixArgs = [...baseArgs, "--fix"];
+      let stderr = "";
 
-        // Run both oxlint --fix and prettier in parallel
-        const [fixResult, prettierResult] = await Promise.allSettled([
-          this.runOxlintCommand(fixArgs, task, logger),
-          this.runPrettierFix(task.files, logger),
-        ]);
+      child.stderr?.on("data", (data: Buffer) => {
+        stderr += data.toString();
+      });
 
-        // Handle oxlint result
-        let issues: OxlintIssue[] = [];
-
-        if (fixResult.status === "fulfilled") {
-          issues = fixResult.value.issues;
+      child.on("close", (code) => {
+        if (code === 0) {
+          logger.debug(`Oxfmt formatting completed`);
+          resolve();
         } else {
-          logger.error("Oxlint fix failed", {
-            error: String(fixResult.reason),
-          });
-          issues = [
-            {
-              file: "oxlint-error",
-              severity: "error" as const,
-              // eslint-disable-next-line i18next/no-literal-string
-              message: `Oxlint failed: ${String(fixResult.reason)}`,
-              type: "oxlint" as const,
-            },
-          ];
+          // eslint-disable-next-line i18next/no-literal-string
+          reject(new Error(`Oxfmt failed with exit code ${code}: ${stderr}`));
         }
+      });
 
-        // Handle prettier result
-        if (prettierResult.status === "rejected") {
-          logger.warn("Prettier formatting failed", {
-            error: String(prettierResult.reason),
-          });
-        }
-
-        return {
-          id: task.id,
-          success: fixResult.status === "fulfilled",
-          issues,
-          duration: Date.now() - startTime,
-        };
-      }
-
-      // Just run normal check
-      const result = await this.runOxlintCommand(baseArgs, task, logger);
-      return {
-        id: task.id,
-        success: true,
-        issues: result.issues,
-        duration: Date.now() - startTime,
-      };
-    } catch (error) {
-      const errorMessage = parseError(error).message;
-      logger.error(`Worker ${task.id} failed`, { error: errorMessage });
-
-      return {
-        id: task.id,
-        success: false,
-        issues: [
-          {
-            file: "worker-error",
-            severity: "error" as const,
-            message: errorMessage,
-            type: "oxlint" as const,
-          },
-        ],
-        duration: Date.now() - startTime,
-        error: errorMessage,
-      };
-    }
+      child.on("error", (error) => {
+        reject(error);
+      });
+    });
   }
 
   /**
@@ -562,46 +402,19 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   }
 
   /**
-   * Merge results from all workers
-   */
-  private mergeWorkerResults(
-    workerResults: WorkerResult[],
-    data: OxlintRequestOutput,
-    logger: EndpointLogger,
-  ): OxlintResponseOutput {
-    const allIssues: OxlintIssue[] = [];
-
-    // Collect all issues from workers
-    for (const result of workerResults) {
-      allIssues.push(...result.issues);
-    }
-
-    // Sort issues by file, then by line number (unless skipSorting is true)
-    const issues = data.skipSorting
-      ? allIssues
-      : sortIssuesByLocation(allIssues);
-
-    logger.debug("Merged worker results", {
-      totalWorkers: workerResults.length,
-      totalIssues: issues.length,
-    });
-
-    return this.buildResponse(issues, data);
-  }
-
-  /**
    * Run oxlint command and return results
    */
   private async runOxlintCommand(
     args: string[],
-    task: WorkerTask,
+    timeout: number,
     logger: EndpointLogger,
   ): Promise<{
     issues: OxlintIssue[];
   }> {
-    logger.debug(`Worker ${task.id} starting with ${task.files.length} files`);
+    // eslint-disable-next-line i18next/no-literal-string
+    logger.debug(`Executing Oxlint command: bunx ${args.join(" ")}`);
 
-    // Use spawn for parallel execution
+    // Use spawn for execution
     const { spawn } = await import("node:child_process");
     const stdout = await new Promise<string>((resolve, reject) => {
       const child = spawn("bunx", args, {
@@ -627,7 +440,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         // So we only accept 0 and 1, reject on code >= 2
         if (code !== null && code >= 2) {
           const errorMsg =
-            stderrOutput.trim() || createWorkerExitCodeMessage(task.id, code);
+            stderrOutput.trim() || `Oxlint failed with exit code ${code}`;
           reject(new Error(errorMsg));
         } else {
           resolve(output);
@@ -644,8 +457,8 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         setTimeout(() => {
           child.kill("SIGKILL");
         }, 5000);
-        reject(new Error(createWorkerTimeoutMessage(task.id, task.timeout)));
-      }, task.timeout * 1000);
+        reject(new Error(`Oxlint timed out after ${timeout}s`));
+      }, timeout * 1000);
 
       // Clear timeout when process completes
       child.on("close", () => {
@@ -656,9 +469,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     // Parse oxlint output
     const result = await this.parseOxlintOutput(stdout, logger);
 
-    logger.debug(
-      `Worker ${task.id} completed with ${result.issues.length} issues`,
-    );
+    logger.debug(`Oxlint completed with ${result.issues.length} issues`);
 
     return result;
   }
@@ -773,183 +584,6 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     }
 
     return { issues };
-  }
-
-  /**
-   * Get prettier config from centralized config
-   */
-  private getPrettierConfig(): PrettierConfig {
-    if (this.config?.prettier.enabled) {
-      return this.config.prettier;
-    }
-    // Return default enabled config
-    return {
-      enabled: true,
-      configPath: ".tmp/.oxfmtrc.json",
-      semi: true,
-      singleQuote: false,
-      trailingComma: "all",
-      tabWidth: 2,
-      printWidth: 80,
-    };
-  }
-
-  /**
-   * Check if files need prettier formatting using --list-different
-   */
-  private async checkPrettierNeeded(
-    files: string[],
-    prettierConfig: PrettierConfig,
-    logger: EndpointLogger,
-  ): Promise<string[]> {
-    logger.debug(`Checking which files need prettier formatting`);
-
-    const { spawn } = await import("node:child_process");
-
-    return await new Promise((resolve) => {
-      /* eslint-disable i18next/no-literal-string */
-      const configArgs = Object.entries(prettierConfig)
-        .filter(
-          ([key]) =>
-            key !== "enabled" &&
-            key !== "configPath" &&
-            key !== "jsxBracketSameLine",
-        )
-        .flatMap(([key, value]) => {
-          // Convert camelCase to kebab-case for CLI flags
-          const flagName = key.replaceAll(/([A-Z])/g, "-$1").toLowerCase();
-          if (typeof value === "boolean") {
-            return value ? [`--${flagName}`] : [`--no-${flagName}`];
-          }
-          return [`--${flagName}`, String(value)];
-        });
-      /* eslint-enable i18next/no-literal-string */
-
-      const child = spawn(
-        "bunx",
-        ["prettier", "--list-different", ...configArgs, ...files],
-        {
-          cwd: process.cwd(),
-          stdio: ["ignore", "pipe", "pipe"],
-          shell: false,
-        },
-      );
-
-      let stdout = "";
-
-      child.stdout?.on("data", (data: Buffer) => {
-        stdout += data.toString();
-      });
-
-      child.stderr?.on("data", () => {
-        // Ignore stderr
-      });
-
-      child.on("close", () => {
-        // Parse list of files that need formatting from stdout
-        const needsFormatting = stdout
-          .trim()
-          .split("\n")
-          .filter((line) => line.length > 0);
-
-        logger.debug(
-          `${needsFormatting.length} files need prettier formatting`,
-        );
-        resolve(needsFormatting);
-      });
-
-      child.on("error", (error) => {
-        logger.warn("Prettier check failed, will skip formatting", {
-          error: error.message,
-        });
-        resolve([]); // Don't fail, just skip formatting
-      });
-    });
-  }
-
-  /**
-   * Run prettier on files for formatting (only files that need it)
-   */
-  private async runPrettierFix(
-    files: string[],
-    logger: EndpointLogger,
-  ): Promise<void> {
-    // Get prettier config from check.config.ts
-    const prettierConfig = this.getPrettierConfig();
-
-    if (!prettierConfig.enabled) {
-      logger.debug("Prettier is disabled, skipping formatting");
-      return;
-    }
-
-    // First check which files actually need formatting
-    const filesToFormat = await this.checkPrettierNeeded(
-      files,
-      prettierConfig,
-      logger,
-    );
-
-    if (filesToFormat.length === 0) {
-      logger.debug("No files need prettier formatting, skipping");
-      return;
-    }
-
-    logger.debug(`Running prettier on ${filesToFormat.length} files`);
-
-    const { spawn } = await import("node:child_process");
-
-    // Convert prettier config to CLI flags (exclude internal config properties)
-    /* eslint-disable i18next/no-literal-string */
-    const configArgs = Object.entries(prettierConfig)
-      .filter(
-        ([key]) =>
-          key !== "enabled" &&
-          key !== "configPath" &&
-          key !== "jsxBracketSameLine",
-      )
-      .flatMap(([key, value]) => {
-        // Convert camelCase to kebab-case for CLI flags
-        const flagName = key.replaceAll(/([A-Z])/g, "-$1").toLowerCase();
-        if (typeof value === "boolean") {
-          return value ? [`--${flagName}`] : [`--no-${flagName}`];
-        }
-        return [`--${flagName}`, String(value)];
-      });
-    /* eslint-enable i18next/no-literal-string */
-
-    return await new Promise((resolve, reject) => {
-      const child = spawn(
-        "bunx",
-        ["prettier", "--write", ...configArgs, ...filesToFormat],
-        {
-          cwd: process.cwd(),
-          stdio: ["ignore", "pipe", "pipe"],
-          shell: false,
-        },
-      );
-
-      let stderr = "";
-
-      child.stderr?.on("data", (data: Buffer) => {
-        stderr += data.toString();
-      });
-
-      child.on("close", (code) => {
-        if (code === 0) {
-          logger.debug(`Prettier formatted ${filesToFormat.length} files`);
-          resolve();
-        } else {
-          // eslint-disable-next-line i18next/no-literal-string
-          reject(
-            new Error(`Prettier failed with exit code ${code}: ${stderr}`),
-          );
-        }
-      });
-
-      child.on("error", (error) => {
-        reject(error);
-      });
-    });
   }
 }
 

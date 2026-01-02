@@ -173,7 +173,7 @@ Commands respect endpoint permissions:
 // definition.ts
 allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF];
 
-// user must have ADMIN; disabled for CLI 
+// user must have ADMIN; disabled for CLI
 ```
 
 Special role `WEB_OFF` and `AI_TOOL_OFF` for CLI-only operations:

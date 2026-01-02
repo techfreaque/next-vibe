@@ -161,6 +161,27 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
 
       logger.debug("ESLint configuration loaded");
 
+      // Check if parallel mode is enabled
+      const useParallel = checkConfig.eslint.parallel ?? true;
+
+      if (!useParallel) {
+        // Non-parallel mode: pass paths directly to eslint
+        // eslint-disable-next-line i18next/no-literal-string
+        logger.debug(
+          `Starting sequential ESLint execution (path: ${data.path || "./"}, fix: ${data.fix})`,
+        );
+
+        const result = await this.executeSequential(data, checkConfig, logger);
+
+        // eslint-disable-next-line i18next/no-literal-string
+        logger.debug(
+          `Sequential ESLint execution completed (${result.issues.items.length} issues found)`,
+        );
+
+        return success(result);
+      }
+
+      // Parallel mode: discover files and distribute across workers
       logger.debug("Starting parallel ESLint execution", {
         path: data.path,
         fix: data.fix,
@@ -261,6 +282,119 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         },
       });
     }
+  }
+
+  /**
+   * Execute ESLint sequentially (non-parallel mode)
+   * Passes paths directly to eslint instead of discovering all files
+   */
+  private async executeSequential(
+    data: LintRequestOutput,
+    checkConfig: {
+      eslint: { enabled: true; configPath: string; cachePath: string };
+    },
+    logger: EndpointLogger,
+  ): Promise<LintResponseOutput> {
+    // Ensure cache directory exists
+    const cacheDir = checkConfig.eslint.cachePath;
+    await fs.mkdir(dirname(cacheDir), { recursive: true });
+
+    // Handle multiple paths - support files, folders, or mixed
+    const targetPaths = data.path
+      ? Array.isArray(data.path)
+        ? data.path
+        : [data.path]
+      : ["./"];
+
+    logger.debug("Running ESLint on paths", { targetPaths });
+
+    // Build ESLint command
+    const eslintConfigPath = resolve(
+      process.cwd(),
+      checkConfig.eslint.configPath,
+    );
+    const args = [
+      "eslint",
+      "--format=json",
+      "--cache",
+      "--cache-location",
+      cacheDir,
+      "--cache-strategy",
+      "metadata",
+      "--config",
+      eslintConfigPath,
+      ...targetPaths,
+    ];
+
+    if (data.fix) {
+      args.push("--fix");
+    }
+
+    // Execute ESLint
+    // eslint-disable-next-line i18next/no-literal-string
+    const command = `bunx ${args.join(" ")}`;
+    logger.debug("Executing ESLint command (Sequential)", { command });
+
+    const { spawn } = await import("node:child_process");
+    const stdout = await new Promise<string>((resolve, reject) => {
+      const child = spawn("bunx", args, {
+        cwd: process.cwd(),
+        stdio: ["ignore", "pipe", "pipe"],
+        shell: false,
+      });
+
+      let output = "";
+
+      child.stdout?.on("data", (data: Buffer) => {
+        output += data.toString();
+      });
+
+      child.stderr?.on("data", () => {
+        // Ignore stderr
+      });
+
+      child.on("close", (code) => {
+        // ESLint exit codes: 0=success, 1=lint errors found, 2=config/internal error
+        if (code !== null && code > 2) {
+          // eslint-disable-next-line i18next/no-literal-string
+          reject(new Error(`ESLint failed with exit code ${code}`));
+        } else {
+          resolve(output);
+        }
+      });
+
+      child.on("error", (error) => {
+        reject(error);
+      });
+
+      // Set timeout
+      const timeoutId = setTimeout(() => {
+        child.kill("SIGTERM");
+        setTimeout(() => {
+          child.kill("SIGKILL");
+        }, 5000);
+        // eslint-disable-next-line i18next/no-literal-string
+        reject(new Error(`ESLint timed out after ${data.timeout}s`));
+      }, data.timeout * 1000);
+
+      child.on("close", () => {
+        clearTimeout(timeoutId);
+      });
+    });
+
+    // Parse ESLint output
+    const result = await this.parseEslintOutputWithFixableDetection(
+      stdout,
+      data.fix,
+      logger,
+    );
+
+    // Build response
+    const sortedIssues = data.skipSorting
+      ? result.issues
+      : sortIssuesByLocation(result.issues);
+
+    return this.buildResponse(sortedIssues, data);
   }
 
   /**
@@ -571,7 +705,9 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     issues: LintIssue[];
     hasFixableIssues: boolean;
   }> {
-    logger.debug(`Worker ${task.id} starting with ${task.files.length} files`);
+    // eslint-disable-next-line i18next/no-literal-string
+    const command = `bunx ${args.join(" ")}`;
+    logger.debug(`Executing ESLint command (Worker ${task.id})`, { command });
 
     // Use spawn for parallel execution
     const { spawn } = await import("node:child_process");

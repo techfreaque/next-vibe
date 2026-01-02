@@ -26,7 +26,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => 
+    handler: async ({ data, logger }) =>
       await browserRepository.executeTool(data, logger),
   },
 });
@@ -127,8 +127,7 @@ export const { GET, POST, PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ user, logger }) =>
-      MyRepository.list(user, logger),
+    handler: ({ user, logger }) => MyRepository.list(user, logger),
   },
   [Methods.POST]: {
     email: undefined,

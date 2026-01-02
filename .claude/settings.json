@@ -1,10 +1,6 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(find:*)",
-      "Bash(vibe check:*)",
-      "Bash(git diff:*)"
-    ],
+    "allow": ["Bash(find:*)", "Bash(vibe check:*)", "Bash(git diff:*)"],
     "deny": [
       "Bash(git add:*)",
       "Bash(git commit:*)",

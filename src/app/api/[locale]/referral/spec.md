@@ -1,6 +1,7 @@
 # Referral System – High-Level Spec
 
 ## 1. Goals & Entry Points
+
 - Allow **any authenticated user** to create **N referral codes**, each unique globally in the DB.
 - Support **two main entry flows**:
   1. **Marketing links via `/[locale]/track`** – URL includes a referral code (e.g. `?ref=CODE`); track route validates + stores it against the existing `leadId` cookie so later signup can use it.
@@ -15,12 +16,14 @@
 **CRITICAL ARCHITECTURE DECISION**: Hybrid two-phase referral tracking.
 
 **Why hybrid lead + user tracking?**
+
 - **Phase 1 (Pre-signup)**: Track via leadId (device/session) - user doesn't exist yet
 - **Phase 2 (Post-signup)**: Copy to userId - permanent, stable referral chain
 - **Problem solved**: If leadId disappears (cleared cookies, new device), userId chain remains intact
 - **Payment payout**: Always uses userId chain (stable, never breaks)
 
 **Flow:**
+
 1. User clicks referral link → leadId created (middleware)
 2. Referral code stored → `lead_referrals` table (leadId → referralCodeId)
 3. User signs up → `user_referrals` table created (userId → referrerUserId)
@@ -77,6 +80,7 @@ Balances and aggregates (e.g. total earned) can be computed via queries or a lat
 ## 3. Payout Algorithm (Multi‑Level Marketing)
 
 **Chain Resolution (User-Based - Stable)**:
+
 1. User makes payment → get userId (sourceUserId)
 2. Get referrerUserId from `user_referrals` WHERE referredUserId = sourceUserId (level 0)
 3. Get referrerUserId from `user_referrals` WHERE referredUserId = previous referrerUserId (level 1)
@@ -84,12 +88,14 @@ Balances and aggregates (e.g. total earned) can be computed via queries or a lat
 5. Cap at `L_max` levels (configurable, e.g. 5–10)
 
 **Why user-based chain?**
+
 - `user_referrals` is permanent (doesn't depend on leadId/cookies)
 - Simple recursive query: userId → referrerUserId → referrerUserId...
 - No need to traverse leads or userLeadLinks
 - Chain never breaks even if user clears cookies or uses new device
 
 **Payout Distribution**:
+
 - For each qualifying transaction with total amount `T` (e.g. `$10`):
   - **Pool**: `P = 0.2 × T` (20%) → e.g. `$2`.
   - Fetch the **upline chain** using user-based resolution above.
@@ -102,6 +108,7 @@ Balances and aggregates (e.g. total earned) can be computed via queries or a lat
 - If there are fewer uplines than `L_max`, we only use existing levels and renormalize over those levels so their shares still sum to `P`.
 
 ## 4. API Surface: `/api/[locale]/referral`
+
 Mirror the **login** feature structure (`definition.ts`, `repository.ts`, `hooks.ts`, `_components`, `i18n`, `route.ts`, tests):
 
 1. **Endpoints (initial set)**
@@ -135,6 +142,7 @@ Mirror the **login** feature structure (`definition.ts`, `repository.ts`, `hooks
 ## 5. Frontend Integration
 
 ### 5.1 `/[locale]/track` route
+
 - Extend existing `track` page to understand referral codes, without breaking current lead tracking:
   - Accept `ref` query param (e.g., `/track?ref=FRIEND2024&url=/signup`).
   - Store referral code in **localStorage** (key: `referralCode`).
@@ -142,6 +150,7 @@ Mirror the **login** feature structure (`definition.ts`, `repository.ts`, `hooks
   - No server-side call needed at this point - just store for later use.
 
 ### 5.2 Signup flow (CRITICAL: Two-phase conversion)
+
 - **Phase 1: Pre-signup (Lead-based)**
   - On page load (before form submission):
     1. Check localStorage for `referralCode`.
@@ -164,6 +173,7 @@ Mirror the **login** feature structure (`definition.ts`, `repository.ts`, `hooks
 - **Key insight**: Two-phase conversion ensures referral chain survives even if leadId disappears.
 
 ### 5.3 Referral dashboard UI
+
 - New user‑facing UI (page + components), reusing the API hooks:
   - List of codes with create button.
   - For each code: signups count, active subscribers, total revenue, total earnings.
@@ -173,6 +183,7 @@ Mirror the **login** feature structure (`definition.ts`, `repository.ts`, `hooks
   - `i18n/*` for translations.
 
 ## 6. Payment Success Integration
+
 - Identify central **payment success handlers** (subscriptions, credit packs).
 - After a successful transaction:
   1. Resolve buyer’s referral chain using **user-based resolution** (see section 3).
@@ -182,6 +193,7 @@ Mirror the **login** feature structure (`definition.ts`, `repository.ts`, `hooks
 - For refunds/chargebacks (later phase), add logic to mark relevant `referral_earnings` as `voided` and exclude them from available balances.
 
 ## 7. Constraints, Security & Edge Cases
+
 - **Uniqueness**: DB unique index on `referral_codes.code` ensures no collisions; retries on conflict when generating codes.
 - **Limits per user**: allow unbounded initially but design repository so we can plug in per‑plan limits later.
 - **No loops**:
@@ -197,6 +209,7 @@ Mirror the **login** feature structure (`definition.ts`, `repository.ts`, `hooks
 - **Lead disappearance**: Not a problem - `user_referrals` is permanent and independent of leadId.
 
 ## 8. Implementation Strategy
+
 - Use **`core/user/public/login`** as the architectural template for:
   - Folder layout, `route.ts`, `definition.ts`, `hooks.ts`, `repository.ts`, `_components`, `i18n`, and tests.
 - Phase 1 (this spec): define data model, APIs, and integration points.
