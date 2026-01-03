@@ -988,6 +988,9 @@ export const translations: typeof enTranslations = {
       next: "Następna gałąź",
     },
   },
+  batchToolConfirmation: {
+    title: "Potwierdzenie Narzędzi Wsadowych",
+  },
   reasoning: {
     title: "Myślenie",
     multiple: "{{count}} kroków rozumowania",

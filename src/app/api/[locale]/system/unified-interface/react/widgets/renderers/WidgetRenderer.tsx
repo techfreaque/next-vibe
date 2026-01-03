@@ -44,6 +44,7 @@ import { StatWidget } from "../implementations/StatWidget";
 import { SubmitButtonWidget } from "../implementations/SubmitButtonWidget";
 import { TextWidget } from "../implementations/TextWidget";
 import { TitleWidget } from "../implementations/TitleWidget";
+import type { CancelButtonConfig, SubmitButtonConfig } from "./EndpointRenderer";
 
 /**
  * Widget Renderer Props
@@ -73,6 +74,10 @@ export interface WidgetRendererProps<TKey extends string> {
   isSubmitting?: boolean;
   /** Endpoint definition (required for some widgets like FormFieldWidget) */
   endpoint: CreateApiEndpointAny;
+  /** Submit button configuration */
+  submitButton?: SubmitButtonConfig;
+  /** Cancel button configuration */
+  cancelButton?: CancelButtonConfig;
 }
 
 /**
@@ -114,6 +119,8 @@ export function WidgetRenderer<const TKey extends string>({
   onCancel,
   isSubmitting,
   endpoint,
+  submitButton,
+  cancelButton,
 }: WidgetRendererProps<TKey>): JSX.Element {
   const baseProps = {
     field,
@@ -127,6 +134,8 @@ export function WidgetRenderer<const TKey extends string>({
     onCancel,
     isSubmitting,
     endpoint,
+    submitButton,
+    cancelButton,
   };
 
   // Wrap widget in error boundary

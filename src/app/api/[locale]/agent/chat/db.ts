@@ -355,7 +355,7 @@ export const chatMessages = pgTable(
 
     // Message content
     role: text("role", { enum: ChatMessageRoleDB }).notNull(),
-    content: text("content").notNull(),
+    content: text("content"), // Nullable: tool messages have null content, assistant messages can be null if no text before tool calls
 
     // Threading/branching - self-reference requires AnyPgColumn to break circular inference
     parentId: uuid("parent_id").references((): AnyPgColumn => chatMessages.id, {
@@ -404,7 +404,7 @@ export const chatMessages = pgTable(
     // GIN index for full-text search performance
     searchVectorIdx: index("chat_messages_search_vector_idx").using(
       "gin",
-      sql`to_tsvector('english', ${table.content})`,
+      sql`to_tsvector('english', COALESCE(${table.content}, ''))`,
     ),
     // Additional indexes for common queries
     threadIdIdx: index("chat_messages_thread_id_idx").on(table.threadId),

@@ -144,40 +144,25 @@ export function parseCliArgumentsSimple(args: string[]): {
     }
 
     if (arg.startsWith("--")) {
-      // Handle --key=value or --key value
+      // Handle --key=value or --key (boolean flag)
       const sliced = arg.slice(2);
       const [key, ...valueParts] = sliced.split("=");
       let value: string | number | boolean;
 
       if (valueParts.length > 0) {
-        // --key=value format
-        value = valueParts.join("=");
-      } else if (i + 1 < args.length && !args[i + 1].startsWith("-")) {
-        // --key value format
-        value = args[i + 1];
-        i++; // Skip the next argument as it's the value
+        // --key=value format - use the explicit value
+        value = convertCliValue(valueParts.join("="));
       } else {
-        // Boolean flag
+        // --key format without value - always boolean, never consume next argument
         value = true;
-      }
-
-      // Try to parse simple boolean values
-      if (typeof value === "string") {
-        value = convertCliValue(value);
       }
 
       // Support nested object notation (e.g., --group.name=value)
       setNestedValue(namedArgs, key, value);
     } else if (arg.startsWith("-")) {
-      // Handle -k value (single dash)
+      // Handle -k (single dash) - always boolean, never consume next argument
       const key = arg.slice(1);
-      if (i + 1 < args.length && args[i + 1] && !args[i + 1].startsWith("-")) {
-        const value = convertCliValue(args[i + 1]);
-        setNestedValue(namedArgs, key, value);
-        i++;
-      } else {
-        setNestedValue(namedArgs, key, true);
-      }
+      setNestedValue(namedArgs, key, true);
     } else {
       // Positional argument
       positionalArgs.push(arg);
@@ -229,7 +214,7 @@ export function parseCliArguments(
     }
 
     if (arg.startsWith("--")) {
-      // Handle --key=value or --key value
+      // Handle --key=value or --key (boolean flag)
       try {
         const sliced = arg.slice(2);
         if (typeof sliced !== "string") {
@@ -240,21 +225,11 @@ export function parseCliArguments(
         let value: string | number | boolean;
 
         if (valueParts.length > 0) {
-          // --key=value format
-          value = valueParts.join("=");
-        } else if (i + 1 < relevantArgs.length && !relevantArgs[i + 1].startsWith("-")) {
-          // --key value format
-          value = relevantArgs[i + 1];
-          i++; // Skip the next argument as it's the value
+          // --key=value format - use the explicit value
+          value = convertCliValue(valueParts.join("="));
         } else {
-          // Boolean flag
+          // --key format without value - always boolean, never consume next argument
           value = true;
-        }
-
-        // Try to parse simple boolean values only
-        if (typeof value === "string") {
-          value = convertCliValue(value);
-          // Don't parse JSON here - let the main handler do it
         }
 
         // Support nested object notation (e.g., --group.name=value)
@@ -264,19 +239,9 @@ export function parseCliArguments(
         continue;
       }
     } else if (arg.startsWith("-")) {
-      // Handle -k value (single dash)
+      // Handle -k (single dash) - always boolean, never consume next argument
       const key = arg.slice(1);
-      if (
-        i + 1 < relevantArgs.length &&
-        relevantArgs[i + 1] &&
-        !relevantArgs[i + 1].startsWith("-")
-      ) {
-        const value = convertCliValue(relevantArgs[i + 1]);
-        setNestedValue(namedArgs, key, value);
-        i++;
-      } else {
-        setNestedValue(namedArgs, key, true);
-      }
+      setNestedValue(namedArgs, key, true);
     } else {
       // Positional argument
       positionalArgs.push(arg);

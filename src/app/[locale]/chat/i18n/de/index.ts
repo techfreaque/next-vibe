@@ -992,6 +992,9 @@ export const translations: typeof enTranslations = {
       next: "Nächster Zweig",
     },
   },
+  batchToolConfirmation: {
+    title: "Stapel-Tool-Bestätigung",
+  },
   reasoning: {
     title: "Denken",
     multiple: "{{count}} Denkschritte",

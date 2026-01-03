@@ -65,19 +65,17 @@ export function useMessageEditor({
   onCancel,
   logger,
 }: UseMessageEditorOptions): UseMessageEditorReturn {
-  const [content, setContent] = useState(message.content);
+  const [content, setContent] = useState(message.content ?? "");
   const [attachments, setAttachments] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [actionType, setActionType] = useState<EditorActionType>(null);
   const editorRef = useRef<DivRefObject>(null);
   const textareaRef = useRef<TextareaRefObject>(null);
 
-  // Generate unique draft key for this message editor
   const draftKey = `message-editor-draft:${message.id}`;
 
-  // Capture message content in ref to avoid re-running effect when content changes
-  const messageContentRef = useRef(message.content);
-  messageContentRef.current = message.content;
+  const messageContentRef = useRef(message.content ?? "");
+  messageContentRef.current = message.content ?? "";
 
   // Load draft on mount or when message ID changes
   // Don't re-run when message.content changes to avoid overriding user input

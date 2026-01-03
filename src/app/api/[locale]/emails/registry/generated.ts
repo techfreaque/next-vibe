@@ -104,10 +104,7 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
     description: "app.api.emails.templates.password.reset.confirm.meta.description",
     category: "auth",
     path: "/src/app/api/[locale]/user/public/reset-password/confirm/email.tsx",
-    exampleProps: {
-      publicName: "Max Mustermann",
-      userId: "example-user-id-123",
-    },
+    exampleProps: { publicName: "Max Mustermann", userId: "example-user-id-123" },
   },
   "password-reset-request": {
     id: "password-reset-request",

@@ -25,13 +25,13 @@ export interface CreateMessageParams {
   audioInput?: { file: File };
   attachments?: File[];
   operation: "send" | "retry" | "edit";
-  // Optional: for send operation with tool confirmation or explicit params
+  // Optional: for send operation with tool confirmations or explicit params
   messageHistory?: ChatMessage[] | null;
-  toolConfirmation?: {
+  toolConfirmations?: Array<{
     messageId: string;
     confirmed: boolean;
     updatedArgs?: Record<string, string | number | boolean | null>;
-  };
+  }>;
 }
 
 export interface MessageOperationDeps {
@@ -72,7 +72,10 @@ export async function createAndSendUserMessage(
   chatStore.setLoading(true);
 
   try {
-    const newMessageId = crypto.randomUUID();
+    // For tool confirmations, we don't create a new user message
+    // We're just confirming existing tool calls
+    const hasToolConfirmations = params.toolConfirmations && params.toolConfirmations.length > 0;
+    const newMessageId = hasToolConfirmations ? null : crypto.randomUUID();
 
     // Load thread messages
     let threadMessages: ChatMessage[];
@@ -95,69 +98,76 @@ export async function createAndSendUserMessage(
       }
     }
 
-    // Handle attachments based on mode (BEFORE creating message)
-    let messageMetadata: ChatMessage["metadata"] = {};
-    if (audioInput) {
-      messageMetadata = { isTranscribing: true };
-    } else if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-      // INCOGNITO MODE: Convert File objects to base64
-      if (attachments && attachments.length > 0) {
-        const { convertFilesToIncognitoAttachments } =
-          await import("../../../../../incognito/file-utils");
-        const attachmentMetadata = await convertFilesToIncognitoAttachments(attachments);
-        messageMetadata = { attachments: attachmentMetadata };
+    // Skip user message creation for tool confirmations
+    if (!hasToolConfirmations) {
+      // Handle attachments based on mode (BEFORE creating message)
+      let messageMetadata: ChatMessage["metadata"] = {};
+      if (audioInput) {
+        messageMetadata = { isTranscribing: true };
+      } else if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
+        // INCOGNITO MODE: Convert File objects to base64
+        if (attachments && attachments.length > 0) {
+          const { convertFilesToIncognitoAttachments } =
+            await import("../../../../../incognito/file-utils");
+          const attachmentMetadata = await convertFilesToIncognitoAttachments(attachments);
+          messageMetadata = { attachments: attachmentMetadata };
 
-        logger.debug(`Converted ${operation} attachments to base64 (incognito)`, {
-          attachmentCount: attachmentMetadata.length,
-        });
+          logger.debug(`Converted ${operation} attachments to base64 (incognito)`, {
+            attachmentCount: attachmentMetadata.length,
+          });
+        }
+      } else {
+        // PRIVATE MODE: Set loading state, FILES_UPLOADED event will update with URLs
+        if (attachments && attachments.length > 0) {
+          messageMetadata = { isUploadingAttachments: true };
+
+          logger.debug(`${operation} will upload attachments via AI stream (private)`, {
+            attachmentCount: attachments.length,
+          });
+        }
+      }
+
+      // Create user message
+      const createdUserMessage: ChatMessage = {
+        id: newMessageId!,
+        threadId,
+        role: ChatMessageRole.USER,
+        content: audioInput ? "" : content,
+        parentId: parentMessageId,
+        depth: parentDepth + 1,
+        sequenceId: null,
+        authorId: currentRootFolderId === DefaultFolderId.INCOGNITO ? "incognito" : null,
+        authorName: null,
+        authorAvatar: null,
+        authorColor: null,
+        isAI: false,
+        model: settings.selectedModel,
+        character: settings.selectedCharacter,
+        errorType: null,
+        errorMessage: null,
+        errorCode: null,
+        edited: false,
+        originalId: null,
+        tokens: null,
+        metadata: messageMetadata,
+        upvotes: 0,
+        downvotes: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        searchVector: null,
+      };
+
+      chatStore.addMessage(createdUserMessage);
+
+      // Save to localStorage (incognito only - server saves via API)
+      if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
+        const { saveMessage } = await import("../../../../../incognito/storage");
+        await saveMessage(createdUserMessage);
       }
     } else {
-      // PRIVATE MODE: Set loading state, FILES_UPLOADED event will update with URLs
-      if (attachments && attachments.length > 0) {
-        messageMetadata = { isUploadingAttachments: true };
-
-        logger.debug(`${operation} will upload attachments via AI stream (private)`, {
-          attachmentCount: attachments.length,
-        });
-      }
-    }
-
-    // Create user message
-    const createdUserMessage: ChatMessage = {
-      id: newMessageId,
-      threadId,
-      role: ChatMessageRole.USER,
-      content: audioInput ? "" : content,
-      parentId: parentMessageId,
-      depth: parentDepth + 1,
-      sequenceId: null,
-      authorId: currentRootFolderId === DefaultFolderId.INCOGNITO ? "incognito" : null,
-      authorName: null,
-      authorAvatar: null,
-      authorColor: null,
-      isAI: false,
-      model: settings.selectedModel,
-      character: settings.selectedCharacter,
-      errorType: null,
-      errorMessage: null,
-      errorCode: null,
-      edited: false,
-      originalId: null,
-      tokens: null,
-      metadata: messageMetadata,
-      upvotes: 0,
-      downvotes: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      searchVector: null,
-    };
-
-    chatStore.addMessage(createdUserMessage);
-
-    // Save to localStorage (incognito only - server saves via API)
-    if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-      const { saveMessage } = await import("../../../../../incognito/storage");
-      await saveMessage(createdUserMessage);
+      logger.debug("Skipping user message creation for tool confirmations", {
+        count: params.toolConfirmations?.length ?? 0,
+      });
     }
 
     // Voice mode settings
@@ -192,7 +202,7 @@ export async function createAndSendUserMessage(
             toolId: tool.id,
             requiresConfirmation: tool.requiresConfirmation,
           })) ?? null,
-        toolConfirmation: params.toolConfirmation ?? null,
+        toolConfirmations: params.toolConfirmations ?? null,
         messageHistory: messageHistory ?? null,
         attachments: attachments && attachments.length > 0 ? attachments : null,
         voiceMode: effectiveVoiceMode,

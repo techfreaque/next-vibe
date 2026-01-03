@@ -991,6 +991,9 @@ export const translations = {
       next: "Next branch",
     },
   },
+  batchToolConfirmation: {
+    title: "Batch Tool Confirmation",
+  },
   toolCall: {
     search: {
       title: "Searching the web",

@@ -24,7 +24,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../shared/types/common.schema";
 import { DefaultFolderId } from "../chat/config";
-import { selectChatMessageSchema } from "../chat/db";
+import { type ChatMessage, selectChatMessageSchema } from "../chat/db";
 import { ChatMessageRole, ChatMessageRoleOptions } from "../chat/enum";
 import { ModelId, ModelIdOptions } from "../chat/model-access/models";
 import { DEFAULT_TTS_VOICE, TtsVoice } from "../text-to-speech/enum";
@@ -139,7 +139,7 @@ const { POST } = createEndpoint({
           description: "app.api.agent.chat.aiStream.post.userMessageId.description",
           columns: 3,
         },
-        z.uuid(),
+        z.uuid().nullable(),
       ),
       parentMessageId: requestDataField(
         {
@@ -260,52 +260,20 @@ const { POST } = createEndpoint({
           },
         ),
       ),
-      toolConfirmation: objectOptionalField(
+      toolConfirmations: requestDataArrayOptionalField(
         {
-          type: WidgetType.CONTAINER,
-          title: "app.api.agent.chat.aiStream.post.toolConfirmation.label",
-          description: "app.api.agent.chat.aiStream.post.toolConfirmation.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
+          type: WidgetType.DATA_LIST,
+          label: "app.api.agent.chat.aiStream.post.toolConfirmations.label",
+          description: "app.api.agent.chat.aiStream.post.toolConfirmations.description",
+          optional: true,
         },
-        { request: "data" },
-        {
-          messageId: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.UUID,
-              label: "app.api.agent.chat.aiStream.post.toolConfirmation.messageId.label",
-              description:
-                "app.api.agent.chat.aiStream.post.toolConfirmation.messageId.description",
-              columns: 6,
-            },
-            z.string().uuid(),
-          ),
-          confirmed: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.agent.chat.aiStream.post.toolConfirmation.confirmed.label",
-              description:
-                "app.api.agent.chat.aiStream.post.toolConfirmation.confirmed.description",
-              columns: 6,
-            },
-            z.boolean(),
-          ),
-          updatedArgs: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.JSON,
-              label: "app.api.agent.chat.aiStream.post.toolConfirmation.updatedArgs.label",
-              description:
-                "app.api.agent.chat.aiStream.post.toolConfirmation.updatedArgs.description",
-              columns: 12,
-            },
-            z
-              .record(z.string(), z.union([z.string(), z.coerce.number(), z.boolean(), z.null()]))
-              .optional(),
-          ),
-        },
+        z.object({
+          messageId: z.string().uuid(),
+          confirmed: z.boolean(),
+          updatedArgs: z
+            .record(z.string(), z.union([z.string(), z.coerce.number(), z.boolean(), z.null()]))
+            .optional(),
+        }),
       ),
 
       // === MESSAGE HISTORY (for incognito mode) ===
@@ -325,7 +293,7 @@ const { POST } = createEndpoint({
             }),
           )
           .optional()
-          .nullable(),
+          .nullable() as z.ZodType<ChatMessage[]>,
       ),
 
       // === FILE ATTACHMENTS ===
@@ -529,7 +497,7 @@ const { POST } = createEndpoint({
         temperature: 0.7,
         maxTokens: 1000,
         tools: null,
-        toolConfirmation: null,
+        toolConfirmations: null,
         messageHistory: [],
         attachments: [],
         resumeToken: null,
@@ -550,7 +518,7 @@ const { POST } = createEndpoint({
         temperature: 0.8,
         maxTokens: 1500,
         tools: null,
-        toolConfirmation: null,
+        toolConfirmations: null,
         messageHistory: [],
         attachments: [],
         resumeToken: null,
@@ -571,7 +539,7 @@ const { POST } = createEndpoint({
         temperature: 0.7,
         maxTokens: 1200,
         tools: null,
-        toolConfirmation: null,
+        toolConfirmations: null,
         messageHistory: [],
         attachments: [],
         resumeToken: null,

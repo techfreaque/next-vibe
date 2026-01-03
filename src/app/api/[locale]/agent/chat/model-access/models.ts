@@ -410,7 +410,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     icon: "si-anthropic",
     openRouterModel: "anthropic/claude-haiku-4.5",
     creditCost: 3,
-    utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.CODING],
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.CODING, ModelUtility.VISION],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.FAST,

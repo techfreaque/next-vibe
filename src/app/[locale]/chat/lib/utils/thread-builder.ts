@@ -1,4 +1,5 @@
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { BRANCH_INDEX_KEY } from "@/app/api/[locale]/agent/chat/hooks/use-branch-management";
 
 /**
  * Get direct replies for a specific message
@@ -31,7 +32,7 @@ export function sortMessagesByTime(messages: ChatMessage[]): ChatMessage[] {
  *
  * Special handling for root-level branches:
  * When there are multiple root messages (parentId === null), they are treated as
- * siblings at the root level. Use branchIndices["__root__"] to select which root to follow.
+ * siblings at the root level. Use branchIndices[BRANCH_INDEX_KEY] to select which root to follow.
  */
 export function buildMessagePath(
   messages: ChatMessage[],
@@ -75,9 +76,9 @@ export function buildMessagePath(
   let currentMessage: ChatMessage | undefined;
   if (rootMessages.length > 1) {
     // Multiple root messages - treat as branches at root level
-    const rootBranchIndex = branchIndices["__root__"] ?? 0;
+    const rootBranchIndex = branchIndices[BRANCH_INDEX_KEY] ?? 0;
     const validRootIndex = Math.min(Math.max(0, rootBranchIndex), rootMessages.length - 1);
-    branchInfo["__root__"] = {
+    branchInfo[BRANCH_INDEX_KEY] = {
       siblings: rootMessages,
       currentIndex: validRootIndex,
     };

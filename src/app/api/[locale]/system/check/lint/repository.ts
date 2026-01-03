@@ -20,6 +20,7 @@ import {
   distributeFilesAcrossWorkers,
   sortIssuesByLocation,
 } from "../config/shared";
+import type { CheckConfig } from "../config/types";
 import { getSystemResources } from "../config/utils";
 import type { LintIssue, LintRequestOutput, LintResponseOutput } from "./definition";
 
@@ -62,6 +63,7 @@ export interface LintRepositoryInterface {
   execute(
     data: LintRequestOutput,
     logger: EndpointLogger,
+    providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<LintResponseOutput>>;
 }
 
@@ -72,48 +74,52 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
   async execute(
     data: LintRequestOutput,
     logger: EndpointLogger,
+    providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<LintResponseOutput>> {
     try {
-      // Use unified config management
-      const configResult = await ensureConfigReady(logger, false);
+      // Use provided config or load it
+      let checkConfig: CheckConfig;
+      if (providedConfig) {
+        checkConfig = providedConfig;
+      } else {
+        const configResult = await ensureConfigReady(logger, false);
 
-      if (!configResult.ready) {
-        return success({
-          issues: {
-            items: [
-              {
-                file: configResult.configPath,
-                severity: "error" as const,
-                message: configResult.message,
-                type: "lint" as const,
+        if (!configResult.ready) {
+          return success({
+            issues: {
+              items: [
+                {
+                  file: configResult.configPath,
+                  severity: "error" as const,
+                  message: configResult.message,
+                  type: "lint" as const,
+                },
+              ],
+              files: [
+                {
+                  file: configResult.configPath,
+                  errors: 1,
+                  warnings: 0,
+                  total: 1,
+                },
+              ],
+              summary: {
+                totalIssues: 1,
+                totalFiles: 1,
+                totalErrors: 1,
+                displayedIssues: 1,
+                displayedFiles: 1,
+                currentPage: 1,
+                totalPages: 1,
               },
-            ],
-            files: [
-              {
-                file: configResult.configPath,
-                errors: 1,
-                warnings: 0,
-                total: 1,
-              },
-            ],
-            summary: {
-              totalIssues: 1,
-              totalFiles: 1,
-              totalErrors: 1,
-              displayedIssues: 1,
-              displayedFiles: 1,
-              currentPage: 1,
-              totalPages: 1,
             },
-          },
-        });
+          });
+        }
+        checkConfig = configResult.config;
       }
-
-      const checkConfig = configResult.config;
 
       // Check if ESLint is enabled in config
       if (!(checkConfig.eslint?.enabled ?? true)) {
-        // eslint-disable-next-line i18next/no-literal-string
         logger.info("ESLint is disabled in check.config.ts (eslint.enabled: false)");
 
         return success({
@@ -153,47 +159,52 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         });
       }
 
-      logger.debug("ESLint configuration loaded");
+      logger.debug("[ESLINT] Configuration loaded");
+
+      // At this point, we know eslint is enabled (checked above)
+      const enabledConfig = checkConfig as CheckConfig & {
+        eslint: { enabled: true; configPath: string; cachePath: string };
+      };
 
       // Check if parallel mode is enabled
-      const useParallel = checkConfig.eslint.parallel ?? true;
+      const useParallel = enabledConfig.eslint.parallel ?? true;
 
       if (!useParallel) {
         // Non-parallel mode: pass paths directly to eslint
-        // eslint-disable-next-line i18next/no-literal-string
+
         logger.debug(
-          `Starting sequential ESLint execution (path: ${data.path || "./"}, fix: ${data.fix})`,
+          `[ESLINT] Starting sequential execution (path: ${data.path || "./"}, fix: ${data.fix})`,
         );
 
-        const result = await this.executeSequential(data, checkConfig, logger);
+        const result = await this.executeSequential(data, enabledConfig, logger);
 
-        // eslint-disable-next-line i18next/no-literal-string
         logger.debug(
-          `Sequential ESLint execution completed (${result.issues.items.length} issues found)`,
+          `[ESLINT] Sequential execution completed (${result.issues.items.length} issues found)`,
         );
 
         return success(result);
       }
 
       // Parallel mode: discover files and distribute across workers
-      logger.debug("Starting parallel ESLint execution", {
-        path: data.path,
-        fix: data.fix,
-      });
+
+      logger.debug(
+        `[ESLINT] Starting parallel execution (path: ${data.path || "./"}, fix: ${data.fix})`,
+      );
 
       // Get system resources and determine optimal worker count
       const resources = getSystemResources();
-      logger.debug("System resources detected", {
-        cpus: resources.cpuCores,
-        memory: resources.availableMemoryMB,
-      });
+
+      logger.debug(
+        `[ESLINT] System resources detected (CPUs: ${resources.cpuCores}, Memory: ${resources.availableMemoryMB}MB)`,
+      );
 
       // Discover files to lint using config's ignored directories
       const filesToLint = await discoverFiles(data.path || "./", logger, {
-        extensions: checkConfig.eslint.lintableExtensions,
-        ignores: checkConfig.eslint.ignores || [],
+        extensions: enabledConfig.eslint.lintableExtensions,
+        ignores: enabledConfig.eslint.ignores || [],
       });
-      logger.debug(`Found ${filesToLint.length} files to lint`);
+
+      logger.debug(`[ESLINT] Found ${filesToLint.length} files to lint`);
 
       if (filesToLint.length === 0) {
         return success({
@@ -214,16 +225,15 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       }
 
       // Distribute files across workers
-      const eslintConfigPath = checkConfig.eslint.enabled
-        ? resolve(process.cwd(), checkConfig.eslint.configPath)
-        : "";
+      const eslintConfigPath = resolve(process.cwd(), enabledConfig.eslint.configPath);
       const workerTasks = this.distributeFiles(
         filesToLint,
         resources.maxWorkers,
         data,
         eslintConfigPath,
       );
-      logger.debug(`Distributing work across ${workerTasks.length} workers`);
+
+      logger.debug(`[ESLINT] Distributing work across ${workerTasks.length} workers`);
 
       // Pre-create all cache directories in parallel
       await this.createCacheDirectories(workerTasks, logger);
@@ -234,14 +244,15 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       // Merge results from all workers
       const mergedResult = this.mergeWorkerResults(workerResults, data, logger);
 
-      logger.debug("Parallel ESLint execution completed", {
-        totalIssues: mergedResult.issues.items.length,
-      });
+      logger.debug(
+        `[ESLINT] Parallel execution completed (${mergedResult.issues.items.length} issues found)`,
+      );
 
       return success(mergedResult);
     } catch (error) {
       const errorMessage = parseError(error).message;
-      logger.error("Parallel ESLint execution failed", { error: errorMessage });
+
+      logger.error(`[ESLINT] Parallel execution failed: ${errorMessage}`);
 
       return success({
         issues: {
@@ -293,7 +304,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     // Handle multiple paths - support files, folders, or mixed
     const targetPaths = data.path ? (Array.isArray(data.path) ? data.path : [data.path]) : ["./"];
 
-    logger.debug("Running ESLint on paths", { targetPaths });
+    logger.debug(`[ESLINT] Running on ${targetPaths.length} path(s): ${targetPaths.join(", ")}`);
 
     // Build ESLint command
     const eslintConfigPath = resolve(process.cwd(), checkConfig.eslint.configPath);
@@ -315,9 +326,8 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     }
 
     // Execute ESLint
-    // eslint-disable-next-line i18next/no-literal-string
-    const command = `bunx ${args.join(" ")}`;
-    logger.debug("Executing ESLint command (Sequential)", { command });
+
+    logger.debug(`[ESLINT] Executing command: bunx ${args.join(" ")}`);
 
     const { spawn } = await import("node:child_process");
     const stdout = await new Promise<string>((resolve, reject) => {
@@ -340,7 +350,6 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       child.on("close", (code) => {
         // ESLint exit codes: 0=success, 1=lint errors found, 2=config/internal error
         if (code !== null && code > 2) {
-          // eslint-disable-next-line i18next/no-literal-string
           reject(new Error(`ESLint failed with exit code ${code}`));
         } else {
           resolve(output);
@@ -357,7 +366,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         setTimeout(() => {
           child.kill("SIGKILL");
         }, 5000);
-        // eslint-disable-next-line i18next/no-literal-string
+
         reject(new Error(`ESLint timed out after ${data.timeout}s`));
       }, data.timeout * 1000);
 
@@ -411,9 +420,9 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     try {
       await fs.mkdir(dirname(globalCacheDir), { recursive: true });
     } catch (error) {
-      logger.warn(`Failed to create global cache directory: ${globalCacheDir}`, {
-        error: parseError(error).message,
-      });
+      logger.warn(
+        `[ESLINT] Failed to create global cache directory: ${globalCacheDir} - ${parseError(error).message}`,
+      );
     }
   }
 
@@ -514,7 +523,8 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       };
     } catch (error) {
       const errorMessage = parseError(error).message;
-      logger.error(`Worker ${task.id} failed`, { error: errorMessage });
+
+      logger.error(`[ESLINT:Worker${task.id}] Execution failed: ${errorMessage}`);
 
       return {
         id: task.id,
@@ -639,10 +649,9 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     // Sort issues by file, then by line number (unless skipSorting is true)
     const issues = data.skipSorting ? allIssues : sortIssuesByLocation(allIssues);
 
-    logger.debug("Merged worker results", {
-      totalWorkers: workerResults.length,
-      totalIssues: issues.length,
-    });
+    logger.debug(
+      `[ESLINT] Merged results from ${workerResults.length} workers (${issues.length} total issues)`,
+    );
 
     return this.buildResponse(issues, data);
   }
@@ -658,9 +667,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     issues: LintIssue[];
     hasFixableIssues: boolean;
   }> {
-    // eslint-disable-next-line i18next/no-literal-string
-    const command = `bunx ${args.join(" ")}`;
-    logger.debug(`Executing ESLint command (Worker ${task.id})`, { command });
+    logger.debug(`[ESLINT:Worker${task.id}] Executing command: bunx ${args.join(" ")}`);
 
     // Use spawn for parallel execution
     const { spawn } = await import("node:child_process");
@@ -719,7 +726,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     );
 
     logger.debug(
-      `Worker ${task.id} completed with ${result.issues.length} issues, ${result.hasFixableIssues ? "has" : "no"} fixable issues`,
+      `[ESLINT:Worker${task.id}] Completed with ${result.issues.length} issues (${result.hasFixableIssues ? "has" : "no"} fixable)`,
     );
 
     return result;
@@ -763,10 +770,10 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         parsedResults = JSON.parse(stdout) as EslintResult;
       } catch (parseError) {
         // JSON parse failed - log the error and return empty results
-        logger.warn("Failed to parse ESLint JSON output", {
-          error: parseError instanceof Error ? parseError.message : String(parseError),
-          stdoutPreview: stdout.slice(0, 200),
-        });
+
+        logger.warn(
+          `[ESLINT] Failed to parse JSON output: ${parseError instanceof Error ? parseError.message : String(parseError)} (preview: ${stdout.slice(0, 100)}...)`,
+        );
         return { issues, hasFixableIssues };
       }
 
@@ -778,9 +785,9 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
             try {
               await fs.writeFile(result.filePath, result.output!, "utf8");
             } catch (error) {
-              logger.warn(`Failed to write fixed file: ${result.filePath}`, {
-                error: parseError(error).message,
-              });
+              logger.warn(
+                `[ESLINT] Failed to write fixed file: ${result.filePath} - ${parseError(error).message}`,
+              );
             }
           });
 
@@ -824,9 +831,10 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       }
     } catch (error) {
       // Unexpected error during processing
-      logger.error("Unexpected error processing ESLint results", {
-        error: error instanceof Error ? error.message : String(error),
-      });
+
+      logger.error(
+        `[ESLINT] Unexpected error processing results: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     return { issues, hasFixableIssues };

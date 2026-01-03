@@ -33,6 +33,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { BRANCH_INDEX_KEY } from "../../../../../hooks/use-branch-management";
 import { BranchNavigator } from "../branch-navigator";
 import { ErrorMessageBubble } from "../error-message-bubble";
 import { GroupedAssistantMessage } from "../grouped-assistant-message";
@@ -145,7 +146,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   }
 
   // Check for root-level branches (multiple root messages)
-  const rootBranches = branchInfo["__root__"];
+  const rootBranches = branchInfo[BRANCH_INDEX_KEY];
   const hasRootBranches = rootBranches && rootBranches.siblings.length > 1;
 
   return (
@@ -157,14 +158,14 @@ export const LinearMessageView = React.memo(function LinearMessageView({
             <BranchNavigator
               currentBranchIndex={rootBranches.currentIndex}
               totalBranches={rootBranches.siblings.length}
-              branches={rootBranches.siblings.map((sibling) => ({
-                id: sibling.id,
-                preview: sibling.content.slice(0, 50) + (sibling.content.length > 50 ? "..." : ""),
-              }))}
-              onSwitchBranch={(index) =>
-                // eslint-disable-next-line i18next/no-literal-string
-                onSwitchBranch("__root__", index)
-              }
+              branches={rootBranches.siblings.map((sibling) => {
+                const content = sibling.content ?? "";
+                return {
+                  id: sibling.id,
+                  preview: content.slice(0, 50) + (content.length > 50 ? "..." : ""),
+                };
+              })}
+              onSwitchBranch={(index) => onSwitchBranch(BRANCH_INDEX_KEY, index)}
               locale={locale}
             />
           </Div>
@@ -379,7 +380,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                               "border border-blue-500/30 bg-blue-500/5 rounded-md",
                             )}
                           >
-                            <Markdown content={message.content} />
+                            <Markdown content={message.content ?? ""} />
                           </Div>
 
                           <Div className="mt-1 text-xs text-muted-foreground pl-2">
@@ -436,11 +437,13 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                 <BranchNavigator
                   currentBranchIndex={branches.currentIndex}
                   totalBranches={branches.siblings.length}
-                  branches={branches.siblings.map((sibling) => ({
-                    id: sibling.id,
-                    preview:
-                      sibling.content.slice(0, 50) + (sibling.content.length > 50 ? "..." : ""),
-                  }))}
+                  branches={branches.siblings.map((sibling) => {
+                    const content = sibling.content ?? "";
+                    return {
+                      id: sibling.id,
+                      preview: content.slice(0, 50) + (content.length > 50 ? "..." : ""),
+                    };
+                  })}
                   onSwitchBranch={(index) => onSwitchBranch(message.id, index)}
                   locale={locale}
                 />

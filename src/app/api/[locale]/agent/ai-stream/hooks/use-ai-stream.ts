@@ -109,7 +109,15 @@ function handleMessageCreatedEvent(params: {
       const chatThread = useChatStore.getState().threads[eventData.threadId];
       const isIncognito = isIncognitoFromStream || chatThread?.rootFolderId === "incognito";
 
-      if (isIncognito) {
+      // CRITICAL: Always add TOOL and ASSISTANT messages to chat store (both incognito and non-incognito)
+      // - TOOL messages: allows TOOL_RESULT events to update them later
+      // - ASSISTANT messages: needed for real-time streaming display (maintains parent chain)
+      const shouldAddToStore =
+        isIncognito ||
+        eventData.role === ChatMessageRole.TOOL ||
+        eventData.role === ChatMessageRole.ASSISTANT;
+
+      if (shouldAddToStore) {
         // Check if message already exists (created client-side for incognito text mode)
         const existingMessage = useChatStore.getState().messages[eventData.messageId];
         if (existingMessage) {
@@ -120,10 +128,12 @@ function handleMessageCreatedEvent(params: {
           return; // Skip - message was created client-side
         }
 
-        logger.debug("[MESSAGE_CREATED] Saving to chat store (incognito)", {
+        logger.debug("[MESSAGE_CREATED] Saving to chat store", {
           messageId: eventData.messageId,
           role: eventData.role,
           hasToolCall: !!toolCall,
+          isIncognito,
+          isTool: eventData.role === ChatMessageRole.TOOL,
         });
 
         useChatStore.getState().addMessage({
@@ -134,7 +144,7 @@ function handleMessageCreatedEvent(params: {
           parentId: eventData.parentId,
           depth: eventData.depth,
           sequenceId: eventData.sequenceId ?? null,
-          authorId: "incognito",
+          authorId: isIncognito ? "incognito" : "system", // Use "system" for non-incognito TOOL messages
           authorName: null,
           authorAvatar: null,
           authorColor: null,
@@ -159,55 +169,58 @@ function handleMessageCreatedEvent(params: {
           searchVector: null,
         });
 
-        void import("../../chat/incognito/storage")
-          .then(({ saveMessage }) => {
-            logger.debug("[MESSAGE_CREATED] Saving to localStorage", {
-              messageId: eventData.messageId,
-              role: eventData.role,
-              hasToolCall: !!toolCall,
-            });
+        // Only save to localStorage for incognito mode
+        if (isIncognito) {
+          void import("../../chat/incognito/storage")
+            .then(({ saveMessage }) => {
+              logger.debug("[MESSAGE_CREATED] Saving to localStorage", {
+                messageId: eventData.messageId,
+                role: eventData.role,
+                hasToolCall: !!toolCall,
+              });
 
-            saveMessage({
-              id: eventData.messageId,
-              threadId: eventData.threadId,
-              role: eventData.role,
-              content: eventData.content || "",
-              parentId: eventData.parentId,
-              depth: eventData.depth,
-              sequenceId: eventData.sequenceId ?? null,
-              authorId: "incognito",
-              authorName: null,
-              authorAvatar: null, // Incognito has no avatar
-              authorColor: null, // Incognito has no color
-              isAI:
-                eventData.role === ChatMessageRole.ASSISTANT ||
-                eventData.role === ChatMessageRole.TOOL,
-              model: eventData.model ?? null,
-              character: eventData.character ?? null,
-              errorType: eventData.role === ChatMessageRole.ERROR ? "STREAM_ERROR" : null,
-              errorMessage: eventData.role === ChatMessageRole.ERROR ? eventData.content : null,
-              errorCode: null,
-              edited: false,
-              originalId: null,
-              tokens: null,
-              metadata: eventData.metadata
-                ? { ...eventData.metadata, ...(toolCall ? { toolCall } : {}) }
-                : toolCall
-                  ? { toolCall }
-                  : {},
-              upvotes: 0,
-              downvotes: 0,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              searchVector: null,
+              saveMessage({
+                id: eventData.messageId,
+                threadId: eventData.threadId,
+                role: eventData.role,
+                content: eventData.content || "",
+                parentId: eventData.parentId,
+                depth: eventData.depth,
+                sequenceId: eventData.sequenceId ?? null,
+                authorId: "incognito",
+                authorName: null,
+                authorAvatar: null, // Incognito has no avatar
+                authorColor: null, // Incognito has no color
+                isAI:
+                  eventData.role === ChatMessageRole.ASSISTANT ||
+                  eventData.role === ChatMessageRole.TOOL,
+                model: eventData.model ?? null,
+                character: eventData.character ?? null,
+                errorType: eventData.role === ChatMessageRole.ERROR ? "STREAM_ERROR" : null,
+                errorMessage: eventData.role === ChatMessageRole.ERROR ? eventData.content : null,
+                errorCode: null,
+                edited: false,
+                originalId: null,
+                tokens: null,
+                metadata: eventData.metadata
+                  ? { ...eventData.metadata, ...(toolCall ? { toolCall } : {}) }
+                  : toolCall
+                    ? { toolCall }
+                    : {},
+                upvotes: 0,
+                downvotes: 0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                searchVector: null,
+              });
+              return undefined;
+            })
+            .catch((error: Error) => {
+              logger.error("Failed to save incognito message", {
+                error,
+              });
             });
-            return undefined;
-          })
-          .catch((error: Error) => {
-            logger.error("Failed to save incognito message", {
-              error,
-            });
-          });
+        }
       }
     } catch (error) {
       logger.error("Failed to process message creation", parseError(error));
@@ -710,10 +723,14 @@ export function useAIStream(
 
                 // Update streaming message with tool call result
                 if (eventData.toolCall) {
-                  // Update stream store with toolCall result
-                  store.setToolCall(eventData.messageId, eventData.toolCall);
+                  // Store toolCall in const to avoid TypeScript narrowing issues in Promise chains
+                  const toolCall = eventData.toolCall;
 
-                  // Update chat store if incognito
+                  // Update stream store with toolCall result
+                  store.setToolCall(eventData.messageId, toolCall);
+
+                  // CRITICAL FIX: Update chat store for BOTH incognito AND non-incognito threads
+                  // The UI reads from chat store, so we MUST update it regardless of incognito status
                   const currentMessage =
                     useAIStreamStore.getState().streamingMessages[eventData.messageId];
                   const streamThread = currentMessage
@@ -721,21 +738,40 @@ export function useAIStream(
                     : null;
                   const isIncognitoFromStream = streamThread?.rootFolderId === "incognito";
 
-                  if (isIncognitoFromStream) {
-                    logger.info("Updating tool result in chat store (incognito)", {
-                      messageId: eventData.messageId,
-                    });
-                    void import("../../chat/hooks/store")
-                      .then(({ useChatStore }) => {
+                  logger.info("Updating tool result in chat store", {
+                    messageId: eventData.messageId,
+                    isIncognito: isIncognitoFromStream,
+                  });
+
+                  void import("../../chat/hooks/store")
+                    .then(({ useChatStore }) => {
+                      // Check if message exists in chat store before updating
+                      const chatMessage = useChatStore.getState().messages[eventData.messageId];
+
+                      if (chatMessage) {
+                        // Update chat store with tool result (works for both incognito and non-incognito)
                         useChatStore.getState().updateMessage(eventData.messageId, {
-                          metadata: { toolCall: eventData.toolCall },
+                          metadata: { toolCall },
                         });
 
                         logger.info("Tool result updated in chat store", {
                           messageId: eventData.messageId,
+                          hasResult: !!toolCall.result,
+                          hasError: !!toolCall.error,
                         });
+                      } else {
+                        logger.warn(
+                          "Tool result event: message not in chat store (will be loaded from DB)",
+                          {
+                            messageId: eventData.messageId,
+                            hasResult: !!toolCall.result,
+                            hasError: !!toolCall.error,
+                          },
+                        );
+                      }
 
-                        // Also update localStorage
+                      // Also update localStorage for incognito mode
+                      if (isIncognitoFromStream) {
                         return import("../../chat/incognito/storage").then(({ saveMessage }) => {
                           const chatMessage = useChatStore.getState().messages[eventData.messageId];
                           if (chatMessage) {
@@ -743,15 +779,16 @@ export function useAIStream(
                           }
                           return undefined;
                         });
-                      })
-                      .catch((error) => {
-                        logger.error("Failed to update tool result in chat store", {
-                          error: error instanceof Error ? error.message : String(error),
-                        });
+                      }
+                      return undefined;
+                    })
+                    .catch((error) => {
+                      logger.error("Failed to update tool result in chat store", {
+                        error: error instanceof Error ? error.message : String(error),
                       });
-                  }
+                    });
 
-                  logger.info("Tool result updated in message", {
+                  logger.info("Tool result event processing complete", {
                     messageId: eventData.messageId,
                     hasResult: !!eventData.toolCall.result,
                   });

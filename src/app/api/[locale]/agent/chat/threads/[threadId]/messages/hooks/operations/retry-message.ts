@@ -42,10 +42,9 @@ export async function retryMessage(
     return;
   }
 
-  // Retry uses the SAME parent as the original message
   await createAndSendUserMessage(
     {
-      content: message.content,
+      content: message.content ?? "",
       parentMessageId: message.parentId,
       threadId: message.threadId,
       attachments,

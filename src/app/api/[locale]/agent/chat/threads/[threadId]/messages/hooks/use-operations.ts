@@ -28,11 +28,11 @@ export interface MessageOperations {
       content: string;
       threadId?: string;
       parentId?: string;
-      toolConfirmation?: {
+      toolConfirmations?: Array<{
         messageId: string;
         confirmed: boolean;
         updatedArgs?: Record<string, string | number | boolean | null>;
-      };
+      }>;
       /** Audio input for voice-to-voice mode - bypasses text content */
       audioInput?: { file: File };
       /** File attachments */
@@ -128,11 +128,11 @@ export function useMessageOperations(deps: MessageOperationsDeps): MessageOperat
         content: string;
         threadId?: string;
         parentId?: string;
-        toolConfirmation?: {
+        toolConfirmations?: Array<{
           messageId: string;
           confirmed: boolean;
           updatedArgs?: Record<string, string | number | boolean | null>;
-        };
+        }>;
         audioInput?: { file: File };
         attachments: File[];
       },

@@ -209,7 +209,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.content.content" as const,
             },
-            z.string(),
+            z.string().nullable(),
           ),
           parentId: responseField(
             {

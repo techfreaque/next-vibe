@@ -8,7 +8,7 @@ import { create } from "zustand";
 
 import { aliasToPathMap } from "../../../system/generated/endpoint";
 import { DEFAULT_TTS_VOICE, type TtsVoiceValue } from "../../text-to-speech/enum";
-import { DEFAULT_TOOL_CONFIRMATION_IDS,DEFAULT_TOOL_IDS } from "../config";
+import { DEFAULT_TOOL_CONFIRMATION_IDS, DEFAULT_TOOL_IDS } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { ViewMode, type ViewModeValue } from "../enum";
 import {

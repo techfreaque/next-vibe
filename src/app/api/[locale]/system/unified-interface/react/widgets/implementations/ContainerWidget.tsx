@@ -47,6 +47,8 @@ export function ContainerWidget<const TKey extends string>({
   onCancel,
   isSubmitting,
   endpoint,
+  submitButton,
+  cancelButton,
 }: ReactWidgetProps<typeof WidgetTypeEnum.CONTAINER, TKey>): JSX.Element {
   const { t } = getTranslator(context);
   const { t: globalT } = simpleT(context.locale);
@@ -486,10 +488,15 @@ export function ContainerWidget<const TKey extends string>({
                 type="button"
                 onClick={onCancel}
                 disabled={isSubmitting}
-                variant="outline"
+                variant={cancelButton?.variant ?? "outline"}
+                size={cancelButton?.size}
                 className="flex-1"
               >
-                {globalT("app.api.system.unifiedInterface.react.widgets.endpointRenderer.cancel")}
+                {cancelButton?.text
+                  ? globalT(cancelButton.text)
+                  : globalT(
+                      "app.api.system.unifiedInterface.react.widgets.endpointRenderer.cancel",
+                    )}
               </Button>
             )}
             <Button
@@ -502,6 +509,8 @@ export function ContainerWidget<const TKey extends string>({
                 }
               }}
               disabled={isSubmitting}
+              variant={submitButton?.variant}
+              size={submitButton?.size}
               className={onCancel ? "flex-1" : "w-full"}
             >
               {isSubmitting ? autoSubmitLoadingText : autoSubmitText}

@@ -283,7 +283,7 @@ export const translations: typeof enTranslations = {
   errors: {
     toolExecutionError: "Werkzeug-Ausführungsfehler: {{error}}",
     toolExecutionFailed: "Werkzeug-Ausführung fehlgeschlagen",
-    userDeclinedTool: "Benutzer hat die Werkzeug-Ausführung abgelehnt",
+    userDeclinedTool: "Benutzer hat die Ausführung dieses Werkzeugs abgelehnt.",
     streamError: "Stream-Fehler: {{error}}",
     streamProcessingError: "Fehler beim Verarbeiten des Streams",
     timeout:

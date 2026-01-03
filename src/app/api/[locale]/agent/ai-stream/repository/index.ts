@@ -173,7 +173,7 @@ class AiStreamRepository implements IAiStreamRepository {
       userMessageId,
       messages,
       systemPrompt: initialSystemPrompt,
-      toolConfirmationResult,
+      toolConfirmationResults,
       voiceMode,
       voiceTranscription,
       userMessageMetadata,
@@ -197,7 +197,7 @@ class AiStreamRepository implements IAiStreamRepository {
         locale,
         logger,
         systemPrompt,
-        toolConfirmationResult,
+        toolConfirmationResults,
       });
       systemPrompt = updatedSystemPrompt;
 
@@ -259,7 +259,9 @@ class AiStreamRepository implements IAiStreamRepository {
           }
 
           try {
-            AiStreamRepository.emitInitialEvents({
+            // Emit initial events and capture which tool results were already emitted
+            // This prevents duplicate TOOL_RESULT emissions during streaming
+            const emittedToolResultIds = AiStreamRepository.emitInitialEvents({
               isNewThread,
               threadId: threadResultThreadId,
               rootFolderId: data.rootFolderId,
@@ -272,7 +274,7 @@ class AiStreamRepository implements IAiStreamRepository {
               effectiveParentMessageId,
               messageDepth,
               effectiveContent,
-              toolConfirmationResult,
+              toolConfirmationResults,
               voiceTranscription,
               userMessageMetadata,
               controller,
@@ -360,27 +362,49 @@ class AiStreamRepository implements IAiStreamRepository {
             >();
             let isInReasoningBlock = false; // Track if we're inside <think></think> tags
 
+            // Track if any tools in current step require confirmation
+            // When true, we'll abort the stream at finish-step (after all tool calls are processed)
+            let stepHasToolsAwaitingConfirmation = false;
+
             // Track message sequencing - all messages in this response share the same sequenceId
             // CRITICAL: When continuing after tool confirmation, reuse the original sequenceId
             // so all messages (tool + response) are grouped together in the UI
-            const sequenceId = toolConfirmationResult?.sequenceId ?? crypto.randomUUID();
+            const lastConfirmedTool = toolConfirmationResults[toolConfirmationResults.length - 1];
+            const sequenceId = lastConfirmedTool?.sequenceId ?? crypto.randomUUID();
             logger.info("[AI Stream] Sequence ID initialized", {
               sequenceId,
-              isToolContinuation: !!toolConfirmationResult,
-              toolMessageId: toolConfirmationResult?.messageId,
+              isToolContinuation: !!lastConfirmedTool,
+              toolMessageId: lastConfirmedTool?.messageId,
+              confirmedToolCount: toolConfirmationResults.length,
             });
 
             // Track the current parent for chaining messages
             // This gets updated as we create reasoning messages and tool calls
-            // IMPORTANT: For tool confirmation, the next ASSISTANT message should be child of the TOOL message
-            let currentParentId: string | null =
-              toolConfirmationResult?.messageId ?? initialAiParentId;
-            let currentDepth = toolConfirmationResult ? messageDepth + 1 : initialAiDepth;
+            // IMPORTANT: For tool confirmation, the next ASSISTANT message should be child of the LAST TOOL message
+            let currentParentId: string | null = lastConfirmedTool?.messageId ?? initialAiParentId;
+            let currentDepth = lastConfirmedTool ? messageDepth + 1 : initialAiDepth;
 
             // Update last known values for error handling
             lastSequenceId = sequenceId;
             lastParentId = currentParentId;
             lastDepth = currentDepth;
+
+            // Log message structure being sent to AI SDK
+            logger.info("[AI Stream] Messages structure for AI SDK", {
+              messageCount: messages.length,
+              messageRoles: messages.map((m, i) => `${i}:${m.role}`).join(", "),
+              lastFiveMessages: messages.slice(-5).map((m, i) => ({
+                idx: messages.length - 5 + i,
+                role: m.role,
+                contentType: typeof m.content,
+                contentPreview:
+                  typeof m.content === "string"
+                    ? m.content.slice(0, 80)
+                    : Array.isArray(m.content)
+                      ? `${m.content.length} parts: ${m.content.map((p) => ("type" in p ? p.type : "unknown")).join(",")}`
+                      : "unknown",
+              })),
+            });
 
             const streamResult = streamText({
               model: provider.chat(modelConfig.openRouterModel),
@@ -422,6 +446,26 @@ class AiStreamRepository implements IAiStreamRepository {
                   });
                 }
 
+                // Check if any tools in this step require confirmation
+                // If yes, abort stream AFTER all tool calls have been processed
+                if (stepHasToolsAwaitingConfirmation) {
+                  logger.info(
+                    "[AI Stream] Step complete - tools require confirmation, aborting stream",
+                    {
+                      toolCallsInStep: pendingToolMessages.size,
+                    },
+                  );
+
+                  // Abort the stream to stop the AI SDK from processing further
+                  streamAbortController.abort(new Error("Tool requires user confirmation"));
+
+                  // Close the controller to stop sending events to client
+                  controller.close();
+
+                  // Exit the loop - stream is done until user confirms
+                  return;
+                }
+
                 // After a step finishes, update currentParentId/currentDepth to point to the last message
                 // The next ASSISTANT message should be a CHILD of the last tool message, so increment depth
                 logger.info("[AI Stream] Step finished - updating parent chain", {
@@ -436,6 +480,9 @@ class AiStreamRepository implements IAiStreamRepository {
                 // Reset currentAssistantMessageId so the next step creates a new ASSISTANT message
                 currentAssistantMessageId = null;
                 currentAssistantContent = "";
+
+                // Reset confirmation tracking for next step
+                stepHasToolsAwaitingConfirmation = false;
               } else if (part.type === "text-delta") {
                 const result = await AiStreamRepository.processTextDelta({
                   textDelta: part.text,
@@ -548,6 +595,18 @@ class AiStreamRepository implements IAiStreamRepository {
                   currentAssistantContent = result.currentAssistantContent;
                   isInReasoningBlock = result.isInReasoningBlock;
 
+                  // Track if this tool requires confirmation
+                  if (result.requiresConfirmation) {
+                    stepHasToolsAwaitingConfirmation = true;
+                    logger.info(
+                      "[AI Stream] Tool requires confirmation - will abort at finish-step",
+                      {
+                        toolName: part.toolName,
+                        messageId: result.pendingToolMessage.messageId,
+                      },
+                    );
+                  }
+
                   // Update currentParentId/currentDepth to chain each tool call to the previous message
                   // This creates: USER → ASSISTANT → TOOL1 → TOOL2 → ASSISTANT (next step)
                   // The next tool call should be a child of THIS tool message
@@ -620,6 +679,7 @@ class AiStreamRepository implements IAiStreamRepository {
                   controller,
                   encoder,
                   logger,
+                  emittedToolResultIds,
                 });
                 if (result) {
                   // Update currentParentId/currentDepth for the next tool call
@@ -893,11 +953,11 @@ class AiStreamRepository implements IAiStreamRepository {
     locale: CountryLanguage;
     logger: EndpointLogger;
     systemPrompt: string;
-    toolConfirmationResult?: {
+    toolConfirmationResults: Array<{
       messageId: string;
       sequenceId: string;
       toolCall: ToolCall;
-    };
+    }>;
   }): Promise<{
     tools: Record<string, CoreTool> | undefined;
     toolsConfig: Map<string, { requiresConfirmation: boolean }>;
@@ -913,8 +973,33 @@ class AiStreamRepository implements IAiStreamRepository {
       };
     }
 
-    // Extract tool IDs and build config map
+    // Extract tool IDs and build confirmation config map
     const toolIds = params.requestedTools?.map((t) => t.toolId) ?? null;
+
+    // Build confirmed tools set for quick lookup
+    const confirmedToolNames = new Set(
+      params.toolConfirmationResults.map((r) => r.toolCall.toolName),
+    );
+
+    // Build toolConfirmationConfig map BEFORE calling loadTools
+    // Map tool IDs to their confirmation requirements (from API request)
+    const toolConfirmationConfig = new Map<string, boolean>();
+    if (params.requestedTools) {
+      for (const toolConfig of params.requestedTools) {
+        // Map tool alias/path to AI SDK tool name using getFullPath
+        const aiSdkToolName = getFullPath(toolConfig.toolId);
+        if (aiSdkToolName) {
+          // If this tool was just confirmed, DON'T require confirmation again
+          // This prevents the infinite loop where the AI calls the same tool again after confirmation
+          const isConfirmedTool = confirmedToolNames.has(aiSdkToolName);
+
+          toolConfirmationConfig.set(
+            aiSdkToolName,
+            isConfirmedTool ? false : toolConfig.requiresConfirmation,
+          );
+        }
+      }
+    }
 
     const toolsResult = await loadTools({
       requestedTools: toolIds,
@@ -922,6 +1007,7 @@ class AiStreamRepository implements IAiStreamRepository {
       locale: params.locale,
       logger: params.logger,
       systemPrompt: params.systemPrompt,
+      toolConfirmationConfig,
     });
 
     // Build toolsConfig map using AI SDK tool names (not aliases)
@@ -933,8 +1019,11 @@ class AiStreamRepository implements IAiStreamRepository {
         // Map tool alias/path to AI SDK tool name using getFullPath
         const aiSdkToolName = getFullPath(toolConfig.toolId);
         if (aiSdkToolName && toolsResult.tools[aiSdkToolName]) {
+          // If this tool was just confirmed, DON'T require confirmation again
+          const isConfirmedTool = confirmedToolNames.has(aiSdkToolName);
+
           toolsConfig.set(aiSdkToolName, {
-            requiresConfirmation: toolConfig.requiresConfirmation,
+            requiresConfirmation: isConfirmedTool ? false : toolConfig.requiresConfirmation,
           });
         }
       }
@@ -971,11 +1060,11 @@ class AiStreamRepository implements IAiStreamRepository {
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
     logger: EndpointLogger;
-    toolConfirmationResult?: {
+    toolConfirmationResults: Array<{
       messageId: string;
       sequenceId: string;
-      toolCall: ToolCall; // Full ToolCall object with all required fields including args
-    };
+      toolCall: ToolCall;
+    }>;
     /** Voice transcription metadata (when audio input was transcribed) */
     voiceTranscription?: {
       wasTranscribed: boolean;
@@ -993,7 +1082,7 @@ class AiStreamRepository implements IAiStreamRepository {
         data?: string;
       }>;
     };
-  }): void {
+  }): Set<string> | undefined {
     const {
       isNewThread,
       threadId,
@@ -1002,7 +1091,7 @@ class AiStreamRepository implements IAiStreamRepository {
       controller,
       encoder,
       logger,
-      toolConfirmationResult,
+      toolConfirmationResults,
       voiceTranscription,
     } = params;
 
@@ -1032,31 +1121,41 @@ class AiStreamRepository implements IAiStreamRepository {
       logger.debug("VOICE_TRANSCRIBED event emitted");
     }
 
-    // Handle tool confirmation result emission
-    if (toolConfirmationResult) {
-      logger.info(
-        "✅ Skipping USER MESSAGE_CREATED event for tool confirmation - emitting TOOL_RESULT instead",
-        {
-          toolMessageId: toolConfirmationResult.messageId,
-          toolName: toolConfirmationResult.toolCall.toolName,
-        },
-      );
+    // Emit TOOL_RESULT events for batch confirmations to update frontend
+    // These are needed to show execution state (success/error) in UI immediately
+    if (toolConfirmationResults && toolConfirmationResults.length > 0) {
+      logger.debug("✅ Emitting TOOL_RESULT events for batch confirmations", {
+        count: toolConfirmationResults.length,
+        messageIds: toolConfirmationResults.map((r) => r.messageId),
+      });
 
-      // Emit TOOL_RESULT event to update frontend with executed tool result
-      const toolResultEvent = createStreamEvent.toolResult({
-        messageId: toolConfirmationResult.messageId,
-        toolName: toolConfirmationResult.toolCall.toolName,
-        result: toolConfirmationResult.toolCall.result,
-        error: toolConfirmationResult.toolCall.error,
-        toolCall: toolConfirmationResult.toolCall, // Include full tool call data for frontend rendering
-      });
-      controller.enqueue(encoder.encode(formatSSEEvent(toolResultEvent)));
-      logger.info("TOOL_RESULT event emitted for confirmed tool", {
-        messageId: toolConfirmationResult.messageId,
-        hasResult: !!toolConfirmationResult.toolCall.result,
-        hasError: !!toolConfirmationResult.toolCall.error,
-      });
+      // Track message IDs that we've emitted TOOL_RESULT for
+      // This prevents duplicate emissions during AI streaming
+      const emittedToolResults = new Set<string>();
+
+      for (const result of toolConfirmationResults) {
+        const toolResultEvent = createStreamEvent.toolResult({
+          messageId: result.messageId,
+          toolName: result.toolCall.toolName,
+          result: result.toolCall.result,
+          error: result.toolCall.error,
+          toolCall: result.toolCall,
+        });
+        controller.enqueue(encoder.encode(formatSSEEvent(toolResultEvent)));
+        emittedToolResults.add(result.messageId);
+
+        logger.debug("TOOL_RESULT event emitted for batch confirmation", {
+          messageId: result.messageId,
+          toolName: result.toolCall.toolName,
+          hasResult: !!result.toolCall.result,
+          hasError: !!result.toolCall.error,
+        });
+      }
+
+      // Return this set so it can be used during streaming to prevent duplicate emissions
+      return emittedToolResults;
     }
+    return undefined;
   }
 
   /**
@@ -1160,8 +1259,10 @@ class AiStreamRepository implements IAiStreamRepository {
     }
 
     // Save ASSISTANT message to database if not incognito
+    // IMPORTANT: Don't save empty messages to avoid clutter in the conversation
+    // Empty messages will be saved later when content is added (via finalizeAssistantMessage)
     // Public users (userId undefined) are allowed - helper converts to null
-    if (!isIncognito) {
+    if (!isIncognito && initialContent) {
       const result = await createTextMessage({
         messageId,
         threadId,
@@ -1180,6 +1281,11 @@ class AiStreamRepository implements IAiStreamRepository {
           error: result.message,
         });
       }
+    } else if (!isIncognito && !initialContent) {
+      logger.debug("Skipping database save for empty ASSISTANT message", {
+        messageId,
+        reason: "Message will be saved when content is added",
+      });
     }
 
     logger.debug("ASSISTANT message created", {
@@ -1246,16 +1352,29 @@ class AiStreamRepository implements IAiStreamRepository {
     controller.enqueue(encoder.encode(formatSSEEvent(contentDoneEvent)));
 
     // Update ASSISTANT message in database with final content and tokens
+    // IMPORTANT: Message might not exist in DB if it was created with empty content
+    // (empty messages are skipped in createAssistantMessage to avoid clutter)
+    // So only update if there's actual content
     // Public users (userId undefined) are allowed - helper converts to null
-    if (!isIncognito) {
+    if (!isIncognito && currentAssistantContent) {
       await db
         .update(chatMessages)
         .set({
-          content: currentAssistantContent,
+          content: currentAssistantContent.trim() || null, // Save null if content is empty/whitespace
           tokens: usage.totalTokens,
           updatedAt: new Date(),
         })
         .where(eq(chatMessages.id, currentAssistantMessageId));
+
+      logger.debug("Updated ASSISTANT message in database", {
+        messageId: currentAssistantMessageId,
+        contentLength: currentAssistantContent.length,
+      });
+    } else if (!isIncognito && !currentAssistantContent) {
+      logger.debug("Skipping database update for empty ASSISTANT message", {
+        messageId: currentAssistantMessageId,
+        reason: "Message has no content",
+      });
     }
 
     logger.info("Finalized ASSISTANT message", {
@@ -1571,6 +1690,7 @@ class AiStreamRepository implements IAiStreamRepository {
     isInReasoningBlock: boolean;
     currentParentId: string | null;
     currentDepth: number;
+    requiresConfirmation: boolean;
     pendingToolMessage: {
       messageId: string;
       toolCallData: {
@@ -1591,7 +1711,6 @@ class AiStreamRepository implements IAiStreamRepository {
       isIncognito,
       userId,
       toolsConfig,
-      streamAbortController,
       controller,
       encoder,
       logger,
@@ -1599,37 +1718,68 @@ class AiStreamRepository implements IAiStreamRepository {
 
     let { currentAssistantMessageId, currentParentId, currentDepth } = params;
 
-    // Tool call event - ASSISTANT message should already exist from tool-input-start
-    // But create it if it doesn't (safety fallback)
+    // Tool call event without preceding text/reasoning - create placeholder ASSISTANT message
+    // CRITICAL: Must CREATE the message in DB so TOOL messages can reference it as parent_id
     if (!currentAssistantMessageId) {
-      const result = await AiStreamRepository.createAssistantMessage({
-        initialContent: "",
-        threadId,
-        parentId: currentParentId,
-        depth: currentDepth,
-        model,
-        character,
-        sequenceId,
-        isIncognito,
-        userId,
-        controller,
-        encoder,
-        logger,
-      });
-      currentAssistantMessageId = result.messageId;
+      currentAssistantMessageId = crypto.randomUUID();
 
-      // Update parent chain to point to the newly created ASSISTANT message
+      // Update parent chain to point to the placeholder ASSISTANT message
       // This ensures the TOOL message becomes a child of the ASSISTANT message
-      currentParentId = currentAssistantMessageId;
+      const newParentId = currentAssistantMessageId;
+      const newDepth = currentDepth;
+      currentParentId = newParentId;
       // currentDepth stays the same - ASSISTANT message is at the same depth
 
-      logger.warn(
-        "[AI Stream] Created ASSISTANT message at tool-call (should have been created earlier)",
-        {
+      logger.info("[AI Stream] Creating placeholder ASSISTANT message for tool-call parent chain", {
+        messageId: currentAssistantMessageId,
+        reason: "Tool call without preceding text/reasoning",
+        parentId: params.currentParentId,
+        depth: newDepth,
+      });
+
+      // CRITICAL FIX: Create the ASSISTANT message in the database immediately
+      // This prevents foreign key errors when TOOL messages try to reference it as parent_id
+      if (!isIncognito && userId) {
+        await createTextMessage({
           messageId: currentAssistantMessageId,
-          updatedParentId: currentParentId,
-        },
-      );
+          threadId,
+          content: "", // Empty content - will be saved as null and updated if AI generates text
+          parentId: params.currentParentId,
+          depth: newDepth,
+          sequenceId,
+          userId,
+          model,
+          character,
+          logger,
+        });
+
+        logger.info("[AI Stream] Created placeholder ASSISTANT message in database", {
+          messageId: currentAssistantMessageId,
+          threadId,
+        });
+      }
+
+      // CRITICAL FIX: Emit MESSAGE_CREATED event for placeholder ASSISTANT messages
+      // This is required so the parent chain is maintained in the UI
+      // Without this, TOOL messages appear orphaned because their parent doesn't exist in frontend store
+      const placeholderMessageEvent = createStreamEvent.messageCreated({
+        messageId: currentAssistantMessageId,
+        threadId,
+        role: ChatMessageRole.ASSISTANT,
+        content: "", // Empty content - will be updated if AI generates text
+        parentId: params.currentParentId,
+        depth: currentDepth,
+        sequenceId,
+        model,
+        character,
+      });
+      controller.enqueue(encoder.encode(formatSSEEvent(placeholderMessageEvent)));
+
+      logger.info("[AI Stream] MESSAGE_CREATED event sent for placeholder ASSISTANT", {
+        messageId: currentAssistantMessageId,
+        parentId: params.currentParentId,
+        depth: currentDepth,
+      });
     }
 
     let newAssistantContent = currentAssistantContent;
@@ -1715,7 +1865,7 @@ class AiStreamRepository implements IAiStreamRepository {
       messageId: toolMessageId,
       threadId,
       role: ChatMessageRole.TOOL,
-      content: "",
+      content: null, // Tool messages have no text content
       parentId: newCurrentParentId,
       depth: newCurrentDepth,
       sequenceId,
@@ -1774,18 +1924,23 @@ class AiStreamRepository implements IAiStreamRepository {
       });
     }
 
-    // If tool requires confirmation, send waiting event and abort stream
+    // If tool requires confirmation, emit TOOL_WAITING event
+    // DON'T abort stream yet - allow all tool calls to be processed first
+    // Stream will abort at finish-step if any tools require confirmation
     if (requiresConfirmation) {
-      logger.info("[AI Stream] Tool requires confirmation - pausing stream for user confirmation", {
-        messageId: toolMessageId,
-        toolName: part.toolName,
-        isIncognito,
-      });
+      logger.info(
+        "[AI Stream] Tool requires confirmation - emitting TOOL_WAITING (stream will continue)",
+        {
+          messageId: toolMessageId,
+          toolName: part.toolName,
+          isIncognito,
+        },
+      );
 
       // Tool message already saved to DB above (for both confirmation and non-confirmation tools)
       // No need to save again here
 
-      // Emit TOOL_WAITING event to notify frontend that stream is paused
+      // Emit TOOL_WAITING event to notify frontend
       // This works for both logged-in and incognito modes
       const waitingEvent = createStreamEvent.toolWaiting({
         messageId: toolMessageId,
@@ -1794,24 +1949,16 @@ class AiStreamRepository implements IAiStreamRepository {
       });
       controller.enqueue(encoder.encode(formatSSEEvent(waitingEvent)));
 
-      logger.info("[AI Stream] Emitted TOOL_WAITING event - frontend should show confirmation UI", {
-        messageId: toolMessageId,
-        isIncognito,
-      });
+      logger.info(
+        "[AI Stream] Emitted TOOL_WAITING event - continuing to process more tool calls",
+        {
+          messageId: toolMessageId,
+          toolName: part.toolName,
+          isIncognito,
+        },
+      );
 
-      // Abort the AI SDK stream to prevent it from continuing
-      // The stream will be resumed when user confirms/rejects the tool
-      logger.info("[AI Stream] Aborting AI SDK stream - waiting for user confirmation", {
-        messageId: toolMessageId,
-      });
-
-      // Abort the stream to stop the AI SDK from processing further
-      streamAbortController.abort(new Error("Tool requires user confirmation"));
-
-      // Close the controller to stop sending events to client
-      controller.close();
-
-      // Return early to prevent further processing
+      // DON'T abort or close controller here - continue processing
       // IMPORTANT: Preserve currentAssistantMessageId so multiple tool calls in the same step
       // all remain children of the same ASSISTANT message (not creating branches)
       return {
@@ -1820,6 +1967,7 @@ class AiStreamRepository implements IAiStreamRepository {
         isInReasoningBlock: _newIsInReasoningBlock,
         currentParentId: newCurrentParentId,
         currentDepth: newCurrentDepth,
+        requiresConfirmation: true,
         pendingToolMessage: {
           messageId: toolMessageId,
           toolCallData: {
@@ -1855,6 +2003,7 @@ class AiStreamRepository implements IAiStreamRepository {
       isInReasoningBlock: _newIsInReasoningBlock,
       currentParentId: newCurrentParentId,
       currentDepth: newCurrentDepth,
+      requiresConfirmation: false,
       pendingToolMessage: {
         messageId: toolMessageId,
         toolCallData: {
@@ -2009,7 +2158,7 @@ class AiStreamRepository implements IAiStreamRepository {
         messageId: toolMessageId,
         threadId,
         role: ChatMessageRole.TOOL,
-        content: "",
+        content: null, // Tool messages have no text content
         parentId: toolCallData.parentId,
         depth: toolCallData.depth,
         model,
@@ -2078,6 +2227,7 @@ class AiStreamRepository implements IAiStreamRepository {
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
     logger: EndpointLogger;
+    emittedToolResultIds?: Set<string>;
   }): Promise<{
     currentParentId: string | null;
     currentDepth: number;
@@ -2094,6 +2244,7 @@ class AiStreamRepository implements IAiStreamRepository {
       controller,
       encoder,
       logger,
+      emittedToolResultIds,
     } = params;
 
     if (!pendingToolMessage) {
@@ -2185,7 +2336,7 @@ class AiStreamRepository implements IAiStreamRepository {
         messageId: toolMessageId,
         threadId,
         role: ChatMessageRole.TOOL,
-        content: "",
+        content: null, // Tool messages have no text content
         parentId: toolCallData.parentId,
         depth: toolCallData.depth,
         model,
@@ -2313,33 +2464,38 @@ class AiStreamRepository implements IAiStreamRepository {
     });
 
     // Emit TOOL_RESULT event for real-time UX with updated tool call data
-    const toolResultEvent = createStreamEvent.toolResult({
-      messageId: toolMessageId,
-      toolName: part.toolName,
-      result: validatedOutput,
-      error: toolError,
-      toolCall: toolCallWithResult, // Include full tool call data with result
-    });
-
-    try {
-      controller.enqueue(encoder.encode(formatSSEEvent(toolResultEvent)));
-    } catch (e) {
-      if (e instanceof TypeError && e.message.includes("Controller is already closed")) {
-        logger.info("[AI Stream] Controller closed - skipping tool result event", {
-          toolCallId: part.toolCallId,
+    // SKIP if this tool result was already emitted in batch confirmation handler
+    if (emittedToolResultIds && emittedToolResultIds.has(toolMessageId)) {
+      logger.info(
+        "[AI Stream] Skipping TOOL_RESULT emission - already emitted in batch confirmations",
+        {
+          messageId: toolMessageId,
           toolName: part.toolName,
-        });
+        },
+      );
+    } else {
+      const toolResultEvent = createStreamEvent.toolResult({
+        messageId: toolMessageId,
+        toolName: part.toolName,
+        result: validatedOutput,
+        error: toolError,
+        toolCall: toolCallWithResult, // Include full tool call data with result
+      });
+
+      try {
+        controller.enqueue(encoder.encode(formatSSEEvent(toolResultEvent)));
+      } catch (e) {
+        if (e instanceof TypeError && e.message.includes("Controller is already closed")) {
+          logger.info("[AI Stream] Controller closed - skipping tool result event", {
+            toolCallId: part.toolCallId,
+            toolName: part.toolName,
+          });
+          return null;
+        }
+        logger.error("[AI Stream] Failed to enqueue tool result event", parseError(e));
         return null;
       }
-      logger.error("[AI Stream] Failed to enqueue tool result event", parseError(e));
-      return null;
     }
-
-    logger.info("[AI Stream] Tool result streamed to UI", {
-      toolName: part.toolName,
-      hasResult: !!validatedOutput,
-      hasError: !!toolError,
-    });
 
     // NOW update parent chain: tool message is in DB, next message can be its child
     // Return the tool message's depth (not +1) because processToolCall will increment it

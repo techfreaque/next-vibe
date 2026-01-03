@@ -305,11 +305,10 @@ export class RouteDelegationHandler {
     // Merge CLI data with provided data using registry
     const contextData = context.data;
 
-    logger.debug("[Route Executor] Data collection details", {
-      contextData,
-      cliData,
-      interactiveOption: context.options?.interactive,
-    });
+    // eslint-disable-next-line i18next/no-literal-string
+    logger.debug(
+      `[ROUTE EXECUTOR] Data collection (hasContextData: ${!!contextData}, hasCliData: ${cliData ? Object.keys(cliData).length > 0 : false}, interactive: ${context.options?.interactive})`,
+    );
 
     if (contextData || (cliData && Object.keys(cliData).length > 0)) {
       // Merge context options (interactive, dryRun) into data only if explicitly set
@@ -322,7 +321,10 @@ export class RouteDelegationHandler {
         optionsData.dryRun = context.options.dryRun;
       }
 
-      logger.debug("[Route Executor] Building options data", { optionsData });
+      // eslint-disable-next-line i18next/no-literal-string
+      logger.debug(
+        `[ROUTE EXECUTOR] Building options data (interactive: ${optionsData.interactive}, dryRun: ${optionsData.dryRun})`,
+      );
 
       const mergedData = routeExecutionExecutor.mergeData(
         optionsData,
@@ -330,7 +332,10 @@ export class RouteDelegationHandler {
         cliData || {},
       );
 
-      logger.debug("[Route Executor] Final merged data", { mergedData });
+      // eslint-disable-next-line i18next/no-literal-string
+      logger.debug(
+        `[ROUTE EXECUTOR] Final merged data (keys: ${Object.keys(mergedData).join(", ")})`,
+      );
 
       // mergedData is Partial<InputData>, which is compatible with InputData for our purposes
       inputData.data = mergedData;
@@ -610,6 +615,62 @@ export class RouteDelegationHandler {
   }
 
   /**
+   * Build a mapping of single-letter shortcuts to full field names
+   * Only includes letters that uniquely map to one field
+   */
+  private buildSingleLetterShortcuts(
+    endpointDefinition: CreateApiEndpointAny | null,
+  ): Map<string, string> {
+    const shortcuts = new Map<string, string>();
+
+    // Extract field names from endpoint definition
+    if (
+      !endpointDefinition ||
+      typeof endpointDefinition !== "object" ||
+      !("fields" in endpointDefinition)
+    ) {
+      return shortcuts;
+    }
+
+    const fields = endpointDefinition.fields;
+    if (!fields || typeof fields !== "object" || !("children" in fields)) {
+      return shortcuts;
+    }
+
+    const fieldNames: string[] = [];
+    const children = fields.children;
+
+    if (children && typeof children === "object") {
+      // Collect all field names
+      for (const key of Object.keys(children)) {
+        if (typeof key === "string") {
+          fieldNames.push(key);
+        }
+      }
+    }
+
+    // Build first-letter to field-names mapping
+    const firstLetterMap = new Map<string, string[]>();
+    for (const fieldName of fieldNames) {
+      const firstLetter = fieldName[0]?.toLowerCase();
+      if (firstLetter) {
+        const existing = firstLetterMap.get(firstLetter) || [];
+        existing.push(fieldName);
+        firstLetterMap.set(firstLetter, existing);
+      }
+    }
+
+    // Only add shortcuts for unique first letters
+    for (const [letter, names] of firstLetterMap) {
+      if (names.length === 1) {
+        shortcuts.set(letter, names[0]);
+      }
+    }
+
+    return shortcuts;
+  }
+
+  /**
    * Extract response fields from endpoint definition
    */
   private extractResponseFields<const TKey extends string>(
@@ -763,6 +824,26 @@ export class RouteDelegationHandler {
       }
     }
 
+    // Build single-letter shortcuts for this endpoint
+    const shortcuts = this.buildSingleLetterShortcuts(endpoint);
+
+    // Expand single-letter keys to full field names
+    const expandedNamedArgs: typeof namedArgs = {};
+    for (const [key, value] of Object.entries(namedArgs)) {
+      // If it's a single letter, try to expand it
+      if (key.length === 1) {
+        const fullName = shortcuts.get(key.toLowerCase());
+        if (fullName) {
+          expandedNamedArgs[fullName] = value;
+        } else {
+          // Keep the original key if no unique mapping found
+          expandedNamedArgs[key] = value;
+        }
+      } else {
+        expandedNamedArgs[key] = value;
+      }
+    }
+
     // Map named arguments to data fields (convert kebab-case to camelCase)
     // Skip CLI-level options that are already in context.options
     const cliLevelOptions = [
@@ -777,7 +858,7 @@ export class RouteDelegationHandler {
       "user-type",
     ];
 
-    for (const [key, value] of Object.entries(namedArgs)) {
+    for (const [key, value] of Object.entries(expandedNamedArgs)) {
       // Skip CLI-level options
       if (cliLevelOptions.includes(key)) {
         continue;

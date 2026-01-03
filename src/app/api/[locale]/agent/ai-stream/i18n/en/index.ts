@@ -281,7 +281,7 @@ export const translations = {
   errors: {
     toolExecutionError: "Tool execution error: {{error}}",
     toolExecutionFailed: "Tool execution failed",
-    userDeclinedTool: "User declined tool execution",
+    userDeclinedTool: "User declined to execute this tool.",
     streamError: "Stream error: {{error}}",
     streamProcessingError: "Error processing stream",
     timeout:

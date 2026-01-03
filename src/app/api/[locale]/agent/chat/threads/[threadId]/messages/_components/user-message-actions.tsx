@@ -49,7 +49,7 @@ export function UserMessageActions({
         className,
       )}
     >
-      <CopyButton content={message.content} locale={locale} logger={logger} />
+      <CopyButton content={message.content ?? undefined} locale={locale} logger={logger} />
 
       {onBranch && (
         <MessageActionButton

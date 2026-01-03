@@ -48,6 +48,8 @@ export const translations = {
         executing: "Executing...",
         complete: "Complete",
         waitingForConfirmation: "Waiting for confirmation",
+        pendingConfirmation: "Pending Confirmation",
+        pendingCancellation: "Pending Cancellation",
       },
       sections: {
         request: "Request",

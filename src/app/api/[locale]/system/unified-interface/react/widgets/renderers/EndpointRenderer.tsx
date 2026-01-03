@@ -43,7 +43,16 @@ export interface SubmitButtonConfig {
   /** Icon component to display in the button */
   icon?: React.ComponentType<{ className?: string }>;
   /** Button variant */
-  variant?: "default" | "primary" | "secondary" | "destructive" | "ghost" | "link";
+  variant?: "default" | "secondary" | "destructive" | "ghost" | "link";
+  /** Button size */
+  size?: "default" | "sm" | "lg" | "icon";
+}
+
+export interface CancelButtonConfig {
+  /** Cancel button text translation key */
+  text?: TranslationKey;
+  /** Button variant */
+  variant?: "default" | "secondary" | "destructive" | "ghost" | "link" | "outline";
   /** Button size */
   size?: "default" | "sm" | "lg" | "icon";
 }
@@ -75,6 +84,8 @@ export interface EndpointRendererProps<
   submitButtonLoadingText?: TranslationKey;
   /** Submit button configuration */
   submitButton?: SubmitButtonConfig;
+  /** Cancel button configuration */
+  cancelButton?: CancelButtonConfig;
   /** Additional content to render below fields */
   children?: React.ReactNode;
   /** Custom className for the container */
@@ -180,6 +191,8 @@ export function EndpointRenderer<
   disabled = false,
   response,
   endpointMutations,
+  submitButton,
+  cancelButton,
 }: EndpointRendererProps<TEndpoint, TFieldValues>): JSX.Element {
   // Check if endpoint.fields itself is a container widget
   const isRootContainer =
@@ -250,6 +263,8 @@ export function EndpointRenderer<
         onCancel={onCancel}
         isSubmitting={isSubmitting}
         endpoint={endpoint}
+        submitButton={submitButton}
+        cancelButton={cancelButton}
       />
     );
 

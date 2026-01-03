@@ -19,6 +19,7 @@ import { ErrorResponseTypes, fail, success } from "../../../shared/types/respons
 import { parseError } from "../../../shared/utils/parse-error";
 import { parseJsonWithComments } from "../../../shared/utils/parse-json";
 import { ensureConfigReady } from "../config/repository";
+import type { CheckConfig } from "../config/types";
 import type { TypecheckIssue, TypecheckRequestOutput, TypecheckResponseOutput } from "./definition";
 import {
   createTypecheckConfig,
@@ -84,6 +85,7 @@ export interface TypecheckRepositoryInterface {
   execute(
     data: TypecheckRequestOutput,
     logger: EndpointLogger,
+    providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<TypecheckResponseOutput>>;
 }
 
@@ -106,11 +108,10 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
    */
   private static getBaseCommand(useTsgo: boolean): string {
     if (useTsgo) {
-      // eslint-disable-next-line i18next/no-literal-string
       return "bunx tsgo";
     }
     // tsc needs increased memory for large projects
-    // eslint-disable-next-line i18next/no-literal-string
+
     return 'NODE_OPTIONS="--max-old-space-size=32768" bunx tsc';
   }
 
@@ -122,7 +123,6 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     buildInfoFile: string,
     projectConfig: string,
   ): string {
-    // eslint-disable-next-line i18next/no-literal-string
     return `${baseCommand} --noEmit --incremental --tsBuildInfoFile ${buildInfoFile} --skipLibCheck --project ${projectConfig}`;
   }
 
@@ -334,7 +334,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   private static getRelativePrefix(cachePath: string): string {
     // Count directory depth by splitting on path separator
     const depth = cachePath.split("/").filter((p) => p && p !== ".").length;
-    // eslint-disable-next-line i18next/no-literal-string
+
     return "../".repeat(depth);
   }
 
@@ -417,7 +417,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         typeRoots: adjustedTypeRoots,
         paths: {
           ...adjustedPaths,
-          // eslint-disable-next-line i18next/no-literal-string
+
           "*": [`${prefix}*`], // Replace baseUrl functionality for tsgo compatibility (resolve from project root)
         },
       },
@@ -438,48 +438,53 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   async execute(
     data: TypecheckRequestOutput,
     logger: EndpointLogger,
+    providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<TypecheckResponseOutput>> {
     const startTime = Date.now();
     let output = "";
     let config: TypecheckConfig | undefined;
 
     try {
-      // Load and validate configuration
-      const configResult = await ensureConfigReady(logger, false);
+      // Use provided config or load it
+      let checkConfig: CheckConfig;
+      if (providedConfig) {
+        checkConfig = providedConfig;
+      } else {
+        const configResult = await ensureConfigReady(logger, false);
 
-      if (!configResult.ready) {
-        return success({
-          issues: {
-            items: [
-              {
-                file: configResult.configPath,
-                severity: "error" as const,
-                message: configResult.message,
-                type: "type" as const,
+        if (!configResult.ready) {
+          return success({
+            issues: {
+              items: [
+                {
+                  file: configResult.configPath,
+                  severity: "error" as const,
+                  message: configResult.message,
+                  type: "type" as const,
+                },
+              ],
+              files: [
+                {
+                  file: configResult.configPath,
+                  errors: 1,
+                  warnings: 0,
+                  total: 1,
+                },
+              ],
+              summary: {
+                totalIssues: 1,
+                totalFiles: 1,
+                totalErrors: 1,
+                displayedIssues: 1,
+                displayedFiles: 1,
+                currentPage: 1,
+                totalPages: 1,
               },
-            ],
-            files: [
-              {
-                file: configResult.configPath,
-                errors: 1,
-                warnings: 0,
-                total: 1,
-              },
-            ],
-            summary: {
-              totalIssues: 1,
-              totalFiles: 1,
-              totalErrors: 1,
-              displayedIssues: 1,
-              displayedFiles: 1,
-              currentPage: 1,
-              totalPages: 1,
             },
-          },
-        });
+          });
+        }
+        checkConfig = configResult.config;
       }
-
-      const checkConfig = configResult.config;
 
       // Check if typecheck is enabled
       if (!checkConfig.typecheck.enabled) {
@@ -506,7 +511,8 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
       // Get the appropriate base command
       const baseCommand = TypecheckRepositoryImpl.getBaseCommand(useTsgo);
-      logger.debug(`Using ${useTsgo ? "tsgo" : "tsc"} for type checking`);
+
+      logger.debug(`[TYPESCRIPT] Using ${useTsgo ? "tsgo" : "tsc"} for type checking`);
 
       // Create TypeScript checking configuration
       config = createTypecheckConfig(data.path, typecheckConfig.cachePath);
@@ -524,7 +530,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         });
       }
 
-      logger.debug("Executing TypeScript command:", command);
+      logger.debug(`[TYPESCRIPT] Executing command: ${command}`);
 
       // Execute the typecheck command
       const execResult = await this.executeCommand(command, data.timeout, logger);
@@ -680,7 +686,8 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
   ): string | null {
     if (config.pathType === PathType.NO_PATH) {
       // No specific path provided, check entire project
-      logger.debug("Running TypeScript check on entire project");
+
+      logger.debug("[TYPESCRIPT] Running check on entire project");
       return TypecheckRepositoryImpl.buildTypecheckCommand(
         baseCommand,
         config.buildInfoFile,
@@ -702,7 +709,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     } else {
       // Folder - create temporary tsconfig with folder glob pattern
       const folderPath = config.targetPath || ".";
-      // eslint-disable-next-line i18next/no-literal-string
+
       TypecheckRepositoryImpl.createTempTsConfig(
         [`${folderPath}/**/*`],
         config.tempConfigFile,
@@ -732,7 +739,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         maxBuffer: 1024 * 1024 * 10, // 10MB buffer
       });
 
-      logger.debug("TypeScript command executed successfully");
+      logger.debug("[TYPESCRIPT] Command executed successfully");
       return {
         success: true,
         output: [result.stdout, result.stderr].filter(Boolean).join("\n"),
@@ -756,7 +763,8 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
       // Other errors are unexpected
       const parsedError = parseError(execError);
-      logger.error("Unexpected error executing TypeScript command", parsedError);
+
+      logger.error(`[TYPESCRIPT] Unexpected error executing command: ${parsedError.message}`);
       return {
         success: false,
         output: "",
@@ -780,10 +788,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     const parsedError = parseError(error);
     const targetPath = config?.targetPath ?? data.path;
 
-    logger.warn("Typecheck execution error", {
-      error: parsedError.message,
-      duration,
-    });
+    logger.warn(`[TYPESCRIPT] Execution error: ${parsedError.message} (duration: ${duration}ms)`);
 
     // Try to extract issues from error output
     const hasStderr = error && typeof error === "object" && "stderr" in error;

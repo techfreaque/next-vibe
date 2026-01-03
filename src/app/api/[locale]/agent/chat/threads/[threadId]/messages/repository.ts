@@ -133,7 +133,7 @@ export async function getParentMessage(
   id: string;
   threadId: string;
   role: ChatMessageRole;
-  content: string;
+  content: string | null;
   parentId: string | null;
   depth: number;
 } | null> {
@@ -308,7 +308,7 @@ export async function createTextMessage(params: {
       id: params.messageId,
       threadId: params.threadId,
       role: ChatMessageRole.ASSISTANT,
-      content: params.content,
+      content: params.content.trim() || null, // Save null if content is empty/whitespace
       parentId: params.parentId,
       depth: params.depth,
       authorId: params.userId ?? null,
@@ -346,7 +346,7 @@ export async function updateMessageContent(params: {
 }): Promise<void> {
   await db
     .update(chatMessages)
-    .set({ content: params.content })
+    .set({ content: params.content.trim() || null }) // Save null if content is empty/whitespace
     .where(eq(chatMessages.id, params.messageId));
 
   params.logger.debug("Updated message content", {
@@ -374,28 +374,47 @@ export async function createToolMessage(params: {
     toolCall: params.toolCall,
   };
 
-  await db.insert(chatMessages).values({
-    id: params.messageId,
-    threadId: params.threadId,
-    role: ChatMessageRole.TOOL,
-    content: "",
-    parentId: params.parentId,
-    depth: params.depth,
-    authorId: params.userId ?? null,
-    sequenceId: params.sequenceId,
-    isAI: true,
-    model: params.model,
-    character: params.character,
-    metadata,
-  });
+  try {
+    await db.insert(chatMessages).values({
+      id: params.messageId,
+      threadId: params.threadId,
+      role: ChatMessageRole.TOOL,
+      content: null, // Tool messages don't have text content, only metadata with toolCall info
+      parentId: params.parentId,
+      depth: params.depth,
+      authorId: params.userId ?? null,
+      sequenceId: params.sequenceId,
+      isAI: true,
+      model: params.model,
+      character: params.character,
+      metadata,
+    });
 
-  params.logger.debug("Created TOOL message", {
-    messageId: params.messageId,
-    threadId: params.threadId,
-    toolName: params.toolCall.toolName,
-    sequenceId: params.sequenceId,
-    userId: params.userId ?? "public",
-  });
+    params.logger.debug("Created TOOL message", {
+      messageId: params.messageId,
+      threadId: params.threadId,
+      toolName: params.toolCall.toolName,
+      sequenceId: params.sequenceId,
+      userId: params.userId ?? "public",
+    });
+  } catch (error) {
+    params.logger.error("Failed to create TOOL message - FULL ERROR", {
+      error: error instanceof Error ? error.message : String(error),
+      errorStack: error instanceof Error ? error.stack : undefined,
+      errorObject: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+      errorCause:
+        error instanceof Error && error.cause
+          ? JSON.stringify(error.cause, Object.getOwnPropertyNames(error.cause))
+          : undefined,
+      messageId: params.messageId,
+      threadId: params.threadId,
+      toolName: params.toolCall.toolName,
+      parentId: params.parentId,
+      sequenceId: params.sequenceId,
+    });
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+    throw error;
+  }
 }
 
 export function handleAnswerAsAiOperation<

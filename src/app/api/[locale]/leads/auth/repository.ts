@@ -88,11 +88,9 @@ export class LeadAuthRepository {
     }
 
     const shouldUpdate = cookieLeadId !== userLeadLink.leadId;
-    logger.debug("Found lead for user", {
-      userId,
-      leadId: userLeadLink.leadId,
-      shouldUpdateCookie: shouldUpdate,
-    });
+    logger.debug(
+      `Found lead for user (userId: ${userId}, leadId: ${userLeadLink.leadId}, shouldUpdateCookie: ${shouldUpdate})`,
+    );
     return {
       leadId: userLeadLink.leadId,
       shouldUpdateCookie: shouldUpdate,

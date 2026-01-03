@@ -49,6 +49,8 @@ export const translations: typeof enTranslations = {
         executing: "Wykonywanie...",
         complete: "Zakończono",
         waitingForConfirmation: "Oczekiwanie na potwierdzenie",
+        pendingConfirmation: "Oczekujące Potwierdzenie",
+        pendingCancellation: "Oczekujące Anulowanie",
       },
       sections: {
         request: "Żądanie",

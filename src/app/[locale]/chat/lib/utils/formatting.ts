@@ -112,7 +112,10 @@ export function getIdColor(id: string): string {
  * @param content - Message content
  * @returns Array of referenced IDs (post numbers or short IDs as strings)
  */
-export function extractReferences(content: string): string[] {
+export function extractReferences(content: string | null): string[] {
+  if (!content) {
+    return [];
+  }
   const regex = />>\s*([0-9]+)/g; // Match >>1234567 style post numbers
   const matches = content.matchAll(regex);
   return Array.from(matches, (m) => m[1]);

@@ -104,13 +104,20 @@ export function parseSearchParams(searchParams: URLSearchParams): ParsedObject {
 /**
  * Parse FormData and convert dot notation to nested objects
  * Example: fileUpload.file => { fileUpload: { file: File } }
+ * Handles multiple values with same key as arrays (e.g., multiple attachments)
  */
 function parseFormData(
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, @typescript-eslint/no-explicit-any -- Infrastructure: FormData type compatibility between Next.js and web standards
   formData: any,
 ): Record<
   string,
-  string | number | boolean | null | File | Record<string, string | number | boolean | null | File>
+  | string
+  | number
+  | boolean
+  | null
+  | File
+  | File[]
+  | Record<string, string | number | boolean | null | File>
 > {
   const result: Record<
     string,
@@ -119,10 +126,32 @@ function parseFormData(
     | boolean
     | null
     | File
+    | File[]
     | Record<string, string | number | boolean | null | File>
   > = {};
 
+  // First pass: collect all values for each key
+  const keyValues: Map<string, Array<string | File>> = new Map();
   for (const [key, value] of formData.entries()) {
+    if (!keyValues.has(key)) {
+      keyValues.set(key, []);
+    }
+    keyValues.get(key)!.push(value);
+  }
+
+  // Second pass: process values
+  for (const [key, values] of keyValues.entries()) {
+    // Determine if this should be an array or single value
+    // Keep as array only if all values are Files (to satisfy type system)
+    const allFiles = values.every((v) => v instanceof File);
+
+    let value: string | File | File[];
+    if (key === "attachments" || (allFiles && values.length > 1)) {
+      value = values.filter((v): v is File => v instanceof File);
+    } else {
+      value = values[0];
+    }
+
     if (key.includes(".")) {
       // Handle dot notation for nested objects
       const parts = key.split(".");
@@ -133,6 +162,7 @@ function parseFormData(
         | boolean
         | null
         | File
+        | File[]
         | Record<string, string | number | boolean | null | File>
       > = result;
 
@@ -148,20 +178,11 @@ function parseFormData(
 
       const lastPart = parts.at(-1);
       if (lastPart) {
-        // Keep File objects as-is, convert strings to appropriate types
-        if (typeof value === "object" && value !== null && "name" in value && "size" in value) {
-          current[lastPart] = value;
-        } else {
-          current[lastPart] = value;
-        }
+        current[lastPart] = value;
       }
     } else {
       // Simple key-value pair
-      if (typeof value === "object" && value !== null && "name" in value && "size" in value) {
-        result[key] = value;
-      } else {
-        result[key] = value;
-      }
+      result[key] = value;
     }
   }
 
@@ -169,9 +190,17 @@ function parseFormData(
 }
 
 /**
- * Merged value type - extends ParsedValue to include File
+ * Merged value type - extends ParsedValue to include File and File[]
  */
-type MergedValue = string | number | boolean | null | File | MergedObject | readonly MergedValue[];
+type MergedValue =
+  | string
+  | number
+  | boolean
+  | null
+  | File
+  | File[]
+  | MergedObject
+  | readonly MergedValue[];
 interface MergedObject {
   [key: string]: MergedValue;
 }
@@ -225,6 +254,7 @@ export async function parseRequestBody(
     | boolean
     | null
     | File
+    | File[]
     | Record<string, string | number | boolean | null | File>
   >
 > {
@@ -263,6 +293,7 @@ export async function parseRequestBody(
           | boolean
           | null
           | File
+          | File[]
           | Record<string, string | number | boolean | null | File>
         >;
       }

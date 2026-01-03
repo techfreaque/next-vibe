@@ -100,14 +100,9 @@ export async function getCliUser(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<ResponseType<InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>>> {
-  // Enhanced debugging: Log authentication flow entry point
-  const authFlowData = {
-    locale,
-    cwd: process.cwd(),
-    nodeEnv: process.env.NODE_ENV,
-    vibeProjectRoot: process.env.VIBE_PROJECT_ROOT,
-  };
-  logger.debug("[CLI AUTH] Starting CLI user authentication flow", authFlowData);
+  logger.debug(
+    `[CLI AUTH] Starting authentication flow (locale: ${locale}, cwd: ${process.cwd()}, env: ${process.env.NODE_ENV})`,
+  );
 
   // Step 1: Check for existing session from .vibe.session file
   try {
@@ -116,20 +111,18 @@ export async function getCliUser(
     const sessionResult = await readSessionFile(logger);
 
     if (sessionResult.success && sessionResult.data) {
-      logger.debug("[CLI AUTH] Found existing CLI session", {
-        userId: sessionResult.data.userId,
-        leadId: sessionResult.data.leadId,
-      });
+      logger.debug(
+        `[CLI AUTH] Found existing session (userId: ${sessionResult.data.userId}, leadId: ${sessionResult.data.leadId})`,
+      );
 
       // Verify the token is still valid
       const { AuthRepository } = await import("@/app/api/[locale]/user/auth/repository");
       const verifyResult = await AuthRepository.verifyJwt(sessionResult.data.token, logger);
 
       if (verifyResult.success && verifyResult.data) {
-        logger.debug("[CLI AUTH] Session token is valid, using session user", {
-          userId: verifyResult.data.id,
-          roles: verifyResult.data.roles,
-        });
+        logger.debug(
+          `[CLI AUTH] Session token valid, using session user (userId: ${verifyResult.data.id}, roles: ${verifyResult.data.roles.join(", ")})`,
+        );
         return {
           success: true,
           data: createCliUserFromDb(
@@ -139,34 +132,30 @@ export async function getCliUser(
           ),
         };
       }
-      logger.debug("[CLI AUTH] Session token is invalid or expired, falling back to email auth", {
-        verifySuccess: verifyResult.success,
-        verifyMessage: verifyResult.message,
-      });
+
+      logger.debug(
+        `[CLI AUTH] Session token invalid or expired, falling back to email auth (success: ${verifyResult.success}, message: ${verifyResult.message})`,
+      );
     } else {
       logger.debug("[CLI AUTH] No session data found in session file");
     }
   } catch (error) {
-    logger.debug("[CLI AUTH] No valid session found, falling back to email auth", {
-      error: parseError(error).message,
-    });
+    logger.debug(
+      `[CLI AUTH] No valid session found, falling back to email auth: ${parseError(error).message}`,
+    );
   }
 
   // Step 2: Check VIBE_CLI_USER_EMAIL environment variable
   logger.debug("[CLI AUTH] Step 2: Checking VIBE_CLI_USER_EMAIL environment variable");
   const cliUserEmail = getCliUserEmail();
 
-  logger.debug("[CLI AUTH] VIBE_CLI_USER_EMAIL result", {
-    hasEmail: !!cliUserEmail,
-    email: cliUserEmail ? `${cliUserEmail.slice(0, 3)}***` : null,
-    envVarExists: "VIBE_CLI_USER_EMAIL" in process.env,
-  });
+  logger.debug(
+    `[CLI AUTH] VIBE_CLI_USER_EMAIL result (hasEmail: ${!!cliUserEmail}, email: ${cliUserEmail ? `${cliUserEmail.slice(0, 3)}***` : "null"}, envVarExists: ${"VIBE_CLI_USER_EMAIL" in process.env})`,
+  );
 
   // Step 3: If VIBE_CLI_USER_EMAIL is not set, return public user
   if (!cliUserEmail) {
-    logger.debug("[CLI AUTH] Step 3: CLI user email not configured, creating public user", {
-      envVar: "VIBE_CLI_USER_EMAIL",
-    });
+    logger.debug("[CLI AUTH] Step 3: CLI user email not configured, creating public user");
 
     // Create a public user with a new lead directly from database
     // We can't use getLeadIdFromDb() here because it tries to access cookies
@@ -189,7 +178,7 @@ export async function getCliUser(
         })
         .returning();
 
-      logger.debug("Created public lead for CLI", { leadId: newLead.id });
+      logger.debug(`[CLI AUTH] Created public lead for CLI (leadId: ${newLead.id})`);
 
       return {
         success: true,
@@ -199,9 +188,7 @@ export async function getCliUser(
         } as InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
       };
     } catch (error) {
-      logger.error("Failed to create public lead for CLI", {
-        error: parseError(error).message,
-      });
+      logger.error(`[CLI AUTH] Failed to create public lead for CLI: ${parseError(error).message}`);
 
       // Fallback to default ID if database fails
       return {
@@ -215,10 +202,10 @@ export async function getCliUser(
   }
 
   // Step 4: Email is set, authenticate from database
-  logger.debug("[CLI AUTH] Step 4: Authenticating user from database", {
-    email: cliUserEmail,
-    locale,
-  });
+
+  logger.debug(
+    `[CLI AUTH] Step 4: Authenticating user from database (email: ${cliUserEmail}, locale: ${locale})`,
+  );
 
   try {
     const { AuthRepository } = await import("@/app/api/[locale]/user/auth/repository");
@@ -228,12 +215,9 @@ export async function getCliUser(
     if (authResult.success && authResult.data) {
       const user = authResult.data;
 
-      logger.debug("[CLI AUTH] CLI user found in database - authentication successful", {
-        id: user.id,
-        leadId: user.leadId,
-        roles: user.roles,
-        email: cliUserEmail,
-      });
+      logger.debug(
+        `[CLI AUTH] CLI user found in database - authentication successful (id: ${user.id}, leadId: ${user.leadId}, roles: ${user.roles.join(", ")}, email: ${cliUserEmail})`,
+      );
 
       return {
         success: true,
@@ -243,11 +227,10 @@ export async function getCliUser(
 
     // User not found in database - this is expected for CLI_AUTH_BYPASS routes
     // Use debug level to avoid polluting output for routes that don't require auth
-    logger.debug("[CLI AUTH] CLI user not found in database", {
-      email: cliUserEmail,
-      authSuccess: authResult.success,
-      authMessage: authResult.message,
-    });
+
+    logger.debug(
+      `[CLI AUTH] CLI user not found in database (email: ${cliUserEmail}, authSuccess: ${authResult.success}, authMessage: ${authResult.message})`,
+    );
 
     return {
       success: false,
@@ -260,11 +243,9 @@ export async function getCliUser(
   } catch (error) {
     // Database error - use debug level as CLI_AUTH_BYPASS routes will still work
     // This avoids polluting CLI output for routes that don't require auth
-    logger.debug("[CLI AUTH] Error getting CLI user from database", {
-      error: parseError(error).message,
-      email: cliUserEmail,
-      locale,
-    });
+    logger.debug(
+      `[CLI AUTH] Error getting CLI user from database (error: ${parseError(error).message}, email: ${cliUserEmail})`,
+    );
 
     return {
       success: false,

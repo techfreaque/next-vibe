@@ -31,11 +31,11 @@ interface UseInputHandlersProps {
       content: string;
       threadId?: string;
       parentId?: string;
-      toolConfirmation?: {
+      toolConfirmations?: Array<{
         messageId: string;
         confirmed: boolean;
         updatedArgs?: Record<string, string | number | boolean | null>;
-      };
+      }>;
       /** Audio input for voice-to-voice mode */
       audioInput?: { file: File };
       /** File attachments */

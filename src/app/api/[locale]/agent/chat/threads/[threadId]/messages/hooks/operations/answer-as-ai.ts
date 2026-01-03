@@ -106,6 +106,7 @@ export async function answerAsAI(
           })) ?? null,
         messageHistory: messageHistory ?? null,
         attachments: attachments && attachments.length > 0 ? attachments : null,
+        toolConfirmations: null,
         voiceMode: null,
         audioInput: { file: null },
       },

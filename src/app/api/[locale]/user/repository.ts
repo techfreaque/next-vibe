@@ -66,10 +66,9 @@ export class UserRepository {
         detailLevel = UserDetailLevel.MINIMAL,
       } = options;
 
-      logger.debug("Getting user by auth", {
-        roles: roles.map(String),
-        detailLevel: String(detailLevel),
-      });
+      logger.debug(
+        `Getting user by auth (roles: ${roles.map(String).join(", ")}, detailLevel: ${String(detailLevel)})`,
+      );
 
       const verifiedUser = await AuthRepository.getAuthMinimalUser(
         roles,
@@ -125,7 +124,7 @@ export class UserRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
     try {
-      logger.debug("Getting user by ID", { userId, detailLevel });
+      logger.debug(`Getting user by ID (userId: ${userId}, detailLevel: ${detailLevel})`);
 
       const results = await db.select().from(users).where(eq(users.id, userId));
 
@@ -203,7 +202,7 @@ export class UserRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
     try {
-      logger.debug("Getting user by email", { email, detailLevel });
+      logger.debug(`Getting user by email (email: ${email}, detailLevel: ${detailLevel})`);
 
       const results = await db.select({ id: users.id }).from(users).where(eq(users.email, email));
 

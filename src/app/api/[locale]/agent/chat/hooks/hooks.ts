@@ -123,11 +123,11 @@ export interface UseChatReturn {
       attachments: File[];
       threadId?: string;
       parentId?: string;
-      toolConfirmation?: {
+      toolConfirmations?: Array<{
         messageId: string;
         confirmed: boolean;
         updatedArgs?: Record<string, string | number | boolean | null>;
-      };
+      }>;
       /** Audio input for voice-to-voice mode - bypasses text content */
       audioInput?: { file: File };
     },
@@ -536,6 +536,7 @@ export function useChat(
     navigateToThread: navigationOps.navigateToThread,
     navigateToNewThread: navigationOps.navigateToNewThread,
     deleteThread: (threadId: string) => threadOps.deleteThread(threadId, activeThreadId),
+    activeThreadId,
     logger,
   });
 

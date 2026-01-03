@@ -276,14 +276,19 @@ export function ThreadItem({
                     variant="ghost"
                     size="icon"
                     className="h-5 w-6"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setDropdownOpen(true);
                     }}
                   >
                     <MoreVertical className="h-3.5 w-3.5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" onCloseAutoFocus={(e) => e?.preventDefault()}>
+                <DropdownMenuContent
+                  align="end"
+                  onCloseAutoFocus={(e) => e?.preventDefault()}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   {/* Only show Rename if user has permission (computed server-side) */}
                   {thread.canEdit && (
                     <DropdownMenuItem onSelect={handleEdit} className="cursor-pointer">

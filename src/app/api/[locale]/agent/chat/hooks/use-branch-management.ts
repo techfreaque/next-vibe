@@ -31,6 +31,8 @@ interface UseBranchManagementReturn {
 // Stable empty object to avoid creating new objects on every render
 const EMPTY_BRANCH_INDICES: Record<string, number> = {};
 
+export const BRANCH_INDEX_KEY = "__root__";
+
 export function useBranchManagement({
   activeThreadMessages,
   threadId,
@@ -122,7 +124,7 @@ export function useBranchManagement({
     // Add root branches if multiple roots exist
     if (rootMessages.length > 1) {
       branchMap.set(
-        "__root__",
+        BRANCH_INDEX_KEY,
         rootMessages.toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
       );
     }
@@ -179,7 +181,7 @@ export function useBranchManagement({
     const updatesToApply: Record<string, number> = {};
 
     for (const newMsg of newMessages) {
-      const parentKey = newMsg.parentId || "__root__";
+      const parentKey = newMsg.parentId || BRANCH_INDEX_KEY;
       const siblings = branchMap.get(parentKey);
 
       if (!siblings || siblings.length <= 1) {

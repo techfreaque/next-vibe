@@ -134,12 +134,10 @@ export function ThreadedMessageContent({
         {/* Message content - render all messages in sequence */}
         <Div className="text-sm">
           {allMessagesInSequence.map((msg, msgIndex) => {
-            // Check if there's content after this message
             const hasContentAfter = allMessagesInSequence
               .slice(msgIndex + 1)
-              .some((m) => m.content.trim().length > 0);
+              .some((m) => (m.content ?? "").trim().length > 0);
 
-            // TOOL message
             if (msg.role === "tool" && msg.metadata?.toolCall) {
               return (
                 <ToolDisplay
@@ -154,8 +152,7 @@ export function ThreadedMessageContent({
               );
             }
 
-            // Skip empty messages
-            if (!msg.content.trim()) {
+            if (!(msg.content ?? "").trim()) {
               return null;
             }
 
@@ -173,9 +170,8 @@ export function ThreadedMessageContent({
                       msgIndex > 0 && "mt-3",
                     )}
                   >
-                    {/* NEW ARCHITECTURE: Tool calls are separate TOOL messages now */}
                     <Markdown
-                      content={msg.content}
+                      content={msg.content ?? ""}
                       messageId={msg.id}
                       hasContentAfter={hasContentAfter}
                       collapseState={collapseState}

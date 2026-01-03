@@ -20,6 +20,7 @@ interface UseThreadNavigationProps {
   navigateToThread: (threadId: string) => void;
   navigateToNewThread: (rootFolderId: DefaultFolderId, subFolderId: string | null) => void;
   deleteThread: (threadId: string) => Promise<void>;
+  activeThreadId: string | null;
   logger: EndpointLogger;
 }
 
@@ -37,6 +38,7 @@ export function useThreadNavigation({
   navigateToThread,
   navigateToNewThread,
   deleteThread,
+  activeThreadId,
   logger,
 }: UseThreadNavigationProps): UseThreadNavigationReturn {
   const router = useRouter();
@@ -85,17 +87,21 @@ export function useThreadNavigation({
   // Handle thread deletion
   const handleDeleteThread = useCallback(
     async (threadId: string): Promise<void> => {
-      logger.debug("Chat: Handling thread deletion", { threadId });
+      logger.debug("Chat: Handling thread deletion", { threadId, activeThreadId });
 
       // Delete the thread
       await deleteThread(threadId);
 
-      // Navigate to the root folder page
-      const url = `/${locale}/threads/${currentRootFolderId}`;
-      logger.debug("Chat: Navigating after thread deletion", { url });
-      router.push(url);
+      // Only navigate if the deleted thread was the active one
+      if (threadId === activeThreadId) {
+        const url = `/${locale}/threads/${currentRootFolderId}`;
+        logger.debug("Chat: Navigating after deleting active thread", { url });
+        router.push(url);
+      } else {
+        logger.debug("Chat: Deleted non-active thread, no navigation needed");
+      }
     },
-    [deleteThread, logger, locale, currentRootFolderId, router],
+    [deleteThread, logger, locale, currentRootFolderId, router, activeThreadId],
   );
 
   return {

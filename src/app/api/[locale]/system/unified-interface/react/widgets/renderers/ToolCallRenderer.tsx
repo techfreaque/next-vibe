@@ -42,6 +42,11 @@ import { simpleT } from "@/i18n/core/shared";
 
 import { EndpointRenderer } from "./EndpointRenderer";
 
+type ToolDecision =
+  | { type: "pending" }
+  | { type: "confirmed"; updatedArgs?: Record<string, string | number | boolean | null> }
+  | { type: "declined" };
+
 interface ToolCallRendererProps {
   toolCall: ToolCall;
   locale: CountryLanguage;
@@ -68,6 +73,13 @@ interface ToolCallRendererProps {
       currentState: boolean,
     ) => void;
   };
+  /** Optional batch mode handlers - when provided, tool won't submit individually */
+  onConfirm?: (formData: FieldValues) => void;
+  onCancel?: () => void;
+  /** Parent message ID for batch submission */
+  parentId?: string;
+  /** Decision state for batch mode - used to style buttons and manage collapse */
+  decision?: ToolDecision;
 }
 
 /**
@@ -83,6 +95,10 @@ export function ToolCallRenderer({
   toolIndex = 0,
   collapseState,
   user,
+  onConfirm: batchOnConfirm,
+  onCancel: batchOnCancel,
+  parentId,
+  decision,
 }: ToolCallRendererProps): JSX.Element {
   const { t } = simpleT(locale);
   const { sendMessage } = useChatContext();
@@ -91,6 +107,10 @@ export function ToolCallRenderer({
   const isWaitingForConfirmation = Boolean(toolCall.waitingForConfirmation);
 
   const getIsOpen = (): boolean => {
+    // If a decision has been made in batch mode, collapse the tool
+    if (decision && decision.type !== "pending") {
+      return false;
+    }
     // Always open when waiting for confirmation
     if (isWaitingForConfirmation) {
       return true;
@@ -107,6 +127,13 @@ export function ToolCallRenderer({
     return defaultOpen;
   };
   const [isOpen, setIsOpen] = useState(getIsOpen);
+
+  // Update isOpen when decision changes
+  useEffect(() => {
+    if (decision && decision.type !== "pending") {
+      setIsOpen(false);
+    }
+  }, [decision]);
 
   const [definition, setDefinition] = useState<CreateApiEndpointAny | null>(null);
 
@@ -348,7 +375,21 @@ export function ToolCallRenderer({
                   {t("app.api.system.unifiedInterface.react.widgets.toolCall.status.error")}
                 </Span>
               )}
-              {isWaitingForConfirmation && (
+              {isWaitingForConfirmation && decision?.type === "confirmed" && (
+                <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-500">
+                  {t(
+                    "app.api.system.unifiedInterface.react.widgets.toolCall.status.pendingConfirmation",
+                  )}
+                </Span>
+              )}
+              {isWaitingForConfirmation && decision?.type === "declined" && (
+                <Span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-500">
+                  {t(
+                    "app.api.system.unifiedInterface.react.widgets.toolCall.status.pendingCancellation",
+                  )}
+                </Span>
+              )}
+              {isWaitingForConfirmation && (!decision || decision.type === "pending") && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-500">
                   {t(
                     "app.api.system.unifiedInterface.react.widgets.toolCall.status.waitingForConfirmation",
@@ -447,6 +488,13 @@ export function ToolCallRenderer({
                 const needsConfirmation = isWaitingForConfirmation && !isDeclined;
 
                 const handleConfirm = (formData: FieldValues): void => {
+                  // Batch mode: call provided handler (allows changing choice)
+                  if (batchOnConfirm) {
+                    batchOnConfirm(formData);
+                    return;
+                  }
+
+                  // Individual mode: submit immediately
                   const argsRecord: Record<string, string | number | boolean | null> = {};
                   for (const [key, value] of Object.entries(formData)) {
                     if (
@@ -462,33 +510,71 @@ export function ToolCallRenderer({
                     content: "",
                     attachments: [],
                     threadId,
-                    parentId: messageId,
-                    toolConfirmation: {
-                      messageId,
-                      confirmed: true,
-                      updatedArgs: argsRecord,
-                    },
+                    parentId: parentId ?? messageId,
+                    toolConfirmations: [
+                      {
+                        messageId,
+                        confirmed: true,
+                        updatedArgs: argsRecord,
+                      },
+                    ],
                   });
                 };
 
                 const handleCancel = (): void => {
+                  // Batch mode: call provided handler (allows changing choice)
+                  if (batchOnCancel) {
+                    batchOnCancel();
+                    return;
+                  }
+
+                  // Individual mode: submit immediately
                   sendMessage({
                     content: "",
                     attachments: [],
                     threadId,
-                    parentId: messageId,
-                    toolConfirmation: {
-                      messageId,
-                      confirmed: false,
-                    },
+                    parentId: parentId ?? messageId,
+                    toolConfirmations: [
+                      {
+                        messageId,
+                        confirmed: false,
+                      },
+                    ],
                   });
                 };
+
+                // Determine if tool has a pending decision in batch mode
+                const isPendingConfirm = decision?.type === "confirmed";
+                const isPendingCancel = decision?.type === "declined";
+                const hasPendingDecision = isPendingConfirm || isPendingCancel;
 
                 // Use EndpointRenderer for 100% definition-driven rendering
                 return (
                   <Div className="p-4 space-y-4" data-tool-editable={isEditable}>
-                    {/* Show info banner when waiting for confirmation */}
-                    {isWaitingForConfirmation && !isDeclined && (
+                    {/* Show pending confirmation banner */}
+                    {isWaitingForConfirmation && isPendingConfirm && (
+                      <Div className="rounded-md bg-green-500/10 border border-green-500/20 p-3">
+                        <Span className="text-green-600 dark:text-green-500 text-sm font-medium">
+                          {t(
+                            "app.api.system.unifiedInterface.react.widgets.toolCall.status.pendingConfirmation",
+                          )}
+                        </Span>
+                      </Div>
+                    )}
+
+                    {/* Show pending cancellation banner */}
+                    {isWaitingForConfirmation && isPendingCancel && (
+                      <Div className="rounded-md bg-red-500/10 border border-red-500/20 p-3">
+                        <Span className="text-red-600 dark:text-red-500 text-sm font-medium">
+                          {t(
+                            "app.api.system.unifiedInterface.react.widgets.toolCall.status.pendingCancellation",
+                          )}
+                        </Span>
+                      </Div>
+                    )}
+
+                    {/* Show waiting for confirmation banner (no decision yet) */}
+                    {isWaitingForConfirmation && !isDeclined && !hasPendingDecision && (
                       <Div className="rounded-md bg-amber-500/10 border border-amber-500/20 p-3">
                         <Span className="text-amber-600 dark:text-amber-500 text-sm font-medium">
                           {t(
@@ -518,13 +604,23 @@ export function ToolCallRenderer({
                       endpoint={definition}
                       locale={locale}
                       data={mergedData}
-                      disabled={!isEditable || isDeclined}
+                      disabled={!isEditable || isDeclined || hasPendingDecision}
                       form={needsConfirmation || isDeclined ? confirmationForm : undefined}
                       onSubmit={needsConfirmation ? handleConfirm : undefined}
                       onCancel={needsConfirmation ? handleCancel : undefined}
-                      submitButtonText={
+                      submitButton={
                         needsConfirmation
-                          ? "app.api.system.unifiedInterface.react.widgets.toolCall.actions.confirm"
+                          ? {
+                              text: "app.api.system.unifiedInterface.react.widgets.toolCall.actions.confirm",
+                              variant: decision?.type === "confirmed" ? "default" : "ghost",
+                            }
+                          : undefined
+                      }
+                      cancelButton={
+                        needsConfirmation
+                          ? {
+                              variant: decision?.type === "declined" ? "destructive" : "ghost",
+                            }
                           : undefined
                       }
                     />

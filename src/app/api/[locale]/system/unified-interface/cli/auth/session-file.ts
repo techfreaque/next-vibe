@@ -57,24 +57,20 @@ export async function readSessionFile(logger: EndpointLogger): Promise<ResponseT
     const cwd = process.cwd();
 
     // Enhanced debugging: Log current working directory and full path
-    logger.debug("Reading session file", {
-      path: sessionPath,
-      projectRoot,
-      cwd,
-      sessionFileName: SESSION_FILE_NAME,
-      vibeProjectRoot: process.env.VIBE_PROJECT_ROOT,
-    });
+
+    logger.debug(
+      `[SESSION FILE] Reading session file (path: ${sessionPath}, projectRoot: ${projectRoot}, cwd: ${cwd})`,
+    );
 
     // Check if file exists before attempting to read
     try {
       await fs.access(sessionPath);
-      logger.debug("Session file exists at path", { path: sessionPath });
+
+      logger.debug(`[SESSION FILE] File exists at path: ${sessionPath}`);
     } catch (accessError) {
       const errorMsg = parseError(accessError).message;
-      logger.debug("Session file does not exist at path", {
-        path: sessionPath,
-        accessError: errorMsg,
-      });
+
+      logger.debug(`[SESSION FILE] File does not exist at path: ${sessionPath} (${errorMsg})`);
     }
 
     const fileContent = await fs.readFile(sessionPath, "utf-8");
@@ -97,7 +93,7 @@ export async function readSessionFile(logger: EndpointLogger): Promise<ResponseT
     // Check if session is expired
     const expiresAt = new Date(sessionData.expiresAt);
     if (expiresAt < new Date()) {
-      logger.debug("Session expired", { expiresAt: sessionData.expiresAt });
+      logger.debug(`[SESSION FILE] Session expired (expiresAt: ${sessionData.expiresAt})`);
       return fail({
         message: "app.api.system.unifiedInterface.cli.vibe.errors.sessionExpired",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
@@ -105,10 +101,9 @@ export async function readSessionFile(logger: EndpointLogger): Promise<ResponseT
       });
     }
 
-    logger.debug("Session file read successfully", {
-      userId: sessionData.userId,
-      expiresAt: sessionData.expiresAt,
-    });
+    logger.debug(
+      `[SESSION FILE] Read successfully (userId: ${sessionData.userId}, expiresAt: ${sessionData.expiresAt})`,
+    );
 
     return success(sessionData);
   } catch (error) {
@@ -120,27 +115,22 @@ export async function readSessionFile(logger: EndpointLogger): Promise<ResponseT
       parsedError.message.includes(FILE_NOT_FOUND_ERROR_PATTERNS.NO_SUCH_FILE);
     if (isFileNotFoundError) {
       // Enhanced debugging: Log path details when file not found
-      const debugData = {
-        searchedPath: getSessionFilePath(),
-        projectRoot: getProjectRoot(),
-        cwd: process.cwd(),
-        vibeProjectRoot: process.env.VIBE_PROJECT_ROOT,
-        errorMessage: parsedError.message,
-      };
-      logger.debug("Session file not found - user not authenticated", debugData);
+      const searchedPath = getSessionFilePath();
+      const projectRoot = getProjectRoot();
+      const cwd = process.cwd();
+
+      logger.debug(
+        `[SESSION FILE] File not found - user not authenticated (searchedPath: ${searchedPath}, projectRoot: ${projectRoot}, cwd: ${cwd}, error: ${parsedError.message})`,
+      );
       return fail({
         message: "app.api.system.unifiedInterface.cli.vibe.errors.notFound",
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
-    logger.error("Error reading session file", {
-      ...parsedError,
-      path: getSessionFilePath(),
-      projectRoot: getProjectRoot(),
-      cwd: process.cwd(),
-      vibeProjectRoot: process.env.VIBE_PROJECT_ROOT,
-    });
+    logger.error(
+      `[SESSION FILE] Error reading session file: ${parsedError.message} (path: ${getSessionFilePath()}, projectRoot: ${getProjectRoot()}, cwd: ${process.cwd()})`,
+    );
     return fail({
       message: "app.api.system.unifiedInterface.cli.vibe.errors.readFailed",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -158,10 +148,10 @@ export async function writeSessionFile(
 ): Promise<ResponseType<void>> {
   try {
     const sessionPath = getSessionFilePath();
-    logger.debug("Writing session file", {
-      path: sessionPath,
-      userId: sessionData.userId,
-    });
+
+    logger.debug(
+      `[SESSION FILE] Writing session file (path: ${sessionPath}, userId: ${sessionData.userId})`,
+    );
 
     // Validate session data
     if (
@@ -179,15 +169,15 @@ export async function writeSessionFile(
     const fileContent = JSON.stringify(sessionData, null, 2);
     await fs.writeFile(sessionPath, fileContent, "utf-8");
 
-    logger.debug("Session file written successfully", {
-      path: sessionPath,
-      userId: sessionData.userId,
-    });
+    logger.debug(
+      `[SESSION FILE] Written successfully (path: ${sessionPath}, userId: ${sessionData.userId})`,
+    );
 
     return success();
   } catch (error) {
     const parsedError = parseError(error);
-    logger.error("Error writing session file", parsedError);
+
+    logger.error(`[SESSION FILE] Error writing session file: ${parsedError.message}`);
     return fail({
       message: "app.api.system.unifiedInterface.cli.vibe.errors.writeFailed",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -202,11 +192,12 @@ export async function writeSessionFile(
 export async function deleteSessionFile(logger: EndpointLogger): Promise<ResponseType<void>> {
   try {
     const sessionPath = getSessionFilePath();
-    logger.debug("Deleting session file", { path: sessionPath });
+
+    logger.debug(`[SESSION FILE] Deleting session file (path: ${sessionPath})`);
 
     await fs.unlink(sessionPath);
 
-    logger.debug("Session file deleted successfully", { path: sessionPath });
+    logger.debug(`[SESSION FILE] Deleted successfully (path: ${sessionPath})`);
     return success();
   } catch (error) {
     const parsedError = parseError(error);
@@ -216,11 +207,11 @@ export async function deleteSessionFile(logger: EndpointLogger): Promise<Respons
       parsedError.message.includes(FILE_NOT_FOUND_ERROR_PATTERNS.ENOENT) ||
       parsedError.message.includes(FILE_NOT_FOUND_ERROR_PATTERNS.NO_SUCH_FILE);
     if (isFileNotFoundError) {
-      logger.debug("Session file not found - already logged out");
+      logger.debug("[SESSION FILE] File not found - already logged out");
       return success();
     }
 
-    logger.error("Error deleting session file", parsedError);
+    logger.error(`[SESSION FILE] Error deleting session file: ${parsedError.message}`);
     return fail({
       message: "app.api.system.unifiedInterface.cli.vibe.errors.deleteFailed",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,

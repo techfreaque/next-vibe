@@ -3,7 +3,7 @@
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { Logo } from "@/app/[locale]/_components/logo";
@@ -76,65 +76,67 @@ export function ChatMessages({
   const isStreamingActive = useAIStreamStore((state) => state.isStreaming);
 
   // Merge streaming messages with persisted messages for instant UI updates
-  const mergedMessages = useMemo(() => {
-    const messageMap = new Map<string, ChatMessage>();
+  // NOTE: Removed useMemo because it wasn't recalculating when streamingMessages changed
+  const messageMap = new Map<string, ChatMessage>();
 
-    // Add all persisted messages first
-    for (const msg of activeThreadMessages) {
-      messageMap.set(msg.id, msg);
+  // Add all persisted messages first
+  for (const msg of activeThreadMessages) {
+    messageMap.set(msg.id, msg);
+  }
+
+  // Override with streaming messages (they have the latest content)
+  // IMPORTANT: Only merge streaming messages that belong to the current thread
+  for (const streamMsg of Object.values(streamingMessages)) {
+    // Skip streaming messages from other threads
+    if (activeThreadId && streamMsg.threadId !== activeThreadId) {
+      continue;
     }
 
-    // Override with streaming messages (they have the latest content)
-    // IMPORTANT: Only merge streaming messages that belong to the current thread
-    for (const streamMsg of Object.values(streamingMessages)) {
-      // Skip streaming messages from other threads
-      if (activeThreadId && streamMsg.threadId !== activeThreadId) {
-        continue;
-      }
-
-      const existingMsg = messageMap.get(streamMsg.messageId);
-      if (existingMsg) {
-        // Update existing message with streaming content
-        messageMap.set(streamMsg.messageId, {
-          ...existingMsg,
-          content: streamMsg.content,
-        });
-      } else {
-        // Add new streaming message with all required fields
-        messageMap.set(streamMsg.messageId, {
-          id: streamMsg.messageId,
-          threadId: streamMsg.threadId,
-          role: streamMsg.role,
-          content: streamMsg.content,
-          parentId: streamMsg.parentId,
-          depth: streamMsg.depth,
-          model: streamMsg.model ?? null,
-          character: streamMsg.character ?? null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          sequenceId: streamMsg.sequenceId ?? null,
-          // Required fields with defaults
-          authorId: null,
-          authorName: null,
-          authorAvatar: null,
-          authorColor: null,
-          isAI: streamMsg.role === "assistant",
-          errorType: null,
-          errorMessage: null,
-          errorCode: null,
-          edited: false,
-          originalId: null,
-          tokens: null,
-          metadata: {},
-          upvotes: 0,
-          downvotes: 0,
-          searchVector: null,
-        });
-      }
+    const existingMsg = messageMap.get(streamMsg.messageId);
+    if (existingMsg) {
+      // Update existing message with streaming content and metadata
+      messageMap.set(streamMsg.messageId, {
+        ...existingMsg,
+        content: streamMsg.content,
+        metadata: streamMsg.toolCall
+          ? { ...existingMsg.metadata, toolCall: streamMsg.toolCall }
+          : existingMsg.metadata,
+      });
+    } else {
+      // Add new streaming message with all required fields
+      messageMap.set(streamMsg.messageId, {
+        id: streamMsg.messageId,
+        threadId: streamMsg.threadId,
+        role: streamMsg.role,
+        content: streamMsg.content,
+        parentId: streamMsg.parentId,
+        depth: streamMsg.depth,
+        model: streamMsg.model ?? null,
+        character: streamMsg.character ?? null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        sequenceId: streamMsg.sequenceId ?? null,
+        // Required fields with defaults
+        authorId: null,
+        authorName: null,
+        authorAvatar: null,
+        authorColor: null,
+        isAI: streamMsg.role === "assistant",
+        errorType: null,
+        errorMessage: null,
+        errorCode: null,
+        edited: false,
+        originalId: null,
+        tokens: null,
+        metadata: streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {},
+        upvotes: 0,
+        downvotes: 0,
+        searchVector: null,
+      });
     }
+  }
 
-    return [...messageMap.values()];
-  }, [activeThreadMessages, streamingMessages, activeThreadId]);
+  const mergedMessages = [...messageMap.values()];
 
   // Check if user is at bottom of scroll
   const isAtBottom = useCallback((): boolean => {
@@ -263,12 +265,11 @@ export function ChatMessages({
       wasAtBottomBeforeStreamingRef.current = !userScrolledUp;
     }
 
-    // Reset when streaming stops
     if (!isCurrentlyStreaming && wasStreaming) {
       wasAtBottomBeforeStreamingRef.current = true;
     }
 
-    lastMessageContentRef.current = lastMessage.content;
+    lastMessageContentRef.current = lastMessage.content ?? "";
 
     // Only auto-scroll if:
     // 1. Currently streaming

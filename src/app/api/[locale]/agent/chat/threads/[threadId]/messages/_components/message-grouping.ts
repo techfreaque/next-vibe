@@ -67,13 +67,11 @@ export function groupMessagesBySequence(messages: ChatMessage[]): MessageGroup[]
  * Used to determine if tool calls should be collapsed by default
  */
 export function hasContentAfterToolCalls(group: MessageGroup): boolean {
-  // Check if primary message has content
-  if (group.primary.content.trim().length > 0) {
+  if ((group.primary.content ?? "").trim().length > 0) {
     return true;
   }
 
-  // Check if any continuation has content
-  return group.continuations.some((msg) => msg.content.trim().length > 0);
+  return group.continuations.some((msg) => (msg.content ?? "").trim().length > 0);
 }
 
 /**
@@ -103,11 +101,11 @@ export function getAllToolCallsFromGroup(group: MessageGroup): ToolCall[] {
  * Joins content from primary and all continuations
  */
 export function getCombinedContent(group: MessageGroup): string {
-  const contents = [group.primary.content];
+  const contents = [group.primary.content ?? ""];
 
   for (const continuation of group.continuations) {
-    if (continuation.content.trim().length > 0) {
-      contents.push(continuation.content);
+    if ((continuation.content ?? "").trim().length > 0) {
+      contents.push(continuation.content ?? "");
     }
   }
 

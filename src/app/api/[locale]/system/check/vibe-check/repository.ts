@@ -14,6 +14,7 @@ import { env } from "@/config/env";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { ensureConfigReady } from "../config/repository";
+import type { CheckConfig } from "../config/types";
 import type { LintResponseOutput } from "../lint/definition";
 import { lintRepository } from "../lint/repository";
 import type { OxlintResponseOutput } from "../oxlint/definition";
@@ -55,15 +56,16 @@ export class VibeCheckRepository {
   }
 
   private static async runOxlintCheck(
-    path: string,
+    paths: string[],
     fix: boolean,
     timeout: number,
+    config: CheckConfig,
     logger: EndpointLogger,
   ): Promise<CheckResult> {
     const startTime = Date.now();
     const result = await oxlintRepository.execute(
       {
-        path,
+        path: paths.length === 1 ? paths[0] : paths,
         fix,
         timeout,
         skipSorting: true,
@@ -72,6 +74,7 @@ export class VibeCheckRepository {
         maxFilesInSummary: 999999,
       },
       logger,
+      config,
     );
     logger.info("✓ Oxlint check completed");
     return {
@@ -85,7 +88,7 @@ export class VibeCheckRepository {
     path: string,
     fix: boolean,
     timeout: number,
-    cacheDir: string,
+    config: CheckConfig,
     logger: EndpointLogger,
   ): Promise<CheckResult> {
     const startTime = Date.now();
@@ -94,13 +97,14 @@ export class VibeCheckRepository {
         path,
         fix,
         timeout,
-        cacheDir,
+        cacheDir: config.eslint.enabled ? config.eslint.cachePath : "./.tmp",
         skipSorting: true,
         limit: 999999,
         page: 1,
         maxFilesInSummary: 999999,
       },
       logger,
+      config,
     );
     logger.info("✓ ESLint check completed");
     return {
@@ -113,6 +117,7 @@ export class VibeCheckRepository {
   private static async runTypecheckCheck(
     path: string,
     timeout: number,
+    config: CheckConfig,
     logger: EndpointLogger,
   ): Promise<CheckResult> {
     const startTime = Date.now();
@@ -127,6 +132,7 @@ export class VibeCheckRepository {
         maxFilesInSummary: 999999,
       },
       logger,
+      config,
     );
     logger.info("✓ TypeScript check completed");
     return {
@@ -245,66 +251,73 @@ export class VibeCheckRepository {
       let firstCheckStart = 0;
       let lastCheckEnd = 0;
 
-      const allResults = await Promise.allSettled(
-        pathsToCheck.map(async (path) => {
-          const promises: Promise<CheckResult>[] = [];
+      // Run checkers for all paths in parallel
+      // Oxlint supports multiple paths natively, but TypeScript and ESLint need separate runs per path
+      const promises: Promise<CheckResult>[] = [];
 
-          if (!effectiveData.skipOxlint && configResult.config.oxlint.enabled) {
-            logger.info("Starting Oxlint check...");
-            promises.push(
-              this.runOxlintCheck(
-                path || baseDir,
-                effectiveData.fix,
-                effectiveData.timeout,
-                logger,
-              ).then((result) => {
-                if (firstCheckStart === 0) {
-                  firstCheckStart = Date.now();
-                }
-                lastCheckEnd = Date.now();
-                return result;
-              }),
-            );
-          }
+      // Oxlint can handle multiple paths efficiently in a single run
+      if (!effectiveData.skipOxlint && configResult.config.oxlint.enabled) {
+        const oxlintPaths =
+          pathsToCheck.length === 0 ? baseDir : pathsToCheck.map((p) => p || baseDir);
+        logger.info("Starting Oxlint check...");
+        promises.push(
+          this.runOxlintCheck(
+            Array.isArray(oxlintPaths) ? oxlintPaths : [oxlintPaths],
+            effectiveData.fix,
+            effectiveData.timeout,
+            configResult.config,
+            logger,
+          ).then((result) => {
+            if (firstCheckStart === 0) {
+              firstCheckStart = Date.now();
+            }
+            lastCheckEnd = Date.now();
+            return result;
+          }),
+        );
+      }
 
-          if (!effectiveData.skipEslint && configResult.config.eslint.enabled) {
-            logger.info("Starting ESLint check...");
-            const cacheDir = configResult.config.eslint.cachePath || "";
-            promises.push(
-              this.runEslintCheck(
-                path || baseDir,
-                effectiveData.fix,
-                effectiveData.timeout,
-                cacheDir,
-                logger,
-              ).then((result) => {
-                if (firstCheckStart === 0) {
-                  firstCheckStart = Date.now();
-                }
-                lastCheckEnd = Date.now();
-                return result;
-              }),
-            );
-          }
+      // ESLint and TypeScript: run separately for each path (required for proper file handling)
+      for (const path of pathsToCheck) {
+        if (!effectiveData.skipEslint && configResult.config.eslint.enabled) {
+          logger.info("Starting ESLint check...");
+          promises.push(
+            this.runEslintCheck(
+              path || baseDir,
+              effectiveData.fix,
+              effectiveData.timeout,
+              configResult.config,
+              logger,
+            ).then((result) => {
+              if (firstCheckStart === 0) {
+                firstCheckStart = Date.now();
+              }
+              lastCheckEnd = Date.now();
+              return result;
+            }),
+          );
+        }
 
-          if (!effectiveData.skipTypecheck && configResult.config.typecheck.enabled) {
-            logger.info("Starting TypeScript check...");
-            promises.push(
-              this.runTypecheckCheck(path || baseDir, effectiveData.timeout, logger).then(
-                (result) => {
-                  if (firstCheckStart === 0) {
-                    firstCheckStart = Date.now();
-                  }
-                  lastCheckEnd = Date.now();
-                  return result;
-                },
-              ),
-            );
-          }
+        if (!effectiveData.skipTypecheck && configResult.config.typecheck.enabled) {
+          logger.info("Starting TypeScript check...");
+          promises.push(
+            this.runTypecheckCheck(
+              path || baseDir,
+              effectiveData.timeout,
+              configResult.config,
+              logger,
+            ).then((result) => {
+              if (firstCheckStart === 0) {
+                firstCheckStart = Date.now();
+              }
+              lastCheckEnd = Date.now();
+              return result;
+            }),
+          );
+        }
+      }
 
-          return await Promise.allSettled(promises);
-        }),
-      );
+      const checkResults = await Promise.allSettled(promises);
 
       logger.debug("All checks completed");
 
@@ -313,7 +326,7 @@ export class VibeCheckRepository {
           lastCheckEnd - firstCheckStart;
       }
 
-      const { allIssues, hasErrors } = this.processCheckResults(allResults, performanceTimings);
+      const { allIssues, hasErrors } = this.processCheckResults(checkResults, performanceTimings);
 
       const sortedIssues = this.sortIssues(allIssues);
       const response = this.buildResponse(
@@ -323,14 +336,6 @@ export class VibeCheckRepository {
         effectiveData.maxFilesInSummary,
         isMCP, // Skip files list for compact MCP responses
       );
-
-      logger.debug("[Vibe Check] Response summary", {
-        totalIssues: response.issues.summary.totalIssues,
-        totalFiles: response.issues.summary.totalFiles,
-        totalErrors: response.issues.summary.totalErrors,
-        displayedIssues: response.issues.summary.displayedIssues,
-        displayedFiles: response.issues.summary.displayedFiles,
-      });
 
       return success(response, {
         isErrorResponse: hasErrors ? true : undefined,
@@ -357,47 +362,41 @@ export class VibeCheckRepository {
   }
 
   private static processCheckResults(
-    allResults: PromiseSettledResult<PromiseSettledResult<CheckResult>[]>[],
+    checkResults: PromiseSettledResult<CheckResult>[],
     performanceTimings: Partial<Record<TranslationKey, number>>,
   ): { allIssues: CheckIssue[]; hasErrors: boolean } {
     const allIssues: CheckIssue[] = [];
     let hasErrors = false;
 
-    for (const pathResult of allResults) {
-      if (pathResult.status === "rejected") {
+    for (const checkResult of checkResults) {
+      if (checkResult.status === "rejected") {
+        hasErrors = true;
+        allIssues.push({
+          file: "check-error",
+          severity: "error",
+          message: String(checkResult.reason),
+          type: "oxlint",
+        });
         continue;
       }
 
-      for (const checkResult of pathResult.value) {
-        if (checkResult.status === "rejected") {
-          hasErrors = true;
-          allIssues.push({
-            file: "check-error",
-            severity: "error",
-            message: String(checkResult.reason),
-            type: "oxlint",
-          });
-          continue;
-        }
+      const { type, result, duration } = checkResult.value;
 
-        const { type, result, duration } = checkResult.value;
+      // Accumulate performance timing
+      const key = this.getPerformanceKey(type);
+      performanceTimings[key] = (performanceTimings[key] || 0) + duration;
 
-        // Accumulate performance timing
-        const key = this.getPerformanceKey(type);
-        performanceTimings[key] = (performanceTimings[key] || 0) + duration;
-
-        // Extract issues
-        const issues = this.extractIssuesFromResult(result);
-        if (issues.length > 0) {
-          allIssues.push(...issues);
-          if (this.hasErrorSeverity(issues)) {
-            hasErrors = true;
-          }
-        }
-
-        if (!result.success) {
+      // Extract issues
+      const issues = this.extractIssuesFromResult(result);
+      if (issues.length > 0) {
+        allIssues.push(...issues);
+        if (this.hasErrorSeverity(issues)) {
           hasErrors = true;
         }
+      }
+
+      if (!result.success) {
+        hasErrors = true;
       }
     }
 

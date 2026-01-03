@@ -10,6 +10,7 @@ import { useCallback, useRef } from "react";
 import { parseError } from "../../../shared/utils";
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
 import type { ChatMessage } from "../db";
+import { BRANCH_INDEX_KEY } from "./use-branch-management";
 
 const STORAGE_KEY_PREFIX = "chat_branch_state_";
 const STORAGE_VERSION = 1;
@@ -77,9 +78,9 @@ export function useBranchPersistence({
     // Validate each stored index
     for (const [parentId, index] of Object.entries(indices)) {
       // Special case: root level branches
-      if (parentId === "__root__") {
+      if (parentId === BRANCH_INDEX_KEY) {
         if (rootMessages.length > 1 && index >= 0 && index < rootMessages.length) {
-          validated["__root__"] = index;
+          validated[BRANCH_INDEX_KEY] = index;
         }
         continue;
       }

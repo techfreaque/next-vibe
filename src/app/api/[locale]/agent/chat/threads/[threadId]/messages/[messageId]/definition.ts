@@ -162,7 +162,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.threadId.messages.messageId.get.response.message.content.content" as const,
             },
-            z.string(),
+            z.string().nullable(),
           ),
           parentId: responseField(
             {
@@ -416,7 +416,7 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.threadId.messages.messageId.patch.response.message.content.content" as const,
             },
-            z.string(),
+            z.string().nullable(),
           ),
           role: responseField(
             {

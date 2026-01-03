@@ -46,7 +46,7 @@ export interface MessageCreatedEventData {
   role: ChatMessageRole;
   parentId: string | null;
   depth: number;
-  content: string;
+  content: string | null;
   model?: ModelId;
   character?: string;
   sequenceId?: string | null; // Links messages in the same AI response sequence

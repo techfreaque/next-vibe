@@ -23,6 +23,7 @@ export interface OxlintRepositoryInterface {
   execute(
     data: OxlintRequestOutput,
     logger: EndpointLogger,
+    providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<OxlintResponseOutput>>;
 }
 
@@ -35,51 +36,57 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   async execute(
     data: OxlintRequestOutput,
     logger: EndpointLogger,
+    providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<OxlintResponseOutput>> {
     try {
       // eslint-disable-next-line i18next/no-literal-string
-      logger.debug(`Starting Oxlint execution (path: ${data.path || "./"}, fix: ${data.fix})`);
+      logger.debug(`[OXLINT] Starting execution (path: ${data.path || "./"}, fix: ${data.fix})`);
 
-      // Use unified config management
-      const configResult = await ensureConfigReady(logger, false);
-
-      if (!configResult.ready) {
-        return success({
-          issues: {
-            items: [
-              {
-                file: configResult.configPath,
-                severity: "error" as const,
-                message: configResult.message,
-                type: "oxlint" as const,
+      // Use provided config or load it
+      let config: CheckConfig;
+      if (providedConfig) {
+        config = providedConfig;
+      } else {
+        const configResult = await ensureConfigReady(logger, false);
+        if (!configResult.ready) {
+          return success({
+            issues: {
+              items: [
+                {
+                  file: configResult.configPath,
+                  severity: "error" as const,
+                  message: configResult.message,
+                  type: "oxlint" as const,
+                },
+              ],
+              files: [
+                {
+                  file: configResult.configPath,
+                  errors: 1,
+                  warnings: 0,
+                  total: 1,
+                },
+              ],
+              summary: {
+                totalIssues: 1,
+                totalFiles: 1,
+                totalErrors: 1,
+                displayedIssues: 1,
+                displayedFiles: 1,
+                currentPage: 1,
+                totalPages: 1,
               },
-            ],
-            files: [
-              {
-                file: configResult.configPath,
-                errors: 1,
-                warnings: 0,
-                total: 1,
-              },
-            ],
-            summary: {
-              totalIssues: 1,
-              totalFiles: 1,
-              totalErrors: 1,
-              displayedIssues: 1,
-              displayedFiles: 1,
-              currentPage: 1,
-              totalPages: 1,
             },
-          },
-        });
+          });
+        }
+        config = configResult.config;
       }
 
-      // Config is ready - store it for use in methods
-      this.config = configResult.config;
+      // Store config for use in methods
+      this.config = config;
 
       // Check if oxlint is enabled
-      if (!this.config.oxlint.enabled) {
+      if (!config.oxlint.enabled) {
         logger.info("Oxlint is disabled in check.config.ts");
         return success({
           issues: {
@@ -99,14 +106,14 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       }
 
       // Ensure cache directory exists
-      const cacheDir = this.config.oxlint.cachePath;
+      const cacheDir = this.config.oxlint.enabled ? this.config.oxlint.cachePath : "./.tmp";
       await fs.mkdir(cacheDir, { recursive: true });
 
       // Handle multiple paths - support files, folders, or mixed
       const targetPaths = data.path ? (Array.isArray(data.path) ? data.path : [data.path]) : ["./"];
 
       // eslint-disable-next-line i18next/no-literal-string
-      logger.debug(`Running oxlint on ${targetPaths.length} path(s): ${targetPaths.join(", ")}`);
+      logger.debug(`[OXLINT] Running on ${targetPaths.length} path(s): ${targetPaths.join(", ")}`);
 
       // Run oxlint on paths (folders and/or files)
       // Oxlint will handle file discovery based on ignore patterns in config
@@ -119,12 +126,13 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       );
 
       // eslint-disable-next-line i18next/no-literal-string
-      logger.debug(`Oxlint execution completed (${response.issues.items.length} issues found)`);
+      logger.debug(`[OXLINT] Execution completed (${response.issues.items.length} issues found)`);
 
       return success(response);
     } catch (error) {
       const errorMessage = parseError(error).message;
-      logger.error("Oxlint execution failed", { error: errorMessage });
+      // eslint-disable-next-line i18next/no-literal-string
+      logger.error(`[OXLINT] Execution failed: ${errorMessage}`);
 
       return success({
         issues: {
@@ -167,7 +175,8 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     timeout: number,
     logger: EndpointLogger,
   ): Promise<{ issues: OxlintIssue[] }> {
-    logger.debug(`Running oxlint on ${paths.length} path(s)`);
+    // eslint-disable-next-line i18next/no-literal-string
+    logger.debug(`[OXLINT] Running on ${paths.length} path(s)`);
 
     // Build oxlint command arguments
     if (!this.config?.oxlint.enabled) {
@@ -219,15 +228,13 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       if (oxlintResult.status === "fulfilled") {
         // Log oxfmt result if it failed
         if (oxfmtResult.status === "rejected") {
-          logger.warn("Oxfmt formatting failed", {
-            error: String(oxfmtResult.reason),
-          });
+          // eslint-disable-next-line i18next/no-literal-string
+          logger.warn(`[OXLINT] Oxfmt formatting failed: ${String(oxfmtResult.reason)}`);
         }
         return oxlintResult.value;
       } else {
-        logger.error("Oxlint fix failed", {
-          error: String(oxlintResult.reason),
-        });
+        // eslint-disable-next-line i18next/no-literal-string
+        logger.error(`[OXLINT] Fix failed: ${String(oxlintResult.reason)}`);
         // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
         throw oxlintResult.reason;
       }
@@ -245,9 +252,8 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       return;
     }
 
-    /* eslint-disable i18next/no-literal-string */
-    logger.debug(`Executing Oxfmt command: bunx oxfmt ${paths.join(" ")}`);
-    /* eslint-enable i18next/no-literal-string */
+    // eslint-disable-next-line i18next/no-literal-string
+    logger.debug(`[OXLINT] Executing Oxfmt command: bunx oxfmt ${paths.join(" ")}`);
 
     const { spawn } = await import("node:child_process");
 
@@ -268,7 +274,8 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
 
       child.on("close", (code) => {
         if (code === 0) {
-          logger.debug(`Oxfmt formatting completed`);
+          // eslint-disable-next-line i18next/no-literal-string
+          logger.debug("[OXLINT] Oxfmt formatting completed");
           resolve();
         } else {
           // eslint-disable-next-line i18next/no-literal-string
@@ -381,7 +388,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     issues: OxlintIssue[];
   }> {
     // eslint-disable-next-line i18next/no-literal-string
-    logger.debug(`Executing Oxlint command: bunx ${args.join(" ")}`);
+    logger.debug(`[OXLINT] Executing command: bunx ${args.join(" ")}`);
 
     // Use spawn for execution
     const { spawn } = await import("node:child_process");
@@ -437,7 +444,8 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     // Parse oxlint output
     const result = await this.parseOxlintOutput(stdout, logger);
 
-    logger.debug(`Oxlint completed with ${result.issues.length} issues`);
+    // eslint-disable-next-line i18next/no-literal-string
+    logger.debug(`[OXLINT] Completed with ${result.issues.length} issues`);
 
     return result;
   }
@@ -492,10 +500,10 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         parsedOutput = JSON.parse(stdout) as OxlintOutput;
       } catch (parseError) {
         // JSON parse failed - log the error and return empty results
-        logger.warn("Failed to parse oxlint JSON output", {
-          error: parseError instanceof Error ? parseError.message : String(parseError),
-          stdout,
-        });
+        // eslint-disable-next-line i18next/no-literal-string
+        logger.warn(
+          `[OXLINT] Failed to parse JSON output: ${parseError instanceof Error ? parseError.message : String(parseError)} (preview: ${stdout.slice(0, 100)}...)`,
+        );
         return { issues };
       }
 
@@ -543,9 +551,10 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       }
     } catch (error) {
       // Unexpected error during processing
-      logger.error("Unexpected error processing oxlint results", {
-        error: error instanceof Error ? error.message : String(error),
-      });
+      // eslint-disable-next-line i18next/no-literal-string
+      logger.error(
+        `[OXLINT] Unexpected error processing results: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     return { issues };

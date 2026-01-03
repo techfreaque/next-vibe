@@ -20,11 +20,11 @@ export interface SendMessageParams {
   content: string;
   threadId?: string;
   parentId?: string;
-  toolConfirmation?: {
+  toolConfirmations?: Array<{
     messageId: string;
     confirmed: boolean;
     updatedArgs?: Record<string, string | number | boolean | null>;
-  };
+  }>;
   audioInput?: { file: File };
   attachments: File[];
 }
@@ -88,7 +88,8 @@ export async function sendMessage(
   try {
     // Determine thread ID to use
     let threadIdToUse: string | null;
-    if (params.toolConfirmation) {
+    const hasToolConfirmations = params.toolConfirmations && params.toolConfirmations.length > 0;
+    if (hasToolConfirmations) {
       threadIdToUse = params.threadId ?? null;
     } else {
       threadIdToUse = activeThreadId === "new" ? null : activeThreadId;
@@ -114,7 +115,7 @@ export async function sendMessage(
         threadMessages = chatStore.getThreadMessages(threadIdToUse);
       }
 
-      if (params.toolConfirmation && params.parentId) {
+      if (hasToolConfirmations && params.parentId) {
         parentMessageId = params.parentId;
       } else if (threadMessages.length > 0) {
         const branchIndices = chatStore.getBranchIndices(threadIdToUse);
@@ -162,6 +163,8 @@ export async function sendMessage(
         rolesAdmin: null,
         createdAt: new Date(),
         updatedAt: new Date(),
+        searchVector: null,
+        published: false,
       };
       useChatStore.getState().addThread(newThread);
 
@@ -198,7 +201,7 @@ export async function sendMessage(
         attachments: params.attachments,
         operation: "send",
         messageHistory, // Pass pre-loaded message history for incognito mode
-        toolConfirmation: params.toolConfirmation,
+        toolConfirmations: params.toolConfirmations,
       },
       {
         logger,

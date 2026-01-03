@@ -69,25 +69,18 @@ program
 program
   .argument("[command]", earlyT("app.api.system.unifiedInterface.cli.vibe.help.usage"))
   .argument("[args...]", earlyT("app.api.system.unifiedInterface.cli.vibe.help.commands"))
+  .option("-d, --data <json>", earlyT("app.api.system.unifiedInterface.cli.vibe.executeCommand"))
   .option(
-    // eslint-disable-next-line i18next/no-literal-string
-    "-d, --data <json>",
-    earlyT("app.api.system.unifiedInterface.cli.vibe.executeCommand"),
-  )
-  .option(
-    // eslint-disable-next-line i18next/no-literal-string
     "-u, --user-type <type>",
     earlyT("app.api.system.unifiedInterface.cli.vibe.help.userType"),
     "ADMIN",
   )
   .option(
-    // eslint-disable-next-line i18next/no-literal-string
     "-l, --locale <locale>",
     earlyT("app.api.system.unifiedInterface.cli.vibe.help.locale"),
     cliEnv.VIBE_CLI_LOCALE,
   )
   .option(
-    // eslint-disable-next-line i18next/no-literal-string
     "-o, --output <format>",
     earlyT("app.api.system.unifiedInterface.cli.vibe.output"),
     DEFAULT_OUTPUT,
@@ -104,7 +97,6 @@ program
     false,
   )
   .option(
-    // eslint-disable-next-line i18next/no-literal-string
     "-i, --interactive",
     earlyT("app.api.system.unifiedInterface.cli.vibe.help.interactive"),
     false,
@@ -136,13 +128,9 @@ program
       setupGlobalErrorHandlers(logger);
 
       if (debug) {
-        logger.debug("Command execution details", {
-          command,
-          args: (args || []).join(" "),
-          verbose: debug ?? false,
-          interactive: options.interactive ?? false,
-          rawDataOption: options.data || "none",
-        });
+        logger.debug(
+          `[CLI] Executing command: ${command} ${(args || []).join(" ")} (verbose: ${debug}, interactive: ${options.interactive ?? false})`,
+        );
         enableDebug();
       }
 

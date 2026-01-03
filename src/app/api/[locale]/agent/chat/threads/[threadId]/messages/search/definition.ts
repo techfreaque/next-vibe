@@ -190,7 +190,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.threads.threadId.messages.search.get.response.results.message.content.content" as const,
               },
-              z.string(),
+              z.string().nullable(),
             ),
             role: responseField(
               {

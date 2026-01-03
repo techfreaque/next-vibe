@@ -1322,7 +1322,7 @@ export class AuthRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<JwtPrivatePayloadType>> {
     try {
-      logger.debug("Authenticating user by email", { email });
+      logger.debug(`Authenticating user by email (email: ${email})`);
 
       const userResult = await UserRepository.getUserByEmail(
         email,

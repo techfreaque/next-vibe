@@ -684,12 +684,10 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       // Support both direct object exports and factory functions
       const config = typeof exportedValue === "function" ? exportedValue() : exportedValue;
 
-      logger.debug("Loaded check.config.ts", { path: configPath });
+      logger.debug(`Loaded check.config.ts (path: ${configPath})`);
       return config;
     } catch (error) {
-      logger.debug("Failed to load check.config.ts", {
-        error: parseError(error).message,
-      });
+      logger.debug(`Failed to load check.config.ts (error: ${parseError(error).message})`);
       return null;
     }
   }

@@ -36,7 +36,7 @@ export class UserRolesRepository {
     try {
       // Safety check for logger
       if (logger && typeof logger.debug === "function") {
-        logger.debug("Finding user roles by user ID", { userId });
+        logger.debug(`Finding user roles by user ID (userId: ${userId})`);
       }
 
       // Handle CLI-only user without database access

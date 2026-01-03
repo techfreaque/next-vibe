@@ -2,11 +2,20 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
+import type { FieldValues } from "react-hook-form";
 
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import { ToolCallRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/ToolCallRenderer";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+export type ToolDecision =
+  | { type: "pending" }
+  | {
+      type: "confirmed";
+      updatedArgs?: Record<string, string | number | boolean | null>;
+    }
+  | { type: "declined" };
 
 /**
  * Tool Display Props
@@ -40,6 +49,13 @@ interface ToolDisplayProps {
     ) => void;
   };
   user: JwtPayloadType;
+  /** Optional batch mode handlers */
+  onConfirm?: (formData: FieldValues) => void;
+  onCancel?: () => void;
+  parentId?: string;
+  defaultOpen?: boolean;
+  /** Decision state for batch mode */
+  decision?: ToolDecision;
 }
 
 /**
@@ -70,13 +86,18 @@ export function ToolDisplay({
   threadId,
   messageId,
   collapseState,
+  onConfirm,
+  onCancel,
+  parentId,
+  defaultOpen: defaultOpenProp,
+  decision,
 }: ToolDisplayProps): JSX.Element | null {
   if (!toolCall) {
     return null;
   }
 
-  // Tool calls should always start collapsed
-  const defaultOpen = false;
+  // Tool calls should always start collapsed unless overridden
+  const defaultOpen = defaultOpenProp ?? false;
 
   return (
     <Div className="flex flex-col gap-3 mb-3">
@@ -89,6 +110,10 @@ export function ToolDisplay({
         toolIndex={0}
         collapseState={collapseState}
         user={user}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+        parentId={parentId}
+        decision={decision}
       />
     </Div>
   );
