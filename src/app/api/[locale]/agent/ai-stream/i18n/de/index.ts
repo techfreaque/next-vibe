@@ -108,6 +108,10 @@ export const translations: typeof enTranslations = {
       label: "System-Prompt",
       description: "Optionale Systemanweisungen",
       placeholder: "System-Prompt eingeben...",
+      now: "jetzt",
+      minutesAgo: "{{minutes}}m her",
+      hoursAgo: "{{hours}}h her",
+      daysAgo: "{{days}}t her",
     },
     enableSearch: {
       label: "Web-Suche aktivieren",

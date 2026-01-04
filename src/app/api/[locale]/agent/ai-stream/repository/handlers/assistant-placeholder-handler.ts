@@ -62,9 +62,8 @@ export class AssistantPlaceholderHandler {
       depth: newDepth,
     });
 
-    // CRITICAL FIX: Create the ASSISTANT message in the database immediately
-    // This prevents foreign key errors when TOOL messages try to reference it as parent_id
-    if (!isIncognito && userId) {
+    // Create the ASSISTANT message in the database immediately so TOOL messages can reference it as parent_id
+    if (!isIncognito) {
       await createTextMessage({
         messageId,
         threadId,

@@ -6,28 +6,18 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Code, Copy, FileText } from "next-vibe-ui/ui/icons";
 import { Markdown } from "next-vibe-ui/ui/markdown";
-import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import React, { useCallback, useMemo } from "react";
-import { useState } from "react";
+import React from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
-import { Logo } from "@/app/[locale]/_components/logo";
-import {
-  chatAnimations,
-  chatProse,
-  chatShadows,
-  chatTransitions,
-} from "@/app/[locale]/chat/lib/design-tokens";
-import { createMetadataSystemMessage } from "@/app/api/[locale]/agent/ai-stream/repository/sytem-prompt/message-metadata-generator";
+import { chatAnimations, chatProse, chatShadows } from "@/app/[locale]/chat/lib/design-tokens";
+import { DebugSystemPrompt } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/debug-component";
+import { createMetadataSystemMessage } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/message-metadata";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole, ViewMode } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { useSystemPrompt } from "@/app/api/[locale]/agent/chat/hooks/use-system-prompt";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -61,8 +51,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   user,
 }: LinearMessageViewProps): JSX.Element {
   const { t } = simpleT(locale);
-  const [copiedSystemPrompt, setCopiedSystemPrompt] = useState(false);
-  const [showMarkdown, setShowMarkdown] = useState(true);
 
   // Get callbacks and editor actions from context
   const {
@@ -91,47 +79,10 @@ export const LinearMessageView = React.memo(function LinearMessageView({
     collapseState,
     // View mode to check if we should show system messages
     viewMode,
-    // Characters and selected character
-    characters,
+    // Selected character and model (for debug mode)
     selectedCharacter,
+    selectedModel,
   } = useChatContext();
-
-  // Get the current character's system prompt (memoized to ensure stable reference)
-  const characterPrompt = useMemo(() => {
-    const prompt = selectedCharacter ? characters[selectedCharacter]?.systemPrompt || "" : "";
-
-    return prompt;
-  }, [selectedCharacter, characters]);
-
-  // Generate system prompt on client side (same as server)
-  const systemPrompt = useSystemPrompt({
-    locale,
-    rootFolderId,
-    subFolderId,
-    characterPrompt: characterPrompt,
-  });
-
-  // Debug: Log final system prompt
-  if (typeof window !== "undefined" && viewMode === ViewMode.DEBUG) {
-    logger.debug("Generated system prompt", {
-      systemPromptLength: systemPrompt.length,
-      systemPromptPreview: systemPrompt.slice(0, 500),
-      includesYourRole: systemPrompt.includes("## Your Role"),
-      includesFormattingInstructions: systemPrompt.includes("# Formatting Instructions"),
-    });
-  }
-
-  const handleCopySystemPrompt = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(systemPrompt);
-      setCopiedSystemPrompt(true);
-      setTimeout(() => setCopiedSystemPrompt(false), 2000);
-    } catch (error) {
-      logger.error("Failed to copy system prompt", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
-  }, [systemPrompt, logger]);
 
   // Group messages by sequence for proper display
   const messageGroups = groupMessagesBySequence(messages);
@@ -174,63 +125,15 @@ export const LinearMessageView = React.memo(function LinearMessageView({
 
       {/* Show System Prompt in Debug Mode */}
       {viewMode === ViewMode.DEBUG && (
-        <Div className={cn(chatAnimations.slideIn, "mb-4")}>
-          <Div
-            className={cn(
-              "rounded-2xl px-3 py-2.5 sm:px-4 sm:py-3",
-              "bg-purple-500/10 border border-purple-500/20",
-              chatShadows.sm,
-              chatTransitions.default,
-            )}
-          >
-            {/* Card Header with Logo */}
-            <Div className="flex items-center justify-between mb-3 pb-2 border-b border-purple-500/20">
-              <Div className="flex items-center gap-2">
-                <Div className="text-sm font-semibold text-purple-400">
-                  {t("app.chat.debugView.systemPromptTitle")}
-                </Div>
-                <Button
-                  onClick={handleCopySystemPrompt}
-                  size="sm"
-                  variant="ghost"
-                  className="h-7 px-2 hover:bg-purple-500/20"
-                >
-                  <Copy className="h-4 w-4" />
-                  {copiedSystemPrompt && (
-                    <Span className="ml-1 text-xs text-purple-400">
-                      {t("app.chat.debugView.copied")}
-                    </Span>
-                  )}
-                </Button>
-                <Button
-                  onClick={() => setShowMarkdown(!showMarkdown)}
-                  size="sm"
-                  variant="ghost"
-                  className="h-7 px-2 hover:bg-purple-500/20"
-                  title={showMarkdown ? "Show as plain text" : "Show as markdown"}
-                >
-                  {showMarkdown ? <FileText className="h-4 w-4" /> : <Code className="h-4 w-4" />}
-                </Button>
-              </Div>
-
-              {/* Logo on the right */}
-              <Div className="flex items-center">
-                <Logo locale={locale} disabled size="h-8" />
-              </Div>
-            </Div>
-
-            {/* System Prompt Content */}
-            {showMarkdown ? (
-              <Div className={cn(chatProse.all, "text-sm")}>
-                <Markdown content={systemPrompt} />
-              </Div>
-            ) : (
-              <Div className="text-sm leading-relaxed whitespace-pre-wrap wrap-break-word text-foreground/80 font-mono">
-                {systemPrompt}
-              </Div>
-            )}
-          </Div>
-        </Div>
+        <DebugSystemPrompt
+          locale={locale}
+          rootFolderId={rootFolderId}
+          subFolderId={subFolderId}
+          characterId={selectedCharacter}
+          selectedModel={selectedModel}
+          user={user}
+          logger={logger}
+        />
       )}
 
       {messages.map((message, index) => {

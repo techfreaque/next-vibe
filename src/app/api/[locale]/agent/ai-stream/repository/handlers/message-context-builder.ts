@@ -53,13 +53,14 @@ export class MessageContextBuilder {
       hasUserMessageMetadata: !!params.userMessageMetadata,
       attachmentCount: params.userMessageMetadata?.attachments?.length ?? 0,
     });
-    // SECURITY: Reject messageHistory for non-incognito threads
+    // SECURITY: Reject non-empty messageHistory for non-incognito threads
     // Non-incognito threads must fetch history from database to prevent manipulation
-    if (!params.isIncognito && params.messageHistory) {
+    if (!params.isIncognito && params.messageHistory && params.messageHistory.length > 0) {
       params.logger.error("Security violation: messageHistory provided for non-incognito thread", {
         operation: params.operation,
         threadId: params.threadId,
         isIncognito: params.isIncognito,
+        messageHistoryLength: params.messageHistory.length,
       });
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Security violation should throw immediately
       throw new Error(
@@ -67,16 +68,20 @@ export class MessageContextBuilder {
       );
     }
 
-    if (params.operation === "answer-as-ai") {
-      if (params.isIncognito && params.messageHistory) {
-        return await MessageConverter.toAiSdkMessages(
-          params.messageHistory,
-          params.rootFolderId,
-          params.upcomingResponseContext,
-        );
-      }
+    // Get message history - source depends on mode (incognito: passed, server: DB)
+    let history: ChatMessage[] = [];
 
-      if (!params.isIncognito && params.userId && params.threadId && params.parentMessageId) {
+    if (params.isIncognito && params.messageHistory) {
+      // Incognito: use passed message history
+      history = params.messageHistory;
+      params.logger.debug("[BuildMessageContext] Using passed message history (incognito)", {
+        operation: params.operation,
+        historyLength: history.length,
+      });
+    } else if (!params.isIncognito && params.threadId) {
+      // Server: fetch message history from database
+      if (params.operation === "answer-as-ai" && params.parentMessageId) {
+        // For answer-as-ai: get all messages up to parent (not just branch)
         const allMessages = await db
           .select()
           .from(chatMessages)
@@ -86,36 +91,29 @@ export class MessageContextBuilder {
         const parentIndex = allMessages.findIndex((msg) => msg.id === params.parentMessageId);
 
         if (parentIndex !== -1) {
-          const contextMessages = allMessages.slice(0, parentIndex + 1);
-          return await MessageConverter.toAiSdkMessages(
-            contextMessages,
-            params.rootFolderId,
-            params.upcomingResponseContext,
-          );
+          history = allMessages.slice(0, parentIndex + 1);
+        } else {
+          params.logger.error("Parent message not found in thread", {
+            parentMessageId: params.parentMessageId,
+            threadId: params.threadId,
+          });
         }
-        params.logger.error("Parent message not found in thread", {
-          parentMessageId: params.parentMessageId,
-          threadId: params.threadId,
-        });
-        return [];
+      } else {
+        // For other operations: fetch history filtered by branch
+        history = await fetchMessageHistory(
+          params.threadId,
+          params.logger,
+          params.parentMessageId ?? null,
+        );
       }
-      return [];
-    } else if (!params.isIncognito && params.userId && params.threadId) {
-      // Non-incognito mode: fetch history from database filtered by branch
-      const history = await fetchMessageHistory(
-        params.threadId,
-        params.logger,
-        params.parentMessageId ?? null, // Pass parent message ID for branch filtering, convert undefined to null
-      );
 
-      // Fetch file data for attachments in history
+      // Fetch file data for attachments in server mode
       const { getStorageAdapter } = await import("../../../chat/storage");
       const storage = getStorageAdapter();
 
       for (const message of history) {
         if (message.metadata?.attachments) {
           for (const attachment of message.metadata.attachments) {
-            // If attachment has URL but no base64 data, fetch from storage
             if (attachment.url && !attachment.data) {
               const base64Data = await storage.readFileAsBase64(attachment.id, params.threadId);
               if (base64Data) {
@@ -130,37 +128,34 @@ export class MessageContextBuilder {
         }
       }
 
-      // Return ONLY past messages - new message comes from content/attachments params
-      const historyMessages = await MessageConverter.toAiSdkMessages(
-        history,
-        params.rootFolderId,
-        params.upcomingResponseContext,
-      );
-      params.logger.debug("[BuildMessageContext] Returning history for server mode", {
-        historyLength: historyMessages.length,
-      });
-      return historyMessages;
-    } else if (params.isIncognito && params.messageHistory) {
-      // Incognito mode: Return ONLY past messages - new message comes from content/attachments params
-      params.logger.debug("Using provided message history for incognito mode", {
+      params.logger.debug("[BuildMessageContext] Fetched message history from DB (server)", {
         operation: params.operation,
-        historyLength: params.messageHistory.length,
+        historyLength: history.length,
       });
-      const historyMessages = await MessageConverter.toAiSdkMessages(
-        params.messageHistory,
-        params.rootFolderId,
-        params.upcomingResponseContext,
-      );
-      params.logger.debug("[BuildMessageContext] Returning history for incognito mode", {
-        historyLength: historyMessages.length,
+    } else {
+      params.logger.debug("[BuildMessageContext] No history (new conversation)", {
+        operation: params.operation,
+        hasThreadId: !!params.threadId,
       });
-      return historyMessages;
     }
 
-    params.logger.debug("[BuildMessageContext] No history (new conversation)", {
-      operation: params.operation,
-      hasThreadId: !!params.threadId,
+    // Convert history to AI SDK format (same logic for both modes)
+    if (history.length === 0) {
+      return [];
+    }
+
+    const historyMessages = await MessageConverter.toAiSdkMessages(
+      history,
+      params.logger,
+      params.rootFolderId,
+      params.upcomingResponseContext,
+    );
+
+    params.logger.debug("[BuildMessageContext] Returning converted history", {
+      historyLength: historyMessages.length,
+      isIncognito: params.isIncognito,
     });
-    return [];
+
+    return historyMessages;
   }
 }

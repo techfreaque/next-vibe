@@ -100,31 +100,21 @@ export async function createAndSendUserMessage(
 
     // Skip user message creation for tool confirmations
     if (!hasToolConfirmations) {
-      // Handle attachments based on mode (BEFORE creating message)
+      // Set loading state metadata (unified for both modes)
       let messageMetadata: ChatMessage["metadata"] = {};
       if (audioInput) {
+        // Voice input: Show transcribing state until VOICE_TRANSCRIBED event arrives
         messageMetadata = { isTranscribing: true };
-      } else if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-        // INCOGNITO MODE: Convert File objects to base64
-        if (attachments && attachments.length > 0) {
-          const { convertFilesToIncognitoAttachments } =
-            await import("../../../../../incognito/file-utils");
-          const attachmentMetadata = await convertFilesToIncognitoAttachments(attachments);
-          messageMetadata = { attachments: attachmentMetadata };
+      } else if (attachments && attachments.length > 0) {
+        // File attachments: Show uploading state
+        // Server mode: FILES_UPLOADED event will update with storage URLs
+        // Incognito mode: Client updates after API processes files
+        messageMetadata = { isUploadingAttachments: true };
 
-          logger.debug(`Converted ${operation} attachments to base64 (incognito)`, {
-            attachmentCount: attachmentMetadata.length,
-          });
-        }
-      } else {
-        // PRIVATE MODE: Set loading state, FILES_UPLOADED event will update with URLs
-        if (attachments && attachments.length > 0) {
-          messageMetadata = { isUploadingAttachments: true };
-
-          logger.debug(`${operation} will upload attachments via AI stream (private)`, {
-            attachmentCount: attachments.length,
-          });
-        }
+        logger.debug(`${operation} will process attachments via API`, {
+          attachmentCount: attachments.length,
+          mode: currentRootFolderId === DefaultFolderId.INCOGNITO ? "incognito" : "server",
+        });
       }
 
       // Create user message
@@ -203,7 +193,7 @@ export async function createAndSendUserMessage(
             requiresConfirmation: tool.requiresConfirmation,
           })) ?? null,
         toolConfirmations: params.toolConfirmations ?? null,
-        messageHistory: messageHistory ?? null,
+        messageHistory: messageHistory ?? [],
         attachments: attachments && attachments.length > 0 ? attachments : null,
         voiceMode: effectiveVoiceMode,
         audioInput: audioInput ?? { file: null },

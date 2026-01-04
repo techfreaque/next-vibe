@@ -361,8 +361,7 @@ export function useChat(
       }
     };
     void loadDraftForContext();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [draftKey]);
+  }, [draftKey, logger]);
 
   // Wrapper function to save input and draft together
   const setInputAndSaveDraft = useCallback(

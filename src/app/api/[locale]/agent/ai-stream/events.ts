@@ -3,7 +3,7 @@
  * 100% typesafe event definitions shared between server and client
  */
 
-import type { MessageResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 
 import type { MessageMetadata, ToolCall, ToolCallResult } from "../chat/db";
 import type { ChatMessageRole } from "../chat/enum";
@@ -113,7 +113,7 @@ export interface ToolResultEventData {
   messageId: string;
   toolName: string;
   result: ToolCallResult | undefined;
-  error?: MessageResponseType; // Tool execution error message
+  error?: ErrorResponseType; // Tool execution error message
   toolCall?: ToolCall; // Full tool call data with result for frontend rendering
 }
 
@@ -354,7 +354,7 @@ export function parseSSEEvent(eventString: string): StreamEvent | null {
       // Deserialize top-level error field
       if (toolResultData.error && typeof toolResultData.error === "string") {
         try {
-          updates.error = JSON.parse(toolResultData.error) as MessageResponseType;
+          updates.error = JSON.parse(toolResultData.error) as ErrorResponseType;
         } catch {
           // If error parsing fails, keep the original string
         }
@@ -363,7 +363,7 @@ export function parseSSEEvent(eventString: string): StreamEvent | null {
       // Deserialize error inside toolCall object
       if (toolResultData.toolCall?.error && typeof toolResultData.toolCall.error === "string") {
         try {
-          const parsedError = JSON.parse(toolResultData.toolCall.error) as MessageResponseType;
+          const parsedError = JSON.parse(toolResultData.toolCall.error) as ErrorResponseType;
           updates.toolCall = {
             ...toolResultData.toolCall,
             error: parsedError,

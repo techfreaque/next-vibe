@@ -15,6 +15,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { memories, type Memory } from "./db";
+import { formatMemorySummary } from "./formatter";
 
 /**
  * Memory configuration
@@ -186,8 +187,8 @@ export async function deleteMemory(params: {
 }
 
 /**
- * Generate memory summary for system prompt
- * Returns formatted string with numbered memories
+ * Generate memory summary for system prompt (server-side)
+ * Fetches memories from database and formats them using shared formatter
  */
 export async function generateMemorySummary(params: {
   userId: string;
@@ -197,71 +198,19 @@ export async function generateMemorySummary(params: {
 
   const memoriesList = await getMemoriesList({ userId, logger });
 
-  if (memoriesList.length === 0) {
-    return "";
+  // Update access metadata if memories exist
+  if (memoriesList.length > 0) {
+    await updateMemoryAccess({ userId, logger });
   }
-
-  // Update access metadata
-  await updateMemoryAccess({ userId, logger });
-
-  // Format as numbered list with IDs, priority, and recency
-  const summary = memoriesList
-    .map((memory, index) => {
-      const memoryNum = memory.memoryNumber;
-      const priority = memory.priority ?? 0;
-      const age = getRelativeTime(memory.createdAt ?? new Date());
-      return `${index + 1}. [ID:${memoryNum} | P:${priority} | ${age}] ${memory.content}`;
-    })
-    .join("\n");
 
   logger.info("Generated memory summary", {
     userId,
     memoryCount: memoriesList.length,
   });
 
-  return `## User Memories (${memoriesList.length})
-${summary}
-
-**Legend:** ID=memory identifier (starts at 0) | P=priority (0-100, higher=more important) | Age=when added
-
-## Memory Management (All memories already loaded above)
-**Auto-consolidate when you see >2 similar memories (>80% content overlap)**
-
-**Tools:**
-- \`memories:add\` - Store NEW facts only
-- \`memories:update\` - Merge/improve existing (use ID number)
-- \`memories:delete\` - Remove wrong/outdated
-
-**Consolidation Examples:**
-1. "User likes coffee" + "Drinks coffee daily" → Update to: "Likes coffee, drinks daily"
-2. "Lives in Berlin" + "Berlin resident" + "From Berlin" → Update first, delete others
-3. "Testing tools" + "Tool testing" + "Tested all tools" → Merge into one comprehensive memory
-
-**Rules:**
-- >2 memories about same topic with >80% overlap = consolidate immediately
-- When consolidating: UPDATE most recent/highest priority, DELETE duplicates
-- Check priority (P:) and age before deciding which to keep`;
+  // Use shared formatter (DRY - same logic as client)
+  return formatMemorySummary(memoriesList);
 }
-
-// Helper to get relative time
-const getRelativeTime = (date: Date): string => {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffMins < 1) {
-    return "now";
-  }
-  if (diffMins < 60) {
-    return `${diffMins}m ago`;
-  }
-  if (diffHours < 24) {
-    return `${diffHours}h ago`;
-  }
-  return `${diffDays}d ago`;
-};
 
 /**
  * Get next memory number for a user

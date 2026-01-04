@@ -84,11 +84,6 @@ export class FinalizationHandler {
         messageId: currentAssistantMessageId,
         contentLength: currentAssistantContent.length,
       });
-    } else if (!isIncognito && !currentAssistantContent) {
-      logger.debug("Skipping database update for empty ASSISTANT message", {
-        messageId: currentAssistantMessageId,
-        reason: "Message has no content",
-      });
     }
 
     logger.info("Finalized ASSISTANT message", {

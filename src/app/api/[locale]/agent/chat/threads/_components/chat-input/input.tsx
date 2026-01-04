@@ -19,6 +19,7 @@ import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welco
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatPermissions } from "@/app/api/[locale]/agent/chat/hooks/use-chat-permissions";
 import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { useVoiceRuntimeState } from "@/app/api/[locale]/agent/chat/voice-mode/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -63,10 +64,14 @@ export function ChatInput({ locale, logger, user, className }: ChatInputProps): 
 
   const { canPost, noPermissionReason } = useChatPermissions(chat, locale);
   const { t } = simpleT(locale);
+  const voiceRuntime = useVoiceRuntimeState();
 
   const currentModel = getModelById(selectedModel);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
   const isInputDisabled = isLoading || !canPost;
+
+  // Show stop button when streaming OR when TTS is playing
+  const showStopButton = isLoading || voiceRuntime.isSpeaking;
 
   // Call mode state
   const { isCallMode, toggleCallMode } = useCallMode({
@@ -86,7 +91,7 @@ export function ChatInput({ locale, logger, user, className }: ChatInputProps): 
   });
 
   // UI state
-  const showMicButton = !voice.isRecording && !voice.isProcessing && !isLoading;
+  const showMicButton = !voice.isRecording && !voice.isProcessing && !showStopButton;
   const showTextarea = !voice.isRecording && !voice.isProcessing;
 
   return (
@@ -271,7 +276,7 @@ export function ChatInput({ locale, logger, user, className }: ChatInputProps): 
           )}
 
           {/* Send / Stop button */}
-          {isLoading ? (
+          {showStopButton ? (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>

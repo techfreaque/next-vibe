@@ -21,6 +21,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { dateSchema } from "../../../shared/types/common.schema";
+
 /**
  * Memory tool aliases for AI tool calling
  */
@@ -109,7 +111,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.memories.get.response.memories.memory.createdAt.content" as const,
               },
-              z.date(),
+              dateSchema,
             ),
           },
         ),
@@ -321,6 +323,7 @@ export type MemoriesListRequestInput = typeof GET.types.RequestInput;
 export type MemoriesListRequestOutput = typeof GET.types.RequestOutput;
 export type MemoriesListResponseInput = typeof GET.types.ResponseInput;
 export type MemoriesListResponseOutput = typeof GET.types.ResponseOutput;
+export type MemoriesList = MemoriesListResponseOutput["memories"];
 
 // Type exports for POST endpoint
 export type MemoryAddRequestInput = typeof POST.types.RequestInput;

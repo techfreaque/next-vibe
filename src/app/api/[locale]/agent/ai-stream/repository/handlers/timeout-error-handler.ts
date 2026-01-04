@@ -4,6 +4,8 @@
 
 import "server-only";
 
+import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { ChatMessageRole } from "../../../chat/enum";
@@ -49,16 +51,29 @@ export class TimeoutErrorHandler {
       hasContent: !!lastSequenceId,
     });
 
-    // Create a timeout-specific error message for the UI
-    const timeoutError = {
-      message: "app.api.agent.chat.aiStream.errors.timeout",
+    const timeoutError = fail({
+      message: "app.api.agent.chat.aiStream.errors.timeout" as const,
+      errorType: ErrorResponseTypes.UNKNOWN_ERROR,
       messageParams: { seconds: String(maxDuration) },
-    };
+    });
 
-    // Create ERROR message in DB if not incognito
     const errorMessageId = crypto.randomUUID();
+    const { serializeError } = await import("../../error-utils");
+
+    // Emit ERROR message event for UI
+    const errorMessageEvent = createStreamEvent.messageCreated({
+      messageId: errorMessageId,
+      threadId,
+      role: ChatMessageRole.ERROR,
+      content: serializeError(timeoutError),
+      parentId: lastParentId,
+      depth: lastDepth,
+      sequenceId: lastSequenceId,
+    });
+    controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
+
+    // Save ERROR message to DB (server mode only - incognito stores in localStorage)
     if (!isIncognito) {
-      const { serializeError } = await import("../../error-utils");
       await createErrorMessage({
         messageId: errorMessageId,
         threadId,
@@ -71,19 +86,6 @@ export class TimeoutErrorHandler {
         logger,
       });
     }
-
-    // Emit ERROR message event for UI
-    const { serializeError } = await import("../../error-utils");
-    const errorMessageEvent = createStreamEvent.messageCreated({
-      messageId: errorMessageId,
-      threadId,
-      role: ChatMessageRole.ERROR,
-      content: serializeError(timeoutError),
-      parentId: lastParentId,
-      depth: lastDepth,
-      sequenceId: lastSequenceId,
-    });
-    controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
 
     // Emit error event to update UI state
     const errorEvent = createStreamEvent.error({

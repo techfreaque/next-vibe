@@ -82,8 +82,7 @@ export function EmailPreviewClient({
   // Initial preview render
   useEffect(() => {
     updatePreview(currentProps);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateId, selectedLanguage, selectedCountry, exampleProps]);
+  }, [templateId, selectedLanguage, selectedCountry, exampleProps, currentProps, updatePreview]);
 
   const handlePropsChange = useCallback(
     (newProps: Record<string, string | number | boolean>) => {

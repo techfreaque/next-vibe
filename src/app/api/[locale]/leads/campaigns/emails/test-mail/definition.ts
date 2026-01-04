@@ -16,6 +16,7 @@ import {
   LeadStatus,
   LeadStatusOptions,
 } from "@/app/api/[locale]/leads/enum";
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -299,7 +300,7 @@ const { POST } = createEndpoint({
               type: WidgetType.TEXT,
               content: "app.api.leads.campaigns.emails.testMail.post.response.sentAt.content",
             },
-            z.date(),
+            dateSchema,
           ),
         },
       ),

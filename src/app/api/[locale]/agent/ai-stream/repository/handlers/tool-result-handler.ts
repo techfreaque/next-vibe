@@ -6,7 +6,11 @@ import type { ReadableStreamDefaultController } from "node:stream/web";
 
 import type { JSONValue } from "ai";
 import { eq } from "drizzle-orm";
-import type { MessageResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  type ErrorResponseType,
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -154,7 +158,7 @@ export class ToolResultHandler {
     });
 
     // Extract error message from AI SDK and structure it for translation
-    let toolError: MessageResponseType | undefined;
+    let toolError: ErrorResponseType | undefined;
     if (isError) {
       // When tool throws error, AI SDK puts error message in output
       const errorMessage =
@@ -164,10 +168,11 @@ export class ToolResultHandler {
             ? String(output.message)
             : JSON.stringify(output);
 
-      toolError = {
-        message: "app.api.agent.chat.aiStream.errors.toolExecutionError",
+      toolError = fail({
+        message: "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+        errorType: ErrorResponseTypes.UNKNOWN_ERROR,
         messageParams: { error: errorMessage },
-      };
+      });
     }
 
     // Clean output by removing undefined values (they break validation)
@@ -186,88 +191,86 @@ export class ToolResultHandler {
       error: toolError,
     };
 
-    // Update TOOL message in DB with result (or emit for incognito)
-    if (isIncognito) {
-      // Incognito mode: Emit MESSAGE_CREATED events so client can save to localStorage
-      // Emit TOOL message with toolCall object
-      const toolMessageEvent = createStreamEvent.messageCreated({
-        messageId: toolMessageId,
+    // Emit MESSAGE_CREATED event with updated toolCall for TOOL message
+    const toolMessageEvent = createStreamEvent.messageCreated({
+      messageId: toolMessageId,
+      threadId,
+      role: ChatMessageRole.TOOL,
+      content: null, // Tool messages have no text content
+      parentId: toolCallData.parentId,
+      depth: toolCallData.depth,
+      model,
+      character,
+      sequenceId,
+      toolCall: toolCallWithResult, // Include tool call data with result
+    });
+
+    try {
+      controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
+    } catch (e) {
+      if (e instanceof TypeError && e.message.includes("Controller is already closed")) {
+        logger.info("[AI Stream] Controller closed - skipping message event", {
+          toolCallId: part.toolCallId,
+        });
+        return null;
+      }
+      logger.error("[AI Stream] Failed to enqueue tool message event", parseError(e));
+      return null;
+    }
+
+    logger.info("[AI Stream] TOOL MESSAGE_CREATED event sent", {
+      messageId: toolMessageId,
+      toolName: part.toolName,
+      isIncognito,
+    });
+
+    // Handle ERROR message if tool failed
+    if (toolError) {
+      const errorMessageId = crypto.randomUUID();
+      const { serializeError } = await import("../../error-utils");
+
+      // Emit ERROR MESSAGE_CREATED event
+      const errorMessageEvent = createStreamEvent.messageCreated({
+        messageId: errorMessageId,
         threadId,
-        role: ChatMessageRole.TOOL,
-        content: null, // Tool messages have no text content
-        parentId: toolCallData.parentId,
-        depth: toolCallData.depth,
+        role: ChatMessageRole.ERROR,
+        content: serializeError(toolError),
+        parentId: toolMessageId,
+        depth: toolCallData.depth + 1,
         model,
         character,
         sequenceId,
-        toolCall: toolCallWithResult, // Include tool call data with result (singular - each TOOL message has exactly one tool call)
+      });
+      controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
+
+      logger.info("[AI Stream] ERROR MESSAGE_CREATED event sent", {
+        errorMessageId,
+        toolError,
+        isIncognito,
       });
 
-      try {
-        controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
-      } catch (e) {
-        if (e instanceof TypeError && e.message.includes("Controller is already closed")) {
-          logger.info("[AI Stream] Controller closed - skipping message event", {
-            toolCallId: part.toolCallId,
-          });
-          return null;
-        }
-        logger.error("[AI Stream] Failed to enqueue tool message event", parseError(e));
-        return null;
-      }
-
-      logger.info("[AI Stream] TOOL MESSAGE_CREATED event sent (incognito)", {
-        messageId: toolMessageId,
-        toolName: part.toolName,
-      });
-
-      // Emit ERROR message if error
-      if (toolError) {
-        const errorMessageId = crypto.randomUUID();
-        const { serializeError } = await import("../../error-utils");
-        const errorMessageEvent = createStreamEvent.messageCreated({
-          messageId: errorMessageId,
-          threadId,
-          role: ChatMessageRole.ERROR,
-          content: serializeError(toolError), // Serialize structured error for transmission
-          parentId: toolMessageId,
-          depth: toolCallData.depth + 1,
-          model,
-          character,
-          sequenceId,
-        });
-        controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
-
-        logger.info("[AI Stream] ERROR MESSAGE_CREATED event sent (incognito)", {
-          errorMessageId,
-          toolError,
-        });
-      }
-    } else {
-      // DB mode: Create ERROR message first if error (proper timestamp order)
-      if (toolError && userId) {
-        const errorMessageId = crypto.randomUUID();
-        const { serializeError } = await import("../../error-utils");
+      // Save ERROR message to DB (server mode only - incognito stores in localStorage)
+      if (!isIncognito) {
         await createErrorMessage({
           messageId: errorMessageId,
           threadId,
-          content: serializeError(toolError), // Serialize structured error for storage
+          content: serializeError(toolError),
           errorType: "TOOL_ERROR",
-          parentId: toolMessageId, // Error is child of tool message
+          parentId: toolMessageId,
           depth: toolCallData.depth + 1,
           userId,
           sequenceId,
           logger,
         });
 
-        logger.info("[AI Stream] ERROR message created for tool error", {
+        logger.debug("[AI Stream] ERROR message saved to DB", {
           errorMessageId,
-          toolError,
         });
       }
+    }
 
-      // UPDATE existing TOOL message in DB with result/error
-      // Message was already created in processToolCall, now we just update it with the result
+    // Update TOOL message in DB with result (server mode only - incognito stores in localStorage)
+    if (!isIncognito) {
       const updateResult = await db
         .update(chatMessages)
         .set({
@@ -284,8 +287,7 @@ export class ToolResultHandler {
           toolName: part.toolName,
           threadId,
         });
-        // Message doesn't exist - this shouldn't happen since we created it in processToolCall
-        // But if it does, we need to create it now
+        // Fallback: create message if update failed
         await createToolMessage({
           messageId: toolMessageId,
           threadId,
@@ -302,7 +304,7 @@ export class ToolResultHandler {
           messageId: toolMessageId,
         });
       } else {
-        logger.info("[AI Stream] Tool message updated with result", {
+        logger.debug("[AI Stream] Tool message updated in DB", {
           messageId: toolMessageId,
           hasResult: !!validatedOutput,
           hasError: !!toolError,
@@ -310,7 +312,7 @@ export class ToolResultHandler {
       }
     }
 
-    logger.info("[AI Stream] Tool result validated and saved to DB", {
+    logger.info("[AI Stream] Tool result processed", {
       messageId: toolMessageId,
       toolCallId: part.toolCallId,
       toolName: part.toolName,

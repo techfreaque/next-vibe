@@ -126,6 +126,10 @@ export const translations = {
       label: "System Prompt",
       description: "Optional system instructions",
       placeholder: "Enter system prompt...",
+      now: "now",
+      minutesAgo: "{{minutes}}m ago",
+      hoursAgo: "{{hours}}h ago",
+      daysAgo: "{{days}}d ago",
     },
     enableSearch: {
       label: "Enable Web Search",

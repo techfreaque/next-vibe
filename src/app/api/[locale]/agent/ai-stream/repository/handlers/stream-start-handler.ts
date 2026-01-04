@@ -78,7 +78,7 @@ export class StreamStartHandler {
     isNewThread: boolean;
     threadId: string;
     rootFolderId: DefaultFolderId;
-    subFolderId: string | undefined;
+    subFolderId: string | null;
     effectiveContent: string;
     operation: AiStreamOperation;
     effectiveRole: ChatMessageRole;

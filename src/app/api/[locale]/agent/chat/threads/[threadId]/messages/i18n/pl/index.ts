@@ -5,6 +5,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   ...searchTranslations,
+  transcribing: "Transkrypcja audio...",
   get: {
     title: "List Thread Messages",
     description: "Retrieve all messages in a chat thread",

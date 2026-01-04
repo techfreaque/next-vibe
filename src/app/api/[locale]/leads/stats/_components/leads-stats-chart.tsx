@@ -205,7 +205,7 @@ export function LeadsStatsChart({
           <Skeleton className="h-5 w-48 " />
         </CardHeader>
         <CardContent>
-          <Skeleton style={{ height: `${height}px`, width: "100%" }} />
+          <Skeleton className="h-96 w-full" />
         </CardContent>
       </Card>
     );

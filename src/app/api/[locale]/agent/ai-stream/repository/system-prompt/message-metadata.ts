@@ -4,15 +4,16 @@
  * CRITICAL: This file must be isomorphic (works in both environments)
  */
 
-/* eslint-disable i18next/no-literal-string */
-
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { defaultLocale } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 /**
  * Get relative time string from date (compact format)
  */
 export function getRelativeTime(date: Date): string {
+  const { t } = simpleT(defaultLocale);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
@@ -20,15 +21,17 @@ export function getRelativeTime(date: Date): string {
   const diffDays = Math.floor(diffHours / 24);
 
   if (diffMins < 1) {
-    return "now";
+    return t("app.api.agent.chat.aiStream.post.systemPrompt.now");
   }
   if (diffMins < 60) {
-    return `${diffMins}m ago`;
+    return t("app.api.agent.chat.aiStream.post.systemPrompt.minutesAgo", {
+      minutes: diffMins,
+    });
   }
   if (diffHours < 24) {
-    return `${diffHours}h ago`;
+    return t("app.api.agent.chat.aiStream.post.systemPrompt.hoursAgo", { hours: diffHours });
   }
-  return `${diffDays}d ago`;
+  return t("app.api.agent.chat.aiStream.post.systemPrompt.daysAgo", { days: diffDays });
 }
 
 /**
@@ -103,9 +106,5 @@ export function createMetadataSystemMessage(
   rootFolderId: DefaultFolderId | undefined,
 ): string {
   const metadata = createMessageMetadata(message, rootFolderId);
-  // Don't send empty context if no metadata
-  if (!metadata || metadata.trim().length === 0) {
-    return "";
-  }
   return `[Context: ${metadata}]`;
 }

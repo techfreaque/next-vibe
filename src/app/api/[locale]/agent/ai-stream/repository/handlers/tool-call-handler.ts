@@ -100,7 +100,7 @@ export class ToolCallHandler {
 
       // CRITICAL FIX: Create the ASSISTANT message in the database immediately
       // This prevents foreign key errors when TOOL messages try to reference it as parent_id
-      if (!isIncognito && userId) {
+      if (!isIncognito) {
         await createTextMessage({
           messageId: currentAssistantMessageId,
           threadId,
@@ -252,7 +252,7 @@ export class ToolCallHandler {
     // CRITICAL: Store tool message to DB immediately (if not incognito)
     // This is required so subsequent tool calls can use this message as parent
     // Without this, parallel tool calls will fail with foreign key constraint errors
-    if (!isIncognito && userId) {
+    if (!isIncognito) {
       logger.info("[AI Stream] Creating tool message in DB", {
         messageId: toolMessageId,
         toolCallId,

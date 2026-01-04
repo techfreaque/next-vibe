@@ -12,6 +12,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { FileAttachments } from "../../../_components/message-display/file-attachments";
 import { MessageAuthorInfo } from "./message-author";
+import { TranscribingIndicator } from "./transcribing-indicator";
 import { UserMessageActions } from "./user-message-actions";
 
 interface UserMessageBubbleProps {
@@ -70,9 +71,14 @@ export function UserMessageBubble({
             chatTransitions.default,
           )}
         >
-          <Div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap break-words">
-            {message.content}
-          </Div>
+          {/* Voice transcribing state */}
+          {message.metadata?.isTranscribing ? (
+            <TranscribingIndicator locale={locale} />
+          ) : (
+            <Div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap wrap-break-word">
+              {message.content}
+            </Div>
+          )}
 
           {/* File Attachments */}
           {message.metadata?.attachments && message.metadata.attachments.length > 0 && (

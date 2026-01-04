@@ -664,7 +664,10 @@ export interface AvatarWidgetConfig<TKey extends string> extends BaseWidgetConfi
 
 export interface MarkdownWidgetConfig<TKey extends string> extends BaseWidgetConfig {
   type: WidgetType.MARKDOWN;
-  content: NoInfer<TKey>;
+  content?: NoInfer<TKey>; // Optional - only for hardcoded static content, not for field values
+  columns?: number;
+  label?: NoInfer<TKey>;
+  description?: NoInfer<TKey>;
 }
 
 export interface MarkdownEditorWidgetConfig<TKey extends string> extends BaseWidgetConfig {

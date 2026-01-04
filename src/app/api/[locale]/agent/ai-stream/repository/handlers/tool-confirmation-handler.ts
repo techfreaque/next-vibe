@@ -6,9 +6,9 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import {
+  type ErrorResponseType,
   ErrorResponseTypes,
   fail,
-  type MessageResponseType,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
@@ -34,12 +34,11 @@ export class ToolConfirmationHandler {
     };
     messageHistory?: ChatMessage[];
     isIncognito: boolean;
-    userId: string | undefined;
     locale: CountryLanguage;
     logger: EndpointLogger;
     user: JwtPayloadType;
   }): Promise<ResponseType<{ threadId: string; toolMessageId: string }>> {
-    const { toolConfirmation, messageHistory, isIncognito, userId, locale, logger, user } = params;
+    const { toolConfirmation, messageHistory, isIncognito, locale, logger, user } = params;
 
     logger.debug("[Tool Confirmation] handleToolConfirmationInSetup called", {
       messageId: toolConfirmation.messageId,
@@ -47,14 +46,14 @@ export class ToolConfirmationHandler {
       hasUpdatedArgs: !!toolConfirmation.updatedArgs,
     });
 
-    // Find tool message in messageHistory (incognito) or DB
+    // Find tool message - source depends on mode (incognito: messageHistory, server: DB)
     let toolMessage: ChatMessage | undefined;
 
     if (isIncognito && messageHistory) {
       toolMessage = messageHistory.find((msg) => msg.id === toolConfirmation.messageId) as
         | ChatMessage
         | undefined;
-    } else if (userId) {
+    } else if (!isIncognito) {
       const [dbMessage] = await db
         .select()
         .from(chatMessages)
@@ -134,7 +133,7 @@ export class ToolConfirmationHandler {
         },
       ];
       let toolResult: ToolCallResult | undefined;
-      let toolError: MessageResponseType | undefined;
+      let toolError: ErrorResponseType | undefined;
 
       logger.debug("[Tool Confirmation] Executing tool", {
         toolName: toolCall.toolName,
@@ -157,10 +156,11 @@ export class ToolConfirmationHandler {
           logger.error("[Tool Confirmation] Tool missing execute method", {
             toolName: toolCall.toolName,
           });
-          toolError = {
-            message: "app.api.agent.chat.aiStream.errors.toolExecutionError",
+          toolError = fail({
+            message: "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+            errorType: ErrorResponseTypes.UNKNOWN_ERROR,
             messageParams: { error: "Tool does not have execute method" },
-          };
+          });
         }
       } catch (error) {
         logger.error("[Tool Confirmation] Tool execution failed", {
@@ -168,12 +168,13 @@ export class ToolConfirmationHandler {
           error: error instanceof Error ? error.message : String(error),
           errorStack: error instanceof Error ? error.stack : undefined,
         });
-        toolError = {
-          message: "app.api.agent.chat.aiStream.errors.toolExecutionError",
+        toolError = fail({
+          message: "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+          errorType: ErrorResponseTypes.UNKNOWN_ERROR,
           messageParams: {
             error: error instanceof Error ? error.message : String(error),
           },
-        };
+        });
       }
 
       // Update tool message with result
@@ -186,8 +187,15 @@ export class ToolConfirmationHandler {
         waitingForConfirmation: false,
       };
 
-      // Update in DB (non-incognito) or messageHistory (incognito - handled by client)
-      if (!isIncognito && userId) {
+      // Update tool message with result - persistence differs by mode
+      if (isIncognito && messageHistory) {
+        // Incognito: update messageHistory array (client will save to localStorage)
+        const msgIndex = messageHistory.findIndex((msg) => msg.id === toolConfirmation.messageId);
+        if (msgIndex >= 0) {
+          messageHistory[msgIndex].metadata = { toolCall: updatedToolCall };
+        }
+      } else if (!isIncognito) {
+        // Server: update DB
         await db
           .update(chatMessages)
           .set({
@@ -195,12 +203,6 @@ export class ToolConfirmationHandler {
             updatedAt: new Date(),
           })
           .where(eq(chatMessages.id, toolConfirmation.messageId));
-      } else if (isIncognito && messageHistory) {
-        // Update in messageHistory array for incognito mode
-        const msgIndex = messageHistory.findIndex((msg) => msg.id === toolConfirmation.messageId);
-        if (msgIndex >= 0) {
-          messageHistory[msgIndex].metadata = { toolCall: updatedToolCall };
-        }
       }
 
       logger.debug("[Tool Confirmation] Tool executed", {
@@ -214,12 +216,21 @@ export class ToolConfirmationHandler {
         args: toolCall.args, // Keep original args for display
         isConfirmed: false,
         waitingForConfirmation: false,
-        error: {
-          message: "app.api.agent.chat.aiStream.errors.userDeclinedTool",
-        },
+        error: fail({
+          message: "app.api.agent.chat.aiStream.errors.userDeclinedTool" as const,
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        }),
       };
 
-      if (!isIncognito && userId) {
+      // Update tool message with rejection - persistence differs by mode
+      if (isIncognito && messageHistory) {
+        // Incognito: update messageHistory array (client will save to localStorage)
+        const msgIndex = messageHistory.findIndex((msg) => msg.id === toolConfirmation.messageId);
+        if (msgIndex >= 0) {
+          messageHistory[msgIndex].metadata = { toolCall: rejectedToolCall };
+        }
+      } else if (!isIncognito) {
+        // Server: update DB
         await db
           .update(chatMessages)
           .set({
@@ -227,11 +238,6 @@ export class ToolConfirmationHandler {
             updatedAt: new Date(),
           })
           .where(eq(chatMessages.id, toolConfirmation.messageId));
-      } else if (isIncognito && messageHistory) {
-        const msgIndex = messageHistory.findIndex((msg) => msg.id === toolConfirmation.messageId);
-        if (msgIndex >= 0) {
-          messageHistory[msgIndex].metadata = { toolCall: rejectedToolCall };
-        }
       }
 
       logger.debug("[Tool Confirmation] Tool rejected by user");

@@ -6,29 +6,26 @@
 
 import "server-only";
 
-import { getCharacterById } from "@/app/api/[locale]/agent/chat/characters/repository";
+import { CharactersRepository } from "@/app/api/[locale]/agent/chat/characters/repository";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { generateMemorySummary } from "@/app/api/[locale]/agent/chat/memories/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import {
-  generateSystemPrompt,
-  getCurrentDateString,
-  getModelCount,
-} from "./system-prompt-generator";
+import { generateSystemPrompt, getCurrentDateString } from "./generator";
 
 /**
  * Build complete system prompt from character ID
  *
  * This is a server-side function that:
- * 1. Loads character from database
+ * 1. Loads character from database using CharactersRepository
  * 2. Loads user memories from database
  * 3. Delegates to generateSystemPrompt for actual prompt construction
  *
  * @param characterId - Optional character ID (can be default character ID or custom character UUID)
- * @param userId - Optional user ID (required for custom characters and memories)
+ * @param user - User JWT payload (required for custom characters)
  * @param logger - Logger instance
  * @param t - Translation function for appName
  * @param locale - User's locale (language-country)
@@ -39,7 +36,7 @@ import {
  */
 export async function buildSystemPrompt(params: {
   characterId: string | null | undefined;
-  userId: string | undefined;
+  user: JwtPayloadType;
   logger: EndpointLogger;
   t: TFunction;
   locale: CountryLanguage;
@@ -47,7 +44,8 @@ export async function buildSystemPrompt(params: {
   subFolderId: string | null;
   callMode: boolean | null | undefined;
 }): Promise<string> {
-  const { characterId, userId, logger, t, locale, rootFolderId, subFolderId, callMode } = params;
+  const { characterId, user, logger, t, locale, rootFolderId, subFolderId, callMode } = params;
+  const userId = user.id;
 
   logger.debug("Building system prompt", {
     hasCharacterId: !!characterId,
@@ -86,9 +84,10 @@ export async function buildSystemPrompt(params: {
   // Get character system prompt if provided
   if (characterId) {
     try {
-      const character = await getCharacterById(characterId, userId);
+      const result = await CharactersRepository.getCharacterById({ id: characterId }, user, logger);
 
-      if (character) {
+      if (result.success) {
+        const character = result.data.character;
         logger.debug("Using character system prompt", {
           characterId: character.id,
           characterName: character.name,
@@ -101,7 +100,10 @@ export async function buildSystemPrompt(params: {
           logger.debug("Character has empty system prompt, using default behavior");
         }
       } else {
-        logger.warn("Character not found, using default", { characterId });
+        logger.warn("Character not found, using default", {
+          characterId,
+          error: result.message,
+        });
       }
     } catch (error) {
       logger.error("Failed to load character, using default", {
@@ -116,7 +118,6 @@ export async function buildSystemPrompt(params: {
   const systemPrompt = generateSystemPrompt({
     appName,
     date: getCurrentDateString(),
-    modelCount: getModelCount(),
     locale,
     rootFolderId,
     subFolderId,

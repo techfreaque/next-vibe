@@ -22,6 +22,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { Countries, CountriesOptions, Languages, LanguagesOptions } from "@/i18n/core/config";
 
+import { dateSchema } from "../../../shared/types/common.schema";
 import {
   EmailCampaignStage,
   EmailCampaignStageOptions,
@@ -338,14 +339,14 @@ const { GET } = createEndpoint({
                   type: WidgetType.TEXT,
                   content: "app.api.leads.lead.id.get.response.createdAt.content",
                 },
-                z.date(),
+                dateSchema,
               ),
               updatedAt: responseField(
                 {
                   type: WidgetType.TEXT,
                   content: "app.api.leads.lead.id.get.response.updatedAt.content",
                 },
-                z.date(),
+                dateSchema,
               ),
             },
           ),
@@ -991,14 +992,14 @@ const { PATCH } = createEndpoint({
                   type: WidgetType.TEXT,
                   content: "app.api.leads.lead.id.patch.response.createdAt.content",
                 },
-                z.date(),
+                dateSchema,
               ),
               updatedAt: responseField(
                 {
                   type: WidgetType.TEXT,
                   content: "app.api.leads.lead.id.patch.response.updatedAt.content",
                 },
-                z.date(),
+                dateSchema,
               ),
             },
           ),

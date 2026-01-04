@@ -10,11 +10,9 @@ import Animated, {
 
 import type { SkeletonProps } from "@/packages/next-vibe-ui/web/ui/skeleton";
 
-import { convertCSSToViewStyle } from "../utils/style-converter";
-
 const duration = 1000;
 
-function Skeleton({ className, style, children, ...props }: SkeletonProps): React.JSX.Element {
+function Skeleton({ className, children, ...props }: SkeletonProps): React.JSX.Element {
   const sv = useSharedValue(1);
 
   React.useEffect(() => {
@@ -28,15 +26,13 @@ function Skeleton({ className, style, children, ...props }: SkeletonProps): Reac
     opacity: sv.value,
   }));
 
-  const convertedStyle = style ? convertCSSToViewStyle(style) : undefined;
-
   // Extract id from props if present and map to nativeID
   const { id, ...restProps } = props as { id?: string };
 
   return (
     <Animated.View
       nativeID={id}
-      style={[animStyle, convertedStyle]}
+      style={animStyle}
       className={cn("rounded-md bg-secondary dark:bg-muted", className)}
       {...restProps}
     >

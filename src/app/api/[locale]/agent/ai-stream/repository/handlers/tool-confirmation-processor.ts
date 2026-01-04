@@ -24,7 +24,6 @@ export class ToolConfirmationProcessor {
     toolConfirmations: Array<{ messageId: string; confirmed: boolean }>;
     messageHistory: ChatMessage[] | undefined;
     isIncognito: boolean;
-    userId: string | undefined;
     locale: CountryLanguage;
     logger: EndpointLogger;
     user: JwtPayloadType;
@@ -37,7 +36,7 @@ export class ToolConfirmationProcessor {
       }>
     >
   > {
-    const { toolConfirmations, messageHistory, isIncognito, userId, locale, logger, user } = params;
+    const { toolConfirmations, messageHistory, isIncognito, locale, logger, user } = params;
 
     logger.debug("[Setup] Processing tool confirmations", {
       count: toolConfirmations.length,
@@ -56,7 +55,6 @@ export class ToolConfirmationProcessor {
         toolConfirmation,
         messageHistory,
         isIncognito,
-        userId,
         locale,
         logger,
         user,

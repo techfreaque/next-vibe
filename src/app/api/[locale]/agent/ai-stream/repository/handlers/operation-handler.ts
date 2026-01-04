@@ -56,7 +56,7 @@ export class OperationHandler {
       case "send":
       case "retry":
       case "edit":
-        // All operations work the same - check for audio input transcription
+        // Audio input transcription
         if (data.audioInput?.file) {
           logger.debug("[Setup] Audio input detected, transcribing...", {
             operation,

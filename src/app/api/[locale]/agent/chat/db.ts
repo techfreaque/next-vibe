@@ -43,7 +43,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
 import { leads } from "@/app/api/[locale]/leads/db";
-import type { MessageResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { users } from "@/app/api/[locale]/user/db";
 import { type UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
@@ -83,7 +83,7 @@ export interface ToolCall {
   toolName: string;
   args: ToolCallResult;
   result?: ToolCallResult;
-  error?: MessageResponseType; // Structured error with translation key and params
+  error?: ErrorResponseType; // Structured error with translation key, params, errorType, and optional nested cause
   executionTime?: number;
   creditsUsed?: number;
   requiresConfirmation?: boolean;
@@ -112,7 +112,7 @@ export interface ToolCallMetadata {
   toolName: string;
   args: ToolCallResult;
   result?: ToolCallResult;
-  error?: MessageResponseType; // Structured error with translation key and params
+  error?: ErrorResponseType; // Structured error with translation key, params, errorType, and optional nested cause
   executionTime?: number;
   creditsUsed?: number;
   requiresConfirmation?: boolean;

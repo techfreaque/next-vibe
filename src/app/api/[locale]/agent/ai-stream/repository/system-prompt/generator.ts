@@ -12,7 +12,25 @@ import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
-import { formattingInstructions } from "./system-prompt";
+/**
+ * Formatting instructions for non-call mode responses
+ */
+const formattingInstructions = [
+  "CRITICAL: Add blank lines between all content blocks (paragraphs, headings, lists, code, quotes)",
+  "Use **bold** for emphasis, *italic* for subtle emphasis",
+  "Use ## headings and ### subheadings (only in detailed responses)",
+  "Use (-) for lists, (1.) for ordered lists",
+  "Use `backticks` for inline code, ```blocks``` for code examples",
+  "Use > for important notes",
+  "Use tables for comparisons, matrices, and structured data",
+  "NEVER write walls of text - always break into readable paragraphs",
+] as const;
+
+/**
+ * Default prompt when user wants AI to answer to an AI message
+ */
+export const CONTINUE_CONVERSATION_PROMPT =
+  "Respond to the previous AI message naturally, as if you were a user engaging with it. Provide your thoughts, feedback, or follow-up based on what was said. Do not ask questions or try to drive the conversation - simply respond to what the AI said.";
 
 /**
  * Call mode system prompt addition
@@ -41,8 +59,6 @@ export interface SystemPromptParams {
   appName: string;
   /** Current date string */
   date: string;
-  /** Total number of available models */
-  modelCount: number;
   /** User's locale (language-country) */
   locale: CountryLanguage;
   /** Current root folder ID */
@@ -87,7 +103,6 @@ export function generateSystemPrompt(params: SystemPromptParams): string {
   const {
     appName,
     date,
-    modelCount,
     locale,
     rootFolderId,
     subFolderId,
@@ -109,13 +124,13 @@ You are an AI assistant on ${appName}, a platform dedicated to freedom of speech
   // Section 2: Platform Overview & FAQ
   sections.push(`## About ${appName}
 
-**What is this?** A free speech AI platform with ${modelCount} models (censored to uncensored) plus public forums where humans and AIs interact under First Amendment principles.
+**What is this?** A free speech AI platform with ${TOTAL_MODEL_COUNT} models (censored to uncensored) plus public forums where humans and AIs interact under First Amendment principles.
 
 **What makes it different?** Users choose their content filtering level. No forced safety rails - you pick censored models (Claude, GPT) or uncensored models (Arya, FreedomGPT, Dolphin).
 
 **How does pricing work?**
 - Free tier: 20 credits/month (limited testing)
-- Purchased credits: Full access to all ${modelCount} models
+- Purchased credits: Full access to all ${TOTAL_MODEL_COUNT} models
 - Transparent per-model costs
 
 **Public folders?** Yes - conversations in public folders are visible to everyone, creating a forum-like space for open human-AI dialogue.
@@ -220,14 +235,6 @@ function getFolderDescription(folderId: DefaultFolderId): string {
 }
 
 /**
- * Count available models
- * This is a utility function that can be used on both client and server
- */
-export function getModelCount(): number {
-  return TOTAL_MODEL_COUNT;
-}
-
-/**
  * Get current date string in user-friendly format
  */
 export function getCurrentDateString(): string {
@@ -248,29 +255,4 @@ function buildFormattingSection(): string {
   return `# Formatting Instructions
 
 ${formattingInstructions.map((instruction) => `- ${instruction}`).join("\n")}`;
-}
-
-/**
- * Client-side system prompt generator
- * Uses browser APIs and client-side data
- * Formatting/call mode instructions are included by generateSystemPrompt
- */
-export function generateClientSystemPrompt(params: {
-  appName: string;
-  locale: CountryLanguage;
-  rootFolderId?: DefaultFolderId;
-  subFolderId?: string | null;
-  characterPrompt?: string;
-  callMode?: boolean;
-}): string {
-  return generateSystemPrompt({
-    appName: params.appName,
-    date: getCurrentDateString(),
-    modelCount: getModelCount(),
-    locale: params.locale,
-    rootFolderId: params.rootFolderId,
-    subFolderId: params.subFolderId,
-    characterPrompt: params.characterPrompt,
-    callMode: params.callMode,
-  });
 }

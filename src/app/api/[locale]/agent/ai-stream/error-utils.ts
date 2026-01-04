@@ -1,13 +1,20 @@
 /**
  * Error Serialization Utilities
- * Centralized utilities for handling MessageResponseType serialization/deserialization
+ * Centralized utilities for handling ErrorResponseType serialization/deserialization
  */
 
-import type { MessageResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 
 /**
- * Serialize MessageResponseType to JSON string for storage/transmission
+ * Serialize ErrorResponseType to JSON string for storage/transmission
  */
-export function serializeError(error: MessageResponseType): string {
+export function serializeError(error: ErrorResponseType): string {
   return JSON.stringify(error);
+}
+
+/**
+ * Deserialize JSON string back to ErrorResponseType
+ */
+export function deserializeError(serialized: string): ErrorResponseType {
+  return JSON.parse(serialized) as ErrorResponseType;
 }

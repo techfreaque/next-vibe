@@ -18,6 +18,23 @@ export class AudioQueueManager {
   private nextExpectedChunk = 0;
 
   /**
+   * Update voice mode store with playback state
+   */
+  private updateVoiceModeStore(isPlaying: boolean): void {
+    // Dynamically import to avoid circular dependencies and ensure it works client-side only
+    if (typeof window !== "undefined") {
+      void import("../../chat/voice-mode/store")
+        .then(({ useVoiceModeStore }) => {
+          useVoiceModeStore.getState().setSpeaking(isPlaying);
+          return undefined;
+        })
+        .catch(() => {
+          // Silently fail - voice mode store not available
+        });
+    }
+  }
+
+  /**
    * Add audio chunk to queue
    */
   enqueue(audioData: string, chunkIndex: number): void {
@@ -84,10 +101,13 @@ export class AudioQueueManager {
     }
 
     this.isPlaying = true;
+    this.updateVoiceModeStore(true);
+
     const next = this.queue.shift();
 
     if (!next) {
       this.isPlaying = false;
+      this.updateVoiceModeStore(false);
       return;
     }
 
@@ -98,9 +118,17 @@ export class AudioQueueManager {
       // Playback failed - continue with next chunk
     }
 
-    this.isPlaying = false;
-    // Process next in queue
-    void this.processQueue();
+    // Check if there are more chunks to play
+    const hasMoreChunks = this.queue.length > 0;
+
+    if (!hasMoreChunks) {
+      this.isPlaying = false;
+      this.updateVoiceModeStore(false);
+    } else {
+      this.isPlaying = false;
+      // Process next in queue
+      void this.processQueue();
+    }
   }
 
   /**
@@ -163,6 +191,7 @@ export class AudioQueueManager {
    * Stop playback and clear queue
    */
   stop(): void {
+    const wasPlaying = this.isPlaying;
     this.queue = [];
     if (this.currentAudio) {
       this.currentAudio.pause();
@@ -175,6 +204,11 @@ export class AudioQueueManager {
     });
     this.preloadedAudio.clear();
     this.nextExpectedChunk = 0;
+
+    // Update voice mode store if we were playing
+    if (wasPlaying) {
+      this.updateVoiceModeStore(false);
+    }
   }
 
   /**

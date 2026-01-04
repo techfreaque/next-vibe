@@ -4,14 +4,13 @@ import * as ProgressPrimitive from "@radix-ui/react-progress";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 
-import type { StyleType } from "../utils/style-type";
-
-export type ProgressRootProps = {
+export interface ProgressRootProps {
   value?: number | null;
   max?: number;
   getValueLabel?: (value: number, max: number) => string;
   children?: React.ReactNode;
-} & StyleType;
+  className?: string;
+}
 
 export interface ProgressIndicatorProps {
   className?: string;

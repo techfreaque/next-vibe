@@ -264,7 +264,7 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.DATA_LIST,
           label: "app.api.agent.chat.aiStream.post.toolConfirmations.label",
-          description: "app.api.agent.chat.aiStream.post.toolConfirmations.description",
+          description: "app.api.agent.chat.aiStream.post.toolConfirmation.description",
           optional: true,
         },
         z.object({

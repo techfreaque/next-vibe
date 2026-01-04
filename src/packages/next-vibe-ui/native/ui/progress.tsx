@@ -14,10 +14,6 @@ import type {
   ProgressIndicatorProps,
   ProgressRootProps,
 } from "@/packages/next-vibe-ui/web/ui/progress";
-
-import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle } from "../utils/style-converter";
-
 // Re-export types for consistency
 export type { ProgressIndicatorProps, ProgressRootProps };
 
@@ -26,19 +22,14 @@ const StyledProgressIndicator = ProgressPrimitive.Indicator;
 
 function Progress({
   className,
-  style,
   value,
   max,
   getValueLabel,
   children,
 }: ProgressRootProps): React.JSX.Element {
-  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <StyledProgressRoot
-      {...applyStyleType({
-        nativeStyle,
-        className: cn("relative h-4 w-full overflow-hidden rounded-full bg-secondary", className),
-      })}
+      className={cn("relative h-4 w-full overflow-hidden rounded-full bg-secondary", className)}
       value={value ?? undefined}
       max={max}
       getValueLabel={getValueLabel}

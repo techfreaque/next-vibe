@@ -16,6 +16,7 @@ const baseEnvSchema = z.object({
   GAB_AI_API_KEY: z.string(),
   EDEN_AI_API_KEY: z.string().min(1),
   BRAVE_SEARCH_API_KEY: z.string(),
+  SCRAPPEY_API_KEY: z.string(),
 });
 
 const s3StorageSchema = baseEnvSchema.extend({

@@ -15,6 +15,7 @@ import type { ToolCall } from "../../../chat/db";
 import type { ChatMessage } from "../../../chat/db";
 import type { ChatMessageRole } from "../../../chat/enum";
 import type { AiStreamPostRequestOutput } from "../../definition";
+import { CONTINUE_CONVERSATION_PROMPT } from "../system-prompt/generator";
 import { MessageContextBuilder } from "./message-context-builder";
 import { MessageConverter } from "./message-converter";
 
@@ -112,6 +113,7 @@ export class MessagePreparationHandler {
               role: effectiveRole,
               content: effectiveContent,
             },
+        logger,
       );
       if (currentMessage) {
         // toAiSdkMessage can return a single message or an array - handle both
@@ -186,9 +188,20 @@ export class MessagePreparationHandler {
       });
     }
 
-    // Prepend system prompt for server threads (incognito handles it differently)
-    if (!isIncognito && systemPrompt && messages.length > 0 && messages[0].role !== "system") {
-      messages.unshift({ role: "system", content: systemPrompt });
+    // Prepend system prompt if not already present
+    messages.unshift({ role: "system", content: systemPrompt });
+
+    // For answer-as-ai operation, add CONTINUE_CONVERSATION_PROMPT as the last system message
+    // User can optionally provide additional instructions via effectiveContent
+    if (operation === "answer-as-ai") {
+      const systemContent = effectiveContent.trim()
+        ? `${CONTINUE_CONVERSATION_PROMPT}\n\nAdditional instructions: ${effectiveContent}`
+        : CONTINUE_CONVERSATION_PROMPT;
+
+      messages.push({ role: "system", content: systemContent });
+      logger.debug("[Setup] Added CONTINUE_CONVERSATION_PROMPT for answer-as-ai operation", {
+        hasAdditionalContent: !!effectiveContent.trim(),
+      });
     }
 
     return messages;

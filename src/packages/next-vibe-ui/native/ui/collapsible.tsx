@@ -76,7 +76,7 @@ export function CollapsibleContent({
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
-    <CollapsiblePrimitive.Content className={className} {...props}>
+    <CollapsiblePrimitive.Content {...props}>
       <StyledAnimatedView
         entering={FadeIn}
         exiting={FadeOut.duration(200)}

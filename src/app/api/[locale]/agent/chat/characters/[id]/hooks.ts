@@ -18,10 +18,7 @@ import definitions from "./definition";
  * - Fetches default or custom character
  * - Returns full character details
  */
-export function useCharacter(
-  characterId: string,
-  logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
+export function useCharacter(characterId: string, logger: EndpointLogger): CharacterEndpointReturn {
   return useEndpoint(
     definitions,
     {
@@ -29,30 +26,6 @@ export function useCharacter(
         enabled: !!characterId,
         refetchOnWindowFocus: false,
         staleTime: 5 * 60 * 1000, // 5 minutes
-      },
-      urlPathParams: { id: characterId },
-    },
-    logger,
-  );
-}
-
-/**
- * Hook for updating a custom character
- *
- * Features:
- * - Updates custom character fields
- * - Only works for custom characters (UUIDs)
- * - Auto-refetches character list on success
- */
-export function useUpdateCharacter(
-  characterId: string,
-  logger: EndpointLogger,
-): EndpointReturn<typeof definitions> {
-  return useEndpoint(
-    definitions,
-    {
-      formOptions: {
-        persistForm: false,
       },
       urlPathParams: { id: characterId },
     },

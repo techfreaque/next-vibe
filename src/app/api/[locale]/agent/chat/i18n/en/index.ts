@@ -1,6 +1,7 @@
 import { translations as creditsTranslations } from "../../../../credits/i18n/en";
 import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/en";
 import { translations as braveSearchTranslations } from "../../../brave-search/i18n/en";
+import { translations as fetchUrlContentTranslations } from "../../../fetch-url-content/i18n/en";
 import { translations as charactersTranslations } from "../../characters/i18n/en";
 import { translations as favoritesTranslations } from "../../favorites/i18n/en";
 import { translations as filesTranslations } from "../../files/[threadId]/[filename]/i18n/en";
@@ -248,6 +249,14 @@ export const translations = {
     flatView: "Flat view (4chan style)",
     debugView: "Debug view (with system prompts)",
   },
+  flatView: {
+    answerModal: {
+      title: "Answer as AI Model",
+      description: "Generate an AI response to continue the conversation",
+      inputPlaceholder: "Optional: Add specific instructions for the AI response",
+      confirmLabel: "Generate Response",
+    },
+  },
   screenshot: {
     capturing: "Capturing...",
     capture: "Capture Screenshot",
@@ -306,6 +315,7 @@ export const translations = {
   },
   tools: {
     braveSearch: braveSearchTranslations,
+    fetchUrl: fetchUrlContentTranslations,
   },
   models: {
     descriptions: {

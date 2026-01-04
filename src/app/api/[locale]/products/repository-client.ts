@@ -73,6 +73,21 @@ const BRAVE_SEARCH_COST_CALCULATED = BRAVE_SEARCH_COST_PER_REQUEST_USD / CREDIT_
 export const BRAVE_SEARCH_COST_PER_REQUEST = Math.round(BRAVE_SEARCH_COST_CALCULATED * 100) / 100;
 
 /**
+ * Scrappey (URL Fetcher) Pricing
+ * Base: $10.00/10,000 requests
+ * With 30% markup: $13.00/10,000 requests
+ * Per request: $0.0013 = 0.13 credits
+ *
+ * NOTE: Rounded to 2 decimal places to avoid floating point display issues
+ */
+const SCRAPPEY_BASE_COST_PER_10K_USD = 10.0;
+const SCRAPPEY_COST_WITH_MARKUP_USD =
+  SCRAPPEY_BASE_COST_PER_10K_USD * (1 + STANDARD_MARKUP_PERCENTAGE);
+const SCRAPPEY_COST_PER_REQUEST_USD = SCRAPPEY_COST_WITH_MARKUP_USD / 10000;
+const SCRAPPEY_COST_CALCULATED = SCRAPPEY_COST_PER_REQUEST_USD / CREDIT_VALUE_USD;
+export const SCRAPPEY_COST_PER_REQUEST = Math.round(SCRAPPEY_COST_CALCULATED * 100) / 100;
+
+/**
  * Feature Costs Object
  * Consolidated pricing for all non-model features
  */
@@ -82,6 +97,12 @@ export const FEATURE_COSTS = {
    * Based on $5/1000 requests + 30% markup
    */
   BRAVE_SEARCH: BRAVE_SEARCH_COST_PER_REQUEST,
+
+  /**
+   * Fetch URL Content (Scrappey): 0.13 credits per request
+   * Based on $10/10,000 requests + 30% markup
+   */
+  FETCH_URL_CONTENT: SCRAPPEY_COST_PER_REQUEST,
 
   /**
    * STT: 0.013 credits per second

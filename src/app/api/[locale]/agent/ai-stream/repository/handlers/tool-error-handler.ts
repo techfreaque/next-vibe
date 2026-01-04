@@ -6,7 +6,8 @@ import type { ReadableStreamDefaultController } from "node:stream/web";
 
 import type { JSONValue } from "ai";
 import { eq } from "drizzle-orm";
-import type { MessageResponseType } from "next-vibe/shared/types/response.schema";
+import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -72,25 +73,29 @@ export class ToolErrorHandler {
     const { messageId: toolMessageId, toolCallData } = pendingToolMessage;
 
     // Extract error from the tool-error event and structure it for translation
-    const error: MessageResponseType =
+    const error: ErrorResponseType =
       "error" in part && part.error
         ? part.error instanceof Error
-          ? ({
-              message: "app.api.agent.chat.aiStream.errors.toolExecutionError",
+          ? fail({
+              message: "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+              errorType: ErrorResponseTypes.UNKNOWN_ERROR,
               messageParams: { error: part.error.message },
-            } satisfies MessageResponseType)
+            })
           : typeof part.error === "object" &&
               part.error !== null &&
               "message" in part.error &&
               typeof part.error.message === "string"
-            ? (part.error as MessageResponseType)
-            : ({
-                message: "app.api.agent.chat.aiStream.errors.toolExecutionError",
+            ? // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+              (part.error as unknown as ErrorResponseType)
+            : fail({
+                message: "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+                errorType: ErrorResponseTypes.UNKNOWN_ERROR,
                 messageParams: { error: String(part.error) },
-              } satisfies MessageResponseType)
-        : ({
-            message: "app.api.agent.chat.aiStream.errors.toolExecutionFailed",
-          } satisfies MessageResponseType);
+              })
+        : fail({
+            message: "app.api.agent.chat.aiStream.errors.toolExecutionFailed" as const,
+            errorType: ErrorResponseTypes.UNKNOWN_ERROR,
+          });
 
     logger.info("[AI Stream] Tool error event received", {
       toolName: part.toolName,
@@ -105,11 +110,29 @@ export class ToolErrorHandler {
       error,
     };
 
-    // Store TOOL message in DB (or emit for incognito)
-    // NO separate ERROR message - error is stored in TOOL message metadata
-    if (!isIncognito && userId) {
-      // DB mode: UPDATE existing TOOL message with error in metadata
-      // The tool message was already created when tool-call event arrived
+    // Emit MESSAGE_CREATED event with updated toolCall for TOOL message
+    const toolMessageEvent = createStreamEvent.messageCreated({
+      messageId: toolMessageId,
+      threadId,
+      role: ChatMessageRole.TOOL,
+      content: null, // Tool messages have no text content
+      parentId: toolCallData.parentId,
+      depth: toolCallData.depth,
+      model,
+      character,
+      sequenceId,
+      toolCall: toolCallWithError, // Include tool call data with error
+    });
+    controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
+
+    logger.info("[AI Stream] TOOL MESSAGE_CREATED event sent", {
+      messageId: toolMessageId,
+      toolName: part.toolName,
+      isIncognito,
+    });
+
+    // Update TOOL message in DB with error (server mode only - incognito stores in localStorage)
+    if (!isIncognito) {
       const updateResult = await db
         .update(chatMessages)
         .set({
@@ -143,38 +166,11 @@ export class ToolErrorHandler {
           messageId: toolMessageId,
         });
       } else {
-        logger.info("[AI Stream] Tool message updated with error", {
+        logger.debug("[AI Stream] Tool message updated in DB with error", {
           messageId: toolMessageId,
           toolName: part.toolName,
-          error,
         });
       }
-
-      logger.info("[AI Stream] TOOL message stored in DB (error)", {
-        messageId: toolMessageId,
-        toolName: part.toolName,
-        error,
-      });
-    } else if (isIncognito) {
-      // Incognito mode: Emit MESSAGE_CREATED event for TOOL message
-      const toolMessageEvent = createStreamEvent.messageCreated({
-        messageId: toolMessageId,
-        threadId,
-        role: ChatMessageRole.TOOL,
-        content: null, // Tool messages have no text content
-        parentId: toolCallData.parentId,
-        depth: toolCallData.depth,
-        model,
-        character,
-        sequenceId,
-        toolCall: toolCallWithError, // Include tool call data with error (singular - each TOOL message has exactly one tool call)
-      });
-      controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
-
-      logger.info("[AI Stream] TOOL MESSAGE_CREATED event sent (incognito)", {
-        messageId: toolMessageId,
-        toolName: part.toolName,
-      });
     }
 
     // Emit TOOL_RESULT event to frontend with error

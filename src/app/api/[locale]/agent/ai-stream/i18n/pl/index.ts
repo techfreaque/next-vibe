@@ -108,6 +108,10 @@ export const translations: typeof enTranslations = {
       label: "Prompt systemowy",
       description: "Opcjonalne instrukcje systemowe",
       placeholder: "Wprowadź prompt systemowy...",
+      now: "teraz",
+      minutesAgo: "{{minutes}}m temu",
+      hoursAgo: "{{hours}}h temu",
+      daysAgo: "{{days}}d temu",
     },
     enableSearch: {
       label: "Włącz wyszukiwanie internetowe",

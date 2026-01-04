@@ -5,7 +5,7 @@
 import type { ReadableStreamDefaultController } from "node:stream/web";
 
 import type { JSONValue } from "ai";
-import type { MessageResponseType } from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -52,14 +52,27 @@ export class StreamErrorHandler {
     });
 
     // Create structured error with translation key
-    const structuredError: MessageResponseType = {
-      message: "app.api.agent.chat.aiStream.errors.streamError",
+    const structuredError = fail({
+      message: "app.api.agent.chat.aiStream.errors.streamError" as const,
+      errorType: ErrorResponseTypes.UNKNOWN_ERROR,
       messageParams: { error: errorMessage },
-    };
+    });
 
-    // Create ERROR message in DB/localStorage
-    // Public users (userId undefined) are allowed - helper converts to null
     const errorMessageId = crypto.randomUUID();
+
+    // Emit ERROR message event for UI
+    const errorMessageEvent = createStreamEvent.messageCreated({
+      messageId: errorMessageId,
+      threadId,
+      role: ChatMessageRole.ERROR,
+      content: serializeError(structuredError),
+      parentId: lastParentId,
+      depth: lastDepth,
+      sequenceId: lastSequenceId,
+    });
+    controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
+
+    // Save ERROR message to DB (server mode only - incognito stores in localStorage)
     if (!isIncognito) {
       await createErrorMessage({
         messageId: errorMessageId,
@@ -73,18 +86,6 @@ export class StreamErrorHandler {
         logger,
       });
     }
-
-    // Emit ERROR message event for UI
-    const errorMessageEvent = createStreamEvent.messageCreated({
-      messageId: errorMessageId,
-      threadId,
-      role: ChatMessageRole.ERROR,
-      content: serializeError(structuredError),
-      parentId: lastParentId,
-      depth: lastDepth,
-      sequenceId: lastSequenceId,
-    });
-    controller.enqueue(encoder.encode(formatSSEEvent(errorMessageEvent)));
 
     // Emit error event to update UI state
     const errorEvent = createStreamEvent.error({

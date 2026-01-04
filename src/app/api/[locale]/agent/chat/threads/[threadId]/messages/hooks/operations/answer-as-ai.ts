@@ -104,7 +104,7 @@ export async function answerAsAI(
             toolId: tool.id,
             requiresConfirmation: tool.requiresConfirmation,
           })) ?? null,
-        messageHistory: messageHistory ?? null,
+        messageHistory: messageHistory ?? [],
         attachments: attachments && attachments.length > 0 ? attachments : null,
         toolConfirmations: null,
         voiceMode: null,

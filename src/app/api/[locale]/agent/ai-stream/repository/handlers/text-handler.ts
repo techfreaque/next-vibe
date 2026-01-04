@@ -216,11 +216,6 @@ export class TextHandler {
           error: result.message,
         });
       }
-    } else if (!isIncognito && !initialContent) {
-      logger.debug("Skipping database save for empty ASSISTANT message", {
-        messageId,
-        reason: "Message will be saved when content is added",
-      });
     }
 
     logger.debug("ASSISTANT message created", {

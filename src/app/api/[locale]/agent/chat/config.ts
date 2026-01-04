@@ -8,6 +8,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { aliasToPathMap } from "../../system/generated/endpoint";
 import { SEARCH_ALIAS } from "../brave-search/definition";
+import { FETCH_URL_ALIAS } from "../fetch-url-content/definition";
 import { MEMORY_DELETE_ALIAS, MEMORY_UPDATE_ALIAS } from "./memories/[id]/definition";
 import { MEMORY_ADD_ALIAS, MEMORY_LIST_ALIAS } from "./memories/definition";
 import type { IconValue } from "./model-access/icons";
@@ -189,6 +190,7 @@ export const CHAT_CONSTANTS = {
  */
 export const DEFAULT_TOOL_IDS = [
   aliasToPathMap[SEARCH_ALIAS],
+  aliasToPathMap[FETCH_URL_ALIAS],
   aliasToPathMap[MEMORY_LIST_ALIAS],
   aliasToPathMap[MEMORY_ADD_ALIAS],
   aliasToPathMap[MEMORY_UPDATE_ALIAS],

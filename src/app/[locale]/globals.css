@@ -84,6 +84,17 @@
     font-family: Arial, Helvetica, sans-serif;
   }
 
+  /* STT wave animation for transcribing indicator */
+  @keyframes wave {
+    0%,
+    100% {
+      height: 12px;
+    }
+    50% {
+      height: 24px;
+    }
+  }
+
   /* Custom scrollbar styles for all browsers */
   /* Firefox */
   * {

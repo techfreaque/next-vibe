@@ -1,6 +1,7 @@
 import { translations as creditsTranslations } from "../../../../credits/i18n/de";
 import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/de";
 import { translations as braveSearchTranslations } from "../../../brave-search/i18n/de";
+import { translations as fetchUrlContentTranslations } from "../../../fetch-url-content/i18n/de";
 import { translations as charaktersTranslations } from "../../characters/i18n/de";
 import { translations as favoritesTranslations } from "../../favorites/i18n/de";
 import { translations as filesTranslations } from "../../files/[threadId]/[filename]/i18n/de";
@@ -254,6 +255,14 @@ export const translations: typeof enTranslations = {
     flatView: "Flache Ansicht (4chan-Stil)",
     debugView: "Debug-Ansicht (mit Systemprompts)",
   },
+  flatView: {
+    answerModal: {
+      title: "Als KI-Modell antworten",
+      description: "Generieren Sie eine KI-Antwort, um das Gespräch fortzusetzen",
+      inputPlaceholder: "Optional: Spezifische Anweisungen für die KI-Antwort hinzufügen",
+      confirmLabel: "Antwort generieren",
+    },
+  },
   screenshot: {
     capturing: "Erfassen...",
     capture: "Screenshot aufnehmen",
@@ -310,6 +319,7 @@ export const translations: typeof enTranslations = {
   },
   tools: {
     braveSearch: braveSearchTranslations,
+    fetchUrl: fetchUrlContentTranslations,
   },
   models: {
     descriptions: {

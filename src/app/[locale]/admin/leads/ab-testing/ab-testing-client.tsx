@@ -146,15 +146,7 @@ export function ABTestingClient({ locale }: ABTestingClientProps): JSX.Element {
                     <P>{t("app.admin.leads.leads.admin.abTesting.metrics.trafficAllocation")}</P>
                     <P>{variant.weight.toFixed(1)}%</P>
                   </Div>
-                  <Progress
-                    value={variant.weight}
-                    style={
-                      {
-                        "--progress-background": variant.metadata.color,
-                        height: "8px",
-                      } as React.CSSProperties
-                    }
-                  />
+                  <Progress value={variant.weight} />
                 </Div>
 
                 {/* Variant characteristics */}

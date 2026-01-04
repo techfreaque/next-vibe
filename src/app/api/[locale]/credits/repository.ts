@@ -2463,7 +2463,7 @@ export class CreditRepository {
         return { success: false };
       }
 
-      logger.info(`Credits deducted for ${feature}`, {
+      logger.debug(`Credits deducted for ${feature}`, {
         ...identifier,
         cost,
         messageId: creditMessageId,

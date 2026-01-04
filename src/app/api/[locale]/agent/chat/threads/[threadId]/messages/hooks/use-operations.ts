@@ -426,8 +426,22 @@ export function useMessageOperations(deps: MessageOperationsDeps): MessageOperat
   );
 
   const stopGeneration = useCallback((): void => {
-    logger.debug("Message operations: Stopping generation");
+    logger.debug("Message operations: Stopping generation and TTS playback");
     aiStream.stopStream();
+
+    // Also stop TTS playback if it's playing
+    if (typeof window !== "undefined") {
+      void import("../../../../../ai-stream/hooks/audio-queue")
+        .then(({ getAudioQueue }) => {
+          const audioQueue = getAudioQueue();
+          audioQueue.stop();
+          logger.debug("Message operations: TTS playback stopped");
+          return undefined;
+        })
+        .catch((error) => {
+          logger.error("Message operations: Failed to stop TTS playback", parseError(error));
+        });
+    }
   }, [logger, aiStream]);
 
   return {

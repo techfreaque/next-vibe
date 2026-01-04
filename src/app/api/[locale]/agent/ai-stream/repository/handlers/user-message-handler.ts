@@ -14,7 +14,6 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 
-import type { ChatMessage } from "../../../chat/db";
 import type { ChatMessageRole } from "../../../chat/enum";
 import { createUserMessage } from "../../../chat/threads/[threadId]/messages/repository";
 import { FileAttachmentHandler } from "./file-attachment-handler";
@@ -28,7 +27,6 @@ export class UserMessageHandler {
     operation: "send" | "retry" | "edit" | "answer-as-ai";
     hasToolConfirmations: boolean;
     isIncognito: boolean;
-    messageHistory?: ChatMessage[];
     threadId: string;
     effectiveRole: ChatMessageRole;
     effectiveContent: string;
@@ -66,7 +64,6 @@ export class UserMessageHandler {
       operation,
       hasToolConfirmations,
       isIncognito,
-      messageHistory,
       threadId,
       effectiveRole,
       effectiveContent,
@@ -101,19 +98,8 @@ export class UserMessageHandler {
       threadId,
     });
 
-    // For incognito mode with messageHistory, user message is already created client-side
-    // Skip server-side message creation to avoid duplicates
-    if (isIncognito && messageHistory) {
-      logger.debug("[Setup] ✅ SKIPPING user message creation for incognito with messageHistory", {
-        messageId: userMessageId,
-        operation,
-        messageHistoryLength: messageHistory.length,
-      });
-      return {
-        success: true,
-        data: { userMessageId },
-      };
-    }
+    // User message should NOT be in messageHistory for incognito - client creates it with loading state
+    // Both modes: API processes voice/attachments and emits events to update the loading message
 
     // At this point, userMessageId should not be null
     if (!userMessageId) {
@@ -149,18 +135,20 @@ export class UserMessageHandler {
       data?: string;
     }> = [];
 
-    if (!isIncognito && attachments && attachments.length > 0) {
-      logger.debug("[File Processing] Uploading file attachments to storage", {
+    // Process attachments (both modes)
+    if (attachments && attachments.length > 0) {
+      logger.debug("[File Processing] Processing file attachments", {
         fileCount: attachments.length,
+        isIncognito,
       });
 
-      // Convert to base64 immediately for AI (like incognito mode)
+      // Convert to base64 immediately for AI (both modes)
       attachmentMetadata = await Promise.all(
         attachments.map(async (file) => {
           const buffer = Buffer.from(await file.arrayBuffer());
           return {
-            id: "", // Will be updated after upload
-            url: "", // Will be updated after upload
+            id: "", // Will be updated after upload for server mode
+            url: "", // Will be updated after upload for server mode
             filename: file.name,
             mimeType: file.type,
             size: file.size,
@@ -169,53 +157,58 @@ export class UserMessageHandler {
         }),
       );
 
-      // Upload to storage in background and capture promise for SSE event emission
-      fileUploadPromise = FileAttachmentHandler.processFileAttachments({
-        attachments,
-        threadId,
-        userMessageId,
-        userId,
-        logger,
-      }).then(async (result) => {
-        if (result.success) {
-          // Update message with permanent URLs only (no base64 in DB)
-          await FileAttachmentHandler.updateMessageWithAttachments({
-            userMessageId,
-            attachments: result.data,
-            logger,
-          });
+      // Server mode: Upload to storage in background
+      if (!isIncognito) {
+        fileUploadPromise = FileAttachmentHandler.processFileAttachments({
+          attachments,
+          threadId,
+          userMessageId,
+          userId,
+          logger,
+        }).then(async (result) => {
+          if (result.success) {
+            // Update message with permanent URLs only (no base64 in DB)
+            await FileAttachmentHandler.updateMessageWithAttachments({
+              userMessageId,
+              attachments: result.data,
+              logger,
+            });
 
-          return {
-            success: true,
-            userMessageId,
-            attachments: result.data,
-          };
-        } else {
-          logger.error("[File Processing] Failed to upload attachments to storage", {
-            messageId: userMessageId,
-            errorMessage: result.message,
-          });
+            return {
+              success: true,
+              userMessageId,
+              attachments: result.data,
+            };
+          } else {
+            logger.error("[File Processing] Failed to upload attachments to storage", {
+              messageId: userMessageId,
+              errorMessage: result.message,
+            });
 
-          return {
-            success: false,
-            userMessageId,
-          };
-        }
-      });
+            return {
+              success: false,
+              userMessageId,
+            };
+          }
+        });
+      }
     }
 
-    await createUserMessage({
-      messageId: userMessageId,
-      threadId,
-      role: effectiveRole,
-      content: effectiveContent,
-      parentId: effectiveParentMessageId ?? null,
-      depth: messageDepth,
-      userId,
-      authorName,
-      logger,
-      attachments: attachmentMetadata.length > 0 ? attachmentMetadata : undefined,
-    });
+    // Create user message in DB (server mode only - incognito stores in localStorage)
+    if (!isIncognito) {
+      await createUserMessage({
+        messageId: userMessageId,
+        threadId,
+        role: effectiveRole,
+        content: effectiveContent,
+        parentId: effectiveParentMessageId ?? null,
+        depth: messageDepth,
+        userId,
+        authorName,
+        logger,
+        attachments: attachmentMetadata.length > 0 ? attachmentMetadata : undefined,
+      });
+    }
 
     return success({
       userMessageId,

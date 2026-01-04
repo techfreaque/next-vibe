@@ -4,6 +4,7 @@ import { translations as searchTranslations } from "../../search/i18n/en";
 
 export const translations = {
   ...searchTranslations,
+  transcribing: "Transcribing audio...",
   get: {
     title: "List Thread Messages",
     description: "Retrieve all messages in a chat thread",

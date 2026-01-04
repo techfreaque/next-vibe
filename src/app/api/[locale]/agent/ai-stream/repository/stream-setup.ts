@@ -29,15 +29,13 @@ import { DEFAULT_TTS_VOICE, type TtsVoiceValue } from "../../text-to-speech/enum
 import { type AiStreamPostRequestOutput } from "../definition";
 import { AbortControllerSetup } from "./core/abort-controller-setup";
 import { CreditValidatorHandler } from "./core/credit-validator-handler";
-import type { ProviderFactory } from "./core/provider-factory";
 import { ProviderFactory as ProviderFactoryClass } from "./core/provider-factory";
 import { ToolsSetupHandler } from "./core/tools-setup-handler";
 import { MessagePreparationHandler } from "./handlers/message-preparation-handler";
 import { OperationHandler } from "./handlers/operation-handler";
 import { ToolConfirmationProcessor } from "./handlers/tool-confirmation-processor";
 import { UserMessageHandler } from "./handlers/user-message-handler";
-import { UserMessageMetadataHandler } from "./handlers/user-message-metadata-handler";
-import { buildSystemPrompt } from "./sytem-prompt/system-prompt-builder";
+import { buildSystemPrompt } from "./system-prompt/builder";
 
 export interface StreamSetupResult {
   userId: string | undefined;
@@ -165,7 +163,6 @@ export async function setupAiStream(params: {
       toolConfirmations: data.toolConfirmations,
       messageHistory: data.messageHistory ?? undefined,
       isIncognito,
-      userId,
       locale,
       logger,
       user,
@@ -288,7 +285,6 @@ export async function setupAiStream(params: {
     operation: data.operation,
     hasToolConfirmations,
     isIncognito,
-    messageHistory: data.messageHistory ?? undefined,
     threadId: threadResult.threadId,
     effectiveRole,
     effectiveContent,
@@ -308,20 +304,15 @@ export async function setupAiStream(params: {
     fileUploadPromise = userMessageResult.data.fileUploadPromise;
   }
 
-  // Extract user message metadata (for both incognito and server mode)
-  const userMessageMetadata = await UserMessageMetadataHandler.extractMetadata({
-    isIncognito,
-    attachments: data.attachments ?? undefined,
-    messageHistory: data.messageHistory ?? undefined,
-    userMessageId,
-    logger,
-    operation: data.operation,
-  });
+  // Use attachment metadata from user message handler
+  const userMessageMetadata = userMessageResult.data.attachmentMetadata
+    ? { attachments: userMessageResult.data.attachmentMetadata }
+    : undefined;
 
   // Build complete system prompt from character and formatting instructions
   const systemPrompt = await buildSystemPrompt({
     characterId: data.character,
-    userId,
+    user,
     logger,
     t,
     locale,

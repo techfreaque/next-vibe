@@ -92,7 +92,7 @@ class CreditValidator implements CreditValidatorInterface {
       const balance = balanceResult.data.total;
       const hasCredits = balance >= cost;
 
-      logger.info("Validated user credits", {
+      logger.debug("Validated user credits", {
         userId,
         modelId,
         cost,

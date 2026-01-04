@@ -6,13 +6,16 @@ import "server-only";
 
 import type { ModelMessage } from "ai";
 
+import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import { parseError } from "@/app/api/[locale]/shared/utils";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
-import { createMetadataSystemMessage } from "../sytem-prompt/message-metadata-generator";
+import { createMetadataSystemMessage } from "../system-prompt/message-metadata";
 
 export class MessageConverter {
   /**
@@ -32,6 +35,7 @@ export class MessageConverter {
    */
   static async toAiSdkMessage(
     message: ChatMessage | { role: ChatMessageRole; content: string },
+    logger: EndpointLogger,
   ): Promise<ModelMessage | ModelMessage[] | null> {
     switch (message.role) {
       case ChatMessageRole.USER: {
@@ -50,25 +54,6 @@ export class MessageConverter {
             contentParts.push({ type: "text", text: message.content });
           }
 
-          // DEBUG: Log attachment processing
-          // oxlint-disable-next-line no-console
-          console.error("=== PROCESSING USER MESSAGE WITH ATTACHMENTS ===");
-          // oxlint-disable-next-line no-console
-          console.error("Attachment count:", message.metadata.attachments.length);
-          // oxlint-disable-next-line no-console
-          console.error(
-            "Attachments:",
-            JSON.stringify(
-              message.metadata.attachments.map((a) => ({
-                filename: a.filename,
-                mimeType: a.mimeType,
-                hasData: "data" in a && !!a.data,
-                hasUrl: !!a.url,
-                dataLength: "data" in a && a.data ? a.data.length : 0,
-              })),
-            ),
-          );
-
           // Add attachments
           for (const attachment of message.metadata.attachments) {
             // Get base64 data - either from attachment.data or from URL
@@ -80,25 +65,17 @@ export class MessageConverter {
             } else if (attachment.url) {
               // Message from history: fetch from URL and convert to base64
               try {
-                // oxlint-disable-next-line no-console
-                console.error("Fetching attachment from URL for AI context:", attachment.url);
                 const response = await fetch(attachment.url);
                 if (response.ok) {
                   const buffer = await response.arrayBuffer();
                   base64Data = Buffer.from(buffer).toString("base64");
-                  // oxlint-disable-next-line no-console
-                  console.error("Successfully fetched and converted attachment to base64");
-                } else {
-                  // oxlint-disable-next-line no-console
-                  console.error(
-                    "Failed to fetch attachment:",
-                    response.status,
-                    response.statusText,
-                  );
                 }
               } catch (error) {
-                // oxlint-disable-next-line no-console
-                console.error("Error fetching attachment from URL:", error);
+                logger.error("[MessageConverter] Failed to fetch attachment for AI context", {
+                  attachmentId: attachment.id,
+                  filename: attachment.filename,
+                  error: parseError(error),
+                });
               }
             }
 
@@ -109,8 +86,6 @@ export class MessageConverter {
                   type: "image",
                   image: `data:${attachment.mimeType};base64,${base64Data}`,
                 });
-                // oxlint-disable-next-line no-console
-                console.error("Added image part:", attachment.filename);
               } else if (
                 attachment.mimeType.startsWith("text/") ||
                 attachment.mimeType === "application/json" ||
@@ -123,32 +98,19 @@ export class MessageConverter {
                     type: "text",
                     text: `\n\n[File: ${attachment.filename}]\n${decoded}\n[End of file]`,
                   });
-                  // oxlint-disable-next-line no-console
-                  console.error("Added text file as text part:", attachment.filename);
                 } catch (error) {
-                  // oxlint-disable-next-line no-console
-                  console.error("Failed to decode text attachment:", attachment.filename, error);
+                  logger.error(
+                    "[MessageConverter] Failed to decode attachment for AI context",
+                    parseError(error),
+                    {
+                      attachmentId: attachment.id,
+                      filename: attachment.filename,
+                    },
+                  );
                 }
               }
             }
           }
-
-          // oxlint-disable-next-line no-console
-          console.error("Final content parts:", contentParts.length, "parts");
-          // oxlint-disable-next-line no-console
-          console.error(
-            "Content parts structure:",
-            JSON.stringify(
-              contentParts.map((p) => ({
-                type: p.type,
-                ...(p.type === "text"
-                  ? { text: p.text }
-                  : {
-                      imageLength: typeof p.image === "string" ? p.image.length : "URL",
-                    }),
-              })),
-            ),
-          );
 
           return { content: contentParts, role: "user" };
         }
@@ -174,17 +136,12 @@ export class MessageConverter {
             // Tool has been executed - return BOTH messages for AI SDK
             // Message 1: ASSISTANT message with tool-call (the request)
             // Message 2: TOOL message with tool-result (the response)
-            // Translate error messages for AI (using default locale for consistency)
+
+            // Translate error messages recursively for AI (using default locale for consistency)
             const output = toolCall.error
               ? {
                   type: "error-text" as const,
-                  value:
-                    toolCall.error.message === "app.api.agent.chat.aiStream.errors.userDeclinedTool"
-                      ? simpleT(defaultLocale).t(toolCall.error.message)
-                      : JSON.stringify({
-                          message: toolCall.error.message,
-                          params: toolCall.error.messageParams,
-                        }),
+                  value: MessageConverter.translateErrorRecursive(toolCall.error),
                 }
               : { type: "json" as const, value: toolCall.result ?? null };
 
@@ -230,9 +187,37 @@ export class MessageConverter {
           }
         }
         // Skip TOOL messages without toolCall metadata
+        logger.error("[MessageConverter] TOOL message without toolCall metadata", {
+          messageId: MessageConverter.isChatMessage(message) ? message.id : "unknown",
+        });
         return null;
-      case ChatMessageRole.ERROR:
-        return { content: message.content ?? "", role: "assistant" };
+      case ChatMessageRole.ERROR: {
+        // ERROR messages contain serialized MessageResponseType
+        if (!message.content) {
+          return {
+            content: "",
+            role: "assistant",
+          };
+        }
+
+        try {
+          const errorData = JSON.parse(message.content) as ErrorResponseType;
+
+          return {
+            content: MessageConverter.translateErrorRecursive(errorData),
+            role: "assistant",
+          };
+        } catch (error) {
+          logger.error("[MessageConverter] Failed to deserialize error message", {
+            error: parseError(error),
+            content: message.content,
+          });
+          return {
+            content: message.content,
+            role: "assistant",
+          };
+        }
+      }
     }
   }
 
@@ -241,6 +226,7 @@ export class MessageConverter {
    */
   static async toAiSdkMessages(
     messages: ChatMessage[],
+    logger: EndpointLogger,
     rootFolderId?: DefaultFolderId,
     upcomingResponseContext?: { model: string; character: string | null },
   ): Promise<ModelMessage[]> {
@@ -264,7 +250,7 @@ export class MessageConverter {
 
       // Convert and add the actual message
       // toAiSdkMessage can return a single message, an array of messages, or null
-      const converted = await MessageConverter.toAiSdkMessage(msg);
+      const converted = await MessageConverter.toAiSdkMessage(msg, logger);
       if (converted !== null) {
         // If it's an array, flatten it into the result
         if (Array.isArray(converted)) {
@@ -291,5 +277,19 @@ export class MessageConverter {
     }
 
     return result;
+  }
+  /**
+   * Recursively translate error messages including nested causes
+   */
+  private static translateErrorRecursive(error: ErrorResponseType): string {
+    const { t } = simpleT(defaultLocale);
+    const mainMessage = t(error.message, error.messageParams);
+
+    if (error.cause) {
+      const causeMessage = MessageConverter.translateErrorRecursive(error.cause);
+      return `${mainMessage}\n\nCause: ${causeMessage}`;
+    }
+
+    return mainMessage;
   }
 }

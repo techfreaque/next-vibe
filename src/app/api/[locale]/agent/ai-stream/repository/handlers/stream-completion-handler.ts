@@ -88,10 +88,10 @@ export class StreamCompletionHandler {
     // Flush TTS handler to emit any remaining audio
     if (ttsHandler) {
       await ttsHandler.flush();
-      logger.info("[AI Stream] TTS handler flushed");
+      logger.debug("[AI Stream] TTS handler flushed");
     }
 
-    logger.info("[AI Stream] Stream completed", {
+    logger.debug("[AI Stream] Stream completed", {
       totalTokens: usage.totalTokens,
     });
 
