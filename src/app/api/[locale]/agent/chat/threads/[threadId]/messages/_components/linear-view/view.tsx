@@ -23,7 +23,7 @@ import {
   chatShadows,
   chatTransitions,
 } from "@/app/[locale]/chat/lib/design-tokens";
-import { createMetadataSystemMessage } from "@/app/api/[locale]/agent/ai-stream/message-metadata-generator";
+import { createMetadataSystemMessage } from "@/app/api/[locale]/agent/ai-stream/repository/sytem-prompt/message-metadata-generator";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole, ViewMode } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";

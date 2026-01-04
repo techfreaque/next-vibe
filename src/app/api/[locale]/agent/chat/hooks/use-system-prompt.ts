@@ -2,10 +2,10 @@
 
 import { useMemo } from "react";
 
-import { generateClientSystemPrompt } from "@/app/api/[locale]/agent/ai-stream/system-prompt-generator";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { generateClientSystemPrompt } from "../../ai-stream/repository/sytem-prompt/system-prompt-generator";
 import type { DefaultFolderId } from "../config";
 
 /**

@@ -35,7 +35,7 @@ export const FRESHNESS_API_MAP: Record<string, string> = {
   past_month: "pm",
   past_year: "py",
 };
-export const SEARCH_ALIAS = "search" as const;
+export const SEARCH_ALIAS = "web-search" as const;
 
 /**
  * GET /brave-search - Search the web
@@ -54,7 +54,7 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   // CLI alias for better UX
-  aliases: ["search"] as const,
+  aliases: [SEARCH_ALIAS, "search"] as const,
   cli: {
     firstCliArgKey: "query",
   },

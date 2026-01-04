@@ -577,6 +577,9 @@ export type AiStreamPostRequestOutput = typeof POST.types.RequestOutput;
 export type AiStreamPostResponseInput = typeof POST.types.ResponseInput;
 export type AiStreamPostResponseOutput = typeof POST.types.ResponseOutput;
 
+// Extract operation type for type-safe usage
+export type AiStreamOperation = AiStreamPostRequestOutput["operation"];
+
 /**
  * Export definitions
  */

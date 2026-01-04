@@ -9,7 +9,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { aiStreamRepository } from "./repository";
+import { AiStreamRepository } from "./repository";
 
 /**
  * POST handler for AI streaming
@@ -18,7 +18,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: async ({ data, t, locale, logger, user, request }) => {
-      return await aiStreamRepository.createAiStream({
+      return await AiStreamRepository.createAiStream({
         data,
         t,
         locale,
