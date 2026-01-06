@@ -34,6 +34,7 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
     UserRole.MCP_OFF,
     UserRole.PRODUCTION_OFF,
+    UserRole.CLI_AUTH_BYPASS,
   ],
   aliases: ["generate-all", "gen", "generate"],
 
