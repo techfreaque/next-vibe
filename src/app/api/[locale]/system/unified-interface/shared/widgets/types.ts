@@ -8,10 +8,6 @@ import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
 import type { IconKey } from "../../react/icons";
-import type {
-  CancelButtonConfig,
-  SubmitButtonConfig,
-} from "../../react/widgets/renderers/EndpointRenderer";
 import type { CreateApiEndpointAny, UnifiedField } from "../types/endpoint";
 import type { Platform } from "../types/platform";
 import type { ExtractWidgetConfig } from "./configs";
@@ -176,8 +172,6 @@ export interface ReactWidgetProps<
   onCancel?: () => void;
   isSubmitting?: boolean;
   endpoint: CreateApiEndpointAny;
-  submitButton?: SubmitButtonConfig;
-  cancelButton?: CancelButtonConfig;
 }
 
 /**
@@ -201,8 +195,7 @@ export type ReactWidgetPropsMap<TKey extends string> = {
 /**
  * Union of all React widget props.
  */
-export type ReactWidgetPropsUnion<TKey extends string> =
-  ReactWidgetPropsMap<TKey>[WidgetType];
+export type ReactWidgetPropsUnion<TKey extends string> = ReactWidgetPropsMap<TKey>[WidgetType];
 
 export type WidgetRenderer<TKey extends string> = (
   props: WidgetComponentProps<TKey>,
@@ -210,9 +203,7 @@ export type WidgetRenderer<TKey extends string> = (
 
 export interface WidgetRegistryEntry<TKey extends string> {
   type: WidgetType;
-  component:
-    | React.ComponentType<WidgetComponentProps<TKey>>
-    | WidgetRenderer<TKey>;
+  component: React.ComponentType<WidgetComponentProps<TKey>> | WidgetRenderer<TKey>;
   platforms?: Array<
     | typeof Platform.TRPC
     | typeof Platform.NEXT_PAGE

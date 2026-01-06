@@ -29,7 +29,6 @@ import { default as endpointDefinition_POST_16 } from "../generators/endpoint/de
 import { default as endpointDefinition_POST_17 } from "../generators/route-handlers/definition";
 import { default as endpointDefinition_POST_18 } from "../generators/endpoints/definition";
 import { default as endpointDefinition_POST_19 } from "../generators/endpoints-index/definition";
-import { default as endpointDefinition_POST_20 } from "../generators/email-templates/definition";
 
 /**
  * Singleton instance for endpoints registry
@@ -45,16 +44,8 @@ function initializeEndpoints(): Record<string, ApiSection> {
   }
 
   const endpoints: Record<string, ApiSection> = {};
-  setNestedPath(
-    endpoints,
-    ["system", "help", "POST"],
-    endpointDefinition_POST_0.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["system", "help", "list", "POST"],
-    endpointDefinition_POST_1.POST,
-  );
+  setNestedPath(endpoints, ["system", "help", "POST"], endpointDefinition_POST_0.POST);
+  setNestedPath(endpoints, ["system", "help", "list", "POST"], endpointDefinition_POST_1.POST);
   setNestedPath(
     endpoints,
     ["system", "help", "interactive", "POST"],
@@ -95,31 +86,15 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["system", "check", "typecheck", "POST"],
     endpointDefinition_POST_9.POST,
   );
-  setNestedPath(
-    endpoints,
-    ["system", "check", "lint", "POST"],
-    endpointDefinition_POST_10.POST,
-  );
+  setNestedPath(endpoints, ["system", "check", "lint", "POST"], endpointDefinition_POST_10.POST);
   setNestedPath(
     endpoints,
     ["system", "check", "config", "create", "POST"],
     endpointDefinition_POST_11.POST,
   );
-  setNestedPath(
-    endpoints,
-    ["system", "check", "oxlint", "POST"],
-    endpointDefinition_POST_12.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["system", "release-tool", "POST"],
-    endpointDefinition_POST_13.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["system", "builder", "POST"],
-    endpointDefinition_POST_14.POST,
-  );
+  setNestedPath(endpoints, ["system", "check", "oxlint", "POST"], endpointDefinition_POST_12.POST);
+  setNestedPath(endpoints, ["system", "release-tool", "POST"], endpointDefinition_POST_13.POST);
+  setNestedPath(endpoints, ["system", "builder", "POST"], endpointDefinition_POST_14.POST);
   setNestedPath(
     endpoints,
     ["system", "generators", "generate-all", "POST"],
@@ -144,11 +119,6 @@ function initializeEndpoints(): Record<string, ApiSection> {
     endpoints,
     ["system", "generators", "endpoints-index", "POST"],
     endpointDefinition_POST_19.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["system", "generators", "email-templates", "POST"],
-    endpointDefinition_POST_20.POST,
   );
 
   endpointsInstance = endpoints;

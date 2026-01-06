@@ -3,13 +3,13 @@
   "version": "1.0.36",
   "description": "TypeScript code quality checker with CLI and MCP support",
   "keywords": [
-    "cli",
-    "typescript",
-    "react",
-    "nextjs",
     "api",
+    "cli",
+    "framework",
     "fullstack",
-    "framework"
+    "nextjs",
+    "react",
+    "typescript"
   ],
   "homepage": "https://github.com/techfreaque/next-vibe/tree/vibe-check#readme",
   "bugs": {
@@ -53,8 +53,8 @@
     "directory": "vibe-check"
   },
   "bin": {
-    "vibe": ".dist/bin/vibe-runtime.js",
-    "v": ".dist/bin/vibe-runtime.js"
+    "v": ".dist/bin/vibe-runtime.js",
+    "vibe": ".dist/bin/vibe-runtime.js"
   },
   "workspaces": [
     "src/app/api/*/system/guard",
@@ -65,8 +65,8 @@
     "check.config.ts",
     ".dist/**/*",
     "src/app/**/*",
-    "src/i18n/**/*",
-    "src/config/**/*"
+    "src/config/**/*",
+    "src/i18n/**/*"
   ],
   "type": "module",
   "main": "./.dist/bin/vibe-runtime.js",

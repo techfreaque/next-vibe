@@ -170,36 +170,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorsSkipped++;
 
       // 5. Email Templates Generator
-      generatorPromises.push(
-        (async (): Promise<string | null> => {
-          try {
-            outputLines.push("📧 Generating email templates registry...");
-            const { emailTemplateGeneratorRepository } =
-              await import("../email-templates/repository");
-
-            const result = await emailTemplateGeneratorRepository.generateEmailTemplates(
-              {
-                outputFile: "src/app/api/[locale]/emails/registry/generated.ts",
-                dryRun: false,
-              },
-              logger,
-            );
-
-            if (result.success) {
-              outputLines.push("✅ Email templates registry generated successfully");
-              generatorsRun++;
-              return "email-templates";
-            }
-            outputLines.push(
-              `❌ Email templates generation failed: ${result.message || "Unknown error"}`,
-            );
-            return null;
-          } catch (error) {
-            outputLines.push(`❌ Email templates generator failed: ${parseError(error).message}`);
-            return null;
-          }
-        })(),
-      );
+      generatorsSkipped++;
 
       // Wait for all generators to complete
       const results = await Promise.allSettled(generatorPromises);

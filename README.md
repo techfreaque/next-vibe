@@ -25,19 +25,19 @@ Times vary by project size and cache state. **tsgo is enabled by default** (2-3x
 
 - With cache: 1.1s total (Oxlint: 0.48s, ESLint: 1.06s, TypeScript: 0.20s)
 - Without cache: 1.1s total (Oxlint: 0.48s, ESLint: 1.06s, TypeScript: 0.20s)
-- *With tsc: 1.1s cached / 1.5s uncached*
+- **With tsc: 1.1s cached / 1.5s uncached**
 
 **Medium project:**
 
 - With cache: 2.8s total (Oxlint: 2.55s, ESLint: 2.76s, TypeScript: 0.62s)
 - Without cache: 5.9s total (Oxlint: 3.17s, ESLint: 4.37s, TypeScript: 5.81s)
-- *With tsc: 12.5s cached / 13.9s uncached*
+- **With tsc: 12.5s cached / 13.9s uncached**
 
 **Large project:**
 
 - With cache: 9.8s total (Oxlint: 9.80s, ESLint: 3.71s, TypeScript: 3.83s)
 - Without cache: 51.3s total (Oxlint: 16.76s, ESLint: 23.87s, TypeScript: 51.30s)
-- *With tsc: 12.7s cached / 72.9s uncached*
+- **With tsc: 12.7s cached / 72.9s uncached**
 
 **Key insights:**
 
@@ -178,26 +178,26 @@ import type { CheckConfig } from "@next-vibe/checker/system/check/config/types";
 
 const config: CheckConfig = {
   vibeCheck: {
-    fix: true,              // Auto-fix (default: true)
-    limit: 200,             // Max issues to display
-    timeout: 3600,          // Max execution time (seconds)
+    fix: true, // Auto-fix (default: true)
+    limit: 200, // Max issues to display
+    timeout: 3600, // Max execution time (seconds)
   },
 
   oxlint: {
     enabled: true,
     configPath: ".tmp/.oxlintrc.json",
-    cachePath: ".tmp/oxlint-cache",  // Enable caching
+    cachePath: ".tmp/oxlint-cache", // Enable caching
   },
 
   eslint: {
     enabled: true,
     configPath: ".tmp/eslint.config.mjs",
-    cachePath: ".tmp/eslint-cache",  // Enable caching
+    cachePath: ".tmp/eslint-cache", // Enable caching
   },
 
   typecheck: {
     enabled: true,
-    useTsgo: true,  // 2-3x faster than tsc
+    useTsgo: true, // 2-3x faster than tsc
   },
 };
 
@@ -309,7 +309,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
       - run: npm install
-      - run: npm run check  # Uses "v c" script from package.json
+      - run: npm run check # Uses "v c" script from package.json
 ```
 
 ### GitLab CI
@@ -319,7 +319,7 @@ check:
   image: node:18
   script:
     - npm install
-    - npm run check  # Uses "v c" script from package.json
+    - npm run check # Uses "v c" script from package.json
 ```
 
 **Note:** If you didn't add package.json scripts during `config-create`, use `npx @next-vibe/checker check` directly in CI.

@@ -13,13 +13,7 @@
  */
 
 import { execSync } from "node:child_process";
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  renameSync,
-  writeFileSync,
-} from "node:fs";
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import { parseError } from "@/app/api/[locale]/shared/utils";
@@ -568,10 +562,7 @@ function cleanupI18nImports(logger: EndpointLogger): void {
       // Only remove simple top-level exports (key: value,)
       // This regex only matches if it's followed by a comma or closing brace
       // and it's not inside a nested object
-      const simpleExportRegex = new RegExp(
-        `^\\s*${page}:\\s*\\w+Translations,?\\s*$`,
-        "gm",
-      );
+      const simpleExportRegex = new RegExp(`^\\s*${page}:\\s*\\w+Translations,?\\s*$`, "gm");
       if (simpleExportRegex.test(content)) {
         content = content.replace(simpleExportRegex, "");
         modified = true;
@@ -644,8 +635,7 @@ function cleanupDependencies(logger: EndpointLogger, manifest: Manifest): void {
 
   const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
   const originalDepsCount =
-    Object.keys(pkg.dependencies || {}).length +
-    Object.keys(pkg.devDependencies || {}).length;
+    Object.keys(pkg.dependencies || {}).length + Object.keys(pkg.devDependencies || {}).length;
 
   // Remove dependencies
   let removedCount = 0;
@@ -714,8 +704,7 @@ function cleanupDependencies(logger: EndpointLogger, manifest: Manifest): void {
   writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
 
   const newDepsCount =
-    Object.keys(pkg.dependencies || {}).length +
-    Object.keys(pkg.devDependencies || {}).length;
+    Object.keys(pkg.dependencies || {}).length + Object.keys(pkg.devDependencies || {}).length;
 
   logger.debug(
     `\n✅ Removed ${removedCount} dependencies (${originalDepsCount} → ${newDepsCount})\n`,
@@ -746,11 +735,7 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
   logger.debug("  ✓ Patched env-client.ts");
 
   // 3. Patch i18n files - remove packages imports
-  const i18nRootFiles = [
-    "src/i18n/de/index.ts",
-    "src/i18n/en/index.ts",
-    "src/i18n/pl/index.ts",
-  ];
+  const i18nRootFiles = ["src/i18n/de/index.ts", "src/i18n/en/index.ts", "src/i18n/pl/index.ts"];
 
   for (const file of i18nRootFiles) {
     const fullPath = join(PROJECT_ROOT, file);
@@ -859,10 +844,7 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
       /import \* as creditSchema from "\.\.\/\.\.\/credits\/db";\n/,
       "",
     );
-    dbContent = dbContent.replace(
-      /import \* as leadsSchema from "\.\.\/\.\.\/leads\/db";\n/,
-      "",
-    );
+    dbContent = dbContent.replace(/import \* as leadsSchema from "\.\.\/\.\.\/leads\/db";\n/, "");
     dbContent = dbContent.replace(
       /import \* as referralSchema from "\.\.\/\.\.\/referral\/db";\n/,
       "",
@@ -933,8 +915,7 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
   }
 
   // 6. Patch cli-user.ts - remove lead creation
-  const cliUserPath =
-    "src/app/api/[locale]/system/unified-interface/cli/auth/cli-user.ts";
+  const cliUserPath = "src/app/api/[locale]/system/unified-interface/cli/auth/cli-user.ts";
   if (existsSync(cliUserPath)) {
     let cliUserContent = readFileSync(cliUserPath, "utf-8");
 
@@ -1072,16 +1053,10 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
     );
 
     // Replace leadId usage with z.string().uuid()
-    meDefContent = meDefContent.replace(
-      /leadId,(\s+)/g,
-      "z.string().uuid(),$1",
-    );
+    meDefContent = meDefContent.replace(/leadId,(\s+)/g, "z.string().uuid(),$1");
 
     // Replace leadId.nullable() with z.string().uuid().nullable()
-    meDefContent = meDefContent.replace(
-      /leadId\.nullable\(\),/g,
-      "z.string().uuid().nullable(),",
-    );
+    meDefContent = meDefContent.replace(/leadId\.nullable\(\),/g, "z.string().uuid().nullable(),");
 
     writeFileSync(meDefinitionPath, meDefContent);
     logger.debug("  ✓ Patched user/private/me/definition.ts");
@@ -1099,10 +1074,7 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
     );
 
     // Replace leadId usage with z.string().uuid()
-    userTypesContent = userTypesContent.replace(
-      /\bleadId,/g,
-      "leadId: z.string().uuid(),",
-    );
+    userTypesContent = userTypesContent.replace(/\bleadId,/g, "leadId: z.string().uuid(),");
 
     writeFileSync(userTypesPath, userTypesContent);
     logger.debug("  ✓ Patched user/types.ts");
@@ -1171,10 +1143,7 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
     // Remove from exports
     content = content.replace(/env: envTranslations,\s*/g, "");
     content = content.replace(/seeds: seedsTranslations,\s*/g, "");
-    content = content.replace(
-      /generateTrpcRouter: generateTrpcRouterTranslations,\s*/g,
-      "",
-    );
+    content = content.replace(/generateTrpcRouter: generateTrpcRouterTranslations,\s*/g, "");
     content = content.replace(/taskIndex: taskIndexTranslations,\s*/g, "");
 
     writeFileSync(file, content);
@@ -1264,30 +1233,17 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
     let content = readFileSync(authRepoFile, "utf-8");
 
     // Remove lead-related imports
-    content = content.replace(
-      /import.*from ['"]next-vibe-ui\/lib\/redirect['"];?\n/g,
-      "",
-    );
-    content = content.replace(
-      /import.*from ['"]\.\.\/.\.\/leads\/auth\/repository['"];?\n/g,
-      "",
-    );
-    content = content.replace(
-      /import.*from ['"]\.\.\/.\.\/leads\/db['"];?\n/g,
-      "",
-    );
-    content = content.replace(
-      /import.*from ['"]\.\.\/.\.\/leads\/enum['"];?\n/g,
-      "",
-    );
+    content = content.replace(/import.*from ['"]next-vibe-ui\/lib\/redirect['"];?\n/g, "");
+    content = content.replace(/import.*from ['"]\.\.\/.\.\/leads\/auth\/repository['"];?\n/g, "");
+    content = content.replace(/import.*from ['"]\.\.\/.\.\/leads\/db['"];?\n/g, "");
+    content = content.replace(/import.*from ['"]\.\.\/.\.\/leads\/enum['"];?\n/g, "");
 
     writeFileSync(authRepoFile, content);
   }
   logger.debug("  ✓ Patched user/auth/repository.ts");
 
   // 18. Patch trpc router.ts - comment out deleted imports
-  const trpcRouterFile =
-    "src/app/api/[locale]/system/unified-interface/trpc/[...trpc]/router.ts";
+  const trpcRouterFile = "src/app/api/[locale]/system/unified-interface/trpc/[...trpc]/router.ts";
   if (existsSync(trpcRouterFile)) {
     let routerContent = readFileSync(trpcRouterFile, "utf-8");
 
@@ -1311,16 +1267,10 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
   if (existsSync(fieldConfigFile)) {
     let content = readFileSync(fieldConfigFile, "utf-8");
     // First, clean up any broken nested comments from previous runs
-    content = content.replace(
-      /any \/\* any \/\* UseFormReturn \*\/ \*\//g,
-      "any",
-    );
+    content = content.replace(/any \/\* any \/\* UseFormReturn \*\/ \*\//g, "any");
     content = content.replace(/any \/\* UseFormReturn \*\/ *<[^>]*>/g, "any");
     // Comment out import if not already commented
-    if (
-      !content.includes("// import") ||
-      !content.includes("react-hook-form")
-    ) {
+    if (!content.includes("// import") || !content.includes("react-hook-form")) {
       content = content.replace(
         /import.*from ['"]react-hook-form['"];/g,
         "// $& // Removed for minimal checker",
@@ -1338,21 +1288,14 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
     writeFileSync(fieldConfigFile, content);
   }
 
-  const widgetsTypesFile =
-    "src/app/api/[locale]/system/unified-interface/shared/widgets/types.ts";
+  const widgetsTypesFile = "src/app/api/[locale]/system/unified-interface/shared/widgets/types.ts";
   if (existsSync(widgetsTypesFile)) {
     let content = readFileSync(widgetsTypesFile, "utf-8");
     // First, clean up any broken nested comments from previous runs
-    content = content.replace(
-      /any \/\* any \/\* UseFormReturn \*\/ \*\//g,
-      "any",
-    );
+    content = content.replace(/any \/\* any \/\* UseFormReturn \*\/ \*\//g, "any");
     content = content.replace(/any \/\* UseFormReturn \*\/ *<[^>]*>/g, "any");
     // Comment out import if not already commented
-    if (
-      !content.includes("// import") ||
-      !content.includes("react-hook-form")
-    ) {
+    if (!content.includes("// import") || !content.includes("react-hook-form")) {
       content = content.replace(
         /import.*from ['"]react-hook-form['"];/g,
         "// $& // Removed for minimal checker",
@@ -1414,18 +1357,14 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
     if (existsSync(testFile)) {
       let content = readFileSync(testFile, "utf-8");
       // Remove arguments from closeDatabase calls
-      content = content.replace(
-        /await closeDatabase\([^)]+\)/g,
-        "await closeDatabase()",
-      );
+      content = content.replace(/await closeDatabase\([^)]+\)/g, "await closeDatabase()");
       writeFileSync(testFile, content);
     }
   }
   logger.debug("  ✓ Fixed closeDatabase calls in test files");
 
   // 23. Patch generate-all/repository.ts - remove deleted generator blocks entirely
-  const generateAllFile =
-    "src/app/api/[locale]/system/generators/generate-all/repository.ts";
+  const generateAllFile = "src/app/api/[locale]/system/generators/generate-all/repository.ts";
   if (existsSync(generateAllFile)) {
     let content = readFileSync(generateAllFile, "utf-8");
 
@@ -1590,10 +1529,7 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
       /import \{[^}]*\} from ["']@\/app\/api\/\[locale\]\/user\/db["'];?\n?/g,
       "",
     );
-    content = content.replace(
-      /import \{ closeDatabase \} from ["'][^"']*["'];?\n?/g,
-      "",
-    );
+    content = content.replace(/import \{ closeDatabase \} from ["'][^"']*["'];?\n?/g, "");
 
     // Remove ALL db usage (seedDatabase, closeDatabase, SeedManager)
     content = content.replace(/await seedDatabase\([^)]*\);?\n?/g, "");
@@ -1632,8 +1568,7 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
   logger.debug("  ✓ Patched task-runner.ts");
 
   // 31. Fix cli/runtime/debug.ts - REMOVE all db imports and closeDatabase usage
-  const debugFile =
-    "src/app/api/[locale]/system/unified-interface/cli/runtime/debug.ts";
+  const debugFile = "src/app/api/[locale]/system/unified-interface/cli/runtime/debug.ts";
   if (existsSync(debugFile)) {
     let content = readFileSync(debugFile, "utf-8");
 
@@ -1680,10 +1615,7 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
       /import \{[^}]*\} from ["']@\/app\/api\/\[locale\]\/user\/db["'];?\n?/g,
       "",
     );
-    content = content.replace(
-      /import \{ closeDatabase \} from ["'][^"']*["'];?\n?/g,
-      "",
-    );
+    content = content.replace(/import \{ closeDatabase \} from ["'][^"']*["'];?\n?/g, "");
 
     // Remove db usage
     content = content.replace(/await closeDatabase\(\)[^;]*;?\n?/g, "");
@@ -1700,8 +1632,7 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
   logger.debug("  ✓ Patched test-server files");
 
   // 33. Fix cli-user.ts - REMOVE auth repository usage entirely
-  const cliUserFile =
-    "src/app/api/[locale]/system/unified-interface/cli/auth/cli-user.ts";
+  const cliUserFile = "src/app/api/[locale]/system/unified-interface/cli/auth/cli-user.ts";
   if (existsSync(cliUserFile)) {
     let content = readFileSync(cliUserFile, "utf-8");
 
@@ -1730,19 +1661,14 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
     );
 
     // Remove unused parseError import
-    content = content.replace(
-      /import \{ parseError \} from ["'][^"']+parse-error["'];?\n/,
-      "",
-    );
+    content = content.replace(/import \{ parseError \} from ["'][^"']+parse-error["'];?\n/, "");
 
     // Remove unused createCliUserFromDb from exports/imports only
-    content = content.replace(
-      /(export|import) \{[^}]*createCliUserFromDb[^}]*\}/g,
-      (match) =>
-        match
-          .replace(/,?\s*createCliUserFromDb,?/g, "")
-          .replace(/\{\s*,/, "{")
-          .replace(/,\s*\}/, "}"),
+    content = content.replace(/(export|import) \{[^}]*createCliUserFromDb[^}]*\}/g, (match) =>
+      match
+        .replace(/,?\s*createCliUserFromDb,?/g, "")
+        .replace(/\{\s*,/, "{")
+        .replace(/,\s*\}/, "}"),
     );
 
     // Fix broken function declaration - restore function name if it was removed
@@ -1808,10 +1734,7 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
     );
 
     // Remove testing object from exports
-    content = content.replace(
-      /testing: \{\s*test: testTranslations,?\s*\},?\s*/g,
-      "",
-    );
+    content = content.replace(/testing: \{\s*test: testTranslations,?\s*\},?\s*/g, "");
 
     writeFileSync(file, content);
   }
@@ -1849,8 +1772,7 @@ function patchCodeForMinimalBuild(logger: EndpointLogger): void {
   }
 
   // Fix types.ts - replace any with object and prefix unused params
-  const typesLintFile =
-    "src/app/api/[locale]/system/unified-interface/shared/widgets/types.ts";
+  const typesLintFile = "src/app/api/[locale]/system/unified-interface/shared/widgets/types.ts";
   if (existsSync(typesLintFile)) {
     let content = readFileSync(typesLintFile, "utf-8");
 
@@ -1937,9 +1859,7 @@ async function main(): Promise<void> {
   logger.debug("=".repeat(60));
   logger.debug(`\n📊 Summary:`);
   logger.debug(`  • Endpoints: ${endpointCount} (expected ~20-25)`);
-  logger.debug(
-    `  • Dependencies: ${manifest.packageJson?.cleanedDeps || "N/A"}`,
-  );
+  logger.debug(`  • Dependencies: ${manifest.packageJson?.cleanedDeps || "N/A"}`);
   logger.debug(`  • Routes moved: ${manifest.routes.length}`);
   logger.debug(`  • Pages moved: ${manifest.pages.length}`);
   logger.debug(`  • Native files moved: ${manifest.native.length}`);

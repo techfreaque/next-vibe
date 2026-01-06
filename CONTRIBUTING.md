@@ -57,6 +57,7 @@ bun run mcp:test
 ### Before Making Changes
 
 1. **Create a feature branch from `vibe-check`**
+
    ```bash
    git checkout vibe-check
    git pull origin vibe-check
@@ -76,6 +77,7 @@ bun run mcp:test
    - `check.config.ts` - Configuration format
 
 2. **Run vibe check frequently** - Catch issues early
+
    ```bash
    bun vibe check
    ```
@@ -95,6 +97,7 @@ bun run mcp:test
    ```
 
 2. **Test the build**
+
    ```bash
    bun vibe builder
    ```
@@ -126,6 +129,7 @@ bun run mcp:test
 ### Required Practices
 
 ✅ **Do:**
+
 - Use TypeScript strictly (no `any` types)
 - Add translation keys for user-facing messages
 - Pass logger to repository methods
@@ -133,6 +137,7 @@ bun run mcp:test
 - Test your changes thoroughly
 
 ❌ **Don't:**
+
 - Use `@ts-ignore` or type assertions
 - Add `console.log` (use logger instead)
 - Hardcode error messages
@@ -184,6 +189,7 @@ chore: update oxlint dependency to 1.35.0
 ```
 
 **Scope examples:**
+
 - `oxlint` - Oxlint checker
 - `lint` - ESLint checker
 - `typecheck` - TypeScript checker
@@ -207,6 +213,7 @@ git push origin feature/my-feature
 **Target Branch:** `vibe-check`
 
 **Include in PR description:**
+
 - **What** - Summary of changes
 - **Why** - Problem being solved or feature being added
 - **How** - Technical approach taken
@@ -218,28 +225,34 @@ git push origin feature/my-feature
 
 ```markdown
 ## What
+
 Adds support for checking specific file patterns in vibe-check
 
 ## Why
+
 Users want to check only certain file types without creating config files
 
 ## How
+
 - Added `--pattern` flag to CLI
 - Extended repository to accept glob patterns
 - Updated MCP tool signature
 
 ## Testing
+
 - Tested with various glob patterns
 - Verified MCP integration
 - All checks pass
 
 ## Breaking Changes
+
 None
 ```
 
 ### 3. Review Process
 
 Your PR will be reviewed for:
+
 - **Code quality** - Follows TypeScript and framework patterns
 - **Performance** - No performance regressions
 - **Compatibility** - Works with existing configs
@@ -280,12 +293,14 @@ Your PR will be reviewed for:
 ## 📚 Resources
 
 **Essential Documentation:**
+
 - [README.md](README.md) - Main documentation
 - [check.config.ts](check.config.ts) - Configuration reference
 - [Oxlint Documentation](https://oxc.rs/docs/guide/usage/linter.html)
 - [MCP Specification](https://modelcontextprotocol.io/)
 
 **Community:**
+
 - [GitHub Discussions](https://github.com/techfreaque/next-vibe/discussions)
 - [GitHub Issues](https://github.com/techfreaque/next-vibe/issues)
 - **Email**: max@a42.ch

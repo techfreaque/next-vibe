@@ -89,8 +89,7 @@ const releaseConfig: ReleaseFileConfig = {
         // Version bumper for additional files
         versionBumper: [
           {
-            filePath:
-              "./src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
+            filePath: "./src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
             varName: "CLI_VERSION",
           },
         ],
