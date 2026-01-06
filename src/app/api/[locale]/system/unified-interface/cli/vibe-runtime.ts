@@ -48,8 +48,8 @@ interface CliOptions {
 /**
  * CLI Constants to avoid literal strings
  */
-const CLI_NAME = "vibe" as const;
-const CLI_VERSION = "2.0.0" as const;
+const CLI_NAME = "vibe-check" as const;
+const CLI_VERSION = "1.0.35";
 const DEFAULT_OUTPUT = "pretty" as const;
 
 import { cliEnv } from "./env";

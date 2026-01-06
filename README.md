@@ -1,706 +1,360 @@
-# NextVibe
+# @next-vibe/checker
 
-**The AI-First Full-Stack Framework for Next.js**
+> Comprehensive TypeScript code quality checker combining Oxlint, ESLint, and TypeScript
 
-Build once, run everywhere. NextVibe is a revolutionary Next.js framework that uses a single route definition pattern to generate interfaces for **6 platforms**: Next.js API, React Hook + Cross-Platform UI (Web & React Native), CLI, tRPC, AI tools (function calling), and MCP tools.
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org)
 
-[![License: GPL-3.0](https://img.shields.io/badge/Framework-GPL--3.0-blue.svg)](LICENSE)
-[![License: MIT](https://img.shields.io/badge/App-MIT-green.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-7_/_TSGO-blue)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-blue)](https://react.dev/)
+Run parallel code quality checks (Oxlint + ESLint + TypeScript) with auto-fix enabled by default. Built with Rust-powered Oxlint for maximum performance.
 
-> **Fork it. Own it. Extend it.** Like shadcn/ui but for your entire business logic + UI stack.
+## Features
 
----
+- **Parallel execution** - All checks run simultaneously
+- **Smart caching** - Dramatically faster on subsequent runs
+- **Auto-fix** - Automatically fixes issues (enabled by default)
+- **100+ rules** - React, TypeScript, a11y, Next.js, Node.js
+- **Custom plugins** - i18n validation, JSX capitalization, restricted syntax
+- **MCP server** - Expose tools via Model Context Protocol
+- **Fast type checking** - Uses tsgo (2-3x faster than tsc)
 
-## 🎯 What is NextVibe?
+## Performance
 
-NextVibe is **not a package you install** - it's a **pattern you adopt**. Fork this repository to build production-ready applications using a single Next.js-like codebase with recursive route definitions that automatically generate:
+Times vary by project size and cache state. **tsgo is enabled by default** (2-3x faster than tsc).
 
-### One Definition → 6 Platforms
+**Small project:**
 
-Write your endpoint once in `definition.ts`, and NextVibe automatically generates:
+- With cache: 1.1s total (Oxlint: 0.48s, ESLint: 1.06s, TypeScript: 0.20s)
+- Without cache: 1.1s total (Oxlint: 0.48s, ESLint: 1.06s, TypeScript: 0.20s)
+- *With tsc: 1.1s cached / 1.5s uncached*
 
-1. **🌐 Next.js API** - RESTful endpoint with full type safety
-2. **⚛️ React Hook + Cross-Platform UI** - Type-safe hooks + data-driven UI for Web & React Native (iOS/Android)
-3. **💻 CLI Tool** - Interactive command-line interface
-4. **🔌 tRPC** - Type-safe client-server procedures
-5. **🤖 AI Function Calling** - OpenAI/Anthropic compatible schema
-6. **🔧 MCP Server** - Model Context Protocol for AI tools
+**Medium project:**
 
-**See it in action: [Unbottled.ai](#unbottledai-reference-application)** - A production AI chat platform built entirely with NextVibe.
+- With cache: 2.8s total (Oxlint: 2.55s, ESLint: 2.76s, TypeScript: 0.62s)
+- Without cache: 5.9s total (Oxlint: 3.17s, ESLint: 4.37s, TypeScript: 5.81s)
+- *With tsc: 12.5s cached / 13.9s uncached*
 
----
+**Large project:**
 
-## 🌟 Why NextVibe?
+- With cache: 9.8s total (Oxlint: 9.80s, ESLint: 3.71s, TypeScript: 3.83s)
+- Without cache: 51.3s total (Oxlint: 16.76s, ESLint: 23.87s, TypeScript: 51.30s)
+- *With tsc: 12.7s cached / 72.9s uncached*
 
-### Built for AI Collaboration
+**Key insights:**
 
-- **Forces One Way**: Recursive folder patterns eliminate ambiguity - AI can't deviate
-- **vibe check** combines lint + typecheck - AI can't skip either
-- **Instant CLI testing**: AI tests endpoints during development
-- **100% type-safe**: Even translations, error messages, and CLI args
+- **Caching provides 5x speedup on large projects**
+- **tsgo is 2-3x faster than tsc for TypeScript checking**
+- **ESLint can be disabled** if you only need Oxlint rules (saves ~3s on large projects)
 
-### Developer Experience
+## Installation
 
-- **Fork, Don't Install**: Full code ownership, no black boxes
-- **Auto-managed Database**: Docker + PostgreSQL + migrations handled automatically
-- **One Command Setup**: `vibe dev` does everything
-- **Cross-platform by Default**: Web + Mobile from the same code
-- **Zero Configuration Routing**: Folder structure IS your API
+### Recommended: AI-Assisted Setup (Clean Migration)
 
----
+**Best for:** Migrating from existing linters (ESLint, Prettier, etc.) or setting up from scratch.
 
-## 🚀 Quick Start
+Copy this prompt to your AI agent (Claude Code, Cursor, etc.):
 
-### Prerequisites
+```
+Migrate to @next-vibe/checker:
 
-```bash
-- Bun 1.3.0+ (recommended) or Node.js 20+
-- Docker (auto-managed in dev mode)
+STEP 1: Ask user questions
+- Strictness? (relaxed/balanced/strict/pedantic)
+- Disable ESLint for max speed? (~3s faster, loses: import sorting, React hooks)
+- Enable React rules? (react-hooks, jsx-a11y, react-compiler)
+- Enable Next.js rules?
+- Enable i18n rules?
+- Enable pedantic rules?
+- Enable restricted syntax? (no throw, unknown, any, object)
+- Create .mcp.json?
+- Install globally? (makes `vibe` and `v` commands available everywhere)
+- VSCode integration? (only ask if .vscode folder doesn't exist - auto-enable if it exists)
+
+STEP 2: Install and create config
+1. Detect package manager (check for bun.lockb, package-lock.json, yarn.lock, pnpm-lock.yaml)
+2. Install locally: <pm> add -D @next-vibe/checker
+3. If user wants global: <pm> add -g @next-vibe/checker (or global install command for pm)
+4. Delete old check.config.ts if it exists
+5. Detect VSCode: Check if .vscode folder exists
+6. Create config with user's answers:
+   <pm-exec> @next-vibe/checker config-create \
+     --update-package-json=true \
+     --create-mcp-config=<true|false> \
+     --update-vscode-settings=<true if .vscode exists OR user said yes> \
+     --enable-react-rules=<true|false> \
+     --enable-nextjs-rules=<true|false> \
+     --enable-i18n-rules=<true|false> \
+     --enable-pedantic-rules=<true|false> \
+     --enable-restricted-syntax=<true|false>
+   Note: package.json scripts updated automatically to "v c"
+
+STEP 3: Customize check.config.ts and editor
+1. Read check.config.ts
+2. If user wants to disable ESLint: Change line 721 from `enabled: true,` to `enabled: false,`
+3. If strictness is pedantic: Change line 47 from `pedantic: false,` to `pedantic: true,`
+4. Analyze old linter configs (.eslintrc.*, .prettierrc, etc.) for custom rules
+5. Port custom rules to Oxlint plugins (create files in oxlint-plugins/*.ts)
+6. Add custom plugin paths to jsPlugins array around line 125
+7. Setup editor integration:
+   - VSCode: Already configured via .vscode/settings.json (oxc extension, tsgo)
+   - Other editors: Detect editor, configure for tsgo and oxlint:
+     * JetBrains IDEs: Setup oxlint file watcher, configure tsgo for TypeScript
+     * Neovim/Vim: Configure LSP for oxlint and tsgo
+     * Sublime/Atom/etc: Setup linter plugins
+8. Remove old linter packages and configs
+9. Test: <pm-exec> @next-vibe/checker check
+10. Report results (what was changed, what rules were ported, editor setup)
+
+Oxlint plugins are much faster than ESLint - always prefer them for custom rules.
 ```
 
-### Get Started in 3 Commands
+The AI agent will handle the complete migration automatically.
+
+### Manual Installation
 
 ```bash
-# 1. Fork this repository on GitHub, then clone
-git clone https://github.com/YOUR_USERNAME/next-vibe
-cd next-vibe
-
-# 2. Install dependencies
-bun install
-
-# 3. Start development (auto-manages everything)
-vibe dev
+npm install --save-dev @next-vibe/checker
+# or
+bun add -d @next-vibe/checker
 ```
 
-That's it! NextVibe automatically:
+Optional global install for `vibe` command:
 
-- ✅ Starts PostgreSQL in Docker (if not running)
-- ✅ Creates database and runs migrations
-- ✅ Seeds development data
-- ✅ Starts Next.js dev server on http://localhost:3000
-- ✅ Starts cron task runner
-- ✅ Watches for changes and regenerates types
+```bash
+npm install -g @next-vibe/checker
+# or
+bun add -g @next-vibe/checker
+```
 
-**📚 [Full Quick Start Guide →](docs/guides/quickstart.md)**
+Without global install, use `npx @next-vibe/checker` instead of `vibe`.
 
----
+## Quick Start
 
-## 🎨 The Definition Pattern
+```bash
+# 1. Install in your project
+npm install --save-dev @next-vibe/checker
 
-### Write Once, Run Everywhere
+# 2. Create configuration (interactive)
+vibe config-create
 
-Here's a REAL example from the codebase - the login endpoint definition:
+# 3. Run checks
+vibe check
+# or use the short version:
+v c
+```
+
+**Tip:** Use `v` as a short alias for `vibe` and `c` for `check` (e.g., `v c` instead of `vibe check`).
+
+The `config-create` command interactively sets up:
+
+- `check.config.ts` - Main configuration
+- ESLint enable/disable - Only needed for rules not in Oxlint (import sorting, React hooks)
+- `.mcp.json` - MCP server config (optional)
+- `.vscode/settings.json` - VSCode integration (optional)
+- `package.json` scripts - npm run check/lint/typecheck (optional)
+
+## Commands
+
+```bash
+vibe check                # Run all checks (auto-fix enabled)
+vibe check src            # Check specific paths
+vibe check src public     # Check multiple paths
+vibe check some/path.ts   # Check specific file
+vibe check --limit=50     # Limit displayed issues
+vibe config-create        # Create/update configuration
+vibe mcp                  # Start MCP server
+vibe list                 # List all commands
+
+# Short versions
+v c                       # Same as: vibe check
+v c src                   # Same as: vibe check src
+v cc           # Same as: vibe config-create
+```
+
+## Configuration
+
+The `check.config.ts` file controls all behavior:
 
 ```typescript
-// src/app/api/[locale]/user/public/login/definition.ts (simplified for clarity)
-import { z } from "zod";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  objectField,
-  requestDataField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  Methods,
-  WidgetType,
-  FieldDataType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { CheckConfig } from "@next-vibe/checker/system/check/config/types";
 
-const { POST } = createEndpoint({
-  method: Methods.POST,
-  path: ["user", "public", "login"],
-  title: "app.api.user.public.login.title",
-  description: "app.api.user.public.login.description",
-
-  fields: objectField(
-    { type: WidgetType.CONTAINER },
-    { request: "data", response: true },
-    {
-      // Request fields
-      credentials: objectField(
-        { type: WidgetType.CONTAINER },
-        { request: "data" },
-        {
-          email: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.EMAIL,
-              label: "app.api.user.public.login.fields.email.label",
-            },
-            z.string().email(),
-          ),
-          password: requestDataField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.PASSWORD,
-              label: "app.api.user.public.login.fields.password.label",
-            },
-            z.string().min(1),
-          ),
-        },
-      ),
-
-      // Response fields
-      success: responseField({ type: WidgetType.BADGE }, z.boolean()),
-      message: responseField({ type: WidgetType.TEXT }, z.string()),
-      user: objectField(
-        { type: WidgetType.CONTAINER },
-        { response: true },
-        {
-          id: responseField({ type: WidgetType.TEXT }, z.string()),
-          email: responseField({ type: WidgetType.TEXT }, z.string()),
-          privateName: responseField({ type: WidgetType.TEXT }, z.string()),
-        },
-      ),
-    },
-  ),
-});
-
-export default { POST };
-```
-
-### What This Automatically Generates
-
-#### 1. 🌐 Next.js API Endpoint
-
-```bash
-POST /api/en-GLOBAL/user/public/login
-```
-
-#### 2. ⚛️ React Hook + Cross-Platform UI (Web & Mobile)
-
-**REAL code from `src/app/api/[locale]/user/public/login/_components/login-form.tsx`:**
-
-```typescript
-"use client";
-
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { Link } from "next-vibe-ui/ui/link";
-import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useLogin } from "@/app/api/[locale]/user/public/login/hooks";
-import loginEndpoints from "@/app/api/[locale]/user/public/login/definition";
-
-export function LoginForm({ locale }) {
-  const logger = createEndpointLogger(false, Date.now(), locale);
-  const loginResult = useLogin({
-    allowPasswordAuth: true,
-    allowSocialAuth: false,
-  }, logger);
-
-  const { form, onSubmit, isSubmitting } = loginResult.create || {};
-  const { isAccountLocked, loginOptions, alert } = loginResult;
-
-  return (
-    <Card>
-      <CardContent className="mt-6">
-        {alert && <FormAlert alert={alert} className="mb-6" />}
-
-        {/* Data-driven UI: Automatically renders ALL form fields */}
-        <EndpointRenderer
-          endpoint={loginEndpoints.POST}
-          form={form}
-          onSubmit={onSubmit}
-          locale={locale}
-          isSubmitting={isSubmitting || isAccountLocked || !loginOptions.allowPasswordAuth}
-          submitButtonText="app.user.other.login.auth.login.signInButton"
-        >
-          <Div className="space-y-4">
-            <Link href={`/${locale}/user/reset-password`}>
-              {t("app.user.other.login.auth.login.forgotPassword")}
-            </Link>
-          </Div>
-        </EndpointRenderer>
-      </CardContent>
-    </Card>
-  );
-}
-```
-
-**Key points:**
-
-- `next-vibe-ui/ui/*` components work on **both Web (Next.js) and React Native**
-- Platform resolution happens via TypeScript path mapping in `tsconfig.json`
-- `EndpointRenderer` automatically generates the entire form from the definition
-- Same JSX code runs on web and mobile with zero changes
-
-#### 3. 💻 CLI Command
-
-```bash
-vibe user:public:login \
-  --credentials.email="test@example.com" \
-  --credentials.password="password123"
-
-# Output:
-# ✓ Login successful
-# {
-#   "success": true,
-#   "message": "Welcome back!",
-#   "user": { "id": "...", "email": "test@example.com", ... }
-# }
-```
-
-#### 4. 🔌 tRPC Procedure
-
-```typescript
-// Automatic type-safe RPC
-const result = await trpc.user.public.login.mutate({
-  credentials: {
-    email: "test@example.com",
-    password: "password123",
+const config: CheckConfig = {
+  vibeCheck: {
+    fix: true,              // Auto-fix (default: true)
+    limit: 200,             // Max issues to display
+    timeout: 3600,          // Max execution time (seconds)
   },
-  options: {
-    rememberMe: true,
+
+  oxlint: {
+    enabled: true,
+    configPath: ".tmp/.oxlintrc.json",
+    cachePath: ".tmp/oxlint-cache",  // Enable caching
   },
-});
+
+  eslint: {
+    enabled: true,
+    configPath: ".tmp/eslint.config.mjs",
+    cachePath: ".tmp/eslint-cache",  // Enable caching
+  },
+
+  typecheck: {
+    enabled: true,
+    useTsgo: true,  // 2-3x faster than tsc
+  },
+};
+
+export default config;
 ```
 
-#### 5. 🤖 AI Tool (Function Calling)
+See [check.config.ts](./check.config.ts) for complete example with all options.
 
-```typescript
-// Automatic AI tool schema for chat integration
+## What Gets Checked
+
+### Oxlint (Rust-powered)
+
+- 100+ built-in rules for React, TypeScript, a11y
+- Custom plugins:
+  - i18n validation (no hardcoded strings)
+  - JSX capitalization enforcement
+  - Restricted syntax (no `throw`, `unknown`, `object` types)
+- Promise best practices
+- Node.js patterns
+- Unicorn modern JS rules
+- **Uses cache** for faster subsequent runs
+
+### ESLint (Optional)
+
+- Import/export sorting
+- React hooks validation
+- React compiler rules
+- **Uses cache** for faster subsequent runs
+- **Can be disabled** if you don't need these rules (Oxlint covers most cases)
+- Only needed for rules not yet supported by Oxlint
+
+### TypeScript
+
+- Full type checking with tsgo or tsc
+- Strict type rules (optional)
+
+All checks run **in parallel** for maximum speed.
+
+## MCP Server
+
+Configure in `.mcp.json` (created by `vibe config-create`):
+
+```json
 {
-  name: "user_public_login",
-  description: "Authenticate user with email and password",
-  parameters: {
-    type: "object",
-    properties: {
-      credentials: {
-        type: "object",
-        properties: {
-          email: { type: "string", format: "email" },
-          password: { type: "string" }
-        }
+  "mcpServers": {
+    "vibe": {
+      "command": "npx",
+      "args": ["@next-vibe/checker", "mcp"],
+      "env": {
+        "PROJECT_ROOT": "/path/to/your/project"
       }
     }
   }
 }
 ```
 
-#### 6. 🔧 MCP Tool
+The MCP server exposes:
 
-```typescript
-// Model Context Protocol tool for AI development
+- `check` - Run comprehensive code quality checks
+
+Compatible with any MCP client.
+
+## Usage in Projects
+
+### With npm Scripts
+
+If you selected package.json update during `config-create`:
+
+```json
 {
-  name: "mcp__vibe__user_public_login_POST",
-  description: "User login endpoint",
-  inputSchema: { /* Auto-generated from definition */ }
-}
-```
-
-**One definition.ts file. Six complete implementations. Zero duplication.**
-
-**📚 [Deep dive into definitions →](docs/patterns/definition.md)**
-
----
-
-## 🏗️ Unbottled.ai: Reference Application
-
-**Unbottled.ai** is a production AI chat platform built entirely with NextVibe, demonstrating every framework feature in a real commercial application.
-
-### Live Features
-
-🤖 **AI Chat Platform**
-
-- Multi-model AI chat (Claude, GPT, Gemini, DeepSeek, and 30+ models)
-- AI agent chat with function calling
-- Branching conversations with message trees
-- Persona system for customized AI behavior
-- Speech-to-text and text-to-speech
-- MCP (Model Context Protocol) tool integration
-
-💼 **Lead Generation System**
-
-- Automated email campaigns with journey-based workflows
-- CSV import with batch processing
-- Lead tracking and engagement analytics
-- SMTP/IMAP email client integration
-- SMS notifications via Twilio
-
-👥 **User Management**
-
-- Authentication with JWT + NextAuth
-- Role-based access control (public, customer, admin)
-- User profiles with avatar uploads
-- Email verification workflows
-- Password reset flows
-
-💳 **Payment Processing**
-
-- Subscription management with Stripe and NowPayments
-- Credit system for AI usage
-- Referral program with earnings tracking
-- Invoice generation
-
-📧 **Communication**
-
-- React Email templates with tracking pixels
-- SMTP client with multiple account support
-- IMAP email reading and folder management
-- Email campaign automation
-
-🔧 **Admin Tools**
-
-- Data-driven admin panels
-- Database studio (Drizzle Studio integration)
-- System health monitoring
-- Cron task management
-- Translation management
-
-### Technical Implementation
-
-**Generated Interfaces:**
-
-- **200+ API endpoints** each generating 7+ platform interfaces
-- **Web app** running on Next.js with full SSR
-- **CLI tools** for database management, email sending, user creation
-- **tRPC procedures** for type-safe client-server communication
-- **React hooks** auto-generated for all endpoints
-- **AI tools** with function calling for chat agents
-- **MCP tools** for AI development workflow
-
-**Database Architecture:**
-
-- PostgreSQL with Drizzle ORM
-- 50+ tables with proper relationships
-- Automatic migrations from schema changes
-- Seed data for development/testing
-
-**Codebase Stats:**
-
-- Single Next.js-like codebase
-- Full type safety across 200,000+ lines
-- Zero runtime type errors
-- All translations type-checked (en, de, pl)
-
-### Key Patterns Demonstrated
-
-1. **Recursive API Architecture**: Folder structure defines the entire API
-2. **Repository-First**: All business logic in type-safe repositories
-3. **Email Integration**: React Email templates with translation support
-4. **Task System**: Cron jobs and background processing
-5. **Enum Patterns**: Database-safe enums with translations
-6. **i18n**: Type-safe translations across 3 languages
-
-**📚 [Explore Unbottled.ai architecture →](docs/examples/unbottled-ai/UNBOTTLED_AI.md)**
-
----
-
-## 🛠️ Core Concepts
-
-### 1. Recursive API Architecture
-
-Your folder structure **IS** your API. No routing configuration needed.
-
-```
-src/app/api/[locale]/
-├── user/
-│   ├── public/
-│   │   ├── login/
-│   │   │   ├── definition.ts    # API contract
-│   │   │   ├── repository.ts    # Business logic
-│   │   │   ├── route.ts         # Auto-generates all interfaces
-│   │   │   ├── hooks.ts         # React hooks (optional)
-│   │   │   └── i18n/            # Translations
-│   │   └── signup/
-│   └── private/
-│       └── me/
-```
-
-Delete a folder = delete the feature across ALL platforms.
-
-### 2. Cross-Platform UI Components
-
-**Platform-independent components via TypeScript path mapping:**
-
-```typescript
-// Import from next-vibe-ui/ui/* - works on Web AND React Native
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Card } from "next-vibe-ui/ui/card";
-import { Link } from "next-vibe-ui/ui/link";
-
-// tsconfig.json resolves to platform-specific implementation:
-// - Web build: ./src/packages/next-vibe-ui/web/ui/*
-// - Native build: ./src/packages/next-vibe-ui/native/ui/*
-```
-
-**The same JSX works everywhere:**
-
-```typescript
-// This exact code runs on Next.js AND React Native
-export function MyComponent() {
-  return (
-    <Div className="flex-1 items-center">
-      <Card>
-        <Button onPress={() => console.log("works!")}>
-          Click Me
-        </Button>
-      </Card>
-    </Div>
-  );
-}
-```
-
-### 3. Type-Safe Everything
-
-**Even your translations are type-checked:**
-
-```typescript
-t("app.api.user.public.login.title"); // ✅ Valid
-t("app.invalid.key"); // ❌ TypeScript error at compile time
-```
-
-ESLint enforces translation usage - no hardcoded strings allowed.
-
-**📚 [i18n patterns →](docs/patterns/i18n.md)**
-
-### 4. Repository-First Architecture
-
-All business logic lives in repositories with standard interfaces:
-
-```typescript
-// repository.ts - Real pattern from codebase
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { success } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-export class LoginRepository {
-  async login(
-    data: { credentials: { email: string; password: string } },
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ success: boolean; message: string; user: User }>> {
-    logger.info("Login attempt", { email: data.credentials.email });
-
-    // Business logic here
-
-    return success({
-      success: true,
-      message: "Welcome back!",
-      user: {
-        /* user data */
-      },
-    });
+  "scripts": {
+    "check": "v c",
+    "lint": "v c",
+    "typecheck": "v c"
   }
 }
 ```
 
-**📚 [Database patterns →](docs/patterns/database.md)**
+The scripts use the short version `v c` (equivalent to `vibe check`).
 
-### 5. AI-Optimized Tooling
-
-Traditional approach (AI might skip one):
+Then run:
 
 ```bash
-npm run lint      # AI might skip
-npm run typecheck # Or skip this
+npm run check
+# or
+npm run lint
+# or
+npm run typecheck
 ```
 
-NextVibe approach (AI can't ignore):
+### Without Global Install
 
 ```bash
-vibe check
-vibe check src/path/to/folder/or/file
-# ✅ Runs BOTH lint + typecheck in one command
-# ✅ Extensive ESLint rules enforce patterns
-# ✅ Type-checks translations, schemas, everything
-# ✅ Zero warnings tolerance
+npx @next-vibe/checker check
 ```
 
-### 6. Auto-Managed Database
+## CI/CD Integration
 
-```bash
-vibe dev
-# ✅ Detects if PostgreSQL is running
-# ✅ Starts it via Docker if not running
-# ✅ Creates database if missing
-# ✅ Runs all pending migrations
-# ✅ Seeds development data
-# ✅ Starts Next.js dev server
+### GitHub Actions
+
+```yaml
+name: Code Quality
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: npm install
+      - run: npm run check  # Uses "v c" script from package.json
 ```
 
-**📚 [Database patterns →](docs/patterns/database.md)**
+### GitLab CI
 
----
-
-## 💻 Vibe CLI
-
-Your development Swiss Army knife:
-
-```bash
-# Development
-vibe dev                    # Start dev server (auto-manages DB)
-vibe check                  # Run lint + typecheck together
-vibe check src/path         # Check specific folder
-
-# Database
-vibe migrate                # Run migrations
-vibe migrate --generate     # Generate migration from schema changes
-vibe seed                   # Seed database
-vibe reset                  # Drop DB + migrate + seed
-vibe studio                 # Open Drizzle Studio (DB GUI)
-vibe ping                   # Check database connection
-
-# Code Quality
-vibe lint                   # Linting only
-vibe lint --fix             # Fix auto-fixable issues
-vibe typecheck              # Type checking only
-vibe test                   # Run tests
-
-# Testing Endpoints
-vibe user:public:login \
-  --credentials.email="test@example.com" \
-  --credentials.password="password123"
-
-# Payment Providers
-vibe stripe check           # Check if Stripe CLI is installed
-vibe stripe listen          # Start webhook forwarding
-vibe nowpayments tunnel     # Start NowPayments tunnel
-
-# Production
-vibe build                  # Build for production
-vibe start                  # Start production server
+```yaml
+check:
+  image: node:18
+  script:
+    - npm install
+    - npm run check  # Uses "v c" script from package.json
 ```
 
----
+**Note:** If you didn't add package.json scripts during `config-create`, use `npx @next-vibe/checker check` directly in CI.
 
-## 🏗️ Tech Stack
+## Caching
 
-**Frontend:**
+The checker uses caching to speed up subsequent runs:
 
-- Next.js 16 (App Router)
-- React 19
-- TypeScript 7 / TSGO
-- Tailwind CSS 4 / NativeWind 5
-- shadcn/ui + react-native-reusables
+- **Oxlint cache**: `.tmp/oxlint-cache`
+- **ESLint cache**: `.tmp/eslint-cache`
 
-**Backend:**
+Cache directories are created automatically. Add `.tmp/` to your `.gitignore`.
 
-- Next.js API Routes
-- tRPC 11 (auto-generated)
-- PostgreSQL + Drizzle ORM
-- Zod validation
+On first run (cold cache), checks are slower. Subsequent runs are significantly faster.
 
-**Developer Experience:**
+## Contributing
 
-- Bun runtime
-- Vibe CLI (custom tooling)
-- ESLint with custom rules
-- Automatic type generation
-
----
-
-## 📚 Documentation
-
-- **[Documentation Index](docs/README.md)** - Complete documentation guide
-- **[Quick Start](docs/guides/quickstart.md)** - Get up and running
-- **[Endpoint Definitions](docs/patterns/definition.md)** - Define your APIs
-- **[Database Patterns](docs/patterns/database.md)** - Drizzle ORM and schemas
-- **[i18n Patterns](docs/patterns/i18n.md)** - Type-safe translations
-- **[Logger Patterns](docs/patterns/logger.md)** - Proper logging
-- **[Unbottled.ai Example](docs/examples/unbottled-ai/UNBOTTLED_AI.md)** - Full commercial application
-
----
-
-## 🗺️ Roadmap
-
-### ✅ Milestone 1: Core Framework (Complete)
-
-- ✅ Recursive API architecture
-- ✅ Type-safe translations
-- ✅ Vibe CLI tooling
-- ✅ Auto-managed database
-
-### 🔄 Milestone 2: Developer Experience (In Progress)
-
-- ✅ Endpoint generators
-- ✅ Migration helpers
-- 🔄 Better error messages
-
-### 📋 Milestone 3: React Native Support (In Progress)
-
-- 🔄 Single codebase for Web + Native
-- ✅ NativeWind integration
-- ✅ Expo Router auto-generation
-- 🔄 Full UI component parity
-
----
-
-## 📄 License
-
-**Dual License: GPL-3.0 + MIT**
-
-### Framework Core (GPL-3.0)
-
-`src/app/api/[locale]/` + `src/packages/` are GPL-3.0:
-
-- ✅ Use freely in any project
-- ✅ Fork and modify as needed
-- ⚠️ Distribute modifications under GPL-3.0
-
-### Everything Else (MIT)
-
-All other code is MIT licensed:
-
-- ✅ Full freedom - use commercially
-- ✅ Modify without restrictions
-- ✅ Keep changes private
-- ✅ Build proprietary applications
-
-See [LICENSE](LICENSE) for details.
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-### Quick Contribution Steps
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run `vibe check` (must pass with 0 errors, 0 warnings)
-5. Submit a pull request
-
----
-
-## 👥 Team
-
-**Creator & Lead Developer:**
-Marcus Brandstätter ([max@a42.ch](mailto:max@a42.ch))
-
-**AI Development Contributors:**
-
-- Augment
-- Claude Code
-- Cursor
-
----
-
-## 📞 Support & Community
-
-- **Documentation**: [./docs/](./docs/)
-- **Issues**: [GitHub Issues](https://github.com/techfreaque/next-vibe/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/techfreaque/next-vibe/discussions)
-- **Email**: <max@a42.ch>
-
----
-
-## 🚀 Ready to Build?
+This project lives on the `vibe-check` branch:
 
 ```bash
-# Fork this repository on GitHub, then:
-git clone https://github.com/YOUR_USERNAME/next-vibe
+git clone https://github.com/techfreaque/next-vibe.git
 cd next-vibe
+git checkout vibe-check
 bun install
-vibe dev
+bun vibe check
 ```
 
-**Welcome to NextVibe. 🎵**
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines.
+
+## License
+
+GPL-3.0-only - see [LICENSE](LICENSE)
+
+## Links
+
+- [GitHub Repository](https://github.com/techfreaque/next-vibe/tree/vibe-check)
+- [npm Package](https://www.npmjs.com/package/@next-vibe/checker)
+- [Report Issues](https://github.com/techfreaque/next-vibe/issues)

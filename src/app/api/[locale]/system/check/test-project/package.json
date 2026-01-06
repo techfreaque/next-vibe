@@ -4,10 +4,14 @@
   "description": "Test project for vibe check system",
   "scripts": {
     "check": "bun ../../unified-interface/cli/vibe-runtime.ts check",
-    "config-create": "bun ../../unified-interface/cli/vibe-runtime.ts config-create",
-    "check-r": "vibe check"
+    "cc": "bun ../../unified-interface/cli/vibe-runtime.ts config-create",
+    "check-b": "bun ../../../../../../../.dist/bin/vibe-runtime.js check",
+    "cc-b": "bun ../../../../../../../.dist/bin/vibe-runtime.js config-create",
+    "check-r": "v check",
+    "cc-r": "v config-create",
+    "r-version": "v --version"
   },
   "dependencies": {
-    "@next-vibe/checker": "^1.0.15"
+    "@next-vibe/checker": "^1.0.33"
   }
 }

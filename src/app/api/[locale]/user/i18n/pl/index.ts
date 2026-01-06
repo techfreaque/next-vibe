@@ -1,18 +1,10 @@
 import { translations as authTranslations } from "../../auth/i18n/pl";
-import { translations as privateTranslations } from "../../private/i18n/pl";
-import { translations as publicTranslations } from "../../public/i18n/pl";
-import { translations as searchTranslations } from "../../search/i18n/pl";
-import { translations as sessionCleanupTranslations } from "../../session-cleanup/i18n/pl";
 import { translations as userRolesTranslations } from "../../user-roles/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Zarządzanie Użytkownikami",
   auth: authTranslations,
-  private: privateTranslations,
-  public: publicTranslations,
-  search: searchTranslations,
-  "session-cleanup": sessionCleanupTranslations,
   userRoles: userRolesTranslations,
   profileVisibility: {
     public: "Publiczny",

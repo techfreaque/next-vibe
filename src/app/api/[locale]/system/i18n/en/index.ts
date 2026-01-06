@@ -1,19 +1,14 @@
 import { translations as builderTranslations } from "../../builder/i18n/en";
 import { translations as checkTranslations } from "../../check/i18n/en";
-import { translations as dbTranslations } from "../../db/i18n/en";
 import { translations as generatorsTranslations } from "../../generators/i18n/en";
-import { translations as guardTranslations } from "../../guard/i18n/en";
 import { translations as helpTranslations } from "../../help/i18n/en";
-import { translations as launchpadTranslations } from "../../launchpad/i18n/en";
 import { translations as releaseToolTranslations } from "../../release-tool/i18n/en";
-import { translations as serverTranslations } from "../../server/i18n/en";
-import { translations as translationsTranslations } from "../../translations/i18n/en";
 import { translations as unifiedInterfaceTranslations } from "../../unified-interface/i18n/en";
 
 export const translations = {
   builder: builderTranslations,
   check: checkTranslations,
-  db: dbTranslations,
+
   dev: {
     category: "Development",
     typecheck: {
@@ -64,10 +59,8 @@ export const translations = {
       },
     },
   },
-  guard: guardTranslations,
-  launchpad: launchpadTranslations,
+
   releaseTool: releaseToolTranslations,
-  server: serverTranslations,
-  translations: translationsTranslations,
+
   unifiedInterface: unifiedInterfaceTranslations,
 };

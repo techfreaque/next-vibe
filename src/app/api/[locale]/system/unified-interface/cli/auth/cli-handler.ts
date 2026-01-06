@@ -19,19 +19,10 @@ export class CliAuthHandler extends BaseAuthHandler {
    * Checks: Authorization header → .vibe.session file
    */
   async getStoredAuthToken(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Request not used in CLI auth
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<string | undefined> {
-    // Check Authorization header first
-    if (context.request) {
-      const authHeader = context.request.headers.get("authorization");
-      if (authHeader?.startsWith("Bearer ")) {
-        const token = authHeader.slice(7); // Remove "Bearer " prefix
-        logger.debug("Found auth token in Authorization header");
-        return token;
-      }
-    }
-
     // Fall back to session file
     const sessionResult = await readSessionFile(logger);
     if (sessionResult.success) {

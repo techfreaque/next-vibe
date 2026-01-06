@@ -1,20 +1,15 @@
 import { translations as builderTranslations } from "../../builder/i18n/de";
 import { translations as checkTranslations } from "../../check/i18n/de";
-import { translations as dbTranslations } from "../../db/i18n/de";
 import { translations as generatorsTranslations } from "../../generators/i18n/de";
-import { translations as guardTranslations } from "../../guard/i18n/de";
 import { translations as helpTranslations } from "../../help/i18n/de";
-import { translations as launchpadTranslations } from "../../launchpad/i18n/de";
 import { translations as releaseToolTranslations } from "../../release-tool/i18n/de";
-import { translations as serverTranslations } from "../../server/i18n/de";
-import { translations as translationsTranslations } from "../../translations/i18n/de";
 import { translations as unifiedInterfaceTranslations } from "../../unified-interface/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   builder: builderTranslations,
   check: checkTranslations,
-  db: dbTranslations,
+
   dev: {
     category: "Entwicklung",
     typecheck: {
@@ -65,10 +60,8 @@ export const translations: typeof enTranslations = {
       },
     },
   },
-  guard: guardTranslations,
-  launchpad: launchpadTranslations,
+
   releaseTool: releaseToolTranslations,
-  server: serverTranslations,
-  translations: translationsTranslations,
+
   unifiedInterface: unifiedInterfaceTranslations,
 };

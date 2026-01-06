@@ -12,7 +12,7 @@ const isBrowser = !isServer && typeof document !== "undefined";
 
 export const platform = { isServer, isReactNative: false, isBrowser };
 
-export const requireEnvs = true as const;
+export const requireEnvs = false as const;
 
 // Helper to create properly typed schemas based on requireEnvs
 type RequireEnvs = typeof requireEnvs;

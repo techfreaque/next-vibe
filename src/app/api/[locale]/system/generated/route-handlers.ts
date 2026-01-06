@@ -258,7 +258,7 @@ export async function getRouteHandler(path: string): Promise<GenericHandlerBase 
       return (await import("@/app/api/[locale]/browser/wait-for/route")).tools
         .POST as GenericHandlerBase;
     case "build":
-      return (await import("@/app/api/[locale]/system/server/build/route")).tools
+      return (await import("@/app/api/[locale]/system/builder/route")).tools
         .POST as GenericHandlerBase;
     case "builder":
       return (await import("@/app/api/[locale]/system/builder/route")).tools
@@ -267,22 +267,11 @@ export async function getRouteHandler(path: string): Promise<GenericHandlerBase 
       return (await import("@/app/api/[locale]/system/builder/route")).tools
         .POST as GenericHandlerBase;
     case "c":
-      return (await import("@/app/api/[locale]/system/check/vibe-check/route")).tools
-        .POST as GenericHandlerBase;
-    case "cancel-subscription":
-      return (await import("@/app/api/[locale]/subscription/route")).tools
-        .DELETE as GenericHandlerBase;
-    case "cc":
-      return (await import("@/app/api/[locale]/system/check/config/create/route")).tools
-        .POST as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/system/check/vibe-check/route"))
+        .tools.POST as GenericHandlerBase;
     case "check":
-      return (await import("@/app/api/[locale]/system/check/vibe-check/route")).tools
-        .POST as GenericHandlerBase;
-    case "chrome":
-      return (await import("@/app/api/[locale]/browser/route")).tools.POST as GenericHandlerBase;
-    case "click-tracking":
-      return (await import("@/app/api/[locale]/leads/tracking/engagement/route")).tools
-        .GET as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/system/check/vibe-check/route"))
+        .tools.POST as GenericHandlerBase;
     case "commands":
       return (await import("@/app/api/[locale]/system/help/list/route")).tools
         .POST as GenericHandlerBase;
@@ -369,84 +358,6 @@ export async function getRouteHandler(path: string): Promise<GenericHandlerBase 
     case "elint":
       return (await import("@/app/api/[locale]/system/check/lint/route")).tools
         .POST as GenericHandlerBase;
-    case "emails_imap-client_accounts_create_POST":
-      return (await import("@/app/api/[locale]/emails/imap-client/accounts/create/route")).tools
-        .POST as GenericHandlerBase;
-    case "emails_imap-client_accounts_id_DELETE":
-      return (await import("@/app/api/[locale]/emails/imap-client/accounts/[id]/route")).tools
-        .DELETE as GenericHandlerBase;
-    case "emails_imap-client_accounts_id_GET":
-      return (await import("@/app/api/[locale]/emails/imap-client/accounts/[id]/route")).tools
-        .GET as GenericHandlerBase;
-    case "emails_imap-client_accounts_id_PUT":
-      return (await import("@/app/api/[locale]/emails/imap-client/accounts/[id]/route")).tools
-        .PUT as GenericHandlerBase;
-    case "emails_imap-client_accounts_list_GET":
-      return (await import("@/app/api/[locale]/emails/imap-client/accounts/list/route")).tools
-        .GET as GenericHandlerBase;
-    case "emails_imap-client_accounts_test_POST":
-      return (await import("@/app/api/[locale]/emails/imap-client/accounts/test/route")).tools
-        .POST as GenericHandlerBase;
-    case "emails_imap-client_config_GET":
-      return (await import("@/app/api/[locale]/emails/imap-client/config/route")).tools
-        .GET as GenericHandlerBase;
-    case "emails_imap-client_config_POST":
-      return (await import("@/app/api/[locale]/emails/imap-client/config/route")).tools
-        .POST as GenericHandlerBase;
-    case "emails_imap-client_folders_list_GET":
-      return (await import("@/app/api/[locale]/emails/imap-client/folders/list/route")).tools
-        .GET as GenericHandlerBase;
-    case "emails_imap-client_folders_sync_POST":
-      return (await import("@/app/api/[locale]/emails/imap-client/folders/sync/route")).tools
-        .POST as GenericHandlerBase;
-    case "emails_imap-client_health_GET":
-      return (await import("@/app/api/[locale]/emails/imap-client/health/route")).tools
-        .GET as GenericHandlerBase;
-    case "emails_imap-client_messages_id_GET":
-      return (await import("@/app/api/[locale]/emails/imap-client/messages/[id]/route")).tools
-        .GET as GenericHandlerBase;
-    case "emails_imap-client_messages_id_PATCH":
-      return (await import("@/app/api/[locale]/emails/imap-client/messages/[id]/route")).tools
-        .PATCH as GenericHandlerBase;
-    case "emails_imap-client_messages_list_GET":
-      return (await import("@/app/api/[locale]/emails/imap-client/messages/list/route")).tools
-        .GET as GenericHandlerBase;
-    case "emails_imap-client_messages_sync_POST":
-      return (await import("@/app/api/[locale]/emails/imap-client/messages/sync/route")).tools
-        .POST as GenericHandlerBase;
-    case "emails_imap-client_sync_POST":
-      return (await import("@/app/api/[locale]/emails/imap-client/sync/route")).tools
-        .POST as GenericHandlerBase;
-    case "emails_messages_id_GET":
-      return (await import("@/app/api/[locale]/emails/messages/[id]/route")).tools
-        .GET as GenericHandlerBase;
-    case "emails_messages_list_GET":
-      return (await import("@/app/api/[locale]/emails/messages/list/route")).tools
-        .GET as GenericHandlerBase;
-    case "emails_messages_stats_GET":
-      return (await import("@/app/api/[locale]/emails/messages/stats/route")).tools
-        .GET as GenericHandlerBase;
-    case "emails_preview_render_POST":
-      return (await import("@/app/api/[locale]/emails/preview/render/route")).tools
-        .POST as GenericHandlerBase;
-    case "emails_preview_send-test_POST":
-      return (await import("@/app/api/[locale]/emails/preview/send-test/route")).tools
-        .POST as GenericHandlerBase;
-    case "emails_send_POST":
-      return (await import("@/app/api/[locale]/emails/send/route")).tools
-        .POST as GenericHandlerBase;
-    case "emails_smtp-client_create_POST":
-      return (await import("@/app/api/[locale]/emails/smtp-client/create/route")).tools
-        .POST as GenericHandlerBase;
-    case "emails_smtp-client_edit_id_GET":
-      return (await import("@/app/api/[locale]/emails/smtp-client/edit/[id]/route")).tools
-        .GET as GenericHandlerBase;
-    case "emails_smtp-client_edit_id_PUT":
-      return (await import("@/app/api/[locale]/emails/smtp-client/edit/[id]/route")).tools
-        .PUT as GenericHandlerBase;
-    case "emails_smtp-client_list_GET":
-      return (await import("@/app/api/[locale]/emails/smtp-client/list/route")).tools
-        .GET as GenericHandlerBase;
     case "eslint":
       return (await import("@/app/api/[locale]/system/check/lint/route")).tools
         .POST as GenericHandlerBase;
@@ -466,142 +377,28 @@ export async function getRouteHandler(path: string): Promise<GenericHandlerBase 
       return (await import("@/app/api/[locale]/system/generators/generate-all/route")).tools
         .POST as GenericHandlerBase;
     case "generate-all":
-      return (await import("@/app/api/[locale]/system/generators/generate-all/route")).tools
-        .POST as GenericHandlerBase;
-    case "generate:env":
-      return (await import("@/app/api/[locale]/system/generators/env/route")).tools
-        .POST as GenericHandlerBase;
-    case "generate:expo":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/react-native/generate/route")
+        await import("@/app/api/[locale]/system/generators/generate-all/route")
       ).tools.POST as GenericHandlerBase;
-    case "guard":
-      return (await import("@/app/api/[locale]/system/guard/start/route")).tools
-        .POST as GenericHandlerBase;
-    case "guard-destroy":
-      return (await import("@/app/api/[locale]/system/guard/destroy/route")).tools
-        .POST as GenericHandlerBase;
-    case "guard-start":
-      return (await import("@/app/api/[locale]/system/guard/start/route")).tools
-        .POST as GenericHandlerBase;
-    case "guard-status":
-      return (await import("@/app/api/[locale]/system/guard/status/route")).tools
-        .POST as GenericHandlerBase;
-    case "guard-stop":
-      return (await import("@/app/api/[locale]/system/guard/stop/route")).tools
-        .POST as GenericHandlerBase;
-    case "guard:destroy":
-      return (await import("@/app/api/[locale]/system/guard/destroy/route")).tools
-        .POST as GenericHandlerBase;
-    case "guard:remove":
-      return (await import("@/app/api/[locale]/system/guard/destroy/route")).tools
-        .POST as GenericHandlerBase;
-    case "guard:start":
-      return (await import("@/app/api/[locale]/system/guard/start/route")).tools
-        .POST as GenericHandlerBase;
-    case "guard:status":
-      return (await import("@/app/api/[locale]/system/guard/status/route")).tools
-        .POST as GenericHandlerBase;
-    case "guard:stop":
-      return (await import("@/app/api/[locale]/system/guard/stop/route")).tools
-        .POST as GenericHandlerBase;
     case "h":
       return (await import("@/app/api/[locale]/system/help/route")).tools
         .POST as GenericHandlerBase;
-    case "health":
-      return (await import("@/app/api/[locale]/system/server/health/route")).tools
-        .GET as GenericHandlerBase;
     case "help":
       return (await import("@/app/api/[locale]/system/help/route")).tools
         .POST as GenericHandlerBase;
     case "i":
-      return (await import("@/app/api/[locale]/system/help/interactive/route")).tools
-        .POST as GenericHandlerBase;
-    case "import-jobs-list":
-      return (await import("@/app/api/[locale]/import/route")).tools.GET as GenericHandlerBase;
-    case "import-leads":
-      return (await import("@/app/api/[locale]/leads/import/route")).tools
-        .POST as GenericHandlerBase;
-    case "import:csv":
-      return (await import("@/app/api/[locale]/import/route")).tools.POST as GenericHandlerBase;
-    case "import:jobs":
-      return (await import("@/app/api/[locale]/import/route")).tools.GET as GenericHandlerBase;
-    case "import_GET":
-      return (await import("@/app/api/[locale]/import/route")).tools.GET as GenericHandlerBase;
-    case "import_POST":
-      return (await import("@/app/api/[locale]/import/route")).tools.POST as GenericHandlerBase;
-    case "install":
-      return (await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/route"))
+      return (await import("@/app/api/[locale]/system/help/interactive/route"))
         .tools.POST as GenericHandlerBase;
+    case "install":
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/route")
+      ).tools.POST as GenericHandlerBase;
     case "interactive":
       return (await import("@/app/api/[locale]/system/help/interactive/route")).tools
         .POST as GenericHandlerBase;
     case "l":
-      return (await import("@/app/api/[locale]/system/check/oxlint/route")).tools
-        .POST as GenericHandlerBase;
-    case "leads-import":
-      return (await import("@/app/api/[locale]/leads/import/route")).tools
-        .POST as GenericHandlerBase;
-    case "leads_batch_DELETE":
-      return (await import("@/app/api/[locale]/leads/batch/route")).tools
-        .DELETE as GenericHandlerBase;
-    case "leads_batch_PATCH":
-      return (await import("@/app/api/[locale]/leads/batch/route")).tools
-        .PATCH as GenericHandlerBase;
-    case "leads_campaigns_campaign-starter_campaign-starter-config_GET":
-      return (
-        await import("@/app/api/[locale]/leads/campaigns/campaign-starter/campaign-starter-config/route")
-      ).tools.GET as GenericHandlerBase;
-    case "leads_campaigns_campaign-starter_campaign-starter-config_PUT":
-      return (
-        await import("@/app/api/[locale]/leads/campaigns/campaign-starter/campaign-starter-config/route")
-      ).tools.PUT as GenericHandlerBase;
-    case "leads_campaigns_emails_test-mail_POST":
-      return (await import("@/app/api/[locale]/leads/campaigns/emails/test-mail/route")).tools
-        .POST as GenericHandlerBase;
-    case "leads_create_POST":
-      return (await import("@/app/api/[locale]/leads/create/route")).tools
-        .POST as GenericHandlerBase;
-    case "leads_export_GET":
-      return (await import("@/app/api/[locale]/leads/export/route")).tools
-        .GET as GenericHandlerBase;
-    case "leads_import_POST":
-      return (await import("@/app/api/[locale]/leads/import/route")).tools
-        .POST as GenericHandlerBase;
-    case "leads_import_jobs_jobId_DELETE":
-      return (await import("@/app/api/[locale]/leads/import/jobs/[jobId]/route")).tools
-        .DELETE as GenericHandlerBase;
-    case "leads_import_jobs_jobId_PATCH":
-      return (await import("@/app/api/[locale]/leads/import/jobs/[jobId]/route")).tools
-        .PATCH as GenericHandlerBase;
-    case "leads_import_jobs_jobId_retry_POST":
-      return (await import("@/app/api/[locale]/leads/import/jobs/[jobId]/retry/route")).tools
-        .POST as GenericHandlerBase;
-    case "leads_import_jobs_jobId_stop_POST":
-      return (await import("@/app/api/[locale]/leads/import/jobs/[jobId]/stop/route")).tools
-        .POST as GenericHandlerBase;
-    case "leads_import_status_GET":
-      return (await import("@/app/api/[locale]/leads/import/status/route")).tools
-        .GET as GenericHandlerBase;
-    case "leads_lead_id_GET":
-      return (await import("@/app/api/[locale]/leads/lead/[id]/route")).tools
-        .GET as GenericHandlerBase;
-    case "leads_lead_id_PATCH":
-      return (await import("@/app/api/[locale]/leads/lead/[id]/route")).tools
-        .PATCH as GenericHandlerBase;
-    case "leads_list_GET":
-      return (await import("@/app/api/[locale]/leads/list/route")).tools.GET as GenericHandlerBase;
-    case "leads_search_GET":
-      return (await import("@/app/api/[locale]/leads/search/route")).tools
-        .GET as GenericHandlerBase;
-    case "leads_stats_GET":
-      return (await import("@/app/api/[locale]/leads/stats/route")).tools.GET as GenericHandlerBase;
-    case "leads_tracking_engagement_GET":
-      return (await import("@/app/api/[locale]/leads/tracking/engagement/route")).tools
-        .GET as GenericHandlerBase;
-    case "leads_tracking_engagement_POST":
-      return (await import("@/app/api/[locale]/leads/tracking/engagement/route")).tools
-        .POST as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/system/check/oxlint/route"))
+        .tools.POST as GenericHandlerBase;
     case "lint":
       return (await import("@/app/api/[locale]/system/check/oxlint/route")).tools
         .POST as GenericHandlerBase;
@@ -611,78 +408,18 @@ export async function getRouteHandler(path: string): Promise<GenericHandlerBase 
     case "ls":
       return (await import("@/app/api/[locale]/system/help/list/route")).tools
         .POST as GenericHandlerBase;
-    case "manifest_GET":
-      return (await import("@/app/api/[locale]/manifest/route")).tools.GET as GenericHandlerBase;
     case "mcp":
-      return (await import("@/app/api/[locale]/system/unified-interface/mcp/serve/route")).tools
-        .POST as GenericHandlerBase;
-    case "mcp:serve":
-      return (await import("@/app/api/[locale]/system/unified-interface/mcp/serve/route")).tools
-        .POST as GenericHandlerBase;
-    case "mcp:start":
-      return (await import("@/app/api/[locale]/system/unified-interface/mcp/serve/route")).tools
-        .POST as GenericHandlerBase;
-    case "memories-add":
-      return (await import("@/app/api/[locale]/agent/chat/memories/route")).tools
-        .POST as GenericHandlerBase;
-    case "memories-delete":
-      return (await import("@/app/api/[locale]/agent/chat/memories/[id]/route")).tools
-        .DELETE as GenericHandlerBase;
-    case "memories-list":
-      return (await import("@/app/api/[locale]/agent/chat/memories/route")).tools
-        .GET as GenericHandlerBase;
-    case "memories-update":
-      return (await import("@/app/api/[locale]/agent/chat/memories/[id]/route")).tools
-        .PATCH as GenericHandlerBase;
-    case "migrate":
-      return (await import("@/app/api/[locale]/system/db/migrate/route")).tools
-        .POST as GenericHandlerBase;
-    case "migrate-prod":
-      return (await import("@/app/api/[locale]/system/db/migrate-prod/route")).tools
-        .POST as GenericHandlerBase;
-    case "migrate-repair":
-      return (await import("@/app/api/[locale]/system/db/migrate-repair/route")).tools
-        .POST as GenericHandlerBase;
-    case "migrate-sync":
-      return (await import("@/app/api/[locale]/system/db/migrate-sync/route")).tools
-        .POST as GenericHandlerBase;
-    case "migrate-tasks":
-      return (await import("@/app/api/[locale]/system/db/migrate/task-management/route")).tools
-        .POST as GenericHandlerBase;
-    case "native:generate":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/react-native/generate/route")
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/route")
       ).tools.POST as GenericHandlerBase;
-    case "newsletter-status":
-      return (await import("@/app/api/[locale]/newsletter/status/route")).tools
-        .GET as GenericHandlerBase;
-    case "newsletter-subscribe":
-      return (await import("@/app/api/[locale]/newsletter/subscribe/route")).tools
-        .POST as GenericHandlerBase;
-    case "newsletter-unsubscribe":
-      return (await import("@/app/api/[locale]/newsletter/unsubscribe/route")).tools
-        .POST as GenericHandlerBase;
-    case "newsletter:status":
-      return (await import("@/app/api/[locale]/newsletter/status/route")).tools
-        .GET as GenericHandlerBase;
-    case "newsletter_status_GET":
-      return (await import("@/app/api/[locale]/newsletter/status/route")).tools
-        .GET as GenericHandlerBase;
-    case "newsletter_subscribe_POST":
-      return (await import("@/app/api/[locale]/newsletter/subscribe/route")).tools
-        .POST as GenericHandlerBase;
-    case "newsletter_unsubscribe_POST":
-      return (await import("@/app/api/[locale]/newsletter/unsubscribe/route")).tools
-        .POST as GenericHandlerBase;
-    case "nowpayments":
-      return (await import("@/app/api/[locale]/payment/providers/nowpayments/cli/route")).tools
-        .POST as GenericHandlerBase;
-    case "nowpayments-cli":
-      return (await import("@/app/api/[locale]/payment/providers/nowpayments/cli/route")).tools
-        .POST as GenericHandlerBase;
-    case "nowpayments-tunnel":
-      return (await import("@/app/api/[locale]/payment/providers/nowpayments/cli/route")).tools
-        .POST as GenericHandlerBase;
+    case "mcp:serve":
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/route")
+      ).tools.POST as GenericHandlerBase;
+    case "mcp:start":
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/route")
+      ).tools.POST as GenericHandlerBase;
     case "ox":
       return (await import("@/app/api/[locale]/system/check/oxlint/route")).tools
         .POST as GenericHandlerBase;
@@ -692,148 +429,39 @@ export async function getRouteHandler(path: string): Promise<GenericHandlerBase 
     case "package":
       return (await import("@/app/api/[locale]/system/builder/route")).tools
         .POST as GenericHandlerBase;
-    case "payment_GET":
-      return (await import("@/app/api/[locale]/payment/route")).tools.GET as GenericHandlerBase;
-    case "payment_POST":
-      return (await import("@/app/api/[locale]/payment/route")).tools.POST as GenericHandlerBase;
-    case "payment_checkout_POST":
-      return (await import("@/app/api/[locale]/payment/checkout/route")).tools
-        .POST as GenericHandlerBase;
-    case "payment_invoice_POST":
-      return (await import("@/app/api/[locale]/payment/invoice/route")).tools
-        .POST as GenericHandlerBase;
-    case "payment_portal_POST":
-      return (await import("@/app/api/[locale]/payment/portal/route")).tools
-        .POST as GenericHandlerBase;
-    case "payment_providers_nowpayments_cli_POST":
-      return (await import("@/app/api/[locale]/payment/providers/nowpayments/cli/route")).tools
-        .POST as GenericHandlerBase;
-    case "payment_providers_stripe_cli_POST":
-      return (await import("@/app/api/[locale]/payment/providers/stripe/cli/route")).tools
-        .POST as GenericHandlerBase;
-    case "payment_refund_POST":
-      return (await import("@/app/api/[locale]/payment/refund/route")).tools
-        .POST as GenericHandlerBase;
-    case "ping":
-      return (await import("@/app/api/[locale]/system/db/ping/route")).tools
-        .POST as GenericHandlerBase;
     case "pub":
-      return (await import("@/app/api/[locale]/system/release-tool/route")).tools
-        .POST as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/system/release-tool/route"))
+        .tools.POST as GenericHandlerBase;
     case "publish":
-      return (await import("@/app/api/[locale]/system/release-tool/route")).tools
-        .POST as GenericHandlerBase;
-    case "pulse:execute":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/pulse/route")).tools
-        .POST as GenericHandlerBase;
-    case "pulse:status":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/pulse/status/route"))
-        .tools.GET as GenericHandlerBase;
-    case "record-engagement":
-      return (await import("@/app/api/[locale]/leads/tracking/engagement/route")).tools
-        .POST as GenericHandlerBase;
-    case "referral_POST":
-      return (await import("@/app/api/[locale]/referral/route")).tools.POST as GenericHandlerBase;
-    case "referral_codes_list_GET":
-      return (await import("@/app/api/[locale]/referral/codes/list/route")).tools
-        .GET as GenericHandlerBase;
-    case "referral_earnings_list_GET":
-      return (await import("@/app/api/[locale]/referral/earnings/list/route")).tools
-        .GET as GenericHandlerBase;
-    case "referral_link-to-lead_POST":
-      return (await import("@/app/api/[locale]/referral/link-to-lead/route")).tools
-        .POST as GenericHandlerBase;
-    case "referral_stats_GET":
-      return (await import("@/app/api/[locale]/referral/stats/route")).tools
-        .GET as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/system/release-tool/route"))
+        .tools.POST as GenericHandlerBase;
     case "release":
-      return (await import("@/app/api/[locale]/system/release-tool/route")).tools
-        .POST as GenericHandlerBase;
-    case "reset":
-      return (await import("@/app/api/[locale]/system/db/reset/route")).tools
-        .POST as GenericHandlerBase;
-    case "reset-tasks":
-      return (await import("@/app/api/[locale]/system/db/reset/task-management/route")).tools
-        .POST as GenericHandlerBase;
-    case "runner":
-      return (
-        await import("@/app/api/[locale]/system/unified-interface/tasks/unified-runner/route")
-      ).tools.POST as GenericHandlerBase;
-    case "schema-verify":
-      return (await import("@/app/api/[locale]/system/db/schema-verify/route")).tools
-        .POST as GenericHandlerBase;
-    case "search":
-      return (await import("@/app/api/[locale]/agent/brave-search/route")).tools
-        .GET as GenericHandlerBase;
-    case "seed":
-      return (await import("@/app/api/[locale]/system/db/seed/route")).tools
-        .POST as GenericHandlerBase;
-    case "server:dev":
-      return (await import("@/app/api/[locale]/system/server/dev/route")).tools
-        .POST as GenericHandlerBase;
-    case "server:start":
-      return (await import("@/app/api/[locale]/system/server/start/route")).tools
-        .POST as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/system/release-tool/route"))
+        .tools.POST as GenericHandlerBase;
     case "setup":
-      return (await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/route")
+      ).tools.POST as GenericHandlerBase;
     case "setup:status":
-      return (await import("@/app/api/[locale]/system/unified-interface/cli/setup/status/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/status/route")
+      ).tools.POST as GenericHandlerBase;
     case "setup:uninstall":
-      return (await import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/route")
+      ).tools.POST as GenericHandlerBase;
     case "setup:update":
-      return (await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/route"))
-        .tools.POST as GenericHandlerBase;
-    case "side-tasks":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/side-tasks/route"))
-        .tools.POST as GenericHandlerBase;
-    case "sql":
-      return (await import("@/app/api/[locale]/system/db/sql/route")).tools
-        .POST as GenericHandlerBase;
-    case "start":
-      return (await import("@/app/api/[locale]/system/server/start/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/route")
+      ).tools.POST as GenericHandlerBase;
     case "start-mcp":
-      return (await import("@/app/api/[locale]/system/unified-interface/mcp/serve/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/route")
+      ).tools.POST as GenericHandlerBase;
     case "status":
-      return (await import("@/app/api/[locale]/system/server/health/route")).tools
-        .GET as GenericHandlerBase;
-    case "stripe":
-      return (await import("@/app/api/[locale]/payment/providers/stripe/cli/route")).tools
-        .POST as GenericHandlerBase;
-    case "stripe-cli":
-      return (await import("@/app/api/[locale]/payment/providers/stripe/cli/route")).tools
-        .POST as GenericHandlerBase;
-    case "stt":
-      return (await import("@/app/api/[locale]/agent/speech-to-text/hotkey/route")).tools
-        .POST as GenericHandlerBase;
-    case "studio":
-      return (await import("@/app/api/[locale]/system/db/studio/route")).tools
-        .POST as GenericHandlerBase;
-    case "subscribe":
-      return (await import("@/app/api/[locale]/newsletter/subscribe/route")).tools
-        .POST as GenericHandlerBase;
-    case "subscription-cancel":
-      return (await import("@/app/api/[locale]/subscription/route")).tools
-        .DELETE as GenericHandlerBase;
-    case "subscription-update":
-      return (await import("@/app/api/[locale]/subscription/route")).tools
-        .PUT as GenericHandlerBase;
-    case "subscription_DELETE":
-      return (await import("@/app/api/[locale]/subscription/route")).tools
-        .DELETE as GenericHandlerBase;
-    case "subscription_GET":
-      return (await import("@/app/api/[locale]/subscription/route")).tools
-        .GET as GenericHandlerBase;
-    case "subscription_POST":
-      return (await import("@/app/api/[locale]/subscription/route")).tools
-        .POST as GenericHandlerBase;
-    case "subscription_PUT":
-      return (await import("@/app/api/[locale]/subscription/route")).tools
-        .PUT as GenericHandlerBase;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/status/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_builder_POST":
       return (await import("@/app/api/[locale]/system/builder/route")).tools
         .POST as GenericHandlerBase;
@@ -844,105 +472,33 @@ export async function getRouteHandler(path: string): Promise<GenericHandlerBase 
       return (await import("@/app/api/[locale]/system/check/lint/route")).tools
         .POST as GenericHandlerBase;
     case "system_check_oxlint_POST":
-      return (await import("@/app/api/[locale]/system/check/oxlint/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_check_testing_test_POST":
-      return (await import("@/app/api/[locale]/system/check/testing/test/route")).tools
-        .POST as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/system/check/oxlint/route"))
+        .tools.POST as GenericHandlerBase;
     case "system_check_typecheck_POST":
       return (await import("@/app/api/[locale]/system/check/typecheck/route")).tools
         .POST as GenericHandlerBase;
     case "system_check_vibe-check_POST":
-      return (await import("@/app/api/[locale]/system/check/vibe-check/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_db_migrate-prod_POST":
-      return (await import("@/app/api/[locale]/system/db/migrate-prod/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_db_migrate-repair_POST":
-      return (await import("@/app/api/[locale]/system/db/migrate-repair/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_db_migrate-sync_POST":
-      return (await import("@/app/api/[locale]/system/db/migrate-sync/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_db_migrate_POST":
-      return (await import("@/app/api/[locale]/system/db/migrate/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_db_migrate_task-management_POST":
-      return (await import("@/app/api/[locale]/system/db/migrate/task-management/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_db_ping_POST":
-      return (await import("@/app/api/[locale]/system/db/ping/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_db_reset_POST":
-      return (await import("@/app/api/[locale]/system/db/reset/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_db_reset_task-management_POST":
-      return (await import("@/app/api/[locale]/system/db/reset/task-management/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_db_schema-verify_POST":
-      return (await import("@/app/api/[locale]/system/db/schema-verify/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_db_seed_POST":
-      return (await import("@/app/api/[locale]/system/db/seed/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_db_sql_POST":
-      return (await import("@/app/api/[locale]/system/db/sql/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_db_studio_POST":
-      return (await import("@/app/api/[locale]/system/db/studio/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_db_utils_GET":
-      return (await import("@/app/api/[locale]/system/db/utils/route")).tools
-        .GET as GenericHandlerBase;
-    case "system_db_utils_docker-operations_POST":
-      return (await import("@/app/api/[locale]/system/db/utils/docker-operations/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_generators_email-templates_POST":
-      return (await import("@/app/api/[locale]/system/generators/email-templates/route")).tools
-        .POST as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/system/check/vibe-check/route"))
+        .tools.POST as GenericHandlerBase;
     case "system_generators_endpoint_POST":
       return (await import("@/app/api/[locale]/system/generators/endpoint/route")).tools
         .POST as GenericHandlerBase;
     case "system_generators_endpoints-index_POST":
-      return (await import("@/app/api/[locale]/system/generators/endpoints-index/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_generators_endpoints_POST":
-      return (await import("@/app/api/[locale]/system/generators/endpoints/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_generators_env_POST":
-      return (await import("@/app/api/[locale]/system/generators/env/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_generators_generate-all_POST":
-      return (await import("@/app/api/[locale]/system/generators/generate-all/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_generators_generate-trpc-router_POST":
-      return (await import("@/app/api/[locale]/system/generators/generate-trpc-router/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_generators_generate-trpc-router_validation_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-trpc-router/validation/route")
+        await import("@/app/api/[locale]/system/generators/endpoints-index/route")
+      ).tools.POST as GenericHandlerBase;
+    case "system_generators_endpoints_POST":
+      return (
+        await import("@/app/api/[locale]/system/generators/endpoints/route")
+      ).tools.POST as GenericHandlerBase;
+    case "system_generators_generate-all_POST":
+      return (
+        await import("@/app/api/[locale]/system/generators/generate-all/route")
       ).tools.POST as GenericHandlerBase;
     case "system_generators_route-handlers_POST":
-      return (await import("@/app/api/[locale]/system/generators/route-handlers/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_generators_seeds_POST":
-      return (await import("@/app/api/[locale]/system/generators/seeds/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_generators_task-index_POST":
-      return (await import("@/app/api/[locale]/system/generators/task-index/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_guard_destroy_POST":
-      return (await import("@/app/api/[locale]/system/guard/destroy/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_guard_start_POST":
-      return (await import("@/app/api/[locale]/system/guard/start/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_guard_status_POST":
-      return (await import("@/app/api/[locale]/system/guard/status/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_guard_stop_POST":
-      return (await import("@/app/api/[locale]/system/guard/stop/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import("@/app/api/[locale]/system/generators/route-handlers/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_help_POST":
       return (await import("@/app/api/[locale]/system/help/route")).tools
         .POST as GenericHandlerBase;
@@ -953,223 +509,41 @@ export async function getRouteHandler(path: string): Promise<GenericHandlerBase 
       return (await import("@/app/api/[locale]/system/help/list/route")).tools
         .POST as GenericHandlerBase;
     case "system_release-tool_POST":
-      return (await import("@/app/api/[locale]/system/release-tool/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_server_build_POST":
-      return (await import("@/app/api/[locale]/system/server/build/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_server_dev_POST":
-      return (await import("@/app/api/[locale]/system/server/dev/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_server_health_GET":
-      return (await import("@/app/api/[locale]/system/server/health/route")).tools
-        .GET as GenericHandlerBase;
-    case "system_server_start_POST":
-      return (await import("@/app/api/[locale]/system/server/start/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_translations_reorganize_POST":
-      return (await import("@/app/api/[locale]/system/translations/reorganize/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_translations_restore-backup_POST":
-      return (await import("@/app/api/[locale]/system/translations/restore-backup/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_translations_stats_GET":
-      return (await import("@/app/api/[locale]/system/translations/stats/route")).tools
-        .GET as GenericHandlerBase;
-    case "system_unified-interface_ai_tools_GET":
-      return (await import("@/app/api/[locale]/system/unified-interface/ai/tools/route")).tools
-        .GET as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/system/release-tool/route"))
+        .tools.POST as GenericHandlerBase;
     case "system_unified-interface_cli_setup_install_POST":
-      return (await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_unified-interface_cli_setup_status_POST":
-      return (await import("@/app/api/[locale]/system/unified-interface/cli/setup/status/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/status/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_unified-interface_cli_setup_uninstall_POST":
-      return (await import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_unified-interface_cli_setup_update_POST":
-      return (await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_unified-interface_mcp_serve_POST":
-      return (await import("@/app/api/[locale]/system/unified-interface/mcp/serve/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_unified-interface_react-native_generate_POST":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/react-native/generate/route")
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/route")
       ).tools.POST as GenericHandlerBase;
-    case "system_unified-interface_tasks_cron_history_GET":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/cron/history/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_unified-interface_tasks_cron_stats_GET":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/cron/stats/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_unified-interface_tasks_cron_status_GET":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/cron/status/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_unified-interface_tasks_cron_tasks_GET":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_unified-interface_tasks_cron_tasks_POST":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_unified-interface_tasks_pulse_POST":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/pulse/route")).tools
-        .POST as GenericHandlerBase;
-    case "system_unified-interface_tasks_pulse_execute_POST":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/pulse/execute/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_unified-interface_tasks_pulse_status_GET":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/pulse/status/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_unified-interface_tasks_side-tasks_GET":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/side-tasks/route"))
-        .tools.GET as GenericHandlerBase;
-    case "system_unified-interface_tasks_side-tasks_POST":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/side-tasks/route"))
-        .tools.POST as GenericHandlerBase;
-    case "system_unified-interface_tasks_types_GET":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/types/route")).tools
-        .GET as GenericHandlerBase;
-    case "system_unified-interface_tasks_unified-runner_POST":
-      return (
-        await import("@/app/api/[locale]/system/unified-interface/tasks/unified-runner/route")
-      ).tools.POST as GenericHandlerBase;
-    case "t":
-      return (await import("@/app/api/[locale]/system/check/testing/test/route")).tools
-        .POST as GenericHandlerBase;
-    case "task-runner":
-      return (
-        await import("@/app/api/[locale]/system/unified-interface/tasks/unified-runner/route")
-      ).tools.POST as GenericHandlerBase;
-    case "tasks:cron:stats":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/cron/stats/route"))
-        .tools.GET as GenericHandlerBase;
-    case "tasks:cron:status":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/cron/status/route"))
-        .tools.GET as GenericHandlerBase;
-    case "tasks:side":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/side-tasks/route"))
-        .tools.POST as GenericHandlerBase;
-    case "tasks:side:status":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/side-tasks/route"))
-        .tools.GET as GenericHandlerBase;
-    case "tasks:types":
-      return (await import("@/app/api/[locale]/system/unified-interface/tasks/types/route")).tools
-        .GET as GenericHandlerBase;
     case "tc":
-      return (await import("@/app/api/[locale]/system/check/typecheck/route")).tools
-        .POST as GenericHandlerBase;
-    case "test":
-      return (await import("@/app/api/[locale]/system/check/testing/test/route")).tools
-        .POST as GenericHandlerBase;
-    case "tools:list":
-      return (await import("@/app/api/[locale]/system/unified-interface/ai/tools/route")).tools
-        .GET as GenericHandlerBase;
-    case "track-click":
-      return (await import("@/app/api/[locale]/leads/tracking/engagement/route")).tools
-        .GET as GenericHandlerBase;
-    case "track-engagement":
-      return (await import("@/app/api/[locale]/leads/tracking/engagement/route")).tools
-        .POST as GenericHandlerBase;
-    case "translations:reorganize":
-      return (await import("@/app/api/[locale]/system/translations/reorganize/route")).tools
-        .POST as GenericHandlerBase;
-    case "translations:restore":
-      return (await import("@/app/api/[locale]/system/translations/restore-backup/route")).tools
-        .POST as GenericHandlerBase;
-    case "translations:stats":
-      return (await import("@/app/api/[locale]/system/translations/stats/route")).tools
-        .GET as GenericHandlerBase;
-    case "trpc-validate":
-      return (
-        await import("@/app/api/[locale]/system/generators/generate-trpc-router/validation/route")
-      ).tools.POST as GenericHandlerBase;
-    case "ts":
-      return (await import("@/app/api/[locale]/system/translations/stats/route")).tools
-        .GET as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/system/check/typecheck/route"))
+        .tools.POST as GenericHandlerBase;
     case "typecheck":
-      return (await import("@/app/api/[locale]/system/check/typecheck/route")).tools
-        .POST as GenericHandlerBase;
-    case "unified-runner":
-      return (
-        await import("@/app/api/[locale]/system/unified-interface/tasks/unified-runner/route")
-      ).tools.POST as GenericHandlerBase;
+      return (await import("@/app/api/[locale]/system/check/typecheck/route"))
+        .tools.POST as GenericHandlerBase;
     case "uninstall":
-      return (await import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/route"))
-        .tools.POST as GenericHandlerBase;
-    case "unsubscribe":
-      return (await import("@/app/api/[locale]/newsletter/unsubscribe/route")).tools
-        .POST as GenericHandlerBase;
-    case "update":
-      return (await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/route"))
-        .tools.POST as GenericHandlerBase;
-    case "update-subscription":
-      return (await import("@/app/api/[locale]/subscription/route")).tools
-        .PUT as GenericHandlerBase;
-    case "user_auth_check_GET":
-      return (await import("@/app/api/[locale]/user/auth/check/route")).tools
-        .GET as GenericHandlerBase;
-    case "user_private_logout_POST":
-      return (await import("@/app/api/[locale]/user/private/logout/route")).tools
-        .POST as GenericHandlerBase;
-    case "user_private_me_DELETE":
-      return (await import("@/app/api/[locale]/user/private/me/route")).tools
-        .DELETE as GenericHandlerBase;
-    case "user_private_me_GET":
-      return (await import("@/app/api/[locale]/user/private/me/route")).tools
-        .GET as GenericHandlerBase;
-    case "user_private_me_POST":
-      return (await import("@/app/api/[locale]/user/private/me/route")).tools
-        .POST as GenericHandlerBase;
-    case "user_private_me_avatar_DELETE":
-      return (await import("@/app/api/[locale]/user/private/me/avatar/route")).tools
-        .DELETE as GenericHandlerBase;
-    case "user_private_me_avatar_POST":
-      return (await import("@/app/api/[locale]/user/private/me/avatar/route")).tools
-        .POST as GenericHandlerBase;
-    case "user_private_me_password_POST":
-      return (await import("@/app/api/[locale]/user/private/me/password/route")).tools
-        .POST as GenericHandlerBase;
-    case "user_public_login_POST":
-      return (await import("@/app/api/[locale]/user/public/login/route")).tools
-        .POST as GenericHandlerBase;
-    case "user_public_login_options_GET":
-      return (await import("@/app/api/[locale]/user/public/login/options/route")).tools
-        .GET as GenericHandlerBase;
-    case "user_public_reset-password_confirm_POST":
-      return (await import("@/app/api/[locale]/user/public/reset-password/confirm/route")).tools
-        .POST as GenericHandlerBase;
-    case "user_public_reset-password_request_POST":
-      return (await import("@/app/api/[locale]/user/public/reset-password/request/route")).tools
-        .POST as GenericHandlerBase;
-    case "user_public_reset-password_validate_GET":
-      return (await import("@/app/api/[locale]/user/public/reset-password/validate/route")).tools
-        .GET as GenericHandlerBase;
-    case "user_public_signup_POST":
-      return (await import("@/app/api/[locale]/user/public/signup/route")).tools
-        .POST as GenericHandlerBase;
-    case "user_search_GET":
-      return (await import("@/app/api/[locale]/user/search/route")).tools.GET as GenericHandlerBase;
-    case "users_create_POST":
-      return (await import("@/app/api/[locale]/users/create/route")).tools
-        .POST as GenericHandlerBase;
-    case "users_list_GET":
-      return (await import("@/app/api/[locale]/users/list/route")).tools.GET as GenericHandlerBase;
-    case "users_stats_GET":
-      return (await import("@/app/api/[locale]/users/stats/route")).tools.GET as GenericHandlerBase;
-    case "users_user_id_DELETE":
-      return (await import("@/app/api/[locale]/users/user/[id]/route")).tools
-        .DELETE as GenericHandlerBase;
-    case "users_user_id_GET":
-      return (await import("@/app/api/[locale]/users/user/[id]/route")).tools
-        .GET as GenericHandlerBase;
-    case "users_user_id_PUT":
-      return (await import("@/app/api/[locale]/users/user/[id]/route")).tools
-        .PUT as GenericHandlerBase;
-    case "validate-trpc":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-trpc-router/validation/route")
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/route")
+      ).tools.POST as GenericHandlerBase;
+    case "update":
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/route")
       ).tools.POST as GenericHandlerBase;
     case "web-search":
       return (await import("@/app/api/[locale]/agent/brave-search/route")).tools

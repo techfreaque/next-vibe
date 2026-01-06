@@ -411,21 +411,12 @@ export class CliResourceManager {
   /**
    * Initialize CLI resources and monitoring
    */
+  // oxlint-disable-next-line no-unused-vars
   initialize(logger: EndpointLogger, locale: CountryLanguage): void {
     this.performanceMonitor.initialize();
 
     // Create AbortController for request cancellation
     this.abortController = new AbortController();
-
-    // Register database cleanup - this is critical for preventing hanging
-    this.cleanupRegistry.register(async () => {
-      try {
-        const { closeDatabase } = await import("@/app/api/[locale]/system/db");
-        await closeDatabase(logger);
-      } catch {
-        // Database might not be imported yet
-      }
-    });
 
     // Register process signal handlers for graceful shutdown
     this.setupSignalHandlers(locale);

@@ -1,6 +1,5 @@
 import "server-only";
 
-import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -14,7 +13,6 @@ import type { Platform } from "../../types/platform";
  */
 export interface AuthContext {
   platform: Platform;
-  request?: NextRequest;
   token?: string;
   jwtPayload?: JwtPayloadType;
   locale: CountryLanguage;

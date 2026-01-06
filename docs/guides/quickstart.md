@@ -59,32 +59,6 @@ bun install
 npm install
 ```
 
-### 3. Environment Configuration
-
-```bash
-# Copy the example environment file
-cp .env.example .env
-```
-
-Edit `.env` with your configuration:
-
-```env
-# Database (auto-managed by vibe dev if using Docker)
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/nextvibe"
-
-# Authentication
-JWT_SECRET="your-secret-key-here"
-NEXTAUTH_SECRET="your-nextauth-secret"
-
-# Optional: AI APIs (if using Unbottled.ai features)
-OPENROUTER_API_KEY="your-key"
-BRAVE_SEARCH_API_KEY="your-key"
-
-# Optional: Payment providers
-STRIPE_SECRET_KEY="sk_test_..."
-NOWPAYMENTS_API_KEY="..."
-```
-
 ### 4. Start Development Server
 
 ```bash
