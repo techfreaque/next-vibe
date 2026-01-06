@@ -45,12 +45,21 @@ const AB_TEST_CONSTANTS = {
 /**
  * Journey Variant Metadata
  */
-const JOURNEY_VARIANT_METADATA = {
+const JOURNEY_VARIANT_METADATA: Record<
+  (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
+  {
+    name: string;
+    description: string;
+    color: string;
+    icon: IconKey;
+    characteristics: readonly string[];
+  }
+> = {
   [EmailJourneyVariant.PERSONAL_APPROACH]: {
     name: "Personal & Human Touch",
     description: "Emphasizes personal connection, human expertise, and relationship building",
     color: "#10B981", // Emerald
-    icon: "people",
+    icon: "user",
     characteristics: [
       "Personal storytelling",
       "Human connection",
@@ -63,7 +72,7 @@ const JOURNEY_VARIANT_METADATA = {
     name: "Results & Social Proof",
     description: "Focuses on metrics, case studies, and proven results",
     color: "#3B82F6", // Blue
-    icon: "bar-chart",
+    icon: "trending-up",
     characteristics: [
       "Data-driven messaging",
       "Case studies",
@@ -76,7 +85,7 @@ const JOURNEY_VARIANT_METADATA = {
     name: "Personal Approach & Results Focused",
     description: "Combines personal touch with results-driven messaging",
     color: "#8B5CF6", // Purple
-    icon: "target",
+    icon: "zap",
     characteristics: [
       "Personal relationship building",
       "Data-driven results",

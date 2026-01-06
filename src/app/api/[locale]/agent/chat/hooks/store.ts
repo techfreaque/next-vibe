@@ -10,7 +10,7 @@ import { defaultModel, type ModelId as ModelIdType } from "@/app/api/[locale]/ag
 
 import { aliasToPathMap } from "../../../system/generated/endpoint";
 import { DEFAULT_TTS_VOICE, type TtsVoiceValue } from "../../text-to-speech/enum";
-import { DEFAULT_TOOL_CONFIRMATION_IDS, DEFAULT_TOOL_IDS } from "../config";
+import { DEFAULT_TOOL_CONFIRMATION_IDS, DEFAULT_TOOL_IDS } from "../constants";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { ViewMode, type ViewModeValue } from "../enum";
 import {
@@ -34,6 +34,7 @@ export interface EnabledTool {
 export interface ChatSettings {
   selectedModel: ModelIdType;
   selectedCharacter: string;
+  activeFavoriteId: string | null;
   temperature: number;
   maxTokens: number;
   ttsAutoplay: boolean;
@@ -103,6 +104,7 @@ interface ChatState {
 const getDefaultSettings = (): ChatSettings => ({
   selectedModel: defaultModel,
   selectedCharacter: "default",
+  activeFavoriteId: null,
   temperature: 0.7,
   maxTokens: 2000,
   ttsAutoplay: false,

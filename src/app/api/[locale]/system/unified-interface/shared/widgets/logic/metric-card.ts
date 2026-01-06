@@ -71,7 +71,10 @@ export function extractMetricCardData(value: WidgetData): ProcessedMetricCard | 
   const description =
     "description" in value && typeof value.description === "string" ? value.description : undefined;
 
-  const icon = "icon" in value && typeof value.icon === "string" ? value.icon : undefined;
+  // Type assertion for icon: widget configuration is trusted to provide valid IconKey strings
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const icon =
+    "icon" in value && typeof value.icon === "string" ? (value.icon as IconKey) : undefined;
 
   const color = "color" in value && typeof value.color === "string" ? value.color : undefined;
 

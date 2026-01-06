@@ -3,7 +3,26 @@
  * Centralized enum definitions for character system using localized enum pattern
  */
 
+import {
+  Brain,
+  Code,
+  Eye,
+  FileText,
+  Image,
+  Lightbulb,
+  MessageSquare,
+  ShieldOff,
+  Sparkles,
+  Theater,
+  Zap,
+} from "next-vibe-ui/ui/icons";
+
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+import type { TranslationKey } from "@/i18n/core/static-types";
+import type { IconComponent } from "@/packages/next-vibe-ui/web/lib/helper";
+
+import { ModelUtility, type ModelUtilityValue } from "../../models/enum";
 
 /**
  * Character Category Enum

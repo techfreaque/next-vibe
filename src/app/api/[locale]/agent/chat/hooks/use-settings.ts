@@ -19,6 +19,7 @@ export interface SettingsOperations {
   settings: ChatSettings;
   setSelectedCharacter: (character: string) => void;
   setSelectedModel: (model: ModelId) => void;
+  setActiveFavoriteId: (id: string | null) => void;
   setTemperature: (temp: number) => void;
   setMaxTokens: (tokens: number) => void;
   setTTSAutoplay: (autoplay: boolean) => void;
@@ -124,10 +125,18 @@ export function useSettings(deps: {
     [updateSettings],
   );
 
+  const setActiveFavoriteId = useCallback(
+    (id: string | null) => {
+      updateSettings({ activeFavoriteId: id });
+    },
+    [updateSettings],
+  );
+
   return {
     settings: chatStore.settings,
     setSelectedCharacter,
     setSelectedModel,
+    setActiveFavoriteId,
     setTemperature,
     setMaxTokens,
     setTTSAutoplay,

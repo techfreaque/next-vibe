@@ -94,6 +94,7 @@ export interface UseChatReturn {
   // Settings
   selectedCharacter: string;
   selectedModel: ModelId;
+  activeFavoriteId: string | null;
   temperature: number;
   maxTokens: number;
   ttsAutoplay: boolean;
@@ -103,6 +104,7 @@ export interface UseChatReturn {
   enabledTools: Array<{ id: string; requiresConfirmation: boolean }>;
   setSelectedCharacter: (character: string) => void;
   setSelectedModel: (model: ModelId) => void;
+  setActiveFavoriteId: (id: string | null) => void;
   setTemperature: (temp: number) => void;
   setMaxTokens: (tokens: number) => void;
   setTTSAutoplay: (autoplay: boolean) => void;
@@ -627,6 +629,7 @@ export function useChat(
     // Settings
     selectedCharacter: settingsOps.settings.selectedCharacter,
     selectedModel: settingsOps.settings.selectedModel,
+    activeFavoriteId: settingsOps.settings.activeFavoriteId,
     temperature: settingsOps.settings.temperature,
     maxTokens: settingsOps.settings.maxTokens,
     ttsAutoplay: settingsOps.settings.ttsAutoplay,
@@ -636,6 +639,7 @@ export function useChat(
     enabledTools: settingsOps.settings.enabledTools,
     setSelectedCharacter: settingsOps.setSelectedCharacter,
     setSelectedModel: settingsOps.setSelectedModel,
+    setActiveFavoriteId: settingsOps.setActiveFavoriteId,
     setTemperature: settingsOps.setTemperature,
     setMaxTokens: settingsOps.setMaxTokens,
     setTTSAutoplay: settingsOps.setTTSAutoplay,

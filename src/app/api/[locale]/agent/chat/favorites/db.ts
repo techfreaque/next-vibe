@@ -4,7 +4,7 @@
  */
 
 import { relations } from "drizzle-orm";
-import { boolean, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
@@ -48,9 +48,6 @@ export const chatFavorites = pgTable("chat_favorites", {
   // Usage stats
   useCount: integer("use_count").default(0).notNull(),
   lastUsedAt: timestamp("last_used_at"),
-
-  // Is this the active favorite?
-  isActive: boolean("is_active").default(false).notNull(),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),

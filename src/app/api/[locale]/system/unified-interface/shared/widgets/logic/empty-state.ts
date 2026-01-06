@@ -38,7 +38,10 @@ export function extractEmptyStateData(value: WidgetData): ProcessedEmptyState | 
       "description" in value && typeof value.description === "string"
         ? value.description
         : undefined;
-    const icon = "icon" in value && typeof value.icon === "string" ? value.icon : undefined;
+    // Type assertion for icon: widget configuration is trusted to provide valid IconKey strings
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const icon =
+      "icon" in value && typeof value.icon === "string" ? (value.icon as IconKey) : undefined;
     const action =
       "action" in value && typeof value.action === "object" && value.action !== null
         ? {

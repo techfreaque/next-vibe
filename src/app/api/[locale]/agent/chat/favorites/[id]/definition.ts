@@ -216,13 +216,6 @@ const { GET } = createEndpoint({
         },
         z.string().nullable(),
       ),
-      isActive: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.isActive.content" as const,
-        },
-        z.boolean(),
-      ),
       useCount: responseField(
         {
           type: WidgetType.TEXT,
@@ -305,7 +298,6 @@ const { GET } = createEndpoint({
         },
         position: 0,
         color: null,
-        isActive: true,
         useCount: 50,
       },
     },
@@ -542,7 +534,7 @@ const { PATCH } = createEndpoint({
                   options: ModelUtilityOptions,
                   columns: 6,
                 },
-                z.array(z.enum(ModelUtilityDB)).nullable().optional(),
+                z.array(z.enum(ModelUtilityDB)).nullable(),
               ),
               ignoredWeaknesses: requestDataField(
                 {
@@ -554,7 +546,7 @@ const { PATCH } = createEndpoint({
                   options: ModelUtilityOptions,
                   columns: 6,
                 },
-                z.array(z.enum(ModelUtilityDB)).nullable().optional(),
+                z.array(z.enum(ModelUtilityDB)).nullable(),
               ),
             },
           ),
@@ -577,15 +569,6 @@ const { PATCH } = createEndpoint({
           columns: 6,
         },
         iconSchema.optional(),
-      ),
-      isActive: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.agent.chat.favorites.id.patch.isActive.label" as const,
-          columns: 6,
-        },
-        z.boolean().optional(),
       ),
       position: requestDataField(
         {
@@ -675,8 +658,8 @@ const { PATCH } = createEndpoint({
             min: SpeedLevelFilter.FAST,
             max: SpeedLevelFilter.THOROUGH,
           },
-          preferredStrengths: undefined,
-          ignoredWeaknesses: undefined,
+          preferredStrengths: null,
+          ignoredWeaknesses: null,
         },
       },
     },

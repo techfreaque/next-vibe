@@ -19,7 +19,8 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import type { CharacterListResponseOutput } from "@/app/api/[locale]/agent/chat/characters/definition";
+import type { Character } from "@/app/api/[locale]/agent/chat/characters/definition";
+import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
 import type { FavoriteItem } from "@/app/api/[locale]/agent/chat/favorites/components/favorites-bar";
 import {
   CONTENT_DISPLAY,
@@ -27,8 +28,8 @@ import {
   PRICE_DISPLAY,
 } from "@/app/api/[locale]/agent/chat/favorites/display-configs";
 import {
+  IntelligenceLevelFilter,
   ModelSelectionType,
-  type ModelSelectionTypeValue,
 } from "@/app/api/[locale]/agent/chat/favorites/enum";
 import {
   type ModelId,
@@ -41,26 +42,16 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import {
-  applyModelFilters,
-  CONTENT_FILTER_ORDER,
-  getCompatibleModels,
-  INTELLIGENCE_FILTER_ORDER,
-  selectModelForCharacter,
-} from "./types";
-
-type CharacterData = CharacterListResponseOutput["characters"][number];
-
 interface QuickSettingsPanelProps {
   favorite: FavoriteItem;
   onSave: (settings: FavoriteItem["modelSelection"], saveMode: SaveMode) => void;
   onCancel: () => void;
   onDelete?: () => void;
-  onEditCharacter?: (characterData: CharacterData) => void;
+  onEditCharacter?: (characterData: Character) => void;
   onSwitchCharacterView?: () => void;
   onCharacterSwitch?: (characterId: string, keepSettings: boolean) => void;
   /** Characters fetched from API - used for editing custom characters */
-  characters?: Record<string, CharacterData>;
+  characters?: Record<string, Character>;
   isAuthenticated?: boolean;
   locale: CountryLanguage;
 }
@@ -160,11 +151,7 @@ function ModelCard({
 
       <Div className="flex items-center gap-1.5 shrink-0">
         <Badge variant={selected ? "outline" : "secondary"} className="text-[10px] h-5">
-          {model.creditCost === 0
-            ? t("app.chat.selector.free")
-            : model.creditCost === 1
-              ? t("app.chat.selector.creditsSingle")
-              : t("app.chat.selector.creditsExact", { cost: model.creditCost })}
+          {CharactersRepositoryClient.formatCreditCost(model.creditCost, t)}
         </Badge>
         {selected && <Check className="h-4 w-4 text-primary" />}
       </Div>
@@ -189,29 +176,27 @@ export function QuickSettingsPanel({
   const { t } = simpleT(locale);
 
   const character = useMemo(() => {
-    if (!favorite.characterId) {
+    if (!favorite.characterId || !characters) {
       return null;
     }
-    // Always use getCharacterById for built-in characters (required for model filtering)
-    // Custom characters are not supported for model filtering yet
-    return getCharacterById(favorite.characterId);
-  }, [favorite.characterId]);
+    // Get character from API data
+    return CharactersRepositoryClient.getCharacterById(characters, favorite.characterId);
+  }, [favorite.characterId, characters]);
 
   const isModelOnly = !character;
 
+  // Extract filters from modelSelection
+  const initialFilters = CharactersRepositoryClient.extractFiltersFromModelSelection(
+    favorite.modelSelection,
+  );
+
   // Local state for editing
-  const [intelligence, setIntelligence] = useState<typeof IntelligenceLevelFilterValue>(
-    favorite.modelSettings.filters.intelligence,
-  );
-  const [maxPrice, setMaxPrice] = useState<typeof PriceLevelFilterValue>(
-    favorite.modelSettings.filters.maxPrice,
-  );
-  const [content, setContent] = useState<typeof ContentLevelFilterValue>(
-    favorite.modelSettings.filters.content,
-  );
-  const [mode, setMode] = useState<typeof ModelSelectionModeValue>(favorite.modelSettings.mode);
+  const [intelligenceRange, setIntelligenceRange] = useState(initialFilters.intelligenceRange);
+  const [priceRange, setPriceRange] = useState(initialFilters.priceRange);
+  const [contentRange, setContentRange] = useState(initialFilters.contentRange);
+  const [mode, setMode] = useState(favorite.modelSelection.selectionType);
   const [manualModelId, setManualModelId] = useState<ModelId | undefined>(
-    favorite.modelSettings.manualModelId as ModelId | undefined,
+    CharactersRepositoryClient.getManualModelId(favorite.modelSelection),
   );
   const [showAllModels, setShowAllModels] = useState(false);
   const [showUnfilteredModels, setShowUnfilteredModels] = useState(false);
@@ -223,7 +208,7 @@ export function QuickSettingsPanel({
     if (!character) {
       return [];
     }
-    return getCompatibleModels(allModels, character);
+    return CharactersRepositoryClient.getCompatibleModels(allModels, character);
   }, [allModels, character]);
 
   const bestModel = useMemo(() => {
@@ -231,71 +216,29 @@ export function QuickSettingsPanel({
       return null;
     }
     // Use priority logic: manual > preferredModel > auto
-    const selectedModelId = selectModelForCharacter(allModels, character, {
-      mode: mode === ModelSelectionMode.MANUAL ? "manual" : "auto",
-      manualModelId,
-      filters: {
-        intelligence,
-        maxPrice,
-        content,
+    const selectedModelId = CharactersRepositoryClient.selectModelForCharacter(
+      allModels,
+      character,
+      {
+        mode: mode === ModelSelectionType.MANUAL ? "manual" : "auto",
+        manualModelId,
+        filters: {
+          intelligenceRange,
+          priceRange,
+          contentRange,
+        },
       },
-    });
-    return selectedModelId ? (allModels.find((m) => m.id === selectedModelId) ?? null) : null;
-  }, [allModels, character, mode, manualModelId, intelligence, maxPrice, content]);
+    );
+    return CharactersRepositoryClient.findModelById(allModels, selectedModelId);
+  }, [allModels, character, mode, manualModelId, intelligenceRange, priceRange, contentRange]);
 
   const filteredModels = useMemo(() => {
-    return compatibleModels.filter((m) => {
-      // Filter by intelligence (skip if "any")
-      if (intelligence !== IntelligenceLevelFilter.ANY) {
-        const intelligenceOrder = [
-          IntelligenceLevelFilter.QUICK,
-          IntelligenceLevelFilter.SMART,
-          IntelligenceLevelFilter.BRILLIANT,
-        ];
-        const modelIndex = intelligenceOrder.indexOf(m.intelligence);
-        const targetIndex = intelligenceOrder.indexOf(intelligence);
-        if (modelIndex < targetIndex) {
-          return false;
-        }
-      }
-
-      // Filter by content (skip if "any")
-      if (content !== ContentLevelFilter.ANY) {
-        const contentOrder = [
-          ContentLevelFilter.MAINSTREAM,
-          ContentLevelFilter.OPEN,
-          ContentLevelFilter.UNCENSORED,
-        ];
-        const modelContentIndex = contentOrder.indexOf(m.content);
-        const targetContentIndex = contentOrder.indexOf(content);
-        if (modelContentIndex < targetContentIndex) {
-          return false;
-        }
-      }
-
-      // Filter by price (skip if "any")
-      if (maxPrice !== PriceLevelFilter.ANY) {
-        const priceOrder = [
-          PriceLevelFilter.CHEAP,
-          PriceLevelFilter.STANDARD,
-          PriceLevelFilter.PREMIUM,
-        ];
-        const modelPrice =
-          m.creditCost <= 3
-            ? PriceLevelFilter.CHEAP
-            : m.creditCost <= 9
-              ? PriceLevelFilter.STANDARD
-              : PriceLevelFilter.PREMIUM;
-        const modelPriceIndex = priceOrder.indexOf(modelPrice);
-        const maxPriceIndex = priceOrder.indexOf(maxPrice);
-        if (modelPriceIndex > maxPriceIndex) {
-          return false;
-        }
-      }
-
-      return true;
+    return CharactersRepositoryClient.applyModelFilters(compatibleModels, {
+      intelligenceRange,
+      priceRange,
+      contentRange,
     });
-  }, [compatibleModels, intelligence, maxPrice, content]);
+  }, [compatibleModels, intelligenceRange, priceRange, contentRange]);
 
   // Models to display in manual mode - either filtered or all compatible
   const modelsToShow = showUnfilteredModels ? compatibleModels : filteredModels;
@@ -303,52 +246,56 @@ export function QuickSettingsPanel({
 
   // Check if current selection is valid for saving
   const canSave = useMemo(() => {
-    if (mode === ModelSelectionMode.AUTO) {
-      // In auto mode, need at least one matching model
+    if (mode === ModelSelectionType.FILTERS) {
+      // In filters mode, need at least one matching model
       return filteredModels.length > 0;
     }
     // In manual mode, need a selected model
     return !!manualModelId;
   }, [mode, filteredModels.length, manualModelId]);
 
+  const handleSaveWithMode = useCallback(
+    (saveMode: SaveMode) => {
+      const modelSelection: FavoriteItem["modelSelection"] =
+        mode === ModelSelectionType.MANUAL && manualModelId
+          ? {
+              selectionType: ModelSelectionType.MANUAL,
+              manualModelId,
+            }
+          : {
+              selectionType: ModelSelectionType.FILTERS,
+              intelligenceRange,
+              priceRange,
+              contentRange,
+              preferredStrengths: null,
+              ignoredWeaknesses: null,
+            };
+      onSave(modelSelection, saveMode);
+    },
+    [onSave, mode, manualModelId, intelligenceRange, priceRange, contentRange],
+  );
+
   const handleSave = useCallback(() => {
-    onSave(
-      {
-        mode,
-        filters: { intelligence, maxPrice, content },
-        manualModelId: mode === ModelSelectionMode.MANUAL ? manualModelId : undefined,
-      },
-      "update",
-    );
-  }, [onSave, mode, intelligence, maxPrice, content, manualModelId]);
+    handleSaveWithMode("update");
+  }, [handleSaveWithMode]);
 
   const handleApplyOnce = useCallback(() => {
-    onSave(
-      {
-        mode,
-        filters: { intelligence, maxPrice, content },
-        manualModelId: mode === ModelSelectionMode.MANUAL ? manualModelId : undefined,
-      },
-      "temporary",
-    );
-  }, [onSave, mode, intelligence, maxPrice, content, manualModelId]);
+    handleSaveWithMode("temporary");
+  }, [handleSaveWithMode]);
 
   const resolvedModel =
-    mode === ModelSelectionMode.MANUAL && manualModelId
+    mode === ModelSelectionType.MANUAL && manualModelId
       ? (allModels.find((m) => m.id === manualModelId) ?? bestModel)
       : bestModel;
 
-  // Get display info - works for both character and model-only favorites
-  const DisplayIcon = character
-    ? getIconComponent(character.icon)
-    : resolvedModel
-      ? getIconComponent(resolvedModel.icon)
-      : getIconComponent("bot");
-  const displayName = favorite.customName
-    ? favorite.customName
-    : character
-      ? t(character.name)
-      : (resolvedModel?.name ?? t("app.chat.selector.modelOnly"));
+  // Get display info - consolidated logic
+  const displayIcon = CharactersRepositoryClient.getDisplayIcon(favorite, character, resolvedModel);
+  const displayName = CharactersRepositoryClient.getDisplayName(
+    favorite,
+    character,
+    resolvedModel,
+    t,
+  );
 
   return (
     <Div className="flex flex-col max-h-[70vh] overflow-hidden">
@@ -379,7 +326,7 @@ export function QuickSettingsPanel({
           <Div className="flex flex-col gap-3 p-4 border-2 rounded-xl bg-card">
             <Div className="flex items-center gap-3">
               <Div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <DisplayIcon className="h-6 w-6 text-primary" />
+                <Icon icon={displayIcon} className="h-6 w-6 text-primary" />
               </Div>
               <Div className="flex-1 min-w-0">
                 <Span className="font-semibold text-lg block">{displayName}</Span>
@@ -426,27 +373,18 @@ export function QuickSettingsPanel({
           {resolvedModel && (
             <Div className="flex items-center gap-3 p-3 bg-linear-to-r from-primary/10 to-primary/5 border border-primary/25 rounded-xl">
               <Div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-                {(() => {
-                  const ResolvedIcon = getIconComponent(resolvedModel.icon);
-                  return <ResolvedIcon className="h-5 w-5 text-primary" />;
-                })()}
+                <Icon icon={resolvedModel.icon} className="h-5 w-5 text-primary" />
               </Div>
               <Div className="flex-1 min-w-0">
                 <Span className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">
-                  {mode === ModelSelectionMode.AUTO
+                  {mode === ModelSelectionType.FILTERS
                     ? t("app.chat.selector.autoSelectedModel")
                     : t("app.chat.selector.manualSelectedModel")}
                 </Span>
                 <Div className="flex items-center gap-2">
                   <Span className="text-sm font-semibold text-primary">{resolvedModel.name}</Span>
                   <Badge variant="secondary" className="text-[10px] h-5 shrink-0">
-                    {resolvedModel.creditCost === 0
-                      ? t("app.chat.selector.free")
-                      : resolvedModel.creditCost === 1
-                        ? t("app.chat.selector.creditsSingle")
-                        : t("app.chat.selector.creditsExact", {
-                            cost: resolvedModel.creditCost,
-                          })}
+                    {CharactersRepositoryClient.formatCreditCost(resolvedModel.creditCost, t)}
                   </Badge>
                 </Div>
               </Div>
@@ -465,8 +403,8 @@ export function QuickSettingsPanel({
                   value={tier.value}
                   label={tier.label}
                   icon={tier.icon}
-                  selected={intelligence === tier.value}
-                  onClick={() => setIntelligence(tier.value)}
+                  selected={intelligenceRange?.min === tier.value}
+                  onClick={() => setIntelligenceRange({ min: tier.value })}
                   locale={locale}
                 />
               ))}
@@ -485,8 +423,8 @@ export function QuickSettingsPanel({
                   value={tier.value}
                   label={tier.label}
                   icon={tier.icon}
-                  selected={content === tier.value}
-                  onClick={() => setContent(tier.value)}
+                  selected={contentRange?.min === tier.value}
+                  onClick={() => setContentRange({ min: tier.value })}
                   locale={locale}
                 />
               ))}
@@ -505,8 +443,8 @@ export function QuickSettingsPanel({
                   value={tier.value}
                   label={tier.label}
                   icon={tier.icon}
-                  selected={maxPrice === tier.value}
-                  onClick={() => setMaxPrice(tier.value)}
+                  selected={priceRange?.max === tier.value}
+                  onClick={() => setPriceRange({ max: tier.value })}
                   locale={locale}
                 />
               ))}
@@ -522,7 +460,7 @@ export function QuickSettingsPanel({
                 {t("app.chat.selector.modelSelection")}
               </Label>
               <Span className="text-xs text-muted-foreground/70">
-                {mode === ModelSelectionMode.AUTO
+                {mode === ModelSelectionType.FILTERS
                   ? t("app.chat.selector.autoModeDescription")
                   : t("app.chat.selector.manualModeDescription")}
               </Span>
@@ -530,26 +468,26 @@ export function QuickSettingsPanel({
             <Div className="flex items-center gap-2">
               <Button
                 type="button"
-                variant={mode === ModelSelectionMode.AUTO ? "default" : "outline"}
+                variant={mode === ModelSelectionType.FILTERS ? "default" : "outline"}
                 size="sm"
                 className="flex-1 h-9"
-                onClick={() => setMode(ModelSelectionMode.AUTO)}
+                onClick={() => setMode(ModelSelectionType.FILTERS)}
               >
                 {t("app.chat.selector.autoMode")}
               </Button>
               <Button
                 type="button"
-                variant={mode === ModelSelectionMode.MANUAL ? "default" : "outline"}
+                variant={mode === ModelSelectionType.MANUAL ? "default" : "outline"}
                 size="sm"
                 className="flex-1 h-9"
-                onClick={() => setMode(ModelSelectionMode.MANUAL)}
+                onClick={() => setMode(ModelSelectionType.MANUAL)}
               >
                 {t("app.chat.selector.manualMode")}
               </Button>
             </Div>
 
             {/* Model list (visible in manual mode or when expanded) */}
-            {mode === ModelSelectionMode.MANUAL && (
+            {mode === ModelSelectionType.MANUAL && (
               <Div className="flex flex-col gap-2">
                 {/* Toggle to show all models vs filtered */}
                 <Div className="flex items-center justify-between">
@@ -627,8 +565,8 @@ export function QuickSettingsPanel({
               </Div>
             )}
 
-            {/* Warning when no models match in auto mode */}
-            {mode === ModelSelectionMode.AUTO && filteredModels.length === 0 && (
+            {/* Warning when no models match in filters mode */}
+            {mode === ModelSelectionType.FILTERS && filteredModels.length === 0 && (
               <Div className="flex flex-col gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive">
                 <Div className="flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 shrink-0" />

@@ -1083,3 +1083,18 @@ export const ModelIdOptions = Object.values(modelOptions).map((model) => ({
   value: model.id,
   label: model.name as TranslationKey,
 }));
+
+/**
+ * Get credit cost for a specific model
+ * @param modelId - The model identifier
+ * @returns Credit cost (defaults to 1 if model not found)
+ */
+export function getModelCost(modelId: ModelId | string): number {
+  try {
+    const model = getModelById(modelId as ModelId);
+    return model.creditCost;
+  } catch {
+    // Fallback to 1 credit if model not found
+    return 1;
+  }
+}

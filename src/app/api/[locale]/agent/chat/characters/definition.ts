@@ -91,6 +91,14 @@ const { GET } = createEndpoint({
               },
               z.string() as z.ZodType<TranslationKey>,
             ),
+            tagline: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.agent.chat.characters.get.response.characters.character.tagline.content" as const,
+              },
+              z.string() as z.ZodType<TranslationKey>,
+            ),
             description: responseField(
               {
                 type: WidgetType.TEXT,
@@ -344,6 +352,7 @@ const { GET } = createEndpoint({
           {
             id: "default",
             name: "Default",
+            tagline: "Pure AI, No Personality",
             description: "The models unmodified behavior",
             icon: "robot-face",
             systemPrompt: "",
@@ -364,6 +373,7 @@ const { GET } = createEndpoint({
             id: "550e8400-e29b-41d4-a716-446655440000",
             name: "My Custom Character",
             description: "A custom character I created",
+            tagline: "Custom Character",
             icon: "direct-hit",
             systemPrompt: "You are a helpful assistant specialized in...",
             category: CharacterCategory.CODING,

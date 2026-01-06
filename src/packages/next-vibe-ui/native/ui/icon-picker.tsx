@@ -8,14 +8,16 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import { FlatList, Modal, Pressable, ScrollView, TextInput, View } from "react-native";
 
-import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { CategoryKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import { Icon, ICON_CATEGORIES } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { useTranslation } from "@/i18n/core/client";
 
-import { type CategoryKey, ICON_CATEGORIES, type IconPickerProps } from "../../web/ui/icon-picker";
+import type { IconPickerProps } from "../../web/ui/icon-picker";
 import { Text } from "./text";
 
 export type { CategoryKey, IconPickerProps };
 export { ICON_CATEGORIES };
+
 /**
  * Icon Picker Component for React Native
  */
@@ -27,7 +29,7 @@ export function IconPicker({ value, onChange, className }: IconPickerProps): JSX
 
   // Filter icons based on search query
   const filteredIcons = useMemo(() => {
-    const categoryIcons = ICON_CATEGORIES[activeCategory];
+    const categoryIcons = ICON_CATEGORIES[activeCategory].icons;
     if (!searchQuery) {
       return categoryIcons;
     }
@@ -35,33 +37,6 @@ export function IconPicker({ value, onChange, className }: IconPickerProps): JSX
     const query = searchQuery.toLowerCase();
     return categoryIcons.filter((iconKey) => iconKey.toLowerCase().includes(query));
   }, [searchQuery, activeCategory]);
-
-  const categories: Array<{ key: CategoryKey; label: string }> = [
-    { key: "all", label: t("app.ui.iconPicker.categories.all") },
-    { key: "general", label: t("app.ui.iconPicker.categories.general") },
-    { key: "ai", label: t("app.ui.iconPicker.categories.ai") },
-    { key: "education", label: t("app.ui.iconPicker.categories.education") },
-    {
-      key: "communication",
-      label: t("app.ui.iconPicker.categories.communication"),
-    },
-    { key: "science", label: t("app.ui.iconPicker.categories.science") },
-    { key: "arts", label: t("app.ui.iconPicker.categories.arts") },
-    { key: "finance", label: t("app.ui.iconPicker.categories.finance") },
-    { key: "lifestyle", label: t("app.ui.iconPicker.categories.lifestyle") },
-    { key: "security", label: t("app.ui.iconPicker.categories.security") },
-    {
-      key: "programming",
-      label: t("app.ui.iconPicker.categories.programming"),
-    },
-    { key: "platforms", label: t("app.ui.iconPicker.categories.platforms") },
-    {
-      key: "ai_providers",
-      label: t("app.ui.iconPicker.categories.aiProviders"),
-    },
-    { key: "media", label: t("app.ui.iconPicker.categories.media") },
-    { key: "special", label: t("app.ui.iconPicker.categories.special") },
-  ];
 
   return (
     <View className={className}>
@@ -86,95 +61,88 @@ export function IconPicker({ value, onChange, className }: IconPickerProps): JSX
         presentationStyle="pageSheet"
       >
         <View className="flex-1 bg-background">
-          {/* Header */}
-          <View className="p-4 border-b border-border">
-            <View className="flex-row items-center justify-between mb-3">
-              <Text className="text-lg font-semibold">{t("app.ui.iconPicker.title")}</Text>
-              <Pressable onPress={(): void => setModalVisible(false)}>
-                <Text className="text-primary">{t("app.common.cancel")}</Text>
-              </Pressable>
-            </View>
+          {/* Header with search */}
+          <View className="flex flex-col gap-3 p-4 border-b bg-card">
+            <Text className="text-lg font-semibold">{t("app.ui.iconPicker.title")}</Text>
             <TextInput
               placeholder={t("app.ui.iconPicker.searchPlaceholder")}
               value={searchQuery}
-              onChangeText={setSearchQuery}
-              className="h-10 px-3 border border-input rounded-md bg-background"
+              onChangeText={(text): void => setSearchQuery(text)}
+              className="p-2 border border-input rounded-md bg-background"
+              returnKeyType="search"
+              autoCapitalize="none"
             />
           </View>
 
-          {/* Category Tabs */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            className="border-b border-border"
-          >
-            <View className="flex-row p-2 gap-2">
-              {categories.map((cat) => (
+          {/* Scrollable content - category tabs + icon grid */}
+          <ScrollView className="flex-1">
+            {/* Horizontal category tabs */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              className="border-b bg-muted/30"
+              contentContainerStyle={{
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+              }}
+            >
+              {Object.entries(ICON_CATEGORIES).map(([categoryKey, category]) => (
                 <Pressable
-                  key={cat.key}
-                  onPress={(): void => setActiveCategory(cat.key)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-md",
-                    activeCategory === cat.key ? "bg-primary" : "bg-muted",
-                  )}
+                  key={categoryKey}
+                  onPress={(): void => setActiveCategory(categoryKey)}
+                  className="mr-2 mb-1"
                 >
                   <Text
                     className={cn(
-                      "text-xs",
-                      activeCategory === cat.key
-                        ? "text-primary-foreground"
-                        : "text-muted-foreground",
+                      "px-3 py-2 rounded-md text-sm font-medium",
+                      activeCategory === categoryKey
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground",
                     )}
                   >
-                    {cat.label}
+                    {t(category.name)}
                   </Text>
                 </Pressable>
               ))}
-            </View>
+            </ScrollView>
+
+            {/* Icon grid */}
+            <FlatList
+              data={filteredIcons}
+              numColumns={6}
+              keyExtractor={(item): string => item}
+              renderItem={({ item: iconKey }): JSX.Element => {
+                const isSelected = value === iconKey;
+
+                return (
+                  <Pressable
+                    onPress={(): void => {
+                      onChange(iconKey);
+                      setModalVisible(false);
+                    }}
+                    className={cn(
+                      "flex-1 aspect-square items-center justify-center m-1 rounded-md",
+                      isSelected ? "bg-accent border-2 border-primary" : "bg-muted/30",
+                    )}
+                  >
+                    <Icon icon={iconKey} className="h-5 w-5" />
+                  </Pressable>
+                );
+              }}
+              contentContainerStyle={{ padding: 16 }}
+              columnWrapperStyle={{ justifyContent: "flex-start" }}
+              ListHeaderComponent={
+                <Text className="ml-4 mr-4 mb-2 text-xs text-muted-foreground">
+                  {t("app.ui.iconPicker.showing", {
+                    count: filteredIcons.length,
+                    total: ICON_CATEGORIES[activeCategory].icons.length,
+                  })}
+                </Text>
+              }
+            />
           </ScrollView>
-
-          {/* Icon Grid */}
-          <FlatList
-            data={filteredIcons}
-            numColumns={6}
-            keyExtractor={(item): string => item}
-            renderItem={({ item: iconKey }): JSX.Element => {
-              const isSelected = value === iconKey;
-
-              return (
-                <Pressable
-                  onPress={(): void => {
-                    onChange(iconKey);
-                    setModalVisible(false);
-                  }}
-                  className={cn(
-                    "flex-1 aspect-square items-center justify-center m-0.5 rounded-md",
-                    isSelected ? "bg-accent border-2 border-primary" : "bg-muted/30",
-                  )}
-                >
-                  <Icon icon={iconKey} className="h-4 w-4" />
-                </Pressable>
-              );
-            }}
-            contentContainerClassName="p-2"
-          />
-
-          {/* Footer */}
-          <View className="p-3 border-t border-border">
-            <Text className="text-xs text-muted-foreground text-center">
-              {t("app.ui.iconPicker.showing", {
-                count: filteredIcons.length,
-                total: ICON_CATEGORIES[activeCategory].length,
-              })}
-            </Text>
-            {value && (
-              <Text className="text-xs text-primary text-center mt-1 font-mono">{value}</Text>
-            )}
-          </View>
         </View>
       </Modal>
     </View>
   );
 }
-
-IconPicker.displayName = "IconPicker";

@@ -6,7 +6,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { Check } from "next-vibe-ui/ui/icons/Check";
-import { Image } from "next-vibe-ui/ui/image";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
@@ -14,6 +13,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { CharacterBrowserCore } from "@/app/api/[locale]/agent/chat/characters/components/character-browser";
 import type { CharacterListResponseOutput } from "@/app/api/[locale]/agent/chat/characters/definition";
+import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
 import type { FavoriteItem } from "@/app/api/[locale]/agent/chat/favorites/components/favorites-bar";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -33,20 +33,6 @@ interface SelectorOnboardingProps {
 }
 
 type OnboardingStep = "story" | "pick" | "specialists";
-
-// Featured characters for quick onboarding
-const FEATURED_CHARACTER_IDS = ["thea", "hermes"] as const;
-
-/**
- * Get featured characters for onboarding
- */
-function getFeaturedCharacters(
-  characters: Record<string, CharacterListResponseOutput["characters"][number]>,
-): CharacterListResponseOutput["characters"][number][] {
-  return FEATURED_CHARACTER_IDS.map((id) => characters[id]).filter(
-    (c): c is CharacterListResponseOutput["characters"][number] => c !== undefined,
-  );
-}
 
 /**
  * Step indicator dots
@@ -127,17 +113,7 @@ function CompanionCard({
             isSelected ? "ring-primary" : "ring-transparent group-hover:ring-primary/40",
           )}
         >
-          {character.avatar ? (
-            <Image
-              src={character.avatar}
-              alt={t(character.name)}
-              width={64}
-              height={64}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <Icon icon={character.icon} className="h-8 w-8 text-primary" />
-          )}
+          <Icon icon={character.icon} className="h-8 w-8 text-primary" />
         </Div>
         {isSelected && (
           <Div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-sm">
@@ -222,7 +198,10 @@ function PickStep({
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
-  const featuredCharacters = useMemo(() => getFeaturedCharacters(characters), [characters]);
+  const featuredCharacters = useMemo(
+    () => CharactersRepositoryClient.getFeaturedCharacters(characters),
+    [characters],
+  );
 
   return (
     <Div className="flex flex-col p-5 overflow-y-auto">

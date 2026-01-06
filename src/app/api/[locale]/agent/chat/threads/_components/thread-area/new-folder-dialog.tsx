@@ -3,6 +3,7 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
+import { IconPicker } from "next-vibe-ui/ui/icon-picker";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import type { JSX } from "react";
@@ -12,8 +13,6 @@ import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
-
-import { FolderIconSelector } from "./folder-icon-selector";
 
 interface NewFolderDialogProps {
   open: boolean;
@@ -75,7 +74,7 @@ export function NewFolderDialog({
           </Div>
           <Div className="flex flex-col gap-2">
             <Label>{t("app.chat.newFolder.folderIcon")}</Label>
-            <FolderIconSelector value={icon} onChange={setIcon} />
+            <IconPicker value={icon} onChange={setIcon} size="sm" />
           </Div>
           <Div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => onOpenChange(false)}>

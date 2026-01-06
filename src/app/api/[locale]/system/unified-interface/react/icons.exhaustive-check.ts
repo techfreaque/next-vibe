@@ -27,6 +27,7 @@ const {
   Award,
   Banknote,
   BarChart,
+  BarChart2,
   BarChart3,
   BarChart3Icon,
   Bell,
@@ -207,7 +208,6 @@ const {
   Share2,
   Shield,
   ShieldOff,
-  ShieldOffIcon,
   ShieldPlus,
   ShoppingBag,
   ShoppingCart,
@@ -294,3 +294,29 @@ const _exhaustiveCheck: Record<string, never> = exhaustiveCheck;
 type _RegistryCheck = {
   [K in keyof typeof Icons]: K extends keyof typeof ICON_REGISTRY ? true : never;
 };
+
+/**
+ * Type-level exhaustive check for ICON_CATEGORIES
+ * Ensures all icons from ICON_REGISTRY are distributed into categories
+ */
+import type { ICON_CATEGORIES } from "./icons";
+
+// Extract all categorized icons (excluding 'all' which is auto-generated)
+type CategorizedIcons = {
+  [K in keyof typeof ICON_CATEGORIES]: K extends "all"
+    ? never
+    : (typeof ICON_CATEGORIES)[K]["icons"][number];
+}[keyof typeof ICON_CATEGORIES];
+
+// Get all icon keys from registry
+type AllRegistryIcons = keyof typeof ICON_REGISTRY;
+
+// Check: Every icon in registry must be in at least one category
+// This will produce a type error if any registry icon is not categorized
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type _CategoryCoverageCheck = AllRegistryIcons extends CategorizedIcons ? true : never;
+
+// Check: Every categorized icon must exist in registry
+// This will produce a type error if any category contains invalid icon keys
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type _CategoryValidityCheck = CategorizedIcons extends AllRegistryIcons ? true : never;

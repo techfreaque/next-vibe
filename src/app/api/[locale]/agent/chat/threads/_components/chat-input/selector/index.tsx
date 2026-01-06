@@ -11,7 +11,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 import { useTourState } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-state-context";
-import type { ModelFilters } from "@/app/api/[locale]/agent/chat/characters/[id]/definition";
 import { CharacterBrowser } from "@/app/api/[locale]/agent/chat/characters/components/character-browser";
 import { CreateCharacterForm } from "@/app/api/[locale]/agent/chat/characters/components/create-character-form";
 import { EditCharacterModal } from "@/app/api/[locale]/agent/chat/characters/components/edit-character-modal";
@@ -19,18 +18,15 @@ import charactersDefinition, {
   type CharacterListResponseOutput,
 } from "@/app/api/[locale]/agent/chat/characters/definition";
 import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
+import type { FavoriteUpdateRequestOutput } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import {
   type FavoriteItem,
   FavoritesBar,
 } from "@/app/api/[locale]/agent/chat/favorites/components/favorites-bar";
-import {
-  IntelligenceLevelFilter,
-  ModelSelectionType,
-} from "@/app/api/[locale]/agent/chat/favorites/enum";
 import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks";
 import { type ModelId, modelOptions } from "@/app/api/[locale]/agent/models/models";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
-import { Icon, type IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -39,18 +35,13 @@ import { simpleT } from "@/i18n/core/shared";
 import { QuickSettingsPanel } from "./quick-settings-panel";
 import { SelectorOnboarding } from "./selector-onboarding";
 
-/**
- * Render icon helper
- */
-function renderIcon(icon: IconKey, iconClassName = "h-4 w-4"): JSX.Element {
-  return <Icon icon={icon} className={iconClassName} />;
-}
-
 interface SelectorProps {
   characterId: string;
   modelId: ModelId;
+  activeFavoriteId?: string | null;
   onCharacterChange: (characterId: string) => void;
   onModelChange: (modelId: ModelId) => void;
+  onActiveFavoriteChange?: (favoriteId: string | null) => void;
   locale: CountryLanguage;
   user: JwtPayloadType;
   logger: EndpointLogger;
@@ -67,223 +58,6 @@ type SelectorView =
   | "create"
   | "edit"
   | "character-switch";
-
-// Removed old getDefaultIntelligence, getDefaultContent, getDefaultMaxPrice functions
-// Now we use the modelSelection union directly with min/max ranges
-
-/**
- * Deactivate all active favorites
- */
-async function deactivateAllFavorites(
-  favorites: FavoriteItem[],
-  updateFavorite: (id: string, updates: Partial<FavoriteItem>) => Promise<void>,
-): Promise<void> {
-  for (const f of favorites) {
-    if (f.isActive) {
-      await updateFavorite(f.id, { isActive: false });
-    }
-  }
-}
-
-/**
- * Apply favorite selection - sets character (auto-sets voice) and model
- */
-function applyFavoriteSelection(
-  favorite: FavoriteItem,
-  characters: Record<string, CharacterListResponseOutput["characters"][number]>,
-  onCharacterChange: (characterId: string) => void,
-  onModelChange: (modelId: ModelId) => void,
-): void {
-  // Set character if not model-only (this also sets voice via setSelectedCharacter)
-  if (favorite.characterId) {
-    onCharacterChange(favorite.characterId);
-  }
-
-  // Resolve and set model
-  const character = favorite.characterId ? (characters[favorite.characterId] ?? null) : null;
-
-  const allModels = Object.values(modelOptions);
-  const isManual = favorite.modelSelection.selectionType === ModelSelectionType.MANUAL;
-
-  // Extract filters from modelSelection
-  const filters: ModelFilters =
-    !isManual && favorite.modelSelection.selectionType === ModelSelectionType.FILTERS
-      ? {
-          intelligenceRange: favorite.modelSelection.intelligenceRange,
-          priceRange: favorite.modelSelection.priceRange,
-          contentRange: favorite.modelSelection.contentRange,
-          speedRange: favorite.modelSelection.speedRange,
-        }
-      : {
-          intelligenceRange: undefined,
-          priceRange: undefined,
-          contentRange: undefined,
-          speedRange: undefined,
-        };
-
-  const selectedModelId = CharactersRepositoryClient.selectModelForCharacter(allModels, character, {
-    mode: isManual ? "manual" : "auto",
-    manualModelId:
-      isManual && favorite.modelSelection.selectionType === ModelSelectionType.MANUAL
-        ? favorite.modelSelection.manualModelId
-        : undefined,
-    filters,
-  });
-
-  if (selectedModelId) {
-    onModelChange(selectedModelId);
-  } else if (!character) {
-    // Model-only fallback: use first model matching filters
-    const minIntelligence = filters.intelligenceRange?.min;
-    const matchingModel = allModels.find((m) => {
-      if (
-        minIntelligence &&
-        minIntelligence !== IntelligenceLevelFilter.ANY &&
-        m.intelligence !== minIntelligence
-      ) {
-        return false;
-      }
-      return true;
-    });
-    if (matchingModel) {
-      onModelChange(matchingModel.id);
-    }
-  }
-}
-
-/**
- * Create a new favorite from character
- */
-function createFavoriteFromCharacter(
-  characterId: string | null,
-  characters: Record<string, CharacterListResponseOutput["characters"][number]>,
-): FavoriteItem {
-  const character = characterId ? characters[characterId] : null;
-
-  // Use character's modelSelection if available, otherwise create default
-  const modelSelection: FavoriteItem["modelSelection"] = character?.modelSelection ?? {
-    selectionType: ModelSelectionType.FILTERS,
-    intelligenceRange: undefined,
-    priceRange: undefined,
-    contentRange: undefined,
-    speedRange: undefined,
-    preferredStrengths: null,
-    ignoredWeaknesses: null,
-  };
-
-  return {
-    id: `local-${Date.now()}-${characterId ?? "model"}`,
-    characterId: characterId ?? "",
-    customName: null,
-    customIcon: null,
-    voice: character?.voice ?? null,
-    modelSelection,
-    position: 0,
-    color: null,
-    isActive: false,
-    useCount: 0,
-  };
-}
-
-/**
- * Create a new favorite from a character object from API response
- * Extracts all min/max filter values from modelSelection union
- */
-function createFavoriteFromCharacterObject(
-  character: CharacterListResponseOutput["characters"][number],
-): FavoriteItem {
-  // Extract modelSelection from API character response
-  const modelSelection: FavoriteItem["modelSelection"] =
-    character.modelSelection.selectionType === ModelSelectionType.FILTERS
-      ? {
-          selectionType: ModelSelectionType.FILTERS,
-          intelligenceRange: character.modelSelection.intelligenceRange,
-          priceRange: character.modelSelection.priceRange,
-          contentRange: character.modelSelection.contentRange,
-          speedRange: character.modelSelection.speedRange,
-          preferredStrengths: character.modelSelection.preferredStrengths,
-          ignoredWeaknesses: character.modelSelection.ignoredWeaknesses,
-        }
-      : {
-          selectionType: ModelSelectionType.MANUAL,
-          manualModelId: character.modelSelection.manualModelId,
-        };
-
-  return {
-    id: `local-${Date.now()}-${character.id}`,
-    characterId: character.id,
-    customName: null,
-    customIcon: null,
-    voice: character.voice,
-    modelSelection,
-    position: 0,
-    color: null,
-    isActive: false,
-    useCount: 0,
-  };
-}
-
-/**
- * Extract modelSelection from API character response
- */
-function extractModelSelectionFromCharacter(
-  character: CharacterListResponseOutput["characters"][number] | null | undefined,
-): FavoriteItem["modelSelection"] {
-  if (!character) {
-    return {
-      selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: undefined,
-      priceRange: undefined,
-      contentRange: undefined,
-      speedRange: undefined,
-      preferredStrengths: null,
-      ignoredWeaknesses: null,
-    };
-  }
-
-  // Check if it's an API response (has modelSelection)
-  if ("modelSelection" in character) {
-    if (character.modelSelection.selectionType === ModelSelectionType.FILTERS) {
-      return {
-        selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: character.modelSelection.intelligenceRange,
-        priceRange: character.modelSelection.priceRange,
-        contentRange: character.modelSelection.contentRange,
-        speedRange: character.modelSelection.speedRange,
-        preferredStrengths: character.modelSelection.preferredStrengths,
-        ignoredWeaknesses: character.modelSelection.ignoredWeaknesses,
-      };
-    } else {
-      return {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: character.modelSelection.manualModelId,
-      };
-    }
-  }
-
-  // Otherwise it's a built-in Character type (has requirements)
-  if ("requirements" in character) {
-    return {
-      selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: character.requirements?.intelligenceRange,
-      priceRange: character.requirements?.priceRange,
-      contentRange: character.requirements?.contentRange,
-      speedRange: character.requirements?.speedRange,
-      preferredStrengths: null,
-      ignoredWeaknesses: null,
-    };
-  }
-
-  return {
-    selectionType: ModelSelectionType.FILTERS,
-    intelligenceRange: undefined,
-    priceRange: undefined,
-    contentRange: undefined,
-    speedRange: undefined,
-    preferredStrengths: null,
-    ignoredWeaknesses: null,
-  };
-}
 
 export function Selector({
   characterId,
@@ -311,7 +85,7 @@ export function Selector({
     addFavorite,
     updateFavorite,
     deleteFavorite,
-    setActiveFavorite,
+    activeFavoriteId,
   } = useChatFavorites({
     user,
     logger,
@@ -320,23 +94,9 @@ export function Selector({
   // Fetch characters list (for edit character feature)
   const charactersEndpoint = useEndpoint(charactersDefinition, {}, logger);
   const characters = useMemo(() => {
-    const response = charactersEndpoint.read?.response;
-    if (
-      response &&
-      "success" in response &&
-      response.success &&
-      "data" in response &&
-      response.data &&
-      "characters" in response.data
-    ) {
-      const charactersList = response.data.characters;
-      const map: Record<string, CharacterListResponseOutput["characters"][number]> = {};
-      charactersList.forEach((p) => {
-        map[p.id] = p;
-      });
-      return map;
-    }
-    return {};
+    return CharactersRepositoryClient.buildCharacterMapFromResponse(
+      charactersEndpoint.read?.response,
+    );
   }, [charactersEndpoint.read?.response]);
 
   // Local state

@@ -3,6 +3,7 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
+import { IconPicker } from "next-vibe-ui/ui/icon-picker";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import type { JSX } from "react";
@@ -11,8 +12,6 @@ import React, { useEffect, useState } from "react";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { IconSelector } from "./icon-selector";
 
 interface RenameFolderDialogProps {
   open: boolean;
@@ -71,7 +70,7 @@ export function RenameFolderDialog({
           </Div>
           <Div className="flex flex-col gap-2">
             <Label>{t("app.chat.renameFolder.folderIcon")}</Label>
-            <IconSelector value={icon ?? "folder"} onChange={setIcon} locale={locale} />
+            <IconPicker value={icon ?? "folder"} onChange={setIcon} size="sm" />
           </Div>
           <Div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => onOpenChange(false)}>

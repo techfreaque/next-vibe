@@ -16,6 +16,12 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
+  objectField,
+  requestDataField,
+  responseArrayOptionalField,
+  responseField,
+} from "../system/unified-interface/shared/field/utils";
+import {
   ContactPriority,
   ContactPriorityOptions,
   ContactStatus,
@@ -54,118 +60,117 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ],
 
-  fields: (u) =>
-    u.objectField(
-      {
-        type: WidgetType.CONTAINER,
-        title: "form.label",
-        description: "form.description",
-        layoutType: LayoutType.GRID,
-        columns: 12,
-      },
-      { request: "data", response: true },
-      {
-        name: u.requestDataField(
-          {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "form.fields.name.label",
-            description: "form.fields.name.description",
-            placeholder: "form.fields.name.placeholder",
-            columns: 6,
-          },
-          z.string().min(2),
-        ),
-        email: u.requestDataField(
-          {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.EMAIL,
-            label: "form.fields.email.label",
-            description: "form.fields.email.description",
-            placeholder: "form.fields.email.placeholder",
-            columns: 6,
-          },
-          z.string().email(),
-        ),
-        company: u.requestDataField(
-          {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "form.fields.company.label",
-            description: "form.fields.company.description",
-            placeholder: "form.fields.company.placeholder",
-            columns: 12,
-          },
-          z.string().optional(),
-        ),
-        subject: u.requestDataField(
-          {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "form.fields.subject.label",
-            description: "form.fields.subject.description",
-            placeholder: "form.fields.subject.placeholder",
-            options: ContactSubjectOptions,
-            columns: 12,
-          },
-          z.enum(ContactSubject),
-        ),
-        message: u.requestDataField(
-          {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXTAREA,
-            label: "form.fields.message.label",
-            description: "form.fields.message.description",
-            placeholder: "form.fields.message.placeholder",
-            columns: 12,
-          },
-          z.string().min(10),
-        ),
-        priority: u.requestDataField(
-          {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "form.fields.priority.label",
-            description: "form.fields.priority.description",
-            placeholder: "form.fields.priority.placeholder",
-            options: ContactPriorityOptions,
-            columns: 12,
-          },
-          z.enum(ContactPriority).optional(),
-        ),
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title: "form.label",
+      description: "form.description",
+      layoutType: LayoutType.GRID,
+      columns: 12,
+    },
+    { request: "data", response: true },
+    {
+      name: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "form.fields.name.label",
+          description: "form.fields.name.description",
+          placeholder: "form.fields.name.placeholder",
+          columns: 6,
+        },
+        z.string().min(2),
+      ),
+      email: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.EMAIL,
+          label: "form.fields.email.label",
+          description: "form.fields.email.description",
+          placeholder: "form.fields.email.placeholder",
+          columns: 6,
+        },
+        z.string().email(),
+      ),
+      company: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "form.fields.company.label",
+          description: "form.fields.company.description",
+          placeholder: "form.fields.company.placeholder",
+          columns: 12,
+        },
+        z.string().optional(),
+      ),
+      subject: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "form.fields.subject.label",
+          description: "form.fields.subject.description",
+          placeholder: "form.fields.subject.placeholder",
+          options: ContactSubjectOptions,
+          columns: 12,
+        },
+        z.enum(ContactSubject),
+      ),
+      message: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXTAREA,
+          label: "form.fields.message.label",
+          description: "form.fields.message.description",
+          placeholder: "form.fields.message.placeholder",
+          columns: 12,
+        },
+        z.string().min(10),
+      ),
+      priority: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "form.fields.priority.label",
+          description: "form.fields.priority.description",
+          placeholder: "form.fields.priority.placeholder",
+          options: ContactPriorityOptions,
+          columns: 12,
+        },
+        z.enum(ContactPriority).optional(),
+      ),
 
-        // === RESPONSE FIELDS ===
-        // Note: leadId comes from JWT payload (user.leadId) on server-side
-        success: u.responseField(
+      // === RESPONSE FIELDS ===
+      // Note: leadId comes from JWT payload (user.leadId) on server-side
+      success: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "response.success",
+        },
+        z.boolean(),
+      ),
+      messageId: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "response.messageId",
+        },
+        z.string().optional(),
+      ),
+      status: responseArrayOptionalField(
+        {
+          type: WidgetType.DATA_LIST,
+          title: "response.status",
+          description: "response.description",
+        },
+        responseField(
           {
             type: WidgetType.TEXT,
-            content: "response.success",
+            content: "response.status",
           },
-          z.boolean(),
+          z.string(),
         ),
-        messageId: u.responseField(
-          {
-            type: WidgetType.TEXT,
-            content: "response.messageId",
-          },
-          z.string().optional(),
-        ),
-        status: u.responseArrayOptionalField(
-          {
-            type: WidgetType.DATA_LIST,
-            title: "response.status",
-            description: "response.description",
-          },
-          u.responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "response.status",
-            },
-            z.string(),
-          ),
-        ),
-      },
-    ),
+      ),
+    },
+  ),
   examples: {
     requests: {
       default: {

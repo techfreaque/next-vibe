@@ -18,15 +18,16 @@ import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
-import { DEFAULT_TOOL_IDS } from "@/app/api/[locale]/agent/chat/config";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { AIToolMetadataSerialized } from "@/app/api/[locale]/system/unified-interface/ai/tools/definition";
 import { useAIToolsList } from "@/app/api/[locale]/system/unified-interface/ai/tools/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+
+import { DEFAULT_TOOL_IDS } from "../../../constants";
 
 interface AIToolsModalProps {
   locale: CountryLanguage;

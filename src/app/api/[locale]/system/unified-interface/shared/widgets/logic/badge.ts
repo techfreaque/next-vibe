@@ -56,7 +56,7 @@ export function extractBadgeData(value: WidgetData): ProcessedBadge | null {
     return {
       text,
       variant,
-      icon,
+      icon: icon as IconKey | undefined,
     };
   }
 

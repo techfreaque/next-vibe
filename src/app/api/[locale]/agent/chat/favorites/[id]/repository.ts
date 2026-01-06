@@ -111,14 +111,6 @@ export class SingleFavoriteRepository {
         });
       }
 
-      // Handle isActive - if setting to true, deactivate others first
-      if (data.isActive === true) {
-        await db
-          .update(chatFavorites)
-          .set({ isActive: false, updatedAt: new Date() })
-          .where(eq(chatFavorites.userId, userId));
-      }
-
       const [updated] = await db
         .update(chatFavorites)
         .set({

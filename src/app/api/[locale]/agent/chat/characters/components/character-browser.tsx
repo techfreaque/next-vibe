@@ -20,23 +20,16 @@ import {
   DEFAULT_CHARACTERS,
   getCharactersByCategory,
 } from "@/app/api/[locale]/agent/chat/characters/config";
-import { CATEGORY_CONFIG } from "@/app/api/[locale]/agent/chat/characters/utils";
-import {
-  ContentLevelFilter,
-  type ContentLevelFilterValue,
-  IntelligenceLevelFilter,
-  type IntelligenceLevelFilterValue,
-  PriceLevelFilter,
-} from "@/app/api/[locale]/agent/chat/favorites/enum";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import { modelOptions } from "@/app/api/[locale]/agent/chat/model-access/models";
+import type { FavoriteItem } from "@/app/api/[locale]/agent/chat/favorites/components/favorites-bar";
+import { modelOptions } from "@/app/api/[locale]/agent/models/models";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { useIsMobile } from "@/hooks/use-media-query";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { CharacterCategory } from "../../../../characters/enum";
-import type { FavoriteItem } from "./favorites-bar";
-import { selectModelForCharacter } from "./types";
+import { ModelSelectionType } from "../../favorites/enum";
+import { CATEGORY_CONFIG, CharacterCategory } from "../enum";
+import { CharactersRepositoryClient } from "../repository-client";
 
 interface CharacterBrowserProps {
   onAddWithDefaults: (characterId: string) => void;
@@ -48,31 +41,6 @@ interface CharacterBrowserProps {
   favorites?: FavoriteItem[];
 }
 
-/**
- * Get default intelligence from character preferences
- */
-function getDefaultIntelligence(character: Character): typeof IntelligenceLevelFilterValue {
-  if (character.preferences?.preferredStrengths) {
-    const { ModelUtility } = require("@/app/api/[locale]/agent/chat/types");
-    if (character.preferences.preferredStrengths.includes(ModelUtility.SMART)) {
-      return IntelligenceLevelFilter.BRILLIANT;
-    }
-    if (character.preferences.preferredStrengths.includes(ModelUtility.FAST)) {
-      return IntelligenceLevelFilter.QUICK;
-    }
-  }
-  return IntelligenceLevelFilter.SMART;
-}
-
-/**
- * Get default content from character requirements
- */
-function getDefaultContent(character: Character): typeof ContentLevelFilterValue {
-  if (character.requirements?.minContent) {
-    return character.requirements.minContent;
-  }
-  return ContentLevelFilter.OPEN;
-}
 
 /**
  * Character list item component - shows character info with description and model
@@ -91,27 +59,37 @@ export function CharacterListItem({
   isAdded?: boolean;
 }): JSX.Element {
   const { t } = simpleT(locale);
-  const Icon = getIconComponent(character.icon);
   const isTouchDevice = useIsMobile();
-
-  const defaultIntelligence = getDefaultIntelligence(character);
-  const defaultContent = getDefaultContent(character);
 
   const allModels = useMemo(() => Object.values(modelOptions), []);
   const bestModel = useMemo(() => {
-    // Use new priority logic: preferredModel > auto
-    const selectedModelId = selectModelForCharacter(allModels, character, {
-      mode: "auto",
-      filters: {
-        intelligence: defaultIntelligence,
-        maxPrice: PriceLevelFilter.STANDARD,
-        content: defaultContent,
-      },
-    });
-    return selectedModelId ? (allModels.find((m) => m.id === selectedModelId) ?? null) : null;
-  }, [allModels, character, defaultIntelligence, defaultContent]);
+    // Use character model selection for filtering
+    const selection = character.modelSelection;
+    const settings =
+      selection.selectionType === ModelSelectionType.MANUAL
+        ? {
+            mode: "manual" as const,
+            manualModelId: selection.manualModelId,
+            filters: {},
+          }
+        : {
+            mode: "auto" as const,
+            manualModelId: undefined,
+            filters: {
+              intelligenceRange: selection.intelligenceRange,
+              priceRange: selection.priceRange,
+              contentRange: selection.contentRange,
+              speedRange: selection.speedRange,
+            },
+          };
 
-  const ModelIcon = bestModel ? getIconComponent(bestModel.icon) : null;
+    const selectedModelId = CharactersRepositoryClient.selectModelForCharacter(
+      allModels,
+      character,
+      settings,
+    );
+    return selectedModelId ? (allModels.find((m) => m.id === selectedModelId) ?? null) : null;
+  }, [allModels, character]);
 
   return (
     <Div
@@ -162,7 +140,7 @@ export function CharacterListItem({
 
       {/* Character Icon */}
       <Div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
-        <Icon className="h-5 w-5" />
+        <Icon icon={character.icon} className="h-5 w-5" />
       </Div>
 
       {/* Main Info - Full Width */}
@@ -175,7 +153,7 @@ export function CharacterListItem({
         <Div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 mt-1.5">
           {bestModel && (
             <>
-              {ModelIcon && <ModelIcon className="h-3 w-3" />}
+              <Icon icon={bestModel.icon} className="h-3 w-3" />
               <Span className="truncate">{bestModel.name}</Span>
               <Span className="text-muted-foreground/40">•</Span>
               <Span className="shrink-0">
@@ -219,7 +197,6 @@ export function CategorySection({
 }): JSX.Element {
   const { t } = simpleT(locale);
   const config = CATEGORY_CONFIG[category];
-  const CategoryIcon = getIconComponent(config.icon);
 
   const displayCharacters = expanded ? characters : characters.slice(0, 3);
   const hasMore = !expanded && characters.length > 3;
@@ -228,7 +205,7 @@ export function CategorySection({
     <Div className="flex flex-col gap-2">
       {/* Category header */}
       <Div className="flex items-center gap-2 px-1">
-        <CategoryIcon className="h-4 w-4 text-muted-foreground" />
+        <Icon icon={config.icon} className="h-4 w-4 text-muted-foreground" />
         <Span className="font-medium text-sm">{t(config.label)}</Span>
         <Badge variant="outline" className="text-[10px] h-5">
           {characters.length}
@@ -298,12 +275,7 @@ export function CharacterBrowserCore({
 
   // Calculate which characters are already added to favorites (non-customized)
   const addedCharacterIds = useMemo(
-    () =>
-      new Set(
-        favorites
-          .filter((f) => f.characterId && !f.customName && !f.customIcon)
-          .map((f) => f.characterId!),
-      ),
+    () => CharactersRepositoryClient.getDefaultFavoriteCharacterIds(favorites),
     [favorites],
   );
 

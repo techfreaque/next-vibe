@@ -4,68 +4,36 @@ import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Bot } from "next-vibe-ui/ui/icons/Bot";
-import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
-import { getCharacterById } from "@/app/api/[locale]/agent/chat/characters/config";
+import type { CharacterListResponseOutput } from "@/app/api/[locale]/agent/chat/characters/definition";
+import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
+import type { FavoritesListResponseOutput } from "@/app/api/[locale]/agent/chat/favorites/definition";
 import {
-  ContentLevelFilter,
-  type ContentLevelFilterValue,
-  IntelligenceLevelFilter,
-  type IntelligenceLevelFilterValue,
-  ModelSelectionMode,
-  type ModelSelectionModeValue,
-  type PriceLevelFilterValue,
-} from "@/app/api/[locale]/agent/chat/favorites/enum";
-import { getIconComponent, type IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import {
-  type ModelId,
   type ModelOption,
   modelOptions,
   modelProviders,
-} from "@/app/api/[locale]/agent/chat/model-access/models";
-import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
+} from "@/app/api/[locale]/agent/models/models";
+import { Icon, type IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { useIsMobile } from "@/hooks/use-media-query";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { selectModelForCharacter } from "./types";
-
 /**
- * Favorite/Setup item - unified character + model configuration
+ * Favorite item type inferred from API definition
  */
-export interface FavoriteItem {
-  id: string;
-  // Character ID - null means model-only setup
-  characterId: string | null;
-  // Display overrides
-  customName?: string;
-  customIcon?: IconKey;
-  voice?: typeof TtsVoiceValue;
-  // Model selection
-  modelSettings: {
-    mode: typeof ModelSelectionModeValue;
-    filters: {
-      intelligence: typeof IntelligenceLevelFilterValue;
-      maxPrice: typeof PriceLevelFilterValue;
-      content: typeof ContentLevelFilterValue;
-    };
-    manualModelId?: ModelId;
-  };
-  isActive: boolean;
-}
+export type FavoriteItem = FavoritesListResponseOutput["favorites"][number];
 
 interface FavoritesBarProps {
   favorites: FavoriteItem[];
+  activeFavoriteId: string | null;
   onFavoriteSelect: (favoriteId: string) => void;
   onSettingsClick: (favoriteId: string) => void;
   onAddClick: () => void;
   locale: CountryLanguage;
+  characters: Record<string, CharacterListResponseOutput["characters"][number]>;
   className?: string;
 }
 
@@ -73,78 +41,43 @@ interface FavoritesBarProps {
  * Get display info for a favorite
  */
 interface FavoriteDisplay {
-  character: ReturnType<typeof getCharacterById> | null;
+  character: CharacterListResponseOutput["characters"][number] | null;
   resolvedModel: ModelOption | null;
   displayName: string;
-  displayIcon: React.ComponentType<{ className?: string }>;
+  displayIcon: IconKey;
 }
 
-function useFavoriteDisplay(favorite: FavoriteItem, locale: CountryLanguage): FavoriteDisplay {
+function useFavoriteDisplay(
+  favorite: FavoriteItem,
+  locale: CountryLanguage,
+  characters: Record<string, CharacterListResponseOutput["characters"][number]>,
+): FavoriteDisplay {
   const { t } = simpleT(locale);
   const allModels = useMemo(() => Object.values(modelOptions), []);
 
   const character = useMemo(
-    () => (favorite.characterId ? getCharacterById(favorite.characterId) : null),
-    [favorite.characterId],
+    () => CharactersRepositoryClient.getCharacterById(characters, favorite.characterId),
+    [favorite.characterId, characters],
   );
 
   const resolvedModel = useMemo(() => {
-    // Use new priority logic: manual > preferredModel > auto
-    const selectedModelId = selectModelForCharacter(allModels, character ?? null, {
-      mode: favorite.modelSettings.mode === ModelSelectionMode.MANUAL ? "manual" : "auto",
-      manualModelId: favorite.modelSettings.manualModelId,
-      filters: favorite.modelSettings.filters,
-    });
-
-    if (selectedModelId) {
-      return allModels.find((m) => m.id === selectedModelId) ?? null;
-    }
-
-    // Model-only fallback: filter by settings
-    return (
-      allModels.find((m) => {
-        const { filters } = favorite.modelSettings;
-        if (
-          filters.intelligence !== IntelligenceLevelFilter.ANY &&
-          m.intelligence !== filters.intelligence
-        ) {
-          return false;
-        }
-        if (filters.content !== ContentLevelFilter.ANY && m.content !== filters.content) {
-          return false;
-        }
-        return true;
-      }) ?? allModels[0]
+    return CharactersRepositoryClient.resolveModelForSelection(
+      favorite.modelSelection,
+      character ?? null,
+      allModels,
     );
-  }, [character, favorite.modelSettings, allModels]);
+  }, [character, favorite.modelSelection, allModels]);
 
-  // Display name: custom > character name > model name
-  const displayName = useMemo(() => {
-    if (favorite.customName) {
-      return favorite.customName;
-    }
-    if (character) {
-      return t(character.name);
-    }
-    if (resolvedModel) {
-      return resolvedModel.name;
-    }
-    return t("app.chat.selector.setup");
-  }, [favorite.customName, character, resolvedModel, t]);
+  // Display name and icon - consolidated logic
+  const displayName = useMemo(
+    () => CharactersRepositoryClient.getDisplayName(favorite, character, resolvedModel, t),
+    [favorite, character, resolvedModel, t],
+  );
 
-  // Display icon: custom > character icon > model icon
-  const displayIcon = useMemo(() => {
-    if (favorite.customIcon) {
-      return getIconComponent(favorite.customIcon);
-    }
-    if (character) {
-      return getIconComponent(character.icon);
-    }
-    if (resolvedModel) {
-      return getIconComponent(resolvedModel.icon);
-    }
-    return Bot;
-  }, [favorite.customIcon, character, resolvedModel]);
+  const displayIcon = useMemo(
+    () => CharactersRepositoryClient.getDisplayIcon(favorite, character, resolvedModel),
+    [favorite, character, resolvedModel],
+  );
 
   return { character, resolvedModel, displayName, displayIcon };
 }
@@ -157,22 +90,23 @@ function FavoriteRow({
   onSelect,
   onEdit,
   locale,
+  characters,
+  isActive,
 }: {
   favorite: FavoriteItem;
   onSelect: () => void;
   onEdit: () => void;
   locale: CountryLanguage;
+  characters: Record<string, CharacterListResponseOutput["characters"][number]>;
+  isActive: boolean;
 }): JSX.Element {
   const { t } = simpleT(locale);
   const isTouchDevice = useIsMobile();
-  const {
-    character,
-    resolvedModel,
-    displayName,
-    displayIcon: Icon,
-  } = useFavoriteDisplay(favorite, locale);
-
-  const ModelIcon = resolvedModel ? getIconComponent(resolvedModel.icon) : null;
+  const { character, resolvedModel, displayName, displayIcon } = useFavoriteDisplay(
+    favorite,
+    locale,
+    characters,
+  );
   const providerName = resolvedModel
     ? (modelProviders[resolvedModel.provider]?.name ?? resolvedModel.provider)
     : null;
@@ -184,7 +118,7 @@ function FavoriteRow({
       className={cn(
         "relative flex items-start gap-3 p-3 rounded-xl border transition-all",
         "hover:bg-muted/50 hover:border-primary/20 cursor-pointer group",
-        favorite.isActive && "bg-primary/5 border-primary/20",
+        isActive && "bg-primary/5 border-primary/20",
       )}
       onClick={onSelect}
     >
@@ -206,9 +140,9 @@ function FavoriteRow({
           }}
           title={t("app.chat.selector.settings")}
         >
-          <Pencil className="h-4 w-4" />
+          <Icon icon="pencil" className="h-4 w-4" />
         </Button>
-        {!favorite.isActive && (
+        {!isActive && (
           <Button
             type="button"
             variant="ghost"
@@ -220,7 +154,7 @@ function FavoriteRow({
             }}
             title={t("app.chat.selector.switchTo")}
           >
-            <Zap className="h-4 w-4" />
+            <Icon icon="zap" className="h-4 w-4" />
           </Button>
         )}
       </Div>
@@ -229,24 +163,24 @@ function FavoriteRow({
       <Div
         className={cn(
           "w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-colors",
-          favorite.isActive ? "bg-primary/15 text-primary" : "bg-muted group-hover:bg-primary/10",
+          isActive ? "bg-primary/15 text-primary" : "bg-muted group-hover:bg-primary/10",
         )}
       >
-        <Icon className="h-5 w-5" />
+        <Icon icon={displayIcon} className="h-5 w-5" />
       </Div>
 
       {/* Info - Full Width */}
       <Div className="flex-1 min-w-0">
         <Div className="flex items-center gap-2 pr-20">
-          <Div className={cn("font-medium text-base", favorite.isActive && "text-primary")}>
+          <Div className={cn("font-medium text-base", isActive && "text-primary")}>
             {displayName}
           </Div>
-          {favorite.isActive && (
+          {isActive && (
             <Badge variant="default" className="text-[9px] h-4 px-1.5 shrink-0">
               {t("app.chat.selector.active")}
             </Badge>
           )}
-          {isModelOnly && !favorite.isActive && (
+          {isModelOnly && !isActive && (
             <Badge variant="outline" className="text-[9px] h-4 px-1.5 shrink-0 opacity-60">
               {t("app.chat.selector.modelOnly")}
             </Badge>
@@ -254,7 +188,7 @@ function FavoriteRow({
         </Div>
         {resolvedModel && (
           <Div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
-            {ModelIcon && <ModelIcon className="h-3 w-3" />}
+            <Icon icon={resolvedModel.icon} className="h-3 w-3" />
             <Span className="truncate">{resolvedModel.name}</Span>
             {providerName && (
               <>
@@ -264,13 +198,7 @@ function FavoriteRow({
             )}
             <Span className="text-muted-foreground/40">•</Span>
             <Span className="shrink-0">
-              {resolvedModel.creditCost === 0
-                ? t("app.chat.selector.free")
-                : resolvedModel.creditCost === 1
-                  ? t("app.chat.selector.creditsSingle")
-                  : t("app.chat.selector.creditsExact", {
-                      cost: resolvedModel.creditCost,
-                    })}
+              {CharactersRepositoryClient.formatCreditCost(resolvedModel.creditCost, t)}
             </Span>
           </Div>
         )}
@@ -284,10 +212,12 @@ function FavoriteRow({
  */
 export function FavoritesBar({
   favorites,
+  activeFavoriteId,
   onFavoriteSelect,
   onSettingsClick,
   onAddClick,
   locale,
+  characters,
   className,
 }: FavoritesBarProps): JSX.Element {
   const { t } = simpleT(locale);
@@ -306,7 +236,7 @@ export function FavoritesBar({
           className="h-7 text-xs gap-1 -mr-2"
           onClick={onAddClick}
         >
-          <Plus className="h-3 w-3" />
+          <Icon icon="plus" className="h-3 w-3" />
           {t("app.chat.selector.addNew")}
         </Button>
       </Div>
@@ -320,6 +250,8 @@ export function FavoritesBar({
             onSelect={() => onFavoriteSelect(favorite.id)}
             onEdit={() => onSettingsClick(favorite.id)}
             locale={locale}
+            characters={characters}
+            isActive={favorite.id === activeFavoriteId}
           />
         ))}
       </Div>

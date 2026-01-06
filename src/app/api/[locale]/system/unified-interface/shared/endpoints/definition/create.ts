@@ -15,11 +15,7 @@
 import type { z } from "zod";
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
-import {
-  createFieldBuilder,
-  type FieldBuilder,
-  generateSchemaForUsage as generateSchemaFromUtils,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { generateSchemaForUsage as generateSchemaFromUtils } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type {
   ExamplesList,
   ExtractInput,
@@ -437,11 +433,11 @@ export function createEndpoint<
   TFields
 > {
   // Generate schemas from unified fields
-  const fieldBuilder = createFieldBuilder<TScopedTranslationKey>();
-  const fields = typeof config.fields === "function" ? config.fields(fieldBuilder) : config.fields;
-  const requestSchema = generateRequestDataSchema(fields);
-  const responseSchema = generateResponseSchema(fields);
-  const requestUrlSchema = generateRequestUrlSchema(fields);
+  // const fieldBuilder = createFieldBuilder<TScopedTranslationKey>();
+  // const fields = typeof config.fields === "function" ? config.fields(fieldBuilder) : config.fields;
+  const requestSchema = generateRequestDataSchema(config.fields);
+  const responseSchema = generateResponseSchema(config.fields);
+  const requestUrlSchema = generateRequestUrlSchema(config.fields);
 
   function requiresAuthentication(): boolean {
     // Endpoint requires authentication if PUBLIC role is NOT in the allowed roles
@@ -475,7 +471,7 @@ export function createEndpoint<
     description: config.description,
     category: config.category,
     tags: config.tags,
-    fields: fields as typeof config.fields,
+    fields: config.fields,
     allowedRoles: config.allowedRoles,
     examples: config.examples,
     errorTypes: config.errorTypes,

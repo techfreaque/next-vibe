@@ -13,7 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { DefaultFolderId } from "../config";
-import { CHAT_CONSTANTS } from "../config";
+import { CHAT_CONSTANTS } from "../constants";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { ChatMessageRole, ThreadStatus } from "../enum";
 import {

@@ -271,14 +271,6 @@ const { GET } = createEndpoint({
               },
               z.string().nullable(),
             ),
-            isActive: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.get.response.favorite.isActive.content" as const,
-              },
-              z.boolean(),
-            ),
             useCount: responseField(
               {
                 type: WidgetType.TEXT,
@@ -371,7 +363,6 @@ const { GET } = createEndpoint({
             },
             position: 0,
             color: null,
-            isActive: true,
             useCount: 50,
           },
         ],
@@ -603,7 +594,7 @@ const { POST } = createEndpoint({
                   options: ModelUtilityOptions,
                   columns: 6,
                 },
-                z.array(z.enum(ModelUtilityDB)).nullable().default(null),
+                z.array(z.enum(ModelUtilityDB)).nullable(),
               ),
               ignoredWeaknesses: requestDataField(
                 {
@@ -615,7 +606,7 @@ const { POST } = createEndpoint({
                   options: ModelUtilityOptions,
                   columns: 6,
                 },
-                z.array(z.enum(ModelUtilityDB)).nullable().default(null),
+                z.array(z.enum(ModelUtilityDB)).nullable(),
               ),
             },
           ),

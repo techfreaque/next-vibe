@@ -15,7 +15,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatMessages, chatThreads } from "../../../../../db";
-import { canVoteMessage } from "../../../../../permissions/utils";
+import { PermissionsRepositoryClient } from "../../../../../permissions/repository-client";
 import { validateNotIncognito } from "../../../../../validation";
 import type {
   VotePostRequestOutput,
@@ -87,7 +87,7 @@ export const voteRepository = {
       }
 
       // Check voting permissions - simplified
-      if (!canVoteMessage(userId, message)) {
+      if (!PermissionsRepositoryClient.canVoteMessage(userId, message)) {
         return fail({
           message:
             "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.title",
