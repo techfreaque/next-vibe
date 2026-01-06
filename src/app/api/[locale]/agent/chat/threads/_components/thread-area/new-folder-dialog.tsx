@@ -6,9 +6,9 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import type { JSX } from "react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import type { IconKey, IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -18,7 +18,7 @@ import { FolderIconSelector } from "./folder-icon-selector";
 interface NewFolderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (name: string, icon: IconValue) => void;
+  onSave: (name: string, icon: IconKey) => void;
   locale: CountryLanguage;
   /** Optional custom title translation key. If not provided, uses default "app.chat.newFolder.title" */
   titleKey?: TranslationKey;

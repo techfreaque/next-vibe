@@ -12,19 +12,19 @@ import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import { type Character, getCharacterById } from "@/app/api/[locale]/agent/chat/characters/config";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { CharacterBrowserCore } from "@/app/api/[locale]/agent/chat/characters/components/character-browser";
+import type { CharacterListResponseOutput } from "@/app/api/[locale]/agent/chat/characters/definition";
+import type { FavoriteItem } from "@/app/api/[locale]/agent/chat/favorites/components/favorites-bar";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-
-import { CharacterBrowserCore } from "./character-browser";
-import type { FavoriteItem } from "./favorites-bar";
 
 interface SelectorOnboardingProps {
   onSelect: (characterId: string) => void;
   onSaveFavorite?: (characterId: string) => Promise<void>;
   onCustomize: (characterId: string) => void;
   favorites: FavoriteItem[];
+  characters: Record<string, CharacterListResponseOutput["characters"][number]>;
   locale: CountryLanguage;
   initialStep?: OnboardingStep;
   onStepChange?: (step: OnboardingStep) => void;
@@ -40,8 +40,12 @@ const FEATURED_CHARACTER_IDS = ["thea", "hermes"] as const;
 /**
  * Get featured characters for onboarding
  */
-function getFeaturedCharacters(): Character[] {
-  return FEATURED_CHARACTER_IDS.map(getCharacterById).filter((p): p is Character => p !== null);
+function getFeaturedCharacters(
+  characters: Record<string, CharacterListResponseOutput["characters"][number]>,
+): CharacterListResponseOutput["characters"][number][] {
+  return FEATURED_CHARACTER_IDS.map((id) => characters[id]).filter(
+    (c): c is CharacterListResponseOutput["characters"][number] => c !== undefined,
+  );
 }
 
 /**
@@ -95,13 +99,12 @@ function CompanionCard({
   isSelected,
   locale,
 }: {
-  character: Character;
+  character: CharacterListResponseOutput["characters"][number];
   onSelect: () => void;
   isSelected: boolean;
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
-  const Icon = getIconComponent(character.icon);
 
   return (
     <Div
@@ -133,7 +136,7 @@ function CompanionCard({
               className="w-full h-full object-cover"
             />
           ) : (
-            <Icon className="h-8 w-8 text-primary" />
+            <Icon icon={character.icon} className="h-8 w-8 text-primary" />
           )}
         </Div>
         {isSelected && (
@@ -208,16 +211,18 @@ function PickStep({
   selectedId,
   setSelectedId,
   isSaving,
+  characters,
   locale,
 }: {
   onSelect: () => void;
   selectedId: string | null;
   setSelectedId: (id: string) => void;
   isSaving: boolean;
+  characters: Record<string, CharacterListResponseOutput["characters"][number]>;
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
-  const featuredCharacters = useMemo(() => getFeaturedCharacters(), []);
+  const featuredCharacters = useMemo(() => getFeaturedCharacters(characters), [characters]);
 
   return (
     <Div className="flex flex-col p-5 overflow-y-auto">
@@ -268,6 +273,7 @@ function SpecialistStep({
   onCustomize,
   onStartChatting,
   favorites,
+  characters,
   locale,
 }: {
   selectedCharacterId: string;
@@ -275,10 +281,11 @@ function SpecialistStep({
   onCustomize: (characterId: string) => void;
   onStartChatting: () => void;
   favorites: FavoriteItem[];
+  characters: Record<string, CharacterListResponseOutput["characters"][number]>;
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
-  const character = getCharacterById(selectedCharacterId);
+  const character = characters[selectedCharacterId];
   const characterName = character ? t(character.name) : "";
 
   return (
@@ -333,6 +340,7 @@ export function SelectorOnboarding({
   onSaveFavorite,
   onCustomize,
   favorites,
+  characters,
   locale,
   initialStep = "story",
   onStepChange,
@@ -431,6 +439,7 @@ export function SelectorOnboarding({
           selectedId={selectedId}
           setSelectedId={changeSelectedId}
           isSaving={isSaving}
+          characters={characters}
           locale={locale}
         />
       )}
@@ -442,6 +451,7 @@ export function SelectorOnboarding({
           onCustomize={onCustomize}
           onStartChatting={handleStartChatting}
           favorites={favorites}
+          characters={characters}
           locale={locale}
         />
       )}

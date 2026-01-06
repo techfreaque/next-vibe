@@ -14,13 +14,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { chatFavorites, type FavoriteModelSettings } from "../db";
-import {
-  ContentLevelFilter,
-  IntelligenceLevelFilter,
-  ModelSelectionMode,
-  PriceLevelFilter,
-} from "../enum";
+import { chatFavorites } from "../db";
 import type {
   FavoriteDeleteResponseOutput,
   FavoriteDeleteUrlVariablesOutput,
@@ -71,20 +65,7 @@ export class SingleFavoriteRepository {
         });
       }
 
-      return success({
-        characterId: favorite.characterId,
-        customName: favorite.customName,
-        voice: favorite.voice,
-        mode: favorite.modelSettings.mode,
-        intelligence: favorite.modelSettings.filters.intelligence,
-        maxPrice: favorite.modelSettings.filters.maxPrice,
-        content: favorite.modelSettings.filters.content,
-        manualModelId: favorite.modelSettings.manualModelId ?? null,
-        position: favorite.uiSettings.position,
-        color: favorite.uiSettings.color ?? null,
-        isActive: favorite.isActive,
-        useCount: favorite.useCount,
-      });
+      return success(favorite);
     } catch (error) {
       logger.error("Failed to fetch favorite", parseError(error));
       return fail({
@@ -130,25 +111,6 @@ export class SingleFavoriteRepository {
         });
       }
 
-      // Build update values - merge with existing
-      const newModelSettings: FavoriteModelSettings = {
-        mode: data.mode ?? existing.modelSettings.mode,
-        filters: {
-          intelligence: data.intelligence ?? existing.modelSettings.filters.intelligence,
-          maxPrice: data.maxPrice ?? existing.modelSettings.filters.maxPrice,
-          content: data.content ?? existing.modelSettings.filters.content,
-        },
-        manualModelId:
-          data.manualModelId !== undefined
-            ? (data.manualModelId ?? undefined)
-            : existing.modelSettings.manualModelId,
-      };
-
-      const newUiSettings = {
-        position: data.position ?? existing.uiSettings.position,
-        color: existing.uiSettings.color,
-      };
-
       // Handle isActive - if setting to true, deactivate others first
       if (data.isActive === true) {
         await db
@@ -160,12 +122,7 @@ export class SingleFavoriteRepository {
       const [updated] = await db
         .update(chatFavorites)
         .set({
-          characterId: data.characterId ?? existing.characterId,
-          customName: data.customName !== undefined ? data.customName : existing.customName,
-          voice: data.voice !== undefined ? data.voice : existing.voice,
-          modelSettings: newModelSettings,
-          uiSettings: newUiSettings,
-          isActive: data.isActive ?? existing.isActive,
+          ...data,
           updatedAt: new Date(),
         })
         .where(and(eq(chatFavorites.id, favoriteId), eq(chatFavorites.userId, userId)))

@@ -33,7 +33,8 @@ interface SidebarFooterProps {
     free: number;
     expiring: number;
     permanent: number;
-    expiresAt?: string | null;
+    earned: number;
+    expiresAt?: string | number | Date | null;
   } | null;
   user: JwtPayloadType | undefined;
   logger: EndpointLogger;

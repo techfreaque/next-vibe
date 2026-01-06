@@ -20,6 +20,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { dateSchema } from "../../../shared/types/common.schema";
 import {
   EmailCampaignStage,
   EmailCampaignStageOptions,
@@ -197,7 +198,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.tracking.engagement.post.response.timestamp" as const,
         },
-        z.string().datetime(),
+        dateSchema,
       ),
       ipAddress: responseField(
         {
@@ -218,7 +219,7 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.leads.tracking.engagement.post.response.createdAt" as const,
         },
-        z.string().datetime(),
+        dateSchema,
       ),
       leadCreated: responseField(
         {

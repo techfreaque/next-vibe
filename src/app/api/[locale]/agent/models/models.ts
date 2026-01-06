@@ -1,3 +1,4 @@
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import {
@@ -7,10 +8,19 @@ import {
   type IntelligenceLevelValue,
   SpeedLevel,
   type SpeedLevelValue,
-} from "../favorites/enum";
-import type { ModelFeatures, ModelUtilityValue } from "../types";
-import { ModelUtility } from "../types";
-import type { IconKey } from "./icons";
+} from "../chat/favorites/enum";
+import { ModelUtility, type ModelUtilityValue } from "./enum";
+
+/**
+ * Model Features - Binary capabilities
+ */
+export interface ModelFeatures {
+  imageInput: boolean;
+  pdfInput: boolean;
+  imageOutput: boolean;
+  streaming: boolean;
+  toolCalling: boolean;
+}
 
 /**
  * Available AI model identifiers for the chat system.
@@ -1046,7 +1056,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
 /* eslint-enable i18next/no-literal-string */
 
 /** Default model used when no specific model is selected */
-export const defaultModel = ModelId.GPT_5_NANO;
+export const defaultModel = ModelId.CLAUDE_HAIKU_4_5;
 
 /**
  * Retrieves a model configuration by its ID.
@@ -1064,16 +1074,6 @@ export function getModelById(modelId: ModelId): ModelOption {
 
   // Fallback to default model - this should never fail as default model is in the object
   return modelOptions[defaultModel];
-}
-
-/**
- * Helper function to get all available model IDs.
- * Useful for validation and iteration purposes.
- *
- * @returns Array of all available model IDs
- */
-export function getAllModelIds(): ModelId[] {
-  return Object.keys(modelOptions) as ModelId[];
 }
 
 /**

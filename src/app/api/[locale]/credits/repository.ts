@@ -80,7 +80,7 @@ export interface CreditBalance {
   permanent: number;
   earned: number;
   free: number;
-  expiresAt: string | null;
+  expiresAt: string | number | Date | null;
 }
 
 /**

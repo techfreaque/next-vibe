@@ -24,6 +24,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { dateSchema } from "../../../shared/types/common.schema";
+
 /**
  * Translation Backup Restore POST Endpoint
  * Restores translation files from a specified backup
@@ -140,7 +142,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.system.translations.restoreBackup.post.response.backupInfo.backupDate",
             },
-            z.string().datetime(),
+            dateSchema,
           ),
           filesRestored: responseField(
             {

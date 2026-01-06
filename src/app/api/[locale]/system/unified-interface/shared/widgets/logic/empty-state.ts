@@ -4,6 +4,7 @@
  * Used by both React and CLI implementations
  */
 
+import type { IconKey } from "../../../react/icons";
 import type { WidgetData } from "../types";
 
 /**
@@ -12,7 +13,7 @@ import type { WidgetData } from "../types";
 export interface ProcessedEmptyState {
   title: string;
   description?: string;
-  icon?: string;
+  icon?: IconKey;
   action?: {
     label: string;
     action: string;

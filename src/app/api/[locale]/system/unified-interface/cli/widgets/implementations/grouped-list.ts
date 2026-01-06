@@ -5,6 +5,7 @@
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import type { IconKey } from "../../../react/icons";
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
@@ -41,7 +42,7 @@ interface StatConfig {
   field: string;
   value: string;
   label?: string;
-  icon?: string;
+  icon?: IconKey;
   color?: string;
 }
 

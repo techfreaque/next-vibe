@@ -22,6 +22,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { Countries, Languages } from "@/i18n/core/config";
 
+import { dateSchema } from "../../shared/types/common.schema";
 import { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
 
 // Inline schema to avoid deprecated schema.ts imports
@@ -40,20 +41,20 @@ const leadResponseSchema = z.object({
   source: z.enum(LeadSource).optional(),
   notes: z.string().max(1000).optional(),
   convertedUserId: z.uuid().nullable(),
-  convertedAt: z.string().datetime().nullable(),
-  signedUpAt: z.string().datetime().nullable(),
-  consultationBookedAt: z.string().datetime().nullable(),
-  subscriptionConfirmedAt: z.string().datetime().nullable(),
+  convertedAt: dateSchema.nullable(),
+  signedUpAt: dateSchema.nullable(),
+  consultationBookedAt: dateSchema.nullable(),
+  subscriptionConfirmedAt: dateSchema.nullable(),
   currentCampaignStage: z.enum(EmailCampaignStage).nullable(),
   emailsSent: z.coerce.number(),
-  lastEmailSentAt: z.string().datetime().nullable(),
-  unsubscribedAt: z.string().datetime().nullable(),
+  lastEmailSentAt: dateSchema.nullable(),
+  unsubscribedAt: dateSchema.nullable(),
   emailsOpened: z.coerce.number(),
   emailsClicked: z.coerce.number(),
-  lastEngagementAt: z.string().datetime().nullable(),
+  lastEngagementAt: dateSchema.nullable(),
   metadata: z.record(z.string(), z.unknown()).optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: dateSchema,
+  updatedAt: dateSchema,
 });
 
 /**

@@ -19,6 +19,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { dateSchema } from "../../../shared/types/common.schema";
 import { UserRole } from "../../../user/user-roles/enum";
 import { EmailStatus, EmailType } from "../enum";
 
@@ -147,28 +148,28 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               content: "app.api.emails.messages.id.response.email.sentAt",
             },
-            z.string().datetime().nullable(),
+            dateSchema.nullable(),
           ),
           deliveredAt: responseField(
             {
               type: WidgetType.TEXT,
               content: "app.api.emails.messages.id.response.email.deliveredAt",
             },
-            z.string().datetime().nullable(),
+            dateSchema.nullable(),
           ),
           openedAt: responseField(
             {
               type: WidgetType.TEXT,
               content: "app.api.emails.messages.id.response.email.openedAt",
             },
-            z.string().datetime().nullable(),
+            dateSchema.nullable(),
           ),
           clickedAt: responseField(
             {
               type: WidgetType.TEXT,
               content: "app.api.emails.messages.id.response.email.clickedAt",
             },
-            z.string().datetime().nullable(),
+            dateSchema.nullable(),
           ),
           retryCount: responseField(
             {
@@ -203,14 +204,14 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               content: "app.api.emails.messages.id.response.email.createdAt",
             },
-            z.string().datetime(),
+            dateSchema,
           ),
           updatedAt: responseField(
             {
               type: WidgetType.TEXT,
               content: "app.api.emails.messages.id.response.email.updatedAt",
             },
-            z.string().datetime(),
+            dateSchema,
           ),
         },
       ),

@@ -14,16 +14,14 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { getCharacterById } from "../characters/config";
 import { CharacterCategory } from "../characters/enum";
-import { transformToFavoriteModelSettings } from "../shared/model-selection-transform";
+import { getCharacterById } from "../characters/repository";
 import { chatFavorites } from "./db";
 import type {
   FavoriteCreateRequestOutput,
   FavoriteCreateResponseOutput,
   FavoritesListResponseOutput,
 } from "./definition";
-import { ModelSelectionMode, ModelSelectionType } from "./enum";
 
 /**
  * Chat Favorites Repository
@@ -56,7 +54,7 @@ export class ChatFavoritesRepository {
       let hasCompanion = false;
       for (const favorite of favorites) {
         if (favorite.characterId) {
-          const character = getCharacterById(favorite.characterId);
+          const character = await getCharacterById(favorite.characterId, userId);
           if (character?.category === CharacterCategory.COMPANION) {
             hasCompanion = true;
             break;
@@ -65,22 +63,7 @@ export class ChatFavoritesRepository {
       }
 
       return success({
-        favorites: favorites.map((f) => ({
-          id: f.id,
-          characterId: f.characterId,
-          customName: f.customName,
-          customIcon: f.customIcon,
-          voice: f.voice,
-          mode: f.modelSettings.mode,
-          intelligence: f.modelSettings.filters.intelligence,
-          maxPrice: f.modelSettings.filters.maxPrice,
-          content: f.modelSettings.filters.content,
-          manualModelId: f.modelSettings.manualModelId ?? null,
-          position: f.uiSettings.position,
-          color: f.uiSettings.color ?? null,
-          isActive: f.isActive,
-          useCount: f.useCount,
-        })),
+        favorites,
         hasCompanion,
       });
     } catch (error) {
@@ -116,7 +99,7 @@ export class ChatFavoritesRepository {
       });
 
       // Verify character exists
-      const character = getCharacterById(data.characterId);
+      const character = await getCharacterById(data.characterId, userId);
       if (!character) {
         return fail({
           message: "app.api.agent.chat.favorites.post.errors.notFound.title",
@@ -132,9 +115,8 @@ export class ChatFavoritesRepository {
 
       let maxPosition = -1;
       for (const f of existing) {
-        const uiSettings = f.uiSettings as { position: number };
-        if (uiSettings.position > maxPosition) {
-          maxPosition = uiSettings.position;
+        if (f.position > maxPosition) {
+          maxPosition = f.position;
         }
       }
 
@@ -143,21 +125,10 @@ export class ChatFavoritesRepository {
         .values({
           userId,
           characterId: data.characterId,
-          customName: data.customName ?? null,
-          voice: data.voice ?? null,
-          modelSettings: {
-            mode: data.mode,
-            filters: {
-              intelligence: data.intelligence,
-              maxPrice: data.maxPrice,
-              content: data.content,
-            },
-            manualModelId: data.manualModelId,
-          },
-          uiSettings: {
-            position: maxPosition + 1,
-          },
-          isActive: false,
+          customName: data.customName,
+          voice: data.voice,
+          modelSelection: data.modelSelection,
+          position: maxPosition + 1,
         })
         .returning();
 

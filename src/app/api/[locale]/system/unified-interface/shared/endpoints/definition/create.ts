@@ -14,7 +14,7 @@
 
 import type { z } from "zod";
 
-import type { IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import {
   createFieldBuilder,
   type FieldBuilder,
@@ -176,13 +176,10 @@ export interface ApiEndpoint<
    */
   readonly requiresConfirmation?: boolean;
   /** Icon identifier */
-  readonly icon: IconValue;
+  readonly icon: IconKey;
 
   // Unified fields for schema generation
-  // Supports two patterns:
-  // 1. Function: (u) => u.objectField(...) - NEW PATTERN (recommended)
-  // 2. Direct field: objectField(...) - LEGACY PATTERN (backwards compatible)
-  readonly fields: TFields | ((builder: FieldBuilder<TScopedTranslationKey>) => TFields);
+  readonly fields: TFields;
 
   lifecycle?: LifecycleActions;
 

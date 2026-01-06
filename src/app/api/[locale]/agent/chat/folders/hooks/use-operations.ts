@@ -7,11 +7,7 @@
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback } from "react";
 
-import {
-  type IconKey,
-  type IconValue,
-  isIconKey,
-} from "@/app/api/[locale]/system/unified-interface/react/icons";
+import { type IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { type UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -24,7 +20,7 @@ import type { ChatFolder } from "../../hooks/store";
  */
 export interface FolderUpdate {
   name?: string;
-  icon?: IconValue | null;
+  icon?: IconKey | null;
   color?: string | null;
   parentId?: string | null;
   expanded?: boolean;
@@ -45,7 +41,7 @@ export interface FolderOperations {
     name: string,
     rootFolderId: DefaultFolderId,
     parentId: string | null,
-    icon?: IconValue,
+    icon?: IconKey,
   ) => Promise<string>;
   updateFolder: (folderId: string, updates: FolderUpdate) => Promise<void>;
   deleteFolder: (folderId: string) => Promise<void>;
@@ -76,10 +72,10 @@ export function useFolderOperations(deps: FolderOperationsDeps): FolderOperation
       name: string,
       rootFolderId: DefaultFolderId,
       parentId: string | null,
-      icon?: IconValue,
+      icon?: IconKey,
     ): Promise<string> => {
-      // Convert IconValue to IconKey for API (only IconKey strings allowed)
-      const iconKey: IconKey | undefined = icon && isIconKey(icon) ? icon : undefined;
+      // icon is already IconKey type
+      const iconKey: IconKey | undefined = icon;
 
       logger.debug("Folder operations: Creating folder", {
         name,
@@ -183,15 +179,15 @@ export function useFolderOperations(deps: FolderOperationsDeps): FolderOperation
         updatedFields: Object.keys(updates).join(", "),
       });
 
-      // Convert IconValue to IconKey for storage/API
+      // Convert IconKey to IconKey for storage/API
       const storeUpdates: Partial<ChatFolder> = {};
 
-      // Handle icon separately (IconValue -> IconKey conversion)
+      // Handle icon separately (IconKey -> IconKey conversion)
       if ("icon" in updates) {
         const iconValue = updates.icon;
         if (iconValue === null) {
           storeUpdates.icon = null;
-        } else if (iconValue !== undefined && isIconKey(iconValue)) {
+        } else if (iconValue !== undefined) {
           storeUpdates.icon = iconValue;
         }
       }

@@ -12,6 +12,7 @@ import type { ModelUtilityValue } from "@/app/api/[locale]/agent/models/enum";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { users } from "@/app/api/[locale]/user/db";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { CharacterModelSelection } from "./create/definition";
 import type {
@@ -34,9 +35,9 @@ export const customCharacters = pgTable("custom_characters", {
     .references(() => users.id, { onDelete: "cascade" }),
 
   // Character details
-  name: text("name").notNull(),
-  description: text("description").notNull(),
-  tagline: text("tagline").notNull(),
+  name: text("name").$type<TranslationKey>().notNull(),
+  description: text("description").$type<TranslationKey>().notNull(),
+  tagline: text("tagline").$type<TranslationKey>().notNull(),
   icon: text("icon").$type<IconKey>().notNull(),
   avatar: text("avatar"), // Optional avatar URL
   systemPrompt: text("system_prompt").notNull(),
@@ -47,7 +48,7 @@ export const customCharacters = pgTable("custom_characters", {
     .$type<typeof CharacterSourceValue>()
     .notNull()
     .default("app.api.agent.chat.characters.enums.source.my"),
-  task: text("task").$type<ModelUtility>().notNull(), // Primary utility
+  task: text("task").$type<ModelUtility>().notNull(),
 
   voice: text("voice")
     .$type<typeof TtsVoiceValue>()

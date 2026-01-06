@@ -208,11 +208,7 @@ import "server-only";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  fail,
-  success,
-  ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
+import { fail, success, ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -260,9 +256,7 @@ export class TaskRepositoryImpl implements TaskRepository {
     }
   }
 
-  private async performTaskWork(
-    logger: EndpointLogger,
-  ): Promise<{ count: number }> {
+  private async performTaskWork(logger: EndpointLogger): Promise<{ count: number }> {
     // Actual task work implementation
     logger.debug("Performing task work");
     return { count: 42 };
@@ -288,9 +282,7 @@ export const taskRepository = new TaskRepositoryImpl();
 export const taskConfig = {
   name: "data-processing-task",
   schedule: CRON_SCHEDULES.HOURLY, // Every hour
-  enabled:
-    process.env.NODE_ENV === "production" ||
-    process.env.ENABLE_TASKS === "true",
+  enabled: process.env.NODE_ENV === "production" || process.env.ENABLE_TASKS === "true",
   maxConcurrent: 1,
   timeout: TASK_TIMEOUTS.LONG, // 10 minutes
 };

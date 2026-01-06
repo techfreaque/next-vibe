@@ -4,6 +4,7 @@
  * Used by both React and CLI implementations
  */
 
+import type { IconKey } from "../../../react/icons";
 import type { WidgetData } from "../types";
 
 /**
@@ -13,8 +14,8 @@ export interface ProcessedLinkCard {
   url: string;
   title: string;
   description?: string;
-  icon?: string;
-  favicon?: string;
+  icon?: IconKey;
+  favicon?: IconKey;
   metadata?: Record<string, string>;
   snippet?: string;
   age?: string;

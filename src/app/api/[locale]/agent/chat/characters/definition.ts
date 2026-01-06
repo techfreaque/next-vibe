@@ -5,6 +5,8 @@
 
 import { z } from "zod";
 
+import { ModelUtilityDB } from "@/app/api/[locale]/agent/models/enum";
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   field,
@@ -21,16 +23,17 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { iconSchema } from "../../../shared/types/common.schema";
 import { TtsVoiceDB } from "../../text-to-speech/enum";
 import {
   ContentLevelFilterDB,
   IntelligenceLevelFilterDB,
+  ModelSelectionType,
   PriceLevelFilterDB,
+  SpeedLevelFilterDB,
 } from "../favorites/enum";
-import { ModelId } from "../model-access/models";
-import { ModelUtilityDB } from "../types";
 import { CharacterCategory } from "./enum";
 import { CharacterCategoryDB, CharacterSource, CharacterSourceDB } from "./enum";
 
@@ -86,7 +89,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.characters.get.response.characters.character.name.content" as const,
               },
-              z.string(),
+              z.string() as z.ZodType<TranslationKey>,
             ),
             description: responseField(
               {
@@ -94,7 +97,7 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.characters.get.response.characters.character.description.content" as const,
               },
-              z.string(),
+              z.string() as z.ZodType<TranslationKey>,
             ),
             icon: responseField(
               {
@@ -161,13 +164,13 @@ const { GET } = createEndpoint({
                         content:
                           "app.api.agent.chat.characters.get.response.characters.character.selectionType.content" as const,
                       },
-                      z.literal("manual"),
+                      z.literal(ModelSelectionType.MANUAL),
                     ),
-                    preferredModel: responseField(
+                    manualModelId: responseField(
                       {
                         type: WidgetType.TEXT,
                         content:
-                          "app.api.agent.chat.characters.get.response.characters.character.preferredModel.content" as const,
+                          "app.api.agent.chat.characters.get.response.characters.character.manualModelId.content" as const,
                       },
                       z.enum(ModelId),
                     ),
@@ -187,55 +190,55 @@ const { GET } = createEndpoint({
                         content:
                           "app.api.agent.chat.characters.get.response.characters.character.selectionType.content" as const,
                       },
-                      z.literal("filters"),
+                      z.literal(ModelSelectionType.FILTERS),
                     ),
-                    minIntelligence: responseField(
+                    intelligenceRange: responseField(
                       {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.characters.get.response.characters.character.minIntelligence.content" as const,
+                        type: WidgetType.CONTAINER,
+                        layoutType: LayoutType.STACKED,
                       },
-                      z.enum(IntelligenceLevelFilterDB).optional(),
+                      z
+                        .object({
+                          min: z.enum(IntelligenceLevelFilterDB).optional(),
+                          max: z.enum(IntelligenceLevelFilterDB).optional(),
+                        })
+                        .optional(),
                     ),
-                    maxIntelligence: responseField(
+                    priceRange: responseField(
                       {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.characters.get.response.characters.character.maxIntelligence.content" as const,
+                        type: WidgetType.CONTAINER,
+                        layoutType: LayoutType.STACKED,
                       },
-                      z.enum(IntelligenceLevelFilterDB).optional(),
+                      z
+                        .object({
+                          min: z.enum(PriceLevelFilterDB).optional(),
+                          max: z.enum(PriceLevelFilterDB).optional(),
+                        })
+                        .optional(),
                     ),
-                    minPrice: responseField(
+                    contentRange: responseField(
                       {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.characters.get.response.characters.character.minPrice.content" as const,
+                        type: WidgetType.CONTAINER,
+                        layoutType: LayoutType.STACKED,
                       },
-                      z.enum(PriceLevelFilterDB).optional(),
+                      z
+                        .object({
+                          min: z.enum(ContentLevelFilterDB).optional(),
+                          max: z.enum(ContentLevelFilterDB).optional(),
+                        })
+                        .optional(),
                     ),
-                    maxPrice: responseField(
+                    speedRange: responseField(
                       {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.characters.get.response.characters.character.maxPrice.content" as const,
+                        type: WidgetType.CONTAINER,
+                        layoutType: LayoutType.STACKED,
                       },
-                      z.enum(PriceLevelFilterDB).optional(),
-                    ),
-                    minContent: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.characters.get.response.characters.character.minContent.content" as const,
-                      },
-                      z.enum(ContentLevelFilterDB).optional(),
-                    ),
-                    maxContent: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.characters.get.response.characters.character.maxContent.content" as const,
-                      },
-                      z.enum(ContentLevelFilterDB).optional(),
+                      z
+                        .object({
+                          min: z.enum(SpeedLevelFilterDB).optional(),
+                          max: z.enum(SpeedLevelFilterDB).optional(),
+                        })
+                        .optional(),
                     ),
                     preferredStrengths: responseArrayOptionalField(
                       {
@@ -269,13 +272,19 @@ const { GET } = createEndpoint({
                 ),
               ],
             ),
-            suggestedPrompts: responseField(
+            suggestedPrompts: responseArrayOptionalField(
               {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.characters.get.response.characters.character.suggestedPrompts.content" as const,
+                type: WidgetType.DATA_LIST,
               },
-              z.array(z.string()).optional(),
+              field(
+                z.string(),
+                { response: true },
+                {
+                  type: WidgetType.BADGE,
+                  content:
+                    "app.api.agent.chat.characters.get.response.characters.character.suggestedPrompts.content" as const,
+                },
+              ),
             ),
           },
         ),
@@ -342,7 +351,7 @@ const { GET } = createEndpoint({
             source: CharacterSource.BUILT_IN,
             voice: "app.api.agent.textToSpeech.voices.FEMALE",
             modelSelection: {
-              selectionType: "filters" as const,
+              selectionType: ModelSelectionType.FILTERS,
               preferredStrengths: null,
               ignoredWeaknesses: null,
             },
@@ -361,8 +370,8 @@ const { GET } = createEndpoint({
             source: CharacterSource.MY,
             voice: "app.api.agent.textToSpeech.voices.MALE",
             modelSelection: {
-              selectionType: "manual" as const,
-              preferredModel: ModelId.GPT_5,
+              selectionType: ModelSelectionType.MANUAL,
+              manualModelId: ModelId.GPT_5,
             },
             suggestedPrompts: ["Help me with coding", "Review my architecture"],
           },
@@ -378,6 +387,19 @@ export type CharacterListRequestInput = typeof GET.types.RequestInput;
 export type CharacterListRequestOutput = typeof GET.types.RequestOutput;
 export type CharacterListResponseInput = typeof GET.types.ResponseInput;
 export type CharacterListResponseOutput = typeof GET.types.ResponseOutput;
+
+// Individual character type from list response
+export type Character = CharacterListResponseOutput["characters"][number];
+
+// Model selection discriminated union variants
+export type FiltersSelection = Extract<
+  Character["modelSelection"],
+  { selectionType: "app.api.agent.chat.favorites.enums.selectionType.filters" }
+>;
+export type ManualSelection = Extract<
+  Character["modelSelection"],
+  { selectionType: "app.api.agent.chat.favorites.enums.selectionType.manual" }
+>;
 
 const definitions = { GET };
 export { GET };

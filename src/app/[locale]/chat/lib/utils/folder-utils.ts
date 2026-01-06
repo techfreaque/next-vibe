@@ -9,7 +9,7 @@ import {
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
-import type { IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -26,7 +26,7 @@ export function isDefaultFolder(folderId: string): folderId is DefaultFolderId {
  * For default folders, use the icon from DEFAULT_FOLDER_CONFIGS
  * For custom folders, use the stored icon or fallback to "folder"
  */
-export function getFolderIcon(folderId: string, customIcon?: IconValue | null): IconValue {
+export function getFolderIcon(folderId: string, customIcon?: IconKey | null): IconKey {
   if (isDefaultFolder(folderId)) {
     return DEFAULT_FOLDER_CONFIGS[folderId].icon;
   }

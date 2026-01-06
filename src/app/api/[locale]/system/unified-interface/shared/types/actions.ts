@@ -9,6 +9,7 @@ import type { Route } from "next";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { IconKey } from "../../react/icons";
 import type { ActionType, ComponentVariant, InterfaceContext } from "./enums";
 
 /**
@@ -251,7 +252,7 @@ export interface ActionPreset {
  */
 export interface ButtonAction {
   label: TranslationKey;
-  icon?: string;
+  icon?: IconKey;
   variant?: ComponentVariant;
   size?: "sm" | "md" | "lg";
   actions: ActionConfig[];
@@ -265,7 +266,7 @@ export interface ButtonAction {
  */
 export interface ContextMenuAction {
   label: TranslationKey;
-  icon?: string;
+  icon?: IconKey;
   actions: ActionConfig[];
   separator?: boolean;
   disabled?: boolean;
@@ -277,7 +278,7 @@ export interface ContextMenuAction {
  */
 export interface BulkAction {
   label: TranslationKey;
-  icon?: string;
+  icon?: IconKey;
   variant?: ComponentVariant;
   actions: ActionConfig[];
   confirmationMessage?: TranslationKey;

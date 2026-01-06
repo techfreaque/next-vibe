@@ -10,7 +10,7 @@ import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } fro
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
-import type { IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -69,7 +69,7 @@ export interface UseChatReturn {
     {
       id: string;
       name: string;
-      icon: string;
+      icon: IconKey;
       systemPrompt: string;
       voice?: typeof TtsVoiceValue;
     }
@@ -162,7 +162,7 @@ export interface UseChatReturn {
     name: string,
     rootFolderId: DefaultFolderId,
     parentId: string | null,
-    icon?: IconValue,
+    icon?: IconKey,
   ) => Promise<string>;
   updateFolder: (folderId: string, updates: FolderUpdate) => Promise<void>;
   deleteFolder: (folderId: string) => Promise<void>;
@@ -399,7 +399,7 @@ export function useChat(
       {
         id: string;
         name: string;
-        icon: string;
+        icon: IconKey;
         systemPrompt: string;
         voice?: typeof TtsVoiceValue;
       }

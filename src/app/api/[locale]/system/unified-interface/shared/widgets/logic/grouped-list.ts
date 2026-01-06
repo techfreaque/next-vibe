@@ -4,6 +4,7 @@
  * Used by both React and CLI implementations
  */
 
+import type { IconKey } from "../../../react/icons";
 import type { WidgetData } from "../types";
 
 /**
@@ -26,7 +27,7 @@ export interface StatConfig {
   field: string;
   value: string;
   label?: string;
-  icon?: string;
+  icon?: IconKey;
   color?: string;
 }
 

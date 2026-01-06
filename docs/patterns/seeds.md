@@ -139,10 +139,7 @@ export async function test(logger: EndpointLogger): Promise<void>;
 export async function prod(logger: EndpointLogger): Promise<void>;
 
 // With locale parameter (only if actually used in function body)
-export async function dev(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<void>;
+export async function dev(logger: EndpointLogger, locale: CountryLanguage): Promise<void>;
 ```
 
 ### When to Include Locale
@@ -261,10 +258,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
   try {
     // Check if data already exists
-    const existing = await userRepository.findByEmail(
-      "admin@example.com",
-      logger,
-    );
+    const existing = await userRepository.findByEmail("admin@example.com", logger);
 
     if (existing.success && existing.data) {
       logger.debug("✅ Admin user already exists, skipping");
@@ -304,10 +298,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
         successCount++;
       } else {
         failCount++;
-        logger.error(
-          `Failed to create user ${userData.email}:`,
-          result.message,
-        );
+        logger.error(`Failed to create user ${userData.email}:`, result.message);
       }
     } catch (error) {
       failCount++;
@@ -361,10 +352,7 @@ export async function prod(logger: EndpointLogger): Promise<void> {
 ### Using Locale Parameter
 
 ```typescript
-export async function dev(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<void> {
+export async function dev(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
   logger.debug(`🌱 Seeding localized data for ${locale}`);
 
   try {
@@ -395,10 +383,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
   try {
     // First, get required user
-    const userResult = await userRepository.findByEmail(
-      "admin@example.com",
-      logger,
-    );
+    const userResult = await userRepository.findByEmail("admin@example.com", logger);
 
     if (!userResult.success || !userResult.data) {
       logger.error("Required user not found, skipping consultation seed");
@@ -446,10 +431,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 
 ```typescript
 // ❌ WRONG - Locale parameter not used
-export async function dev(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<void> {
+export async function dev(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
   logger.debug("Seeding data");
   // Locale is never used
 }

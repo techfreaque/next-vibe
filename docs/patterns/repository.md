@@ -65,18 +65,10 @@ export class ItemRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<ItemGetResponseOutput>> {
-    const ownershipCheck = await this.validateOwnership(
-      urlPathParams.id,
-      user,
-      logger,
-    );
+    const ownershipCheck = await this.validateOwnership(urlPathParams.id, user, logger);
     if (!ownershipCheck.success) return ownershipCheck; // Propagate failure
 
-    const [item] = await db
-      .select()
-      .from(items)
-      .where(eq(items.id, urlPathParams.id))
-      .limit(1);
+    const [item] = await db.select().from(items).where(eq(items.id, urlPathParams.id)).limit(1);
     if (!item) {
       return fail({
         message: "app.api.items.errors.notFound",
@@ -149,11 +141,7 @@ export class UserRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<UserGetResponseOutput>> {
     try {
-      const [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, urlPathParams.id))
-        .limit(1);
+      const [user] = await db.select().from(users).where(eq(users.id, urlPathParams.id)).limit(1);
       if (!user) {
         return fail({
           message: "app.api.users.errors.notFound",
@@ -292,20 +280,13 @@ For simple repositories:
 import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  ErrorResponseTypes,
-  fail,
-  success,
-} from "next-vibe/shared/types/response.schema";
+import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { myTable } from "./db";
-import type {
-  MyGetResponseOutput,
-  MyGetUrlVariablesOutput,
-} from "./definition";
+import type { MyGetResponseOutput, MyGetUrlVariablesOutput } from "./definition";
 
 export class MyRepository {
   static async getById(
@@ -379,11 +360,7 @@ export class OrderRepository {
     const orderResult = await OrderQueries.findById(urlPathParams.id, logger);
     if (!orderResult.success) return orderResult;
 
-    const accessResult = await OrderValidation.checkAccess(
-      orderResult.data,
-      user,
-      logger,
-    );
+    const accessResult = await OrderValidation.checkAccess(orderResult.data, user, logger);
     if (!accessResult.success) return accessResult;
 
     const order = orderResult.data;
@@ -403,10 +380,7 @@ export class OrderRepository {
     const validationResult = await OrderValidation.validateCreate(data, logger);
     if (!validationResult.success) return validationResult;
 
-    const total = data.items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0,
-    );
+    const total = data.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const insertResult = await OrderQueries.insert(
       {
         userId: user.id!,
@@ -429,28 +403,17 @@ export class OrderRepository {
 import "server-only";
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  success,
-  fail,
-  ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
+import { success, fail, ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { orders, type Order, type NewOrder } from "../db";
 
 export class OrderQueries {
-  static async findById(
-    id: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<Order>> {
+  static async findById(id: string, logger: EndpointLogger): Promise<ResponseType<Order>> {
     try {
       logger.debug("Finding order by ID", { id });
-      const [order] = await db
-        .select()
-        .from(orders)
-        .where(eq(orders.id, id))
-        .limit(1);
+      const [order] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
       if (!order) {
         return fail({
           message: "app.api.orders.errors.notFound",
@@ -467,10 +430,7 @@ export class OrderQueries {
     }
   }
 
-  static async insert(
-    data: NewOrder,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<Order>> {
+  static async insert(data: NewOrder, logger: EndpointLogger): Promise<ResponseType<Order>> {
     try {
       logger.debug("Inserting order", { userId: data.userId });
       const [order] = await db.insert(orders).values(data).returning();
@@ -497,11 +457,7 @@ export class OrderQueries {
 ```typescript
 import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import {
-  success,
-  fail,
-  ErrorResponseTypes,
-} from "next-vibe/shared/types/response.schema";
+import { success, fail, ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { Order } from "../db";
@@ -607,11 +563,7 @@ export class OrderRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<OrderCreateResponseOutput>> {
-    const creditCheck = await CreditRepository.checkBalance(
-      user.id,
-      data.amount,
-      logger,
-    );
+    const creditCheck = await CreditRepository.checkBalance(user.id, data.amount, logger);
     if (!creditCheck.success) return creditCheck;
     // ...
   }

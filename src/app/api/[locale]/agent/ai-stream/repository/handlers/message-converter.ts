@@ -13,7 +13,7 @@ import { defaultLocale } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { DefaultFolderId } from "../../../chat/config";
-import type { ChatMessage } from "../../../chat/db";
+import type { ChatMessage, ToolCallResult } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import { createMetadataSystemMessage } from "../system-prompt/message-metadata";
 
@@ -266,7 +266,7 @@ export class MessageConverter {
           type: "tool-call";
           toolCallId: string;
           toolName: string;
-          input: unknown;
+          input: ToolCallResult;
         }> = [];
 
         // Build separate tool result messages (one per tool call with result)

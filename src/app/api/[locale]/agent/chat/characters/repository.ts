@@ -14,21 +14,18 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { ModelId } from "../model-access/models";
 import type {
   CharacterGetResponseOutput,
   CharacterUpdateRequestOutput,
   CharacterUpdateResponseOutput,
 } from "./[id]/definition";
-import { type Character, DEFAULT_CHARACTERS } from "./config";
+import { DEFAULT_CHARACTERS } from "./config";
 import type {
   CharacterCreateRequestOutput,
   CharacterCreateResponseOutput,
 } from "./create/definition";
-import { customCharacters, type NewCustomCharacter } from "./db";
-import type { CharacterListResponseOutput } from "./definition";
-import { CharacterSource } from "./enum";
-import { categoryToTask } from "./utils";
+import { customCharacters } from "./db";
+import type { Character, CharacterListResponseOutput } from "./definition";
 
 /**
  * Simple character lookup for internal use (non-route handlers)
@@ -55,7 +52,7 @@ export async function getCharacterById(
     .where(and(eq(customCharacters.id, characterId), eq(customCharacters.userId, userId)))
     .limit(1);
 
-  return customCharacter ? (customCharacter as Character) : null;
+  return customCharacter || null;
 }
 
 /**
@@ -82,15 +79,16 @@ export class CharactersRepository {
           .from(customCharacters)
           .where(eq(customCharacters.userId, userId));
 
-        const customCharactersFormatted = customCharactersList as Character[];
         return success({
-          characters: [...DEFAULT_CHARACTERS, ...customCharactersFormatted],
+          characters: [...DEFAULT_CHARACTERS, ...customCharactersList],
         });
       }
 
       // For public/lead users, return only default characters
       logger.debug("Getting default characters for public user");
-      return success({ characters: [...DEFAULT_CHARACTERS] });
+      return success({
+        characters: DEFAULT_CHARACTERS,
+      });
     } catch (error) {
       logger.error("Failed to get characters", parseError(error));
       return fail({
@@ -118,10 +116,7 @@ export class CharactersRepository {
       const defaultCharacter = DEFAULT_CHARACTERS.find((p) => p.id === characterId);
       if (defaultCharacter) {
         return success({
-          character: {
-            ...defaultCharacter,
-            suggestedPrompts: defaultCharacter.suggestedPrompts ?? [],
-          },
+          character: defaultCharacter,
         });
       }
 
@@ -147,10 +142,7 @@ export class CharactersRepository {
       }
 
       return success({
-        character: {
-          ...(customCharacter as Character),
-          suggestedPrompts: customCharacter.suggestedPrompts ?? [],
-        },
+        character: customCharacter,
       });
     } catch (error) {
       logger.error("Failed to get character by ID", parseError(error));
@@ -181,68 +173,12 @@ export class CharactersRepository {
 
       logger.debug("Creating custom character", { userId, name: data.name });
 
-      const task = categoryToTask(data.category);
-
-      // Handle model selection union
-      let preferredModel: ModelId | undefined = undefined;
-      let requirements: NewCustomCharacter["requirements"] = {};
-
-      if (data.modelSelection.selectionType === "manual") {
-        // Manual model selection
-        preferredModel = data.modelSelection.preferredModel;
-      } else {
-        // Filter-based selection - map to requirements
-        const { intelligence, maxPrice, contentLevel } = data.modelSelection;
-
-        // Map intelligence filter to minIntelligence requirement (skip if ANY)
-        if (intelligence !== "app.api.agent.chat.favorites.enums.intelligence.any") {
-          requirements.minIntelligence = intelligence;
-        }
-
-        // Map content level filter to minContent requirement (skip if ANY)
-        if (contentLevel !== "app.api.agent.chat.favorites.enums.content.any") {
-          requirements.minContent = contentLevel;
-        }
-
-        // Note: maxPrice doesn't have a direct requirements mapping
-        // It would be used by model selection algorithm but not stored as a hard requirement
-        // Store it in preferences for now (or handle in model selection logic)
-        logger.debug("Filter-based model selection", {
-          intelligence,
-          maxPrice,
-          contentLevel,
-        });
-      }
-
-      const characterData = {
-        userId,
-        name: data.name,
-        description: data.description,
-        icon: data.icon,
-        systemPrompt: data.systemPrompt,
-        category: data.category,
-        source: CharacterSource.MY,
-        task,
-        preferredModel,
-        voice: data.voice,
-        suggestedPrompts: data.suggestedPrompts || [],
-        requirements,
-        preferences: {},
-        ownership: {
-          type: "user",
-          userId,
-          isDefault: false,
-          isFeatured: false,
-        },
-        display: {
-          shortDescription: data.description,
-        },
-        isPublic: false,
-      };
-
       const [character] = await db
         .insert(customCharacters)
-        .values(characterData as typeof customCharacters.$inferInsert)
+        .values({
+          ...data,
+          userId,
+        })
         .returning();
 
       return success({ id: character.id });
@@ -277,51 +213,8 @@ export class CharactersRepository {
 
       logger.debug("Updating custom character", { userId, characterId });
 
-      // Handle model selection union if provided
-      let preferredModel: ModelId | undefined;
-      let requirements: Partial<NewCustomCharacter["requirements"]> = {};
-
-      if (data.modelSelection) {
-        if (data.modelSelection.selectionType === "manual") {
-          // Manual model selection
-          preferredModel = data.modelSelection.preferredModel;
-        } else {
-          // Filter-based selection - map to requirements
-          const { intelligence, maxPrice, contentLevel } = data.modelSelection;
-
-          // Map intelligence filter to minIntelligence requirement (skip if ANY)
-          if (intelligence !== "app.api.agent.chat.favorites.enums.intelligence.any") {
-            requirements.minIntelligence = intelligence;
-          }
-
-          // Map content level filter to minContent requirement (skip if ANY)
-          if (contentLevel !== "app.api.agent.chat.favorites.enums.content.any") {
-            requirements.minContent = contentLevel;
-          }
-
-          logger.debug("Filter-based model selection", {
-            intelligence,
-            maxPrice,
-            contentLevel,
-          });
-        }
-      }
-
-      const dbData = {
-        ...data,
-        modelSelection: undefined, // Remove the union field before DB insert
-        ...(data.modelSelection &&
-          preferredModel !== undefined && {
-            preferredModel,
-          }),
-        ...(data.modelSelection &&
-          Object.keys(requirements).length > 0 && {
-            requirements,
-          }),
-      };
-
       const updateValues = Object.fromEntries(
-        Object.entries(dbData).filter(([, value]) => value !== undefined),
+        Object.entries(data).filter(([, value]) => value !== undefined),
       );
 
       const [updated] = await db

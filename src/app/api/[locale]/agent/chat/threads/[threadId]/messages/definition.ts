@@ -380,7 +380,7 @@ const { POST } = createEndpoint({
           content:
             "app.api.agent.chat.threads.threadId.messages.post.response.message.createdAt.content" as const,
         },
-        z.string().datetime(),
+        dateSchema,
       ),
     },
   ),

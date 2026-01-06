@@ -20,6 +20,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { dateSchema } from "../../../shared/types/common.schema";
 import { UserRole } from "../../../user/user-roles/enum";
 import { SortOrder, SortOrderOptions } from "../../messages/enum";
 import {
@@ -213,7 +214,7 @@ const { GET } = createEndpoint({
                 type: WidgetType.TEXT,
                 content: "app.api.emails.smtpClient.list.response.account.lastUsedAt",
               },
-              z.string().datetime().nullable(),
+              dateSchema.nullable(),
             ),
             createdAt: responseField(
               {

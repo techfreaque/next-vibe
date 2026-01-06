@@ -14,6 +14,7 @@ import {
 import { ModelUtilityDB, ModelUtilityOptions } from "@/app/api/[locale]/agent/models/enum";
 import { ModelId, ModelIdOptions } from "@/app/api/[locale]/agent/models/models";
 import { TtsVoiceDB, TtsVoiceOptions } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -37,8 +38,6 @@ import {
   ContentLevelFilterDB,
   IntelligenceLevelFilter,
   IntelligenceLevelFilterDB,
-  ModelSelectionMode,
-  ModelSelectionModeDB,
   ModelSelectionType,
   PriceLevelFilter,
   PriceLevelFilterDB,
@@ -100,40 +99,108 @@ const { GET } = createEndpoint({
         },
         z.enum(TtsVoiceDB).nullable(),
       ),
-      mode: responseField(
+      modelSelection: objectUnionField(
         {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.mode.content" as const,
+          type: WidgetType.CONTAINER,
+          title: "app.api.agent.chat.favorites.id.get.response.modelSelection.title" as const,
+          layoutType: LayoutType.STACKED,
         },
-        z.enum(ModelSelectionModeDB),
-      ),
-      intelligence: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.intelligence.content" as const,
-        },
-        z.enum(IntelligenceLevelFilterDB),
-      ),
-      maxPrice: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.maxPrice.content" as const,
-        },
-        z.enum(PriceLevelFilterDB),
-      ),
-      content: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.content.content" as const,
-        },
-        z.enum(ContentLevelFilterDB),
-      ),
-      manualModelId: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.manualModelId.content" as const,
-        },
-        z.enum(ModelId).nullable(),
+        { response: true },
+        "selectionType",
+        [
+          // Variant 1: Manual model selection
+          objectField(
+            {
+              type: WidgetType.CONTAINER,
+              layoutType: LayoutType.STACKED,
+            },
+            { response: true },
+            {
+              selectionType: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.agent.chat.favorites.id.get.response.selectionType.content" as const,
+                },
+                z.literal(ModelSelectionType.MANUAL),
+              ),
+              manualModelId: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.agent.chat.favorites.id.get.response.manualModelId.content" as const,
+                },
+                z.enum(ModelId),
+              ),
+            },
+          ),
+          // Variant 2: Filter-based selection
+          objectField(
+            {
+              type: WidgetType.CONTAINER,
+              layoutType: LayoutType.STACKED,
+            },
+            { response: true },
+            {
+              selectionType: responseField(
+                {
+                  type: WidgetType.TEXT,
+                  content:
+                    "app.api.agent.chat.favorites.id.get.response.selectionType.content" as const,
+                },
+                z.literal(ModelSelectionType.FILTERS),
+              ),
+              intelligenceRange: responseField(
+                {
+                  type: WidgetType.CONTAINER,
+                  layoutType: LayoutType.STACKED,
+                },
+                z
+                  .object({
+                    min: z.enum(IntelligenceLevelFilterDB).optional(),
+                    max: z.enum(IntelligenceLevelFilterDB).optional(),
+                  })
+                  .optional(),
+              ),
+              priceRange: responseField(
+                {
+                  type: WidgetType.CONTAINER,
+                  layoutType: LayoutType.STACKED,
+                },
+                z
+                  .object({
+                    min: z.enum(PriceLevelFilterDB).optional(),
+                    max: z.enum(PriceLevelFilterDB).optional(),
+                  })
+                  .optional(),
+              ),
+              contentRange: responseField(
+                {
+                  type: WidgetType.CONTAINER,
+                  layoutType: LayoutType.STACKED,
+                },
+                z
+                  .object({
+                    min: z.enum(ContentLevelFilterDB).optional(),
+                    max: z.enum(ContentLevelFilterDB).optional(),
+                  })
+                  .optional(),
+              ),
+              speedRange: responseField(
+                {
+                  type: WidgetType.CONTAINER,
+                  layoutType: LayoutType.STACKED,
+                },
+                z
+                  .object({
+                    min: z.enum(SpeedLevelFilterDB).optional(),
+                    max: z.enum(SpeedLevelFilterDB).optional(),
+                  })
+                  .optional(),
+              ),
+            },
+          ),
+        ],
       ),
       position: responseField(
         {
@@ -217,11 +284,25 @@ const { GET } = createEndpoint({
         characterId: "thea",
         customName: "Thea (Smart)",
         voice: null,
-        mode: ModelSelectionMode.AUTO,
-        intelligence: IntelligenceLevelFilter.SMART,
-        maxPrice: PriceLevelFilter.STANDARD,
-        content: ContentLevelFilter.OPEN,
-        manualModelId: null,
+        modelSelection: {
+          selectionType: ModelSelectionType.FILTERS,
+          intelligenceRange: {
+            min: IntelligenceLevelFilter.SMART,
+            max: IntelligenceLevelFilter.BRILLIANT,
+          },
+          priceRange: {
+            min: PriceLevelFilter.CHEAP,
+            max: PriceLevelFilter.STANDARD,
+          },
+          contentRange: {
+            min: ContentLevelFilter.OPEN,
+            max: ContentLevelFilter.UNCENSORED,
+          },
+          speedRange: {
+            min: SpeedLevelFilter.FAST,
+            max: SpeedLevelFilter.THOROUGH,
+          },
+        },
         position: 0,
         color: null,
         isActive: true,
@@ -478,6 +559,24 @@ const { PATCH } = createEndpoint({
             },
           ),
         ],
+      ),
+      color: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.agent.chat.favorites.id.patch.color.label" as const,
+          columns: 6,
+        },
+        z.string().nullable().optional(),
+      ),
+      customIcon: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.ICON,
+          label: "app.api.agent.chat.favorites.id.patch.customIcon.label" as const,
+          columns: 6,
+        },
+        iconSchema.optional(),
       ),
       isActive: requestDataField(
         {

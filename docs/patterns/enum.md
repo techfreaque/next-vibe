@@ -250,13 +250,8 @@ import { consultations } from "./db";
 import { ConsultationStatus, ConsultationStatusValue } from "./enum";
 
 // Use EnumValue for type annotations
-export async function getByStatus(
-  status: ConsultationStatusValue,
-): Promise<Consultation[]> {
-  return await db
-    .select()
-    .from(consultations)
-    .where(eq(consultations.status, status));
+export async function getByStatus(status: ConsultationStatusValue): Promise<Consultation[]> {
+  return await db.select().from(consultations).where(eq(consultations.status, status));
 }
 
 // Use enum values for comparisons
@@ -268,10 +263,7 @@ export async function markCompleted(id: string): Promise<void> {
 }
 
 // Filtering logic
-export function filterByStatus(
-  items: Consultation[],
-  status: ConsultationStatusValue,
-) {
+export function filterByStatus(items: Consultation[], status: ConsultationStatusValue) {
   return items.filter((item) => item.status === status);
 }
 ```

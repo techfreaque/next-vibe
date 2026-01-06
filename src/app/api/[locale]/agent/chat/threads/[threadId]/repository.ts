@@ -52,14 +52,6 @@ export class ThreadByIdRepository {
         .where(eq(chatThreads.id, threadId))
         .limit(1);
 
-      if (!thread) {
-        return fail({
-          message: "app.api.agent.chat.threads.threadId.get.errors.notFound.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-          messageParams: { threadId },
-        });
-      }
-
       // Get folder for permission check
       let folder = null;
       if (thread.folderId) {
@@ -80,29 +72,7 @@ export class ThreadByIdRepository {
 
       logger.debug("Thread found successfully", { threadId: thread.id });
 
-      // Map database fields to response fields
-      // Exclude: rootFolderId (not in response), moderatorIds, searchVector
-      // Map: defaultModel (ModelId -> string), defaultCharacter -> character (CharacterId -> string)
-      const response: ThreadGetResponseOutput = {
-        thread: {
-          id: thread.id,
-          userId: thread.userId,
-          title: thread.title,
-          folderId: thread.folderId,
-          status: thread.status,
-          defaultModel: thread.defaultModel ?? null,
-          character: thread.defaultCharacter ?? null,
-          systemPrompt: thread.systemPrompt,
-          pinned: thread.pinned,
-          archived: thread.archived,
-          tags: thread.tags ?? [],
-          preview: thread.preview,
-          metadata: thread.metadata ?? {},
-          createdAt: thread.createdAt.toISOString(),
-          updatedAt: thread.updatedAt.toISOString(),
-        },
-      };
-      return success(response);
+      return success({ thread });
     } catch (error) {
       logger.error("Error getting thread by ID", parseError(error));
       return fail({
@@ -164,51 +134,10 @@ export class ThreadByIdRepository {
         });
       }
 
-      // Folder validation: folderId is optional and validated by schema
-
-      // Build update object with only provided fields
-      type UpdateData = Partial<typeof chatThreads.$inferInsert> & {
-        updatedAt: Date;
-      };
-      const updateData: UpdateData = {
-        updatedAt: new Date(),
-      };
-
-      if (data.updates?.title !== undefined) {
-        updateData.title = data.updates.title;
-      }
-      if (data.updates?.folderId !== undefined) {
-        updateData.folderId = data.updates.folderId;
-      }
-      if (data.updates?.status !== undefined) {
-        updateData.status = data.updates.status;
-      }
-      if (data.updates?.defaultModel !== undefined) {
-        updateData.defaultModel = data.updates.defaultModel;
-      }
-      if (data.updates?.character !== undefined) {
-        updateData.defaultCharacter = data.updates.character ?? null;
-      }
-      if (data.updates?.systemPrompt !== undefined) {
-        updateData.systemPrompt = data.updates.systemPrompt;
-      }
-      if (data.updates?.pinned !== undefined) {
-        updateData.pinned = data.updates.pinned;
-      }
-      if (data.updates?.archived !== undefined) {
-        updateData.archived = data.updates.archived;
-      }
-      if (data.updates?.tags !== undefined) {
-        updateData.tags = data.updates.tags;
-      }
-      if (data.updates?.published !== undefined) {
-        updateData.published = data.updates.published;
-      }
-
       // Update the thread (user ownership already verified)
       const [updatedThread] = await db
         .update(chatThreads)
-        .set(updateData)
+        .set(data.updates)
         .where(eq(chatThreads.id, threadId))
         .returning();
 
@@ -216,30 +145,7 @@ export class ThreadByIdRepository {
         threadId: updatedThread.id,
       });
 
-      // Map database fields to response fields
-      // Exclude: rootFolderId (not in response), moderatorIds, searchVector
-      // Map: defaultModel (ModelId -> string), defaultCharacter -> character (CharacterId -> string)
-      const response: ThreadPatchResponseOutput = {
-        thread: {
-          id: updatedThread.id,
-          userId: updatedThread.userId,
-          title: updatedThread.title,
-          folderId: updatedThread.folderId,
-          status: updatedThread.status,
-          defaultModel: updatedThread.defaultModel ?? null,
-          character: updatedThread.defaultCharacter ?? null,
-          systemPrompt: updatedThread.systemPrompt,
-          pinned: updatedThread.pinned,
-          archived: updatedThread.archived,
-          tags: updatedThread.tags ?? [],
-          published: updatedThread.published,
-          preview: updatedThread.preview,
-          metadata: updatedThread.metadata ?? {},
-          createdAt: updatedThread.createdAt.toISOString(),
-          updatedAt: updatedThread.updatedAt.toISOString(),
-        },
-      };
-      return success(response);
+      return success({ thread: updatedThread });
     } catch (error) {
       logger.error("Error updating thread", parseError(error));
       return fail({

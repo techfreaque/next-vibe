@@ -19,47 +19,47 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import { getCharacterById } from "@/app/api/[locale]/agent/chat/characters/config";
 import type { CharacterListResponseOutput } from "@/app/api/[locale]/agent/chat/characters/definition";
+import type { FavoriteItem } from "@/app/api/[locale]/agent/chat/favorites/components/favorites-bar";
 import {
-  ContentLevelFilter,
-  type ContentLevelFilterValue,
-  IntelligenceLevelFilter,
-  type IntelligenceLevelFilterValue,
-  ModelSelectionMode,
-  type ModelSelectionModeValue,
-  PriceLevelFilter,
-  type PriceLevelFilterValue,
+  CONTENT_DISPLAY,
+  INTELLIGENCE_DISPLAY,
+  PRICE_DISPLAY,
+} from "@/app/api/[locale]/agent/chat/favorites/display-configs";
+import {
+  ModelSelectionType,
+  type ModelSelectionTypeValue,
 } from "@/app/api/[locale]/agent/chat/favorites/enum";
-import { getIconComponent, type IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
 import {
   type ModelId,
   type ModelOption,
   modelOptions,
   modelProviders,
-} from "@/app/api/[locale]/agent/chat/model-access/models";
-import {
-  CONTENT_DISPLAY,
-  INTELLIGENCE_DISPLAY,
-  PRICE_DISPLAY,
-} from "@/app/api/[locale]/agent/chat/types";
+} from "@/app/api/[locale]/agent/models/models";
+import { Icon, type IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { FavoriteItem } from "./favorites-bar";
-import { getCompatibleModels, selectModelForCharacter } from "./types";
+import {
+  applyModelFilters,
+  CONTENT_FILTER_ORDER,
+  getCompatibleModels,
+  INTELLIGENCE_FILTER_ORDER,
+  selectModelForCharacter,
+} from "./types";
 
 type CharacterData = CharacterListResponseOutput["characters"][number];
 
 interface QuickSettingsPanelProps {
   favorite: FavoriteItem;
-  onSave: (settings: FavoriteItem["modelSettings"], saveMode: SaveMode) => void;
+  onSave: (settings: FavoriteItem["modelSelection"], saveMode: SaveMode) => void;
   onCancel: () => void;
   onDelete?: () => void;
   onEditCharacter?: (characterData: CharacterData) => void;
   onSwitchCharacterView?: () => void;
   onCharacterSwitch?: (characterId: string, keepSettings: boolean) => void;
+  /** Characters fetched from API - used for editing custom characters */
   characters?: Record<string, CharacterData>;
   isAuthenticated?: boolean;
   locale: CountryLanguage;
@@ -85,7 +85,6 @@ function FilterPill<T extends string>({
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
-  const Icon = getIconComponent(icon);
 
   return (
     <Button
@@ -98,7 +97,7 @@ function FilterPill<T extends string>({
         !selected && "hover:border-primary/50 hover:bg-primary/5",
       )}
     >
-      <Icon className={cn("h-4 w-4", selected && "text-primary-foreground")} />
+      <Icon icon={icon} className={cn("h-4 w-4", selected && "text-primary-foreground")} />
       <Span className="text-xs font-medium">{t(label)}</Span>
     </Button>
   );
@@ -123,7 +122,6 @@ function ModelCard({
   dimmed?: boolean;
 }): JSX.Element {
   const { t } = simpleT(locale);
-  const Icon = getIconComponent(model.icon);
 
   return (
     <Div
@@ -141,7 +139,7 @@ function ModelCard({
           selected ? "bg-primary text-primary-foreground" : "bg-muted",
         )}
       >
-        <Icon className="h-4 w-4" />
+        <Icon icon={model.icon} className="h-4 w-4" />
       </Div>
 
       <Div className="flex-1 min-w-0">

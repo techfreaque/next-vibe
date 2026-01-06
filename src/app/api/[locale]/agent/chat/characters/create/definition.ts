@@ -44,7 +44,14 @@ import {
   SpeedLevelFilterDB,
 } from "../../favorites/enum";
 import { CategoryOptions } from "../config";
-import { CharacterCategory, CharacterCategoryDB } from "../enum";
+import {
+  CharacterCategory,
+  CharacterCategoryDB,
+  CharacterOwnershipType,
+  CharacterOwnershipTypeDB,
+  CharacterSource,
+  CharacterSourceDB,
+} from "../enum";
 
 /**
  * Create Character Endpoint (POST)
@@ -122,6 +129,64 @@ const { POST } = createEndpoint({
           columns: 6,
         },
         z.enum(CharacterCategoryDB),
+      ),
+      tagline: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.agent.chat.characters.post.tagline.label" as const,
+          description: "app.api.agent.chat.characters.post.tagline.description" as const,
+          columns: 6,
+        },
+        z.string().min(1).max(500),
+      ),
+      source: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.agent.chat.characters.post.source.label" as const,
+          description: "app.api.agent.chat.characters.post.source.description" as const,
+          options: [
+            {
+              value: CharacterSource.MY,
+              label: "app.api.agent.chat.characters.enums.source.my" as const,
+            },
+          ],
+          columns: 6,
+        },
+        z.enum(CharacterSourceDB),
+      ),
+      task: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.agent.chat.characters.post.task.label" as const,
+          description: "app.api.agent.chat.characters.post.task.description" as const,
+          options: [
+            {
+              value: "app.chat.modelUtilities.chat",
+              label: "app.chat.modelUtilities.chat" as const,
+            },
+          ],
+          columns: 6,
+        },
+        z.enum(ModelUtilityDB),
+      ),
+      ownershipType: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.agent.chat.characters.post.ownershipType.label" as const,
+          description: "app.api.agent.chat.characters.post.ownershipType.description" as const,
+          options: [
+            {
+              value: CharacterOwnershipType.USER,
+              label: "app.api.agent.chat.characters.enums.ownershipType.user" as const,
+            },
+          ],
+          columns: 6,
+        },
+        z.enum(CharacterOwnershipTypeDB),
       ),
       // Model Selection - discriminated union between manual and filter-based
       modelSelection: objectUnionField(
@@ -393,10 +458,14 @@ const { POST } = createEndpoint({
       create: {
         name: "Code Reviewer",
         description: "Expert at reviewing code and suggesting improvements",
+        tagline: "Expert at reviewing code and suggesting improvements",
         icon: "technologist",
         systemPrompt:
           "You are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
         category: CharacterCategory.CODING,
+        source: CharacterSource.MY,
+        task: "app.chat.modelUtilities.chat",
+        ownershipType: CharacterOwnershipType.USER,
         modelSelection: {
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: ModelId.GPT_5,
@@ -407,10 +476,14 @@ const { POST } = createEndpoint({
       createManual: {
         name: "Code Reviewer",
         description: "Expert at reviewing code and suggesting improvements",
+        tagline: "Expert at reviewing code and suggesting improvements",
         icon: "technologist",
         systemPrompt:
           "You are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
         category: CharacterCategory.CODING,
+        source: CharacterSource.MY,
+        task: "app.chat.modelUtilities.chat",
+        ownershipType: CharacterOwnershipType.USER,
         modelSelection: {
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: ModelId.GPT_5,
@@ -422,10 +495,14 @@ const { POST } = createEndpoint({
       createFilters: {
         name: "Creative Writer",
         description: "Helps with creative writing and storytelling",
+        tagline: "Helps with creative writing and storytelling",
         icon: "pen-tool",
         systemPrompt:
           "You are a creative writing assistant. Help users craft compelling stories, characters, and narratives.",
         category: CharacterCategory.CREATIVE,
+        source: CharacterSource.MY,
+        task: "app.chat.modelUtilities.chat",
+        ownershipType: CharacterOwnershipType.USER,
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
           intelligenceRange: {

@@ -22,6 +22,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
 import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
 
@@ -152,7 +153,7 @@ const { GET } = createEndpoint({
           description: "app.api.agent.chat.threads.get.dateFrom.description" as const,
           columns: 6,
         },
-        z.string().datetime().optional(),
+        dateSchema.optional(),
       ),
       dateTo: requestDataField(
         {
@@ -162,7 +163,7 @@ const { GET } = createEndpoint({
           description: "app.api.agent.chat.threads.get.dateTo.description" as const,
           columns: 6,
         },
-        z.string().datetime().optional(),
+        dateSchema.optional(),
       ),
 
       // === RESPONSE ===
@@ -342,7 +343,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.agent.chat.threads.get.response.threads.thread.createdAt.content" as const,
                   },
-                  z.string().datetime(),
+                  dateSchema,
                 ),
                 updatedAt: responseField(
                   {
@@ -350,7 +351,7 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.agent.chat.threads.get.response.threads.thread.updatedAt.content" as const,
                   },
-                  z.string().datetime(),
+                  dateSchema,
                 ),
               },
             ),
@@ -645,7 +646,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.agent.chat.threads.post.response.thread.createdAt.content" as const,
                 },
-                z.string().datetime(),
+                dateSchema,
               ),
               updatedAt: responseField(
                 {
@@ -653,7 +654,7 @@ const { POST } = createEndpoint({
                   content:
                     "app.api.agent.chat.threads.post.response.thread.updatedAt.content" as const,
                 },
-                z.string().datetime(),
+                dateSchema,
               ),
             },
           ),

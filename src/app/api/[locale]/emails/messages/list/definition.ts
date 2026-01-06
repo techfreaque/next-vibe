@@ -22,6 +22,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { dateSchema } from "../../../shared/types/common.schema";
 import {
   EmailSortField,
   EmailSortFieldOptions,
@@ -121,7 +122,7 @@ const { GET } = createEndpoint({
                   description: "app.api.emails.messages.list.fields.dateFrom.description",
                   placeholder: "app.api.emails.messages.list.fields.dateFrom.placeholder",
                 },
-                z.string().datetime().optional(),
+                dateSchema.optional(),
               ),
 
               dateTo: requestDataField(
@@ -132,7 +133,7 @@ const { GET } = createEndpoint({
                   description: "app.api.emails.messages.list.fields.dateTo.description",
                   placeholder: "app.api.emails.messages.list.fields.dateTo.placeholder",
                 },
-                z.string().datetime().optional(),
+                dateSchema.optional(),
               ),
             },
           ),
@@ -359,28 +360,28 @@ const { GET } = createEndpoint({
                     type: WidgetType.TEXT,
                     content: "app.api.emails.messages.list.response.emails.item.sentAt",
                   },
-                  z.string().datetime().nullable(),
+                  dateSchema.nullable(),
                 ),
                 deliveredAt: responseField(
                   {
                     type: WidgetType.TEXT,
                     content: "app.api.emails.messages.list.response.emails.item.deliveredAt",
                   },
-                  z.string().datetime().nullable(),
+                  dateSchema.nullable(),
                 ),
                 openedAt: responseField(
                   {
                     type: WidgetType.TEXT,
                     content: "app.api.emails.messages.list.response.emails.item.openedAt",
                   },
-                  z.string().datetime().nullable(),
+                  dateSchema.nullable(),
                 ),
                 clickedAt: responseField(
                   {
                     type: WidgetType.TEXT,
                     content: "app.api.emails.messages.list.response.emails.item.clickedAt",
                   },
-                  z.string().datetime().nullable(),
+                  dateSchema.nullable(),
                 ),
               },
             ),
@@ -446,14 +447,14 @@ const { GET } = createEndpoint({
                         type: WidgetType.TEXT,
                         content: "app.api.emails.messages.list.response.emails.item.createdAt",
                       },
-                      z.string().datetime(),
+                      dateSchema,
                     ),
                     updatedAt: responseField(
                       {
                         type: WidgetType.TEXT,
                         content: "app.api.emails.messages.list.response.emails.item.updatedAt",
                       },
-                      z.string().datetime(),
+                      dateSchema,
                     ),
                   },
                 ),

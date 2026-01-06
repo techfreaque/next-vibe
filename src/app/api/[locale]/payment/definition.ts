@@ -273,13 +273,13 @@ const { GET, POST } = createFormEndpoint({
           customerEmail: "user@example.com",
           sessionUrl: "https://checkout.stripe.com/pay/cs_test_1234567890",
           sessionId: "cs_test_1234567890",
-        },
+        } as const,
         minimal: {
           priceId: "price_1234567890",
           mode: CheckoutMode.PAYMENT,
           sessionUrl: "https://checkout.stripe.com/pay/cs_test_1234567890",
           sessionId: "cs_test_1234567890",
-        },
+        } as const,
       },
     },
     POST: {
@@ -291,11 +291,11 @@ const { GET, POST } = createFormEndpoint({
           successUrl: "https://example.com/success",
           cancelUrl: "https://example.com/cancel",
           customerEmail: "user@example.com",
-        },
+        } as const,
         minimal: {
           priceId: "price_1234567890",
           mode: CheckoutMode.PAYMENT,
-        },
+        } as const,
       },
       responses: {
         default: {
@@ -308,7 +308,7 @@ const { GET, POST } = createFormEndpoint({
           sessionUrl: "https://checkout.stripe.com/pay/cs_test_1234567890",
           sessionId: "cs_test_1234567890",
           message: "Payment session created successfully",
-        },
+        } as const,
         minimal: {
           priceId: "price_1234567890",
           mode: CheckoutMode.PAYMENT,

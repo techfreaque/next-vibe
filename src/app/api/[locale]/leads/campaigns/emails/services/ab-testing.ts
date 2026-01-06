@@ -9,6 +9,7 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Countries } from "@/i18n/core/config";
 
@@ -49,7 +50,7 @@ const JOURNEY_VARIANT_METADATA = {
     name: "Personal & Human Touch",
     description: "Emphasizes personal connection, human expertise, and relationship building",
     color: "#10B981", // Emerald
-    icon: "👥",
+    icon: "people",
     characteristics: [
       "Personal storytelling",
       "Human connection",
@@ -62,7 +63,7 @@ const JOURNEY_VARIANT_METADATA = {
     name: "Results & Social Proof",
     description: "Focuses on metrics, case studies, and proven results",
     color: "#3B82F6", // Blue
-    icon: "📊",
+    icon: "bar-chart",
     characteristics: [
       "Data-driven messaging",
       "Case studies",
@@ -75,7 +76,7 @@ const JOURNEY_VARIANT_METADATA = {
     name: "Personal Approach & Results Focused",
     description: "Combines personal touch with results-driven messaging",
     color: "#8B5CF6", // Purple
-    icon: "🎯",
+    icon: "target",
     characteristics: [
       "Personal relationship building",
       "Data-driven results",
@@ -84,7 +85,7 @@ const JOURNEY_VARIANT_METADATA = {
       "Results-focused CTAs",
     ] as const,
   },
-} as const;
+};
 
 /**
  * Default A/B Test Configuration
@@ -282,7 +283,7 @@ export function getABTestSummary(config: ABTestConfig = DEFAULT_AB_TEST_CONFIG):
       name: string;
       description: string;
       color: string;
-      icon: string;
+      icon: IconKey;
       characteristics: readonly string[];
     };
   }>;

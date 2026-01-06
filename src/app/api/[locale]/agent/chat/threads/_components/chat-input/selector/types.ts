@@ -16,37 +16,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/favorites/enum";
 import type { ModelId, ModelOption } from "@/app/api/[locale]/agent/models/models";
 import type { ModelFeatures } from "@/app/api/[locale]/agent/models/models";
-
-/**
- * Selector view modes
- */
-export type SelectorMode = "quick" | "characters" | "build";
-
-/**
- * Model selection strategy
- */
-export interface ModelSelectionAuto {
-  type: "auto";
-  intelligence: typeof IntelligenceLevelFilterValue;
-  maxPrice: typeof PriceLevelFilterValue;
-  minContent: typeof ContentLevelFilterValue;
-}
-
-export interface ModelSelectionSpecific {
-  type: "specific";
-  modelId: ModelId;
-}
-
-export type ModelSelection = ModelSelectionAuto | ModelSelectionSpecific;
-
-/**
- * Selector state
- */
-export interface SelectorState {
-  characterId: string;
-  modelSelection: ModelSelection;
-  mode: SelectorMode;
-}
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 
 /**
  * Storage keys for persistence

@@ -24,6 +24,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { dateSchema } from "../../../shared/types/common.schema";
+
 /**
  * Get User Endpoint Definition
  */
@@ -199,7 +201,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.users.user.id.id.get.response.timestamps.createdAt.content" as const,
             },
-            z.string().datetime().describe("Account creation date"),
+            dateSchema.describe("Account creation date"),
           ),
           updatedAt: responseField(
             {
@@ -207,7 +209,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.users.user.id.id.get.response.timestamps.updatedAt.content" as const,
             },
-            z.string().datetime().describe("Last update date"),
+            dateSchema.describe("Last update date"),
           ),
         },
       ),
@@ -294,14 +296,14 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.users.user.id.id.get.response.createdAt.content" as const,
         },
-        z.string().datetime(),
+        dateSchema,
       ),
       updatedAt: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.users.user.id.id.get.response.updatedAt.content" as const,
         },
-        z.string().datetime(),
+        dateSchema,
       ),
     },
   ),
@@ -624,14 +626,14 @@ const { PUT } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.users.user.id.id.put.response.createdAt.content" as const,
         },
-        z.string().datetime(),
+        dateSchema,
       ),
       updatedAt: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.users.user.id.id.put.response.updatedAt.content" as const,
         },
-        z.string().datetime(),
+        dateSchema,
       ),
     },
   ),
@@ -777,7 +779,7 @@ const { DELETE } = createEndpoint({
           content:
             "app.api.users.user.id.id.delete.response.deletionResult.deletedAt.content" as const,
         },
-        z.string().datetime().describe("When the user was deleted"),
+        dateSchema.describe("When the user was deleted"),
       ),
     },
   ),

@@ -37,7 +37,7 @@ export interface PrefillDisplayConfig<TKey extends string> {
   /** Translation key for the label shown with prefilled value */
   labelKey?: NoInfer<TKey>;
   /** Icon to show with prefilled value */
-  icon?: string;
+  icon?: IconKey;
 }
 
 // Base field configuration
@@ -194,7 +194,7 @@ export interface MultiSelectFieldConfig<
     label: NoInfer<TTranslationKey>;
     labelParams?: Record<string, string | number>;
     disabled?: boolean;
-    icon?: string;
+    icon?: IconKey;
   }>;
   maxSelections?: number;
   searchable?: boolean;

@@ -28,7 +28,7 @@ import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { RootFolderBar } from "@/app/api/[locale]/agent/chat/folders/_components/root-folder-bar";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
-import type { IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -158,7 +158,7 @@ export function ChatSidebar({
   }, []);
 
   const handleCreateFolder = React.useCallback(
-    (name: string, icon: IconValue): void => {
+    (name: string, icon: IconKey): void => {
       // If in a subfolder, create under that subfolder
       // If in root folder (no activeFolderId), create at root level
       const parentId: string | null = activeFolderId;

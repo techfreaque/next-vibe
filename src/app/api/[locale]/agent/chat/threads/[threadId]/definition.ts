@@ -6,6 +6,7 @@
 import { z } from "zod";
 
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -20,8 +21,9 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { DefaultFolderId } from "../../config";
 import { ThreadStatus, ThreadStatusOptions } from "../../enum";
 
 /**
@@ -119,7 +121,7 @@ const { GET } = createEndpoint({
             },
             z.string().nullable(),
           ),
-          character: responseField(
+          defaultCharacter: responseField(
             {
               type: WidgetType.TEXT,
               content:
@@ -181,7 +183,7 @@ const { GET } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.threadId.get.response.thread.createdAt.content" as const,
             },
-            z.string().datetime(),
+            dateSchema,
           ),
           updatedAt: responseField(
             {
@@ -189,7 +191,69 @@ const { GET } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.threadId.get.response.thread.updatedAt.content" as const,
             },
-            z.string().datetime(),
+            dateSchema,
+          ),
+          leadId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.threads.threadId.get.response.thread.leadId.content" as const,
+            },
+            z.uuid().nullable(),
+          ),
+          rootFolderId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.threads.threadId.get.response.thread.rootFolderId.content" as const,
+            },
+            z.enum(Object.values(DefaultFolderId)),
+          ),
+          rolesView: responseField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            z.array(z.enum(UserRoleDB)).nullable(),
+          ),
+          rolesEdit: responseField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            z.array(z.enum(UserRoleDB)).nullable(),
+          ),
+          rolesPost: responseField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            z.array(z.enum(UserRoleDB)).nullable(),
+          ),
+          rolesModerate: responseField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            z.array(z.enum(UserRoleDB)).nullable(),
+          ),
+          rolesAdmin: responseField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            z.array(z.enum(UserRoleDB)).nullable(),
+          ),
+          published: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.threads.threadId.get.response.thread.published.content" as const,
+            },
+            z.boolean(),
+          ),
+          searchVector: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.threads.threadId.get.response.thread.searchVector.content" as const,
+            },
+            z.string().nullable(),
           ),
         },
       ),
@@ -254,7 +318,7 @@ const { GET } = createEndpoint({
           folderId: null,
           status: ThreadStatus.ACTIVE,
           defaultModel: "gpt-4o",
-          character: "professional",
+          defaultCharacter: "professional",
           systemPrompt: null,
           pinned: false,
           archived: false,
@@ -263,6 +327,15 @@ const { GET } = createEndpoint({
           metadata: {},
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          leadId: null,
+          rootFolderId: DefaultFolderId.PRIVATE,
+          rolesView: null,
+          rolesEdit: null,
+          rolesPost: null,
+          rolesModerate: null,
+          rolesAdmin: null,
+          published: false,
+          searchVector: null,
         },
       },
     },
@@ -361,7 +434,7 @@ const { PATCH } = createEndpoint({
             },
             z.enum(ModelId).nullable().optional(),
           ),
-          character: requestDataField(
+          defaultCharacter: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
@@ -487,7 +560,7 @@ const { PATCH } = createEndpoint({
             },
             z.string().nullable(),
           ),
-          character: responseField(
+          defaultCharacter: responseField(
             {
               type: WidgetType.TEXT,
               content:
@@ -557,7 +630,7 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.threadId.patch.response.thread.createdAt.content" as const,
             },
-            z.string().datetime(),
+            dateSchema,
           ),
           updatedAt: responseField(
             {
@@ -565,7 +638,61 @@ const { PATCH } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.threadId.patch.response.thread.updatedAt.content" as const,
             },
-            z.string().datetime(),
+            dateSchema,
+          ),
+          leadId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.threads.threadId.patch.response.thread.leadId.content" as const,
+            },
+            z.uuid().nullable(),
+          ),
+          rootFolderId: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.threads.threadId.patch.response.thread.rootFolderId.content" as const,
+            },
+            z.enum(Object.values(DefaultFolderId)),
+          ),
+          rolesView: responseField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            z.array(z.enum(UserRoleDB)).nullable(),
+          ),
+          rolesEdit: responseField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            z.array(z.enum(UserRoleDB)).nullable(),
+          ),
+          rolesPost: responseField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            z.array(z.enum(UserRoleDB)).nullable(),
+          ),
+          rolesModerate: responseField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            z.array(z.enum(UserRoleDB)).nullable(),
+          ),
+          rolesAdmin: responseField(
+            {
+              type: WidgetType.DATA_LIST,
+            },
+            z.array(z.enum(UserRoleDB)).nullable(),
+          ),
+          searchVector: responseField(
+            {
+              type: WidgetType.TEXT,
+              content:
+                "app.api.agent.chat.threads.threadId.patch.response.thread.searchVector.content" as const,
+            },
+            z.string().nullable(),
           ),
         },
       ),
@@ -637,7 +764,7 @@ const { PATCH } = createEndpoint({
           folderId: null,
           status: ThreadStatus.ACTIVE,
           defaultModel: "gpt-4o",
-          character: "professional",
+          defaultCharacter: "professional",
           systemPrompt: null,
           pinned: true,
           archived: false,
@@ -647,6 +774,14 @@ const { PATCH } = createEndpoint({
           metadata: {},
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          leadId: null,
+          rootFolderId: DefaultFolderId.PRIVATE,
+          rolesView: null,
+          rolesEdit: null,
+          rolesPost: null,
+          rolesModerate: null,
+          rolesAdmin: null,
+          searchVector: null,
         },
       },
     },

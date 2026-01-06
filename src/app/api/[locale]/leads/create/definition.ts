@@ -20,6 +20,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { Countries, CountriesOptions, Languages, LanguagesOptions } from "@/i18n/core/config";
 
+import { dateSchema } from "../../shared/types/common.schema";
 import { UserRole } from "../../user/user-roles/enum";
 import { LeadSource, LeadSourceOptions, LeadStatus } from "../enum";
 
@@ -330,14 +331,14 @@ const { POST } = createEndpoint({
                   type: WidgetType.TEXT,
                   content: "app.api.leads.create.post.response.metadata.createdAt",
                 },
-                z.string().datetime(),
+                dateSchema,
               ),
               updatedAt: responseField(
                 {
                   type: WidgetType.TEXT,
                   content: "app.api.leads.create.post.response.metadata.updatedAt",
                 },
-                z.string().datetime(),
+                dateSchema,
               ),
             },
           ),

@@ -4,6 +4,7 @@
  * Used by both React and CLI implementations
  */
 
+import type { IconKey } from "../../../react/icons";
 import type { UnifiedField } from "../../types/endpoint";
 import { WidgetType } from "../../types/enums";
 import type { WidgetData } from "../types";
@@ -21,7 +22,7 @@ export interface ContainerLayout {
  */
 export interface ContainerConfig {
   layout?: ContainerLayout;
-  icon?: string;
+  icon?: IconKey;
   border?: boolean;
   spacing?: "compact" | "normal" | "relaxed";
 }

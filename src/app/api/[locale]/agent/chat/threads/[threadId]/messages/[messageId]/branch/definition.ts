@@ -6,6 +6,7 @@
 import { z } from "zod";
 
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -265,7 +266,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.createdAt.content" as const,
             },
-            z.string().datetime(),
+            dateSchema,
           ),
           updatedAt: responseField(
             {
@@ -273,7 +274,7 @@ const { POST } = createEndpoint({
               content:
                 "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.updatedAt.content" as const,
             },
-            z.string().datetime(),
+            dateSchema,
           ),
         },
       ),

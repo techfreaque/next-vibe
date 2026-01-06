@@ -154,15 +154,7 @@ chat/
  * Drizzle ORM schema definitions for lead management
  */
 
-import {
-  boolean,
-  integer,
-  jsonb,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { boolean, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
@@ -183,9 +175,7 @@ export const leads = pgTable("leads", {
   contactName: text("contact_name"),
 
   // Enum fields - use text() with enum constraint
-  status: text("status", { enum: LeadStatusDB })
-    .notNull()
-    .default(LeadStatus.NEW),
+  status: text("status", { enum: LeadStatusDB }).notNull().default(LeadStatus.NEW),
   source: text("source", { enum: LeadSourceDB }),
 
   // Foreign key
@@ -342,9 +332,7 @@ import { LeadStatus, LeadStatusDB } from "./enum";
 
 // Use text() with enum constraint - NOT pgEnum()
 export const leads = pgTable("leads", {
-  status: text("status", { enum: LeadStatusDB })
-    .notNull()
-    .default(LeadStatus.NEW),
+  status: text("status", { enum: LeadStatusDB }).notNull().default(LeadStatus.NEW),
 });
 ```
 
@@ -499,10 +487,7 @@ await db
 await db.delete(leads).where(eq(leads.id, leadId));
 
 // Soft delete (preferred)
-await db
-  .update(leads)
-  .set({ deletedAt: new Date() })
-  .where(eq(leads.id, leadId));
+await db.update(leads).set({ deletedAt: new Date() }).where(eq(leads.id, leadId));
 ```
 
 ---
@@ -572,18 +557,13 @@ export const chatFolders = pgTable(
   (table) => ({
     // Regular indexes
     userIdIdx: index("chat_folders_user_id_idx").on(table.userId),
-    rootFolderIdIdx: index("chat_folders_root_folder_id_idx").on(
-      table.rootFolderId,
-    ),
+    rootFolderIdIdx: index("chat_folders_root_folder_id_idx").on(table.rootFolderId),
 
     // Unique indexes
     emailIdx: uniqueIndex("users_email_idx").on(table.email),
 
     // GIN indexes for JSONB array containment queries
-    rolesViewIdx: index("chat_folders_roles_view_idx").using(
-      "gin",
-      table.rolesView,
-    ),
+    rolesViewIdx: index("chat_folders_roles_view_idx").using("gin", table.rolesView),
   }),
 );
 ```
@@ -636,9 +616,7 @@ export const statusEnum = pgEnum("status", [
 import { LeadStatus, LeadStatusDB } from "./enum";
 
 export const leads = pgTable("leads", {
-  status: text("status", { enum: LeadStatusDB })
-    .notNull()
-    .default(LeadStatus.NEW),
+  status: text("status", { enum: LeadStatusDB }).notNull().default(LeadStatus.NEW),
 });
 ```
 

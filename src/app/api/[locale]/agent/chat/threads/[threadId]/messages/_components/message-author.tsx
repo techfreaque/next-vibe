@@ -6,10 +6,9 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
-import { getCharacterById } from "@/app/api/[locale]/agent/chat/characters/config";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { getModelById, type ModelId } from "@/app/api/[locale]/agent/models/models";
-import { getIconComponent } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -82,13 +81,12 @@ export function MessageAuthorInfo({
           )}
         >
           {/* Show model icon for AI messages */}
-          {isAI &&
-            model &&
-            ((): JSX.Element | null => {
-              const modelData = getModelById(model);
-              const ModelIcon = getIconComponent(modelData.icon);
-              return <ModelIcon className={cn(compact ? "h-3 w-3" : "h-3.5 w-3.5")} />;
-            })()}
+          {isAI && model && (
+            <Icon
+              icon={getModelById(model).icon}
+              className={cn(compact ? "h-3 w-3" : "h-3.5 w-3.5")}
+            />
+          )}
           {displayName}
         </Span>
 

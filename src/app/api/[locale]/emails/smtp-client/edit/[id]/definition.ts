@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   field,
@@ -156,21 +157,21 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.emails.smtpClient.edit.id.response.account.lastUsedAt",
         },
-        z.string().datetime().nullable(),
+        dateSchema.nullable(),
       ),
       createdAt: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.smtpClient.edit.id.response.account.createdAt",
         },
-        z.string().datetime(),
+        dateSchema,
       ),
       updatedAt: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.emails.smtpClient.edit.id.response.account.updatedAt",
         },
-        z.string().datetime(),
+        dateSchema,
       ),
       campaignTypes: responseField(
         {

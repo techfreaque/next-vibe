@@ -57,7 +57,7 @@ export interface PrefillDisplayConfig<TKey extends string> {
   /** Translation key for the label shown with prefilled value */
   labelKey?: NoInfer<TKey>;
   /** Icon to show with prefilled value */
-  icon?: string;
+  icon?: IconKey;
 }
 
 /**
@@ -518,7 +518,7 @@ interface ContainerWidgetConfigBase<TKey extends string> extends BaseWidgetConfi
   /** Tailwind spacing value for top padding (0, 2, 3, 4, 6, 8) */
   paddingTop?: "0" | "2" | "3" | "4" | "6" | "8";
   optional?: boolean;
-  icon?: string;
+  icon?: IconKey;
   border?: boolean;
   spacing?: "compact" | "normal" | "relaxed";
   /** Render without Card wrapper for inline layouts */
@@ -547,7 +547,7 @@ interface ContainerWidgetConfigBase<TKey extends string> extends BaseWidgetConfi
     /** Submit button position - 'bottom' (default) or 'header' */
     position?: "bottom" | "header";
     /** Icon identifier (e.g., "refresh-cw", "save", "send") */
-    icon?: string;
+    icon?: IconKey;
     /** Button variant */
     variant?: "default" | "primary" | "secondary" | "destructive" | "ghost" | "outline" | "link";
     /** Button size */
@@ -810,7 +810,7 @@ export interface PaginationWidgetConfig extends BaseWidgetConfig {
 export interface ButtonWidgetConfig<TKey extends string> extends BaseWidgetConfig {
   type: WidgetType.BUTTON;
   text: NoInfer<TKey>;
-  icon?: string;
+  icon?: IconKey;
   variant?: "default" | "primary" | "secondary" | "destructive" | "ghost" | "link";
   size?: "default" | "sm" | "lg" | "icon";
   onClick?: string; // Action ID
@@ -858,7 +858,7 @@ export interface MetricCardWidgetConfig<TKey extends string> extends BaseWidgetC
   change?: number;
   trend?: "up" | "down" | "neutral";
   format?: "number" | "currency" | "percentage" | "bytes";
-  icon?: string;
+  icon?: IconKey;
   unit?: string;
   precision?: number;
   threshold?: {
@@ -875,7 +875,7 @@ export interface StatWidgetConfig<TKey extends string> extends BaseWidgetConfig 
   type: WidgetType.STAT;
   label?: NoInfer<TKey>;
   format?: "number" | "percentage" | "currency" | "compact";
-  icon?: string;
+  icon?: IconKey;
   variant?: "default" | "success" | "warning" | "danger" | "info" | "muted";
   trend?: "up" | "down" | "neutral";
   trendValue?: number;
@@ -956,7 +956,7 @@ export interface SubmitButtonWidgetConfig<TKey extends string> extends BaseWidge
   type: WidgetType.SUBMIT_BUTTON;
   text?: NoInfer<TKey>;
   loadingText?: NoInfer<TKey>;
-  icon?: string;
+  icon?: IconKey;
   variant?: "default" | "primary" | "secondary" | "destructive" | "ghost" | "outline" | "link";
   size?: "default" | "sm" | "lg" | "icon";
 }

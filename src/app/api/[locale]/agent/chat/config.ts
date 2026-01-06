@@ -3,7 +3,7 @@
  * Central configuration for chat system including default folders, constants, and system settings
  */
 
-import type { IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { type UserPermissionRoleValue, UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -45,7 +45,7 @@ export interface DefaultFolderConfig {
   translationKey: TranslationKey;
 
   /** Icon identifier (lucide icon name or si icon name) */
-  icon: IconValue;
+  icon: IconKey;
 
   /** Translation key for folder description */
   descriptionKey: TranslationKey;

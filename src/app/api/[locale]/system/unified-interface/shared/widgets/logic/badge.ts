@@ -4,6 +4,7 @@
  * Used by both React and CLI implementations
  */
 
+import type { IconKey } from "../../../react/icons";
 import type { WidgetData } from "../types";
 
 /**
@@ -24,7 +25,7 @@ export type BadgeVariant =
 export interface ProcessedBadge {
   text: string;
   variant: BadgeVariant;
-  icon?: string;
+  icon?: IconKey;
 }
 
 /**

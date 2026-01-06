@@ -6,7 +6,7 @@
 import { storage } from "next-vibe-ui/lib/storage";
 import { create } from "zustand";
 
-import { ModelId, type ModelId as ModelIdType } from "@/app/api/[locale]/agent/models/models";
+import { defaultModel, type ModelId as ModelIdType } from "@/app/api/[locale]/agent/models/models";
 
 import { aliasToPathMap } from "../../../system/generated/endpoint";
 import { DEFAULT_TTS_VOICE, type TtsVoiceValue } from "../../text-to-speech/enum";
@@ -101,7 +101,7 @@ interface ChatState {
 
 // Default settings (used for both server and initial client render)
 const getDefaultSettings = (): ChatSettings => ({
-  selectedModel: ModelId.CLAUDE_HAIKU_4_5,
+  selectedModel: defaultModel,
   selectedCharacter: "default",
   temperature: 0.7,
   maxTokens: 2000,

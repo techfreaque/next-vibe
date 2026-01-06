@@ -22,6 +22,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { dateSchema } from "../../../shared/types/common.schema";
+
 /**
  * Translation Statistics GET Endpoint
  * Retrieves statistics about translation files and key usage
@@ -119,7 +121,7 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               content: "app.api.system.translations.stats.get.success.title",
             },
-            z.string().datetime(),
+            dateSchema,
           ),
         },
       ),

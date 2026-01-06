@@ -14,8 +14,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ user, logger }) =>
-      ChatFavoritesRepository.getFavorites(user, logger),
+    handler: ({ user, logger }) => ChatFavoritesRepository.getFavorites(user, logger),
   },
 });
 ```
@@ -26,8 +25,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) =>
-      await browserRepository.executeTool(data, logger),
+    handler: async ({ data, logger }) => await browserRepository.executeTool(data, logger),
   },
 });
 ```
@@ -131,8 +129,7 @@ export const { GET, POST, PATCH, DELETE, tools } = endpointsHandler({
   },
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger }) =>
-      MyRepository.create(data, user, logger),
+    handler: ({ data, user, logger }) => MyRepository.create(data, user, logger),
   },
 });
 ```
@@ -155,8 +152,7 @@ export const { POST, tools } = endpointsHandler({
         ignoreErrors: false,
       },
     ],
-    handler: ({ data, user, logger }) =>
-      MyRepository.submit(data, user, logger),
+    handler: ({ data, user, logger }) => MyRepository.submit(data, user, logger),
   },
 });
 ```

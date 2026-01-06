@@ -150,12 +150,8 @@ async function processData(data, user, locale, logger: EndpointLogger) {
 **Client-Side:**
 
 ```typescript
-const logger = useMemo(
-  () => createEndpointLogger(false, Date.now(), locale),
-  [locale],
-);
-const handleClick = () =>
-  logger.debug("Button clicked", { timestamp: Date.now() });
+const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+const handleClick = () => logger.debug("Button clicked", { timestamp: Date.now() });
 ```
 
 **Log Levels:** `debug()` (dev only), `info()` (important events), `warn()` (warnings), `error()` (failures), `vibe()` (CLI/framework)

@@ -40,7 +40,7 @@ import {
 import { buildFolderUrl, getRootFolderId } from "@/app/[locale]/chat/lib/utils/navigation";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
-import { Icon, type IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import { Icon, type IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -185,7 +185,7 @@ export function FolderItem({
     setRenameDialogOpen(true);
   };
 
-  const handleSaveRename = (name: string, icon: IconValue | null): void => {
+  const handleSaveRename = (name: string, icon: IconKey | null): void => {
     void updateFolder(folder.id, { name, icon });
   };
 

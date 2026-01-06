@@ -4,6 +4,7 @@
  * Used by both React and CLI implementations
  */
 
+import type { IconKey } from "../../../react/icons";
 import type { UnifiedField } from "../../types/endpoint";
 import { WidgetType } from "../../types/enums";
 import type { WidgetData } from "../types";
@@ -15,7 +16,7 @@ import { formatBytes } from "../utils/formatting";
 export interface MetricConfig {
   format: "bytes" | "currency" | "number" | "percentage";
   precision: number;
-  icon?: string;
+  icon?: IconKey;
   unit?: string;
   threshold?: {
     warning?: number;
@@ -34,7 +35,7 @@ export interface ProcessedMetricCard {
     value: number;
     direction: "up" | "down" | "neutral";
   };
-  icon?: string;
+  icon?: IconKey;
   color?: string;
 }
 

@@ -160,11 +160,7 @@ export interface UseMessageEditorOptions {
   logger: EndpointLogger; // <-- Required parameter
 }
 
-export function useMessageEditor({
-  message,
-  onSave,
-  logger,
-}: UseMessageEditorOptions) {
+export function useMessageEditor({ message, onSave, logger }: UseMessageEditorOptions) {
   const handleSave = async () => {
     try {
       await onSave(message.id, content);

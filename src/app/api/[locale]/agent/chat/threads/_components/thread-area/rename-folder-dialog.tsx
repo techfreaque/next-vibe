@@ -8,7 +8,7 @@ import { Label } from "next-vibe-ui/ui/label";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 
-import type { IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -18,8 +18,8 @@ interface RenameFolderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   folderName: string;
-  folderIcon: IconValue | null;
-  onSave: (name: string, icon: IconValue | null) => void;
+  folderIcon: IconKey | null;
+  onSave: (name: string, icon: IconKey | null) => void;
   locale: CountryLanguage;
 }
 
@@ -33,7 +33,7 @@ export function RenameFolderDialog({
 }: RenameFolderDialogProps): JSX.Element {
   const { t } = simpleT(locale);
   const [name, setName] = useState(folderName);
-  const [icon, setIcon] = useState<IconValue | null>(folderIcon);
+  const [icon, setIcon] = useState<IconKey | null>(folderIcon);
 
   // Update local state when props change
   useEffect(() => {

@@ -5,6 +5,7 @@
 
 import "server-only";
 
+import type { JSONValue } from "ai";
 import type { NextRequest } from "next/server";
 import {
   createStreamingResponse,
@@ -172,7 +173,7 @@ export class AiStreamRepository {
             });
           } catch (error) {
             await StreamErrorCatchHandler.handleError({
-              error,
+              error: error as Error | JSONValue,
               ctx,
               maxDuration,
               model: data.model,

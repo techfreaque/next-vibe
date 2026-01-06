@@ -10,6 +10,7 @@ import type { z } from "zod";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { IconKey } from "../../react/icons";
 import type { CreateApiEndpoint } from "../endpoints/definition/create";
 import type { WidgetConfig } from "../widgets/configs";
 import type {
@@ -876,7 +877,7 @@ export interface FieldActions {
  */
 export interface ButtonAction {
   label: TranslationKey;
-  icon?: string;
+  icon?: IconKey;
   variant?: ComponentVariant;
   size?: ComponentSize;
   actions: ActionConfig[];
@@ -890,7 +891,7 @@ export interface ButtonAction {
  */
 export interface ContextMenuAction {
   label: TranslationKey;
-  icon?: string;
+  icon?: IconKey;
   actions: ActionConfig[];
   separator?: boolean;
   disabled?: boolean;
@@ -902,7 +903,7 @@ export interface ContextMenuAction {
  */
 export interface BulkAction {
   label: TranslationKey;
-  icon?: string;
+  icon?: IconKey;
   variant?: ComponentVariant;
   actions: ActionConfig[];
   confirmationMessage?: TranslationKey;

@@ -121,6 +121,13 @@
       "when": 1767397501360,
       "tag": "20260102234501_light_adam_warlock",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1767664199383,
+      "tag": "20260106014959_slow_mathemanic",
+      "breakpoints": true
     }
   ]
 }

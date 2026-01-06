@@ -23,6 +23,8 @@ import {
 import { UserRole, UserRoleOptions } from "@/app/api/[locale]/user/user-roles/enum";
 import { Countries, CountriesOptions, Languages, LanguagesOptions } from "@/i18n/core/config";
 
+import { dateSchema } from "../../shared/types/common.schema";
+
 /**
  * Users Create Endpoint Definition
  */
@@ -267,7 +269,7 @@ const { POST } = createEndpoint({
               type: WidgetType.TEXT,
               content: "app.api.users.create.post.response.createdAt.content" as const,
             },
-            z.string().datetime().describe("When the user was created"),
+            dateSchema.describe("When the user was created"),
           ),
         },
       ),
@@ -361,14 +363,14 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.users.create.post.response.createdAt.content" as const,
         },
-        z.string().datetime(),
+        dateSchema,
       ),
       responseUpdatedAt: responseField(
         {
           type: WidgetType.TEXT,
           content: "app.api.users.create.post.response.updatedAt.content" as const,
         },
-        z.string().datetime(),
+        dateSchema,
       ),
     },
   ),

@@ -31,6 +31,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { Countries, CountriesOptions, Languages, LanguagesOptions } from "@/i18n/core/config";
 
+import { dateSchema } from "../../shared/types/common.schema";
 import {
   PaymentMethodFilter,
   PaymentMethodFilterOptions,
@@ -304,7 +305,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.STAT,
               label: "app.api.users.stats.response.overviewStats.inactiveUsers.label" as const,
-              icon: "error",
+              icon: "alert-circle",
               variant: "muted",
               format: "compact",
             },
@@ -314,7 +315,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.STAT,
               label: "app.api.users.stats.response.overviewStats.newUsers.label" as const,
-              icon: "growth",
+              icon: "trending-up",
               variant: "info",
               format: "compact",
             },
@@ -341,7 +342,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.STAT,
               label: "app.api.users.stats.response.emailStats.emailVerifiedUsers.label" as const,
-              icon: "verified",
+              icon: "check-circle",
               variant: "success",
               format: "compact",
             },
@@ -351,7 +352,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.STAT,
               label: "app.api.users.stats.response.emailStats.emailUnverifiedUsers.label" as const,
-              icon: "unverified",
+              icon: "x-circle",
               variant: "warning",
               format: "compact",
             },
@@ -361,7 +362,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.STAT,
               label: "app.api.users.stats.response.emailStats.verificationRate.label" as const,
-              icon: "rate",
+              icon: "activity",
               variant: "info",
               format: "percentage",
             },
@@ -470,7 +471,7 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.STAT,
               label: "app.api.users.stats.response.paymentStats.totalRevenue.label" as const,
-              icon: "currency",
+              icon: "dollar-sign",
               variant: "success",
               format: "currency",
             },
@@ -625,7 +626,7 @@ const { GET } = createEndpoint({
                 {
                   type: WidgetType.STAT,
                   label: "app.api.users.stats.response.timeStats.usersCreatedToday.label" as const,
-                  icon: "time",
+                  icon: "clock",
                   variant: "info",
                   size: "sm",
                 },
@@ -636,7 +637,7 @@ const { GET } = createEndpoint({
                   type: WidgetType.STAT,
                   label:
                     "app.api.users.stats.response.timeStats.usersCreatedThisWeek.label" as const,
-                  icon: "time",
+                  icon: "clock",
                   variant: "info",
                   size: "sm",
                 },
@@ -647,7 +648,7 @@ const { GET } = createEndpoint({
                   type: WidgetType.STAT,
                   label:
                     "app.api.users.stats.response.timeStats.usersCreatedThisMonth.label" as const,
-                  icon: "time",
+                  icon: "clock",
                   variant: "success",
                   size: "sm",
                 },
@@ -658,7 +659,7 @@ const { GET } = createEndpoint({
                   type: WidgetType.STAT,
                   label:
                     "app.api.users.stats.response.timeStats.usersCreatedLastMonth.label" as const,
-                  icon: "time",
+                  icon: "clock",
                   variant: "muted",
                   size: "sm",
                 },
@@ -682,7 +683,7 @@ const { GET } = createEndpoint({
                 {
                   type: WidgetType.STAT,
                   label: "app.api.users.stats.response.performanceRates.growthRate.label" as const,
-                  icon: "growth",
+                  icon: "trending-up",
                   variant: "success",
                   format: "percentage",
                 },
@@ -693,7 +694,7 @@ const { GET } = createEndpoint({
                   type: WidgetType.STAT,
                   label:
                     "app.api.users.stats.response.performanceRates.leadToUserConversionRate.label" as const,
-                  icon: "conversion",
+                  icon: "target",
                   variant: "info",
                   format: "percentage",
                 },
@@ -704,7 +705,7 @@ const { GET } = createEndpoint({
                   type: WidgetType.STAT,
                   label:
                     "app.api.users.stats.response.performanceRates.retentionRate.label" as const,
-                  icon: "retention",
+                  icon: "users",
                   variant: "success",
                   format: "percentage",
                 },
@@ -758,7 +759,7 @@ const { GET } = createEndpoint({
               label: "app.api.users.stats.response.businessInsights.generatedAt.label" as const,
               content: "app.api.users.stats.response.businessInsights.generatedAt.label" as const,
             },
-            z.string().datetime().describe("When these statistics were generated"),
+            dateSchema.describe("When these statistics were generated"),
           ),
         },
       ),

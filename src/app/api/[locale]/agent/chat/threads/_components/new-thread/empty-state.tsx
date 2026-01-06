@@ -3,12 +3,11 @@
 import { Div } from "next-vibe-ui/ui/div";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
-import React from "react";
 
 import { DOM_IDS, LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
 import { getDefaultFolderConfig } from "@/app/api/[locale]/agent/chat/config";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { getIconComponent } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -114,7 +113,7 @@ export function ChatEmptyState({ locale, inputHeight }: ChatEmptyStateProps): JS
             className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 ${getColorClasses("bg")}`}
           >
             <Div className={`text-4xl ${getColorClasses("text")}`}>
-              {React.createElement(getIconComponent(folderConfig?.icon || "message-circle"))}
+              <Icon icon={folderConfig?.icon || "message-circle"} className="h-10 w-10" />
             </Div>
           </Div>
 

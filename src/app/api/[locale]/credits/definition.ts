@@ -18,6 +18,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { dateSchema } from "../shared/types/common.schema";
+
 /**
  * Get Credit Balance Endpoint (GET)
  * Retrieves current user's credit balance with breakdown
@@ -92,7 +94,7 @@ const { GET } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.agent.chat.credits.get.expiresAt.content",
         },
-        z.string().datetime().nullable(),
+        dateSchema.nullable(),
       ),
     },
   ),

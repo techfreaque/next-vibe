@@ -22,7 +22,7 @@ import {
   UserRoleDB,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { iconSchema } from "../../../../shared/types/common.schema";
+import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
 
 /**
  * Get Single Folder Endpoint (GET)
@@ -226,7 +226,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.agent.chat.folders.id.get.response.folder.createdAt.content" as const,
                 },
-                z.string().datetime(),
+                dateSchema,
               ),
               updatedAt: responseField(
                 {
@@ -234,7 +234,7 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.agent.chat.folders.id.get.response.folder.updatedAt.content" as const,
                 },
-                z.string().datetime(),
+                dateSchema,
               ),
             },
           ),
@@ -664,7 +664,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.agent.chat.folders.id.patch.response.folder.createdAt.content" as const,
                 },
-                z.string().datetime(),
+                dateSchema,
               ),
               updatedAt: responseField(
                 {
@@ -672,7 +672,7 @@ const { PATCH } = createEndpoint({
                   content:
                     "app.api.agent.chat.folders.id.patch.response.folder.updatedAt.content" as const,
                 },
-                z.string().datetime(),
+                dateSchema,
               ),
             },
           ),

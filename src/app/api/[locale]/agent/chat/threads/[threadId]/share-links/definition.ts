@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createFormEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create-form";
 import { field, objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -223,7 +224,7 @@ const { GET, POST, PATCH, DELETE } = createFormEndpoint({
               },
             ),
             lastAccessedAt: field(
-              z.string().datetime().nullable(),
+              dateSchema.nullable(),
               { GET: { response: true } },
               {
                 type: WidgetType.TEXT,
@@ -233,7 +234,7 @@ const { GET, POST, PATCH, DELETE } = createFormEndpoint({
               },
             ),
             createdAt: field(
-              z.string().datetime(),
+              dateSchema,
               { GET: { response: true } },
               {
                 type: WidgetType.TEXT,

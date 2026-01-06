@@ -26,6 +26,7 @@ import {
   EmailJourneyVariant,
   EmailJourneyVariantOptions,
 } from "../../../leads/enum";
+import { dateSchema } from "../../../shared/types/common.schema";
 import { UserRole } from "../../../user/user-roles/enum";
 import {
   CampaignType,
@@ -449,14 +450,14 @@ const { POST } = createEndpoint({
                   type: WidgetType.TEXT,
                   content: "app.api.emails.smtpClient.create.response.account.createdAt",
                 },
-                z.string().datetime(),
+                dateSchema,
               ),
               updatedAt: responseField(
                 {
                   type: WidgetType.TEXT,
                   content: "app.api.emails.smtpClient.create.response.account.updatedAt",
                 },
-                z.string().datetime(),
+                dateSchema,
               ),
             },
           ),
