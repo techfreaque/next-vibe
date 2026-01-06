@@ -14,11 +14,11 @@ import {
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import { ModelUtility } from "../types";
+import { ModelUtility, type ModelUtilityValue } from "../types";
 import type { IconComponent } from "./icons";
 
 export interface ModelUtilityConfig {
-  id: ModelUtility;
+  id: typeof ModelUtilityValue;
   titleKey: TranslationKey;
   icon: IconComponent;
   order: number;
@@ -30,7 +30,7 @@ export interface ModelUtilityConfig {
  * Configuration for model utility categories
  * Used for grouping models by their primary use cases
  */
-export const MODEL_UTILITIES: Record<ModelUtility, ModelUtilityConfig> = {
+export const MODEL_UTILITIES: Record<typeof ModelUtilityValue, ModelUtilityConfig> = {
   // Core capabilities
   [ModelUtility.CHAT]: {
     id: ModelUtility.CHAT,

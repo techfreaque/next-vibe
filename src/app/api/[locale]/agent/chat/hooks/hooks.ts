@@ -8,7 +8,9 @@
 
 import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import type { IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -21,14 +23,12 @@ import { useCredits } from "../../../credits/hooks";
 import { useAIStreamStore } from "../../ai-stream/hooks/store";
 import { useAIStream } from "../../ai-stream/hooks/use-ai-stream";
 import type { CharacterListResponseOutput } from "../characters/definition";
-import { useCharactersList } from "../characters/hooks";
+import { useCharacters } from "../characters/hooks";
 import type { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { NEW_MESSAGE_ID } from "../enum";
 import type { FolderUpdate } from "../folders/hooks/use-operations";
 import { useFolderOperations } from "../folders/hooks/use-operations";
-import type { IconValue } from "../model-access/icons";
-import type { ModelId } from "../model-access/models";
 import { useMessageOperations } from "../threads/[threadId]/messages/hooks/use-operations";
 import type { ThreadUpdate } from "../threads/hooks/use-operations";
 import { useThreadOperations } from "../threads/hooks/use-operations";
@@ -321,7 +321,7 @@ export function useChat(
   const aiStream = useAIStream(locale, logger, t);
 
   // Fetch characters
-  const charactersEndpoint = useCharactersList(logger);
+  const charactersEndpoint = useCharacters(logger);
 
   // Local state
   const [input, setInput] = useState("");

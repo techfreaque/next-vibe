@@ -9,8 +9,8 @@ import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useWatch } from "react-hook-form";
 
-import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import type { IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -147,9 +147,7 @@ export function ContainerWidget<const TKey extends string>({
   const showHeaderButton = submitButtonConfig?.position === "header" && onSubmit && form;
   const showBottomButton = submitButtonConfig?.position === "bottom" && onSubmit && form;
 
-  const ButtonIcon = submitButtonConfig?.icon
-    ? getIconComponent(submitButtonConfig.icon as IconValue)
-    : undefined;
+  const buttonIcon = submitButtonConfig?.icon ? (submitButtonConfig.icon as IconValue) : undefined;
 
   const buttonText = submitButtonConfig?.text
     ? t(submitButtonConfig.text)
@@ -476,7 +474,7 @@ export function ContainerWidget<const TKey extends string>({
             size={submitButtonConfig.size ?? "default"}
             className="w-full"
           >
-            {ButtonIcon && <ButtonIcon className="h-4 w-4 mr-2" />}
+            {buttonIcon && <Icon icon={buttonIcon} className="h-4 w-4 mr-2" />}
             {isSubmitting ? loadingText : buttonText}
           </Button>
         )}
@@ -654,7 +652,7 @@ export function ContainerWidget<const TKey extends string>({
             size={submitButtonConfig.size ?? "default"}
             className="w-full"
           >
-            {ButtonIcon && <ButtonIcon className="h-4 w-4 mr-2" />}
+            {buttonIcon && <Icon icon={buttonIcon} className="h-4 w-4 mr-2" />}
             {isSubmitting ? loadingText : buttonText}
           </Button>
         </CardContent>

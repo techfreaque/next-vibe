@@ -2,6 +2,7 @@
  * ToolsSetupHandler - Handles AI streaming tools setup
  */
 
+import { getModelById, type ModelId } from "@/app/api/[locale]/agent/models/models";
 import { getFullPath } from "@/app/api/[locale]/system/generated/endpoint";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
@@ -10,7 +11,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";
-import { getModelById, type ModelId } from "../../../chat/model-access/models";
 
 export class ToolsSetupHandler {
   /**

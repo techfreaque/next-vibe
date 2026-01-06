@@ -30,7 +30,7 @@ import { useForm } from "react-hook-form";
 
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
@@ -351,11 +351,7 @@ export function ToolCallRenderer({
               )}
 
               <Div className="flex items-center gap-2">
-                {icon &&
-                  (() => {
-                    const IconComponent = getIconComponent(icon);
-                    return <IconComponent className="h-4 w-4 text-muted-foreground" />;
-                  })()}
+                {icon && <Icon icon={icon} className="h-4 w-4 text-muted-foreground" />}
                 <Span className="font-medium text-sm">{displayName}</Span>
               </Div>
 

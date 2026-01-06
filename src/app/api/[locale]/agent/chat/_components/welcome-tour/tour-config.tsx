@@ -7,7 +7,7 @@ import { Ul } from "next-vibe-ui/ui/ul";
 import type { Step } from "react-joyride";
 
 import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { TFunction } from "@/i18n/core/static-types";
 
 export interface TourStepConfig extends Step {
@@ -141,15 +141,6 @@ export const TOUR_TEXT_ALIGN = {
 export const getTourSteps = (t: TFunction, isAuthenticated = false): TourStepConfig[] => {
   const appName = t("config.appName");
 
-  // Get icon components from folder configs
-  const PrivateFolderIcon = getIconComponent(DEFAULT_FOLDER_CONFIGS.private.icon);
-  const IncognitoFolderIcon = getIconComponent(DEFAULT_FOLDER_CONFIGS.incognito.icon);
-  const SharedFolderIcon = getIconComponent(DEFAULT_FOLDER_CONFIGS.shared.icon);
-  const PublicFolderIcon = getIconComponent(DEFAULT_FOLDER_CONFIGS.public.icon);
-  const KeyboardIcon = getIconComponent("keyboard");
-  const MicIcon = getIconComponent("mic");
-  const PhoneIcon = getIconComponent("phone");
-
   return [
     // Step 1: Welcome
     {
@@ -231,7 +222,7 @@ export const getTourSteps = (t: TFunction, isAuthenticated = false): TourStepCon
             content: (
               <Div className="space-y-3">
                 <H3 className="text-lg font-semibold flex items-center gap-2">
-                  <PrivateFolderIcon className="h-5 w-5" />
+                  <Icon icon={DEFAULT_FOLDER_CONFIGS.private.icon} className="h-5 w-5" />
                   <Span className="text-sky-400">
                     {t("app.chat.welcomeTour.privateFolder.name")}
                   </Span>
@@ -249,7 +240,7 @@ export const getTourSteps = (t: TFunction, isAuthenticated = false): TourStepCon
       content: (
         <Div className="space-y-2">
           <H3 className="text-lg font-semibold flex items-center gap-2">
-            <IncognitoFolderIcon className="h-5 w-5" />
+            <Icon icon={DEFAULT_FOLDER_CONFIGS.incognito.icon} className="h-5 w-5" />
             <Span className="text-purple-400">
               {t("app.chat.welcomeTour.incognitoFolder.name")}
             </Span>
@@ -271,7 +262,7 @@ export const getTourSteps = (t: TFunction, isAuthenticated = false): TourStepCon
             content: (
               <Div className="space-y-3">
                 <H3 className="text-lg font-semibold flex items-center gap-2">
-                  <SharedFolderIcon className="h-5 w-5" />
+                  <Icon icon={DEFAULT_FOLDER_CONFIGS.shared.icon} className="h-5 w-5" />
                   <Span className="text-teal-400">
                     {t("app.chat.welcomeTour.sharedFolder.name")}
                   </Span>
@@ -289,7 +280,7 @@ export const getTourSteps = (t: TFunction, isAuthenticated = false): TourStepCon
       content: (
         <Div className="space-y-2">
           <H3 className="text-lg font-semibold flex items-center gap-2">
-            <PublicFolderIcon className="h-5 w-5" />
+            <Icon icon={DEFAULT_FOLDER_CONFIGS.public.icon} className="h-5 w-5" />
             <Span className="text-amber-400">{t("app.chat.welcomeTour.publicFolder.name")}</Span>
             {t("app.chat.welcomeTour.publicFolder.suffix")}
           </H3>
@@ -360,7 +351,7 @@ export const getTourSteps = (t: TFunction, isAuthenticated = false): TourStepCon
       content: (
         <Div className="space-y-2">
           <H3 className="text-lg font-semibold flex items-center gap-2">
-            <KeyboardIcon className="h-5 w-5" />
+            <Icon icon="keyboard" className="h-5 w-5" />
             {t("app.chat.welcomeTour.chatInput.title")}
           </H3>
           <P className="text-sm">{t("app.chat.welcomeTour.chatInput.description")}</P>
@@ -375,7 +366,7 @@ export const getTourSteps = (t: TFunction, isAuthenticated = false): TourStepCon
       content: (
         <Div className="space-y-2">
           <H3 className="text-lg font-semibold flex items-center gap-2">
-            <MicIcon className="h-5 w-5" />
+            <Icon icon="mic" className="h-5 w-5" />
             {t("app.chat.welcomeTour.voiceInput.title")}
           </H3>
           <P className="text-sm">{t("app.chat.welcomeTour.voiceInput.description")}</P>
@@ -394,7 +385,7 @@ export const getTourSteps = (t: TFunction, isAuthenticated = false): TourStepCon
       content: (
         <Div className="space-y-2">
           <H3 className="text-lg font-semibold flex items-center gap-2">
-            <PhoneIcon className="h-5 w-5 text-green-500" />
+            <Icon icon="phone" className="h-5 w-5 text-green-500" />
             {t("app.chat.welcomeTour.callMode.title")}
           </H3>
           <P className="text-sm">{t("app.chat.welcomeTour.callMode.description")}</P>

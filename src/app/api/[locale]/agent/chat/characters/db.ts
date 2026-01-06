@@ -8,19 +8,17 @@ import { boolean, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-c
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
+import type { ModelUtilityValue } from "@/app/api/[locale]/agent/models/enum";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { users } from "@/app/api/[locale]/user/db";
 
-import type { IconKey } from "../model-access/icons";
-import type { ModelId } from "../model-access/models";
+import type { CharacterModelSelection } from "./create/definition";
 import type {
-  CharacterDisplay,
-  CharacterOwnership,
-  CharacterPreferences,
-  CharacterRequirements,
-  ModelUtility,
-} from "../types";
-import type { CharacterCategoryValue, CharacterSourceValue } from "./enum";
+  CharacterCategoryValue,
+  CharacterOwnershipTypeValue,
+  CharacterSourceValue,
+} from "./enum";
 
 /**
  * Custom Characters Table
@@ -51,24 +49,17 @@ export const customCharacters = pgTable("custom_characters", {
     .default("app.api.agent.chat.characters.enums.source.my"),
   task: text("task").$type<ModelUtility>().notNull(), // Primary utility
 
-  // Optional settings
-  preferredModel: text("preferred_model").$type<ModelId>(),
-  voice: text("voice").$type<typeof TtsVoiceValue>(),
+  voice: text("voice")
+    .$type<typeof TtsVoiceValue>()
+    .notNull()
+    .default("app.api.agent.textToSpeech.voices.FEMALE"),
+  suggestedPrompts: jsonb("suggested_prompts").$type<string[]>().default([]).notNull(),
 
-  // Suggested prompts (up to 4)
-  suggestedPrompts: jsonb("suggested_prompts").$type<string[]>().default([]),
+  // Model selection (discriminated union from API)
+  modelSelection: jsonb("model_selection").$type<CharacterModelSelection>().notNull(),
 
-  // Requirements (hard filters)
-  requirements: jsonb("requirements").$type<CharacterRequirements>().notNull().default({}),
-
-  // Preferences (soft scoring)
-  preferences: jsonb("preferences").$type<CharacterPreferences>().notNull().default({}),
-
-  // Ownership
-  ownership: jsonb("ownership").$type<CharacterOwnership>().notNull(),
-
-  // Display
-  display: jsonb("display").$type<CharacterDisplay>().notNull(),
+  // Ownership type
+  ownershipType: text("ownership_type").$type<typeof CharacterOwnershipTypeValue>().notNull(),
 
   // Sharing
   isPublic: boolean("is_public").default(false).notNull(),

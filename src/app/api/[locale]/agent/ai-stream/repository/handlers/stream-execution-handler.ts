@@ -9,11 +9,11 @@ import type { ReadableStreamDefaultController } from "node:stream/web";
 import type { ModelMessage } from "ai";
 import { stepCountIs, streamText as aiStreamText } from "ai";
 
+import type { ModelId, ModelOption } from "@/app/api/[locale]/agent/models/models";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { ModelId, ModelOption } from "../../../chat/model-access/models";
 import type { ProviderFactory } from "../core/provider-factory";
 import type { StreamContext } from "../core/stream-context";
 import type { StreamingTTSHandler } from "../streaming-tts";

@@ -20,7 +20,7 @@ import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
 import { routeExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint";
 import { Platform } from "../shared/types/platform";
-import { endpointToToolName } from "../shared/utils/path";
+import { endpointToToolName, getPreferredToolName } from "../shared/utils/path";
 import { getTranslatorFromEndpoint } from "../shared/widgets/utils/field-helpers";
 
 /**
@@ -73,8 +73,11 @@ function createToolFromEndpoint(
     },
   });
 
-  // Create AI SDK CoreTool
-  const toolName = endpointToToolName(endpoint);
+  // Get tool names
+  // Internal name (full path): Used for internal tracking/debugging only
+  const internalToolName = endpointToToolName(endpoint);
+  // Preferred name (alias if available): Used for AI SDK, execution, and all lookups
+  const toolName = getPreferredToolName(endpoint);
 
   // Generate schemas for splitting params
   const requestDataSchema = endpoint.fields
@@ -255,13 +258,22 @@ export async function loadTools(params: {
     const toolsMap = new Map<string, CoreTool>();
 
     for (const endpoint of enabledEndpoints) {
-      const aiSdkToolName = endpointToToolName(endpoint);
+      // Internal name for lookups and execution (full path with method)
+      const internalToolName = endpointToToolName(endpoint);
+      // Preferred name for AI model (first alias if available, otherwise internal name)
+      const preferredToolName = getPreferredToolName(endpoint);
+
       try {
         // Check if this tool requires confirmation from the API request config
-        const requiresConfirmation = params.toolConfirmationConfig?.get(aiSdkToolName) ?? false;
+        // Check both preferred name and internal name for backwards compatibility
+        const requiresConfirmation =
+          params.toolConfirmationConfig?.get(preferredToolName) ??
+          params.toolConfirmationConfig?.get(internalToolName) ??
+          false;
 
         params.logger.debug("Creating tool", {
-          toolName: aiSdkToolName,
+          internalToolName,
+          preferredToolName,
           endpoint: [...endpoint.path],
           requiresConfirmation,
         });
@@ -276,17 +288,19 @@ export async function loadTools(params: {
           requiresConfirmation,
         );
 
-        // Use full toolName format (e.g., "v1_core_agent_brave-search_GET")
-        toolsMap.set(aiSdkToolName, createdTool);
+        // Register tool with preferred name (alias) for AI model to see
+        toolsMap.set(preferredToolName, createdTool);
 
         params.logger.debug("Tool created successfully", {
-          toolName: aiSdkToolName,
+          internalToolName,
+          preferredToolName,
           requiresConfirmation,
         });
       } catch (error) {
         const parsedError = parseError(error);
         params.logger.error("Failed to create tool - skipping", {
-          toolName: aiSdkToolName,
+          internalToolName,
+          preferredToolName,
           endpoint: [...endpoint.path],
           error: parsedError.message,
           fullError: parsedError,
@@ -298,7 +312,7 @@ export async function loadTools(params: {
 
     params.logger.info("Tools created", {
       count: toolsMap.size,
-      aiSdkToolNames: [...toolsMap.keys()],
+      preferredToolNames: [...toolsMap.keys()],
     });
 
     return { tools, systemPrompt: params.systemPrompt };

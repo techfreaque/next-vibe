@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { ModelId, ModelIdOptions } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -26,7 +27,6 @@ import { dateSchema } from "../../shared/types/common.schema";
 import { DefaultFolderId } from "../chat/config";
 import { type ChatMessage, selectChatMessageSchema } from "../chat/db";
 import { ChatMessageRole, ChatMessageRoleOptions } from "../chat/enum";
-import { ModelId, ModelIdOptions } from "../chat/model-access/models";
 import { DEFAULT_TTS_VOICE, TtsVoice } from "../text-to-speech/enum";
 
 /**

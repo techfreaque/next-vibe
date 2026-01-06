@@ -5,6 +5,7 @@
 
 import { parseError } from "next-vibe/shared/utils";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
@@ -12,7 +13,6 @@ import { DefaultFolderId } from "../../../../../config";
 import { createCreditUpdateCallback } from "../../../../../credit-updater";
 import type { ChatMessage } from "../../../../../db";
 import { ChatMessageRole } from "../../../../../enum";
-import type { ModelId } from "../../../../../model-access/models";
 
 export interface AnswerAsAIDeps {
   logger: EndpointLogger;

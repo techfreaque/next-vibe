@@ -3,7 +3,7 @@
  * Provides full type inference from definition.POST.fields to form components
  */
 
-import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { Countries } from "@/i18n/core/config";
 
 import type { PrefillDisplayConfig } from "./field-config-types";

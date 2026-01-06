@@ -3,15 +3,16 @@
  * Central configuration for chat system including default folders, constants, and system settings
  */
 
+import type { IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { type UserPermissionRoleValue, UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import { CONTACT_FORM_ALIAS } from "../../contact/definition";
 import { aliasToPathMap } from "../../system/generated/endpoint";
 import { SEARCH_ALIAS } from "../brave-search/definition";
 import { FETCH_URL_ALIAS } from "../fetch-url-content/definition";
 import { MEMORY_DELETE_ALIAS, MEMORY_UPDATE_ALIAS } from "./memories/[id]/definition";
 import { MEMORY_ADD_ALIAS, MEMORY_LIST_ALIAS } from "./memories/definition";
-import type { IconValue } from "./model-access/icons";
 
 /**
  * Default folder IDs
@@ -195,6 +196,7 @@ export const DEFAULT_TOOL_IDS = [
   aliasToPathMap[MEMORY_ADD_ALIAS],
   aliasToPathMap[MEMORY_UPDATE_ALIAS],
   aliasToPathMap[MEMORY_DELETE_ALIAS],
+  aliasToPathMap[CONTACT_FORM_ALIAS],
 ] as const;
 
 /**

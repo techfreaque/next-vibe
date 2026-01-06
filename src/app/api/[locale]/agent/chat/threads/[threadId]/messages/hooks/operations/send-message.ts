@@ -6,6 +6,7 @@
 import { parseError } from "next-vibe/shared/utils";
 
 import { getLastMessageInBranch } from "@/app/[locale]/chat/lib/utils/thread-builder";
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
@@ -13,7 +14,6 @@ import { DefaultFolderId } from "../../../../../config";
 import type { ChatMessage, ChatThread } from "../../../../../db";
 import { ThreadStatus } from "../../../../../enum";
 import { useChatStore } from "../../../../../hooks/store";
-import type { ModelId } from "../../../../../model-access/models";
 import { createAndSendUserMessage } from "./shared";
 
 export interface SendMessageParams {

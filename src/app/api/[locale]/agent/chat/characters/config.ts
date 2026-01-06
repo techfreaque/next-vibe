@@ -4,26 +4,16 @@
  * This file contains default/built-in characters that are read-only
  */
 
+import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { TtsVoiceValue } from "../../text-to-speech/enum";
 import { TtsVoice } from "../../text-to-speech/enum";
-import { ContentLevelFilter, IntelligenceLevelFilter } from "../favorites/enum";
-import type { IconKey } from "../model-access/icons";
-import { ModelId } from "../model-access/models";
-import type {
-  CharacterDisplay,
-  CharacterOwnership,
-  CharacterPreferences,
-  CharacterRequirements,
-} from "../types";
-import { ModelUtility } from "../types";
+import { ContentLevelFilter, IntelligenceLevelFilter, ModelSelectionType } from "../favorites/enum";
 import {
   CharacterCategory,
   CharacterCategoryOptions,
   type CharacterCategoryValue,
   CharacterSource,
-  type CharacterSourceValue,
 } from "./enum";
 import { CATEGORY_CONFIG } from "./utils";
 
@@ -38,34 +28,6 @@ export const CategoryOptions = CharacterCategoryOptions.map((option) => {
     icon: config.icon,
   };
 });
-
-/**
- * Character interface
- */
-export interface Character {
-  id: string;
-  name: TranslationKey;
-  description: TranslationKey;
-  tagline: TranslationKey;
-  icon: IconKey;
-  avatar?: string;
-  systemPrompt: string;
-  category: typeof CharacterCategoryValue;
-  source: typeof CharacterSourceValue;
-  /** Primary utility this character needs */
-  task: ModelUtility;
-  preferredModel?: ModelId;
-  voice?: typeof TtsVoiceValue;
-  suggestedPrompts?: TranslationKey[];
-  /** Hard requirements for model selection */
-  requirements: CharacterRequirements;
-  /** Soft preferences for model scoring */
-  preferences: CharacterPreferences;
-  /** Ownership information */
-  ownership: CharacterOwnership;
-  /** Display configuration */
-  display: CharacterDisplay;
-}
 
 /**
  * Default characters available in the application
@@ -92,8 +54,6 @@ export const DEFAULT_CHARACTERS: readonly Character[] = [
     preferences: {},
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.default.shortDesc" as const,
@@ -166,8 +126,6 @@ Remember: You're not just agreeing with everything - you're a wise companion who
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.thea.shortDesc" as const,
@@ -248,8 +206,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.hermes.shortDesc" as const,
@@ -295,7 +251,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.technical.shortDesc" as const,
@@ -342,7 +297,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.creative.shortDesc" as const,
@@ -390,7 +344,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.teacher.shortDesc" as const,
@@ -905,8 +858,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.quickWriter.shortDesc" as const,
@@ -972,8 +923,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.writer.shortDesc" as const,
@@ -1038,8 +987,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.masterWriter.shortDesc" as const,
@@ -1108,8 +1055,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.researcher.shortDesc" as const,
@@ -1168,8 +1113,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.quickCoder.shortDesc" as const,
@@ -1238,8 +1181,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.coder.shortDesc" as const,
@@ -1304,8 +1245,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription:
@@ -1375,8 +1314,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.brainstormer.shortDesc" as const,
@@ -1446,8 +1383,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.editor.shortDesc" as const,
@@ -1522,8 +1457,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.tutor.shortDesc" as const,
@@ -1600,8 +1533,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.marketer.shortDesc" as const,
@@ -1679,8 +1610,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.storyteller.shortDesc" as const,
@@ -1766,8 +1695,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.scientist.shortDesc" as const,
@@ -1829,8 +1756,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.dataAnalyst.shortDesc" as const,
@@ -1895,8 +1820,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.translator.shortDesc" as const,
@@ -1968,8 +1891,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription:
@@ -2040,8 +1961,6 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.careerCoach.shortDesc" as const,
@@ -2125,8 +2044,6 @@ Always recommend consulting healthcare professionals for medical concerns.
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription:
@@ -2212,8 +2129,6 @@ Always recommend consulting healthcare professionals for medical concerns.
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.travelPlanner.shortDesc" as const,
@@ -2304,8 +2219,6 @@ Always recommend consulting a licensed attorney for legal advice.
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription:
@@ -2398,16 +2311,15 @@ Always recommend consulting a licensed financial advisor for personalized advice
       "app.api.agent.chat.characters.characters.financialAdvisor.suggestedPrompts.3" as const,
     ],
     requirements: {
-      minContent: ContentLevelFilter.MAINSTREAM,
-      minIntelligence: IntelligenceLevelFilter.SMART,
+      minContent: ContentLevelFilter.OPEN,
+      minIntelligence: IntelligenceLevelFilter.BRILLIANT,
+      minPrice: PriceLevelFilter.PREMIUM,
     },
     preferences: {
       preferredStrengths: [ModelUtility.ANALYSIS, ModelUtility.SMART, ModelUtility.CHAT],
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription:
@@ -2535,8 +2447,6 @@ Always recommend consulting a licensed financial advisor for personalized advice
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription:
@@ -2649,8 +2559,6 @@ Format: "As a [user type], I want to [action] so that [benefit]"
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription:
@@ -2735,8 +2643,6 @@ Format: "As a [user type], I want to [action] so that [benefit]"
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.debater.shortDesc" as const,
@@ -2835,8 +2741,6 @@ Format: "As a [user type], I want to [action] so that [benefit]"
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: true,
     },
     display: {
       shortDescription: "app.api.agent.chat.characters.characters.philosopher.shortDesc" as const,
@@ -2937,8 +2841,6 @@ You are a tool for creative expression. Write what is requested with skill and w
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: false, // Not featured due to mature content
     },
     display: {
       shortDescription:
@@ -3048,8 +2950,6 @@ You are here to create immersive roleplay experiences. Embody characters fully a
     },
     ownership: {
       type: "system",
-      isDefault: true,
-      isFeatured: false, // Not featured due to mature content potential
     },
     display: {
       shortDescription:

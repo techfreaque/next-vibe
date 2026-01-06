@@ -9,8 +9,7 @@ import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
 import type { LanguageModelV2 } from "@ai-sdk/provider";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-
-import { ModelId } from "../../chat/model-access/models";
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
 /**
  * Check if a model ID is a FreedomGPT model

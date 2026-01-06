@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -22,7 +23,6 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ChatMessageRole, ChatMessageRoleOptions } from "../../../../../enum";
-import { ModelId } from "../../../../../model-access/models";
 
 /**
  * Create Branch Endpoint (POST)

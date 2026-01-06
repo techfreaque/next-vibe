@@ -10,7 +10,7 @@ import type { JSONValue, streamText, TextStreamPart, ToolSet } from "ai";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { ModelId } from "../../../chat/model-access/models";
+import type { ModelId } from "../../../models/models";
 import type { StreamContext } from "../core/stream-context";
 import type { StreamingTTSHandler } from "../streaming-tts";
 import { FinishStepHandler } from "./finish-step-handler";

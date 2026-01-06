@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -26,7 +27,6 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { MessageMetadata } from "../../../db";
 import { selectChatMessageSchema } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
-import { ModelId } from "../../../model-access/models";
 
 /**
  * Get Messages List Endpoint (GET)

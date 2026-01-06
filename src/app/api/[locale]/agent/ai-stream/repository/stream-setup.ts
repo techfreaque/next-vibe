@@ -14,6 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { getModelById, type ModelOption } from "@/app/api/[locale]/agent/models/models";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -22,7 +23,6 @@ import type { TFunction } from "@/i18n/core/static-types";
 
 import type { ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
-import { getModelById, type ModelOption } from "../../chat/model-access/models";
 import { calculateMessageDepth } from "../../chat/threads/[threadId]/messages/repository";
 import { ensureThread } from "../../chat/threads/repository";
 import { DEFAULT_TTS_VOICE, type TtsVoiceValue } from "../../text-to-speech/enum";
@@ -31,7 +31,7 @@ import { AbortControllerSetup } from "./core/abort-controller-setup";
 import { CreditValidatorHandler } from "./core/credit-validator-handler";
 import { ProviderFactory as ProviderFactoryClass } from "./core/provider-factory";
 import { ToolsSetupHandler } from "./core/tools-setup-handler";
-import { MessagePreparationHandler } from "./handlers/message-preparation-handler";
+import { MessageContextBuilder } from "./handlers/message-context-builder";
 import { OperationHandler } from "./handlers/operation-handler";
 import { ToolConfirmationProcessor } from "./handlers/tool-confirmation-processor";
 import { UserMessageHandler } from "./handlers/user-message-handler";
@@ -326,24 +326,22 @@ export async function setupAiStream(params: {
     hasCharacter: !!data.character,
   });
 
-  // Prepare messages for AI streaming
-  const messages = await MessagePreparationHandler.prepareMessages({
+  // Build complete message context for AI streaming
+  const messages = await MessageContextBuilder.buildMessageContext({
     operation: data.operation,
-    effectiveThreadId,
-    effectiveParentMessageId: data.parentMessageId,
-    effectiveContent,
-    effectiveRole,
+    threadId: effectiveThreadId,
+    parentMessageId: data.parentMessageId,
+    content: effectiveContent,
+    role: effectiveRole,
     userId,
     isIncognito,
     rootFolderId: data.rootFolderId,
     messageHistory: data.messageHistory,
+    logger,
+    upcomingResponseContext: { model: data.model, character: data.character },
     userMessageMetadata,
     hasToolConfirmations,
     toolConfirmationResults,
-    systemPrompt,
-    model: data.model,
-    character: data.character,
-    logger,
   });
 
   const aiMessageId = crypto.randomUUID();

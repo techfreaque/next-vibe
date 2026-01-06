@@ -6,7 +6,7 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { useCallback } from "react";
 
-import { getModelById, type ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { getModelById, type ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type {

@@ -8,7 +8,7 @@ import React from "react";
 import { DOM_IDS, LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
 import { getDefaultFolderConfig } from "@/app/api/[locale]/agent/chat/config";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { getIconComponent } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";

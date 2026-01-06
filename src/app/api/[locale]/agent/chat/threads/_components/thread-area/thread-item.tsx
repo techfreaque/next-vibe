@@ -43,7 +43,7 @@ import React, { useState } from "react";
 import { chatColors, chatTransitions } from "@/app/[locale]/chat/lib/design-tokens";
 import type { UseChatReturn } from "@/app/api/[locale]/agent/chat/hooks/hooks";
 import type { ChatThread } from "@/app/api/[locale]/agent/chat/hooks/store";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -363,22 +363,14 @@ export function ThreadItem({
                               onSelect={() => handleMoveToFolder(null)}
                               className="cursor-pointer"
                             >
-                              {((): JSX.Element => {
-                                const UnfiledIcon = getIconComponent("folder");
-                                return (
-                                  <>
-                                    <UnfiledIcon className="h-4 w-4 mr-2" />
-                                    {t("app.chat.actions.unfiled")}
-                                  </>
-                                );
-                              })()}
+                              <Icon icon="folder" className="h-4 w-4 mr-2" />
+                              {t("app.chat.actions.unfiled")}
                             </DropdownMenuItem>
                           )}
 
                           {/* List all folders */}
                           {allFolders.length > 0 ? (
                             allFolders.map((folder) => {
-                              const FolderIcon = getIconComponent(folder.icon ?? "folder");
                               return (
                                 <DropdownMenuItem
                                   key={folder.id}
@@ -386,7 +378,7 @@ export function ThreadItem({
                                   disabled={currentFolderId === folder.id}
                                   className="cursor-pointer"
                                 >
-                                  <FolderIcon className="h-4 w-4 mr-2" />
+                                  <Icon icon={folder.icon ?? "folder"} className="h-4 w-4 mr-2" />
                                   {folder.name}
                                 </DropdownMenuItem>
                               );

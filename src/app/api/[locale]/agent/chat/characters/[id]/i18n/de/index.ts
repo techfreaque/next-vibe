@@ -23,7 +23,21 @@ export const translations: typeof enTranslations = {
         category: { content: "Kategorie" },
         source: { content: "Quelle" },
         preferredModel: { content: "Bevorzugtes Modell" },
+        voice: { content: "Stimme" },
         suggestedPrompts: { content: "Vorgeschlagene Prompts" },
+        modelSelection: { title: "Modellauswahl" },
+        selectionType: { content: "Auswahltyp" },
+        minIntelligence: { content: "Minimale Intelligenz" },
+        maxIntelligence: { content: "Maximale Intelligenz" },
+        minPrice: { content: "Mindestpreis" },
+        maxPrice: { content: "Maximalpreis" },
+        minContent: { content: "Minimale Inhaltsstufe" },
+        maxContent: { content: "Maximale Inhaltsstufe" },
+        minSpeed: { content: "Minimale Geschwindigkeit" },
+        maxSpeed: { content: "Maximale Geschwindigkeit" },
+        preferredStrengths: { content: "Bevorzugte Stärken" },
+        ignoredWeaknesses: { content: "Ignorierte Schwächen" },
+        manualModelId: { content: "Manuelles Modell" },
       },
     },
     errors: {
@@ -74,6 +88,10 @@ export const translations: typeof enTranslations = {
     container: {
       title: "Charakter aktualisieren",
       description: "Eine vorhandene benutzerdefinierte Charakter ändern",
+    },
+    actions: {
+      update: "Charakter aktualisieren",
+      updating: "Charakter wird aktualisiert",
     },
     response: {
       success: {

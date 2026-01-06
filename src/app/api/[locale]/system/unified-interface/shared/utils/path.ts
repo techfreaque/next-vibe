@@ -61,3 +61,20 @@ export function endpointToToolName(endpoint: CreateApiEndpointAny): string {
   const sanitizedPath = endpoint.path.map(sanitizePathSegment);
   return `${joinPath(sanitizedPath)}${PATH_SEPARATOR}${endpoint.method}`;
 }
+
+/**
+ * Get the preferred tool name for an endpoint
+ * Uses the first alias if available, otherwise falls back to the generated full path
+ * This is what should be displayed to AI models and users
+ *
+ * @param endpoint - The endpoint definition
+ * @returns The preferred tool name (alias if available, otherwise full path)
+ */
+export function getPreferredToolName(endpoint: CreateApiEndpointAny): string {
+  // Use first alias if available
+  if (endpoint.aliases && endpoint.aliases.length > 0) {
+    return endpoint.aliases[0];
+  }
+  // Fall back to generated full path name
+  return endpointToToolName(endpoint);
+}

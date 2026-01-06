@@ -395,6 +395,13 @@ const testRadioGroup: typeof webRadioGroup = RadioGroup;
 void testRadioGroup;
 export * from "./radio-group";
 
+// range-slider
+import type * as webRangeSlider from "../../web/ui/range-slider";
+import * as RangeSlider from "./range-slider";
+const testRangeSlider: typeof webRangeSlider = RangeSlider;
+void testRangeSlider;
+export * from "./range-slider";
+
 // resizable
 import type * as webResizable from "../../web/ui/resizable";
 import * as Resizable from "./resizable";

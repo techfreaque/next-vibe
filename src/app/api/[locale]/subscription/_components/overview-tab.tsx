@@ -7,9 +7,9 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import { modelOptions, modelProviders } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { modelOptions, modelProviders } from "@/app/api/[locale]/agent/models/models";
 import { FEATURE_COSTS, TOTAL_MODEL_COUNT } from "@/app/api/[locale]/products/repository-client";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -159,10 +159,7 @@ export function OverviewTab({
                   return (
                     <Div key={providerId}>
                       <H4 className="font-semibold mb-2 flex items-center gap-2">
-                        {((): JSX.Element => {
-                          const ProviderIcon = getIconComponent(provider.icon);
-                          return <ProviderIcon className="h-5 w-5" />;
-                        })()}
+                        <Icon icon={provider.icon} className="h-5 w-5" />
                         {provider.name}
                       </H4>
                       <Div className="grid grid-cols-2 gap-2 text-sm">

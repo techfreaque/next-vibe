@@ -64,11 +64,44 @@ export const translations: typeof enTranslations = {
         intelligence: {
           content: "Intelligenz: {{value}}",
         },
+        modelSelection: {
+          title: "Modellauswahl",
+        },
+        selectionType: {
+          content: "Auswahltyp: {{value}}",
+        },
+        minIntelligence: {
+          content: "Min. Intelligenz: {{value}}",
+        },
+        maxIntelligence: {
+          content: "Max. Intelligenz: {{value}}",
+        },
+        minPrice: {
+          content: "Mindestpreis: {{value}}",
+        },
         maxPrice: {
           content: "Maximaler Preis: {{value}}",
         },
+        minContent: {
+          content: "Min. Inhaltsstufe: {{value}}",
+        },
+        maxContent: {
+          content: "Max. Inhaltsstufe: {{value}}",
+        },
+        minSpeed: {
+          content: "Min. Geschwindigkeit: {{value}}",
+        },
+        maxSpeed: {
+          content: "Max. Geschwindigkeit: {{value}}",
+        },
         content: {
           content: "Inhaltsstufe: {{value}}",
+        },
+        preferredStrengths: {
+          content: "Bevorzugte Stärken: {{value}}",
+        },
+        ignoredWeaknesses: {
+          content: "Ignorierte Schwächen: {{value}}",
         },
         manualModelId: {
           content: "Manuelles Modell: {{value}}",
@@ -156,17 +189,87 @@ export const translations: typeof enTranslations = {
       label: "Auswahlmodus",
       description: "Wie das Modell ausgewählt werden soll",
     },
+    modelSelection: {
+      title: "Modellauswahl",
+      description:
+        "Wählen Sie, wie das KI-Modell ausgewählt werden soll - entweder ein bestimmtes Modell auswählen oder das System basierend auf Filtern wählen lassen",
+    },
+    selectionType: {
+      label: "Auswahltyp",
+      manual: "Bestimmtes Modell",
+      filters: "Filterkriterien",
+    },
     intelligence: {
       label: "Intelligenzstufe",
       description: "Mindestens erforderliche Intelligenzstufe",
+    },
+    minIntelligence: {
+      label: "Minimale Intelligenz",
+      description: "Minimale Intelligenz-/Fähigkeitsstufe, die für das Modell erforderlich ist",
+    },
+    maxIntelligence: {
+      label: "Maximale Intelligenz",
+      description: "Maximale Intelligenz-/Fähigkeitsstufe, die für das Modell zulässig ist",
+    },
+    intelligenceRange: {
+      label: "Intelligenzbereich",
+      description: "Erforderliche Intelligenz-/Fähigkeitsstufe für das Modell",
+      minLabel: "Min. Intelligenz",
+      maxLabel: "Max. Intelligenz",
+    },
+    priceRange: {
+      label: "Preisbereich",
+      description: "Kreditkostenbereich pro Nachricht",
+      minLabel: "Min. Preis",
+      maxLabel: "Max. Preis",
+    },
+    contentRange: {
+      label: "Inhaltsbereich",
+      description: "Inhaltsmoderation-Stufenbereich",
+      minLabel: "Min. Inhalt",
+      maxLabel: "Max. Inhalt",
+    },
+    speedRange: {
+      label: "Geschwindigkeitsbereich",
+      description: "Antwortgeschwindigkeit-Stufenbereich",
+      minLabel: "Min. Geschwindigkeit",
+      maxLabel: "Max. Geschwindigkeit",
+    },
+    minPrice: {
+      label: "Mindestpreis",
+      description: "Minimale Kreditkosten pro Nachricht",
     },
     maxPrice: {
       label: "Maximaler Preis",
       description: "Maximale Preisstufe",
     },
+    minContent: {
+      label: "Minimale Inhaltsstufe",
+      description: "Minimale Inhaltsmoderationsebene für das Modell",
+    },
+    maxContent: {
+      label: "Maximale Inhaltsstufe",
+      description: "Maximale Inhaltsmoderationsebene für das Modell",
+    },
+    minSpeed: {
+      label: "Minimale Geschwindigkeit",
+      description: "Minimale Geschwindigkeitsstufe, die für das Modell erforderlich ist",
+    },
+    maxSpeed: {
+      label: "Maximale Geschwindigkeit",
+      description: "Maximale Geschwindigkeitsstufe, die für das Modell zulässig ist",
+    },
     content: {
       label: "Inhaltsstufe",
       description: "Moderationsstufe für Inhalte",
+    },
+    preferredStrengths: {
+      label: "Bevorzugte Stärken",
+      description: "Modellfähigkeiten und Stärken, die bevorzugt werden",
+    },
+    ignoredWeaknesses: {
+      label: "Ignorierte Schwächen",
+      description: "Modellschwächen, die ignoriert oder zugelassen werden",
     },
     manualModelId: {
       label: "Manuelles Modell",

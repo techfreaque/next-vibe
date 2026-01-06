@@ -4,10 +4,10 @@
 
 import "server-only";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { ChatMessageRole } from "../../../chat/enum";
-import type { ModelId } from "../../../chat/model-access/models";
 import { createTextMessage } from "../../../chat/threads/[threadId]/messages/repository";
 import { createStreamEvent, formatSSEEvent } from "../../events";
 

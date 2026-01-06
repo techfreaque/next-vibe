@@ -5,11 +5,17 @@
 
 import { z } from "zod";
 
+import { ModelId, ModelIdOptions } from "@/app/api/[locale]/agent/models/models";
+import { IconKeyDB } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  field,
   objectField,
+  objectUnionField,
   requestDataField,
+  requestDataRangeField,
   responseArrayField,
+  responseArrayOptionalField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -21,22 +27,24 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { ModelUtilityDB, ModelUtilityOptions } from "../../models/enum";
 import { TtsVoiceDB, TtsVoiceOptions } from "../../text-to-speech/enum";
-import { IconKeyDB } from "../model-access/icons";
-import { ModelId } from "../model-access/models";
+import {
+  CONTENT_DISPLAY,
+  INTELLIGENCE_DISPLAY,
+  PRICE_DISPLAY,
+  SPEED_DISPLAY,
+} from "./display-configs";
 import {
   ContentLevelFilter,
   ContentLevelFilterDB,
-  ContentLevelFilterOptions,
   IntelligenceLevelFilter,
   IntelligenceLevelFilterDB,
-  IntelligenceLevelFilterOptions,
-  ModelSelectionMode,
-  ModelSelectionModeDB,
-  ModelSelectionModeOptions,
+  ModelSelectionType,
   PriceLevelFilter,
   PriceLevelFilterDB,
-  PriceLevelFilterOptions,
+  SpeedLevelFilter,
+  SpeedLevelFilterDB,
 } from "./enum";
 
 /**
@@ -115,44 +123,137 @@ const { GET } = createEndpoint({
               },
               z.enum(TtsVoiceDB).nullable(),
             ),
-            mode: responseField(
+            modelSelection: objectUnionField(
               {
-                type: WidgetType.TEXT,
-                content: "app.api.agent.chat.favorites.get.response.favorite.mode.content" as const,
+                type: WidgetType.CONTAINER,
+                title:
+                  "app.api.agent.chat.favorites.get.response.favorite.modelSelection.title" as const,
+                layoutType: LayoutType.STACKED,
               },
-              z.enum(ModelSelectionModeDB),
-            ),
-            intelligence: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.get.response.favorite.intelligence.content" as const,
-              },
-              z.enum(IntelligenceLevelFilterDB),
-            ),
-            maxPrice: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.get.response.favorite.maxPrice.content" as const,
-              },
-              z.enum(PriceLevelFilterDB),
-            ),
-            content: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.get.response.favorite.content.content" as const,
-              },
-              z.enum(ContentLevelFilterDB),
-            ),
-            manualModelId: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.get.response.favorite.manualModelId.content" as const,
-              },
-              z.enum(ModelId).nullable(),
+              { response: true },
+              "selectionType",
+              [
+                // Variant 1: Manual model selection
+                objectField(
+                  {
+                    type: WidgetType.CONTAINER,
+                    layoutType: LayoutType.STACKED,
+                  },
+                  { response: true },
+                  {
+                    selectionType: responseField(
+                      {
+                        type: WidgetType.TEXT,
+                        content:
+                          "app.api.agent.chat.favorites.get.response.favorite.selectionType.content" as const,
+                      },
+                      z.literal(ModelSelectionType.MANUAL),
+                    ),
+                    manualModelId: responseField(
+                      {
+                        type: WidgetType.TEXT,
+                        content:
+                          "app.api.agent.chat.favorites.get.response.favorite.manualModelId.content" as const,
+                      },
+                      z.enum(ModelId),
+                    ),
+                  },
+                ),
+                // Variant 2: Filter-based selection
+                objectField(
+                  {
+                    type: WidgetType.CONTAINER,
+                    layoutType: LayoutType.STACKED,
+                  },
+                  { response: true },
+                  {
+                    selectionType: responseField(
+                      {
+                        type: WidgetType.TEXT,
+                        content:
+                          "app.api.agent.chat.favorites.get.response.favorite.selectionType.content" as const,
+                      },
+                      z.literal(ModelSelectionType.FILTERS),
+                    ),
+                    intelligenceRange: responseField(
+                      {
+                        type: WidgetType.CONTAINER,
+                        layoutType: LayoutType.STACKED,
+                      },
+                      z
+                        .object({
+                          min: z.enum(IntelligenceLevelFilterDB).optional(),
+                          max: z.enum(IntelligenceLevelFilterDB).optional(),
+                        })
+                        .optional(),
+                    ),
+                    priceRange: responseField(
+                      {
+                        type: WidgetType.CONTAINER,
+                        layoutType: LayoutType.STACKED,
+                      },
+                      z
+                        .object({
+                          min: z.enum(PriceLevelFilterDB).optional(),
+                          max: z.enum(PriceLevelFilterDB).optional(),
+                        })
+                        .optional(),
+                    ),
+                    contentRange: responseField(
+                      {
+                        type: WidgetType.CONTAINER,
+                        layoutType: LayoutType.STACKED,
+                      },
+                      z
+                        .object({
+                          min: z.enum(ContentLevelFilterDB).optional(),
+                          max: z.enum(ContentLevelFilterDB).optional(),
+                        })
+                        .optional(),
+                    ),
+                    speedRange: responseField(
+                      {
+                        type: WidgetType.CONTAINER,
+                        layoutType: LayoutType.STACKED,
+                      },
+                      z
+                        .object({
+                          min: z.enum(SpeedLevelFilterDB).optional(),
+                          max: z.enum(SpeedLevelFilterDB).optional(),
+                        })
+                        .optional(),
+                    ),
+                    preferredStrengths: responseArrayOptionalField(
+                      {
+                        type: WidgetType.DATA_LIST,
+                      },
+                      field(
+                        z.enum(ModelUtilityDB),
+                        { response: true },
+                        {
+                          type: WidgetType.TEXT,
+                          content:
+                            "app.api.agent.chat.favorites.get.response.favorite.preferredStrengths.content" as const,
+                        },
+                      ),
+                    ),
+                    ignoredWeaknesses: responseArrayOptionalField(
+                      {
+                        type: WidgetType.DATA_LIST,
+                      },
+                      field(
+                        z.enum(ModelUtilityDB),
+                        { response: true },
+                        {
+                          type: WidgetType.TEXT,
+                          content:
+                            "app.api.agent.chat.favorites.get.response.favorite.ignoredWeaknesses.content" as const,
+                        },
+                      ),
+                    ),
+                  },
+                ),
+              ],
             ),
             position: responseField(
               {
@@ -254,11 +355,20 @@ const { GET } = createEndpoint({
             customName: "Thea (Smart)",
             customIcon: null,
             voice: null,
-            mode: ModelSelectionMode.AUTO,
-            intelligence: IntelligenceLevelFilter.SMART,
-            maxPrice: PriceLevelFilter.STANDARD,
-            content: ContentLevelFilter.OPEN,
-            manualModelId: null,
+            modelSelection: {
+              selectionType: ModelSelectionType.FILTERS,
+              intelligenceRange: {
+                min: IntelligenceLevelFilter.SMART,
+              },
+              priceRange: {
+                max: PriceLevelFilter.STANDARD,
+              },
+              contentRange: {
+                min: ContentLevelFilter.OPEN,
+              },
+              preferredStrengths: null,
+              ignoredWeaknesses: null,
+            },
             position: 0,
             color: null,
             isActive: true,
@@ -328,59 +438,188 @@ const { POST } = createEndpoint({
         },
         z.enum(TtsVoiceDB).nullable().optional(),
       ),
-      mode: requestDataField(
+      // Model Selection - discriminated union between manual and filter-based
+      modelSelection: objectUnionField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.favorites.post.mode.label" as const,
-          description: "app.api.agent.chat.favorites.post.mode.description" as const,
-          options: ModelSelectionModeOptions,
-          columns: 6,
+          type: WidgetType.CONTAINER,
+          title: "app.api.agent.chat.favorites.post.modelSelection.title" as const,
+          description: "app.api.agent.chat.favorites.post.modelSelection.description" as const,
+          layoutType: LayoutType.STACKED,
+          border: false,
+          showSubmitButton: false,
         },
-        z.enum(ModelSelectionModeDB),
-      ),
-      intelligence: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.favorites.post.intelligence.label" as const,
-          description: "app.api.agent.chat.favorites.post.intelligence.description" as const,
-          options: IntelligenceLevelFilterOptions,
-          columns: 6,
-        },
-        z.enum(IntelligenceLevelFilterDB),
-      ),
-      maxPrice: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.favorites.post.maxPrice.label" as const,
-          description: "app.api.agent.chat.favorites.post.maxPrice.description" as const,
-          options: PriceLevelFilterOptions,
-          columns: 6,
-        },
-        z.enum(PriceLevelFilterDB),
-      ),
-      content: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.favorites.post.content.label" as const,
-          description: "app.api.agent.chat.favorites.post.content.description" as const,
-          options: ContentLevelFilterOptions,
-          columns: 6,
-        },
-        z.enum(ContentLevelFilterDB),
-      ),
-      manualModelId: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.favorites.post.manualModelId.label" as const,
-          description: "app.api.agent.chat.favorites.post.manualModelId.description" as const,
-          columns: 6,
-        },
-        z.enum(ModelId).optional(),
+        { request: "data" },
+        "selectionType",
+        [
+          // Variant 1: Manual model selection
+          objectField(
+            {
+              type: WidgetType.CONTAINER,
+              layoutType: LayoutType.STACKED,
+            },
+            { request: "data" },
+            {
+              selectionType: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.FILTER_PILLS,
+                  label: "app.api.agent.chat.favorites.post.selectionType.label" as const,
+                  options: [
+                    {
+                      value: ModelSelectionType.MANUAL,
+                      label: "app.api.agent.chat.favorites.post.selectionType.manual" as const,
+                    },
+                    {
+                      value: ModelSelectionType.FILTERS,
+                      label: "app.api.agent.chat.favorites.post.selectionType.filters" as const,
+                    },
+                  ],
+                  columns: 12,
+                },
+                z.literal(ModelSelectionType.MANUAL),
+              ),
+              manualModelId: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.SELECT,
+                  label: "app.api.agent.chat.favorites.post.manualModelId.label" as const,
+                  description:
+                    "app.api.agent.chat.favorites.post.manualModelId.description" as const,
+                  options: ModelIdOptions,
+                  columns: 12,
+                },
+                z.enum(ModelId),
+              ),
+            },
+          ),
+          // Variant 2: Filter-based selection
+          objectField(
+            {
+              type: WidgetType.CONTAINER,
+              layoutType: LayoutType.STACKED,
+            },
+            { request: "data" },
+            {
+              selectionType: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.FILTER_PILLS,
+                  label: "app.api.agent.chat.favorites.post.selectionType.label" as const,
+                  options: [
+                    {
+                      value: ModelSelectionType.MANUAL,
+                      label: "app.api.agent.chat.favorites.post.selectionType.manual" as const,
+                    },
+                    {
+                      value: ModelSelectionType.FILTERS,
+                      label: "app.api.agent.chat.favorites.post.selectionType.filters" as const,
+                    },
+                  ],
+                  columns: 12,
+                },
+                z.literal(ModelSelectionType.FILTERS),
+              ),
+              intelligenceRange: requestDataRangeField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.RANGE_SLIDER,
+                  label: "app.api.agent.chat.favorites.post.intelligenceRange.label" as const,
+                  description:
+                    "app.api.agent.chat.favorites.post.intelligenceRange.description" as const,
+                  options: INTELLIGENCE_DISPLAY.map((tier) => ({
+                    label: tier.label,
+                    value: tier.value,
+                    icon: tier.icon,
+                    description: tier.description,
+                  })),
+                  minLabel: "app.api.agent.chat.favorites.post.intelligenceRange.minLabel" as const,
+                  maxLabel: "app.api.agent.chat.favorites.post.intelligenceRange.maxLabel" as const,
+                  columns: 12,
+                },
+                z.enum(IntelligenceLevelFilterDB),
+              ),
+              priceRange: requestDataRangeField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.RANGE_SLIDER,
+                  label: "app.api.agent.chat.favorites.post.priceRange.label" as const,
+                  description: "app.api.agent.chat.favorites.post.priceRange.description" as const,
+                  options: PRICE_DISPLAY.map((tier) => ({
+                    label: tier.label,
+                    value: tier.value,
+                    icon: tier.icon,
+                    description: tier.description,
+                  })),
+                  minLabel: "app.api.agent.chat.favorites.post.priceRange.minLabel" as const,
+                  maxLabel: "app.api.agent.chat.favorites.post.priceRange.maxLabel" as const,
+                  columns: 12,
+                },
+                z.enum(PriceLevelFilterDB),
+              ),
+              contentRange: requestDataRangeField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.RANGE_SLIDER,
+                  label: "app.api.agent.chat.favorites.post.contentRange.label" as const,
+                  description:
+                    "app.api.agent.chat.favorites.post.contentRange.description" as const,
+                  options: CONTENT_DISPLAY.map((tier) => ({
+                    label: tier.label,
+                    value: tier.value,
+                    icon: tier.icon,
+                    description: tier.description,
+                  })),
+                  minLabel: "app.api.agent.chat.favorites.post.contentRange.minLabel" as const,
+                  maxLabel: "app.api.agent.chat.favorites.post.contentRange.maxLabel" as const,
+                  columns: 12,
+                },
+                z.enum(ContentLevelFilterDB),
+              ),
+              speedRange: requestDataRangeField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.RANGE_SLIDER,
+                  label: "app.api.agent.chat.favorites.post.speedRange.label" as const,
+                  description: "app.api.agent.chat.favorites.post.speedRange.description" as const,
+                  options: SPEED_DISPLAY.map((tier) => ({
+                    label: tier.label,
+                    value: tier.value,
+                    icon: tier.icon,
+                    description: tier.description,
+                  })),
+                  minLabel: "app.api.agent.chat.favorites.post.speedRange.minLabel" as const,
+                  maxLabel: "app.api.agent.chat.favorites.post.speedRange.maxLabel" as const,
+                  columns: 12,
+                },
+                z.enum(SpeedLevelFilterDB),
+              ),
+              preferredStrengths: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.MULTISELECT,
+                  label: "app.api.agent.chat.favorites.post.preferredStrengths.label" as const,
+                  description:
+                    "app.api.agent.chat.favorites.post.preferredStrengths.description" as const,
+                  options: ModelUtilityOptions,
+                  columns: 6,
+                },
+                z.array(z.enum(ModelUtilityDB)).nullable().default(null),
+              ),
+              ignoredWeaknesses: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.MULTISELECT,
+                  label: "app.api.agent.chat.favorites.post.ignoredWeaknesses.label" as const,
+                  description:
+                    "app.api.agent.chat.favorites.post.ignoredWeaknesses.description" as const,
+                  options: ModelUtilityOptions,
+                  columns: 6,
+                },
+                z.array(z.enum(ModelUtilityDB)).nullable().default(null),
+              ),
+            },
+          ),
+        ],
       ),
 
       // === RESPONSE ===
@@ -443,10 +682,27 @@ const { POST } = createEndpoint({
       create: {
         characterId: "thea",
         customName: "Thea (Smart)",
-        mode: ModelSelectionMode.AUTO,
-        intelligence: IntelligenceLevelFilter.SMART,
-        maxPrice: PriceLevelFilter.STANDARD,
-        content: ContentLevelFilter.OPEN,
+        modelSelection: {
+          selectionType: ModelSelectionType.FILTERS,
+          intelligenceRange: {
+            min: IntelligenceLevelFilter.SMART,
+            max: IntelligenceLevelFilter.BRILLIANT,
+          },
+          priceRange: {
+            min: PriceLevelFilter.CHEAP,
+            max: PriceLevelFilter.STANDARD,
+          },
+          contentRange: {
+            min: ContentLevelFilter.OPEN,
+            max: ContentLevelFilter.UNCENSORED,
+          },
+          speedRange: {
+            min: SpeedLevelFilter.FAST,
+            max: SpeedLevelFilter.THOROUGH,
+          },
+          preferredStrengths: null,
+          ignoredWeaknesses: null,
+        },
       },
     },
     responses: {
@@ -469,6 +725,12 @@ export type FavoriteCreateRequestInput = typeof POST.types.RequestInput;
 export type FavoriteCreateRequestOutput = typeof POST.types.RequestOutput;
 export type FavoriteCreateResponseInput = typeof POST.types.ResponseInput;
 export type FavoriteCreateResponseOutput = typeof POST.types.ResponseOutput;
+
+// Individual favorite type from GET response
+export type Favorite = FavoritesListResponseOutput["favorites"][number];
+
+// Favorite field type aliases - only for complex objects
+export type FavoriteModelSelection = Favorite["modelSelection"];
 
 const definitions = { GET, POST };
 export { GET, POST };

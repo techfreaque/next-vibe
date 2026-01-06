@@ -6,8 +6,8 @@
 
 "use client";
 
-import type { ModelId } from "./model-access/models";
-import { getModelById } from "./model-access/models";
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { getModelById } from "@/app/api/[locale]/agent/models/models";
 
 /**
  * Create onContentDone callback for credit updates

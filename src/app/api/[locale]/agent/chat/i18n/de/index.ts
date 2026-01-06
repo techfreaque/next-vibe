@@ -255,14 +255,7 @@ export const translations: typeof enTranslations = {
     flatView: "Flache Ansicht (4chan-Stil)",
     debugView: "Debug-Ansicht (mit Systemprompts)",
   },
-  flatView: {
-    answerModal: {
-      title: "Als KI-Modell antworten",
-      description: "Generieren Sie eine KI-Antwort, um das Gespräch fortzusetzen",
-      inputPlaceholder: "Optional: Spezifische Anweisungen für die KI-Antwort hinzufügen",
-      confirmLabel: "Antwort generieren",
-    },
-  },
+
   screenshot: {
     capturing: "Erfassen...",
     capture: "Screenshot aufnehmen",

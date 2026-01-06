@@ -9,8 +9,7 @@ import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
 import type { LanguageModelV2 } from "@ai-sdk/provider";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-
-import { ModelId } from "../../chat/model-access/models";
+import { ApiProvider, ModelId } from "@/app/api/[locale]/agent/models/models";
 
 /**
  * Check if a model ID is a Gab AI model
@@ -32,15 +31,15 @@ export function isGabAIModel(modelId: ModelId): boolean {
 export function createGabAI(): {
   chat: (modelId: string) => LanguageModelV2;
 } {
-  const apiKey = agentEnv.GAB_AI_API_KEY || "";
+  const apiKey = agentEnv.GAB_AI_API_KEY;
 
   return {
-    chat: () => {
+    chat: (modelId: string) => {
       // Use OpenAI's internal implementation with custom config
       // This gives us their message/tool/stream parsing logic for free
       // Gab AI uses "arya" as the model name
-      return new OpenAIChatLanguageModel("arya", {
-        provider: "gab-ai",
+      return new OpenAIChatLanguageModel(modelId, {
+        provider: ApiProvider.GAB_AI,
         headers: () => ({
           // eslint-disable-next-line i18next/no-literal-string
           Authorization: `Bearer ${apiKey}`,

@@ -7,13 +7,17 @@
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback } from "react";
 
+import {
+  type IconKey,
+  type IconValue,
+  isIconKey,
+} from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { type UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../../config";
 import type { ChatFolder } from "../../hooks/store";
-import { type IconKey, type IconValue, isIconKey } from "../../model-access/icons";
 
 /**
  * Folder update type

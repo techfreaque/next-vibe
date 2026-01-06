@@ -14,8 +14,12 @@
 
 import type { z } from "zod";
 
-import type { IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import { generateSchemaForUsage as generateSchemaFromUtils } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import type { IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import {
+  createFieldBuilder,
+  type FieldBuilder,
+  generateSchemaForUsage as generateSchemaFromUtils,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type {
   ExamplesList,
   ExtractInput,
@@ -175,7 +179,10 @@ export interface ApiEndpoint<
   readonly icon: IconValue;
 
   // Unified fields for schema generation
-  readonly fields: TFields;
+  // Supports two patterns:
+  // 1. Function: (u) => u.objectField(...) - NEW PATTERN (recommended)
+  // 2. Direct field: objectField(...) - LEGACY PATTERN (backwards compatible)
+  readonly fields: TFields | ((builder: FieldBuilder<TScopedTranslationKey>) => TFields);
 
   lifecycle?: LifecycleActions;
 
@@ -433,7 +440,8 @@ export function createEndpoint<
   TFields
 > {
   // Generate schemas from unified fields
-  const fields = config.fields;
+  const fieldBuilder = createFieldBuilder<TScopedTranslationKey>();
+  const fields = typeof config.fields === "function" ? config.fields(fieldBuilder) : config.fields;
   const requestSchema = generateRequestDataSchema(fields);
   const responseSchema = generateResponseSchema(fields);
   const requestUrlSchema = generateRequestUrlSchema(fields);

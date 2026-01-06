@@ -6,6 +6,7 @@
 import { eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   UserPermissionRole,
@@ -14,7 +15,6 @@ import {
 
 import { DefaultFolderId } from "../config";
 import { chatFolders } from "../db";
-import type { IconKey } from "../model-access/icons";
 
 /**
  * Forum category configurations

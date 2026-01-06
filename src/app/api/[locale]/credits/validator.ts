@@ -10,7 +10,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import { getModelCost } from "@/app/api/[locale]/agent/chat/model-access/costs";
+import { getModelCost } from "@/app/api/[locale]/agent/models/costs";
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";

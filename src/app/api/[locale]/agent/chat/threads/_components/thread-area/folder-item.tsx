@@ -40,7 +40,7 @@ import {
 import { buildFolderUrl, getRootFolderId } from "@/app/[locale]/chat/lib/utils/navigation";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
-import { getIconComponent, type IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { Icon, type IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -232,10 +232,9 @@ export function FolderItem({
     };
   }, [folders, folder.parentId, folder.rootFolderId, folder.id]);
 
-  // Memoize folder icon component
-  const FolderIcon = useMemo(() => {
-    const folderIcon = getFolderIcon(folder.id, folder.icon);
-    return getIconComponent(folderIcon);
+  // Memoize folder icon
+  const folderIcon = useMemo(() => {
+    return getFolderIcon(folder.id, folder.icon);
   }, [folder.id, folder.icon]);
 
   const isActive = activeFolderId === folder.id;
@@ -280,7 +279,7 @@ export function FolderItem({
         </Button>
 
         <Div className="flex items-center gap-2 flex-1 min-w-0">
-          <FolderIcon className="h-4 w-4 shrink-0" />
+          <Icon icon={folderIcon} className="h-4 w-4 shrink-0" />
           <Span className="text-sm font-medium truncate">{folderDisplayName}</Span>
           {/* eslint-disable i18next/no-literal-string -- Formatting characters for count display */}
           <Span className="text-xs text-muted-foreground shrink-0">({threadCount})</Span>

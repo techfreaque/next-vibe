@@ -16,12 +16,14 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { getCharacterById } from "../characters/config";
 import { CharacterCategory } from "../characters/enum";
+import { transformToFavoriteModelSettings } from "../shared/model-selection-transform";
 import { chatFavorites } from "./db";
 import type {
   FavoriteCreateRequestOutput,
   FavoriteCreateResponseOutput,
   FavoritesListResponseOutput,
 } from "./definition";
+import { ModelSelectionMode, ModelSelectionType } from "./enum";
 
 /**
  * Chat Favorites Repository

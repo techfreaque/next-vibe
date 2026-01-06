@@ -15,9 +15,9 @@ import {
 import { formatPostNumber } from "@/app/[locale]/chat/lib/utils/post-numbers";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
-import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { getModelById } from "@/app/api/[locale]/agent/models/models";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -160,12 +160,7 @@ export function FlatMessage({
           )}
         >
           {/* Show model icon for AI messages */}
-          {!isUser &&
-            modelData &&
-            ((): JSX.Element | null => {
-              const ModelIcon = getIconComponent(modelData.icon);
-              return <ModelIcon className="h-3.5 w-3.5" />;
-            })()}
+          {!isUser && modelData && <Icon icon={modelData.icon} className="h-3.5 w-3.5" />}
           {displayName}
         </Span>
 

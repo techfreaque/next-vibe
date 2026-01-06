@@ -8,7 +8,7 @@ import {
   SpeedLevel,
   type SpeedLevelValue,
 } from "../favorites/enum";
-import type { ModelFeatures } from "../types";
+import type { ModelFeatures, ModelUtilityValue } from "../types";
 import { ModelUtility } from "../types";
 import type { IconKey } from "./icons";
 
@@ -32,7 +32,7 @@ export enum ModelId {
   GEMINI_2_5_PRO = "gemini-2.5-pro",
   GEMINI_2_5_FLASH = "gemini-2.5-flash",
   GEMINI_2_5_FLASH_LITE = "gemini-2.5-flash-lite",
-  MISTRAL_NEMO = "mistral-nemo",
+  // MISTRAL_NEMO = "mistral-nemo",
   DEEPSEEK_R1_DISTILL = "deepseek-r1-distill",
   QWEN_2_5_7B = "qwen-2-5-7b",
   KIMI_K2 = "kimi-k2",
@@ -93,7 +93,7 @@ export interface ModelOption {
   /** Credit cost per message (0 = free) */
   creditCost: number;
   /** Utility categories this model belongs to (strengths) */
-  utilities: ModelUtility[];
+  utilities: (typeof ModelUtilityValue)[];
   /** Whether this model supports tool/function calling (for search, etc.) */
   supportsTools: boolean;
 
@@ -107,7 +107,7 @@ export interface ModelOption {
   /** Binary features the model supports */
   features: ModelFeatures;
   /** What the model is NOT good at (optional) */
-  weaknesses?: ModelUtility[];
+  weaknesses?: (typeof ModelUtilityValue)[];
 }
 
 export interface ModelProvider {
@@ -211,11 +211,11 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.SMART,
       ModelUtility.ROLEPLAY,
     ],
-    supportsTools: false,
+    supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.THOROUGH,
     content: ContentLevel.UNCENSORED,
-    features: { ...defaultFeatures },
+    features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.CODING],
   },
   [ModelId.FREEDOMGPT_LIBERTY]: {
@@ -251,7 +251,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     parameterCount: undefined,
     contextWindow: 8192,
     icon: "gab-ai-logo",
-    openRouterModel: "gab-ai-arya",
+    openRouterModel: "arya",
     creditCost: 5,
     utilities: [
       ModelUtility.UNCENSORED,
@@ -469,7 +469,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.THOROUGH,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_2_PRO]: {
@@ -494,7 +499,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.THOROUGH,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_CODEX]: {
@@ -513,7 +523,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CREATIVE],
   },
   [ModelId.GPT_5_1_CODEX]: {
@@ -532,7 +547,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_1]: {
@@ -551,7 +571,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_2]: {
@@ -570,7 +595,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_2_CHAT]: {
@@ -595,7 +625,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5]: {
@@ -614,7 +649,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_MINI]: {
@@ -633,7 +673,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.ANALYSIS],
   },
   [ModelId.GPT_5_NANO]: {
@@ -652,7 +697,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.ANALYSIS, ModelUtility.CODING],
   },
   [ModelId.GPT_OSS_120B]: {
@@ -737,7 +787,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
   },
   [ModelId.GEMINI_2_5_FLASH]: {
     id: ModelId.GEMINI_2_5_FLASH,
@@ -755,7 +810,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
   },
   [ModelId.GEMINI_2_5_PRO]: {
     id: ModelId.GEMINI_2_5_PRO,
@@ -773,7 +833,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.BALANCED,
     content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
   },
   [ModelId.GEMINI_3_PRO]: {
     id: ModelId.GEMINI_3_PRO,
@@ -798,25 +863,25 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       toolCalling: true,
     },
   },
-  [ModelId.MISTRAL_NEMO]: {
-    id: ModelId.MISTRAL_NEMO,
-    name: "Mistral Nemo",
-    provider: "mistralAI",
-    apiProvider: ApiProvider.OPENROUTER,
-    description: "app.chat.models.descriptions.mistralNemo",
-    parameterCount: 12,
-    contextWindow: 131072,
-    icon: "si-mistralai",
-    openRouterModel: "mistralai/mistral-nemo:free",
-    creditCost: 0,
-    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
-    supportsTools: true,
-    intelligence: IntelligenceLevel.QUICK,
-    speed: SpeedLevel.FAST,
-    content: ContentLevel.MAINSTREAM,
-    features: { ...defaultFeatures, toolCalling: true },
-    weaknesses: [ModelUtility.ANALYSIS, ModelUtility.CODING],
-  },
+  // [ModelId.MISTRAL_NEMO]: {
+  //   id: ModelId.MISTRAL_NEMO,
+  //   name: "Mistral Nemo",
+  //   provider: "mistralAI",
+  //   apiProvider: ApiProvider.OPENROUTER,
+  //   description: "app.chat.models.descriptions.mistralNemo",
+  //   parameterCount: 12,
+  //   contextWindow: 131072,
+  //   icon: "si-mistralai",
+  //   openRouterModel: "mistralai/mistral-nemo:free",
+  //   creditCost: 0,
+  //   utilities: [ModelUtility.CHAT, ModelUtility.FAST],
+  //   supportsTools: true,
+  //   intelligence: IntelligenceLevel.QUICK,
+  //   speed: SpeedLevel.FAST,
+  //   content: ContentLevel.MAINSTREAM,
+  //   features: { ...defaultFeatures, toolCalling: true },
+  //   weaknesses: [ModelUtility.ANALYSIS, ModelUtility.CODING],
+  // },
   [ModelId.DEEPSEEK_V32]: {
     id: ModelId.DEEPSEEK_V32,
     name: "DeepSeek V3.2",
@@ -947,7 +1012,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.BALANCED,
     content: ContentLevel.OPEN,
-    features: { ...defaultFeatures, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
   },
   [ModelId.GROK_4_FAST]: {
     id: ModelId.GROK_4_FAST,
@@ -965,7 +1035,12 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
-    features: { ...defaultFeatures, toolCalling: true },
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
   },
 };
 /* eslint-enable i18next/no-literal-string */

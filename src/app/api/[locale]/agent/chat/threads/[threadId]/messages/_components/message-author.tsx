@@ -8,8 +8,8 @@ import type { JSX } from "react";
 import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
 import { getCharacterById } from "@/app/api/[locale]/agent/chat/characters/config";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import { getModelById, type ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { getModelById, type ModelId } from "@/app/api/[locale]/agent/models/models";
+import { getIconComponent } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

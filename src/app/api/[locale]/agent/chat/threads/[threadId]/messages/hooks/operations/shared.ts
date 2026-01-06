@@ -5,6 +5,7 @@
 
 import { parseError } from "next-vibe/shared/utils";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
@@ -14,7 +15,6 @@ import { createCreditUpdateCallback } from "../../../../../credit-updater";
 import type { ChatMessage } from "../../../../../db";
 import { ChatMessageRole } from "../../../../../enum";
 import { useChatStore } from "../../../../../hooks/store";
-import type { ModelId } from "../../../../../model-access/models";
 import { useVoiceModeStore } from "../../../../../voice-mode/store";
 import { getCallModeKey } from "../../../../../voice-mode/types";
 
@@ -151,8 +151,28 @@ export async function createAndSendUserMessage(
 
       // Save to localStorage (incognito only - server saves via API)
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-        const { saveMessage } = await import("../../../../../incognito/storage");
-        await saveMessage(createdUserMessage);
+        // If there are attachments, use saveMessageWithAttachments to convert files to base64
+        if (attachments && attachments.length > 0) {
+          const { saveMessageWithAttachments } = await import("../../../../../incognito/storage");
+          const { convertFilesToIncognitoAttachments } =
+            await import("../../../../../incognito/file-utils");
+
+          // Convert files to base64 attachments
+          const incognitoAttachments = await convertFilesToIncognitoAttachments(attachments);
+
+          // Save to localStorage
+          await saveMessageWithAttachments(createdUserMessage, attachments);
+
+          // Update chatStore with actual attachments (so UI shows them immediately)
+          chatStore.updateMessage(createdUserMessage.id, {
+            metadata: {
+              attachments: incognitoAttachments,
+            },
+          });
+        } else {
+          const { saveMessage } = await import("../../../../../incognito/storage");
+          await saveMessage(createdUserMessage);
+        }
       }
     } else {
       logger.debug("Skipping user message creation for tool confirmations", {

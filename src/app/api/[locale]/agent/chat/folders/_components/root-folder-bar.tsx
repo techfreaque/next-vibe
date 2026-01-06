@@ -14,7 +14,7 @@ import {
   DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { FolderAccessModal } from "./folder-access-modal";
@@ -119,7 +119,6 @@ export function RootFolderBar({
           data-tour={TOUR_DATA_ATTRS.ROOT_FOLDERS}
         >
           {rootFolders.map((folderConfig) => {
-            const FolderIcon = getIconComponent(folderConfig.icon);
             const isActive = folderConfig.id === activeFolderId;
             const folderColor = folderConfig.color;
             const colorClasses = getColorClasses(folderColor, isActive);
@@ -134,7 +133,10 @@ export function RootFolderBar({
                 suppressHydrationWarning
                 data-tour={getFolderTourAttr(folderConfig.id)}
               >
-                <FolderIcon className="h-6 w-6 flex items-center justify-center" />
+                <Icon
+                  icon={folderConfig.icon}
+                  className="h-6 w-6 flex items-center justify-center"
+                />
               </Button>
             );
           })}

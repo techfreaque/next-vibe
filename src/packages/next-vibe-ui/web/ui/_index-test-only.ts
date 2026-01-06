@@ -333,6 +333,9 @@ export { Progress, ProgressIndicator } from "./progress";
 // radio-group
 export { RadioGroup, RadioGroupItem } from "./radio-group";
 
+// range-slider
+export { RangeSlider, type RangeSliderProps } from "./range-slider";
+
 // resizable
 export { ResizableContainer, ResizableHandle } from "./resizable";
 

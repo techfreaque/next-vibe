@@ -12,13 +12,13 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { parseError } from "../../../../shared/utils";
 import { chatMessages, type ToolCall, type ToolCallResult } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
-import type { ModelId } from "../../../chat/model-access/models";
 import {
   createErrorMessage,
   createToolMessage,

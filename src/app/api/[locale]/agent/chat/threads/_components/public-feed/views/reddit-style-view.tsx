@@ -21,8 +21,8 @@ import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
-import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 

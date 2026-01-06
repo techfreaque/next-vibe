@@ -5,9 +5,9 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
+import { ApiProvider, getModelById, type ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { ApiProvider, getModelById, type ModelId } from "../../../chat/model-access/models";
 import { createFreedomGPT } from "../../providers/freedomgpt";
 import { createGabAI } from "../../providers/gab-ai";
 import { createUncensoredAI } from "../../providers/uncensored-ai";
@@ -29,10 +29,7 @@ export class ProviderFactory {
 
     switch (modelOption.apiProvider) {
       case ApiProvider.UNCENSORED_AI:
-        return createUncensoredAI({
-          apiKey: agentEnv.UNCENSORED_AI_API_KEY,
-          logger,
-        });
+        return createUncensoredAI(logger);
 
       case ApiProvider.FREEDOMGPT:
         return createFreedomGPT();

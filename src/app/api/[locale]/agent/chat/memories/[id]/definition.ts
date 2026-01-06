@@ -24,8 +24,8 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 /**
  * Memory tool aliases for AI tool calling
  */
-export const MEMORY_UPDATE_ALIAS = "memories:update" as const;
-export const MEMORY_DELETE_ALIAS = "memories:delete" as const;
+export const MEMORY_UPDATE_ALIAS = "memories-update" as const;
+export const MEMORY_DELETE_ALIAS = "memories-delete" as const;
 
 /**
  * Update Memory Endpoint (PATCH)

@@ -11,8 +11,8 @@ import React from "react";
 import { Logo } from "@/app/[locale]/_components/logo";
 import { getCharacterName } from "@/app/api/[locale]/agent/chat/characters/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { getModelById } from "@/app/api/[locale]/agent/models/models";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -98,13 +98,9 @@ export function ThreadedMessageContent({
               )}
             >
               {/* Show model icon for AI messages */}
-              {message.role === "assistant" &&
-                message.model &&
-                ((): JSX.Element | null => {
-                  const modelData = getModelById(message.model);
-                  const ModelIcon = getIconComponent(modelData.icon);
-                  return <ModelIcon className="h-3 w-3" />;
-                })()}
+              {message.role === "assistant" && message.model && (
+                <Icon icon={getModelById(message.model).icon} className="h-3 w-3" />
+              )}
               {message.role === "user"
                 ? currentUserId && message.authorId === currentUserId
                   ? t("app.chat.threadedView.youLabel")

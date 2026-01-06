@@ -9,12 +9,12 @@ import { eq } from "drizzle-orm";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { chatMessages, type ToolCall } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
-import type { ModelId } from "../../../chat/model-access/models";
 import { createToolMessage } from "../../../chat/threads/[threadId]/messages/repository";
 import { createStreamEvent, formatSSEEvent } from "../../events";
 

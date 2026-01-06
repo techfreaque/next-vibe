@@ -223,17 +223,121 @@ export class MessageConverter {
 
   /**
    * Convert array of ChatMessages to AI SDK format
+   * Properly handles multiple consecutive TOOL messages by combining them into a single assistant message
    */
   static async toAiSdkMessages(
     messages: ChatMessage[],
     logger: EndpointLogger,
     rootFolderId?: DefaultFolderId,
-    upcomingResponseContext?: { model: string; character: string | null },
   ): Promise<ModelMessage[]> {
     const result: ModelMessage[] = [];
 
     for (let i = 0; i < messages.length; i++) {
       const msg = messages[i];
+
+      // Check if this is the start of a TOOL message sequence (multiple consecutive tool calls)
+      if (msg.role === ChatMessageRole.TOOL && "metadata" in msg && msg.metadata?.toolCall) {
+        // Look ahead to find all consecutive TOOL messages
+        const toolMessages: ChatMessage[] = [msg];
+        let j = i + 1;
+        while (
+          j < messages.length &&
+          messages[j]?.role === ChatMessageRole.TOOL &&
+          "metadata" in messages[j] &&
+          messages[j].metadata?.toolCall
+        ) {
+          toolMessages.push(messages[j]);
+          j++;
+        }
+
+        // Skip ahead past the tool messages we just collected
+        i = j - 1;
+
+        // Check if the last message in result is an ASSISTANT message with text content
+        // If so, we need to merge the tool calls into that message
+        const lastResultMsg = result[result.length - 1];
+        const hasTextAssistant =
+          lastResultMsg &&
+          lastResultMsg.role === "assistant" &&
+          typeof lastResultMsg.content === "string";
+
+        // Build tool call content array for assistant message
+        const toolCallContent: Array<{
+          type: "tool-call";
+          toolCallId: string;
+          toolName: string;
+          input: unknown;
+        }> = [];
+
+        // Build separate tool result messages (one per tool call with result)
+        const toolResultMessages: ModelMessage[] = [];
+
+        for (const toolMsg of toolMessages) {
+          const toolCall = toolMsg.metadata!.toolCall!;
+
+          // Add tool call to assistant message content
+          toolCallContent.push({
+            type: "tool-call",
+            toolCallId: toolCall.toolCallId,
+            toolName: toolCall.toolName,
+            input: toolCall.args,
+          });
+
+          // If tool was executed, create separate tool result message
+          // AI SDK format: one tool message per result
+          if (toolCall.result || toolCall.error) {
+            const output = toolCall.error
+              ? {
+                  type: "error-text" as const,
+                  value: MessageConverter.translateErrorRecursive(toolCall.error),
+                }
+              : { type: "json" as const, value: toolCall.result ?? null };
+
+            toolResultMessages.push({
+              role: "tool",
+              content: [
+                {
+                  type: "tool-result",
+                  toolCallId: toolCall.toolCallId,
+                  toolName: toolCall.toolName,
+                  output,
+                },
+              ],
+            });
+          }
+        }
+
+        if (hasTextAssistant) {
+          // Merge tool calls into existing assistant message with text
+          // AI SDK format: assistant message can have both text and tool-calls
+          const textContent = lastResultMsg.content as string;
+          result[result.length - 1] = {
+            role: "assistant",
+            content: [{ type: "text", text: textContent }, ...toolCallContent],
+          };
+          logger.debug("[MessageConverter] Merged tool calls into text assistant message", {
+            toolCount: toolMessages.length,
+            resultCount: toolResultMessages.length,
+          });
+        } else {
+          // Create new assistant message with just tool calls
+          // AI SDK format: assistant message with only tool-call content parts
+          result.push({
+            role: "assistant",
+            content: toolCallContent,
+          });
+          logger.debug("[MessageConverter] Created assistant message with tool calls", {
+            toolCount: toolMessages.length,
+            resultCount: toolResultMessages.length,
+          });
+        }
+
+        // Add all TOOL result messages (one message per result)
+        // AI SDK format: separate tool message for each tool result
+        result.push(...toolResultMessages);
+
+        continue;
+      }
 
       // Inject metadata system message before user/assistant messages
       // Only for full ChatMessage objects (not simple { role, content } objects)
@@ -259,21 +363,6 @@ export class MessageConverter {
           result.push(converted);
         }
       }
-    }
-
-    // Add context for the upcoming assistant response at the END
-    // This tells the model what config will be used for its response
-    // and explicitly instructs not to echo this metadata
-    if (upcomingResponseContext) {
-      const parts: string[] = [];
-      parts.push(`Model:${upcomingResponseContext.model}`);
-      if (upcomingResponseContext.character) {
-        parts.push(`Character:${upcomingResponseContext.character}`);
-      }
-      result.push({
-        role: "system",
-        content: `[Your response context: ${parts.join(" | ")}]`,
-      });
     }
 
     return result;

@@ -26,8 +26,8 @@ import { dateSchema } from "../../../shared/types/common.schema";
 /**
  * Memory tool aliases for AI tool calling
  */
-export const MEMORY_LIST_ALIAS = "memories:list" as const;
-export const MEMORY_ADD_ALIAS = "memories:add" as const;
+export const MEMORY_LIST_ALIAS = "memories-list" as const;
+export const MEMORY_ADD_ALIAS = "memories-add" as const;
 
 /**
  * Get Memories List Endpoint (GET)

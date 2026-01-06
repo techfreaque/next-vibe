@@ -6,10 +6,10 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -58,7 +58,6 @@ export function MoveFolderDialog({
   };
 
   const renderFolderOption = (targetFolder: ChatFolder, depth = 0): JSX.Element => {
-    const Icon = getIconComponent(targetFolder.icon ?? "folder");
     const isSelected = selectedFolderId === targetFolder.id;
     const displayName = targetFolder.name;
 
@@ -76,7 +75,7 @@ export function MoveFolderDialog({
               isSelected ? "bg-accent border-2 border-primary" : ""
             }`}
           >
-            <Icon className="h-4 w-4 flex-shrink-0" />
+            <Icon icon={targetFolder.icon ?? "folder"} className="h-4 w-4 flex-shrink-0" />
             <Span className="text-sm truncate">{displayName}</Span>
           </Button>
         </Div>

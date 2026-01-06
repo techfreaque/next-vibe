@@ -7,7 +7,7 @@
 
 import type { Control, FieldPath, FieldValues } from "react-hook-form";
 
-import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { Countries, CountryLanguage } from "@/i18n/core/config";
 
 import type { CreateApiEndpointAny } from "../types/endpoint";
@@ -234,6 +234,23 @@ export interface FilterPillsFieldConfig<
   }>;
 }
 
+export interface RangeSliderFieldConfig<
+  TTranslationKey extends string,
+> extends BaseFieldConfig<TTranslationKey> {
+  type: "range_slider";
+  options: Array<{
+    value: string | number;
+    label: NoInfer<TTranslationKey>;
+    icon?: IconKey;
+    description?: NoInfer<TTranslationKey>;
+  }>;
+  minLabel?: NoInfer<TTranslationKey>;
+  maxLabel?: NoInfer<TTranslationKey>;
+  minDefault?: string | number;
+  maxDefault?: string | number;
+  disabled?: boolean;
+}
+
 // Union type for all field configurations
 export type FieldConfig<TTranslationKey extends string> =
   | TextFieldConfig<TTranslationKey>
@@ -253,7 +270,8 @@ export type FieldConfig<TTranslationKey extends string> =
   | LocationFieldConfig<TTranslationKey>
   | YearPickerFieldConfig<TTranslationKey>
   | IconFieldConfig<TTranslationKey>
-  | FilterPillsFieldConfig<TTranslationKey>;
+  | FilterPillsFieldConfig<TTranslationKey>
+  | RangeSliderFieldConfig<TTranslationKey>;
 
 // Required field styling options
 export type RequiredFieldStyle =

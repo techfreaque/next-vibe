@@ -20,6 +20,11 @@ export const translations = {
       my: "My Characters",
       community: "Community",
     },
+    ownershipType: {
+      system: "System",
+      user: "User",
+      public: "Public",
+    },
   },
   tags: {
     general: "General",
@@ -633,6 +638,19 @@ export const translations = {
           voice: { content: "Voice" },
           suggestedPrompts: { content: "Suggested Prompts" },
           requirements: { content: "Requirements" },
+          modelSelection: { title: "Model Selection" },
+          selectionType: { content: "Selection Type" },
+          minIntelligence: { content: "Minimum Intelligence" },
+          maxIntelligence: { content: "Maximum Intelligence" },
+          minPrice: { content: "Minimum Price" },
+          maxPrice: { content: "Maximum Price" },
+          minContent: { content: "Minimum Content Level" },
+          maxContent: { content: "Maximum Content Level" },
+          minSpeed: { content: "Minimum Speed" },
+          maxSpeed: { content: "Maximum Speed" },
+          preferredStrengths: { content: "Preferred Strengths" },
+          ignoredWeaknesses: { content: "Ignored Weaknesses" },
+          manualModelId: { content: "Manual Model" },
         },
       },
     },
@@ -725,6 +743,30 @@ export const translations = {
       label: "Intelligence Level",
       description: "Minimum intelligence/capability level required for the model",
     },
+    intelligenceRange: {
+      label: "Intelligence Range",
+      description: "Required intelligence/capability level for the model",
+      minLabel: "Min Intelligence",
+      maxLabel: "Max Intelligence",
+    },
+    minIntelligence: {
+      label: "Minimum Intelligence",
+      description: "Minimum intelligence/capability level required for the model",
+    },
+    maxIntelligence: {
+      label: "Maximum Intelligence",
+      description: "Maximum intelligence/capability level allowed for the model",
+    },
+    priceRange: {
+      label: "Price Range",
+      description: "Credit cost range per message",
+      minLabel: "Min Price",
+      maxLabel: "Max Price",
+    },
+    minPrice: {
+      label: "Minimum Price",
+      description: "Minimum credit cost per message with this character",
+    },
     maxPrice: {
       label: "Maximum Price",
       description: "Maximum credit cost you're willing to spend per message with this character",
@@ -732,6 +774,38 @@ export const translations = {
     contentLevel: {
       label: "Content Level",
       description: "Content filtering level for the model (mainstream, open, or uncensored)",
+    },
+    contentRange: {
+      label: "Content Range",
+      description: "Content moderation level range",
+      minLabel: "Min Content",
+      maxLabel: "Max Content",
+    },
+    minContent: {
+      label: "Minimum Content Level",
+      description: "Minimum content moderation level for the model",
+    },
+    maxContent: {
+      label: "Maximum Content Level",
+      description: "Maximum content moderation level for the model",
+    },
+    speedRange: {
+      label: "Speed Range",
+      description: "Response speed level range",
+      minLabel: "Min Speed",
+      maxLabel: "Max Speed",
+    },
+    preferredStrengths: {
+      label: "Preferred Strengths",
+      description: "Model capabilities and strengths to prefer",
+    },
+    ignoredWeaknesses: {
+      label: "Ignored Weaknesses",
+      description: "Model weaknesses to ignore or allow",
+    },
+    manualModelId: {
+      label: "Manual Model",
+      description: "Specific model to always use with this character",
     },
     voice: {
       label: "Voice",

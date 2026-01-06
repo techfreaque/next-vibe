@@ -7,13 +7,13 @@
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback } from "react";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { UseAIStreamReturn } from "../../../../../ai-stream/hooks/use-ai-stream";
 import { DefaultFolderId } from "../../../../config";
 import type { ChatMessage } from "../../../../db";
-import type { ModelId } from "../../../../model-access/models";
 import { answerAsAI as answerAsAIOp } from "./operations/answer-as-ai";
 import { branchMessage as branchMessageOp } from "./operations/branch-message";
 import { retryMessage as retryMessageOp } from "./operations/retry-message";

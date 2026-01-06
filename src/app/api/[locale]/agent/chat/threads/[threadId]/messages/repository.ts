@@ -10,6 +10,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -23,7 +24,6 @@ import {
   type ToolCall,
 } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
-import type { ModelId } from "../../../model-access/models";
 import { canPostInThread, canViewThread } from "../../../permissions/permissions";
 import { validateNotIncognito } from "../../../validation";
 import type {

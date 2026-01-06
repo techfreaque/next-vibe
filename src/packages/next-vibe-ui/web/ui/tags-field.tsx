@@ -133,7 +133,7 @@ export function TagsField<TKey extends string>({
 
   const getTagLabel = (tagValue: string): string => {
     const suggestion = suggestions.find((s) => s.value === tagValue);
-    return suggestion ? t(suggestion.label) : tagValue;
+    return suggestion ? t(suggestion.label) : t(tagValue);
   };
 
   const canAddMore = !maxTags || value.length < maxTags;

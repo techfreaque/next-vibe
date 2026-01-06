@@ -3,7 +3,7 @@
 import { Button } from "next-vibe-ui/ui/button";
 import type { JSX } from "react";
 
-import { getIconComponent, type IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { Icon, type IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
 
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
@@ -28,7 +28,7 @@ export function ButtonWidget<const TKey extends string>({
     onClick: actionId,
   } = field.ui;
 
-  const ButtonIcon = icon ? getIconComponent(icon as IconValue) : undefined;
+  const buttonIcon = icon ? (icon as IconValue) : undefined;
   const buttonText = textKey ? t(textKey) : "Action";
 
   const handleClick = async (): Promise<void> => {
@@ -79,7 +79,7 @@ export function ButtonWidget<const TKey extends string>({
       size={size}
       className={className}
     >
-      {ButtonIcon && <ButtonIcon className="h-4 w-4 mr-2" />}
+      {buttonIcon && <Icon icon={buttonIcon} className="h-4 w-4 mr-2" />}
       {buttonText}
     </Button>
   );

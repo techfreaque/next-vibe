@@ -16,16 +16,13 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H1, H3 } from "next-vibe-ui/ui/typography";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
-import {
-  CategoryOptions,
-  type Character,
-  DEFAULT_CHARACTERS,
-} from "@/app/api/[locale]/agent/chat/characters/config";
+import { CategoryOptions } from "@/app/api/[locale]/agent/chat/characters/config";
+import type { CharacterListResponseOutput } from "@/app/api/[locale]/agent/chat/characters/definition";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { getModelById } from "@/app/api/[locale]/agent/models/models";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -117,9 +114,7 @@ export function SuggestedPrompts({ locale }: SuggestedPromptsProps): JSX.Element
                 : "hover:bg-accent border border-transparent"
             }`}
           >
-            {React.createElement(getIconComponent(character.icon), {
-              className: "text-base sm:text-lg",
-            })}
+            <Icon icon={character.icon} className="text-base sm:text-lg" />
             <Span className="font-medium hidden sm:inline">{character.name}</Span>
           </Button>
         ))}
@@ -170,9 +165,7 @@ export function SuggestedPrompts({ locale }: SuggestedPromptsProps): JSX.Element
                         className="w-full text-left p-4 hover:bg-accent/50 rounded-lg"
                       >
                         <Div className="flex items-start gap-4 w-full">
-                          {React.createElement(getIconComponent(character.icon), {
-                            className: "text-3xl shrink-0",
-                          })}
+                          <Icon icon={character.icon} className="text-3xl shrink-0" />
                           <Div className="flex-1 min-w-0">
                             <H3 className="text-lg font-semibold mb-1">{t(character.name)}</H3>
                             <P className="text-sm text-muted-foreground">
@@ -182,17 +175,13 @@ export function SuggestedPrompts({ locale }: SuggestedPromptsProps): JSX.Element
                             <Div className="flex flex-wrap gap-2 mt-2">
                               {categoryConfig && (
                                 <Div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50 text-xs">
-                                  {React.createElement(getIconComponent(categoryConfig.icon), {
-                                    className: "text-sm",
-                                  })}
+                                  <Icon icon={categoryConfig.icon} className="text-sm" />
                                   <Span>{t(categoryConfig.label)}</Span>
                                 </Div>
                               )}
                               {modelConfig && (
                                 <Div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/50 text-xs">
-                                  {React.createElement(getIconComponent(modelConfig.icon), {
-                                    className: "text-sm",
-                                  })}
+                                  <Icon icon={modelConfig.icon} className="text-sm" />
                                   <Span>{modelConfig.name}</Span>
                                 </Div>
                               )}
@@ -209,9 +198,11 @@ export function SuggestedPrompts({ locale }: SuggestedPromptsProps): JSX.Element
                           size="sm"
                           className="w-full justify-start text-xs gap-2 h-8"
                         >
-                          {React.createElement(isExpanded ? ChevronUp : ChevronDown, {
-                            className: "h-3.5 w-3.5 shrink-0",
-                          })}
+                          {isExpanded ? (
+                            <ChevronUp className="h-3.5 w-3.5 shrink-0" />
+                          ) : (
+                            <ChevronDown className="h-3.5 w-3.5 shrink-0" />
+                          )}
                           <Span className="text-muted-foreground">
                             {isExpanded
                               ? t("app.chat.suggestedPrompts.hideDetails")

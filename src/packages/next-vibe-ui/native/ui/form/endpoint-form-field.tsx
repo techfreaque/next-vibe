@@ -12,7 +12,7 @@ import type { JSX } from "react";
 import type { ControllerRenderProps, FieldPath, FieldValues, Path } from "react-hook-form";
 import { View } from "react-native";
 
-import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type {
   FieldConfig,
   FieldStyleClassName,

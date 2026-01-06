@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -23,7 +24,6 @@ import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId } from "../config";
 import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
-import { ModelId } from "../model-access/models";
 
 /**
  * Get Threads List Endpoint (GET)

@@ -5,11 +5,13 @@
 
 import { z } from "zod";
 
+import { ModelId, ModelIdOptions } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
   objectUnionField,
   requestDataField,
+  requestDataRangeField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -22,17 +24,25 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../../shared/types/common.schema";
+import { ModelUtilityDB, ModelUtilityOptions } from "../../../models/enum";
 import { TtsVoiceDB, TtsVoiceOptions } from "../../../text-to-speech/enum";
+import {
+  CONTENT_DISPLAY,
+  INTELLIGENCE_DISPLAY,
+  PRICE_DISPLAY,
+  SPEED_DISPLAY,
+} from "../../favorites/display-configs";
 import {
   ContentLevelFilter,
   ContentLevelFilterDB,
   IntelligenceLevelFilter,
   IntelligenceLevelFilterDB,
+  ModelSelectionType,
   PriceLevelFilter,
   PriceLevelFilterDB,
+  SpeedLevelFilter,
+  SpeedLevelFilterDB,
 } from "../../favorites/enum";
-import { ModelId, ModelIdOptions } from "../../model-access/models";
-import { CONTENT_DISPLAY, INTELLIGENCE_DISPLAY, PRICE_DISPLAY } from "../../types";
 import { CategoryOptions } from "../config";
 import { CharacterCategory, CharacterCategoryDB } from "../enum";
 
@@ -137,29 +147,29 @@ const { POST } = createEndpoint({
               selectionType: requestDataField(
                 {
                   type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.SELECT,
+                  fieldType: FieldDataType.FILTER_PILLS,
                   label: "app.api.agent.chat.characters.post.selectionType.label" as const,
                   options: [
                     {
-                      value: "manual",
+                      value: ModelSelectionType.MANUAL,
                       label: "app.api.agent.chat.characters.post.selectionType.manual" as const,
                     },
                     {
-                      value: "filters",
+                      value: ModelSelectionType.FILTERS,
                       label: "app.api.agent.chat.characters.post.selectionType.filters" as const,
                     },
                   ],
                   columns: 12,
                 },
-                z.literal("manual"),
+                z.literal(ModelSelectionType.MANUAL),
               ),
-              preferredModel: requestDataField(
+              manualModelId: requestDataField(
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.SELECT,
-                  label: "app.api.agent.chat.characters.post.preferredModel.label" as const,
+                  label: "app.api.agent.chat.characters.post.manualModelId.label" as const,
                   description:
-                    "app.api.agent.chat.characters.post.preferredModel.description" as const,
+                    "app.api.agent.chat.characters.post.manualModelId.description" as const,
                   options: ModelIdOptions,
                   columns: 12,
                 },
@@ -178,71 +188,121 @@ const { POST } = createEndpoint({
               selectionType: requestDataField(
                 {
                   type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.SELECT,
+                  fieldType: FieldDataType.FILTER_PILLS,
                   label: "app.api.agent.chat.characters.post.selectionType.label" as const,
                   options: [
                     {
-                      value: "manual",
+                      value: ModelSelectionType.MANUAL,
                       label: "app.api.agent.chat.characters.post.selectionType.manual" as const,
                     },
                     {
-                      value: "filters",
+                      value: ModelSelectionType.FILTERS,
                       label: "app.api.agent.chat.characters.post.selectionType.filters" as const,
                     },
                   ],
                   columns: 12,
                 },
-                z.literal("filters"),
+                z.literal(ModelSelectionType.FILTERS),
               ),
-              intelligence: requestDataField(
+              intelligenceRange: requestDataRangeField(
                 {
                   type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.FILTER_PILLS,
-                  label: "app.api.agent.chat.characters.post.intelligence.label" as const,
+                  fieldType: FieldDataType.RANGE_SLIDER,
+                  label: "app.api.agent.chat.characters.post.intelligenceRange.label" as const,
                   description:
-                    "app.api.agent.chat.characters.post.intelligence.description" as const,
+                    "app.api.agent.chat.characters.post.intelligenceRange.description" as const,
                   options: INTELLIGENCE_DISPLAY.map((tier) => ({
                     label: tier.label,
                     value: tier.value,
                     icon: tier.icon,
                     description: tier.description,
                   })),
+                  minLabel:
+                    "app.api.agent.chat.characters.post.intelligenceRange.minLabel" as const,
+                  maxLabel:
+                    "app.api.agent.chat.characters.post.intelligenceRange.maxLabel" as const,
                   columns: 12,
                 },
                 z.enum(IntelligenceLevelFilterDB),
               ),
-              maxPrice: requestDataField(
+              priceRange: requestDataRangeField(
                 {
                   type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.FILTER_PILLS,
-                  label: "app.api.agent.chat.characters.post.maxPrice.label" as const,
-                  description: "app.api.agent.chat.characters.post.maxPrice.description" as const,
+                  fieldType: FieldDataType.RANGE_SLIDER,
+                  label: "app.api.agent.chat.characters.post.priceRange.label" as const,
+                  description: "app.api.agent.chat.characters.post.priceRange.description" as const,
                   options: PRICE_DISPLAY.map((tier) => ({
                     label: tier.label,
                     value: tier.value,
                     icon: tier.icon,
                     description: tier.description,
                   })),
+                  minLabel: "app.api.agent.chat.characters.post.priceRange.minLabel" as const,
+                  maxLabel: "app.api.agent.chat.characters.post.priceRange.maxLabel" as const,
                   columns: 12,
                 },
                 z.enum(PriceLevelFilterDB),
               ),
-              contentLevel: requestDataField(
+              contentRange: requestDataRangeField(
                 {
                   type: WidgetType.FORM_FIELD,
-                  fieldType: FieldDataType.FILTER_PILLS,
-                  label: "app.api.agent.chat.characters.post.contentLevel.label" as const,
+                  fieldType: FieldDataType.RANGE_SLIDER,
+                  label: "app.api.agent.chat.characters.post.contentRange.label" as const,
                   description:
-                    "app.api.agent.chat.characters.post.contentLevel.description" as const,
+                    "app.api.agent.chat.characters.post.contentRange.description" as const,
                   options: CONTENT_DISPLAY.map((tier) => ({
                     label: tier.label,
                     value: tier.value,
                     icon: tier.icon,
                     description: tier.description,
                   })),
+                  minLabel: "app.api.agent.chat.characters.post.contentRange.minLabel" as const,
+                  maxLabel: "app.api.agent.chat.characters.post.contentRange.maxLabel" as const,
                   columns: 12,
                 },
                 z.enum(ContentLevelFilterDB),
+              ),
+              speedRange: requestDataRangeField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.RANGE_SLIDER,
+                  label: "app.api.agent.chat.characters.post.speedRange.label" as const,
+                  description: "app.api.agent.chat.characters.post.speedRange.description" as const,
+                  options: SPEED_DISPLAY.map((tier) => ({
+                    label: tier.label,
+                    value: tier.value,
+                    icon: tier.icon,
+                    description: tier.description,
+                  })),
+                  minLabel: "app.api.agent.chat.characters.post.speedRange.minLabel" as const,
+                  maxLabel: "app.api.agent.chat.characters.post.speedRange.maxLabel" as const,
+                  columns: 12,
+                },
+                z.enum(SpeedLevelFilterDB),
+              ),
+              preferredStrengths: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.MULTISELECT,
+                  label: "app.api.agent.chat.characters.post.preferredStrengths.label" as const,
+                  description:
+                    "app.api.agent.chat.characters.post.preferredStrengths.description" as const,
+                  options: ModelUtilityOptions,
+                  columns: 6,
+                },
+                z.array(z.enum(ModelUtilityDB)).nullable().default(null),
+              ),
+              ignoredWeaknesses: requestDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.MULTISELECT,
+                  label: "app.api.agent.chat.characters.post.ignoredWeaknesses.label" as const,
+                  description:
+                    "app.api.agent.chat.characters.post.ignoredWeaknesses.description" as const,
+                  options: ModelUtilityOptions,
+                  columns: 6,
+                },
+                z.array(z.enum(ModelUtilityDB)).nullable().default(null),
               ),
             },
           ),
@@ -338,8 +398,8 @@ const { POST } = createEndpoint({
           "You are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
         category: CharacterCategory.CODING,
         modelSelection: {
-          selectionType: "manual" as const,
-          preferredModel: ModelId.GPT_5,
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ModelId.GPT_5,
         },
         voice: undefined,
         suggestedPrompts: ["Review this code for bugs", "Suggest performance improvements"],
@@ -352,8 +412,8 @@ const { POST } = createEndpoint({
           "You are an expert code reviewer. Analyze code for bugs, performance issues, and best practices.",
         category: CharacterCategory.CODING,
         modelSelection: {
-          selectionType: "manual" as const,
-          preferredModel: ModelId.GPT_5,
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ModelId.GPT_5,
         },
         voice: undefined,
         suggestedPrompts: ["Review this code for bugs", "Suggest performance improvements"],
@@ -367,10 +427,25 @@ const { POST } = createEndpoint({
           "You are a creative writing assistant. Help users craft compelling stories, characters, and narratives.",
         category: CharacterCategory.CREATIVE,
         modelSelection: {
-          selectionType: "filters" as const,
-          intelligence: IntelligenceLevelFilter.BRILLIANT,
-          maxPrice: PriceLevelFilter.STANDARD,
-          contentLevel: ContentLevelFilter.OPEN,
+          selectionType: ModelSelectionType.FILTERS,
+          intelligenceRange: {
+            min: IntelligenceLevelFilter.BRILLIANT,
+            max: IntelligenceLevelFilter.BRILLIANT,
+          },
+          priceRange: {
+            min: PriceLevelFilter.CHEAP,
+            max: PriceLevelFilter.STANDARD,
+          },
+          contentRange: {
+            min: ContentLevelFilter.OPEN,
+            max: ContentLevelFilter.UNCENSORED,
+          },
+          speedRange: {
+            min: SpeedLevelFilter.FAST,
+            max: SpeedLevelFilter.THOROUGH,
+          },
+          preferredStrengths: null,
+          ignoredWeaknesses: null,
         },
         voice: undefined,
         suggestedPrompts: ["Help me develop a character", "Create a story outline"],
@@ -396,6 +471,9 @@ export type CharacterCreateRequestInput = typeof POST.types.RequestInput;
 export type CharacterCreateRequestOutput = typeof POST.types.RequestOutput;
 export type CharacterCreateResponseInput = typeof POST.types.ResponseInput;
 export type CharacterCreateResponseOutput = typeof POST.types.ResponseOutput;
+
+// Character field type aliases
+export type CharacterModelSelection = CharacterCreateRequestOutput["modelSelection"];
 
 const definitions = { POST };
 export { POST };

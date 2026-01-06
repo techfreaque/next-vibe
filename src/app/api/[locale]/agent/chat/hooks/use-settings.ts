@@ -6,11 +6,10 @@
 import { useTheme } from "next-themes";
 import { useCallback, useEffect } from "react";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { DEFAULT_TTS_VOICE } from "@/app/api/[locale]/agent/text-to-speech/enum";
 
-import { getCharacterById } from "../characters/config";
-import type { ModelId } from "../model-access/models";
 import type { ChatSettings } from "./store";
 
 /**
@@ -55,9 +54,8 @@ export function useSettings(deps: {
   // Zustand store methods are stable, so we only depend on the specific method
   const setSelectedCharacter = useCallback(
     (character: string) => {
-      // Update TTS voice based on character's voice preference
-      // Try characters from API first, fallback to static config
-      const selectedChar = characters[character] ?? getCharacterById(character);
+      // Update TTS voice based on character's voice preference from API
+      const selectedChar = characters[character];
       const voicePreference = selectedChar?.voice ?? DEFAULT_TTS_VOICE;
 
       // Update selected character and voice together

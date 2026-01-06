@@ -8,7 +8,7 @@
 import type { Route } from "next";
 import type { z } from "zod";
 
-import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 
 import type { FieldUsageConfig, InferSchemaFromField, ObjectField } from "../types/endpoint";
 import type {
@@ -153,6 +153,23 @@ export interface FilterPillsFieldWidgetConfig<
     icon?: IconKey;
     description?: NoInfer<TKey>;
   }>;
+}
+
+// Range slider (min-max selection with visual slider)
+export interface RangeSliderFieldWidgetConfig<
+  TKey extends string,
+> extends BaseFormFieldWidgetConfig<TKey> {
+  fieldType: FieldDataType.RANGE_SLIDER;
+  options: Array<{
+    label: NoInfer<TKey>;
+    value: string | number;
+    icon?: IconKey;
+    description?: NoInfer<TKey>;
+  }>;
+  minLabel?: NoInfer<TKey>; // Optional label for min handle (defaults to "Min")
+  maxLabel?: NoInfer<TKey>; // Optional label for max handle (defaults to "Max")
+  minDefault?: string | number; // Optional default min value
+  maxDefault?: string | number; // Optional default max value
 }
 
 // Textarea
@@ -312,6 +329,7 @@ export type FormFieldWidgetConfig<TKey extends string> =
   | SelectFieldWidgetConfig<TKey>
   | MultiSelectFieldWidgetConfig<TKey>
   | FilterPillsFieldWidgetConfig<TKey>
+  | RangeSliderFieldWidgetConfig<TKey>
   | TextareaFieldWidgetConfig<TKey>
   | PhoneFieldWidgetConfig<TKey>
   | UrlFieldWidgetConfig<TKey>

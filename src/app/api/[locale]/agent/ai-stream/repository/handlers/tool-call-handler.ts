@@ -6,11 +6,11 @@ import type { ReadableStreamDefaultController } from "node:stream/web";
 
 import type { JSONValue } from "ai";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { ToolCall, ToolCallResult } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
-import type { ModelId } from "../../../chat/model-access/models";
 import {
   createTextMessage,
   createToolMessage,

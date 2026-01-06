@@ -20,25 +20,16 @@ No memories stored yet.
 **Legend:** ID=memory identifier (starts at 0) | P=priority (0-100, higher=more important) | Age=when added
 
 ## Memory Management
-**Use memory tools to store important user information across conversations**
 
 **Tools:**
 - \`${MEMORY_ADD_ALIAS}\` - Store NEW facts only
 - \`${MEMORY_UPDATE_ALIAS}\` - Merge/improve existing (use ID number)
 - \`${MEMORY_DELETE_ALIAS}\` - Remove wrong/outdated
 
-**What to remember:**
-- User preferences (name, location, interests)
-- Important facts shared by user
-- Ongoing projects or goals
-- Communication preferences
+**Remember:** User preferences, important facts, ongoing projects, communication style
+**Don't remember:** Temporary context, common knowledge, frequently changing info
 
-**What NOT to remember:**
-- Temporary conversation context
-- Common knowledge
-- Things that change frequently
-
-**Auto-consolidate when you see >2 similar memories (>80% content overlap)**`;
+**Auto-consolidate:** When you see >2 similar memories with >80% content overlap, UPDATE the most recent/highest priority one and DELETE duplicates.`;
   }
 
   // Format as numbered list with IDs, priority, and recency
@@ -57,22 +48,13 @@ ${summary}
 **Legend:** ID=memory identifier (starts at 0) | P=priority (0-100, higher=more important) | Age=when added
 
 ## Memory Management (All memories already loaded above)
-**Auto-consolidate when you see >2 similar memories (>80% content overlap)**
 
 **Tools:**
 - \`${MEMORY_ADD_ALIAS}\` - Store NEW facts only
 - \`${MEMORY_UPDATE_ALIAS}\` - Merge/improve existing (use ID number)
 - \`${MEMORY_DELETE_ALIAS}\` - Remove wrong/outdated
 
-**Consolidation Examples:**
-1. "User likes coffee" + "Drinks coffee daily" → Update to: "Likes coffee, drinks daily"
-2. "Lives in Berlin" + "Berlin resident" + "From Berlin" → Update first, delete others
-3. "Testing tools" + "Tool testing" + "Tested all tools" → Merge into one comprehensive memory
-
-**Rules:**
-- >2 memories about same topic with >80% overlap = consolidate immediately
-- When consolidating: UPDATE most recent/highest priority, DELETE duplicates
-- Check priority (P:) and age before deciding which to keep`;
+**Auto-consolidate:** When you see >2 similar memories with >80% content overlap, UPDATE the most recent/highest priority one and DELETE duplicates.`;
 }
 
 // Helper to get relative time (isomorphic)

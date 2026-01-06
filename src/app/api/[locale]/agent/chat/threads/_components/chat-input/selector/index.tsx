@@ -11,43 +11,39 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 import { useTourState } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-state-context";
-import { type Character, getCharacterById } from "@/app/api/[locale]/agent/chat/characters/config";
+import type { ModelFilters } from "@/app/api/[locale]/agent/chat/characters/[id]/definition";
+import { CharacterBrowser } from "@/app/api/[locale]/agent/chat/characters/components/character-browser";
+import { CreateCharacterForm } from "@/app/api/[locale]/agent/chat/characters/components/create-character-form";
+import { EditCharacterModal } from "@/app/api/[locale]/agent/chat/characters/components/edit-character-modal";
 import charactersDefinition, {
   type CharacterListResponseOutput,
 } from "@/app/api/[locale]/agent/chat/characters/definition";
+import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
 import {
-  ContentLevelFilter,
-  type ContentLevelFilterValue,
+  type FavoriteItem,
+  FavoritesBar,
+} from "@/app/api/[locale]/agent/chat/favorites/components/favorites-bar";
+import {
   IntelligenceLevelFilter,
-  type IntelligenceLevelFilterValue,
-  ModelSelectionMode,
-  PriceLevelFilter,
-  type PriceLevelFilterValue,
+  ModelSelectionType,
 } from "@/app/api/[locale]/agent/chat/favorites/enum";
-import { getIconComponent, type IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import { type ModelId, modelOptions } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks";
+import { type ModelId, modelOptions } from "@/app/api/[locale]/agent/models/models";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import { Icon, type IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { ModelUtility } from "../../../../types";
-import { CharacterBrowser } from "./character-browser";
-import { CreateCharacterForm } from "./create-character-form";
-import { EditCharacterModal } from "./edit-character-modal";
-import { type FavoriteItem, FavoritesBar } from "./favorites-bar";
 import { QuickSettingsPanel } from "./quick-settings-panel";
 import { SelectorOnboarding } from "./selector-onboarding";
-import { selectModelForCharacter } from "./types";
-import { useChatFavorites } from "./use-chat-favorites";
 
 /**
  * Render icon helper
  */
 function renderIcon(icon: IconKey, iconClassName = "h-4 w-4"): JSX.Element {
-  const Icon = getIconComponent(icon);
-  return <Icon className={iconClassName} />;
+  return <Icon icon={icon} className={iconClassName} />;
 }
 
 interface SelectorProps {
@@ -72,30 +68,8 @@ type SelectorView =
   | "edit"
   | "character-switch";
 
-/**
- * Get default intelligence from character preferences
- */
-function getDefaultIntelligence(character: Character | null): typeof IntelligenceLevelFilterValue {
-  if (character?.preferences?.preferredStrengths) {
-    if (character.preferences.preferredStrengths.includes(ModelUtility.SMART)) {
-      return IntelligenceLevelFilter.BRILLIANT;
-    }
-    if (character.preferences.preferredStrengths.includes(ModelUtility.FAST)) {
-      return IntelligenceLevelFilter.QUICK;
-    }
-  }
-  return IntelligenceLevelFilter.SMART;
-}
-
-/**
- * Get default content from character requirements
- */
-function getDefaultContent(character: Character | null): typeof ContentLevelFilterValue {
-  if (character?.requirements?.minContent) {
-    return character.requirements.minContent;
-  }
-  return ContentLevelFilter.OPEN;
-}
+// Removed old getDefaultIntelligence, getDefaultContent, getDefaultMaxPrice functions
+// Now we use the modelSelection union directly with min/max ranges
 
 /**
  * Deactivate all active favorites
@@ -116,6 +90,7 @@ async function deactivateAllFavorites(
  */
 function applyFavoriteSelection(
   favorite: FavoriteItem,
+  characters: Record<string, CharacterListResponseOutput["characters"][number]>,
   onCharacterChange: (characterId: string) => void,
   onModelChange: (modelId: ModelId) => void,
 ): void {
@@ -125,24 +100,46 @@ function applyFavoriteSelection(
   }
 
   // Resolve and set model
-  const character = favorite.characterId ? (getCharacterById(favorite.characterId) ?? null) : null;
+  const character = favorite.characterId ? (characters[favorite.characterId] ?? null) : null;
 
   const allModels = Object.values(modelOptions);
-  const selectedModelId = selectModelForCharacter(allModels, character, {
-    mode: favorite.modelSettings.mode === ModelSelectionMode.MANUAL ? "manual" : "auto",
-    manualModelId: favorite.modelSettings.manualModelId,
-    filters: favorite.modelSettings.filters,
+  const isManual = favorite.modelSelection.selectionType === ModelSelectionType.MANUAL;
+
+  // Extract filters from modelSelection
+  const filters: ModelFilters =
+    !isManual && favorite.modelSelection.selectionType === ModelSelectionType.FILTERS
+      ? {
+          intelligenceRange: favorite.modelSelection.intelligenceRange,
+          priceRange: favorite.modelSelection.priceRange,
+          contentRange: favorite.modelSelection.contentRange,
+          speedRange: favorite.modelSelection.speedRange,
+        }
+      : {
+          intelligenceRange: undefined,
+          priceRange: undefined,
+          contentRange: undefined,
+          speedRange: undefined,
+        };
+
+  const selectedModelId = CharactersRepositoryClient.selectModelForCharacter(allModels, character, {
+    mode: isManual ? "manual" : "auto",
+    manualModelId:
+      isManual && favorite.modelSelection.selectionType === ModelSelectionType.MANUAL
+        ? favorite.modelSelection.manualModelId
+        : undefined,
+    filters,
   });
 
   if (selectedModelId) {
     onModelChange(selectedModelId);
   } else if (!character) {
     // Model-only fallback: use first model matching filters
+    const minIntelligence = filters.intelligenceRange?.min;
     const matchingModel = allModels.find((m) => {
-      const { filters } = favorite.modelSettings;
       if (
-        filters.intelligence !== IntelligenceLevelFilter.ANY &&
-        m.intelligence !== filters.intelligence
+        minIntelligence &&
+        minIntelligence !== IntelligenceLevelFilter.ANY &&
+        m.intelligence !== minIntelligence
       ) {
         return false;
       }
@@ -159,60 +156,132 @@ function applyFavoriteSelection(
  */
 function createFavoriteFromCharacter(
   characterId: string | null,
-  intelligence?: typeof IntelligenceLevelFilterValue,
-  maxPrice: typeof PriceLevelFilterValue = PriceLevelFilter.STANDARD,
-  content?: typeof ContentLevelFilterValue,
+  characters: Record<string, CharacterListResponseOutput["characters"][number]>,
 ): FavoriteItem {
-  const character = characterId ? getCharacterById(characterId) : null;
+  const character = characterId ? characters[characterId] : null;
 
-  // Use character-specific defaults if not provided
-  const defaultIntelligence = intelligence ?? getDefaultIntelligence(character ?? null);
-  const defaultContent = content ?? getDefaultContent(character ?? null);
+  // Use character's modelSelection if available, otherwise create default
+  const modelSelection: FavoriteItem["modelSelection"] = character?.modelSelection ?? {
+    selectionType: ModelSelectionType.FILTERS,
+    intelligenceRange: undefined,
+    priceRange: undefined,
+    contentRange: undefined,
+    speedRange: undefined,
+    preferredStrengths: null,
+    ignoredWeaknesses: null,
+  };
 
   return {
     id: `local-${Date.now()}-${characterId ?? "model"}`,
-    characterId,
-    voice: character?.voice,
-    modelSettings: {
-      mode: ModelSelectionMode.AUTO,
-      filters: {
-        intelligence: defaultIntelligence,
-        maxPrice,
-        content: defaultContent,
-      },
-    },
+    characterId: characterId ?? "",
+    customName: null,
+    customIcon: null,
+    voice: character?.voice ?? null,
+    modelSelection,
+    position: 0,
+    color: null,
     isActive: false,
+    useCount: 0,
   };
 }
 
 /**
- * Create a new favorite from a character object
- * This version accepts the character object from API response, avoiding the need for getCharacterById()
- * Used when we have the character object already (e.g., from API response or refetched data)
+ * Create a new favorite from a character object from API response
+ * Extracts all min/max filter values from modelSelection union
  */
 function createFavoriteFromCharacterObject(
   character: CharacterListResponseOutput["characters"][number],
-  intelligence?: typeof IntelligenceLevelFilterValue,
-  maxPrice: typeof PriceLevelFilterValue = PriceLevelFilter.STANDARD,
-  content?: typeof ContentLevelFilterValue,
 ): FavoriteItem {
-  // Use character-specific defaults if not provided
-  const defaultIntelligence = intelligence ?? getDefaultIntelligence(character as Character);
-  const defaultContent = content ?? getDefaultContent(character as Character);
+  // Extract modelSelection from API character response
+  const modelSelection: FavoriteItem["modelSelection"] =
+    character.modelSelection.selectionType === ModelSelectionType.FILTERS
+      ? {
+          selectionType: ModelSelectionType.FILTERS,
+          intelligenceRange: character.modelSelection.intelligenceRange,
+          priceRange: character.modelSelection.priceRange,
+          contentRange: character.modelSelection.contentRange,
+          speedRange: character.modelSelection.speedRange,
+          preferredStrengths: character.modelSelection.preferredStrengths,
+          ignoredWeaknesses: character.modelSelection.ignoredWeaknesses,
+        }
+      : {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: character.modelSelection.manualModelId,
+        };
 
   return {
     id: `local-${Date.now()}-${character.id}`,
     characterId: character.id,
+    customName: null,
+    customIcon: null,
     voice: character.voice,
-    modelSettings: {
-      mode: ModelSelectionMode.AUTO,
-      filters: {
-        intelligence: defaultIntelligence,
-        maxPrice,
-        content: defaultContent,
-      },
-    },
+    modelSelection,
+    position: 0,
+    color: null,
     isActive: false,
+    useCount: 0,
+  };
+}
+
+/**
+ * Extract modelSelection from API character response
+ */
+function extractModelSelectionFromCharacter(
+  character: CharacterListResponseOutput["characters"][number] | null | undefined,
+): FavoriteItem["modelSelection"] {
+  if (!character) {
+    return {
+      selectionType: ModelSelectionType.FILTERS,
+      intelligenceRange: undefined,
+      priceRange: undefined,
+      contentRange: undefined,
+      speedRange: undefined,
+      preferredStrengths: null,
+      ignoredWeaknesses: null,
+    };
+  }
+
+  // Check if it's an API response (has modelSelection)
+  if ("modelSelection" in character) {
+    if (character.modelSelection.selectionType === ModelSelectionType.FILTERS) {
+      return {
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: character.modelSelection.intelligenceRange,
+        priceRange: character.modelSelection.priceRange,
+        contentRange: character.modelSelection.contentRange,
+        speedRange: character.modelSelection.speedRange,
+        preferredStrengths: character.modelSelection.preferredStrengths,
+        ignoredWeaknesses: character.modelSelection.ignoredWeaknesses,
+      };
+    } else {
+      return {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: character.modelSelection.manualModelId,
+      };
+    }
+  }
+
+  // Otherwise it's a built-in Character type (has requirements)
+  if ("requirements" in character) {
+    return {
+      selectionType: ModelSelectionType.FILTERS,
+      intelligenceRange: character.requirements?.intelligenceRange,
+      priceRange: character.requirements?.priceRange,
+      contentRange: character.requirements?.contentRange,
+      speedRange: character.requirements?.speedRange,
+      preferredStrengths: null,
+      ignoredWeaknesses: null,
+    };
+  }
+
+  return {
+    selectionType: ModelSelectionType.FILTERS,
+    intelligenceRange: undefined,
+    priceRange: undefined,
+    contentRange: undefined,
+    speedRange: undefined,
+    preferredStrengths: null,
+    ignoredWeaknesses: null,
   };
 }
 
@@ -312,7 +381,10 @@ export function Selector({
     isOnboardingActive && view !== "settings" && view !== "edit" ? "onboarding" : view;
 
   // Get current selections
-  const currentCharacter = useMemo(() => getCharacterById(characterId), [characterId]);
+  const currentCharacter = useMemo(
+    () => characters[characterId] ?? null,
+    [characters, characterId],
+  );
   const currentModel = useMemo(() => modelOptions[modelId], [modelId]);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
 
@@ -326,10 +398,10 @@ export function Selector({
     }
     if (editingCharacterId) {
       // Create temporary favorite for new character (not yet persisted)
-      return createFavoriteFromCharacter(editingCharacterId);
+      return createFavoriteFromCharacter(editingCharacterId, characters);
     }
     return activeFavorite;
-  }, [editingFavoriteId, editingCharacterId, favorites, activeFavorite]);
+  }, [editingFavoriteId, editingCharacterId, favorites, activeFavorite, characters]);
 
   // Handle open state changes
   const handleOpenChange = useCallback(
@@ -372,12 +444,12 @@ export function Selector({
 
       const selected = favorites.find((f) => f.id === favoriteId);
       if (selected) {
-        applyFavoriteSelection(selected, onCharacterChange, onModelChange);
+        applyFavoriteSelection(selected, characters, onCharacterChange, onModelChange);
       }
 
       closeModal();
     },
-    [favorites, onCharacterChange, onModelChange, closeModal, setActiveFavorite],
+    [favorites, onCharacterChange, onModelChange, closeModal, setActiveFavorite, characters],
   );
 
   // Switch to settings view for a specific favorite
@@ -394,7 +466,7 @@ export function Selector({
   // Handle settings save
   const handleSettingsSave = useCallback(
     async (
-      settings: FavoriteItem["modelSettings"],
+      modelSelection: FavoriteItem["modelSelection"],
       saveMode: "temporary" | "update" | "new",
     ): Promise<void> => {
       if (!editingFavorite) {
@@ -403,7 +475,7 @@ export function Selector({
 
       const updatedFavorite: FavoriteItem = {
         ...editingFavorite,
-        modelSettings: settings,
+        modelSelection,
       };
 
       // Check if this is a new character (not yet added to favorites)
@@ -411,23 +483,28 @@ export function Selector({
 
       if (saveMode === "temporary") {
         // Just apply to current chat without saving
-        applyFavoriteSelection(updatedFavorite, onCharacterChange, onModelChange);
+        applyFavoriteSelection(updatedFavorite, characters, onCharacterChange, onModelChange);
       } else if (saveMode === "update") {
         if (isNewCharacter) {
           // Creating new favorite from character browser
           await addFavorite({
             characterId: editingFavorite.characterId,
+            customName: editingFavorite.customName,
+            customIcon: editingFavorite.customIcon,
             voice: editingFavorite.voice,
-            modelSettings: settings,
+            modelSelection,
+            position: editingFavorite.position,
+            color: editingFavorite.color,
             isActive: false,
+            useCount: editingFavorite.useCount,
           });
         } else {
           // Update existing favorite (persists to server if authenticated)
-          await updateFavorite(editingFavorite.id, { modelSettings: settings });
+          await updateFavorite(editingFavorite.id, { modelSelection });
 
           // Apply changes if this is the active favorite
           if (editingFavorite.isActive) {
-            applyFavoriteSelection(updatedFavorite, onCharacterChange, onModelChange);
+            applyFavoriteSelection(updatedFavorite, characters, onCharacterChange, onModelChange);
           }
         }
       } else {
@@ -437,13 +514,18 @@ export function Selector({
         // Create new favorite (persists to server if authenticated)
         await addFavorite({
           characterId: editingFavorite.characterId,
+          customName: editingFavorite.customName,
+          customIcon: editingFavorite.customIcon,
           voice: editingFavorite.voice,
-          modelSettings: settings,
+          modelSelection,
+          position: editingFavorite.position,
+          color: editingFavorite.color,
           isActive: true,
+          useCount: editingFavorite.useCount,
         });
 
         // Apply changes (new favorite is always active)
-        applyFavoriteSelection(updatedFavorite, onCharacterChange, onModelChange);
+        applyFavoriteSelection(updatedFavorite, characters, onCharacterChange, onModelChange);
       }
 
       setEditingFavoriteId(null);
@@ -466,6 +548,7 @@ export function Selector({
       addFavorite,
       updateFavorite,
       isOnboardingActive,
+      characters,
     ],
   );
 
@@ -482,16 +565,21 @@ export function Selector({
         return;
       }
 
-      const favoriteData = createFavoriteFromCharacter(newCharacterId);
+      const favoriteData = createFavoriteFromCharacter(newCharacterId, characters);
 
       await addFavorite({
         characterId: favoriteData.characterId,
+        customName: favoriteData.customName,
+        customIcon: favoriteData.customIcon,
         voice: favoriteData.voice,
-        modelSettings: favoriteData.modelSettings,
+        modelSelection: favoriteData.modelSelection,
+        position: favoriteData.position,
+        color: favoriteData.color,
         isActive: false,
+        useCount: favoriteData.useCount,
       });
     },
-    [addFavorite, favorites],
+    [addFavorite, favorites, characters],
   );
 
   // Handle customize character - open settings for character WITHOUT adding to favorites
@@ -531,7 +619,7 @@ export function Selector({
       // Create favorite from character (API response or static config)
       const favoriteData = character
         ? createFavoriteFromCharacterObject(character)
-        : createFavoriteFromCharacter(characterId);
+        : createFavoriteFromCharacter(characterId, characters);
 
       if (!character) {
         logger.error("Character not found after creation, using fallback", {
@@ -543,12 +631,17 @@ export function Selector({
 
       await addFavorite({
         characterId: favoriteData.characterId,
+        customName: favoriteData.customName,
+        customIcon: favoriteData.customIcon,
         voice: favoriteData.voice,
-        modelSettings: favoriteData.modelSettings,
+        modelSelection: favoriteData.modelSelection,
+        position: favoriteData.position,
+        color: favoriteData.color,
         isActive: true,
+        useCount: favoriteData.useCount,
       });
 
-      applyFavoriteSelection(favoriteData, onCharacterChange, onModelChange);
+      applyFavoriteSelection(favoriteData, characters, onCharacterChange, onModelChange);
 
       closeModal();
     },
@@ -572,8 +665,8 @@ export function Selector({
         return;
       }
 
-      // Get character data (from API response or built-in)
-      const character = characters[newCharacterId] ?? getCharacterById(newCharacterId);
+      // Get character data from API response
+      const character = characters[newCharacterId];
 
       // Prepare update - include voice
       const updates: Partial<FavoriteItem> = {
@@ -581,19 +674,9 @@ export function Selector({
         voice: character?.voice,
       };
 
-      if (!keepSettings) {
-        // Reset to character defaults
-        if (character) {
-          updates.modelSettings = {
-            mode: ModelSelectionMode.AUTO,
-            filters: {
-              intelligence:
-                character.requirements?.minIntelligence || IntelligenceLevelFilter.SMART,
-              content: character.requirements?.minContent || ContentLevelFilter.OPEN,
-              maxPrice: PriceLevelFilter.STANDARD,
-            },
-          };
-        }
+      if (!keepSettings && character) {
+        // Reset to character defaults using the helper function
+        updates.modelSelection = extractModelSelectionFromCharacter(character);
       }
 
       // Update the favorite (persists to server if authenticated)
@@ -604,9 +687,9 @@ export function Selector({
         const updatedFavorite: FavoriteItem = {
           ...editingFavorite,
           ...updates,
-          modelSettings: updates.modelSettings || editingFavorite.modelSettings,
+          modelSelection: updates.modelSelection || editingFavorite.modelSelection,
         };
-        applyFavoriteSelection(updatedFavorite, onCharacterChange, onModelChange);
+        applyFavoriteSelection(updatedFavorite, characters, onCharacterChange, onModelChange);
       }
     },
     [editingFavorite, updateFavorite, onCharacterChange, onModelChange, characters],
@@ -615,20 +698,25 @@ export function Selector({
   // Handle saving favorite during onboarding (called when clicking Continue on pick screen)
   const handleSaveFavorite = useCallback(
     async (selectedCharacterId: string): Promise<void> => {
-      const favoriteData = createFavoriteFromCharacter(selectedCharacterId);
+      const favoriteData = createFavoriteFromCharacter(selectedCharacterId, characters);
 
       await deactivateAllFavorites(favorites, updateFavorite);
 
       await addFavorite({
         characterId: favoriteData.characterId,
+        customName: favoriteData.customName,
+        customIcon: favoriteData.customIcon,
         voice: favoriteData.voice,
-        modelSettings: favoriteData.modelSettings,
+        modelSelection: favoriteData.modelSelection,
+        position: favoriteData.position,
+        color: favoriteData.color,
         isActive: true,
+        useCount: favoriteData.useCount,
       });
 
-      applyFavoriteSelection(favoriteData, onCharacterChange, onModelChange);
+      applyFavoriteSelection(favoriteData, characters, onCharacterChange, onModelChange);
     },
-    [favorites, onCharacterChange, onModelChange, addFavorite, updateFavorite],
+    [favorites, onCharacterChange, onModelChange, addFavorite, updateFavorite, characters],
   );
 
   // Handle onboarding completion (Start Chatting clicked)
@@ -639,25 +727,38 @@ export function Selector({
 
       // Only save if no existing favorite (fallback case)
       if (!existingFavorite) {
-        const favoriteData = createFavoriteFromCharacter(selectedCharacterId);
+        const favoriteData = createFavoriteFromCharacter(selectedCharacterId, characters);
 
         await deactivateAllFavorites(favorites, updateFavorite);
 
         await addFavorite({
           characterId: favoriteData.characterId,
+          customName: favoriteData.customName,
+          customIcon: favoriteData.customIcon,
           voice: favoriteData.voice,
-          modelSettings: favoriteData.modelSettings,
+          modelSelection: favoriteData.modelSelection,
+          position: favoriteData.position,
+          color: favoriteData.color,
           isActive: true,
+          useCount: favoriteData.useCount,
         });
 
-        applyFavoriteSelection(favoriteData, onCharacterChange, onModelChange);
+        applyFavoriteSelection(favoriteData, characters, onCharacterChange, onModelChange);
       }
 
       // Reset onboarding state and close modal
       setIsOnboardingActive(false);
       handleOpenChange(false);
     },
-    [favorites, onCharacterChange, onModelChange, handleOpenChange, addFavorite, updateFavorite],
+    [
+      favorites,
+      onCharacterChange,
+      onModelChange,
+      handleOpenChange,
+      addFavorite,
+      updateFavorite,
+      characters,
+    ],
   );
 
   return (
@@ -702,7 +803,7 @@ export function Selector({
 
           {/* Model icon */}
           <Span className="flex items-center justify-center w-5 h-5 shrink-0 opacity-70">
-            {renderIcon(currentModel.icon, "h-4 w-4")}
+            {currentModel?.icon ? renderIcon(currentModel.icon, "h-4 w-4") : null}
           </Span>
 
           {/* Model name - hidden when container is too narrow, shown earlier when no tools */}
@@ -712,7 +813,7 @@ export function Selector({
               modelSupportsTools ? "hidden @xl:inline" : "hidden @md:inline",
             )}
           >
-            {currentModel.name}
+            {currentModel?.name}
           </Span>
 
           <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
@@ -759,6 +860,7 @@ export function Selector({
               onSaveFavorite={handleSaveFavorite}
               onCustomize={handleCustomize}
               favorites={favorites}
+              characters={characters}
               locale={locale}
               initialStep={onboardingStep}
               onStepChange={setOnboardingStep}
@@ -776,6 +878,7 @@ export function Selector({
                 onSettingsClick={switchToSettings}
                 onAddClick={switchToBrowser}
                 locale={locale}
+                characters={characters}
               />
             </Div>
           )}

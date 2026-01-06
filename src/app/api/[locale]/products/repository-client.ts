@@ -5,7 +5,7 @@
 
 import type { JSX } from "react";
 
-import { modelOptions } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { modelOptions } from "@/app/api/[locale]/agent/models/models";
 import type { SubscriptionPlanValue } from "@/app/api/[locale]/subscription/enum";
 import { SubscriptionPlan } from "@/app/api/[locale]/subscription/enum";
 import type { Countries, CountryLanguage, Currencies } from "@/i18n/core/config";

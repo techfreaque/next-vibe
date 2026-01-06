@@ -11,10 +11,10 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
 import {
-  getIconComponent,
+  Icon,
   ICON_REGISTRY,
   type IconKey,
-} from "@/app/api/[locale]/agent/chat/model-access/icons";
+} from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { useTranslation } from "@/i18n/core/client";
 
 import { Button } from "./button";
@@ -198,9 +198,6 @@ export function IconPicker({
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
   const { t } = useTranslation();
 
-  // Get selected icon component
-  const SelectedIcon = value ? getIconComponent(value) : null;
-
   // Filter icons based on search query
   const filteredIcons = useMemo(() => {
     const categoryIcons = ICON_CATEGORIES[activeCategory];
@@ -233,8 +230,8 @@ export function IconPicker({
           className={cn(sizeClasses[size], className)}
           title={t("app.ui.iconPicker.selectIcon")}
         >
-          {SelectedIcon ? (
-            <SelectedIcon className={iconSizeClasses[size]} />
+          {value ? (
+            <Icon icon={value} className={iconSizeClasses[size]} />
           ) : (
             // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Non-translatable placeholder icon
             <Span className="text-muted-foreground text-xs">?</Span>
@@ -314,7 +311,6 @@ export function IconPicker({
               <ScrollArea className="h-full">
                 <Div className="grid grid-cols-8 gap-1 p-3">
                   {filteredIcons.map((iconKey) => {
-                    const Icon = getIconComponent(iconKey);
                     const isSelected = value === iconKey;
 
                     return (
@@ -332,7 +328,7 @@ export function IconPicker({
                         )}
                         title={iconKey}
                       >
-                        <Icon className="h-4 w-4" />
+                        <Icon icon={iconKey} className="h-4 w-4" />
                       </Button>
                     );
                   })}

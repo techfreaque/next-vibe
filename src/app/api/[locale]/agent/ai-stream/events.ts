@@ -3,11 +3,11 @@
  * 100% typesafe event definitions shared between server and client
  */
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 
 import type { MessageMetadata, ToolCall, ToolCallResult } from "../chat/db";
 import type { ChatMessageRole } from "../chat/enum";
-import type { ModelId } from "../chat/model-access/models";
 
 /**
  * SSE Protocol Constants

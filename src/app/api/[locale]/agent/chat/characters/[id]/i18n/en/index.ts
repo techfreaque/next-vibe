@@ -21,7 +21,21 @@ export const translations = {
         category: { content: "Category" },
         source: { content: "Source" },
         preferredModel: { content: "Preferred Model" },
+        voice: { content: "Voice" },
         suggestedPrompts: { content: "Suggested Prompts" },
+        modelSelection: { title: "Model Selection" },
+        selectionType: { content: "Selection Type" },
+        minIntelligence: { content: "Minimum Intelligence" },
+        maxIntelligence: { content: "Maximum Intelligence" },
+        minPrice: { content: "Minimum Price" },
+        maxPrice: { content: "Maximum Price" },
+        minContent: { content: "Minimum Content Level" },
+        maxContent: { content: "Maximum Content Level" },
+        minSpeed: { content: "Minimum Speed" },
+        maxSpeed: { content: "Maximum Speed" },
+        preferredStrengths: { content: "Preferred Strengths" },
+        ignoredWeaknesses: { content: "Ignored Weaknesses" },
+        manualModelId: { content: "Manual Model" },
       },
     },
     errors: {
@@ -72,6 +86,10 @@ export const translations = {
     container: {
       title: "Update Character",
       description: "Modify an existing custom character",
+    },
+    actions: {
+      update: "Update Character",
+      updating: "Updating Character",
     },
     response: {
       success: {

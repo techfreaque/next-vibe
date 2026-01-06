@@ -3,12 +3,12 @@
  * Handles branching/editing messages in both incognito and server modes
  */
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
 import type { DefaultFolderId } from "../../../../../config";
 import type { ChatMessage } from "../../../../../db";
-import type { ModelId } from "../../../../../model-access/models";
 import { createAndSendUserMessage } from "./shared";
 
 export interface BranchMessageDeps {

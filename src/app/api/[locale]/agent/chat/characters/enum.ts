@@ -64,3 +64,26 @@ export const CharacterSourceDB = [
   CharacterSource.MY,
   CharacterSource.COMMUNITY,
 ] as const;
+
+/**
+ * Character Ownership Type Enum
+ * Who owns/controls the character
+ */
+export const {
+  enum: CharacterOwnershipType,
+  options: CharacterOwnershipTypeOptions,
+  Value: CharacterOwnershipTypeValue,
+} = createEnumOptions({
+  SYSTEM: "app.api.agent.chat.characters.enums.ownershipType.system",
+  USER: "app.api.agent.chat.characters.enums.ownershipType.user",
+  PUBLIC: "app.api.agent.chat.characters.enums.ownershipType.public",
+});
+
+/**
+ * Database enum array for Drizzle
+ */
+export const CharacterOwnershipTypeDB = [
+  CharacterOwnershipType.SYSTEM,
+  CharacterOwnershipType.USER,
+  CharacterOwnershipType.PUBLIC,
+] as const;

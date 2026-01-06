@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   field,
@@ -29,7 +30,6 @@ import {
 
 import { iconSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
-import type { IconKey } from "../model-access/icons";
 
 /**
  * Get Folders List Endpoint (GET)

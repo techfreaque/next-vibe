@@ -252,7 +252,437 @@ export function extractSchemaDefaults<T>(
 }
 
 // ============================================================================
-// FIELD CREATORS
+// FIELD BUILDER - New Pattern
+// ============================================================================
+
+/**
+ * Field builder utility for creating unified fields with type-safe translation keys
+ * This provides a clean API for both scoped and non-scoped routes
+ *
+ * @example
+ * // In createEndpoint:
+ * fields: (u) => u.objectField(
+ *   { type: WidgetType.CONTAINER, title: "form.label", ... },
+ *   { request: "data", response: true },
+ *   { name: u.requestDataField(...), email: u.requestDataField(...) }
+ * )
+ */
+export interface FieldBuilder<TKey extends string = TranslationKey> {
+  // Primitive fields
+  field<
+    const TUIConfig extends WidgetConfig<TKey>,
+    const TSchema extends z.ZodTypeAny,
+    const TUsage extends FieldUsageConfig,
+  >(
+    schema: TSchema,
+    usage: TUsage,
+    ui: TUIConfig,
+    cache?: CacheStrategy,
+  ): PrimitiveField<TSchema, TUsage, TKey, TUIConfig>;
+
+  requestResponseField<const TUIConfig extends WidgetConfig<TKey>, TSchema extends z.ZodTypeAny>(
+    ui: TUIConfig,
+    schema: TSchema,
+    cache?: CacheStrategy,
+    requestAsUrlParams?: boolean,
+  ): PrimitiveField<
+    TSchema,
+    { request: "data" | "urlPathParams"; response: true },
+    TKey,
+    TUIConfig
+  >;
+
+  requestDataField<const TUIConfig extends WidgetConfig<TKey>, TSchema extends z.ZodTypeAny>(
+    ui: TUIConfig,
+    schema: TSchema,
+    cache?: CacheStrategy,
+  ): PrimitiveField<TSchema, { request: "data" }, TKey, TUIConfig>;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  requestDataRangeField<const TUIConfig extends WidgetConfig<TKey>, TEnum extends z.ZodEnum<any>>(
+    ui: TUIConfig,
+    enumSchema: TEnum,
+    cache?: CacheStrategy,
+  ): PrimitiveField<z.ZodTypeAny, { request: "data" }, TKey, TUIConfig>;
+
+  requestUrlPathParamsField<
+    const TUIConfig extends WidgetConfig<TKey>,
+    TSchema extends z.ZodTypeAny,
+  >(
+    ui: TUIConfig,
+    schema: TSchema,
+    cache?: CacheStrategy,
+  ): PrimitiveField<TSchema, { request: "urlPathParams"; response?: never }, TKey, TUIConfig>;
+
+  responseField<TSchema extends z.ZodTypeAny, const TUIConfig extends WidgetConfig<TKey>>(
+    ui: TUIConfig,
+    schema: TSchema,
+    cache?: CacheStrategy,
+  ): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig>;
+
+  // Widget fields
+  widgetField<TUsage extends FieldUsageConfig, const TUIConfig extends WidgetConfig<TKey>>(
+    ui: TUIConfig,
+    usage: TUsage,
+    cache?: CacheStrategy,
+  ): WidgetField<TUsage, TKey, TUIConfig>;
+
+  // Object fields
+  objectField<
+    TChildren extends Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+    TUsage extends FieldUsageConfig,
+    const TUIConfig extends WidgetConfig<TKey>,
+  >(
+    ui: TUIConfig,
+    usage: TUsage,
+    children: TChildren,
+    cache?: CacheStrategy,
+  ): ObjectField<TChildren, TUsage, TKey, TUIConfig>;
+
+  objectOptionalField<C, U extends FieldUsageConfig, const TUIConfig extends WidgetConfig<TKey>>(
+    ui: TUIConfig,
+    usage: U,
+    children: C,
+    cache?: CacheStrategy,
+  ): ObjectOptionalField<C, U, TKey, TUIConfig>;
+
+  objectUnionField<
+    TDiscriminator extends string,
+    TVariants extends readonly [
+      ObjectField<
+        Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+        FieldUsageConfig,
+        TKey,
+        WidgetConfig<TKey>
+      >,
+      ...ObjectField<
+        Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+        FieldUsageConfig,
+        TKey,
+        WidgetConfig<TKey>
+      >[],
+    ],
+    TUsage extends FieldUsageConfig,
+    const TUIConfig extends WidgetConfig<TKey>,
+  >(
+    ui: TUIConfig,
+    usage: TUsage,
+    discriminator: TDiscriminator,
+    variants: TVariants,
+    cache?: CacheStrategy,
+  ): ObjectUnionField<TDiscriminator, TKey, TVariants, TUsage, TUIConfig>;
+
+  // Array fields
+  arrayField<Child, const TUIConfig extends WidgetConfig<TKey>>(
+    usage: FieldUsageConfig,
+    ui: TUIConfig,
+    child: Child,
+    cache?: CacheStrategy,
+  ): ArrayField<Child, FieldUsageConfig, TKey, TUIConfig>;
+
+  requestDataArrayField<Child, const TUIConfig extends WidgetConfig<TKey>>(
+    ui: TUIConfig,
+    child: Child,
+    cache?: CacheStrategy,
+  ): ArrayField<Child, { request: "data" }, TKey, TUIConfig>;
+
+  responseArrayField<Child, const TUIConfig extends WidgetConfig<TKey>>(
+    ui: TUIConfig,
+    child: Child,
+    cache?: CacheStrategy,
+  ): ArrayField<Child, { response: true }, TKey, TUIConfig>;
+
+  arrayOptionalField<Child, const TUIConfig extends WidgetConfig<TKey>>(
+    usage: FieldUsageConfig,
+    ui: TUIConfig,
+    child: Child,
+    cache?: CacheStrategy,
+  ): ArrayOptionalField<Child, FieldUsageConfig, TKey, TUIConfig>;
+
+  requestDataArrayOptionalField<Child, const TUIConfig extends WidgetConfig<TKey>>(
+    ui: TUIConfig,
+    child: Child,
+    cache?: CacheStrategy,
+  ): ArrayOptionalField<Child, { request: "data" }, TKey, TUIConfig>;
+
+  responseArrayOptionalField<Child, const TUIConfig extends WidgetConfig<TKey>>(
+    ui: TUIConfig,
+    child: Child,
+    cache?: CacheStrategy,
+  ): ArrayOptionalField<Child, { response: true }, TKey, TUIConfig>;
+}
+
+/**
+ * Create a FieldBuilder instance with proper type inference for translation keys
+ * This is used internally by createEndpoint to provide the `u` parameter
+ */
+export function createFieldBuilder<TKey extends string = TranslationKey>(): FieldBuilder<TKey> {
+  return {
+    field: <
+      const TUIConfig extends WidgetConfig<TKey>,
+      const TSchema extends z.ZodTypeAny,
+      const TUsage extends FieldUsageConfig,
+    >(
+      schema: TSchema,
+      usage: TUsage,
+      ui: TUIConfig,
+      cache?: CacheStrategy,
+    ): PrimitiveField<TSchema, TUsage, TKey, TUIConfig> => ({
+      type: "primitive" as const,
+      schema,
+      usage,
+      ui,
+      cache,
+    }),
+
+    requestResponseField: <
+      const TUIConfig extends WidgetConfig<TKey>,
+      TSchema extends z.ZodTypeAny,
+    >(
+      ui: TUIConfig,
+      schema: TSchema,
+      cache?: CacheStrategy,
+      requestAsUrlParams?: boolean,
+    ): PrimitiveField<
+      TSchema,
+      { request: "data" | "urlPathParams"; response: true },
+      TKey,
+      TUIConfig
+    > => {
+      const requestType = requestAsUrlParams ? "urlPathParams" : "data";
+      return {
+        type: "primitive" as const,
+        schema,
+        usage: { request: requestType, response: true },
+        ui,
+        cache,
+      };
+    },
+
+    requestDataField: <const TUIConfig extends WidgetConfig<TKey>, TSchema extends z.ZodTypeAny>(
+      ui: TUIConfig,
+      schema: TSchema,
+      cache?: CacheStrategy,
+    ): PrimitiveField<TSchema, { request: "data" }, TKey, TUIConfig> => ({
+      type: "primitive" as const,
+      schema,
+      usage: { request: "data" },
+      ui,
+      cache,
+    }),
+
+    requestDataRangeField: <
+      const TUIConfig extends WidgetConfig<TKey>,
+      TEnum extends z.ZodEnum<any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+    >(
+      ui: TUIConfig,
+      enumSchema: TEnum,
+      cache?: CacheStrategy,
+    ): PrimitiveField<z.ZodTypeAny, { request: "data" }, TKey, TUIConfig> => {
+      const rangeSchema = z
+        .object({
+          min: enumSchema.optional(),
+          max: enumSchema.optional(),
+        })
+        .optional();
+
+      return {
+        type: "primitive" as const,
+        schema: rangeSchema,
+        usage: { request: "data" },
+        ui,
+        cache,
+      };
+    },
+
+    requestUrlPathParamsField: <
+      const TUIConfig extends WidgetConfig<TKey>,
+      TSchema extends z.ZodTypeAny,
+    >(
+      ui: TUIConfig,
+      schema: TSchema,
+      cache?: CacheStrategy,
+    ): PrimitiveField<
+      TSchema,
+      { request: "urlPathParams"; response?: never },
+      TKey,
+      TUIConfig
+    > => ({
+      type: "primitive" as const,
+      schema,
+      usage: { request: "urlPathParams" },
+      ui,
+      cache,
+    }),
+
+    responseField: <TSchema extends z.ZodTypeAny, const TUIConfig extends WidgetConfig<TKey>>(
+      ui: TUIConfig,
+      schema: TSchema,
+      cache?: CacheStrategy,
+    ): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig> => ({
+      type: "primitive" as const,
+      schema,
+      usage: { response: true },
+      ui,
+      cache,
+    }),
+
+    widgetField: <TUsage extends FieldUsageConfig, const TUIConfig extends WidgetConfig<TKey>>(
+      ui: TUIConfig,
+      usage: TUsage,
+      cache?: CacheStrategy,
+    ): WidgetField<TUsage, TKey, TUIConfig> => ({
+      type: "widget" as const,
+      usage,
+      ui,
+      cache,
+    }),
+
+    objectField: <
+      TChildren extends Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+      TUsage extends FieldUsageConfig,
+      const TUIConfig extends WidgetConfig<TKey>,
+    >(
+      ui: TUIConfig,
+      usage: TUsage,
+      children: TChildren,
+      cache?: CacheStrategy,
+    ): ObjectField<TChildren, TUsage, TKey, TUIConfig> => ({
+      type: "object" as const,
+      children,
+      usage,
+      ui,
+      cache,
+    }),
+
+    objectOptionalField: <
+      C,
+      U extends FieldUsageConfig,
+      const TUIConfig extends WidgetConfig<TKey>,
+    >(
+      ui: TUIConfig,
+      usage: U,
+      children: C,
+      cache?: CacheStrategy,
+    ): ObjectOptionalField<C, U, TKey, TUIConfig> => ({
+      type: "object-optional" as const,
+      children,
+      usage,
+      ui,
+      cache,
+    }),
+
+    objectUnionField: <
+      TDiscriminator extends string,
+      TVariants extends readonly [
+        ObjectField<
+          Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+          FieldUsageConfig,
+          TKey,
+          WidgetConfig<TKey>
+        >,
+        ...ObjectField<
+          Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+          FieldUsageConfig,
+          TKey,
+          WidgetConfig<TKey>
+        >[],
+      ],
+      TUsage extends FieldUsageConfig,
+      const TUIConfig extends WidgetConfig<TKey>,
+    >(
+      ui: TUIConfig,
+      usage: TUsage,
+      discriminator: TDiscriminator,
+      variants: TVariants,
+      cache?: CacheStrategy,
+    ): ObjectUnionField<TDiscriminator, TKey, TVariants, TUsage, TUIConfig> => ({
+      type: "object-union" as const,
+      discriminator,
+      variants,
+      usage,
+      ui,
+      cache,
+    }),
+
+    arrayField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
+      usage: FieldUsageConfig,
+      ui: TUIConfig,
+      child: Child,
+      cache?: CacheStrategy,
+    ): ArrayField<Child, FieldUsageConfig, TKey, TUIConfig> => ({
+      type: "array" as const,
+      child,
+      usage,
+      ui,
+      cache,
+    }),
+
+    requestDataArrayField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
+      ui: TUIConfig,
+      child: Child,
+      cache?: CacheStrategy,
+    ): ArrayField<Child, { request: "data" }, TKey, TUIConfig> => ({
+      type: "array" as const,
+      child,
+      usage: { request: "data" },
+      ui,
+      cache,
+    }),
+
+    responseArrayField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
+      ui: TUIConfig,
+      child: Child,
+      cache?: CacheStrategy,
+    ): ArrayField<Child, { response: true }, TKey, TUIConfig> => ({
+      type: "array" as const,
+      child,
+      usage: { response: true },
+      ui,
+      cache,
+    }),
+
+    arrayOptionalField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
+      usage: FieldUsageConfig,
+      ui: TUIConfig,
+      child: Child,
+      cache?: CacheStrategy,
+    ): ArrayOptionalField<Child, FieldUsageConfig, TKey, TUIConfig> => ({
+      type: "array-optional" as const,
+      child,
+      usage,
+      ui,
+      cache,
+    }),
+
+    requestDataArrayOptionalField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
+      ui: TUIConfig,
+      child: Child,
+      cache?: CacheStrategy,
+    ): ArrayOptionalField<Child, { request: "data" }, TKey, TUIConfig> => ({
+      type: "array-optional" as const,
+      child,
+      usage: { request: "data" },
+      ui,
+      cache,
+    }),
+
+    responseArrayOptionalField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
+      ui: TUIConfig,
+      child: Child,
+      cache?: CacheStrategy,
+    ): ArrayOptionalField<Child, { response: true }, TKey, TUIConfig> => ({
+      type: "array-optional" as const,
+      child,
+      usage: { response: true },
+      ui,
+      cache,
+    }),
+  };
+}
+
+// ============================================================================
+// FIELD CREATORS - Legacy Pattern (Kept for backwards compatibility)
 // ============================================================================
 
 /**
@@ -338,6 +768,52 @@ export function requestDataField<
   return {
     type: "primitive" as const,
     schema,
+    usage: { request: "data" },
+    ui,
+    cache,
+  };
+}
+
+/**
+ * Create a request data range field (min/max)
+ * Automatically wraps an enum schema in z.object({ min, max }) structure
+ *
+ * @example
+ * requestDataRangeField(
+ *   {
+ *     type: WidgetType.FORM_FIELD,
+ *     fieldType: FieldDataType.RANGE_SLIDER,
+ *     label: "price.range.label",
+ *     options: PRICE_OPTIONS,
+ *   },
+ *   z.enum(PriceLevelDB),
+ * )
+ */
+export function requestDataRangeField<
+  TKey extends string = TranslationKey,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TEnum extends z.ZodEnum<any> = z.ZodEnum<any>,
+>(
+  ui: TUIConfig,
+  enumSchema: TEnum,
+  cache?: CacheStrategy,
+): PrimitiveField<
+  z.ZodOptional<z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>>,
+  { request: "data" },
+  TKey,
+  TUIConfig
+> {
+  const rangeSchema = z
+    .object({
+      min: enumSchema.optional(),
+      max: enumSchema.optional(),
+    })
+    .optional();
+
+  return {
+    type: "primitive" as const,
+    schema: rangeSchema,
     usage: { request: "data" },
     ui,
     cache,

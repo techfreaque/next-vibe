@@ -10,7 +10,7 @@ import type { FieldValues } from "react-hook-form";
 
 import { chatProse } from "@/app/[locale]/chat/lib/design-tokens";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { getModelById } from "@/app/api/[locale]/agent/chat/model-access/models";
+import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import {
   processMessageGroupForCopy,
   processMessageGroupForTTS,

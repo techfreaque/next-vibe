@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -15,7 +16,6 @@ import type { DefaultFolderId } from "../config";
 import { CHAT_CONSTANTS } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { ChatMessageRole, ThreadStatus } from "../enum";
-import type { ModelId } from "../model-access/models";
 import {
   createIncognitoMessage,
   createIncognitoThread,

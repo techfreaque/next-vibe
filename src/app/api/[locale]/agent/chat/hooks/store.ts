@@ -6,6 +6,8 @@
 import { storage } from "next-vibe-ui/lib/storage";
 import { create } from "zustand";
 
+import { ModelId, type ModelId as ModelIdType } from "@/app/api/[locale]/agent/models/models";
+
 import { aliasToPathMap } from "../../../system/generated/endpoint";
 import { DEFAULT_TTS_VOICE, type TtsVoiceValue } from "../../text-to-speech/enum";
 import { DEFAULT_TOOL_CONFIRMATION_IDS, DEFAULT_TOOL_IDS } from "../config";
@@ -15,7 +17,6 @@ import {
   saveMessage as saveIncognitoMessage,
   saveThread as saveIncognitoThread,
 } from "../incognito/storage";
-import { ModelId, type ModelId as ModelIdType } from "../model-access/models";
 
 export type { ChatFolder, ChatMessage, ChatThread };
 

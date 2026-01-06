@@ -2,20 +2,20 @@
  * Types for the unified character-model selector (v16)
  */
 
+import type { ModelFilters } from "@/app/api/[locale]/agent/chat/characters/[id]/definition";
 import type { Character } from "@/app/api/[locale]/agent/chat/characters/config";
 import {
   ContentLevel,
   ContentLevelFilter,
-  type ContentLevelFilterValue,
   IntelligenceLevel,
   IntelligenceLevelFilter,
-  type IntelligenceLevelFilterValue,
+  PriceLevel,
   PriceLevelFilter,
-  type PriceLevelFilterValue,
   SpeedLevel,
+  SpeedLevelFilter,
 } from "@/app/api/[locale]/agent/chat/favorites/enum";
-import type { ModelId, ModelOption } from "@/app/api/[locale]/agent/chat/model-access/models";
-import type { ModelFeatures } from "@/app/api/[locale]/agent/chat/types";
+import type { ModelId, ModelOption } from "@/app/api/[locale]/agent/models/models";
+import type { ModelFeatures } from "@/app/api/[locale]/agent/models/models";
 
 /**
  * Selector view modes
@@ -140,6 +140,37 @@ export function modelMeetsRequirements(model: ModelOption, character: Character)
     const speedOrder = [SpeedLevel.FAST, SpeedLevel.BALANCED, SpeedLevel.THOROUGH];
     const modelIndex = speedOrder.indexOf(model.speed);
     const maxIndex = speedOrder.indexOf(requirements.maxSpeed);
+    if (modelIndex > maxIndex) {
+      return false;
+    }
+  }
+
+  // Price level check
+  if (requirements.minPrice) {
+    const priceOrder = [PriceLevel.CHEAP, PriceLevel.STANDARD, PriceLevel.PREMIUM];
+    const modelPrice =
+      model.creditCost <= 3
+        ? PriceLevel.CHEAP
+        : model.creditCost <= 9
+          ? PriceLevel.STANDARD
+          : PriceLevel.PREMIUM;
+    const modelIndex = priceOrder.indexOf(modelPrice);
+    const requiredIndex = priceOrder.indexOf(requirements.minPrice);
+    if (modelIndex < requiredIndex) {
+      return false;
+    }
+  }
+
+  if (requirements.maxPrice) {
+    const priceOrder = [PriceLevel.CHEAP, PriceLevel.STANDARD, PriceLevel.PREMIUM];
+    const modelPrice =
+      model.creditCost <= 3
+        ? PriceLevel.CHEAP
+        : model.creditCost <= 9
+          ? PriceLevel.STANDARD
+          : PriceLevel.PREMIUM;
+    const modelIndex = priceOrder.indexOf(modelPrice);
+    const maxIndex = priceOrder.indexOf(requirements.maxPrice);
     if (modelIndex > maxIndex) {
       return false;
     }

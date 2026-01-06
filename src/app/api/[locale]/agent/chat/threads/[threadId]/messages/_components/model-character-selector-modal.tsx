@@ -11,8 +11,8 @@ import type { JSX } from "react";
 import React, { useState } from "react";
 
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
 import { Selector } from "@/app/api/[locale]/agent/chat/threads/_components/chat-input/selector";
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";

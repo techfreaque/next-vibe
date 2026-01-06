@@ -12,13 +12,13 @@ import type { JSX } from "react";
 import React, { useState } from "react";
 
 import {
-  getIconComponent,
+  Icon,
   ICON_REGISTRY,
   type IconKey,
   type IconValue,
   isIconComponent,
   isIconKey,
-} from "@/app/api/[locale]/agent/chat/model-access/icons";
+} from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { InputChangeEvent } from "@/packages/next-vibe-ui/web/ui/input";
@@ -75,9 +75,6 @@ export function IconSelector({
 
   // Translation function
   const { t } = simpleT(locale);
-
-  // Get the current icon component for display
-  const CurrentIcon = getIconComponent(value);
 
   // Get the current value as a string for comparison
   const currentValueString = isIconComponent(value)
@@ -141,7 +138,7 @@ export function IconSelector({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className={cn("h-8 w-8 p-0", className)}>
-          <CurrentIcon className="h-4 w-4" />
+          <Icon icon={value} className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-96 p-0" align="start">
@@ -161,7 +158,6 @@ export function IconSelector({
                   </H4>
                   <Div className="grid grid-cols-8 gap-1">
                     {icons.map((iconKey) => {
-                      const Icon = ICON_REGISTRY[iconKey];
                       const isSelected =
                         isIconKey(currentValueString) && currentValueString === iconKey;
 
@@ -177,7 +173,7 @@ export function IconSelector({
                           )}
                           title={iconKey}
                         >
-                          <Icon className="h-4 w-4" />
+                          <Icon icon={iconKey} className="h-4 w-4" />
                         </Button>
                       );
                     })}
@@ -229,7 +225,6 @@ export function IconSelector({
                 </Div>
                 <Div className="grid grid-cols-8 gap-1">
                   {COMMON_ICONS.map((iconKey) => {
-                    const Icon = getIconComponent(iconKey);
                     return (
                       <Button
                         key={iconKey}
@@ -244,7 +239,7 @@ export function IconSelector({
                           currentValueString === iconKey && "bg-accent border-2 border-primary",
                         )}
                       >
-                        <Icon className="h-4 w-4" />
+                        <Icon icon={iconKey} className="h-4 w-4" />
                       </Button>
                     );
                   })}

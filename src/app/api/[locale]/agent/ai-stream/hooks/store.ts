@@ -5,10 +5,11 @@
 
 import { create } from "zustand";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import type { DefaultFolderId } from "../../chat/config";
 import type { ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
-import type { ModelId } from "../../chat/model-access/models";
 
 /**
  * Streaming message state

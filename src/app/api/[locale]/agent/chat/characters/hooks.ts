@@ -1,33 +1,32 @@
 /**
  * Characters Hooks
- * React hooks for character list and create operations
+ * React hooks for character operations and model selection
  */
 
 "use client";
 
-import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
+import { useMemo } from "react";
+
+import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { DEFAULT_CHARACTERS } from "./config";
+import type { Character } from "./config";
 import definitions from "./definition";
+import { CharactersRepositoryClient } from "./repository-client";
 
 /**
- * Hook for fetching characters list (default + custom)
- *
- * Features:
- * - Returns all default characters from config
- * - Returns user's custom characters from database
- * - Automatically merges both lists
+ * Hook to fetch all characters (default + custom)
  */
-export function useCharactersList(logger: EndpointLogger): EndpointReturn<typeof definitions> {
+export function useCharacters(
+  logger: EndpointLogger,
+): ReturnType<typeof useEndpoint<typeof definitions>> {
   return useEndpoint(
     definitions,
     {
       queryOptions: {
-        enabled: true,
-        refetchOnWindowFocus: true,
-        staleTime: 60 * 1000, // 60 seconds
+        refetchOnWindowFocus: false,
+        staleTime: 5 * 60 * 1000, // 5 minutes
       },
     },
     logger,
@@ -35,35 +34,32 @@ export function useCharactersList(logger: EndpointLogger): EndpointReturn<typeof
 }
 
 /**
- * Hook for creating new custom characters
- *
- * Features:
- * - Form handling for character creation
- * - System prompt customization
- * - Category and icon selection
- * - Auto-refetches character list on success
+ * Hook to get compatible models for a character
  */
-export function useCreateCharacter(logger: EndpointLogger): EndpointReturn<typeof definitions> {
-  return useEndpoint(
-    definitions,
-    {
-      formOptions: {
-        persistForm: false,
-      },
-    },
-    logger,
-  );
+export function useCompatibleModels(
+  models: ModelOption[],
+  character: Character | null,
+): ModelOption[] {
+  return useMemo(() => {
+    if (!character) {
+      return models;
+    }
+    return CharactersRepositoryClient.getCompatibleModels(models, character);
+  }, [models, character]);
 }
 
 /**
- * Hook for getting default characters only
- *
- * Returns the default character configurations from config file
- * These characters are always available and don't require database queries
- *
- * @returns Array of default character configurations
+ * Hook to get recommended models for a character
  */
-export function useDefaultCharacters(): typeof DEFAULT_CHARACTERS {
-  return DEFAULT_CHARACTERS;
+export function useRecommendedModels(
+  models: ModelOption[],
+  character: Character | null,
+  limit = 5,
+): ModelOption[] {
+  return useMemo(() => {
+    if (!character) {
+      return [];
+    }
+    return CharactersRepositoryClient.getRecommendedModels(models, character, limit);
+  }, [models, character, limit]);
 }
-export type CharactersListEndpointReturn = EndpointReturn<typeof definitions>;

@@ -16,7 +16,7 @@ import { getDirectReplies } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/hooks/store";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { processMessageGroupForTTS } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";

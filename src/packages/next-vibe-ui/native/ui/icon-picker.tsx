@@ -8,7 +8,7 @@ import type { JSX } from "react";
 import { useMemo, useState } from "react";
 import { FlatList, Modal, Pressable, ScrollView, TextInput, View } from "react-native";
 
-import { getIconComponent } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { useTranslation } from "@/i18n/core/client";
 
 import { type CategoryKey, ICON_CATEGORIES, type IconPickerProps } from "../../web/ui/icon-picker";
@@ -24,9 +24,6 @@ export function IconPicker({ value, onChange, className }: IconPickerProps): JSX
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
   const { t } = useTranslation();
-
-  // Get selected icon component
-  const SelectedIcon = value ? getIconComponent(value) : null;
 
   // Filter icons based on search query
   const filteredIcons = useMemo(() => {
@@ -73,8 +70,8 @@ export function IconPicker({ value, onChange, className }: IconPickerProps): JSX
         onPress={(): void => setModalVisible(true)}
         className="h-10 w-10 border border-input rounded-md items-center justify-center bg-background"
       >
-        {SelectedIcon ? (
-          <SelectedIcon className="h-5 w-5" />
+        {value ? (
+          <Icon icon={value} className="h-5 w-5" />
         ) : (
           // eslint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Non-translatable placeholder icon
           <Text className="text-muted-foreground text-xs">?</Text>
@@ -142,7 +139,6 @@ export function IconPicker({ value, onChange, className }: IconPickerProps): JSX
             numColumns={6}
             keyExtractor={(item): string => item}
             renderItem={({ item: iconKey }): JSX.Element => {
-              const Icon = getIconComponent(iconKey);
               const isSelected = value === iconKey;
 
               return (
@@ -156,7 +152,7 @@ export function IconPicker({ value, onChange, className }: IconPickerProps): JSX
                     isSelected ? "bg-accent border-2 border-primary" : "bg-muted/30",
                   )}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon icon={iconKey} className="h-4 w-4" />
                 </Pressable>
               );
             }}

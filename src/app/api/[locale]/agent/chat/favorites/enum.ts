@@ -20,6 +20,24 @@ export const {
 export const ModelSelectionModeDB = [ModelSelectionMode.AUTO, ModelSelectionMode.MANUAL] as const;
 
 /**
+ * Model Selection Type Enum (for API discriminator)
+ * Maps to the selectionType field in objectUnionField
+ */
+export const {
+  enum: ModelSelectionType,
+  options: ModelSelectionTypeOptions,
+  Value: ModelSelectionTypeValue,
+} = createEnumOptions({
+  MANUAL: "app.api.agent.chat.favorites.enums.selectionType.manual",
+  FILTERS: "app.api.agent.chat.favorites.enums.selectionType.filters",
+});
+
+export const ModelSelectionTypeDB = [
+  ModelSelectionType.MANUAL,
+  ModelSelectionType.FILTERS,
+] as const;
+
+/**
  * Intelligence Level Enum (actual model tiers, no ANY)
  * How smart the model should be
  */

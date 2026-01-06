@@ -24,6 +24,7 @@ interface ProcessWithInternals {
   _getActiveRequests?: () => never[];
 }
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { mcpSilentMode } from "@/config/debug";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { binaryStartTime } from "../vibe-runtime";
@@ -497,6 +498,9 @@ export class CliResourceManager {
           });
           logger.info("app.api.system.unifiedInterface.cli.vibe.utils.debug.performanceBreakdown");
           logger.info(formatPerformanceBreakdown(breakdown));
+        }
+        if (mcpSilentMode) {
+          // In MCP mode, dynamically import and log to file instead of console
         } else {
           // Use console.log directly to avoid duplicate timestamp from logger
           // The execution summary is already formatted and translated

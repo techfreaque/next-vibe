@@ -249,14 +249,7 @@ export const translations = {
     flatView: "Flat view (4chan style)",
     debugView: "Debug view (with system prompts)",
   },
-  flatView: {
-    answerModal: {
-      title: "Answer as AI Model",
-      description: "Generate an AI response to continue the conversation",
-      inputPlaceholder: "Optional: Add specific instructions for the AI response",
-      confirmLabel: "Generate Response",
-    },
-  },
+
   screenshot: {
     capturing: "Capturing...",
     capture: "Capture Screenshot",

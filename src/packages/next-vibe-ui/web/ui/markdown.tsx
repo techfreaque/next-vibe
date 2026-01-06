@@ -247,7 +247,7 @@ export function Markdown({
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm, remarkBreaks]}
                           components={{
-                            p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                            p: ({ children }) => <div className="mb-2 last:mb-0">{children}</div>,
                           }}
                         >
                           {thinking}
@@ -298,9 +298,9 @@ export function Markdown({
           ),
 
           p: ({ children }) => (
-            <p className="text-base leading-7 mb-4 last:mb-0 text-slate-700 dark:text-slate-300">
+            <div className="text-base leading-7 mb-4 last:mb-0 text-slate-700 dark:text-slate-300">
               {children}
-            </p>
+            </div>
           ),
 
           ul: ({ children }) => (
@@ -565,9 +565,9 @@ function MarkdownImage({ src, alt }: { src?: string; alt?: string }): JSX.Elemen
           />
         </button>
         {alt && (
-          <p className="text-sm text-slate-500 dark:text-slate-400 italic mt-2 text-center">
+          <div className="text-sm text-slate-500 dark:text-slate-400 italic mt-2 text-center">
             {alt}
-          </p>
+          </div>
         )}
       </div>
       {isOpen && (

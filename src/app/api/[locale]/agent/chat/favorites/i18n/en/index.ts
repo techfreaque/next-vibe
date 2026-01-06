@@ -63,11 +63,44 @@ export const translations = {
         intelligence: {
           content: "Intelligence: {{value}}",
         },
+        modelSelection: {
+          title: "Model Selection",
+        },
+        selectionType: {
+          content: "Selection Type: {{value}}",
+        },
+        minIntelligence: {
+          content: "Min Intelligence: {{value}}",
+        },
+        maxIntelligence: {
+          content: "Max Intelligence: {{value}}",
+        },
+        minPrice: {
+          content: "Min Price: {{value}}",
+        },
         maxPrice: {
           content: "Max Price: {{value}}",
         },
+        minContent: {
+          content: "Min Content Level: {{value}}",
+        },
+        maxContent: {
+          content: "Max Content Level: {{value}}",
+        },
+        minSpeed: {
+          content: "Min Speed: {{value}}",
+        },
+        maxSpeed: {
+          content: "Max Speed: {{value}}",
+        },
         content: {
           content: "Content Level: {{value}}",
+        },
+        preferredStrengths: {
+          content: "Preferred Strengths: {{value}}",
+        },
+        ignoredWeaknesses: {
+          content: "Ignored Weaknesses: {{value}}",
         },
         manualModelId: {
           content: "Manual Model: {{value}}",
@@ -155,17 +188,87 @@ export const translations = {
       label: "Selection Mode",
       description: "How the model should be selected",
     },
+    modelSelection: {
+      title: "Model Selection",
+      description:
+        "Choose how to select the AI model - either pick a specific model or let the system choose based on filters",
+    },
+    selectionType: {
+      label: "Selection Type",
+      manual: "Specific Model",
+      filters: "Filter Criteria",
+    },
     intelligence: {
       label: "Intelligence Level",
       description: "Minimum intelligence level required",
+    },
+    intelligenceRange: {
+      label: "Intelligence Range",
+      description: "Required intelligence/capability level for the model",
+      minLabel: "Min Intelligence",
+      maxLabel: "Max Intelligence",
+    },
+    minIntelligence: {
+      label: "Minimum Intelligence",
+      description: "Minimum intelligence/capability level required for the model",
+    },
+    maxIntelligence: {
+      label: "Maximum Intelligence",
+      description: "Maximum intelligence/capability level allowed for the model",
+    },
+    priceRange: {
+      label: "Price Range",
+      description: "Credit cost range per message",
+      minLabel: "Min Price",
+      maxLabel: "Max Price",
+    },
+    minPrice: {
+      label: "Minimum Price",
+      description: "Minimum credit cost per message",
     },
     maxPrice: {
       label: "Max Price",
       description: "Maximum price tier to use",
     },
+    contentRange: {
+      label: "Content Range",
+      description: "Content moderation level range",
+      minLabel: "Min Content",
+      maxLabel: "Max Content",
+    },
+    minContent: {
+      label: "Minimum Content Level",
+      description: "Minimum content moderation level for the model",
+    },
+    maxContent: {
+      label: "Maximum Content Level",
+      description: "Maximum content moderation level for the model",
+    },
+    speedRange: {
+      label: "Speed Range",
+      description: "Response speed level range",
+      minLabel: "Min Speed",
+      maxLabel: "Max Speed",
+    },
+    minSpeed: {
+      label: "Minimum Speed",
+      description: "Minimum speed level required for the model",
+    },
+    maxSpeed: {
+      label: "Maximum Speed",
+      description: "Maximum speed level allowed for the model",
+    },
     content: {
       label: "Content Level",
       description: "Content moderation level",
+    },
+    preferredStrengths: {
+      label: "Preferred Strengths",
+      description: "Model capabilities and strengths to prefer",
+    },
+    ignoredWeaknesses: {
+      label: "Ignored Weaknesses",
+      description: "Model weaknesses to ignore or allow",
     },
     manualModelId: {
       label: "Manual Model",

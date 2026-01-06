@@ -15,6 +15,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { chatFavorites, type FavoriteModelSettings } from "../db";
+import {
+  ContentLevelFilter,
+  IntelligenceLevelFilter,
+  ModelSelectionMode,
+  PriceLevelFilter,
+} from "../enum";
 import type {
   FavoriteDeleteResponseOutput,
   FavoriteDeleteUrlVariablesOutput,

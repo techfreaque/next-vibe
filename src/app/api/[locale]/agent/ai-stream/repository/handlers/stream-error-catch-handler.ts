@@ -8,9 +8,9 @@ import type { ReadableStreamDefaultController } from "node:stream/web";
 
 import type { JSONValue } from "ai";
 
+import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { ModelId } from "../../../chat/model-access/models";
 import type { StreamContext } from "../core/stream-context";
 import { AbortErrorHandler } from "./abort-error-handler";
 import { StreamErrorHandler } from "./stream-error-handler";

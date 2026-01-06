@@ -21,6 +21,11 @@ export const translations: typeof enTranslations = {
       my: "Meine Charaktere",
       community: "Community",
     },
+    ownershipType: {
+      system: "System",
+      user: "Benutzer",
+      public: "Öffentlich",
+    },
   },
   tags: {
     general: "Allgemein",
@@ -636,6 +641,19 @@ export const translations: typeof enTranslations = {
           voice: { content: "Stimme" },
           suggestedPrompts: { content: "Vorgeschlagene Prompts" },
           requirements: { content: "Anforderungen" },
+          modelSelection: { title: "Modellauswahl" },
+          selectionType: { content: "Auswahltyp" },
+          minIntelligence: { content: "Minimale Intelligenz" },
+          maxIntelligence: { content: "Maximale Intelligenz" },
+          minPrice: { content: "Mindestpreis" },
+          maxPrice: { content: "Maximalpreis" },
+          minContent: { content: "Minimale Inhaltsstufe" },
+          maxContent: { content: "Maximale Inhaltsstufe" },
+          minSpeed: { content: "Minimale Geschwindigkeit" },
+          maxSpeed: { content: "Maximale Geschwindigkeit" },
+          preferredStrengths: { content: "Bevorzugte Stärken" },
+          ignoredWeaknesses: { content: "Ignorierte Schwächen" },
+          manualModelId: { content: "Manuelles Modell" },
         },
       },
     },
@@ -729,6 +747,30 @@ export const translations: typeof enTranslations = {
       label: "Intelligenzstufe",
       description: "Minimale Intelligenz-/Fähigkeitsstufe, die für das Modell erforderlich ist",
     },
+    intelligenceRange: {
+      label: "Intelligenzbereich",
+      description: "Erforderliche Intelligenz-/Fähigkeitsstufe für das Modell",
+      minLabel: "Min. Intelligenz",
+      maxLabel: "Max. Intelligenz",
+    },
+    minIntelligence: {
+      label: "Minimale Intelligenz",
+      description: "Minimale Intelligenz-/Fähigkeitsstufe, die für das Modell erforderlich ist",
+    },
+    maxIntelligence: {
+      label: "Maximale Intelligenz",
+      description: "Maximale Intelligenz-/Fähigkeitsstufe, die für das Modell zulässig ist",
+    },
+    priceRange: {
+      label: "Preisbereich",
+      description: "Kreditkostenbereich pro Nachricht",
+      minLabel: "Min. Preis",
+      maxLabel: "Max. Preis",
+    },
+    minPrice: {
+      label: "Mindestpreis",
+      description: "Minimale Kreditkosten pro Nachricht mit diesem Charakter",
+    },
     maxPrice: {
       label: "Maximaler Preis",
       description:
@@ -737,6 +779,38 @@ export const translations: typeof enTranslations = {
     contentLevel: {
       label: "Inhaltsebene",
       description: "Inhaltsfilterungsstufe für das Modell (Mainstream, offen oder unzensiert)",
+    },
+    contentRange: {
+      label: "Inhaltsbereich",
+      description: "Inhaltsmoderation-Stufenbereich",
+      minLabel: "Min. Inhalt",
+      maxLabel: "Max. Inhalt",
+    },
+    minContent: {
+      label: "Minimale Inhaltsstufe",
+      description: "Minimale Inhaltsmoderationsebene für das Modell",
+    },
+    maxContent: {
+      label: "Maximale Inhaltsstufe",
+      description: "Maximale Inhaltsmoderationsebene für das Modell",
+    },
+    speedRange: {
+      label: "Geschwindigkeitsbereich",
+      description: "Antwortgeschwindigkeit-Stufenbereich",
+      minLabel: "Min. Geschwindigkeit",
+      maxLabel: "Max. Geschwindigkeit",
+    },
+    preferredStrengths: {
+      label: "Bevorzugte Stärken",
+      description: "Modellfähigkeiten und Stärken, die bevorzugt werden",
+    },
+    ignoredWeaknesses: {
+      label: "Ignorierte Schwächen",
+      description: "Modellschwächen, die ignoriert oder zugelassen werden",
+    },
+    manualModelId: {
+      label: "Manuelles Modell",
+      description: "Spezifisches Modell, das immer mit diesem Charakter verwendet werden soll",
     },
     voice: {
       label: "Stimme",

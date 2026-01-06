@@ -3,7 +3,7 @@
 import { Button } from "next-vibe-ui/ui/button";
 import type { JSX } from "react";
 
-import { getIconComponent, type IconValue } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import { Icon, type IconValue } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { WidgetType } from "../../../shared/types/enums";
@@ -31,7 +31,7 @@ export function SubmitButtonWidget<const TKey extends string>({
     size = "default",
   } = field.ui;
 
-  const ButtonIcon = icon ? getIconComponent(icon as IconValue) : undefined;
+  const buttonIcon = icon ? (icon as IconValue) : undefined;
 
   const buttonText = textKey
     ? t(textKey)
@@ -54,7 +54,7 @@ export function SubmitButtonWidget<const TKey extends string>({
       size={size}
       className={className}
     >
-      {ButtonIcon && <ButtonIcon className="h-4 w-4 mr-2" />}
+      {buttonIcon && <Icon icon={buttonIcon} className="h-4 w-4 mr-2" />}
       {isSubmitting ? loadingText : buttonText}
     </Button>
   );

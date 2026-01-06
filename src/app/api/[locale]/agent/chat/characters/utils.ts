@@ -3,8 +3,9 @@
  * Helper functions for character system
  */
 
-import type { IconKey } from "../model-access/icons";
-import { ModelUtility } from "../types";
+import { ModelUtility, type ModelUtilityValue } from "@/app/api/[locale]/agent/models/enum";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+
 import { CharacterCategory, type CharacterCategoryValue } from "./enum";
 
 /**
@@ -14,7 +15,7 @@ export interface CategoryConfig {
   category: typeof CharacterCategoryValue;
   label: typeof CharacterCategoryValue; // Translation key (same as category)
   icon: IconKey;
-  task: ModelUtility;
+  task: typeof ModelUtilityValue;
 }
 
 /**
@@ -87,6 +88,6 @@ export const CATEGORY_CONFIG: Record<typeof CharacterCategoryValue, CategoryConf
 /**
  * Get the primary task utility for a category
  */
-export function categoryToTask(category: typeof CharacterCategoryValue): ModelUtility {
+export function categoryToTask(category: typeof CharacterCategoryValue): typeof ModelUtilityValue {
   return CATEGORY_CONFIG[category].task;
 }

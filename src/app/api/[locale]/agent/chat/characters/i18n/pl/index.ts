@@ -21,6 +21,11 @@ export const translations: typeof enTranslations = {
       my: "Moje postacie",
       community: "Społeczność",
     },
+    ownershipType: {
+      system: "System",
+      user: "Użytkownik",
+      public: "Publiczny",
+    },
   },
   tags: {
     general: "Ogólne",
@@ -633,6 +638,19 @@ export const translations: typeof enTranslations = {
           voice: { content: "Głos" },
           suggestedPrompts: { content: "Sugerowane prompty" },
           requirements: { content: "Wymagania" },
+          modelSelection: { title: "Wybór modelu" },
+          selectionType: { content: "Typ wyboru" },
+          minIntelligence: { content: "Minimalna inteligencja" },
+          maxIntelligence: { content: "Maksymalna inteligencja" },
+          minPrice: { content: "Minimalna cena" },
+          maxPrice: { content: "Maksymalna cena" },
+          minContent: { content: "Minimalny poziom treści" },
+          maxContent: { content: "Maksymalny poziom treści" },
+          minSpeed: { content: "Minimalna prędkość" },
+          maxSpeed: { content: "Maksymalna prędkość" },
+          preferredStrengths: { content: "Preferowane mocne strony" },
+          ignoredWeaknesses: { content: "Ignorowane słabe strony" },
+          manualModelId: { content: "Ręczny model" },
         },
       },
     },
@@ -725,6 +743,42 @@ export const translations: typeof enTranslations = {
       label: "Poziom inteligencji",
       description: "Minimalny poziom inteligencji/możliwości wymagany dla modelu",
     },
+    minIntelligence: {
+      label: "Minimalna inteligencja",
+      description: "Minimalny poziom inteligencji/możliwości wymagany dla modelu",
+    },
+    maxIntelligence: {
+      label: "Maksymalna inteligencja",
+      description: "Maksymalny poziom inteligencji/możliwości dozwolony dla modelu",
+    },
+    intelligenceRange: {
+      label: "Zakres inteligencji",
+      description: "Wymagany poziom inteligencji/możliwości modelu",
+      minLabel: "Min. inteligencja",
+      maxLabel: "Maks. inteligencja",
+    },
+    priceRange: {
+      label: "Zakres cen",
+      description: "Zakres kosztów kredytów za wiadomość",
+      minLabel: "Min. cena",
+      maxLabel: "Maks. cena",
+    },
+    contentRange: {
+      label: "Zakres treści",
+      description: "Zakres poziomu moderacji treści",
+      minLabel: "Min. treść",
+      maxLabel: "Maks. treść",
+    },
+    speedRange: {
+      label: "Zakres prędkości",
+      description: "Zakres poziomu prędkości odpowiedzi",
+      minLabel: "Min. prędkość",
+      maxLabel: "Maks. prędkość",
+    },
+    minPrice: {
+      label: "Minimalna cena",
+      description: "Minimalny koszt kredytów na wiadomość z tą postacią",
+    },
     maxPrice: {
       label: "Maksymalna cena",
       description: "Maksymalny koszt kredytów, który jesteś gotów wydać na wiadomość z tą postacią",
@@ -732,6 +786,26 @@ export const translations: typeof enTranslations = {
     contentLevel: {
       label: "Poziom treści",
       description: "Poziom filtrowania treści dla modelu (główny nurt, otwarty lub bez cenzury)",
+    },
+    minContent: {
+      label: "Minimalny poziom treści",
+      description: "Minimalny poziom moderacji treści dla modelu",
+    },
+    maxContent: {
+      label: "Maksymalny poziom treści",
+      description: "Maksymalny poziom moderacji treści dla modelu",
+    },
+    preferredStrengths: {
+      label: "Preferowane mocne strony",
+      description: "Możliwości i mocne strony modelu do preferowania",
+    },
+    ignoredWeaknesses: {
+      label: "Ignorowane słabe strony",
+      description: "Słabe strony modelu do ignorowania lub akceptowania",
+    },
+    manualModelId: {
+      label: "Model ręczny",
+      description: "Konkretny model zawsze używany z tą postacią",
     },
     voice: {
       label: "Głos",

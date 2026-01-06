@@ -64,11 +64,44 @@ export const translations: typeof enTranslations = {
         intelligence: {
           content: "Inteligencja: {{value}}",
         },
+        modelSelection: {
+          title: "Wybór modelu",
+        },
+        selectionType: {
+          content: "Typ wyboru: {{value}}",
+        },
+        minIntelligence: {
+          content: "Min. inteligencja: {{value}}",
+        },
+        maxIntelligence: {
+          content: "Maks. inteligencja: {{value}}",
+        },
+        minPrice: {
+          content: "Minimalna cena: {{value}}",
+        },
         maxPrice: {
           content: "Maksymalna cena: {{value}}",
         },
+        minContent: {
+          content: "Min. poziom treści: {{value}}",
+        },
+        maxContent: {
+          content: "Maks. poziom treści: {{value}}",
+        },
+        minSpeed: {
+          content: "Min. prędkość: {{value}}",
+        },
+        maxSpeed: {
+          content: "Maks. prędkość: {{value}}",
+        },
         content: {
           content: "Poziom treści: {{value}}",
+        },
+        preferredStrengths: {
+          content: "Preferowane mocne strony: {{value}}",
+        },
+        ignoredWeaknesses: {
+          content: "Ignorowane słabe strony: {{value}}",
         },
         manualModelId: {
           content: "Model ręczny: {{value}}",
@@ -156,17 +189,87 @@ export const translations: typeof enTranslations = {
       label: "Tryb wyboru",
       description: "Sposób wyboru modelu",
     },
+    modelSelection: {
+      title: "Wybór modelu",
+      description:
+        "Wybierz sposób wyboru modelu AI - wybierz konkretny model lub pozwól systemowi wybrać na podstawie filtrów",
+    },
+    selectionType: {
+      label: "Typ wyboru",
+      manual: "Konkretny model",
+      filters: "Kryteria filtrowania",
+    },
     intelligence: {
       label: "Poziom inteligencji",
       description: "Minimalny wymagany poziom inteligencji",
+    },
+    minIntelligence: {
+      label: "Minimalna inteligencja",
+      description: "Minimalny poziom inteligencji/możliwości wymagany dla modelu",
+    },
+    maxIntelligence: {
+      label: "Maksymalna inteligencja",
+      description: "Maksymalny poziom inteligencji/możliwości dozwolony dla modelu",
+    },
+    intelligenceRange: {
+      label: "Zakres inteligencji",
+      description: "Wymagany poziom inteligencji/możliwości modelu",
+      minLabel: "Min. inteligencja",
+      maxLabel: "Maks. inteligencja",
+    },
+    priceRange: {
+      label: "Zakres cen",
+      description: "Zakres kosztów kredytów za wiadomość",
+      minLabel: "Min. cena",
+      maxLabel: "Maks. cena",
+    },
+    contentRange: {
+      label: "Zakres treści",
+      description: "Zakres poziomu moderacji treści",
+      minLabel: "Min. treść",
+      maxLabel: "Maks. treść",
+    },
+    speedRange: {
+      label: "Zakres prędkości",
+      description: "Zakres poziomu prędkości odpowiedzi",
+      minLabel: "Min. prędkość",
+      maxLabel: "Maks. prędkość",
+    },
+    minPrice: {
+      label: "Minimalna cena",
+      description: "Minimalny koszt kredytów na wiadomość",
     },
     maxPrice: {
       label: "Maksymalna cena",
       description: "Maksymalny poziom cenowy",
     },
+    minContent: {
+      label: "Minimalny poziom treści",
+      description: "Minimalny poziom moderacji treści dla modelu",
+    },
+    maxContent: {
+      label: "Maksymalny poziom treści",
+      description: "Maksymalny poziom moderacji treści dla modelu",
+    },
+    minSpeed: {
+      label: "Minimalna prędkość",
+      description: "Minimalny poziom prędkości wymagany dla modelu",
+    },
+    maxSpeed: {
+      label: "Maksymalna prędkość",
+      description: "Maksymalny poziom prędkości dozwolony dla modelu",
+    },
     content: {
       label: "Poziom treści",
       description: "Poziom moderacji treści",
+    },
+    preferredStrengths: {
+      label: "Preferowane mocne strony",
+      description: "Możliwości i mocne strony modelu do preferowania",
+    },
+    ignoredWeaknesses: {
+      label: "Ignorowane słabe strony",
+      description: "Słabe strony modelu do ignorowania lub akceptowania",
     },
     manualModelId: {
       label: "Model ręczny",

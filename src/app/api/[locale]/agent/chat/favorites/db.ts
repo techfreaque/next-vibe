@@ -8,44 +8,11 @@ import { boolean, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import type { IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
-import type { ModelId } from "@/app/api/[locale]/agent/chat/model-access/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { users } from "@/app/api/[locale]/user/db";
 
-import type {
-  ContentLevelFilterValue,
-  IntelligenceLevelFilterValue,
-  ModelSelectionModeValue,
-  PriceLevelFilterValue,
-} from "./enum";
-
-/**
- * Model settings filters structure (DB format - uses translation keys)
- * Supports "any" to disable specific filters
- */
-export interface FavoriteModelFilters {
-  intelligence: typeof IntelligenceLevelFilterValue;
-  maxPrice: typeof PriceLevelFilterValue;
-  content: typeof ContentLevelFilterValue;
-}
-
-/**
- * Model settings structure (DB format - uses translation keys)
- */
-export interface FavoriteModelSettings {
-  mode: typeof ModelSelectionModeValue;
-  filters: FavoriteModelFilters;
-  manualModelId?: ModelId;
-}
-
-/**
- * Favorite UI settings structure
- */
-export interface FavoriteUISettings {
-  position: number;
-  color?: string;
-}
+import type { FavoriteModelSelection } from "./definition";
 
 /**
  * Favorites Table
@@ -74,11 +41,9 @@ export const chatFavorites = pgTable("chat_favorites", {
   // Custom TTS voice (overrides character voice)
   voice: text("voice").$type<typeof TtsVoiceValue>(),
 
-  // Model settings (mode, filters, manual model id)
-  modelSettings: jsonb("model_settings").$type<FavoriteModelSettings>().notNull(),
-
-  // UI settings (position, color)
-  uiSettings: jsonb("ui_settings").$type<FavoriteUISettings>().notNull(),
+  modelSelection: jsonb("model_selection").$type<FavoriteModelSelection>().notNull(),
+  position: integer("position").notNull(),
+  color: text("color"),
 
   // Usage stats
   useCount: integer("use_count").default(0).notNull(),
