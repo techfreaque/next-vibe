@@ -269,6 +269,10 @@ export async function getRouteHandler(path: string): Promise<GenericHandlerBase 
     case "c":
       return (await import("@/app/api/[locale]/system/check/vibe-check/route"))
         .tools.POST as GenericHandlerBase;
+    case "cc":
+      return (
+        await import("@/app/api/[locale]/system/check/config/create/route")
+      ).tools.POST as GenericHandlerBase;
     case "check":
       return (await import("@/app/api/[locale]/system/check/vibe-check/route"))
         .tools.POST as GenericHandlerBase;
