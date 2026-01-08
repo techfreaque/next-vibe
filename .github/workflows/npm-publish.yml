@@ -81,6 +81,3 @@ jobs:
       # This runs checks, builds, and publishes according to release.config.ts
       - name: Run release (CI mode)
         run: src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts release --ci --skip-git-tag --skip-git-push
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
