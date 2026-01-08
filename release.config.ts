@@ -66,7 +66,7 @@ const releaseConfig: ReleaseFileConfig = {
 
         // CI release command (alternative to npm config)
         ciReleaseCommand: {
-          command: ["npm", "publish", "--access", "public"],
+          command: ["npm", "login", "&&", "npm", "publish", "--access", "public"],
         },
 
         // Changelog generation
