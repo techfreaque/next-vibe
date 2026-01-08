@@ -16,10 +16,10 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
-  objectField,
-  requestDataField,
-  responseArrayOptionalField,
-  responseField,
+  scopedObjectField,
+  scopedRequestDataField,
+  scopedResponseArrayOptionalField,
+  scopedResponseField,
 } from "../system/unified-interface/shared/field/utils";
 import {
   ContactPriority,
@@ -40,17 +40,12 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST as const,
   path: ["contact"] as const,
-  title: "title" as const,
-  description: "description" as const,
-  category: "category" as const,
+  title: "title",
+  description: "description",
+  category: "category",
   icon: "mail",
   aliases: [CONTACT_FORM_ALIAS] as const,
-  tags: [
-    "tags.contactForm" as const,
-    "tags.contactUs" as const,
-    "tags.contactSubmission" as const,
-    "tags.helpSupport" as const,
-  ],
+  tags: ["tags.contactForm", "tags.contactUs", "tags.contactSubmission", "tags.helpSupport"],
 
   allowedRoles: [
     UserRole.PUBLIC,
@@ -60,7 +55,9 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ],
 
-  fields: objectField(
+  fields: scopedObjectField(
+    scopedTranslation,
+
     {
       type: WidgetType.CONTAINER,
       title: "form.label",
@@ -70,7 +67,8 @@ const { POST } = createEndpoint({
     },
     { request: "data", response: true },
     {
-      name: requestDataField(
+      name: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -81,7 +79,8 @@ const { POST } = createEndpoint({
         },
         z.string().min(2),
       ),
-      email: requestDataField(
+      email: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.EMAIL,
@@ -92,7 +91,8 @@ const { POST } = createEndpoint({
         },
         z.string().email(),
       ),
-      company: requestDataField(
+      company: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -103,7 +103,8 @@ const { POST } = createEndpoint({
         },
         z.string().optional(),
       ),
-      subject: requestDataField(
+      subject: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
@@ -115,7 +116,8 @@ const { POST } = createEndpoint({
         },
         z.enum(ContactSubject),
       ),
-      message: requestDataField(
+      message: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
@@ -126,7 +128,8 @@ const { POST } = createEndpoint({
         },
         z.string().min(10),
       ),
-      priority: requestDataField(
+      priority: scopedRequestDataField(
+        scopedTranslation,
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
@@ -141,27 +144,31 @@ const { POST } = createEndpoint({
 
       // === RESPONSE FIELDS ===
       // Note: leadId comes from JWT payload (user.leadId) on server-side
-      success: responseField(
+      success: scopedResponseField(
+        scopedTranslation,
         {
           type: WidgetType.TEXT,
           content: "response.success",
         },
         z.boolean(),
       ),
-      messageId: responseField(
+      messageId: scopedResponseField(
+        scopedTranslation,
         {
           type: WidgetType.TEXT,
           content: "response.messageId",
         },
         z.string().optional(),
       ),
-      status: responseArrayOptionalField(
+      status: scopedResponseArrayOptionalField(
+        scopedTranslation,
         {
           type: WidgetType.DATA_LIST,
           title: "response.status",
           description: "response.description",
         },
-        responseField(
+        scopedResponseField(
+          scopedTranslation,
           {
             type: WidgetType.TEXT,
             content: "response.status",

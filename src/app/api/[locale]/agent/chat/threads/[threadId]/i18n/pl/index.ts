@@ -33,8 +33,14 @@ export const translations: typeof enTranslations = {
         userId: {
           content: "ID użytkownika",
         },
+        leadId: {
+          content: "ID leada",
+        },
         threadTitle: {
           content: "Tytuł",
+        },
+        rootFolderId: {
+          content: "ID folderu głównego",
         },
         folderId: {
           content: "ID folderu",
@@ -62,6 +68,9 @@ export const translations: typeof enTranslations = {
         },
         published: {
           content: "Opublikowany",
+        },
+        searchVector: {
+          content: "Wektor wyszukiwania",
         },
         preview: {
           content: "Podgląd",
@@ -189,8 +198,14 @@ export const translations: typeof enTranslations = {
         userId: {
           content: "ID użytkownika",
         },
+        leadId: {
+          content: "ID leada",
+        },
         threadTitle: {
           content: "Tytuł",
+        },
+        rootFolderId: {
+          content: "ID folderu głównego",
         },
         folderId: {
           content: "ID folderu",
@@ -218,6 +233,9 @@ export const translations: typeof enTranslations = {
         },
         published: {
           content: "Opublikowany",
+        },
+        searchVector: {
+          content: "Wektor wyszukiwania",
         },
         preview: {
           content: "Podgląd",

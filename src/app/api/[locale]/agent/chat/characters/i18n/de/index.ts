@@ -632,11 +632,13 @@ export const translations: typeof enTranslations = {
           title: "Charakter",
           id: { content: "Charakter-ID" },
           name: { content: "Charakter-Name" },
+          tagline: { content: "Charakter-Slogan" },
           description: { content: "Charakter-Beschreibung" },
           icon: { content: "Charakter-Symbol" },
           systemPrompt: { content: "System-Prompt" },
           category: { content: "Kategorie" },
           source: { content: "Quelle" },
+          ownershipType: { content: "Eigentümertyp" },
           preferredModel: { content: "Bevorzugtes Modell" },
           voice: { content: "Stimme" },
           suggestedPrompts: { content: "Vorgeschlagene Prompts" },
@@ -726,6 +728,14 @@ export const translations: typeof enTranslations = {
     category: {
       label: "Kategorie",
       description: "Die Kategorie, zu der dieser Charakter gehört",
+    },
+    tagline: {
+      label: "Slogan",
+      description: "Ein kurzer Slogan, der den Charakter beschreibt",
+    },
+    ownershipType: {
+      label: "Eigentümertyp",
+      description: "Wer besitzt diesen Charakter (System, Benutzer oder öffentlich)",
     },
     modelSelection: {
       title: "Modellauswahl",

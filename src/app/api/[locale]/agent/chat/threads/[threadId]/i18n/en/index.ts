@@ -32,8 +32,14 @@ export const translations = {
         userId: {
           content: "User ID",
         },
+        leadId: {
+          content: "Lead ID",
+        },
         threadTitle: {
           content: "Title",
+        },
+        rootFolderId: {
+          content: "Root Folder ID",
         },
         folderId: {
           content: "Folder ID",
@@ -61,6 +67,9 @@ export const translations = {
         },
         published: {
           content: "Published",
+        },
+        searchVector: {
+          content: "Search Vector",
         },
         preview: {
           content: "Preview",
@@ -188,8 +197,14 @@ export const translations = {
         userId: {
           content: "User ID",
         },
+        leadId: {
+          content: "Lead ID",
+        },
         threadTitle: {
           content: "Title",
+        },
+        rootFolderId: {
+          content: "Root Folder ID",
         },
         folderId: {
           content: "Folder ID",
@@ -217,6 +232,9 @@ export const translations = {
         },
         published: {
           content: "Published",
+        },
+        searchVector: {
+          content: "Search Vector",
         },
         preview: {
           content: "Preview",

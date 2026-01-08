@@ -9,7 +9,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import { CharactersRepository } from "../repository";
 import definitions from "./definition";
 
-export const { GET, PATCH, tools } = endpointsHandler({
+export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
@@ -20,5 +20,10 @@ export const { GET, PATCH, tools } = endpointsHandler({
     email: undefined,
     handler: ({ data, urlPathParams, user, logger }) =>
       CharactersRepository.updateCharacter(data, urlPathParams, user, logger),
+  },
+  [Methods.DELETE]: {
+    email: undefined,
+    handler: ({ urlPathParams, user, logger }) =>
+      CharactersRepository.deleteCharacter(urlPathParams, user, logger),
   },
 });

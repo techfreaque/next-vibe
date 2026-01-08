@@ -52,7 +52,7 @@ export function useDebugSystemPrompt(params: {
       return "";
     }
 
-    return response.data.character.systemPrompt || "";
+    return response.data.systemPrompt || "";
   }, [characterId, characterEndpoint.read?.response]);
 
   // Fetch memories ONLY when this component is rendered (i.e., debug mode active)

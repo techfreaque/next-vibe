@@ -333,6 +333,8 @@ export const translations = {
         aiProviders: "AI Providers",
         media: "Media",
         special: "Special",
+        navigation: "Navigation",
+        ui: "UI & Controls",
       },
     },
     countries: {

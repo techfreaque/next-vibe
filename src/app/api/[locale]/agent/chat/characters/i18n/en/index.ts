@@ -629,11 +629,13 @@ export const translations = {
           title: "Character",
           id: { content: "Character ID" },
           name: { content: "Character Name" },
+          tagline: { content: "Character Tagline" },
           description: { content: "Character Description" },
           icon: { content: "Character Icon" },
           systemPrompt: { content: "System Prompt" },
           category: { content: "Category" },
           source: { content: "Source" },
+          ownershipType: { content: "Ownership Type" },
           preferredModel: { content: "Preferred Model" },
           voice: { content: "Voice" },
           suggestedPrompts: { content: "Suggested Prompts" },
@@ -723,6 +725,14 @@ export const translations = {
     category: {
       label: "Category",
       description: "The category this character belongs to",
+    },
+    tagline: {
+      label: "Tagline",
+      description: "A short tagline describing the character",
+    },
+    ownershipType: {
+      label: "Ownership Type",
+      description: "Who owns this character (system, user, or public)",
     },
     modelSelection: {
       title: "Model Selection",

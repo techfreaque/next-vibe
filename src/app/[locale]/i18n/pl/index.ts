@@ -338,6 +338,8 @@ export const translations: typeof enTranslations = {
         aiProviders: "Dostawcy AI",
         media: "Media",
         special: "Specjalne",
+        navigation: "Nawigacja",
+        ui: "UI i Sterowanie",
       },
     },
     countries: {

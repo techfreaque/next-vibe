@@ -208,6 +208,14 @@ export const translations = {
     position: {
       label: "Position",
     },
+    color: {
+      label: "Color",
+      description: "Custom color for this favorite",
+    },
+    customIcon: {
+      label: "Custom Icon",
+      description: "Custom icon for this favorite",
+    },
     response: {
       success: {
         content: "Updated: {{value}}",

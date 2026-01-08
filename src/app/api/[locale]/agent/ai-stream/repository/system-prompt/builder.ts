@@ -87,7 +87,7 @@ export async function buildSystemPrompt(params: {
       const result = await CharactersRepository.getCharacterById({ id: characterId }, user, logger);
 
       if (result.success) {
-        const character = result.data.character;
+        const character = result.data;
         logger.debug("Using character system prompt", {
           characterId: character.id,
           characterName: character.name,

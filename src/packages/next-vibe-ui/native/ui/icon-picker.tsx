@@ -9,7 +9,11 @@ import { useMemo, useState } from "react";
 import { FlatList, Modal, Pressable, ScrollView, TextInput, View } from "react-native";
 
 import type { CategoryKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
-import { Icon, ICON_CATEGORIES } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import {
+  Icon,
+  ICON_CATEGORIES,
+  ICON_CATEGORIES_LIST,
+} from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { useTranslation } from "@/i18n/core/client";
 
 import type { IconPickerProps } from "../../web/ui/icon-picker";
@@ -86,7 +90,7 @@ export function IconPicker({ value, onChange, className }: IconPickerProps): JSX
                 paddingVertical: 8,
               }}
             >
-              {Object.entries(ICON_CATEGORIES).map(([categoryKey, category]) => (
+              {ICON_CATEGORIES_LIST.map(([categoryKey, category]) => (
                 <Pressable
                   key={categoryKey}
                   onPress={(): void => setActiveCategory(categoryKey)}

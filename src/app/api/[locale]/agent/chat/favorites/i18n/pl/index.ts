@@ -4,6 +4,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   id: idTranslations,
   enums: {
+    selectionType: {
+      manual: "Konkretny model",
+      filters: "Kryteria filtrowania",
+    },
     mode: {
       auto: "Auto",
       manual: "Ręczny",

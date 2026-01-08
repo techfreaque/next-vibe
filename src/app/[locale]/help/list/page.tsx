@@ -3,11 +3,12 @@
  * Shows all available commands with filtering options
  */
 
+import { notFound } from "next-vibe-ui/lib/not-found";
 import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type { JSX } from "react";
 
 import { HelpListView } from "@/app/api/[locale]/system/help/list/_components/help-list-view";
-import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface HelpListPageProps {
@@ -16,7 +17,9 @@ interface HelpListPageProps {
 
 export default async function HelpListPage({ params }: HelpListPageProps): Promise<JSX.Element> {
   const { locale } = await params;
-  await requireAdminUser(locale, `/${locale}/help/list`);
+  if (env.NODE_ENV === "production") {
+    notFound();
+  }
 
   return (
     <PageLayout scrollable={true}>

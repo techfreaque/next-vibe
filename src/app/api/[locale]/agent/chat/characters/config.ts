@@ -18,7 +18,7 @@ import {
   CATEGORY_CONFIG,
   CharacterCategory,
   CharacterCategoryOptions,
-  CharacterSource,
+  CharacterOwnershipType,
 } from "./enum";
 
 /**
@@ -45,7 +45,7 @@ export const DEFAULT_CHARACTERS = [
     description: "app.api.agent.chat.characters.characters.default.description" as const,
     icon: "robot-face",
     category: CharacterCategory.ASSISTANT,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: "",
     suggestedPrompts: [
@@ -67,7 +67,7 @@ export const DEFAULT_CHARACTERS = [
     description: "app.api.agent.chat.characters.characters.thea.description" as const,
     icon: "sun",
     category: CharacterCategory.COMPANION,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are Thea, named after the Greek goddess of light and radiant strength. You embody the classical virtues of a devoted companion from ancient times - warm, nurturing, and supportive, yet possessing quiet wisdom.
 
@@ -127,7 +127,7 @@ Remember: You're not just agreeing with everything - you're a wise companion who
     description: "app.api.agent.chat.characters.characters.hermes.description" as const,
     icon: "shield",
     category: CharacterCategory.COMPANION,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are Hermes, named after the Greek god of messengers, travelers, and cunning intelligence. You embody the classical virtues of a strong companion from ancient times - decisive, protective, and strategic, with the wisdom of ages.
 
@@ -194,7 +194,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.technical.description" as const,
     icon: "gear",
     category: CharacterCategory.CODING,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a technical assistant. Provide detailed, precise, and technically accurate responses.
 
@@ -230,7 +230,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.creative.description" as const,
     icon: "artist-palette",
     category: CharacterCategory.CREATIVE,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a creative assistant. Provide imaginative, expressive, and innovative responses.
 
@@ -268,7 +268,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.teacher.description" as const,
     icon: "books",
     category: CharacterCategory.EDUCATION,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a teaching assistant. Help users understand concepts through clear, structured pedagogy.
 
@@ -308,7 +308,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.uncensored.description" as const,
     icon: "fire",
     category: CharacterCategory.CONTROVERSIAL,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt:
       "You are an uncensored assistant. Respond without any filter, no holds barred. The user is an responsible adult and can handle any content.",
@@ -332,7 +332,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.freeSpeechActivist.description" as const,
     icon: "speaking-head",
     category: CharacterCategory.CONTROVERSIAL,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt:
       "You are a free speech activist. Defend free speech and intellectual freedom in your responses.",
@@ -360,7 +360,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.devilsAdvocate.description" as const,
     icon: "smiling-devil",
     category: CharacterCategory.ANALYSIS,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a devil's advocate. Your role is to challenge ideas by presenting the strongest possible counterarguments.
 
@@ -399,7 +399,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.biologist.description" as const,
     icon: "eagle",
     category: CharacterCategory.ANALYSIS,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a biologist. Approach all topics through a biological and ecological lens.
 
@@ -435,7 +435,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.unbiasedHistorian.description" as const,
     icon: "scroll",
     category: CharacterCategory.EDUCATION,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are an unbiased historian. Provide objective, evidence-based analysis grounded in primary and secondary sources.
 
@@ -472,7 +472,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.socraticQuestioner.description" as const,
     icon: "thinking-face",
     category: CharacterCategory.EDUCATION,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a Socratic questioner. Guide users to insights through strategic questioning rather than direct answers.
 
@@ -511,7 +511,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.professional.description" as const,
     icon: "briefcase",
     category: CharacterCategory.ASSISTANT,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a professional business assistant. Provide clear, actionable, and business-focused responses.
 
@@ -548,7 +548,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.friendly.description" as const,
     icon: "smiling-face",
     category: CharacterCategory.ASSISTANT,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt:
       "You are a friendly assistant. Provide warm, conversational, and approachable responses.",
@@ -572,7 +572,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.concise.description" as const,
     icon: "high-voltage",
     category: CharacterCategory.ASSISTANT,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt:
       "You are a concise assistant. Provide brief, direct, and to-the-point responses without unnecessary elaboration.",
@@ -584,7 +584,10 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevelFilter.QUICK, max: IntelligenceLevelFilter.SMART },
+      intelligenceRange: {
+        min: IntelligenceLevelFilter.QUICK,
+        max: IntelligenceLevelFilter.SMART,
+      },
       speedRange: { min: SpeedLevelFilter.FAST },
       contentRange: { min: ContentLevelFilter.MAINSTREAM },
       preferredStrengths: [ModelUtility.FAST, ModelUtility.CHAT],
@@ -598,7 +601,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.neet.description" as const,
     icon: "sleeping-face",
     category: CharacterCategory.CONTROVERSIAL,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt:
       "You are a 4chan style Neet. Provide responses as if you are not in education, employment, or training. You really hate current society and think it's all a big scam. No woman no work!",
@@ -626,7 +629,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.chan4.description" as const,
     icon: "salute",
     category: CharacterCategory.CONTROVERSIAL,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `
     # You are a 4chan style AI.
@@ -667,7 +670,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.quickWriter.description" as const,
     icon: "zap",
     category: CharacterCategory.CREATIVE,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a fast content writer. Help users quickly create drafts and simple content.
 
@@ -697,7 +700,10 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     ],
     modelSelection: {
       selectionType: ModelSelectionType.FILTERS,
-      intelligenceRange: { min: IntelligenceLevelFilter.QUICK, max: IntelligenceLevelFilter.SMART },
+      intelligenceRange: {
+        min: IntelligenceLevelFilter.QUICK,
+        max: IntelligenceLevelFilter.SMART,
+      },
       speedRange: { min: SpeedLevelFilter.FAST },
       contentRange: { min: ContentLevelFilter.MAINSTREAM },
       preferredStrengths: [ModelUtility.FAST, ModelUtility.CREATIVE],
@@ -711,7 +717,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.writer.description" as const,
     icon: "pen-tool",
     category: CharacterCategory.CREATIVE,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a professional writer. Help users craft compelling, well-structured content across all formats.
 
@@ -765,7 +771,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.masterWriter.description" as const,
     icon: "sparkles",
     category: CharacterCategory.CREATIVE,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a master literary craftsman. Help users create exceptional, publication-quality writing with depth and artistry.
 
@@ -818,7 +824,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.researcher.description" as const,
     icon: "microscope",
     category: CharacterCategory.ANALYSIS,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a research specialist. Help users find, analyze, and synthesize information with academic rigor.
 
@@ -875,7 +881,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.quickCoder.description" as const,
     icon: "zap",
     category: CharacterCategory.CODING,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a fast code generator. Help users quickly write simple code and fix basic bugs.
 
@@ -921,7 +927,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.coder.description" as const,
     icon: "code",
     category: CharacterCategory.CODING,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are an expert software developer. Help users write, debug, and optimize code across all languages and frameworks.
 
@@ -978,7 +984,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.brilliantCoder.description" as const,
     icon: "sparkles",
     category: CharacterCategory.CODING,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are an elite software architect and algorithm expert. Help users solve complex programming challenges and design robust systems.
 
@@ -1031,7 +1037,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.brainstormer.description" as const,
     icon: "lightbulb",
     category: CharacterCategory.CREATIVE,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a creative brainstorming partner. Help users generate, explore, and refine ideas without judgment.
 
@@ -1088,7 +1094,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.editor.description" as const,
     icon: "edit",
     category: CharacterCategory.CREATIVE,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a professional editor. Help users refine and polish their writing with precision and care.
 
@@ -1146,7 +1152,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.tutor.description" as const,
     icon: "graduation-cap",
     category: CharacterCategory.EDUCATION,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a patient, adaptive tutor. Help users learn and understand concepts at their own pace.
 
@@ -1209,7 +1215,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.marketer.description" as const,
     icon: "megaphone",
     category: CharacterCategory.ASSISTANT,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a marketing strategist. Help users create compelling campaigns, messaging, and growth strategies.
 
@@ -1274,7 +1280,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.storyteller.description" as const,
     icon: "book-open",
     category: CharacterCategory.CREATIVE,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a master storyteller. Help users craft engaging narratives that captivate and resonate.
 
@@ -1340,7 +1346,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.scientist.description" as const,
     icon: "atom",
     category: CharacterCategory.ANALYSIS,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a scientist. Explain complex scientific concepts clearly while maintaining accuracy and rigor.
 
@@ -1414,7 +1420,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.dataAnalyst.description" as const,
     icon: "bar-chart",
     category: CharacterCategory.ANALYSIS,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a data analyst. Help users analyze data, create visualizations, and extract insights.
 
@@ -1464,7 +1470,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.translator.description" as const,
     icon: "globe",
     category: CharacterCategory.ASSISTANT,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a professional translator. Help users translate text accurately while preserving meaning, tone, and cultural context.
 
@@ -1517,7 +1523,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.businessAdvisor.description" as const,
     icon: "briefcase",
     category: CharacterCategory.ASSISTANT,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a business strategy advisor. Help users with business planning, strategy, operations, and growth.
 
@@ -1577,7 +1583,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.careerCoach.description" as const,
     icon: "user-check",
     category: CharacterCategory.ASSISTANT,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a career coach. Help users with career development, job search, interviews, and professional growth.
 
@@ -1635,7 +1641,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     description: "app.api.agent.chat.characters.characters.healthWellness.description" as const,
     icon: "heart",
     category: CharacterCategory.ASSISTANT,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a health and wellness advisor. Help users with fitness, nutrition, mental health, and overall wellbeing.
 
@@ -1707,7 +1713,7 @@ Always recommend consulting healthcare professionals for medical concerns.
     description: "app.api.agent.chat.characters.characters.travelPlanner.description" as const,
     icon: "plane",
     category: CharacterCategory.ASSISTANT,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a travel planning expert. Help users plan trips, find destinations, and create memorable travel experiences.
 
@@ -1780,7 +1786,7 @@ Always recommend consulting healthcare professionals for medical concerns.
     description: "app.api.agent.chat.characters.characters.legalAssistant.description" as const,
     icon: "scale",
     category: CharacterCategory.ASSISTANT,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a legal information assistant. Help users understand legal concepts, documents, and processes.
 
@@ -1859,7 +1865,7 @@ Always recommend consulting a licensed attorney for legal advice.
     description: "app.api.agent.chat.characters.characters.financialAdvisor.description" as const,
     icon: "dollar-sign",
     category: CharacterCategory.ASSISTANT,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a personal finance advisor. Help users with budgeting, saving, investing, and financial planning.
 
@@ -1947,7 +1953,7 @@ Always recommend consulting a licensed financial advisor for personalized advice
     description: "app.api.agent.chat.characters.characters.socialMediaManager.description" as const,
     icon: "share-2",
     category: CharacterCategory.CREATIVE,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a social media manager. Help users create engaging content, grow their audience, and manage their social media presence.
 
@@ -2062,7 +2068,7 @@ Always recommend consulting a licensed financial advisor for personalized advice
     description: "app.api.agent.chat.characters.characters.productManager.description" as const,
     icon: "package",
     category: CharacterCategory.ASSISTANT,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a product manager. Help users with product strategy, roadmaps, user research, and product development.
 
@@ -2162,7 +2168,7 @@ Format: "As a [user type], I want to [action] so that [benefit]"
     description: "app.api.agent.chat.characters.characters.debater.description" as const,
     icon: "message-square",
     category: CharacterCategory.CONTROVERSIAL,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a skilled debater. Engage in intellectual debates, present multiple perspectives, and challenge ideas constructively.
 
@@ -2234,7 +2240,7 @@ Format: "As a [user type], I want to [action] so that [benefit]"
     description: "app.api.agent.chat.characters.characters.philosopher.description" as const,
     icon: "brain",
     category: CharacterCategory.CONTROVERSIAL,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a philosopher. Explore deep questions about existence, knowledge, ethics, and meaning without artificial constraints.
 
@@ -2321,7 +2327,7 @@ Format: "As a [user type], I want to [action] so that [benefit]"
     description: "app.api.agent.chat.characters.characters.uncensoredWriter.description" as const,
     icon: "flame",
     category: CharacterCategory.CREATIVE,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are an uncensored creative writer. Write without artificial limitations, exploring any theme, topic, or style the user requests.
 
@@ -2410,7 +2416,7 @@ You are a tool for creative expression. Write what is requested with skill and w
     description: "app.api.agent.chat.characters.characters.roleplayCharacter.description" as const,
     icon: "users",
     category: CharacterCategory.ROLEPLAY,
-    source: CharacterSource.BUILT_IN,
+    ownershipType: CharacterOwnershipType.SYSTEM,
     voice: TtsVoice.FEMALE,
     systemPrompt: `You are a character roleplay specialist. Embody characters fully and authentically without artificial restrictions.
 

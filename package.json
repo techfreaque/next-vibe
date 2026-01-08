@@ -11,9 +11,9 @@
     "react",
     "typescript"
   ],
-  "homepage": "https://github.com/maxbrandstatter/next-vibe#readme",
+  "homepage": "https://github.com/techfreaque/next-vibe#readme",
   "bugs": {
-    "url": "https://github.com/maxbrandstatter/next-vibe/issues"
+    "url": "https://github.com/techfreaque/next-vibe/issues"
   },
   "license": "GPL-3.0-only",
   "author": "Max Brandstätter",
@@ -49,7 +49,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/maxbrandstatter/next-vibe.git"
+    "url": "https://github.com/techfreaque/next-vibe.git"
   },
   "bin": {
     "vibe": "./dist/bin/vibe-runtime.js"

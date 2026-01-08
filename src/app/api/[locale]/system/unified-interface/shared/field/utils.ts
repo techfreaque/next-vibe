@@ -718,8 +718,8 @@ export function requestResponseField<
 >(
   ui: TUIConfig,
   schema: TSchema,
-  cache?: CacheStrategy,
   requestAsUrlParams?: false,
+  cache?: CacheStrategy,
 ): PrimitiveField<TSchema, { request: "data"; response: true }, TKey, TUIConfig>;
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<
@@ -729,8 +729,8 @@ export function requestResponseField<
 >(
   ui: TUIConfig,
   schema: TSchema,
-  cache?: CacheStrategy,
   requestAsUrlParams?: true,
+  cache?: CacheStrategy,
 ): PrimitiveField<TSchema, { request: "urlPathParams"; response: true }, TKey, TUIConfig>;
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<
@@ -740,8 +740,8 @@ export function requestResponseField<
 >(
   ui: TUIConfig,
   schema: TSchema,
-  cache?: CacheStrategy,
   requestAsUrlParams?: boolean,
+  cache?: CacheStrategy,
 ): PrimitiveField<TSchema, { request: "data" | "urlPathParams"; response: true }, TKey, TUIConfig> {
   const requestType = requestAsUrlParams ? "urlPathParams" : "data";
   return {
@@ -769,6 +769,27 @@ export function requestDataField<
     type: "primitive" as const,
     schema,
     usage: { request: "data" },
+    ui,
+    cache,
+  };
+}
+
+/**
+ * Create a response field
+ */
+export function responseDataField<
+  TKey extends string = TranslationKey,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
+>(
+  ui: TUIConfig,
+  schema: TSchema,
+  cache?: CacheStrategy,
+): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig> {
+  return {
+    type: "primitive" as const,
+    schema,
+    usage: { response: true },
     ui,
     cache,
   };
@@ -815,6 +836,68 @@ export function requestDataRangeField<
     type: "primitive" as const,
     schema: rangeSchema,
     usage: { request: "data" },
+    ui,
+    cache,
+  };
+}
+
+export function requestResponseRangeField<
+  TKey extends string = TranslationKey,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TEnum extends z.ZodEnum<any> = z.ZodEnum<any>,
+>(
+  ui: TUIConfig,
+  enumSchema: TEnum,
+  cache?: CacheStrategy,
+): PrimitiveField<
+  z.ZodOptional<z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>>,
+  { request: "data"; response: true },
+  TKey,
+  TUIConfig
+> {
+  const rangeSchema = z
+    .object({
+      min: enumSchema.optional(),
+      max: enumSchema.optional(),
+    })
+    .optional();
+
+  return {
+    type: "primitive" as const,
+    schema: rangeSchema,
+    usage: { request: "data", response: true },
+    ui,
+    cache,
+  };
+}
+
+export function responseRangeField<
+  TKey extends string = TranslationKey,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TEnum extends z.ZodEnum<any> = z.ZodEnum<any>,
+>(
+  ui: TUIConfig,
+  enumSchema: TEnum,
+  cache?: CacheStrategy,
+): PrimitiveField<
+  z.ZodOptional<z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>>,
+  { response: true },
+  TKey,
+  TUIConfig
+> {
+  const rangeSchema = z
+    .object({
+      min: enumSchema.optional(),
+      max: enumSchema.optional(),
+    })
+    .optional();
+
+  return {
+    type: "primitive" as const,
+    schema: rangeSchema,
+    usage: { response: true },
     ui,
     cache,
   };

@@ -122,6 +122,26 @@ export const translations: typeof enTranslations = {
       label: "Kategorie",
       description: "Die Kategorie, zu der diese Charakter gehört",
     },
+    tagline: {
+      label: "Slogan",
+      description: "Ein kurzer Slogan, der den Charakter beschreibt",
+    },
+    source: {
+      label: "Quelle",
+      description: "Die Quelle dieses Charakters (integriert, benutzerdefiniert oder Community)",
+    },
+    ownershipType: {
+      label: "Eigentümertyp",
+      description: "Wer besitzt diesen Charakter (System, Benutzer oder öffentlich)",
+    },
+    voice: {
+      label: "Stimme",
+      description: "Text-zu-Sprache-Stimme für diesen Charakter",
+    },
+    modelSelection: {
+      label: "Modellauswahl",
+      description: "Wie das KI-Modell für diesen Charakter ausgewählt wird",
+    },
     preferredModel: {
       label: "Bevorzugtes Modell",
       description: "Das bevorzugte KI-Modell für diese Charakter",
@@ -185,9 +205,21 @@ export const translations: typeof enTranslations = {
       description: "Die eindeutige Kennung des zu löschenden Charakters",
     },
     errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description: "Die Charakter-Daten sind ungültig",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Verbindung zum Server nicht möglich",
+      },
       unauthorized: {
         title: "Nicht autorisiert",
         description: "Sie sind nicht berechtigt, diesen Charakter zu löschen",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Sie haben keine Berechtigung, diesen Charakter zu löschen",
       },
       notFound: {
         title: "Charakter nicht gefunden",
@@ -197,10 +229,23 @@ export const translations: typeof enTranslations = {
         title: "Serverfehler",
         description: "Ein Fehler ist beim Löschen des Charakters aufgetreten",
       },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler beim Löschen des Charakters ist aufgetreten",
+      },
+      unsavedChanges: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben nicht gespeicherte Änderungen",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Der Charakter wurde von einem anderen Benutzer geändert",
+      },
     },
     success: {
       title: "Charakter gelöscht",
       description: "Der Charakter wurde erfolgreich gelöscht",
+      content: "Charakter erfolgreich gelöscht",
     },
   },
 };

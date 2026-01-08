@@ -120,6 +120,26 @@ export const translations = {
       label: "Category",
       description: "The category this character belongs to",
     },
+    tagline: {
+      label: "Tagline",
+      description: "A short tagline describing the character",
+    },
+    source: {
+      label: "Source",
+      description: "The source of this character (built-in, custom, or community)",
+    },
+    ownershipType: {
+      label: "Ownership Type",
+      description: "Who owns this character (system, user, or public)",
+    },
+    voice: {
+      label: "Voice",
+      description: "Text-to-speech voice for this character",
+    },
+    modelSelection: {
+      label: "Model Selection",
+      description: "How the AI model is selected for this character",
+    },
     preferredModel: {
       label: "Preferred Model",
       description: "The preferred AI model for this character",
@@ -183,9 +203,21 @@ export const translations = {
       description: "The unique identifier of the character to delete",
     },
     errors: {
+      validation: {
+        title: "Validation Error",
+        description: "The character data is invalid",
+      },
+      network: {
+        title: "Network Error",
+        description: "Unable to connect to the server",
+      },
       unauthorized: {
         title: "Unauthorized",
         description: "You are not authorized to delete this character",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "You don't have permission to delete this character",
       },
       notFound: {
         title: "Character Not Found",
@@ -195,10 +227,23 @@ export const translations = {
         title: "Server Error",
         description: "An error occurred while deleting the character",
       },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred while deleting the character",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "The character has been modified by another user",
+      },
     },
     success: {
       title: "Character Deleted",
       description: "The character has been successfully deleted",
+      content: "Character deleted successfully",
     },
   },
 };

@@ -436,7 +436,6 @@ const { PUT } = createEndpoint({
           columns: 12,
         },
         z.string().uuid("usersErrors.validation.id.invalid"),
-        undefined,
         true,
       ),
 

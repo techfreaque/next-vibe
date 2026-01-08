@@ -210,6 +210,14 @@ export const translations: typeof enTranslations = {
     position: {
       label: "Pozycja",
     },
+    color: {
+      label: "Kolor",
+      description: "Niestandardowy kolor dla tego ulubionego",
+    },
+    customIcon: {
+      label: "Niestandardowa ikona",
+      description: "Niestandardowa ikona dla tego ulubionego",
+    },
     response: {
       success: {
         content: "Zaktualizowano: {{value}}",

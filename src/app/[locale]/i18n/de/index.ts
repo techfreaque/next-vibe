@@ -342,6 +342,8 @@ export const translations: typeof enTranslations = {
         aiProviders: "KI-Anbieter",
         media: "Medien",
         special: "Spezial",
+        navigation: "Navigation",
+        ui: "UI & Steuerung",
       },
     },
     countries: {

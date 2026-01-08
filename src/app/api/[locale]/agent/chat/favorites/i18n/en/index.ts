@@ -3,6 +3,10 @@ import { translations as idTranslations } from "../../[id]/i18n/en";
 export const translations = {
   id: idTranslations,
   enums: {
+    selectionType: {
+      manual: "Specific Model",
+      filters: "Filter Criteria",
+    },
     mode: {
       auto: "Auto",
       manual: "Manual",

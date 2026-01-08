@@ -1089,8 +1089,8 @@ export const ICON_CATEGORIES = {
       "si-alibabadotcom",
     ],
   },
-  ai_providers: {
-    name: "app.ui.iconPicker.categories.ai_providers",
+  aiProviders: {
+    name: "app.ui.iconPicker.categories.aiProviders",
     icons: [
       "si-anthropic",
       "si-googlegemini",
@@ -1182,5 +1182,10 @@ export const ICON_CATEGORIES = {
     ],
   },
 } as const satisfies Record<string, { readonly name: TranslationKey; readonly icons: IconKey[] }>;
+
+export const ICON_CATEGORIES_LIST = Object.entries(ICON_CATEGORIES) as [
+  CategoryKey,
+  (typeof ICON_CATEGORIES)[CategoryKey],
+][];
 
 export type CategoryKey = keyof typeof ICON_CATEGORIES;

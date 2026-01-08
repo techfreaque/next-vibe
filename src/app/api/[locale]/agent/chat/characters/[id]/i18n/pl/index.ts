@@ -122,6 +122,26 @@ export const translations: typeof enTranslations = {
       label: "Kategoria",
       description: "Kategoria, do której należy ta postać",
     },
+    tagline: {
+      label: "Slogan",
+      description: "Krótki slogan opisujący postać",
+    },
+    source: {
+      label: "Źródło",
+      description: "Źródło tej postaciy (wbudowane, niestandardowe lub społecznościowe)",
+    },
+    ownershipType: {
+      label: "Typ własności",
+      description: "Kto jest właścicielem tej postaciy (system, użytkownik lub publiczny)",
+    },
+    voice: {
+      label: "Głos",
+      description: "Głos tekstu na mowę dla tej postaciy",
+    },
+    modelSelection: {
+      label: "Wybór modelu",
+      description: "Jak model AI jest wybierany dla tej postaciy",
+    },
     preferredModel: {
       label: "Preferowany model",
       description: "Preferowany model AI dla tej postaciy",
@@ -185,8 +205,20 @@ export const translations: typeof enTranslations = {
       description: "Unikalny identyfikator postaci do usunięcia",
     },
     errors: {
+      validation: {
+        title: "Błąd walidacji",
+        description: "Dane postaci są nieprawidłowe",
+      },
+      network: {
+        title: "Błąd sieci",
+        description: "Nie można połączyć się z serwerem",
+      },
       unauthorized: {
         title: "Brak autoryzacji",
+        description: "Nie masz uprawnień do usunięcia tej postaci",
+      },
+      forbidden: {
+        title: "Zabronione",
         description: "Nie masz uprawnień do usunięcia tej postaci",
       },
       notFound: {
@@ -197,10 +229,23 @@ export const translations: typeof enTranslations = {
         title: "Błąd serwera",
         description: "Wystąpił błąd podczas usuwania postaci",
       },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieoczekiwany błąd podczas usuwania postaci",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Postać została zmodyfikowana przez innego użytkownika",
+      },
     },
     success: {
       title: "Postać usunięta",
       description: "Postać została pomyślnie usunięta",
+      content: "Postać usunięta pomyślnie",
     },
   },
 };
