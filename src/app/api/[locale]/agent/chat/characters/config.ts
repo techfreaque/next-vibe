@@ -5,39 +5,56 @@
  */
 
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
-import { TtsVoice } from "../../text-to-speech/enum";
+import { TtsVoice, type TtsVoiceValue } from "../../text-to-speech/enum";
 import {
   ContentLevelFilter,
   IntelligenceLevelFilter,
   ModelSelectionType,
   SpeedLevelFilter,
 } from "../favorites/enum";
-import type { Character } from "./definition";
+import type { CustomCharacter } from "./db";
 import {
-  CATEGORY_CONFIG,
   CharacterCategory,
-  CharacterCategoryOptions,
+  type CharacterCategoryValue,
   CharacterOwnershipType,
+  type CharacterOwnershipTypeValue,
 } from "./enum";
 
 /**
- * Category options with icons for UI
- * Generated from centralized category configuration
+ * Character type representing FULL character details
+ * Used when:
+ * - Defining default characters in config
+ * - Fetching individual character via GET /characters/[id]
+ * - Sending messages (needs systemPrompt, modelSelection)
+ *
+ * DO NOT use this for list display - use CharacterListItem from definition.ts instead
+ *
+ * Excludes database-specific fields like userId, createdAt, updatedAt
  */
-export const CategoryOptions = CharacterCategoryOptions.map((option) => {
-  const config = CATEGORY_CONFIG[option.value as keyof typeof CATEGORY_CONFIG];
-  return {
-    ...option,
-    icon: config.icon,
-  };
-});
+interface Character {
+  id: string;
+  name: TranslationKey;
+  tagline: TranslationKey;
+  description: TranslationKey;
+  icon: IconKey;
+  systemPrompt: string;
+  category: typeof CharacterCategoryValue;
+  voice: typeof TtsVoiceValue;
+  suggestedPrompts: string[];
+  modelSelection: CustomCharacter["modelSelection"];
+  ownershipType: typeof CharacterOwnershipTypeValue;
+  modelInfo?: string;
+  creditCost?: string;
+}
 
 /**
  * Default characters available in the application
  * These are read-only and defined in code
  */
-export const DEFAULT_CHARACTERS = [
+export const DEFAULT_CHARACTERS: Character[] = [
   {
     id: "default",
     name: "app.api.agent.chat.characters.characters.default.name" as const,
@@ -2506,29 +2523,12 @@ You are here to create immersive roleplay experiences. Embody characters fully a
       ignoredWeaknesses: null,
     },
   },
-] satisfies Character[];
+];
 
 /**
- * Get character details by ID
+ * Get all default characters in a specific category
+ * Returns full Character objects for browsing/display
  */
-export function getCharacterById(id: string): Character | undefined {
-  return DEFAULT_CHARACTERS.find((p) => p.id === id);
-}
-
-/**
- * Get character display name by ID
- */
-export function getCharacterName(id: string): string {
-  const character = getCharacterById(id);
-  return character ? character.name : DEFAULT_CHARACTERS[0].name;
-}
-
-/**
- * Get characters by category
- */
-export function getCharactersByCategory(category: string): Character[] {
+export function getCharactersByCategory(category: Character["category"]): readonly Character[] {
   return DEFAULT_CHARACTERS.filter((p) => p.category === category);
 }
-
-// Re-export Character type from definition.ts
-export type { Character } from "./definition";

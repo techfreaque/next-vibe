@@ -6,6 +6,7 @@ import type { FieldValues } from "react-hook-form";
 
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import { ToolCallRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/ToolCallRenderer";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -21,6 +22,7 @@ export type ToolDecision =
  * Tool Display Props
  */
 interface ToolDisplayProps {
+  logger: EndpointLogger;
   /** Single tool call to display (each TOOL message has exactly one tool call) */
   toolCall: ToolCall;
   /** Current locale for translations */
@@ -91,6 +93,7 @@ export function ToolDisplay({
   parentId,
   defaultOpen: defaultOpenProp,
   decision,
+  logger,
 }: ToolDisplayProps): JSX.Element | null {
   if (!toolCall) {
     return null;
@@ -114,6 +117,7 @@ export function ToolDisplay({
         onCancel={onCancel}
         parentId={parentId}
         decision={decision}
+        logger={logger}
       />
     </Div>
   );

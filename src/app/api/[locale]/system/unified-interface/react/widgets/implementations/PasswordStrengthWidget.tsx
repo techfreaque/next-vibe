@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
@@ -8,7 +9,13 @@ import type { JSX } from "react";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { WidgetType } from "../../../shared/types/enums";
+import { calculatePasswordStrength } from "../../../shared/widgets/logic/password-strength";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
+import {
+  getHeightClassName,
+  getSpacingClassName,
+  getTextSizeClassName,
+} from "../../../shared/widgets/utils/widget-helpers";
 
 /**
  * Displays a visual indicator of password strength.
@@ -21,7 +28,29 @@ export function PasswordStrengthWidget<const TKey extends string>({
   form,
 }: ReactWidgetProps<typeof WidgetType.PASSWORD_STRENGTH, TKey>): JSX.Element | null {
   const { t } = simpleT(context.locale);
-  const { watchField = "password" } = field.ui;
+  const {
+    watchField = "password",
+    containerGap,
+    labelTextSize,
+    barHeight,
+    suggestionTextSize,
+    suggestionMarginTop,
+    weakBgColor = "bg-red-500",
+    fairBgColor = "bg-orange-500",
+    goodBgColor = "bg-yellow-500",
+    strongBgColor = "bg-green-500",
+    weakTextColor = "text-red-500",
+    fairTextColor = "text-orange-500",
+    goodTextColor = "text-yellow-500",
+    strongTextColor = "text-green-500",
+  } = field.ui;
+
+  // Get classes from config (no hardcoding!)
+  const containerGapClass = getSpacingClassName("gap", containerGap);
+  const labelTextSizeClass = getTextSizeClassName(labelTextSize);
+  const suggestionTextSizeClass = getTextSizeClassName(suggestionTextSize);
+  const suggestionMarginTopClass = getSpacingClassName("margin", suggestionMarginTop);
+  const barHeightClass = getHeightClassName(barHeight);
 
   const password = form?.watch(watchField) as string | undefined;
 
@@ -29,68 +58,54 @@ export function PasswordStrengthWidget<const TKey extends string>({
     return null;
   }
 
-  let strength = 0;
-  let color = "bg-red-500";
-  let labelText = t("app.user.components.auth.common.passwordStrength.weak");
+  // Use shared logic for strength calculation
+  const { level, widthPercentage } = calculatePasswordStrength(password);
 
-  if (password.length >= 8) {
-    strength += 1;
-  }
-  if (password.length >= 10) {
-    strength += 1;
-  }
+  // Get colors from config based on level
+  const colorClass =
+    level === "weak"
+      ? weakBgColor
+      : level === "fair"
+        ? fairBgColor
+        : level === "good"
+          ? goodBgColor
+          : strongBgColor;
 
-  if (/[A-Z]/.test(password)) {
-    strength += 1;
-  }
-  if (/[0-9]/.test(password)) {
-    strength += 1;
-  }
-  if (/[^A-Za-z0-9]/.test(password)) {
-    strength += 1;
-  }
+  const textColorClass =
+    level === "weak"
+      ? weakTextColor
+      : level === "fair"
+        ? fairTextColor
+        : level === "good"
+          ? goodTextColor
+          : strongTextColor;
 
-  if (strength <= 2) {
-    color = "bg-red-500";
-    labelText = t("app.user.components.auth.common.passwordStrength.weak");
-  } else if (strength <= 3) {
-    color = "bg-orange-500";
-    labelText = t("app.user.components.auth.common.passwordStrength.fair");
-  } else if (strength <= 4) {
-    color = "bg-yellow-500";
-    labelText = t("app.user.components.auth.common.passwordStrength.good");
-  } else {
-    color = "bg-green-500";
-    labelText = t("app.user.components.auth.common.passwordStrength.strong");
-  }
-
-  const widthPercentage = Math.max(20, Math.min(100, (strength / 5) * 100));
+  const labelText = t(`app.user.components.auth.common.passwordStrength.${level}`);
 
   return (
-    <Div className={`flex flex-col gap-1 ${className ?? ""}`}>
-      <Div className="flex justify-between text-xs">
+    <Div className={cn("flex flex-col", containerGapClass || "gap-1", className)}>
+      <Div className={cn("flex justify-between", labelTextSizeClass || "text-xs")}>
         <Span>{t("app.user.components.auth.common.passwordStrength.label")}</Span>
-        <Span
-          className={
-            strength <= 2
-              ? "text-red-500"
-              : strength <= 3
-                ? "text-orange-500"
-                : strength <= 4
-                  ? "text-yellow-500"
-                  : "text-green-500"
-          }
-        >
-          {labelText}
-        </Span>
+        <Span className={textColorClass}>{labelText}</Span>
       </Div>
-      <Div className="h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+      <Div
+        className={cn(
+          barHeightClass,
+          "w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden",
+        )}
+      >
         <Div style={{ width: `${widthPercentage}%` }}>
-          <Div className={`h-full ${color} transition-all duration-300`} />
+          <Div className={cn("h-full transition-all duration-300", colorClass)} />
         </Div>
       </Div>
-      {strength <= 2 && (
-        <P className="text-xs text-red-500 mt-1">
+      {level === "weak" && (
+        <P
+          className={cn(
+            textColorClass,
+            suggestionTextSizeClass || "text-xs",
+            suggestionMarginTopClass || "mt-1",
+          )}
+        >
           {t("app.user.components.auth.common.passwordStrength.suggestion")}
         </P>
       )}

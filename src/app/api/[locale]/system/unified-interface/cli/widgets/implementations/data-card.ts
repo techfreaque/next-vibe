@@ -1,6 +1,11 @@
 /**
  * Data Card Widget Renderer
- * Handles DATA_CARD widget type for CLI display
+ *
+ * Handles DATA_CARD widget type for CLI display.
+ * Displays structured information in a card format with title, description, fields, and optional actions.
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All data extraction logic imported from shared.
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -12,6 +17,10 @@ import type { CLIWidgetProps } from "../core/types";
 export class DataCardWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_CARD> {
   readonly widgetType = WidgetType.DATA_CARD;
 
+  /**
+   * Render data card with title, optional description, field list, and actions.
+   * Displays in a structured format with separators and styled text.
+   */
   render(props: CLIWidgetProps<typeof WidgetType.DATA_CARD, string>): string {
     const { value, context } = props;
     const indent = this.createIndent(context.depth, context);

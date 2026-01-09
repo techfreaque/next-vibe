@@ -11,6 +11,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import type { FolderListResponseOutput } from "../folders/definition";
 import { GET as foldersGetEndpoint } from "../folders/definition";
@@ -100,6 +101,7 @@ async function loadIncognitoData(
 async function loadThreadsFromServer(
   logger: EndpointLogger,
   locale: CountryLanguage,
+  rootFolderId: DefaultFolderId.PRIVATE | DefaultFolderId.SHARED | DefaultFolderId.PUBLIC,
   addThread: (thread: ChatThread) => void,
 ): Promise<void> {
   try {
@@ -109,6 +111,7 @@ async function loadThreadsFromServer(
       {
         page: 1,
         limit: 100,
+        rootFolderId,
       },
       undefined,
       locale,
@@ -142,11 +145,11 @@ async function loadThreadsFromServer(
             tags: [],
             preview: thread.preview,
             metadata: {},
-            rolesView: thread.rolesView,
-            rolesEdit: thread.rolesEdit,
-            rolesPost: thread.rolesPost,
-            rolesModerate: thread.rolesModerate,
-            rolesAdmin: thread.rolesAdmin,
+            rolesView: thread.rolesView ?? null,
+            rolesEdit: thread.rolesEdit ?? null,
+            rolesPost: thread.rolesPost ?? null,
+            rolesModerate: thread.rolesModerate ?? null,
+            rolesAdmin: thread.rolesAdmin ?? null,
             published: false,
             createdAt: new Date(thread.createdAt),
             updatedAt: new Date(thread.updatedAt),
@@ -174,13 +177,16 @@ async function loadThreadsFromServer(
 async function loadFoldersFromServer(
   logger: EndpointLogger,
   locale: CountryLanguage,
+  rootFolderId: DefaultFolderId.PRIVATE | DefaultFolderId.SHARED | DefaultFolderId.PUBLIC,
   addFolder: (folder: ChatFolder) => void,
 ): Promise<void> {
   try {
     const foldersResponse = await apiClient.fetch(
       foldersGetEndpoint,
       logger,
-      {},
+      {
+        rootFolderId,
+      },
       undefined,
       locale,
       {
@@ -209,12 +215,12 @@ async function loadFoldersFromServer(
             parentId: folder.parentId,
             expanded: folder.expanded,
             sortOrder: folder.sortOrder,
-            rolesView: folder.rolesView,
-            rolesManage: folder.rolesManage,
-            rolesCreateThread: folder.rolesCreateThread,
-            rolesPost: folder.rolesPost,
-            rolesModerate: folder.rolesModerate,
-            rolesAdmin: folder.rolesAdmin,
+            rolesView: folder.rolesView ?? null,
+            rolesManage: folder.rolesManage ?? null,
+            rolesCreateThread: folder.rolesCreateThread ?? null,
+            rolesPost: folder.rolesPost ?? null,
+            rolesModerate: folder.rolesModerate ?? null,
+            rolesAdmin: folder.rolesAdmin ?? null,
             createdAt: new Date(folder.createdAt),
             updatedAt: new Date(folder.updatedAt),
             canManage: folder.canManage,
@@ -242,6 +248,7 @@ export function useDataLoader(
   user: JwtPayloadType | undefined,
   locale: CountryLanguage,
   logger: EndpointLogger,
+  currentRootFolderId: DefaultFolderId,
   addThread: (thread: ChatThread) => void,
   addMessage: (message: ChatMessage) => void,
   addFolder: (folder: ChatFolder) => void,
@@ -263,20 +270,29 @@ export function useDataLoader(
       logger.debug("Chat: Checking authentication before loading data", {
         isAuthenticated,
         isPublic: user?.isPublic ?? true,
+        currentRootFolderId,
       });
 
-      // ALWAYS load incognito data from localStorage
-      await loadIncognitoData(logger, addThread, addMessage, addFolder);
+      // ALWAYS load incognito data from localStorage (for incognito mode only)
+      if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
+        await loadIncognitoData(logger, addThread, addMessage, addFolder);
+        // Skip server calls for incognito mode - everything is local-only
+        setDataLoaded(true);
+        logger.info("Chat: Incognito mode - skipping server data load");
+        return;
+      }
 
-      // Load server data in parallel
+      // Load server data in parallel for non-incognito folders
       logger.info("Chat: Loading server data", {
         isAuthenticated,
         loadingScope: isAuthenticated ? "all" : "public only",
+        rootFolderId: currentRootFolderId,
       });
 
+      // TypeScript now knows currentRootFolderId is PRIVATE | SHARED | PUBLIC
       await Promise.all([
-        loadThreadsFromServer(logger, locale, addThread),
-        loadFoldersFromServer(logger, locale, addFolder),
+        loadThreadsFromServer(logger, locale, currentRootFolderId, addThread),
+        loadFoldersFromServer(logger, locale, currentRootFolderId, addFolder),
       ]);
 
       // Mark data as loaded
@@ -284,5 +300,5 @@ export function useDataLoader(
     };
 
     void loadData();
-  }, [locale, user, logger, addThread, addMessage, addFolder, setDataLoaded]);
+  }, [locale, user, logger, currentRootFolderId, addThread, addMessage, addFolder, setDataLoaded]);
 }

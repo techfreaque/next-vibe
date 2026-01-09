@@ -1,7 +1,20 @@
 /**
  * Markdown Widget Renderer
- * Handles MARKDOWN widget type for CLI display
- * Converts markdown to plain text with basic ANSI formatting
+ *
+ * Handles MARKDOWN widget type for CLI display.
+ * Converts markdown to plain text with ANSI formatting support for:
+ * - Headings (# to ######) - bold style
+ * - Bold text (**text** or __text__) - bold style
+ * - Italic text (*text* or _text_) - dim style
+ * - Inline code (`code`) - blue style
+ * - Code blocks (```code```) - blue style
+ * - Unordered lists (- item, * item) - bullet points
+ * - Ordered lists (1. item) - preserved as-is
+ * - Links [text](url) - blue text with dimmed URL
+ * - Horizontal rules (--- or ***) - separator lines
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All data extraction logic imported from shared.
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -16,6 +29,14 @@ import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.MARKDOWN> {
   readonly widgetType = WidgetType.MARKDOWN;
 
+  /**
+   * Render markdown content with ANSI formatting.
+   * Uses shared extraction logic to process markdown data,
+   * then converts markdown syntax to CLI-friendly formatted text.
+   *
+   * @param props Widget properties with markdown content and rendering context
+   * @returns Formatted markdown string with ANSI codes and indentation
+   */
   render(props: CLIWidgetProps<typeof WidgetType.MARKDOWN, string>): string {
     const { value, context } = props;
     const t = context.t;
@@ -36,6 +57,15 @@ export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     return this.renderMarkdown(data, context);
   }
 
+  /**
+   * Render markdown content with formatting and indentation.
+   * Converts markdown syntax to ANSI-formatted text, then applies
+   * consistent indentation to each line based on nesting depth.
+   *
+   * @param data Processed markdown data with content
+   * @param context Rendering context with depth and options
+   * @returns Formatted and indented markdown string
+   */
   private renderMarkdown(data: ProcessedMarkdown, context: WidgetRenderContext): string {
     const { content } = data;
     const indent = this.createIndent(context.depth, context);
@@ -49,8 +79,34 @@ export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
   }
 
   /**
-   * Convert markdown to plain text with basic ANSI formatting
-   * Supports: headings, bold, italic, code blocks, inline code, lists
+   * Convert markdown syntax to plain text with ANSI formatting.
+   * Processes markdown elements using regex replacements to convert to CLI-friendly format.
+   *
+   * Supported Markdown Elements:
+   * - Headings (# to ######): Converted to bold text
+   * - Bold (**text** or __text__): Converted to bold ANSI style
+   * - Italic (*text* or _text_): Converted to dim ANSI style
+   * - Inline code (`code`): Converted to blue ANSI style
+   * - Code blocks (```code```): Converted to blue ANSI style
+   * - Unordered lists (- item, * item): Converted to bullet points (• or -)
+   * - Ordered lists (1. item): Preserved as-is with numbering
+   * - Links [text](url): Converted to blue text with dimmed URL in parentheses
+   * - Horizontal rules (--- or ***): Converted to separator lines (────)
+   *
+   * Processing Order:
+   * 1. Headings → bold
+   * 2. Bold markers → bold style
+   * 3. Italic markers → dim style
+   * 4. Inline code → blue style
+   * 5. Code blocks → blue style
+   * 6. Unordered lists → bullets
+   * 7. Ordered lists → preserved
+   * 8. Links → styled with URL
+   * 9. Horizontal rules → separators
+   *
+   * @param content Raw markdown string to convert
+   * @param context Rendering context for styling and emoji support
+   * @returns Converted text with ANSI formatting codes
    */
   private convertMarkdownToPlainText(content: string, context: WidgetRenderContext): string {
     let result = content;

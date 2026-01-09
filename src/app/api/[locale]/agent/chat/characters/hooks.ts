@@ -17,6 +17,9 @@ import { CharactersRepositoryClient } from "./repository-client";
 
 /**
  * Hook to fetch all characters (default + custom)
+ * - All users use API (endpoint is public)
+ * - Public users: read-only access to defaults
+ * - Authenticated users: can create/edit custom characters
  */
 export function useCharacters(
   logger: EndpointLogger,

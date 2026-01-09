@@ -14,6 +14,7 @@ export interface AccordionItem {
   title: string;
   content: WidgetData;
   expanded?: boolean;
+  disabled?: boolean;
 }
 
 /**
@@ -49,6 +50,7 @@ export function extractAccordionData(value: WidgetData): ProcessedAccordion | nu
         title: "title" in item && typeof item.title === "string" ? item.title : "",
         content: "content" in item ? item.content : null,
         expanded: "expanded" in item && typeof item.expanded === "boolean" ? item.expanded : false,
+        disabled: "disabled" in item && typeof item.disabled === "boolean" ? item.disabled : false,
       }))
       .filter((item) => item.id && item.title);
 

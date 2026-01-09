@@ -1,10 +1,8 @@
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 import type { TParams } from "@/i18n/core/static-types";
 
 import type { CreateApiEndpointAny, UnifiedField } from "../../types/endpoint";
 import { WidgetType } from "../../types/enums";
-import type { WidgetRenderContext } from "../types";
 
 /**
  * Check if field is used for request (form input)
@@ -81,32 +79,6 @@ export function isFieldRequired<TKey extends string>(field: UnifiedField<TKey>):
     return field.required;
   }
   return false;
-}
-
-/**
- * Get translation function from context
- * Uses scoped translation function if provided, otherwise falls back to global
- *
- * @param context - Widget render context
- * @returns Translation function { t }
- *
- * @example
- * ```ts
- * const { t } = getTranslator(context);
- * t("form.fields.name.label");
- * ```
- */
-export function getTranslator(context: WidgetRenderContext): {
-  t: <K extends string>(key: K, params?: TParams) => string;
-} {
-  if (context.scopedT) {
-    return context.scopedT(context.locale) as {
-      t: <K extends string>(key: K, params?: TParams) => string;
-    };
-  }
-  return simpleT(context.locale) as {
-    t: <K extends string>(key: K, params?: TParams) => string;
-  };
 }
 
 export function getTranslatorFromEndpoint<TEndpoint extends CreateApiEndpointAny>(

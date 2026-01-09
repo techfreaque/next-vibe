@@ -1,11 +1,19 @@
 /**
  * Section Widget Renderer
  * Handles SECTION widget type for organizing content into labeled sections
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All business logic imported from shared.
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { isSectionEmpty } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/section";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
-import { getTranslator } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
+import {
+  hasChildren,
+  isWidgetDataArray,
+  isWidgetDataObject,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
@@ -16,7 +24,8 @@ export class SectionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.
   render(props: CLIWidgetProps<typeof WidgetType.SECTION, string>): string {
     const { value, context } = props;
 
-    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    // Use type guard from central file
+    if (isWidgetDataObject(value)) {
       return this.renderSection(value, props, context);
     }
 
@@ -31,34 +40,29 @@ export class SectionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.
     const result: string[] = [];
     const { field } = props;
     const { title: titleKey } = field.ui;
-    const { t } = getTranslator(context);
 
-    if (this.isSectionEmpty(value)) {
+    // Use shared logic from section.ts
+    if (isSectionEmpty(value)) {
       return "";
     }
 
     if (titleKey) {
-      const title = t(titleKey);
+      const title = context.t(titleKey);
       result.push("");
       result.push(this.styleText(title.toUpperCase(), "bold", context));
       result.push(this.styleText("─".repeat(50), "dim", context));
     }
 
-    // Render nested fields
-    for (const [key, val] of Object.entries(value)) {
-      if (val === undefined || val === null) {
-        continue;
-      }
+    // Use centralized renderChildren helper - eliminates duplication
+    const renderedChildren = this.renderChildren(field, value, context);
+    result.push(...renderedChildren);
 
-      if (field.type === "object" && field.children?.[key]) {
-        const childField = field.children[key];
-        const rendered = context.renderWidget(childField.ui.type, childField, val);
-        if (rendered) {
-          result.push(rendered);
+    // Handle fields without metadata (fallback)
+    if (!hasChildren(field)) {
+      for (const [key, val] of Object.entries(value)) {
+        if (val !== undefined && val !== null) {
+          result.push(this.renderSimpleField(key, val, context));
         }
-      } else {
-        // Fallback rendering
-        result.push(this.renderSimpleField(key, val));
       }
     }
 
@@ -66,49 +70,24 @@ export class SectionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.
   }
 
   /**
-   * Check if section is empty (has no meaningful content)
+   * Render a simple field when no metadata is available.
+   * Uses centralized renderValue helper for consistent formatting.
    */
-  private isSectionEmpty(value: { [key: string]: WidgetData }): boolean {
-    const entries = Object.entries(value);
-    if (entries.length === 0) {
-      return true;
-    }
-
-    // Check if all values are empty/null/undefined
-    return entries.every((entry) => {
-      const val = entry[1];
-      if (val === null || val === undefined) {
-        return true;
-      }
-      if (Array.isArray(val) && val.length === 0) {
-        return true;
-      }
-      if (typeof val === "object" && Object.keys(val).length === 0) {
-        return true;
-      }
-      return false;
-    });
-  }
-
-  /**
-   * Render a simple field when no metadata is available
-   */
-  private renderSimpleField(key: string, value: WidgetData): string {
+  private renderSimpleField(key: string, value: WidgetData, context: WidgetRenderContext): string {
     if (value === null || value === undefined) {
       return "";
     }
 
-    if (Array.isArray(value)) {
+    // Special handling for arrays - preserve original formatting
+    if (isWidgetDataArray(value)) {
       if (value.length === 0) {
         return "";
       }
-      return value.map((item) => `  ${item}`).join("\n");
+      return value.map((item) => `  ${this.renderValue(item, context)}`).join("\n");
     }
 
-    if (typeof value === "object") {
-      return JSON.stringify(value, null, 2);
-    }
-
-    return `${key}: ${value}`;
+    // Use centralized renderValue for consistent formatting
+    const formattedValue = this.renderValue(value, context);
+    return `${key}: ${formattedValue}`;
   }
 }

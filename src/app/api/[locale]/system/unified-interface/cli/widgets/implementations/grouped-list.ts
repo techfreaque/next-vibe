@@ -1,9 +1,30 @@
 /**
  * Grouped List Widget Renderer
- * Specialized renderer for grouped lists with beautiful CLI output
+ *
+ * Handles GROUPED_LIST widget type for CLI display.
+ * Specialized renderer for displaying grouped lists with support for:
+ * - Flat grouping by field (e.g., group code quality issues by file)
+ * - Hierarchical/tree rendering for nested paths
+ * - Multiple render modes: code-quality (lint issues) and simple (commands/general items)
+ * - Group headers with item counts
+ * - Summary statistics with error/warning counts
+ * - Affected files list for code quality mode
+ * - Item sorting within groups
+ * - Truncation indicators for large groups
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All type guards imported from shared.
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import {
+  isWidgetDataArray,
+  isWidgetDataBoolean,
+  isWidgetDataNumber,
+  isWidgetDataObject,
+  isWidgetDataPrimitive,
+  isWidgetDataString,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
 
 import type { IconKey } from "../../../react/icons";
 import { BaseWidgetRenderer } from "../core/base-renderer";
@@ -59,11 +80,27 @@ interface TreeNode {
 export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.GROUPED_LIST> {
   readonly widgetType = WidgetType.GROUPED_LIST;
 
+  /**
+   * Render grouped list with items organized by specified field.
+   * Supports two rendering strategies:
+   * - Hierarchical: Tree structure for nested paths (when config.hierarchical = true)
+   * - Flat: Groups with headers and items (default)
+   *
+   * For flat rendering:
+   * - Groups items by configured field (e.g., "file" for code quality issues)
+   * - Renders each group with header showing group key and item count
+   * - Sorts items within each group by configured field (e.g., "severity")
+   * - Shows summary statistics if configured
+   *
+   * For hierarchical rendering:
+   * - Builds tree structure from paths
+   * - Renders nested structure with proper indentation
+   */
   render(props: CLIWidgetProps<typeof WidgetType.GROUPED_LIST, string>): string {
     const { value: data, context } = props;
     const t = context.t;
 
-    if (!Array.isArray(data) || data.length === 0) {
+    if (!isWidgetDataArray(data) || data.length === 0) {
       return context.renderEmptyState(
         t(
           "app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable",
@@ -72,9 +109,8 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
     }
 
     // Type narrow the array items to GroupedListItem
-    const typedData: GroupedListItem[] = data.filter(
-      (item): item is GroupedListItem =>
-        typeof item === "object" && item !== null && !Array.isArray(item),
+    const typedData: GroupedListItem[] = data.filter((item): item is GroupedListItem =>
+      isWidgetDataObject(item),
     ) as GroupedListItem[];
     const config = this.getGroupedListConfig();
 
@@ -102,6 +138,16 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
     return output.trim();
   }
 
+  /**
+   * Get configuration for grouped list rendering.
+   * Returns default configuration optimized for code quality tool output:
+   * - Groups by "file" field
+   * - Sorts by "severity" within groups
+   * - Shows group summaries
+   * - Limits to 50 items per group
+   *
+   * @returns GroupedListConfig with default settings
+   */
   private getGroupedListConfig(): GroupedListConfig {
     return {
       groupBy: "file",
@@ -112,7 +158,20 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
   }
 
   /**
-   * Group data by specified field
+   * Group data by specified field value.
+   * Creates a map where keys are string representations of the field values
+   * and values are arrays of items with that field value.
+   *
+   * Special handling:
+   * - Null/undefined values grouped under "Other" (translated)
+   * - Boolean values converted to "true"/"false" strings
+   * - All other primitives converted to strings
+   * - Groups sorted alphabetically by key
+   *
+   * @param data Array of items to group
+   * @param groupBy Field name to group by
+   * @param context Rendering context for translations
+   * @returns Map of group keys to item arrays, sorted alphabetically
    */
   private groupData(
     data: GroupedListItem[],
@@ -128,14 +187,12 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
     for (const item of data) {
       const groupValue = item[groupBy];
       let groupKey = otherLabel;
-      if (typeof groupValue === "string") {
-        groupKey = groupValue;
-      } else if (typeof groupValue === "number") {
-        groupKey = String(groupValue);
-      } else if (typeof groupValue === "boolean") {
-        groupKey = groupValue ? "true" : "false";
-      } else if (groupValue !== null && groupValue !== undefined) {
-        groupKey = otherLabel;
+      if (isWidgetDataPrimitive(groupValue) && groupValue !== null && groupValue !== undefined) {
+        if (isWidgetDataBoolean(groupValue)) {
+          groupKey = groupValue ? "true" : "false";
+        } else {
+          groupKey = String(groupValue);
+        }
       }
       if (!groups.has(groupKey)) {
         groups.set(groupKey, []);
@@ -148,7 +205,18 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
   }
 
   /**
-   * Render a single group
+   * Render a single group with header and items.
+   * - Line 1: Group header with formatted group key and item count
+   * - Lines 2+: Each item indented with 2 spaces
+   * - Optional truncation message if group exceeds maxItemsPerGroup
+   *
+   * Items are sorted according to config.sortBy before rendering.
+   *
+   * @param groupKey Display name for the group (e.g., file path)
+   * @param items Array of items in this group
+   * @param config Grouped list configuration
+   * @param context Rendering context
+   * @returns Formatted group string with newlines
    */
   private renderGroup(
     groupKey: string,
@@ -190,7 +258,16 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
   }
 
   /**
-   * Render group header
+   * Render group header with styled path and item count.
+   * Format: [📄] path/to/file (N items)
+   * - Optional file icon when emojis enabled
+   * - Underlined file path
+   * - Dimmed item count in parentheses
+   *
+   * @param groupKey Group identifier (e.g., file path)
+   * @param itemCount Number of items in this group
+   * @param context Rendering context
+   * @returns Formatted header string
    */
   private renderGroupHeader(
     groupKey: string,
@@ -213,7 +290,24 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
   }
 
   /**
-   * Render individual group item (lint issue or command)
+   * Render individual group item with format based on render mode.
+   *
+   * Code Quality Mode (renderMode = "code-quality"):
+   * Format: line:col  severity  message [rule]
+   * - Location (line:column) - blue, padded to 8 chars
+   * - Severity icon + text - color-coded, padded to 12 chars
+   * - Message text
+   * - Rule in brackets - dimmed (if not "unknown")
+   *
+   * Simple Mode (default):
+   * Format: command           description
+   * - Rule/command name - bold, padded to 20 chars
+   * - Message/description text
+   *
+   * @param item Item to render
+   * @param context Rendering context
+   * @param config Configuration including renderMode
+   * @returns Formatted item string with space-separated parts
    */
   private renderGroupItem(
     item: GroupedListItem,
@@ -241,25 +335,33 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
 
       // Message
       if (item.message) {
-        parts.push(item.message);
+        const message = isWidgetDataString(item.message, context);
+        if (message) {
+          parts.push(message);
+        }
       }
 
       // Rule (if available)
-      if (item.rule && typeof item.rule === "string" && item.rule !== "unknown") {
-        const ruleText = this.styleText(`[${item.rule}]`, "dim", context);
+      const rule = isWidgetDataString(item.rule, context);
+      if (rule && rule !== "unknown") {
+        const ruleText = this.styleText(`[${rule}]`, "dim", context);
         parts.push(ruleText);
       }
     } else {
       // Render as command or general item (simple mode)
       // Rule (command name) first - styled and padded
-      if (item.rule && typeof item.rule === "string" && item.rule !== "unknown") {
-        const commandName = this.styleText(item.rule.padEnd(20), "bold", context);
+      const rule = isWidgetDataString(item.rule, context);
+      if (rule && rule !== "unknown") {
+        const commandName = this.styleText(rule.padEnd(20), "bold", context);
         parts.push(commandName);
       }
 
       // Message (description) second
       if (item.message) {
-        parts.push(item.message);
+        const message = isWidgetDataString(item.message, context);
+        if (message) {
+          parts.push(message);
+        }
       }
     }
 
@@ -267,7 +369,18 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
   }
 
   /**
-   * Sort items within a group
+   * Sort items within a group according to specified field.
+   *
+   * When sortBy = "severity":
+   * - Primary sort: error (0) < warning (1) < info (2) < other (3)
+   * - Secondary sort: line number (ascending)
+   *
+   * For other sortBy values:
+   * - Falls back to line number sorting only
+   *
+   * @param items Array of items to sort
+   * @param sortBy Field name to sort by (e.g., "severity")
+   * @returns New sorted array (original array unchanged)
    */
   private sortItems(items: GroupedListItem[], sortBy: string): GroupedListItem[] {
     return items.toSorted((a, b) => {
@@ -281,7 +394,7 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
       }
 
       // Secondary sort by line number
-      if (typeof a.line === "number" && typeof b.line === "number") {
+      if (isWidgetDataNumber(a.line) && isWidgetDataNumber(b.line)) {
         return a.line - b.line;
       }
 
@@ -290,7 +403,11 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
   }
 
   /**
-   * Format file path for display
+   * Format file path for display.
+   * Currently returns path as-is since CWD stripping requires process access.
+   *
+   * @param filePath Raw file path
+   * @returns Formatted file path (currently unchanged)
    */
   private formatFilePath(filePath: string): string {
     // Return file path as-is - CWD stripping not available without process
@@ -298,19 +415,34 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
   }
 
   /**
-   * Format location (line:column)
+   * Format code location as "line:column" string.
+   * Falls back to "0:0" for missing values.
+   *
+   * @param line Optional line number
+   * @param column Optional column number
+   * @returns Formatted location string (e.g., "42:15" or "42:0" or "0:0")
    */
   private formatLocation(line?: number, column?: number): string {
-    if (typeof line === "number" && typeof column === "number") {
+    if (isWidgetDataNumber(line) && isWidgetDataNumber(column)) {
       return `${line}:${column}`;
-    } else if (typeof line === "number") {
+    } else if (isWidgetDataNumber(line)) {
       return `${line}:${0}`;
     }
     return `${0}:${0}`;
   }
 
   /**
-   * Format severity with icon and color
+   * Format severity level with icon and color styling.
+   *
+   * Supported severity levels:
+   * - error: ❌/✗ + red "error" text
+   * - warning: ⚠️/! + yellow "warn" text
+   * - info: ℹ️/i + blue "info" text
+   * - other: returns severity string as-is
+   *
+   * @param severity Severity level string (e.g., "error", "warning", "info")
+   * @param context Rendering context for styling and emoji settings
+   * @returns Formatted severity string with icon and color
    */
   private formatSeverity(severity: string, context: WidgetRenderContext): string {
     const icons = context.options.useEmojis;
@@ -343,9 +475,23 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
   }
 
   /**
-   * Render summary statistics with beautiful formatting
+   * Render summary statistics section with beautiful formatting.
+   * Only shown in code-quality render mode.
+   *
+   * Includes:
+   * - Affected files list (with error/warning counts per file)
+   * - Summary header with separator line
+   * - Total files and issues counts
+   * - Error count (red, with icon)
+   * - Warning count (yellow, with icon)
+   * - Custom summary stats if configured
+   *
+   * @param data Full array of all items
+   * @param groups Map of grouped items
+   * @param config Configuration including renderMode and custom stats
+   * @param context Rendering context
+   * @returns Formatted summary string, or empty string if not applicable
    */
-
   private renderSummary(
     data: GroupedListItem[],
     groups: Map<string, GroupedListItem[]>,
@@ -448,7 +594,18 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
   }
 
   /**
-   * Render a clean list of affected files with error counts
+   * Render a clean list of affected files with error/warning counts.
+   * Shows files alphabetically sorted with color-coded issue counts.
+   *
+   * Format per file:
+   * [📄] filename (N errors, M warnings)
+   * - Files with errors shown in red
+   * - Files with warnings shown in yellow
+   * - Files with neither shown in dim
+   *
+   * @param groups Map of file names to their issues
+   * @param context Rendering context
+   * @returns Formatted affected files list with header and separator
    */
   private renderAffectedFilesList(
     groups: Map<string, GroupedListItem[]>,
@@ -520,7 +677,12 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
   }
 
   /**
-   * Calculate count for a specific stat configuration
+   * Calculate count for a specific stat configuration.
+   * Counts items where the specified field matches the specified value.
+   *
+   * @param data Array of all items
+   * @param stat Stat configuration with field name and value to match
+   * @returns Count of items where item[stat.field] === stat.value
    */
   private calculateStatCount(data: GroupedListItem[], stat: StatConfig): number {
     if (!stat.field || !stat.value) {
@@ -534,7 +696,23 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
   }
 
   /**
-   * Render hierarchical tree structure for nested paths
+   * Render hierarchical tree structure for nested paths.
+   * Builds a tree from flat data by splitting paths on "/" separator,
+   * then renders recursively with proper indentation.
+   *
+   * Used when config.hierarchical = true, typically for file system paths
+   * or category hierarchies.
+   *
+   * Process:
+   * 1. Build tree structure from flat data by splitting paths
+   * 2. Each path segment becomes a tree node
+   * 3. Items attached to leaf nodes
+   * 4. Render recursively with indentation
+   *
+   * @param data Array of items with path-like groupBy field
+   * @param config Configuration with groupBy field name
+   * @param context Rendering context
+   * @returns Formatted tree string with nested indentation
    */
   private renderHierarchical(
     data: GroupedListItem[],
@@ -551,8 +729,9 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
 
     // Group items by category path
     for (const item of data) {
-      const categoryPath = item[config.groupBy];
-      if (typeof categoryPath !== "string") {
+      const categoryPathValue = item[config.groupBy];
+      const categoryPath = isWidgetDataString(categoryPathValue, context);
+      if (!categoryPath) {
         continue;
       }
 
@@ -584,7 +763,22 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
   }
 
   /**
-   * Render a single tree node and its children
+   * Render a single tree node and its children recursively.
+   *
+   * For nodes with items (depth > 0):
+   * - Shows node path with total item count (including children)
+   * - Renders node's items with indentation
+   * - Shows truncation message if needed
+   * - Adds blank line after items
+   *
+   * Then recursively renders all child nodes with increased depth.
+   * Children are sorted alphabetically before rendering.
+   *
+   * @param node Tree node to render
+   * @param depth Current depth in tree (0 = root, increases with nesting)
+   * @param config Configuration including sort options
+   * @param context Rendering context
+   * @returns Formatted tree node string with newlines, or empty string if nothing to render
    */
   private renderTreeNode(
     node: TreeNode,
@@ -654,7 +848,11 @@ export class GroupedListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetT
   }
 
   /**
-   * Count items recursively including all children
+   * Count items recursively including all children.
+   * Sums up items from this node and all descendant nodes.
+   *
+   * @param node Tree node to count from
+   * @returns Total count of items in this node and all its descendants
    */
   private countItemsRecursive(node: TreeNode): number {
     let count = node.items.length;

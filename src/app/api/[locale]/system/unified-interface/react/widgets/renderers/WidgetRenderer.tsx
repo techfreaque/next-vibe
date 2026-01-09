@@ -27,18 +27,23 @@ import { CreditTransactionListWidget } from "../implementations/CreditTransactio
 import { DataCardsWidget } from "../implementations/DataCardsWidget";
 import { DataListWidget } from "../implementations/DataListWidget";
 import { DataTableWidget } from "../implementations/DataTableWidget";
+import { DescriptionWidget } from "../implementations/DescriptionWidget";
 import { EditableTextWidget } from "../implementations/EditableTextWidget";
 import { FormAlertWidget } from "../implementations/FormAlertWidget";
 import { FormFieldWidget } from "../implementations/FormFieldWidget";
 import { GroupedListWidget } from "../implementations/GroupedListWidget";
+import { IconWidget } from "../implementations/IconWidget";
 import { LinkCardWidget } from "../implementations/LinkCardWidget";
 import { LinkListWidget } from "../implementations/LinkListWidget";
 import { LinkWidget } from "../implementations/LinkWidget";
 import { MarkdownWidget } from "../implementations/MarkdownWidget";
+import { MetadataWidget } from "../implementations/MetadataWidget";
 import { MetricCardWidget } from "../implementations/MetricCardWidget";
+import { NavigateButtonWidget } from "../implementations/NavigateButtonWidget";
 import { PaginationWidget } from "../implementations/PaginationWidget";
 import { PasswordStrengthWidget } from "../implementations/PasswordStrengthWidget";
 import { SectionWidget } from "../implementations/SectionWidget";
+import { SeparatorWidget } from "../implementations/SeparatorWidget";
 import { StatsGridWidget } from "../implementations/StatsGridWidget";
 import { StatWidget } from "../implementations/StatWidget";
 import { SubmitButtonWidget } from "../implementations/SubmitButtonWidget";
@@ -175,8 +180,23 @@ function renderWidget<const TKey extends string>(
     case WidgetType.TEXT:
       return <TextWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.TEXT, TKey>)} />;
 
+    case WidgetType.DESCRIPTION:
+      return (
+        <DescriptionWidget
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.DESCRIPTION, TKey>)}
+        />
+      );
+
+    case WidgetType.METADATA:
+      return (
+        <MetadataWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.METADATA, TKey>)} />
+      );
+
     case WidgetType.BADGE:
       return <BadgeWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.BADGE, TKey>)} />;
+
+    case WidgetType.ICON:
+      return <IconWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.ICON, TKey>)} />;
 
     case WidgetType.MARKDOWN:
       return (
@@ -293,6 +313,11 @@ function renderWidget<const TKey extends string>(
         <SectionWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.SECTION, TKey>)} />
       );
 
+    case WidgetType.SEPARATOR:
+      return (
+        <SeparatorWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.SEPARATOR, TKey>)} />
+      );
+
     // Link display widgets
     case WidgetType.LINK_CARD:
       return (
@@ -307,6 +332,13 @@ function renderWidget<const TKey extends string>(
     // Interactive widgets
     case WidgetType.BUTTON:
       return <ButtonWidget {...(baseProps as ReactWidgetProps<typeof WidgetType.BUTTON, TKey>)} />;
+
+    case WidgetType.NAVIGATE_BUTTON:
+      return (
+        <NavigateButtonWidget
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.NAVIGATE_BUTTON, TKey>)}
+        />
+      );
 
     case WidgetType.SUBMIT_BUTTON:
       return (

@@ -52,6 +52,14 @@ export class ThreadByIdRepository {
         .where(eq(chatThreads.id, threadId))
         .limit(1);
 
+      // Check if thread exists
+      if (!thread) {
+        return fail({
+          message: "app.api.agent.chat.threads.threadId.get.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
       // Get folder for permission check
       let folder = null;
       if (thread.folderId) {
@@ -72,7 +80,34 @@ export class ThreadByIdRepository {
 
       logger.debug("Thread found successfully", { threadId: thread.id });
 
-      return success({ thread });
+      return success({
+        thread: {
+          id: thread.id,
+          userId: thread.userId,
+          title: thread.title,
+          folderId: thread.folderId,
+          status: thread.status,
+          defaultModel: thread.defaultModel,
+          defaultCharacter: thread.defaultCharacter,
+          systemPrompt: thread.systemPrompt,
+          pinned: thread.pinned,
+          archived: thread.archived,
+          tags: thread.tags ?? [],
+          preview: thread.preview,
+          metadata: thread.metadata ?? {},
+          createdAt: thread.createdAt,
+          updatedAt: thread.updatedAt,
+          leadId: thread.leadId,
+          rootFolderId: thread.rootFolderId,
+          rolesView: thread.rolesView,
+          rolesEdit: thread.rolesEdit,
+          rolesPost: thread.rolesPost,
+          rolesModerate: thread.rolesModerate,
+          rolesAdmin: thread.rolesAdmin,
+          published: thread.published,
+          searchVector: thread.searchVector,
+        },
+      });
     } catch (error) {
       logger.error("Error getting thread by ID", parseError(error));
       return fail({
@@ -145,7 +180,34 @@ export class ThreadByIdRepository {
         threadId: updatedThread.id,
       });
 
-      return success({ thread: updatedThread });
+      return success({
+        thread: {
+          id: updatedThread.id,
+          userId: updatedThread.userId,
+          title: updatedThread.title,
+          folderId: updatedThread.folderId,
+          status: updatedThread.status,
+          defaultModel: updatedThread.defaultModel,
+          defaultCharacter: updatedThread.defaultCharacter,
+          systemPrompt: updatedThread.systemPrompt,
+          pinned: updatedThread.pinned,
+          archived: updatedThread.archived,
+          tags: updatedThread.tags ?? [],
+          preview: updatedThread.preview,
+          metadata: updatedThread.metadata ?? {},
+          createdAt: updatedThread.createdAt,
+          updatedAt: updatedThread.updatedAt,
+          leadId: updatedThread.leadId,
+          rootFolderId: updatedThread.rootFolderId,
+          rolesView: updatedThread.rolesView,
+          rolesEdit: updatedThread.rolesEdit,
+          rolesPost: updatedThread.rolesPost,
+          rolesModerate: updatedThread.rolesModerate,
+          rolesAdmin: updatedThread.rolesAdmin,
+          published: updatedThread.published,
+          searchVector: updatedThread.searchVector,
+        },
+      });
     } catch (error) {
       logger.error("Error updating thread", parseError(error));
       return fail({

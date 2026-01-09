@@ -1,6 +1,16 @@
 /**
  * Link List Widget Renderer
- * Handles LINK_LIST widget type for CLI display
+ *
+ * Handles LINK_LIST widget type for CLI display.
+ * Displays a list of links with optional title and description.
+ * Each link shows:
+ * - Icon or bullet point
+ * - Link title or URL (blue)
+ * - URL in parentheses (if title differs from URL)
+ * - Optional description
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All data extraction logic imported from shared.
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -16,6 +26,10 @@ import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 export class LinkListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.LINK_LIST> {
   readonly widgetType = WidgetType.LINK_LIST;
 
+  /**
+   * Render link list with optional title and description header.
+   * Uses shared extraction logic to process the link list data before rendering.
+   */
   render(props: CLIWidgetProps<typeof WidgetType.LINK_LIST, string>): string {
     const { value, context } = props;
     const t = context.t;
@@ -36,6 +50,12 @@ export class LinkListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     return this.renderLinkList(data, context);
   }
 
+  /**
+   * Render link list with optional title and description header.
+   * - Title (bold) on first line if present
+   * - Description (wrapped) on following lines if present
+   * - Each link item rendered with icon/bullet, title/URL, and optional description
+   */
   private renderLinkList(data: ProcessedLinkList, context: WidgetRenderContext): string {
     const { items, title, description } = data;
     const indent = this.createIndent(context.depth, context);
@@ -68,6 +88,13 @@ export class LinkListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     return result.join("\n");
   }
 
+  /**
+   * Render a single link item with styling.
+   * - Icon/bullet + title/URL (blue styled)
+   * - URL in parentheses (dimmed) if title differs from URL
+   * - Optional description prefixed with dash
+   * All parts joined on one line with spaces.
+   */
   private renderLinkItem(item: LinkItem, indent: string, context: WidgetRenderContext): string {
     const { url, title, description, icon } = item;
 

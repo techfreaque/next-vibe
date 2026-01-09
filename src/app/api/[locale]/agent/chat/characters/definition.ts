@@ -5,37 +5,34 @@
 
 import { z } from "zod";
 
-import { ModelUtilityDB } from "@/app/api/[locale]/agent/models/enum";
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  field,
+  backButton,
+  navigateButtonField,
   objectField,
-  objectUnionField,
   responseArrayField,
-  responseArrayOptionalField,
   responseField,
+  widgetField,
+  widgetObjectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
   Methods,
+  SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { iconSchema } from "../../../shared/types/common.schema";
-import { TtsVoiceDB } from "../../text-to-speech/enum";
 import {
-  ContentLevelFilterDB,
-  IntelligenceLevelFilterDB,
-  ModelSelectionType,
-  PriceLevelFilterDB,
-  SpeedLevelFilterDB,
-} from "../favorites/enum";
-import { CharacterCategory } from "./enum";
-import { CharacterCategoryDB, CharacterSource, CharacterSourceDB } from "./enum";
+  DELETE as CharacterDELETE,
+  GET as CharacterGET,
+  PATCH as CharacterPATCH,
+} from "./[id]/definition";
+import { POST as CharacterPOST } from "./create/definition";
+import { CharacterCategoryDB } from "./enum";
 
 /**
  * Get Characters List Endpoint (GET)
@@ -55,242 +52,195 @@ const { GET } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.characters.get.container.title" as const,
-      description: "app.api.agent.chat.characters.get.container.description" as const,
       layoutType: LayoutType.STACKED,
+      noCard: true,
+      gap: "6",
     },
     { response: true },
     {
-      // === RESPONSE ===
-      characters: responseArrayField(
+      // Top action buttons container (widget object field - pure UI, no response data)
+      topActions: widgetObjectField(
         {
-          type: WidgetType.DATA_CARDS,
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.INLINE,
+          gap: "2",
+          noCard: true,
+        },
+        {},
+        {
+          backButton: backButton(),
+          createButton: navigateButtonField({
+            targetEndpoint: CharacterPOST,
+            extractParams: () => ({}),
+            prefillFromGet: false,
+            label: "app.api.agent.chat.characters.get.createButton.label" as const,
+            icon: "plus",
+            variant: "default",
+          }),
+        },
+      ),
+
+      // Separator between buttons and content (widget field - pure UI)
+      separator: widgetField(
+        {
+          type: WidgetType.SEPARATOR,
+          spacingTop: SpacingSize.RELAXED,
+          spacingBottom: SpacingSize.RELAXED,
+        },
+        {},
+      ),
+
+      // Sections array
+      sections: responseArrayField(
+        {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.STACKED,
+          noCard: true,
+          gap: "6",
         },
         objectField(
           {
             type: WidgetType.CONTAINER,
-            title: "app.api.agent.chat.characters.get.response.characters.character.title" as const,
-            layoutType: LayoutType.GRID,
-            columns: 2,
+            layoutType: LayoutType.STACKED,
+            gap: "4",
+            noCard: true,
           },
           { response: true },
           {
-            id: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.characters.get.response.characters.character.id.content" as const,
-              },
-              z.string(),
-            ),
-            name: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.characters.get.response.characters.character.name.content" as const,
-              },
-              z.string() as z.ZodType<TranslationKey>,
-            ),
-            tagline: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.characters.get.response.characters.character.tagline.content" as const,
-              },
-              z.string() as z.ZodType<TranslationKey>,
-            ),
-            description: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.characters.get.response.characters.character.description.content" as const,
-              },
-              z.string() as z.ZodType<TranslationKey>,
-            ),
-            icon: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.characters.get.response.characters.character.icon.content" as const,
-              },
-              // Runtime: accepts any string (emoji, IconKey), Type: IconKey
-              iconSchema,
-            ),
-            systemPrompt: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.characters.get.response.characters.character.systemPrompt.content" as const,
-              },
-              z.string(),
-            ),
-            category: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.characters.get.response.characters.character.category.content" as const,
-              },
-              z.enum(CharacterCategoryDB),
-            ),
-            source: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.characters.get.response.characters.character.source.content" as const,
-              },
-              z.enum(CharacterSourceDB),
-            ),
-            voice: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.characters.get.response.characters.character.voice.content" as const,
-              },
-              z.enum(TtsVoiceDB),
-            ),
-            modelSelection: objectUnionField(
+            sectionHeader: objectField(
               {
                 type: WidgetType.CONTAINER,
-                title:
-                  "app.api.agent.chat.characters.get.response.characters.character.modelSelection.title" as const,
-                layoutType: LayoutType.STACKED,
+                layoutType: LayoutType.INLINE,
+                gap: "2",
+                noCard: true,
               },
               { response: true },
-              "selectionType",
-              [
-                // Variant 1: Manual model selection
-                objectField(
-                  {
-                    type: WidgetType.CONTAINER,
-                    layoutType: LayoutType.STACKED,
-                  },
-                  { response: true },
-                  {
-                    selectionType: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.characters.get.response.characters.character.selectionType.content" as const,
-                      },
-                      z.literal(ModelSelectionType.MANUAL),
-                    ),
-                    manualModelId: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.characters.get.response.characters.character.manualModelId.content" as const,
-                      },
-                      z.enum(ModelId),
-                    ),
-                  },
-                ),
-                // Variant 2: Filter-based selection
-                objectField(
-                  {
-                    type: WidgetType.CONTAINER,
-                    layoutType: LayoutType.STACKED,
-                  },
-                  { response: true },
-                  {
-                    selectionType: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.characters.get.response.characters.character.selectionType.content" as const,
-                      },
-                      z.literal(ModelSelectionType.FILTERS),
-                    ),
-                    intelligenceRange: responseField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        layoutType: LayoutType.STACKED,
-                      },
-                      z
-                        .object({
-                          min: z.enum(IntelligenceLevelFilterDB).optional(),
-                          max: z.enum(IntelligenceLevelFilterDB).optional(),
-                        })
-                        .optional(),
-                    ),
-                    priceRange: responseField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        layoutType: LayoutType.STACKED,
-                      },
-                      z
-                        .object({
-                          min: z.enum(PriceLevelFilterDB).optional(),
-                          max: z.enum(PriceLevelFilterDB).optional(),
-                        })
-                        .optional(),
-                    ),
-                    contentRange: responseField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        layoutType: LayoutType.STACKED,
-                      },
-                      z
-                        .object({
-                          min: z.enum(ContentLevelFilterDB).optional(),
-                          max: z.enum(ContentLevelFilterDB).optional(),
-                        })
-                        .optional(),
-                    ),
-                    speedRange: responseField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        layoutType: LayoutType.STACKED,
-                      },
-                      z
-                        .object({
-                          min: z.enum(SpeedLevelFilterDB).optional(),
-                          max: z.enum(SpeedLevelFilterDB).optional(),
-                        })
-                        .optional(),
-                    ),
-                    preferredStrengths: responseArrayOptionalField(
-                      {
-                        type: WidgetType.DATA_LIST,
-                      },
-                      field(
-                        z.enum(ModelUtilityDB),
-                        { response: true },
-                        {
-                          type: WidgetType.TEXT,
-                          content:
-                            "app.api.agent.chat.characters.get.response.characters.character.preferredStrengths.content" as const,
-                        },
-                      ),
-                    ),
-                    ignoredWeaknesses: responseArrayOptionalField(
-                      {
-                        type: WidgetType.DATA_LIST,
-                      },
-                      field(
-                        z.enum(ModelUtilityDB),
-                        { response: true },
-                        {
-                          type: WidgetType.TEXT,
-                          content:
-                            "app.api.agent.chat.characters.get.response.characters.character.ignoredWeaknesses.content" as const,
-                        },
-                      ),
-                    ),
-                  },
-                ),
-              ],
-            ),
-            suggestedPrompts: responseArrayOptionalField(
               {
-                type: WidgetType.DATA_LIST,
+                icon: responseField(
+                  { type: WidgetType.ICON, iconSize: "sm", noHover: true },
+                  iconSchema,
+                ),
+                title: responseField(
+                  { type: WidgetType.TEXT, size: "lg", emphasis: "bold" },
+                  z.string() as z.ZodType<TranslationKey>,
+                ),
+                count: responseField({ type: WidgetType.BADGE }, z.number()),
               },
-              field(
-                z.string(),
+            ),
+            characters: responseArrayField(
+              {
+                type: WidgetType.DATA_CARDS,
+                layout: { type: LayoutType.GRID, columns: 1, spacing: "normal" },
+                maxItems: 3,
+              },
+              objectField(
+                {
+                  type: WidgetType.CONTAINER,
+                  layoutType: LayoutType.INLINE,
+                  gap: "4",
+                  alignItems: "start",
+                  noCard: true,
+                },
                 { response: true },
                 {
-                  type: WidgetType.BADGE,
-                  content:
-                    "app.api.agent.chat.characters.get.response.characters.character.suggestedPrompts.content" as const,
+                  id: responseField({ type: WidgetType.TEXT, hidden: true }, z.string()),
+                  category: responseField(
+                    { type: WidgetType.TEXT, hidden: true },
+                    z.enum(CharacterCategoryDB),
+                  ),
+                  icon: responseField(
+                    {
+                      type: WidgetType.ICON,
+                      containerSize: "lg",
+                      iconSize: "base",
+                      borderRadius: "lg",
+                    },
+                    iconSchema,
+                  ),
+                  content: objectField(
+                    {
+                      type: WidgetType.CONTAINER,
+                      layoutType: LayoutType.STACKED,
+                      gap: "1",
+                      noCard: true,
+                    },
+                    { response: true },
+                    {
+                      name: responseField(
+                        {
+                          type: WidgetType.TEXT,
+                          size: "base",
+                          emphasis: "bold",
+                        },
+                        z.string() as z.ZodType<TranslationKey>,
+                      ),
+                      description: responseField(
+                        { type: WidgetType.TEXT, size: "xs", variant: "muted" },
+                        z.string() as z.ZodType<TranslationKey>,
+                      ),
+                      modelRow: objectField(
+                        {
+                          type: WidgetType.CONTAINER,
+                          layoutType: LayoutType.INLINE,
+                          gap: "1",
+                          noCard: true,
+                        },
+                        { response: true },
+                        {
+                          modelIcon: responseField(
+                            {
+                              type: WidgetType.ICON,
+                              iconSize: "xs",
+                              noHover: true,
+                            },
+                            iconSchema,
+                          ),
+                          modelInfo: responseField(
+                            {
+                              type: WidgetType.TEXT,
+                              size: "xs",
+                              variant: "muted",
+                            },
+                            z.string(),
+                          ),
+                          separator1: widgetField(
+                            {
+                              type: WidgetType.TEXT,
+                              size: "xs",
+                              variant: "muted",
+                              content: "•" as const,
+                            },
+                            { response: true },
+                          ),
+                          modelProvider: responseField(
+                            {
+                              type: WidgetType.TEXT,
+                              size: "xs",
+                              variant: "muted",
+                            },
+                            z.string(),
+                          ),
+                          separator2: widgetField(
+                            {
+                              type: WidgetType.TEXT,
+                              size: "xs",
+                              variant: "muted",
+                              content: "•" as const,
+                            },
+                            { response: true },
+                          ),
+                          creditCost: responseField(
+                            {
+                              type: WidgetType.TEXT,
+                              size: "xs",
+                              variant: "muted",
+                            },
+                            z.string(),
+                          ),
+                        },
+                      ),
+                    },
+                  ),
                 },
               ),
             ),
@@ -348,42 +298,54 @@ const { GET } = createEndpoint({
     requests: undefined,
     responses: {
       listAll: {
-        characters: [
+        sections: [
           {
-            id: "default",
-            name: "Default",
-            tagline: "Pure AI, No Personality",
-            description: "The models unmodified behavior",
-            icon: "robot-face",
-            systemPrompt: "",
-            category: CharacterCategory.ASSISTANT,
-            source: CharacterSource.BUILT_IN,
-            voice: "app.api.agent.textToSpeech.voices.FEMALE",
-            modelSelection: {
-              selectionType: ModelSelectionType.FILTERS,
-              preferredStrengths: null,
-              ignoredWeaknesses: null,
+            sectionHeader: {
+              title: "app.api.agent.chat.characters.enums.category.assistant",
+              icon: "robot-face",
+              count: 1,
             },
-            suggestedPrompts: [
-              "Help me brainstorm ideas for a new project",
-              "Explain quantum computing in simple terms",
+            characters: [
+              {
+                id: "default",
+                icon: "robot-face",
+                category: "app.api.agent.chat.characters.enums.category.assistant",
+                content: {
+                  name: "app.api.agent.chat.characters.default.name",
+                  description: "app.api.agent.chat.characters.default.description",
+                  modelRow: {
+                    modelIcon: "sparkles",
+                    modelInfo: "Claude Sonnet 4.5",
+                    modelProvider: "Anthropic",
+                    creditCost: "1.5 credits",
+                  },
+                },
+              },
             ],
           },
           {
-            id: "550e8400-e29b-41d4-a716-446655440000",
-            name: "My Custom Character",
-            description: "A custom character I created",
-            tagline: "Custom Character",
-            icon: "direct-hit",
-            systemPrompt: "You are a helpful assistant specialized in...",
-            category: CharacterCategory.CODING,
-            source: CharacterSource.MY,
-            voice: "app.api.agent.textToSpeech.voices.MALE",
-            modelSelection: {
-              selectionType: ModelSelectionType.MANUAL,
-              manualModelId: ModelId.GPT_5,
+            sectionHeader: {
+              title: "app.api.agent.chat.characters.enums.category.coding",
+              icon: "code",
+              count: 1,
             },
-            suggestedPrompts: ["Help me with coding", "Review my architecture"],
+            characters: [
+              {
+                id: "550e8400-e29b-41d4-a716-446655440000",
+                icon: "direct-hit",
+                category: "app.api.agent.chat.characters.enums.category.coding",
+                content: {
+                  name: "app.api.agent.chat.characters.custom.name",
+                  description: "app.api.agent.chat.characters.custom.description",
+                  modelRow: {
+                    modelIcon: "sparkles",
+                    modelInfo: "GPT-5",
+                    modelProvider: "OpenAI",
+                    creditCost: "3 credits",
+                  },
+                },
+              },
+            ],
           },
         ],
       },
@@ -398,18 +360,9 @@ export type CharacterListRequestOutput = typeof GET.types.RequestOutput;
 export type CharacterListResponseInput = typeof GET.types.ResponseInput;
 export type CharacterListResponseOutput = typeof GET.types.ResponseOutput;
 
-// Individual character type from list response
-export type Character = CharacterListResponseOutput["characters"][number];
-
-// Model selection discriminated union variants
-export type FiltersSelection = Extract<
-  Character["modelSelection"],
-  { selectionType: "app.api.agent.chat.favorites.enums.selectionType.filters" }
->;
-export type ManualSelection = Extract<
-  Character["modelSelection"],
-  { selectionType: "app.api.agent.chat.favorites.enums.selectionType.manual" }
->;
+// Individual character card type from list response
+export type CharacterListItem =
+  CharacterListResponseOutput["sections"][number]["characters"][number];
 
 const definitions = { GET };
 export { GET };

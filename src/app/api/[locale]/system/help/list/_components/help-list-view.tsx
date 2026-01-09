@@ -67,6 +67,7 @@ export function HelpListView({ locale }: HelpListViewProps): JSX.Element {
               data={responseData ?? undefined}
               locale={locale}
               isSubmitting={isSubmitting}
+              logger={logger}
             />
           </CardContent>
         </Card>

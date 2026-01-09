@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import type { JSX } from "react";
 
@@ -8,7 +9,10 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
-import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
+import {
+  getIconSizeClassName,
+  getSpacingClassName,
+} from "../../../shared/widgets/utils/widget-helpers";
 
 /**
  * Renders a submit button for forms with loading state support.
@@ -21,7 +25,6 @@ export function SubmitButtonWidget<const TKey extends string>({
   onSubmit,
   isSubmitting,
 }: ReactWidgetProps<typeof WidgetType.SUBMIT_BUTTON, TKey>): JSX.Element {
-  const { t } = getTranslator(context);
   const { t: globalT } = simpleT(context.locale);
   const {
     text: textKey,
@@ -29,16 +32,22 @@ export function SubmitButtonWidget<const TKey extends string>({
     icon,
     variant = "default",
     size = "default",
+    iconSize,
+    iconSpacing,
   } = field.ui;
+
+  // Get classes from config (no hardcoding!)
+  const iconSizeClass = getIconSizeClassName(iconSize);
+  const iconSpacingClass = getSpacingClassName("margin", iconSpacing);
 
   const buttonIcon = icon ? (icon as IconKey) : undefined;
 
   const buttonText = textKey
-    ? t(textKey)
+    ? context.t(textKey)
     : globalT("app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit");
 
   const loadingText = loadingTextKey
-    ? t(loadingTextKey)
+    ? context.t(loadingTextKey)
     : globalT("app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting");
 
   return (
@@ -54,7 +63,12 @@ export function SubmitButtonWidget<const TKey extends string>({
       size={size}
       className={className}
     >
-      {buttonIcon && <Icon icon={buttonIcon} className="h-4 w-4 mr-2" />}
+      {buttonIcon && (
+        <Icon
+          icon={buttonIcon}
+          className={cn(iconSizeClass || "h-4 w-4", iconSpacingClass || "mr-2")}
+        />
+      )}
       {isSubmitting ? loadingText : buttonText}
     </Button>
   );

@@ -1,6 +1,15 @@
 /**
  * Empty State Widget Renderer
- * Handles EMPTY_STATE widget type for CLI display
+ *
+ * Handles EMPTY_STATE widget type for CLI display.
+ * Displays empty state messages when no data is available, with:
+ * - Optional icon (when emojis enabled)
+ * - Title message
+ * - Optional description
+ * - Optional action prompt
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All data extraction logic imported from shared.
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -12,6 +21,11 @@ import type { CLIWidgetProps } from "../core/types";
 export class EmptyStateWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.EMPTY_STATE> {
   readonly widgetType = WidgetType.EMPTY_STATE;
 
+  /**
+   * Render empty state with title, description, and optional action.
+   * Uses dimmed styling to indicate informational nature.
+   * Action is displayed in blue as an interactive prompt.
+   */
   render(props: CLIWidgetProps<typeof WidgetType.EMPTY_STATE, string>): string {
     const { value, context } = props;
     const indent = this.createIndent(context.depth, context);

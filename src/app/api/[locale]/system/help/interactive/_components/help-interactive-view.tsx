@@ -11,6 +11,7 @@ import {
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import { ChevronLeft, ChevronRight } from "next-vibe-ui/ui/icons";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, P } from "next-vibe-ui/ui/typography";
@@ -218,6 +219,8 @@ export function HelpInteractiveView({
   const [searchQuery, setSearchQuery] = useState("");
   const [groupingMode, setGroupingMode] = useState<GroupingMode>("path");
   const [selectedEndpoint, setSelectedEndpoint] = useState<CreateApiEndpointAny | null>(null);
+  // Sidebar is collapsed by default when viewing a specific endpoint, open otherwise
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(!!initialEndpointId);
   const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
 
   // Fetch endpoints server-side with user permissions
@@ -395,14 +398,29 @@ export function HelpInteractiveView({
           </P>
         </Div>
 
-        <Div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Div className="relative flex flex-col lg:flex-row gap-6">
           {/* Left sidebar - Endpoint list */}
-          <Div className="lg:col-span-1">
+          <Div
+            className={`
+              transition-all duration-300 ease-in-out
+              ${isSidebarCollapsed ? "w-0 lg:w-0 overflow-hidden" : "w-full lg:w-80 xl:w-96"}
+            `}
+          >
             <Card className="sticky top-4">
               <CardContent className="mt-6">
-                <P className="text-lg font-semibold mb-4">
-                  {t("app.api.system.help.interactive.ui.endpointsLabel")}
-                </P>
+                <Div className="flex items-center justify-between mb-4">
+                  <P className="text-lg font-semibold">
+                    {t("app.api.system.help.interactive.ui.endpointsLabel")}
+                  </P>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setIsSidebarCollapsed(true)}
+                    aria-label="Close sidebar"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                </Div>
 
                 {/* Search */}
                 <Input
@@ -442,7 +460,7 @@ export function HelpInteractiveView({
                 </Div>
 
                 {/* Endpoint list with accordion */}
-                <Div className="max-h-[600px] overflow-y-auto">
+                <Div className="max-h-150 overflow-y-auto">
                   {groupingMode === "path" ? (
                     /* Nested path tree view */
                     <PathTreeAccordion
@@ -517,7 +535,21 @@ export function HelpInteractiveView({
           </Div>
 
           {/* Right content - Endpoint details and execution */}
-          <Div className="lg:col-span-2">
+          <Div className="flex-1 min-w-0">
+            {/* Toggle button for collapsed sidebar */}
+            {isSidebarCollapsed && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setIsSidebarCollapsed(false)}
+                className="mb-4"
+                aria-label="Open sidebar"
+              >
+                <ChevronRight className="h-4 w-4 mr-2" />
+                {t("app.api.system.help.interactive.ui.endpointsLabel")}
+              </Button>
+            )}
+
             {!selectedEndpoint && (
               <Card>
                 <CardContent className="mt-6 text-center py-12">

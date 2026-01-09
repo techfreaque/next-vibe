@@ -73,13 +73,8 @@ export function ThreadedMessage({
     voteMessage: onVoteMessage,
     handleModelChange: onModelChange,
     setSelectedCharacter: onCharacterChange,
-    selectedCharacter,
-    characters,
+    ttsVoice,
   } = useChatContext();
-
-  // Get voice from current character
-  const currentCharacter = characters[selectedCharacter];
-  const characterVoice = currentCharacter?.voice;
 
   const { t } = simpleT(locale);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -129,7 +124,7 @@ export function ThreadedMessage({
     locale,
     logger,
     deductCredits,
-    voice: characterVoice,
+    voice: ttsVoice,
   });
 
   const hasReplies = replies.length > 0;
@@ -271,6 +266,7 @@ export function ThreadedMessage({
                   setHoveredUserId(userId);
                   setUserCardPosition(position);
                 }}
+                logger={logger}
               />
             )}
 

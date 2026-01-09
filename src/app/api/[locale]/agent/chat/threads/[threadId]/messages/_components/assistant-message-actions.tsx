@@ -47,12 +47,8 @@ export function AssistantMessageActions({
   const { t } = simpleT(locale);
   const isTouch = useTouchDevice();
 
-  // Get ttsAutoplay, ttsVoice, deductCredits, and character info from context
-  const { ttsAutoplay, ttsVoice, deductCredits, selectedCharacter, characters } = useChatContext();
-
-  // Get voice from current character (if available), fallback to chat settings
-  const currentCharacter = characters[selectedCharacter];
-  const characterVoice = currentCharacter?.voice ?? ttsVoice;
+  // Get ttsAutoplay, ttsVoice, deductCredits from context
+  const { ttsAutoplay, ttsVoice, deductCredits } = useChatContext();
 
   // Check if this message is currently streaming
   const streamingMessage = useAIStreamStore((state) => state.streamingMessages[messageId]);
@@ -66,7 +62,7 @@ export function AssistantMessageActions({
       text: ttsText,
       enabled: ttsAutoplay,
       isStreaming: isMessageStreaming,
-      voice: characterVoice,
+      voice: ttsVoice,
       locale,
       logger,
       deductCredits,

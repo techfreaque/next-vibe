@@ -18,6 +18,11 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
+import {
+  getIconSizeClassName,
+  getSpacingClassName,
+  getTextSizeClassName,
+} from "../../../shared/widgets/utils/widget-helpers";
 
 /**
  * Pagination widget with page navigation and items per page selector
@@ -25,13 +30,34 @@ import type { ReactWidgetProps } from "../../../shared/widgets/types";
  */
 export function PaginationWidget<const TKey extends string>({
   value,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  field: _field,
+  field,
   context,
   className,
   form,
 }: ReactWidgetProps<typeof WidgetType.PAGINATION, TKey>): JSX.Element {
   const { t } = simpleT(context.locale);
+  const {
+    showBorder = true,
+    padding,
+    margin,
+    controlsGap,
+    elementGap,
+    textSize,
+    selectWidth,
+    iconSize,
+  } = field.ui;
+
+  // Get classes from config (no hardcoding!)
+  const paddingClass = getSpacingClassName("padding", padding);
+  const marginClass = getSpacingClassName("margin", margin);
+  const controlsGapClass = getSpacingClassName("gap", controlsGap);
+  const elementGapClass = getSpacingClassName("gap", elementGap);
+  const textSizeClass = getTextSizeClassName(textSize);
+  const iconSizeClass = getIconSizeClassName(iconSize);
+
+  // Select width mapping
+  const selectWidthClass =
+    selectWidth === "sm" ? "w-[60px]" : selectWidth === "lg" ? "w-[80px]" : "w-[70px]";
 
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return <Div className={className}>—</Div>;
@@ -71,8 +97,22 @@ export function PaginationWidget<const TKey extends string>({
   const endItem = Math.min(page * limit, total);
 
   return (
-    <Div className={cn("flex items-center justify-between border-t pt-4 mt-4", className)}>
-      <Div className="flex items-center gap-2 text-sm text-muted-foreground">
+    <Div
+      className={cn(
+        "flex items-center justify-between",
+        showBorder && "border-t",
+        paddingClass || "pt-4",
+        marginClass || "mt-4",
+        className,
+      )}
+    >
+      <Div
+        className={cn(
+          "flex items-center text-muted-foreground",
+          elementGapClass || "gap-2",
+          textSizeClass || "text-sm",
+        )}
+      >
         <Span>
           {t("app.api.system.unifiedInterface.react.widgets.pagination.showing", {
             start: startItem,
@@ -82,13 +122,13 @@ export function PaginationWidget<const TKey extends string>({
         </Span>
       </Div>
 
-      <Div className="flex items-center gap-4">
-        <Div className="flex items-center gap-2">
-          <Span className="text-sm text-muted-foreground">
+      <Div className={cn("flex items-center", controlsGapClass || "gap-4")}>
+        <Div className={cn("flex items-center", elementGapClass || "gap-2")}>
+          <Span className={cn("text-muted-foreground", textSizeClass || "text-sm")}>
             {t("app.api.system.unifiedInterface.react.widgets.pagination.itemsPerPage")}
           </Span>
           <Select value={String(limit)} onValueChange={handleLimitChange}>
-            <SelectTrigger className="w-[70px]">
+            <SelectTrigger className={selectWidthClass}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -100,17 +140,17 @@ export function PaginationWidget<const TKey extends string>({
           </Select>
         </Div>
 
-        <Div className="flex items-center gap-2">
+        <Div className={cn("flex items-center", elementGapClass || "gap-2")}>
           <Button
             variant="outline"
             size="sm"
             onClick={() => handlePageChange(page - 1)}
             disabled={!canGoPrevious}
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className={iconSizeClass || "h-4 w-4"} />
           </Button>
 
-          <Span className="text-sm font-medium">
+          <Span className={cn("font-medium", textSizeClass || "text-sm")}>
             {t("app.api.system.unifiedInterface.react.widgets.pagination.page", {
               current: page,
               total: totalPages,
@@ -123,7 +163,7 @@ export function PaginationWidget<const TKey extends string>({
             onClick={() => handlePageChange(page + 1)}
             disabled={!canGoNext}
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className={iconSizeClass || "h-4 w-4"} />
           </Button>
         </Div>
       </Div>

@@ -5,14 +5,15 @@ import type { ResponseType } from "@/app/api/[locale]/shared/types/response.sche
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
+import type { UseNavigationStackReturn } from "../../react/hooks/use-navigation-stack";
 import type { IconKey } from "../../react/icons";
 import type {
   CancelButtonConfig,
   SubmitButtonConfig,
 } from "../../react/widgets/renderers/EndpointRenderer";
+import type { EndpointLogger } from "../logger/endpoint";
 import type { CreateApiEndpointAny, UnifiedField } from "../types/endpoint";
 import type { Platform } from "../types/platform";
 import type { ExtractWidgetConfig } from "./configs";
@@ -70,7 +71,10 @@ export interface WidgetRenderContext {
   locale: CountryLanguage;
   isInteractive: boolean;
   permissions: readonly UserRoleValue[];
+  logger: EndpointLogger;
+
   onNavigate?: (url: string) => void;
+
   platform?:
     | typeof Platform.TRPC
     | typeof Platform.NEXT_PAGE
@@ -82,14 +86,17 @@ export interface WidgetRenderContext {
   disabled?: boolean; // Disable all form inputs
   response?: ResponseType<WidgetData>; // Full ResponseType from endpoint (includes success/error state)
   /**
-   * Optional scoped translation function for this endpoint
-   * When provided, widgets should use this instead of the global translation function
-   * This enables module-specific translations with type safety
-   * Note: Uses method syntax for bivariance - accepts both narrow (scoped) and broad (string) key types
+   * Navigation context for cross-definition navigation
+   * Provides type-safe navigation methods (push/pop) for endpoint navigation
    */
-  scopedT: (locale: CountryLanguage) => {
-    t(key: string, params?: TParams): TranslatedKeyType;
-  };
+  navigation?: UseNavigationStackReturn;
+  /**
+   * Translation function for widgets to use directly
+   * This is the scoped translation from the endpoint definition
+   * Automatically falls back to global translation if no scoped translation is defined
+   * Widgets should ALWAYS use context.t for all translations
+   */
+  t: <K extends string>(key: K, params?: TParams) => string;
   /**
    * Endpoint mutations available for widgets to trigger directly
    * Widgets can call these methods to perform CRUD operations

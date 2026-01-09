@@ -8,11 +8,17 @@ import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/t
 import {
   buildTableData,
   type CodeOutputConfig,
-  type CodeOutputItem,
   countCodeOutputBySeverity,
   getCodeOutputConfig,
   groupCodeOutputData,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/code-output";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import {
+  isWidgetDataArray,
+  isWidgetDataNumber,
+  isWidgetDataObject,
+  isWidgetDataString,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
 import {
   formatLocation,
   processSummaryTemplate,
@@ -39,21 +45,25 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
     const config = getCodeOutputConfig(field);
 
     // Handle plain string output (e.g., build logs, command output)
-    if (typeof value === "string") {
-      if (value.trim() === "") {
+    const stringValue = isWidgetDataString(value, context);
+    if (stringValue) {
+      if (stringValue.trim() === "") {
         return this.renderEmptyState(context);
       }
-      return value;
+      return stringValue;
     }
 
-    if (!Array.isArray(value) || value.length === 0) {
+    if (!isWidgetDataArray(value) || value.length === 0) {
       return this.renderEmptyState(context);
     }
 
-    const typedData: CodeOutputItem[] = value.filter(
-      (item): item is CodeOutputItem =>
-        typeof item === "object" && item !== null && !Array.isArray(item),
-    ) as CodeOutputItem[];
+    // Filter to objects only - use loop for proper type narrowing
+    const typedData: { [key: string]: WidgetData }[] = [];
+    for (const item of value) {
+      if (isWidgetDataObject(item)) {
+        typedData.push(item);
+      }
+    }
 
     switch (config.format) {
       case "eslint":
@@ -77,7 +87,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
   }
 
   private renderESLintFormat(
-    data: CodeOutputItem[],
+    data: { [key: string]: WidgetData }[],
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
@@ -98,7 +108,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
   }
 
   private renderGroupedData(
-    data: CodeOutputItem[],
+    data: { [key: string]: WidgetData }[],
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
@@ -121,7 +131,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
   }
 
   private renderFlatData(
-    data: CodeOutputItem[],
+    data: { [key: string]: WidgetData }[],
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
@@ -129,29 +139,40 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
   }
 
   private renderDataItem(
-    item: CodeOutputItem,
+    item: { [key: string]: WidgetData },
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
     const parts: string[] = [];
 
     if (item.line || item.column) {
-      // Use shared formatting logic
-      const location = formatLocation(item.line, item.column);
+      // Use shared formatting logic - narrow types to numbers
+      const line = isWidgetDataNumber(item.line) ? item.line : undefined;
+      const column = isWidgetDataNumber(item.column) ? item.column : undefined;
+      const location = formatLocation(line, column);
       parts.push(location.padEnd(10));
     }
 
-    if (item.severity && typeof item.severity === "string") {
-      const severity = this.formatSeverity(item.severity, config, context);
-      parts.push(severity.padEnd(9));
+    if (item.severity) {
+      const severity = isWidgetDataString(item.severity, context);
+      if (severity) {
+        const formatted = this.formatSeverity(severity, config, context);
+        parts.push(formatted.padEnd(9));
+      }
     }
 
-    if (item.message && typeof item.message === "string") {
-      parts.push(item.message);
+    if (item.message) {
+      const message = isWidgetDataString(item.message, context);
+      if (message) {
+        parts.push(message);
+      }
     }
 
-    if (item.rule && typeof item.rule === "string") {
-      parts.push(this.styleText(item.rule, "dim", context));
+    if (item.rule) {
+      const rule = isWidgetDataString(item.rule, context);
+      if (rule) {
+        parts.push(this.styleText(rule, "dim", context));
+      }
     }
 
     return parts.join(" ");
@@ -185,7 +206,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
   }
 
   private renderSummary(
-    data: CodeOutputItem[],
+    data: { [key: string]: WidgetData }[],
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
@@ -197,7 +218,7 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
   }
 
   private renderDefaultSummary(
-    data: CodeOutputItem[],
+    data: { [key: string]: WidgetData }[],
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
@@ -239,7 +260,10 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
     return `${icon}${totalCount} issue${totalCount === 1 ? "" : "s"}`;
   }
 
-  private renderCustomSummary(data: CodeOutputItem[], config: CodeOutputConfig): string {
+  private renderCustomSummary(
+    data: { [key: string]: WidgetData }[],
+    config: CodeOutputConfig,
+  ): string {
     // Use shared counting and template processing logic
     const severityCounts = countCodeOutputBySeverity(data);
     const variables = {
@@ -252,19 +276,19 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
     return processSummaryTemplate(config.summaryTemplate!, variables);
   }
 
-  private renderJSONFormat(data: CodeOutputItem[]): string {
+  private renderJSONFormat(data: { [key: string]: WidgetData }[]): string {
     return JSON.stringify(data, null, 2);
   }
 
-  private renderTableFormat(data: CodeOutputItem[]): string {
+  private renderTableFormat(data: { [key: string]: WidgetData }[]): string {
     return this.renderSimpleTable(data);
   }
 
-  private renderGenericFormat(data: CodeOutputItem[]): string {
+  private renderGenericFormat(data: { [key: string]: WidgetData }[]): string {
     return data.map((item) => JSON.stringify(item)).join("\n");
   }
 
-  private renderSimpleTable(data: CodeOutputItem[]): string {
+  private renderSimpleTable(data: { [key: string]: WidgetData }[]): string {
     if (data.length === 0) {
       return "";
     }

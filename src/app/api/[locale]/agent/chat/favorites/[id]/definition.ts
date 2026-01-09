@@ -17,10 +17,12 @@ import { TtsVoiceDB, TtsVoiceOptions } from "@/app/api/[locale]/agent/text-to-sp
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   objectField,
   objectUnionField,
   requestDataField,
   requestDataRangeField,
+  requestResponseField,
   requestUrlPathParamsField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
@@ -67,17 +69,15 @@ const { GET } = createEndpoint({
     },
     { request: "urlPathParams", response: true },
     {
-      // === REQUEST (URL Path Params) ===
-      id: requestUrlPathParamsField(
+      // === REQUEST (URL Path Params) + RESPONSE ===
+      id: requestResponseField(
         {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.favorites.id.get.id.label" as const,
+          type: WidgetType.TEXT,
+          content: "app.api.agent.chat.favorites.id.get.response.id.content" as const,
         },
         z.string().uuid(),
+        true,
       ),
-
-      // === RESPONSE ===
       characterId: responseField(
         {
           type: WidgetType.TEXT,
@@ -91,6 +91,13 @@ const { GET } = createEndpoint({
           content: "app.api.agent.chat.favorites.id.get.response.customName.content" as const,
         },
         z.string().nullable(),
+      ),
+      customIcon: responseField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.agent.chat.favorites.id.get.response.customIcon.content" as const,
+        },
+        iconSchema.nullable(),
       ),
       voice: responseField(
         {
@@ -223,6 +230,8 @@ const { GET } = createEndpoint({
         },
         z.number(),
       ),
+      // Navigation - back to previous screen
+      backButton: backButton(),
     },
   ),
 
@@ -274,8 +283,10 @@ const { GET } = createEndpoint({
     requests: undefined,
     responses: {
       get: {
+        id: "550e8400-e29b-41d4-a716-446655440000",
         characterId: "thea",
         customName: "Thea (Smart)",
+        customIcon: null,
         voice: null,
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
@@ -534,7 +545,7 @@ const { PATCH } = createEndpoint({
                   options: ModelUtilityOptions,
                   columns: 6,
                 },
-                z.array(z.enum(ModelUtilityDB)).nullable(),
+                z.array(z.enum(ModelUtilityDB)).nullable().optional(),
               ),
               ignoredWeaknesses: requestDataField(
                 {
@@ -546,7 +557,7 @@ const { PATCH } = createEndpoint({
                   options: ModelUtilityOptions,
                   columns: 6,
                 },
-                z.array(z.enum(ModelUtilityDB)).nullable(),
+                z.array(z.enum(ModelUtilityDB)).nullable().optional(),
               ),
             },
           ),
@@ -588,6 +599,8 @@ const { PATCH } = createEndpoint({
         },
         z.boolean(),
       ),
+      // Navigation - back to previous screen
+      backButton: backButton(),
     },
   ),
 
@@ -658,8 +671,6 @@ const { PATCH } = createEndpoint({
             min: SpeedLevelFilter.FAST,
             max: SpeedLevelFilter.THOROUGH,
           },
-          preferredStrengths: null,
-          ignoredWeaknesses: null,
         },
       },
     },
@@ -714,6 +725,8 @@ const { DELETE } = createEndpoint({
         },
         z.boolean(),
       ),
+      // Navigation - back to previous screen
+      backButton: backButton(),
     },
   ),
 
@@ -797,6 +810,9 @@ export type FavoriteDeleteUrlVariablesInput = typeof DELETE.types.UrlVariablesIn
 export type FavoriteDeleteUrlVariablesOutput = typeof DELETE.types.UrlVariablesOutput;
 export type FavoriteDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type FavoriteDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
+
+// Full favorite configuration type (from GET response)
+export type FavoriteItem = FavoriteGetResponseOutput;
 
 const definitions = { GET, PATCH, DELETE };
 export { DELETE, GET, PATCH };

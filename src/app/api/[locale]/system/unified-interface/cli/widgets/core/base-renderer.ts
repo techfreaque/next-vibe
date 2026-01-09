@@ -8,7 +8,6 @@ import chalk from "chalk";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
-import { getTranslator } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
 import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -87,8 +86,7 @@ export abstract class BaseWidgetRenderer<
   ): string {
     // Check if ui config has a label property
     if ("label" in field.ui && field.ui.label) {
-      const { t } = getTranslator(context);
-      return this.styleText(t(field.ui.label), "bold", context);
+      return this.styleText(context.t(field.ui.label), "bold", context);
     }
     return "";
   }
@@ -163,6 +161,190 @@ export abstract class BaseWidgetRenderer<
       default:
         return text + " ".repeat(padding);
     }
+  }
+
+  /**
+   * Render children fields recursively (widget-in-widget rendering).
+   * Eliminates duplicated child rendering logic across widgets.
+   *
+   * @param field - Parent field with children definitions
+   * @param value - Object value containing child data
+   * @param context - Rendering context
+   * @param options - Rendering options
+   * @returns Array of rendered child strings
+   */
+  protected renderChildren<const TKey extends string>(
+    field: UnifiedField<TKey>,
+    value: { [key: string]: WidgetData },
+    context: WidgetRenderContext,
+    options?: {
+      skipKeys?: string[];
+      separator?: string;
+    },
+  ): string[] {
+    const result: string[] = [];
+    const skipKeys = new Set(options?.skipKeys || []);
+
+    // Check if field has children
+    if (field.type !== "object" || !field.children) {
+      return result;
+    }
+
+    // Render each child
+    for (const [key, val] of Object.entries(value)) {
+      // Skip explicitly excluded keys
+      if (skipKeys.has(key)) {
+        continue;
+      }
+
+      // Skip null/undefined
+      if (val === undefined || val === null) {
+        continue;
+      }
+
+      const childField = field.children[key];
+      if (childField) {
+        const rendered = context.renderWidget(childField.ui.type, childField, val);
+        if (rendered) {
+          result.push(rendered);
+        }
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Render any value type generically (any-type-in-any-widget support).
+   * Provides consistent fallback rendering for unexpected data types.
+   *
+   * @param value - Any widget data value
+   * @param context - Rendering context
+   * @param options - Formatting options
+   * @returns Formatted string representation
+   */
+  protected renderValue(
+    value: WidgetData,
+    context: WidgetRenderContext,
+    options?: {
+      maxLength?: number;
+      showType?: boolean;
+      separator?: string;
+    },
+  ): string {
+    // Handle null/undefined
+    if (value === null) {
+      return this.styleText("—", "dim", context);
+    }
+    if (value === undefined) {
+      return this.styleText("—", "dim", context);
+    }
+
+    // Handle boolean
+    if (typeof value === "boolean") {
+      return this.formatter.formatBoolean(value);
+    }
+
+    // Handle number
+    if (typeof value === "number") {
+      return this.formatter.formatNumber(value, context.locale, {
+        precision: 2,
+      });
+    }
+
+    // Handle string
+    if (typeof value === "string") {
+      return this.formatter.formatText(value, {
+        maxLength: options?.maxLength,
+      });
+    }
+
+    // Handle array
+    if (Array.isArray(value)) {
+      if (value.length === 0) {
+        return this.styleText(
+          `[${context.t("app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.empty")}]`,
+          "dim",
+          context,
+        );
+      }
+      const separator = options?.separator ?? ", ";
+      return this.formatter.formatArray(value, { separator, maxItems: 5 });
+    }
+
+    // Handle object
+    if (typeof value === "object") {
+      const keys = Object.keys(value);
+      if (keys.length === 0) {
+        return this.styleText("{}", "dim", context);
+      }
+      return this.formatter.formatObject(value as Record<string, WidgetData>);
+    }
+
+    // Fallback for unknown types
+    return String(value);
+  }
+
+  /**
+   * Get appropriate icon for a value based on its type and content.
+   * Provides consistent icon selection across widgets.
+   *
+   * @param value - The value to get an icon for
+   * @param context - Rendering context
+   * @returns Icon string (empty if emojis disabled)
+   */
+  protected getValueIcon(value: WidgetData, context: WidgetRenderContext): string {
+    if (!context.options.useEmojis) {
+      return "";
+    }
+
+    // Handle null/undefined
+    if (value === null || value === undefined) {
+      // eslint-disable-next-line i18next/no-literal-string
+      return "○ ";
+    }
+
+    // Handle boolean
+    if (typeof value === "boolean") {
+      // eslint-disable-next-line i18next/no-literal-string
+      return value ? "✓ " : "✗ ";
+    }
+
+    // Handle number
+    if (typeof value === "number") {
+      if (value === 0) {
+        // eslint-disable-next-line i18next/no-literal-string
+        return "⚪ ";
+      }
+      if (value > 0) {
+        // eslint-disable-next-line i18next/no-literal-string
+        return "🟢 ";
+      }
+      // eslint-disable-next-line i18next/no-literal-string
+      return "🔴 ";
+    }
+
+    // Handle string
+    if (typeof value === "string") {
+      // eslint-disable-next-line i18next/no-literal-string
+      return "💬 ";
+    }
+
+    // Handle array
+    if (Array.isArray(value)) {
+      // eslint-disable-next-line i18next/no-literal-string
+      return "📋 ";
+    }
+
+    // Handle object
+    if (typeof value === "object") {
+      // eslint-disable-next-line i18next/no-literal-string
+      return "📊 ";
+    }
+
+    // Fallback
+    // eslint-disable-next-line i18next/no-literal-string
+    return "ℹ️ ";
   }
 }
 

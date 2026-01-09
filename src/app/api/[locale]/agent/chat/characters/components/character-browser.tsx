@@ -20,14 +20,13 @@ import {
   DEFAULT_CHARACTERS,
   getCharactersByCategory,
 } from "@/app/api/[locale]/agent/chat/characters/config";
-import type { FavoriteItem } from "@/app/api/[locale]/agent/chat/favorites/components/favorites-bar";
+import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
 import { modelOptions } from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { useIsMobile } from "@/hooks/use-media-query";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { ModelSelectionType } from "../../favorites/enum";
 import { CATEGORY_CONFIG, CharacterCategory } from "../enum";
 import { CharactersRepositoryClient } from "../repository-client";
 
@@ -38,9 +37,8 @@ interface CharacterBrowserProps {
   onBack?: () => void;
   locale: CountryLanguage;
   /** Favorites list to track which characters are already added */
-  favorites?: FavoriteItem[];
+  favorites?: FavoriteCard[];
 }
-
 
 /**
  * Character list item component - shows character info with description and model
@@ -63,32 +61,7 @@ export function CharacterListItem({
 
   const allModels = useMemo(() => Object.values(modelOptions), []);
   const bestModel = useMemo(() => {
-    // Use character model selection for filtering
-    const selection = character.modelSelection;
-    const settings =
-      selection.selectionType === ModelSelectionType.MANUAL
-        ? {
-            mode: "manual" as const,
-            manualModelId: selection.manualModelId,
-            filters: {},
-          }
-        : {
-            mode: "auto" as const,
-            manualModelId: undefined,
-            filters: {
-              intelligenceRange: selection.intelligenceRange,
-              priceRange: selection.priceRange,
-              contentRange: selection.contentRange,
-              speedRange: selection.speedRange,
-            },
-          };
-
-    const selectedModelId = CharactersRepositoryClient.selectModelForCharacter(
-      allModels,
-      character,
-      settings,
-    );
-    return selectedModelId ? (allModels.find((m) => m.id === selectedModelId) ?? null) : null;
+    return CharactersRepositoryClient.resolveModelForSelection(character.modelSelection, allModels);
   }, [allModels, character]);
 
   return (
@@ -157,13 +130,7 @@ export function CharacterListItem({
               <Span className="truncate">{bestModel.name}</Span>
               <Span className="text-muted-foreground/40">•</Span>
               <Span className="shrink-0">
-                {bestModel.creditCost === 0
-                  ? t("app.chat.selector.free")
-                  : bestModel.creditCost === 1
-                    ? t("app.chat.selector.creditsSingle")
-                    : t("app.chat.selector.creditsExact", {
-                        cost: bestModel.creditCost,
-                      })}
+                {CharactersRepositoryClient.formatCreditCost(bestModel.creditCost, t)}
               </Span>
             </>
           )}
@@ -251,7 +218,7 @@ export function CategorySection({
 interface CharacterBrowserCoreProps {
   onAdd: (characterId: string) => void;
   onCustomize: (characterId: string) => void;
-  favorites: FavoriteItem[];
+  favorites: FavoriteCard[];
   locale: CountryLanguage;
   searchQuery?: string;
   hideCompanions?: boolean;
@@ -292,7 +259,7 @@ export function CharacterBrowserCore({
 
   // Filter by search
   const searchFilteredCharacters = useMemo(() => {
-    if (!searchQuery.trim()) {
+    if (!searchQuery) {
       return null;
     }
 

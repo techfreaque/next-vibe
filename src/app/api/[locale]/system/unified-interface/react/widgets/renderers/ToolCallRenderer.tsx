@@ -32,10 +32,12 @@ import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  createEndpointLogger,
+  type EndpointLogger,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { getTranslatorFromEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -55,6 +57,7 @@ interface ToolCallRendererProps {
   threadId: string;
   messageId: string;
   toolIndex?: number;
+  logger: EndpointLogger;
   collapseState?: {
     isCollapsed: (
       key: {
@@ -99,6 +102,7 @@ export function ToolCallRenderer({
   onCancel: batchOnCancel,
   parentId,
   decision,
+  logger,
 }: ToolCallRendererProps): JSX.Element {
   const { t } = simpleT(locale);
   const { sendMessage } = useChatContext();
@@ -315,7 +319,7 @@ export function ToolCallRenderer({
   };
 
   const displayName = definition?.title
-    ? getTranslatorFromEndpoint(definition)(locale).t(definition.title)
+    ? definition.scopedTranslation.scopedT(locale).t(definition.title)
     : toolCall.toolName;
   const icon = definition?.icon;
   const credits = definition?.credits ?? toolCall.creditsUsed ?? 0;
@@ -600,6 +604,7 @@ export function ToolCallRenderer({
                       endpoint={definition}
                       locale={locale}
                       data={mergedData}
+                      logger={logger}
                       disabled={!isEditable || isDeclined || hasPendingDecision}
                       form={needsConfirmation || isDeclined ? confirmationForm : undefined}
                       onSubmit={needsConfirmation ? handleConfirm : undefined}

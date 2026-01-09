@@ -1,6 +1,15 @@
 /**
  * Link Card Widget Renderer
- * Handles LINK_CARD widget type for CLI display
+ *
+ * Handles LINK_CARD widget type for CLI display.
+ * Displays link information in a card format with:
+ * - Title (bold, with optional icon)
+ * - URL (blue, formatted for display)
+ * - Optional description (wrapped text)
+ * - Optional metadata (key-value pairs)
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All data extraction logic imported from shared.
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -16,6 +25,10 @@ import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 export class LinkCardWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.LINK_CARD> {
   readonly widgetType = WidgetType.LINK_CARD;
 
+  /**
+   * Render link card with title, URL, description, and metadata.
+   * Uses shared extraction logic to process the link data before rendering.
+   */
   render(props: CLIWidgetProps<typeof WidgetType.LINK_CARD, string>): string {
     const { value, context } = props;
     const t = context.t;
@@ -36,6 +49,13 @@ export class LinkCardWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     return this.renderLinkCard(data, context);
   }
 
+  /**
+   * Render link card with structured layout.
+   * - Line 1: Icon (if enabled) + Title (bold)
+   * - Line 2: URL (blue, indented)
+   * - Lines 3+: Description (wrapped, indented) if available
+   * - Additional lines: Metadata key-value pairs (dimmed keys, indented) if available
+   */
   private renderLinkCard(data: ProcessedLinkCard, context: WidgetRenderContext): string {
     const { title, url, description, icon, metadata } = data;
     const indent = this.createIndent(context.depth, context);

@@ -10,7 +10,12 @@ import type { z } from "zod";
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 
-import type { FieldUsageConfig, InferSchemaFromField, ObjectField } from "../types/endpoint";
+import type {
+  CreateApiEndpointAny,
+  FieldUsageConfig,
+  InferSchemaFromField,
+  ObjectField,
+} from "../types/endpoint";
 import type {
   FieldDataType,
   FieldUsage,
@@ -18,6 +23,7 @@ import type {
   SpacingSize,
   WidgetType,
 } from "../types/enums";
+import type { WidgetData } from "./types";
 
 /**
  * Layout configuration for containers and widgets
@@ -29,6 +35,7 @@ export interface LayoutConfig {
   gap?: SpacingSize;
   padding?: SpacingSize;
   margin?: SpacingSize;
+  spacing?: "compact" | "normal" | "relaxed"; // Added for consistent spacing control
   responsive?: {
     sm?: Partial<LayoutConfig>;
     md?: Partial<LayoutConfig>;
@@ -45,6 +52,10 @@ interface BaseWidgetConfig {
   type: WidgetType;
   className?: string;
   order?: number;
+  /** Hide this field from rendering */
+  hidden?: boolean;
+  /** Render inline with next sibling that also has inline: true */
+  inline?: boolean;
 }
 
 /**
@@ -379,11 +390,15 @@ export interface DataTableWidgetConfig<TKey extends string> extends BaseWidgetCo
     sortable?: boolean;
     width?: string | number;
     align?: "left" | "center" | "right";
+    format?: "text" | "number" | "date" | "currency" | "percentage" | "boolean" | "badge";
+    render?: string; // Custom render function ID
   }>;
   pagination?: {
     enabled?: boolean;
     pageSize?: number;
     showSizeChanger?: boolean;
+    pageSizeOptions?: number[];
+    position?: "top" | "bottom" | "both";
   };
   sorting?: {
     enabled?: boolean;
@@ -391,11 +406,22 @@ export interface DataTableWidgetConfig<TKey extends string> extends BaseWidgetCo
       key: string;
       direction: "asc" | "desc";
     }>;
+    multiSort?: boolean;
   };
   filtering?: {
     enabled?: boolean;
     global?: boolean;
+    columns?: string[]; // Specific columns to enable filtering on
   };
+  rowActions?: Array<{
+    label: NoInfer<TKey>;
+    icon?: IconKey;
+    onClick?: string; // Action ID
+  }>;
+  selectable?: boolean; // Enable row selection
+  hoverable?: boolean; // Highlight row on hover
+  striped?: boolean; // Alternate row colors
+  compact?: boolean; // Reduce row padding
 }
 
 export interface DataCardsWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -408,16 +434,35 @@ export interface DataCardsWidgetConfig<TKey extends string> extends BaseWidgetCo
   cardImage?: string; // Field name containing image URL (e.g., "avatarUrl", "imageUrl")
   cardContent?: string[]; // Array of field names to display in card body (e.g., ["description", "status"])
   cardMetadata?: string[]; // Array of field names to display as metadata (e.g., ["createdAt", "updatedAt"])
-  cardTemplate?: string; // Template name for card rendering
+  cardTemplate?: "default" | "eslint-issue" | "code-issue" | string; // Template name for card rendering
   groupBy?: string; // Field to group cards by
   showSummary?: boolean; // Show summary for groups
   summaryTemplate?: string; // Template for summary rendering
   layout?: LayoutConfig; // Layout configuration
+  maxItems?: number; // Maximum number of items to show initially (rest hidden behind "Show N more" button)
   itemConfig?: {
-    template: string;
-    size: string;
-    spacing: string;
+    template: "default" | "compact" | "detailed" | string;
+    size: "small" | "medium" | "large" | string;
+    spacing: "compact" | "normal" | "relaxed" | string;
   };
+  // Spacing config
+  gap?: SpacingSize; // Gap between cards in grid
+  cardPadding?: SpacingSize; // Padding inside each card
+  groupGap?: SpacingSize; // Gap between groups
+  groupInnerGap?: SpacingSize; // Gap between group header and cards
+  groupHeaderGap?: SpacingSize; // Gap in group header
+  groupHeaderPadding?: SpacingSize; // Padding in group header
+  cardGap?: SpacingSize; // Gap between cards in a group
+  // Text size config
+  groupTitleSize?: "xs" | "sm" | "base" | "lg"; // Group title text size
+  badgeSize?: "xs" | "sm" | "base" | "lg"; // Badge text size
+  titleSize?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl"; // Title text size
+  descriptionSize?: "xs" | "sm" | "base" | "lg"; // Description text size
+  // Badge padding
+  badgePadding?: SpacingSize; // Badge padding
+  // Border radius
+  cardBorderRadius?: "none" | "sm" | "base" | "lg" | "xl" | "2xl" | "full"; // Card border radius
+  badgeBorderRadius?: "none" | "sm" | "base" | "lg" | "xl" | "2xl" | "full"; // Badge border radius
 }
 
 export interface DataListWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -425,14 +470,43 @@ export interface DataListWidgetConfig<TKey extends string> extends BaseWidgetCon
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
   optional?: boolean;
-  renderMode?: string;
+  renderMode?: "default" | "compact" | "detailed" | string;
   hierarchical?: boolean;
+  groupBy?: string; // Field name from data object to group by
+  sortBy?: string; // Field name from data object to sort by
+  columns?: number; // Number of columns for list layout
+  layout?: LayoutConfig; // Layout configuration for list display
+  showSummary?: boolean; // Show summary information
+  maxItems?: number; // Maximum items to display before pagination/truncation
+  // Spacing config
+  gap?: SpacingSize; // Main container gap
+  simpleArrayGap?: SpacingSize; // Gap for simple value arrays
+  viewSwitcherGap?: SpacingSize; // Gap in view switcher buttons
+  viewSwitcherPadding?: SpacingSize; // Padding in view switcher container
+  buttonPadding?: SpacingSize; // Padding for view switcher buttons
+  tableHeadPadding?: SpacingSize; // Padding for table head cells
+  tableCellPadding?: SpacingSize; // Padding for table body cells
+  gridGap?: SpacingSize; // Gap between grid cards
+  cardPadding?: SpacingSize; // Padding inside grid cards
+  cardInnerGap?: SpacingSize; // Gap between fields in grid cards
+  rowGap?: SpacingSize; // Gap between label and value in card rows
+  buttonSpacing?: SpacingSize; // Margin for show more/less buttons
+  // Text size config
+  tableHeadSize?: "xs" | "sm" | "base" | "lg"; // Table head text size
+  tableCellSize?: "xs" | "sm" | "base" | "lg"; // Table cell text size
+  cardRowSize?: "xs" | "sm" | "base" | "lg"; // Card row text size
+  buttonSize?: "xs" | "sm" | "base" | "lg"; // Show more/less button text size
 }
 
 export interface DataGridWidgetConfig<TKey extends string> extends BaseWidgetConfig {
   type: WidgetType.DATA_GRID;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
+  columns?: number; // Number of columns in grid
+  layout?: LayoutConfig; // Layout configuration for grid display
+  gap?: SpacingSize; // Gap between grid items
+  responsive?: boolean; // Enable responsive column adjustment
+  minColumnWidth?: number | string; // Minimum column width (e.g., 200, "200px", "15rem")
 }
 
 export interface GroupedListWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -443,7 +517,29 @@ export interface GroupedListWidgetConfig<TKey extends string> extends BaseWidget
   sortBy?: string; // Field name from data object to sort by (e.g., "severity", "createdAt", "name")
   columns?: number;
   hierarchical?: boolean;
-  renderMode?: string;
+  renderMode?: "default" | "compact" | "detailed" | string;
+  maxItemsPerGroup?: number; // Maximum items to show per group before truncating
+  showSummary?: boolean; // Show summary for each group
+  // Spacing config
+  gap?: SpacingSize; // Gap between groups
+  headerPadding?: SpacingSize; // Padding for group header button
+  headerGap?: SpacingSize; // Gap between group title and badge
+  badgePadding?: SpacingSize; // Padding for item count badge
+  summaryPadding?: SpacingSize; // Padding for summary section
+  summaryGap?: SpacingSize; // Gap between summary items
+  itemPadding?: SpacingSize; // Padding for each item
+  itemGapX?: SpacingSize; // Horizontal gap in item grid
+  itemGapY?: SpacingSize; // Vertical gap in item grid
+  buttonPadding?: SpacingSize; // Padding for show more button
+  // Text size config
+  groupLabelSize?: "xs" | "sm" | "base" | "lg" | "xl"; // Group label text size
+  badgeSize?: "xs" | "sm" | "base" | "lg"; // Badge text size
+  iconSize?: "xs" | "sm" | "base" | "lg"; // Chevron icon size
+  summarySize?: "xs" | "sm" | "base" | "lg"; // Summary text size
+  itemSize?: "xs" | "sm" | "base" | "lg"; // Item text size
+  buttonSize?: "xs" | "sm" | "base" | "lg"; // Show more button text size
+  summaryTemplate?: string; // Template for group summary rendering
+  layout?: LayoutConfig; // Layout configuration for group display
 }
 
 export interface CodeQualityListWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -451,10 +547,12 @@ export interface CodeQualityListWidgetConfig<TKey extends string> extends BaseWi
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
   groupBy?: string; // Field name from data object to group by (e.g., "file", "code")
-  sortBy?: string; // Field name from data object to sort by (e.g., "severity")
+  sortBy?: "severity" | "file" | "line" | string; // Field name from data object to sort by
   showSummary?: boolean;
   columns?: number;
   layoutType?: LayoutType;
+  maxItemsPerGroup?: number; // Maximum items to show per group before truncating (default: 100)
+  layout?: LayoutConfig; // Layout configuration for issue display
 }
 
 export interface CodeQualityFilesWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -515,14 +613,36 @@ interface ContainerWidgetConfigBase<TKey extends string> extends BaseWidgetConfi
   columns?: number;
   /** Tailwind spacing value for gap between children (0, 1, 2, 3, 4, 6, 8) */
   gap?: "0" | "1" | "2" | "3" | "4" | "6" | "8";
+  /** Alignment for flex/inline layouts (start = top-aligned, center = vertically centered, end = bottom-aligned) */
+  alignItems?: "start" | "center" | "end";
   /** Tailwind spacing value for top padding (0, 2, 3, 4, 6, 8) */
   paddingTop?: "0" | "2" | "3" | "4" | "6" | "8";
+  /** Tailwind spacing value for bottom padding (0, 2, 3, 4, 6, 8) */
+  paddingBottom?: "0" | "2" | "3" | "4" | "6" | "8";
   optional?: boolean;
   icon?: IconKey;
   border?: boolean;
+  /** Add bottom border */
+  borderBottom?: boolean;
   spacing?: "compact" | "normal" | "relaxed";
   /** Render without Card wrapper for inline layouts */
   noCard?: boolean;
+  /** Title text alignment */
+  titleAlign?: "left" | "center" | "right";
+  /** Title text size */
+  titleSize?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
+  /** Description text size */
+  descriptionSize?: "xs" | "sm" | "base" | "lg" | "xl";
+  /** Gap between buttons in auto-submit button container */
+  buttonGap?: SpacingSize;
+  /** Icon size for submit button icons */
+  iconSize?: "xs" | "sm" | "base" | "lg";
+  /** Spacing after icon in buttons */
+  iconSpacing?: SpacingSize;
+  /** Padding for card content */
+  contentPadding?: SpacingSize;
+  /** Gap between header elements */
+  headerGap?: SpacingSize;
   /**
    * Submit/Refresh button configuration for the container
    * Rendered in the header next to the title when position is "header"
@@ -620,11 +740,34 @@ export interface TypedContainerWidgetConfig<
   }) => number | undefined;
 }
 
+export interface SeparatorWidgetConfig<TKey extends string> extends BaseWidgetConfig {
+  type: WidgetType.SEPARATOR;
+  /** Spacing above separator */
+  spacingTop?: SpacingSize;
+  /** Spacing below separator */
+  spacingBottom?: SpacingSize;
+  /** Optional label to display on the separator */
+  label?: NoInfer<TKey>;
+}
+
 export interface SectionWidgetConfig<TKey extends string> extends BaseWidgetConfig {
   type: WidgetType.SECTION;
   title?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
   layoutType?: LayoutType;
+  layout?: LayoutConfig; // Layout configuration for section content
+  columns?: number; // Number of columns for section layout
+  spacing?: "compact" | "normal" | "relaxed"; // Spacing within section
+  collapsible?: boolean; // Allow section to be collapsed
+  defaultCollapsed?: boolean; // Start collapsed (requires collapsible: true)
+  /** Empty state text size */
+  emptyTextSize?: "xs" | "sm" | "base";
+  /** Header padding for collapsible sections */
+  headerPadding?: SpacingSize;
+  /** Chevron icon size */
+  chevronIconSize?: "xs" | "sm" | "base" | "lg";
+  /** Chevron button size */
+  chevronButtonSize?: "xs" | "sm" | "base" | "lg";
 }
 
 export interface TabsWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -633,12 +776,57 @@ export interface TabsWidgetConfig<TKey extends string> extends BaseWidgetConfig 
   tabs?: Array<{
     id: string;
     label: NoInfer<TKey>;
+    icon?: IconKey;
+    disabled?: boolean;
+    badge?: string | number; // Badge content for tab
   }>;
+  defaultTab?: string; // ID of tab to show by default
+  /** Empty state padding */
+  emptyPadding?: SpacingSize;
+  /** Gap between icon and label in trigger */
+  triggerGap?: SpacingSize;
+  /** Icon size in trigger */
+  iconSize?: "xs" | "sm" | "base" | "lg";
+  /** Top margin for content */
+  contentMargin?: SpacingSize;
+  /** Content text size */
+  contentTextSize?: "xs" | "sm" | "base" | "lg";
+  /** Pre padding for JSON content */
+  prePadding?: SpacingSize;
+  /** Pre border radius */
+  preBorderRadius?: "none" | "sm" | "base" | "lg" | "xl";
+  variant?: "default" | "outline" | "pills";
+  orientation?: "horizontal" | "vertical";
+  keepMounted?: boolean; // Keep inactive tabs mounted in DOM
 }
 
 export interface AccordionWidgetConfig<TKey extends string> extends BaseWidgetConfig {
   type: WidgetType.ACCORDION;
   title?: NoInfer<TKey>;
+  items?: Array<{
+    id: string;
+    title: NoInfer<TKey>;
+    icon?: IconKey;
+    disabled?: boolean;
+  }>;
+  defaultOpen?: string[]; // IDs of items to open by default
+  allowMultiple?: boolean; // Allow multiple items to be open simultaneously
+  collapsible?: boolean; // Allow all items to be collapsed
+  variant?: "default" | "bordered" | "separated";
+  /** Empty state padding */
+  emptyPadding?: SpacingSize;
+  /** Empty state text size */
+  emptyTextSize?: "xs" | "sm" | "base";
+  /** Gap between icon and title */
+  titleGap?: SpacingSize;
+  /** Icon size */
+  iconSize?: "xs" | "sm" | "base" | "lg";
+  /** Content text size */
+  contentTextSize?: "xs" | "sm" | "base" | "lg";
+  /** Item padding for separated variant */
+  itemPadding?: SpacingSize;
+  /** Content padding */
+  contentPadding?: SpacingSize;
 }
 
 // ============================================================================
@@ -647,23 +835,30 @@ export interface AccordionWidgetConfig<TKey extends string> extends BaseWidgetCo
 
 export interface TitleWidgetConfig<TKey extends string> extends BaseWidgetConfig {
   type: WidgetType.TITLE;
-  content: NoInfer<TKey>;
+  content?: NoInfer<TKey>;
   level?: 1 | 2 | 3 | 4 | 5 | 6;
   fieldType?: FieldDataType;
+  textAlign?: "left" | "center" | "right";
+  size?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl";
+  gap?: SpacingSize;
+  subtitleGap?: SpacingSize;
 }
 
 export interface TextWidgetConfig<TKey extends string> extends BaseWidgetConfig {
   type: WidgetType.TEXT;
-  content: NoInfer<TKey>;
+  content?: NoInfer<TKey>;
   fieldType?: FieldDataType;
   label?: NoInfer<TKey>;
-  variant?: "default" | "error" | "info" | "success" | "warning";
+  variant?: "default" | "error" | "info" | "success" | "warning" | "muted";
   multiline?: boolean;
   emphasis?: "bold" | "italic" | "underline";
   maxLength?: number;
   format?: "link" | "plain";
   href?: string;
   textAlign?: "left" | "center" | "right";
+  size?: "xs" | "sm" | "base" | "lg" | "xl";
+  gap?: SpacingSize;
+  padding?: SpacingSize;
 }
 
 export interface BadgeWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -673,11 +868,39 @@ export interface BadgeWidgetConfig<TKey extends string> extends BaseWidgetConfig
   variant?: "default" | "success" | "warning" | "error" | "info";
 }
 
+export interface IconWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.ICON;
+  /** Container size */
+  containerSize?: "xs" | "sm" | "base" | "lg" | "xl";
+  /** Icon size */
+  iconSize?: "xs" | "sm" | "base" | "lg" | "xl";
+  /** Border radius */
+  borderRadius?: "none" | "sm" | "base" | "lg" | "xl" | "2xl" | "full";
+  /** Disable hover effect */
+  noHover?: boolean;
+  /** Icon horizontal alignment within container (start = left, center = centered, end = right) */
+  justifyContent?: "start" | "center" | "end";
+}
+
 export interface AvatarWidgetConfig<TKey extends string> extends BaseWidgetConfig {
   type: WidgetType.AVATAR;
   src?: string; // Field name containing avatar URL (e.g., "avatarUrl", "imageUrl") or literal URL
   alt?: NoInfer<TKey>;
   fallback?: string; // Fallback text/initials to display if image fails (e.g., "JD", "?")
+  /** Avatar size */
+  size?: "xs" | "sm" | "base" | "lg" | "xl";
+  /** Fallback text size */
+  fallbackSize?: "xs" | "sm" | "base" | "lg";
+}
+
+export interface DescriptionWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.DESCRIPTION;
+  /** Text size */
+  textSize?: "xs" | "sm" | "base" | "lg";
+  /** Top spacing */
+  spacing?: SpacingSize;
+  /** Number of lines before truncation */
+  lineClamp?: 1 | 2 | 3 | 4 | 5 | 6 | "none";
 }
 
 export interface MarkdownWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -692,6 +915,16 @@ export interface MarkdownEditorWidgetConfig<TKey extends string> extends BaseWid
   type: WidgetType.MARKDOWN_EDITOR;
   label?: NoInfer<TKey>;
   placeholder?: NoInfer<TKey>;
+  /** Container gap */
+  gap?: SpacingSize;
+  /** Input height */
+  inputHeight?: "xs" | "sm" | "base" | "lg";
+  /** Button size */
+  buttonSize?: "xs" | "sm" | "base" | "lg";
+  /** Icon size for action buttons */
+  actionIconSize?: "xs" | "sm" | "base" | "lg";
+  /** Icon size for edit button */
+  editIconSize?: "xs" | "sm" | "base";
 }
 
 export interface LinkWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -700,6 +933,9 @@ export interface LinkWidgetConfig<TKey extends string> extends BaseWidgetConfig 
   text?: NoInfer<TKey>; // Link text to display
   label?: NoInfer<TKey>; // Accessible label (aria-label) - use if text is not descriptive
   external?: boolean; // Opens in new tab if true
+  size?: "xs" | "sm" | "base" | "lg"; // Text size
+  gap?: SpacingSize; // Gap between text and icon
+  iconSize?: "xs" | "sm" | "base" | "lg"; // External link icon size
 }
 
 export interface LinkCardWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -708,6 +944,15 @@ export interface LinkCardWidgetConfig<TKey extends string> extends BaseWidgetCon
   title: NoInfer<TKey>;
   description?: NoInfer<TKey>;
   external?: boolean;
+  padding?: SpacingSize; // Card padding
+  titleGap?: SpacingSize; // Gap between title and icon
+  metaGap?: SpacingSize; // Gap between metadata items
+  titleSize?: "xs" | "sm" | "base" | "lg"; // Title text size
+  metaSize?: "xs" | "sm" | "base" | "lg"; // Metadata text size
+  descriptionSize?: "xs" | "sm" | "base" | "lg"; // Description text size
+  iconSize?: "xs" | "sm" | "base" | "lg"; // External link icon size
+  thumbnailSize?: "sm" | "base" | "lg"; // Thumbnail size
+  spacing?: SpacingSize; // Vertical spacing between sections
 }
 
 export interface LinkListWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -720,6 +965,16 @@ export interface LinkListWidgetConfig<TKey extends string> extends BaseWidgetCon
   }>;
   layoutType?: LayoutType;
   columns?: number;
+  /** Container gap */
+  containerGap?: SpacingSize;
+  /** Header gap */
+  headerGap?: SpacingSize;
+  /** Grid gap */
+  gridGap?: SpacingSize;
+  /** Title text size */
+  titleSize?: "xs" | "sm" | "base" | "lg" | "xl";
+  /** Description text size */
+  descriptionSize?: "xs" | "sm" | "base" | "lg";
 }
 
 // Data-driven card - renders object data as a card with link capability
@@ -764,13 +1019,34 @@ export interface CodeOutputWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.CODE_OUTPUT;
   code?: string; // Literal code snippet from data
   language?: string; // Programming language for syntax highlighting
-  format?: "eslint" | "generic" | "json" | "table";
-  outputFormat?: "eslint" | "generic" | "json" | "table";
+  format?: "eslint" | "generic" | "json" | "table" | string;
+  outputFormat?: "eslint" | "generic" | "json" | "table" | string;
   showSummary?: boolean;
   colorScheme?: "auto" | "light" | "dark";
   severityIcons?: Record<string, string>;
-  groupBy?: string;
-  summaryTemplate?: string;
+  groupBy?: string; // Field name to group output by
+  sortBy?: string; // Field name to sort output by
+  summaryTemplate?: string; // Template for summary rendering
+  maxLines?: number; // Maximum lines to display
+  showLineNumbers?: boolean; // Show line numbers in code output
+  highlightLines?: number[]; // Line numbers to highlight
+  wrapLines?: boolean; // Enable line wrapping
+  /** Empty state padding */
+  emptyPadding?: SpacingSize;
+  /** Header padding */
+  headerPadding?: SpacingSize;
+  /** Language label size */
+  languageLabelSize?: "xs" | "sm" | "base";
+  /** Code block padding */
+  codePadding?: SpacingSize;
+  /** Code text size */
+  codeTextSize?: "xs" | "sm" | "base" | "lg";
+  /** Line number width */
+  lineNumberWidth?: "sm" | "base" | "lg";
+  /** Line number spacing */
+  lineNumberSpacing?: SpacingSize;
+  /** Border radius */
+  borderRadius?: "none" | "sm" | "base" | "lg" | "xl";
 }
 
 export interface SeverityBadgeWidgetConfig extends BaseWidgetConfig {
@@ -801,6 +1077,22 @@ export interface CreditTransactionListWidgetConfig extends BaseWidgetConfig {
 
 export interface PaginationWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.PAGINATION;
+  /** Top border */
+  showBorder?: boolean;
+  /** Container padding */
+  padding?: SpacingSize;
+  /** Container margin */
+  margin?: SpacingSize;
+  /** Gap between info and controls */
+  controlsGap?: SpacingSize;
+  /** Gap between elements */
+  elementGap?: SpacingSize;
+  /** Text size */
+  textSize?: "xs" | "sm" | "base";
+  /** Select width */
+  selectWidth?: "sm" | "base" | "lg";
+  /** Icon size */
+  iconSize?: "xs" | "sm" | "base" | "lg";
 }
 
 // ============================================================================
@@ -814,6 +1106,42 @@ export interface ButtonWidgetConfig<TKey extends string> extends BaseWidgetConfi
   variant?: "default" | "primary" | "secondary" | "destructive" | "ghost" | "link";
   size?: "default" | "sm" | "lg" | "icon";
   onClick?: string; // Action ID
+  /** Icon size */
+  iconSize?: "xs" | "sm" | "base" | "lg";
+  /** Spacing to the right of icon */
+  iconSpacing?: SpacingSize;
+}
+
+export interface NavigateButtonWidgetConfig<
+  out TTargetEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny,
+  out TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
+  TKey extends string = string,
+> extends BaseWidgetConfig {
+  type: WidgetType.NAVIGATE_BUTTON;
+  label?: NoInfer<TKey>;
+  icon?: IconKey;
+  variant?: "default" | "primary" | "secondary" | "destructive" | "ghost" | "outline";
+  /**
+   * Navigation configuration stored in metadata
+   * extractParams: Returns partial urlPathParams and partial data for prefilling
+   */
+  metadata?: {
+    targetEndpoint?: TTargetEndpoint | null;
+    extractParams?: (
+      source: Record<string, WidgetData>,
+    ) => TTargetEndpoint extends CreateApiEndpointAny
+      ? {
+          urlPathParams?: Partial<TTargetEndpoint["types"]["UrlVariablesOutput"]>;
+          data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
+        }
+      : never;
+    prefillFromGet?: boolean;
+    getEndpoint?: TGetEndpoint;
+  };
+  /** Icon size */
+  iconSize?: "xs" | "sm" | "base" | "lg";
+  /** Spacing to the right of icon */
+  iconSpacing?: SpacingSize;
 }
 
 export interface ButtonGroupWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -865,6 +1193,19 @@ export interface MetricCardWidgetConfig<TKey extends string> extends BaseWidgetC
     warning?: number;
     error?: number;
   };
+  // Spacing config
+  headerGap?: SpacingSize; // Gap in card header
+  headerPadding?: SpacingSize; // Padding bottom for header
+  valueGap?: SpacingSize; // Gap between value and trend
+  unitSpacing?: SpacingSize; // Margin for unit
+  trendGap?: SpacingSize; // Gap in trend indicator
+  // Text size config
+  titleSize?: "xs" | "sm" | "base" | "lg"; // Title text size
+  iconSize?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl"; // Icon size
+  valueSize?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl"; // Value text size
+  unitSize?: "xs" | "sm" | "base" | "lg"; // Unit text size
+  trendSize?: "xs" | "sm" | "base" | "lg"; // Trend text size
+  trendIconSize?: "xs" | "sm" | "base" | "lg"; // Trend icon size
 }
 
 /**
@@ -880,6 +1221,26 @@ export interface StatWidgetConfig<TKey extends string> extends BaseWidgetConfig 
   trend?: "up" | "down" | "neutral";
   trendValue?: number;
   size?: "sm" | "md" | "lg";
+  /** Card padding */
+  padding?: SpacingSize;
+  /** Value text size */
+  valueSize?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl";
+  /** Label text size */
+  labelSize?: "xs" | "sm" | "base" | "lg";
+  /** Icon size */
+  iconSize?: "xs" | "sm" | "base" | "lg";
+  /** Spacing after icon */
+  iconSpacing?: SpacingSize;
+  /** Trend indicator size */
+  trendSize?: "xs" | "sm" | "base";
+  /** Trend icon size */
+  trendIconSize?: "xs" | "sm" | "base";
+  /** Gap in trend indicator */
+  trendGap?: SpacingSize;
+  /** Spacing after trend */
+  trendSpacing?: SpacingSize;
+  /** Spacing after value (before label) */
+  labelSpacing?: SpacingSize;
 }
 
 export interface StatsGridWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -888,7 +1249,16 @@ export interface StatsGridWidgetConfig<TKey extends string> extends BaseWidgetCo
   stats?: Array<{
     label: NoInfer<TKey>;
     value: string | number;
+    format?: "number" | "percentage" | "currency" | "compact" | "bytes";
+    icon?: IconKey;
+    variant?: "default" | "success" | "warning" | "danger" | "info" | "muted";
   }>;
+  columns?: number; // Number of stats per row (default: 3)
+  // Spacing config
+  gap?: SpacingSize; // Gap between stat cards
+  padding?: SpacingSize; // Padding for empty state
+  layout?: LayoutConfig; // Layout configuration for stats grid
+  spacing?: "compact" | "normal" | "relaxed"; // Spacing between stats
 }
 
 export interface ChartWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -896,13 +1266,33 @@ export interface ChartWidgetConfig<TKey extends string> extends BaseWidgetConfig
   title?: NoInfer<TKey>;
   label?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
-  chartType?: "line" | "bar" | "pie" | "area" | "donut";
+  chartType?: "line" | "bar" | "pie" | "area" | "donut" | "scatter" | "radar";
   xAxisLabel?: string;
   yAxisLabel?: string;
   height?: number;
   showLegend?: boolean;
   showGrid?: boolean;
   animate?: boolean;
+  colors?: string[]; // Custom color palette for chart
+  stacked?: boolean; // Stack bar/area charts
+  curved?: boolean; // Use curved lines for line/area charts
+  showDataLabels?: boolean; // Show values on data points
+  legendPosition?: "top" | "bottom" | "left" | "right";
+  responsive?: boolean; // Enable responsive sizing
+  /** Title text size */
+  titleTextSize?: "xs" | "sm" | "base" | "lg";
+  /** Description text size */
+  descriptionTextSize?: "xs" | "sm" | "base";
+  /** Empty state text size */
+  emptyTextSize?: "xs" | "sm" | "base";
+  /** Legend container gap */
+  legendGap?: SpacingSize;
+  /** Gap between legend items */
+  legendItemGap?: SpacingSize;
+  /** Legend text size */
+  legendTextSize?: "xs" | "sm" | "base";
+  /** Legend margin top */
+  legendMarginTop?: SpacingSize;
 }
 
 export interface ProgressWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -919,12 +1309,38 @@ export interface ProgressWidgetConfig<TKey extends string> extends BaseWidgetCon
 export interface LoadingWidgetConfig<TKey extends string> extends BaseWidgetConfig {
   type: WidgetType.LOADING;
   message?: NoInfer<TKey>;
+  /** Container padding */
+  padding?: SpacingSize;
+  /** Gap between spinner and message */
+  gap?: SpacingSize;
+  /** Message text size */
+  messageSize?: "xs" | "sm" | "base" | "lg";
+  /** Spinner icon size */
+  spinnerSize?: "xs" | "sm" | "base" | "lg";
+  /** Progress bar height */
+  progressHeight?: "xs" | "sm" | "base";
+  /** Spacing within progress container */
+  progressSpacing?: SpacingSize;
+  /** Percentage text size */
+  percentageSize?: "xs" | "sm" | "base";
 }
 
 export interface ErrorWidgetConfig<TKey extends string> extends BaseWidgetConfig {
   type: WidgetType.ERROR;
   title: NoInfer<TKey>;
   message?: NoInfer<TKey>;
+  /** Icon size */
+  iconSize?: "xs" | "sm" | "base" | "lg";
+  /** Spacing after description */
+  descriptionSpacing?: SpacingSize;
+  /** Error code text size */
+  codeSize?: "xs" | "sm" | "base";
+  /** Spacing between sections */
+  sectionSpacing?: SpacingSize;
+  /** Stack trace text size */
+  stackSize?: "xs" | "sm" | "base";
+  /** Stack trace padding */
+  stackPadding?: SpacingSize;
 }
 
 export interface EmptyStateWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -935,6 +1351,22 @@ export interface EmptyStateWidgetConfig<TKey extends string> extends BaseWidgetC
     text: NoInfer<TKey>;
     onClick?: string;
   };
+  /** Container padding */
+  padding?: SpacingSize;
+  /** Icon container size */
+  iconContainerSize?: "sm" | "md" | "lg";
+  /** Icon size */
+  iconSize?: "xs" | "sm" | "base" | "lg";
+  /** Spacing after icon */
+  iconSpacing?: SpacingSize;
+  /** Title text size */
+  titleSize?: "xs" | "sm" | "base" | "lg" | "xl";
+  /** Spacing after title */
+  titleSpacing?: SpacingSize;
+  /** Description text size */
+  descriptionSize?: "xs" | "sm" | "base" | "lg";
+  /** Spacing after description */
+  descriptionSpacing?: SpacingSize;
 }
 
 export interface StatusIndicatorWidgetConfig<TKey extends string> extends BaseWidgetConfig {
@@ -959,6 +1391,10 @@ export interface SubmitButtonWidgetConfig<TKey extends string> extends BaseWidge
   icon?: IconKey;
   variant?: "default" | "primary" | "secondary" | "destructive" | "ghost" | "outline" | "link";
   size?: "default" | "sm" | "lg" | "icon";
+  /** Icon size */
+  iconSize?: "xs" | "sm" | "base" | "lg";
+  /** Spacing to the right of icon */
+  iconSpacing?: SpacingSize;
 }
 
 // Password strength indicator
@@ -966,6 +1402,32 @@ export interface PasswordStrengthWidgetConfig extends BaseWidgetConfig {
   type: WidgetType.PASSWORD_STRENGTH;
   /** Field name to watch for password value (defaults to "password") */
   watchField?: string;
+  /** Container gap */
+  containerGap?: SpacingSize;
+  /** Label text size */
+  labelTextSize?: "xs" | "sm" | "base";
+  /** Bar height */
+  barHeight?: "xs" | "sm" | "base" | "lg";
+  /** Suggestion text size */
+  suggestionTextSize?: "xs" | "sm" | "base";
+  /** Suggestion margin top */
+  suggestionMarginTop?: SpacingSize;
+  /** Background color for weak password */
+  weakBgColor?: string;
+  /** Background color for fair password */
+  fairBgColor?: string;
+  /** Background color for good password */
+  goodBgColor?: string;
+  /** Background color for strong password */
+  strongBgColor?: string;
+  /** Text color for weak password */
+  weakTextColor?: string;
+  /** Text color for fair password */
+  fairTextColor?: string;
+  /** Text color for good password */
+  goodTextColor?: string;
+  /** Text color for strong password */
+  strongTextColor?: string;
 }
 
 // ============================================================================
@@ -1008,11 +1470,14 @@ export type WidgetConfig<TKey extends string> =
   | SectionWidgetConfig<TKey>
   | TabsWidgetConfig<TKey>
   | AccordionWidgetConfig<TKey>
+  | SeparatorWidgetConfig<TKey>
   // Content widgets
   | TitleWidgetConfig<TKey>
   | TextWidgetConfig<TKey>
   | BadgeWidgetConfig<TKey>
+  | IconWidgetConfig
   | AvatarWidgetConfig<TKey>
+  | DescriptionWidgetConfig
   | MarkdownWidgetConfig<TKey>
   | MarkdownEditorWidgetConfig<TKey>
   | LinkWidgetConfig<TKey>
@@ -1032,6 +1497,7 @@ export type WidgetConfig<TKey extends string> =
   | PaginationWidgetConfig
   // Interactive widgets
   | ButtonWidgetConfig<TKey>
+  | NavigateButtonWidgetConfig<CreateApiEndpointAny, CreateApiEndpointAny | undefined, TKey>
   | ButtonGroupWidgetConfig<TKey>
   | ActionBarWidgetConfig<TKey>
   | PaginationInfoWidgetConfig

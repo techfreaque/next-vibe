@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import type { JSX } from "react";
 
@@ -7,7 +8,10 @@ import { Icon, type IconKey } from "@/app/api/[locale]/system/unified-interface/
 
 import type { WidgetType } from "../../../shared/types/enums";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
-import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
+import {
+  getIconSizeClassName,
+  getSpacingClassName,
+} from "../../../shared/widgets/utils/widget-helpers";
 
 /**
  * Renders an action button widget.
@@ -19,17 +23,22 @@ export function ButtonWidget<const TKey extends string>({
   className,
   value,
 }: ReactWidgetProps<typeof WidgetType.BUTTON, TKey>): JSX.Element {
-  const { t } = getTranslator(context);
   const {
     text: textKey,
     icon,
     variant = "default",
     size = "default",
     onClick: actionId,
+    iconSize,
+    iconSpacing,
   } = field.ui;
 
+  // Get classes from config (no hardcoding!)
+  const iconSizeClass = getIconSizeClassName(iconSize);
+  const iconSpacingClass = getSpacingClassName("margin", iconSpacing);
+
   const buttonIcon = icon ? (icon as IconKey) : undefined;
-  const buttonText = textKey ? t(textKey) : "Action";
+  const buttonText = textKey ? context.t(textKey) : "Action";
 
   const handleClick = async (): Promise<void> => {
     if (!actionId) {
@@ -79,7 +88,12 @@ export function ButtonWidget<const TKey extends string>({
       size={size}
       className={className}
     >
-      {buttonIcon && <Icon icon={buttonIcon} className="h-4 w-4 mr-2" />}
+      {buttonIcon && (
+        <Icon
+          icon={buttonIcon}
+          className={cn(iconSizeClass || "h-4 w-4", iconSpacingClass || "mr-2")}
+        />
+      )}
       {buttonText}
     </Button>
   );

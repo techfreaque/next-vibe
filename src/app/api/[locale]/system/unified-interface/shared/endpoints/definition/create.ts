@@ -12,8 +12,15 @@
  * - Support for all 5 interfaces
  */
 
+import type { FieldValues } from "react-hook-form";
 import type { z } from "zod";
 
+import type {
+  ApiFormOptions,
+  ApiMutationOptions,
+  ApiQueryFormOptions,
+  ApiQueryOptions,
+} from "@/app/api/[locale]/system/unified-interface/react/hooks/types";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { generateSchemaForUsage as generateSchemaFromUtils } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type {
@@ -42,28 +49,11 @@ type ExtractSchemaType<F> = F extends { schema: z.ZodType<infer T> } ? T : never
  * Options for read (GET) operations at the endpoint level
  * These options will be merged with hook-provided options (hook options take priority)
  */
-export interface EndpointReadOptions<TRequest, TUrlVariables> {
+export interface EndpointReadOptions<TRequest extends FieldValues, TResponse, TUrlVariables> {
   /** Form options for query forms (filtering, search, etc.) */
-  formOptions?: {
-    defaultValues?: Partial<TRequest>;
-    persistForm?: boolean;
-    persistenceKey?: string;
-    autoSubmit?: boolean;
-    debounceMs?: number;
-  };
+  formOptions?: ApiQueryFormOptions<TRequest>;
   /** Query options for data fetching */
-  queryOptions?: {
-    enabled?: boolean;
-    staleTime?: number;
-    cacheTime?: number;
-    refetchOnWindowFocus?: boolean;
-    disableLocalCache?: boolean;
-    cacheDuration?: number;
-    deduplicateRequests?: boolean;
-    refreshDelay?: number;
-    forceRefresh?: boolean;
-    backgroundRefresh?: boolean;
-  };
+  queryOptions?: ApiQueryOptions<TRequest, TResponse, TUrlVariables>;
   /** URL path parameters for the read endpoint */
   urlPathParams?: TUrlVariables;
   /** Initial state for the form */
@@ -74,17 +64,11 @@ export interface EndpointReadOptions<TRequest, TUrlVariables> {
  * Options for create/update (POST/PUT/PATCH) operations at the endpoint level
  * These options will be merged with hook-provided options (hook options take priority)
  */
-export interface EndpointCreateOptions<TRequest, TUrlVariables> {
+export interface EndpointCreateOptions<TRequest extends FieldValues, TResponse, TUrlVariables> {
   /** Form options for mutation forms */
-  formOptions?: {
-    defaultValues?: Partial<TRequest>;
-    persistForm?: boolean;
-    persistenceKey?: string;
-  };
+  formOptions?: ApiFormOptions<TRequest>;
   /** Mutation options for create/update operations */
-  mutationOptions?: {
-    invalidateQueries?: string[];
-  };
+  mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
   /** URL path parameters for the create endpoint */
   urlPathParams?: TUrlVariables;
   /** Data to auto-prefill the form with */
@@ -97,11 +81,9 @@ export interface EndpointCreateOptions<TRequest, TUrlVariables> {
  * Options for delete (DELETE) operations at the endpoint level
  * These options will be merged with hook-provided options (hook options take priority)
  */
-export interface EndpointDeleteOptions<TUrlVariables> {
+export interface EndpointDeleteOptions<TRequest, TResponse, TUrlVariables> {
   /** Mutation options for delete operations */
-  mutationOptions?: {
-    invalidateQueries?: string[];
-  };
+  mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
   /** URL path parameters for the delete endpoint */
   urlPathParams?: TUrlVariables;
 }
@@ -241,15 +223,19 @@ export interface ApiEndpoint<
   readonly options?: TMethod extends Methods.GET
     ? EndpointReadOptions<
         ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
+        ExtractOutput<InferSchemaFromField<TFields, FieldUsage.ResponseData>>,
         ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>>
       >
     : TMethod extends Methods.POST | Methods.PUT | Methods.PATCH
       ? EndpointCreateOptions<
           ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
+          ExtractOutput<InferSchemaFromField<TFields, FieldUsage.ResponseData>>,
           ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>>
         >
       : TMethod extends Methods.DELETE
         ? EndpointDeleteOptions<
+            ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
+            ExtractOutput<InferSchemaFromField<TFields, FieldUsage.ResponseData>>,
             ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>>
           >
         : never;

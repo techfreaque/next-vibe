@@ -11,21 +11,59 @@ import {
   TableRow,
 } from "next-vibe-ui/ui/table";
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
-
-import { simpleT } from "@/i18n/core/shared";
+import { useState } from "react";
 
 import type { WidgetType } from "../../../shared/types/enums";
 import { extractDataTableData, formatCellValue } from "../../../shared/widgets/logic/data-table";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
-import {
-  extractColumnConfig,
-  extractTableSortConfig,
-  sortTableRows,
-} from "../../../shared/widgets/utils/widget-helpers";
+import { isWidgetDataString } from "../../../shared/widgets/utils/field-type-guards";
+import { extractColumnConfig, sortTableRows } from "../../../shared/widgets/utils/widget-helpers";
 
 /**
- * Renders sortable data table with column headers.
+ * Data Table Widget - Displays sortable tabular data with column configuration
+ *
+ * Renders data in a table format with sortable columns, configurable alignment,
+ * and optional custom formatting. Supports pagination info and keyboard navigation.
+ * Automatically translates column labels.
+ *
+ * Features:
+ * - Sortable columns with ascending/descending indicators
+ * - Configurable column alignment (left/center/right)
+ * - Custom cell formatters per column
+ * - Keyboard accessible sorting (Enter/Space)
+ * - ARIA attributes for accessibility
+ * - Pagination info display
+ * - Dark mode support
+ * - Hover effects on rows
+ *
+ * Data Format:
+ * - object: {
+ *     rows: Array<Record<string, any>> - Table data rows
+ *     columns: Array<{ key: string, label: string }> - Column definitions
+ *     sortBy?: string - Initial sort column key
+ *     sortOrder?: "asc" | "desc" - Initial sort direction
+ *     totalRows?: number - Total count for pagination display
+ *     columnConfig?: Record<string, {
+ *       align?: "left" | "center" | "right"
+ *       sortable?: boolean
+ *       width?: string
+ *       format?: (value: any) => string
+ *     }>
+ *   }
+ * - null/undefined: Shows "—" placeholder
+ *
+ * Column Configuration:
+ * Each column can specify:
+ * - align: Text alignment in cells
+ * - sortable: Whether column can be sorted
+ * - width: Fixed column width
+ * - format: Custom formatter function for cell values
+ *
+ * @param value - Table data object with rows, columns, and configuration
+ * @param field - Field definition with UI config
+ * @param context - Rendering context with locale and translator
+ * @param className - Optional CSS classes
+ * @param form - Optional form context for column selector UI
  */
 export const DataTableWidget = <const TKey extends string>({
   value,
@@ -34,22 +72,19 @@ export const DataTableWidget = <const TKey extends string>({
   className = "",
   form,
 }: ReactWidgetProps<typeof WidgetType.DATA_TABLE, TKey>): JSX.Element => {
+  const { sorting } = field.ui;
   const hasRequestUsage = field.usage && "request" in field.usage;
 
   if (hasRequestUsage && form) {
     // TODO: Implement column selector UI
   }
-  const { t } = simpleT(context.locale);
-  const [sortBy, setSortBy] = useState<string | null>(null);
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  // Get initial sort from field.ui.sorting config, NOT from value
+  const initialSort = sorting?.defaultSort?.[0];
+  const [sortBy, setSortBy] = useState<string | null>(initialSort?.key ?? null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(initialSort?.direction ?? "asc");
 
   const data = extractDataTableData(value);
-  const sortConfig = extractTableSortConfig(value);
-
-  useEffect(() => {
-    setSortBy(sortConfig.sortBy);
-    setSortOrder(sortConfig.sortOrder);
-  }, [sortConfig.sortBy, sortConfig.sortOrder]);
 
   if (!data) {
     return <Div className={className}>—</Div>;
@@ -75,7 +110,9 @@ export const DataTableWidget = <const TKey extends string>({
           <TableRow>
             {columns.map((column) => {
               const key = column.key;
-              const label = column.label;
+              const label = isWidgetDataString(column.label, context)
+                ? context.t(column.label)
+                : column.label;
 
               const columnConfig = extractColumnConfig(value, key);
               const { align, sortable, width } = columnConfig;
@@ -152,16 +189,21 @@ export const DataTableWidget = <const TKey extends string>({
         </TableBody>
       </Table>
 
-      {sortConfig.totalRows !== undefined && sortConfig.totalRows > rows.length && (
-        <Div className="mt-4 flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-700">
-          <Div className="text-sm text-gray-700 dark:text-gray-300">
-            {t("app.api.system.unifiedInterface.react.widgets.dataTable.showingResults", {
-              count: rows.length,
-              total: sortConfig.totalRows,
-            })}
+      {value &&
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        "totalRows" in value &&
+        typeof value.totalRows === "number" &&
+        value.totalRows > rows.length && (
+          <Div className="mt-4 flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-700">
+            <Div className="text-sm text-gray-700 dark:text-gray-300">
+              {context.t("app.api.system.unifiedInterface.react.widgets.dataTable.showingResults", {
+                count: rows.length,
+                total: value.totalRows,
+              })}
+            </Div>
           </Div>
-        </Div>
-      )}
+        )}
     </Div>
   );
 };

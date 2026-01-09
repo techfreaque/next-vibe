@@ -14,19 +14,63 @@ import {
   splitCodeIntoLines,
 } from "../../../shared/widgets/logic/code-output";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
+import {
+  getSpacingClassName,
+  getTextSizeClassName,
+} from "../../../shared/widgets/utils/widget-helpers";
 
 /**
  * Displays code with syntax highlighting and optional line numbers.
  */
 export function CodeOutputWidget<const TKey extends string>({
   value,
+  field,
   context,
   className,
 }: ReactWidgetProps<typeof WidgetType.CODE_OUTPUT, TKey>): JSX.Element {
+  const {
+    emptyPadding,
+    headerPadding,
+    languageLabelSize,
+    codePadding,
+    codeTextSize,
+    lineNumberWidth,
+    lineNumberSpacing,
+    borderRadius,
+  } = field.ui;
+
+  // Get classes from config (no hardcoding!)
+  const emptyPaddingClass = getSpacingClassName("padding", emptyPadding);
+  const headerPaddingClass = getSpacingClassName("padding", headerPadding);
+  const languageLabelSizeClass = getTextSizeClassName(languageLabelSize);
+  const codePaddingClass = getSpacingClassName("padding", codePadding);
+  const codeTextSizeClass = getTextSizeClassName(codeTextSize);
+  const lineNumberSpacingClass = getSpacingClassName("padding", lineNumberSpacing);
+
+  // Line number width mapping
+  const lineNumberWidthClass =
+    lineNumberWidth === "sm" ? "w-8" : lineNumberWidth === "lg" ? "w-16" : "w-12";
+
+  // Border radius mapping
+  const borderRadiusClass =
+    borderRadius === "none"
+      ? "rounded-none"
+      : borderRadius === "sm"
+        ? "rounded-sm"
+        : borderRadius === "base"
+          ? "rounded"
+          : borderRadius === "xl"
+            ? "rounded-xl"
+            : "rounded-lg";
+
   const data = extractCodeOutputData(value, context.theme ?? "light");
 
   if (!data) {
-    return <Div className={cn("italic p-4 text-muted-foreground", className)}>—</Div>;
+    return (
+      <Div className={cn("italic text-muted-foreground", emptyPaddingClass || "p-4", className)}>
+        —
+      </Div>
+    );
   }
 
   const { code, language, showLineNumbers, highlightLines, theme } = data;
@@ -35,17 +79,32 @@ export function CodeOutputWidget<const TKey extends string>({
   return (
     <Div
       className={cn(
-        "overflow-hidden rounded-lg border border-border",
+        "overflow-hidden border border-border",
+        borderRadiusClass,
         theme === "dark" ? "bg-slate-900" : "bg-slate-50",
         className,
       )}
     >
-      <Div className="flex items-center justify-between border-b border-border bg-accent px-4 py-2">
-        <Span className="font-mono text-xs uppercase text-muted-foreground">{language}</Span>
+      <Div
+        className={cn(
+          "flex items-center justify-between border-b border-border bg-accent",
+          headerPaddingClass || "px-4 py-2",
+        )}
+      >
+        <Span
+          className={cn(
+            "font-mono uppercase text-muted-foreground",
+            languageLabelSizeClass || "text-xs",
+          )}
+        >
+          {language}
+        </Span>
       </Div>
       <Pre
         className={cn(
-          "overflow-x-auto p-4 font-mono text-sm",
+          "overflow-x-auto font-mono",
+          codePaddingClass || "p-4",
+          codeTextSizeClass || "text-sm",
           theme === "dark" ? "text-slate-100" : "text-slate-900",
         )}
       >
@@ -60,7 +119,13 @@ export function CodeOutputWidget<const TKey extends string>({
                 className={cn("flex", highlighted && "bg-yellow-200/20 dark:bg-yellow-500/10")}
               >
                 {showLineNumbers && (
-                  <Span className="inline-block w-12 select-none pr-4 text-right text-muted-foreground">
+                  <Span
+                    className={cn(
+                      "inline-block select-none text-right text-muted-foreground",
+                      lineNumberWidthClass,
+                      lineNumberSpacingClass || "pr-4",
+                    )}
+                  >
                     {lineNumber}
                   </Span>
                 )}

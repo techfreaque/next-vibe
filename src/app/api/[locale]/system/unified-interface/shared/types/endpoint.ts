@@ -13,6 +13,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import type { IconKey } from "../../react/icons";
 import type { CreateApiEndpoint } from "../endpoints/definition/create";
 import type { WidgetConfig } from "../widgets/configs";
+import type { WidgetData } from "../widgets/types";
 import type {
   ActionTiming,
   ActionType,
@@ -349,13 +350,15 @@ export type InferSchemaFromField<F, Usage extends FieldUsage> =
                 >
               ? F extends { usage: infer TUsage }
                 ? MatchesUsage<TUsage, Usage> extends true
-                  ? z.ZodNullable<
-                      z.ZodArray<
-                        TChild extends UnifiedField<string, z.ZodTypeAny>
-                          ? InferSchemaFromField<TChild, Usage>
-                          : TChild extends z.ZodTypeAny
-                            ? TChild
-                            : z.ZodNever
+                  ? z.ZodOptional<
+                      z.ZodNullable<
+                        z.ZodArray<
+                          TChild extends UnifiedField<string, z.ZodTypeAny>
+                            ? InferSchemaFromField<TChild, Usage>
+                            : TChild extends z.ZodTypeAny
+                              ? TChild
+                              : z.ZodNever
+                        >
                       >
                     >
                   : z.ZodNever
@@ -526,19 +529,21 @@ export type InferSchemaFromFieldForMethod<
               >
             ? F extends { usage: infer TUsage }
               ? MatchesUsageForMethod<TUsage, Method, Usage> extends true
-                ? z.ZodNullable<
-                    z.ZodArray<
-                      TChild extends UnifiedField<TTranslationKey, z.ZodTypeAny>
-                        ? InferSchemaFromFieldForMethod<
-                            TTranslationKey,
-                            TChild,
-                            Method,
-                            Usage,
-                            z.ZodTypeAny
-                          >
-                        : TChild extends z.ZodTypeAny
-                          ? TChild
-                          : z.ZodNever
+                ? z.ZodOptional<
+                    z.ZodNullable<
+                      z.ZodArray<
+                        TChild extends UnifiedField<TTranslationKey, z.ZodTypeAny>
+                          ? InferSchemaFromFieldForMethod<
+                              TTranslationKey,
+                              TChild,
+                              Method,
+                              Usage,
+                              z.ZodTypeAny
+                            >
+                          : TChild extends z.ZodTypeAny
+                            ? TChild
+                            : z.ZodNever
+                      >
                     >
                   >
                 : z.ZodNever
@@ -566,6 +571,118 @@ export type InferOutputFromFieldForMethod<
   Usage extends FieldUsage,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
 > = ExtractOutput<InferSchemaFromFieldForMethod<TTranslationKey, F, Method, Usage, TSchema>>;
+
+// ============================================================================
+// NAVIGATION TYPE SYSTEM
+// ============================================================================
+
+/**
+ * Extract request parameters type from an endpoint
+ * Uses ExtractInput to get the input type from the endpoint's request schema
+ */
+export type ExtractRequestParams<TEndpoint> = TEndpoint extends {
+  requestSchema: infer TSchema;
+}
+  ? TSchema extends z.ZodTypeAny
+    ? ExtractInput<TSchema>
+    : never
+  : never;
+
+/**
+ * Extract URL path parameters type from an endpoint
+ * Extracts only the urlPathParams portion of the request schema
+ */
+export type ExtractUrlPathParams<TEndpoint> =
+  ExtractRequestParams<TEndpoint> extends {
+    urlPathParams: infer TUrlParams;
+  }
+    ? TUrlParams
+    : ExtractRequestParams<TEndpoint> extends { urlPathParams?: infer TUrlParams }
+      ? TUrlParams
+      : never;
+
+/**
+ * Type-safe navigation button configuration
+ * Enforces type safety at the definition level
+ *
+ * @template TTargetEndpoint - The target endpoint to navigate to
+ * @template TGetEndpoint - Optional GET endpoint for prefilling data
+ * @template TKey - Translation key type
+ */
+export interface NavigateButtonConfig<
+  TTargetEndpoint extends CreateApiEndpointAny,
+  TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
+  TKey extends string = string,
+> {
+  /** Target endpoint to navigate to (null for back navigation) */
+  targetEndpoint: TTargetEndpoint | null;
+  /**
+   * Extract parameters from source data
+   * Source: Row data from parent (WidgetData values - allows strings, numbers, booleans, etc.)
+   * Return: Partial urlPathParams (for navigation) and partial data (for prefilling)
+   */
+  extractParams: (
+    source: Record<string, WidgetData>,
+  ) => TTargetEndpoint extends CreateApiEndpointAny
+    ? {
+        urlPathParams?: Partial<TTargetEndpoint["types"]["UrlVariablesOutput"]>;
+        data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
+      }
+    : never;
+  /** Prefetch GET data before showing PATCH/PUT form */
+  prefillFromGet?: boolean;
+  /** Optional GET endpoint for prefilling */
+  getEndpoint?: TGetEndpoint;
+  /** Button label translation key */
+  label?: NoInfer<TKey>;
+  /** Button icon */
+  icon?: IconKey;
+  /** Button variant */
+  variant?: "default" | "secondary" | "destructive" | "ghost" | "outline";
+}
+
+/**
+ * Navigation stack entry
+ */
+export interface NavigationStackEntry<
+  TEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny,
+> {
+  endpoint: TEndpoint;
+  params: ExtractRequestParams<TEndpoint>;
+  timestamp: number;
+  getEndpoint?: CreateApiEndpointAny;
+  prefillFromGet?: boolean;
+}
+
+/**
+ * Navigation context provided to widgets
+ * Typed navigation methods with compile-time validation
+ */
+export interface NavigationContext {
+  /**
+   * Navigate to a new endpoint
+   * @param endpoint - Target endpoint
+   * @param params - Type-safe parameters extracted from source
+   * @param prefillFromGet - Whether to fetch GET before showing form
+   */
+  push: <TEndpoint extends CreateApiEndpointAny>(
+    endpoint: TEndpoint,
+    params: ExtractRequestParams<TEndpoint>,
+    prefillFromGet?: boolean,
+  ) => void;
+  /**
+   * Go back to previous endpoint in stack
+   */
+  pop: () => void;
+  /**
+   * Current navigation stack
+   */
+  stack: readonly NavigationStackEntry[];
+  /**
+   * Whether there are items in the stack to go back to
+   */
+  canGoBack: boolean;
+}
 
 // ============================================================================
 // BASIC TYPE UTILITIES

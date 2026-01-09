@@ -10,7 +10,6 @@ import { parseError } from "next-vibe/shared/utils";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import { type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction, TParams, TranslationKey } from "@/i18n/core/static-types";
 
@@ -748,7 +747,8 @@ export class RouteDelegationHandler {
         this.sanitizeDataForRenderer(data),
         fields,
         locale,
-        endpointDefinition.scopedTranslation.scopedT,
+        endpointDefinition.scopedTranslation.scopedT(locale).t,
+        logger,
       );
     } catch (error) {
       // Fallback to basic formatting
@@ -756,7 +756,7 @@ export class RouteDelegationHandler {
         error: parseError(error),
       });
       // eslint-disable-next-line i18next/no-literal-string
-      return `📊 Result:\n${this.formatPretty(data, locale, endpointDefinition.scopedTranslation.scopedT)}`;
+      return `📊 Result:\n${this.formatPretty(data, locale, endpointDefinition.scopedTranslation.scopedT(locale).t, logger)}`;
     }
   }
 
@@ -766,9 +766,8 @@ export class RouteDelegationHandler {
   private formatPretty(
     data: CliResponseData,
     locale: CountryLanguage,
-    scopedT: (locale: CountryLanguage) => {
-      t: (key: string, params?: TParams) => TranslatedKeyType;
-    },
+    t: (key: string, params?: TParams) => string,
+    logger: EndpointLogger,
   ): string {
     // Use the enhanced modular CLI response renderer for pretty formatting
     try {
@@ -776,7 +775,8 @@ export class RouteDelegationHandler {
         this.sanitizeDataForRenderer(data),
         [],
         locale,
-        scopedT,
+        t,
+        logger,
       );
     } catch {
       // Fallback to JSON if enhanced rendering fails

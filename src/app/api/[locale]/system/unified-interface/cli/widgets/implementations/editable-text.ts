@@ -1,7 +1,16 @@
 /**
  * Editable Text Widget Renderer
- * Handles EDITABLE_TEXT widget type for CLI display
- * Note: CLI renders this as readonly text since inline editing is not supported
+ *
+ * Handles MARKDOWN_EDITOR widget type for CLI display.
+ * Renders editable text fields as readonly formatted text since CLI doesn't support
+ * inline editing. Supports both single-line and multiline text with:
+ * - Placeholder text display when value is empty
+ * - Readonly indicator
+ * - Character count with max length
+ * - Text wrapping for multiline content
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All data extraction logic imported from shared.
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -18,6 +27,11 @@ export class EditableTextWidgetRenderer extends BaseWidgetRenderer<
 > {
   readonly widgetType = WidgetType.MARKDOWN_EDITOR;
 
+  /**
+   * Render editable text as readonly formatted text.
+   * Displays value or placeholder, with optional readonly indicator and length info.
+   * Multiline text is rendered with proper indentation and wrapping.
+   */
   render(props: CLIWidgetProps<typeof WidgetType.MARKDOWN_EDITOR, string>): string {
     const { field, value, context } = props;
     const t = context.t;
@@ -38,6 +52,12 @@ export class EditableTextWidgetRenderer extends BaseWidgetRenderer<
     return this.renderEditableText(data, field, context);
   }
 
+  /**
+   * Render editable text with value, placeholder, and metadata indicators.
+   * Handles single-line and multiline text with different formatting:
+   * - Single-line: label + value on one line with indicators
+   * - Multiline: label on first line, indented wrapped content on following lines
+   */
   private renderEditableText(
     data: ProcessedEditableText,
     field: CLIWidgetProps<typeof WidgetType.MARKDOWN_EDITOR, string>["field"],

@@ -6,17 +6,16 @@
 import { z } from "zod";
 
 import { ModelId, ModelIdOptions } from "@/app/api/[locale]/agent/models/models";
-import { IconKeyDB } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  field,
+  navigateButtonField,
   objectField,
   objectUnionField,
   requestDataField,
   requestDataRangeField,
   responseArrayField,
-  responseArrayOptionalField,
   responseField,
+  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -27,8 +26,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { iconSchema } from "../../../shared/types/common.schema";
 import { ModelUtilityDB, ModelUtilityOptions } from "../../models/enum";
 import { TtsVoiceDB, TtsVoiceOptions } from "../../text-to-speech/enum";
+import { DELETE as FavoriteDELETE, PATCH as FavoritePATCH } from "./[id]/definition";
 import {
   CONTENT_DISPLAY,
   INTELLIGENCE_DISPLAY,
@@ -62,222 +63,99 @@ const { GET } = createEndpoint({
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.favorites" as const],
 
-  fields: objectField(
+  fields: responseArrayField(
     {
-      type: WidgetType.CONTAINER,
+      type: WidgetType.DATA_CARDS,
       title: "app.api.agent.chat.favorites.get.container.title" as const,
       description: "app.api.agent.chat.favorites.get.container.description" as const,
-      layoutType: LayoutType.STACKED,
+      layout: { columns: 1, spacing: "normal" },
     },
-    { response: true },
-    {
-      favorites: responseArrayField(
-        {
-          type: WidgetType.DATA_CARDS,
-        },
-        objectField(
+    objectField(
+      {
+        type: WidgetType.CONTAINER,
+        layoutType: LayoutType.INLINE,
+        gap: "4",
+        alignItems: "start",
+        noCard: true,
+      },
+      { response: true },
+      {
+        id: responseField({ type: WidgetType.TEXT, hidden: true }, z.string().uuid()),
+        characterId: responseField({ type: WidgetType.TEXT, hidden: true }, z.string().nullable()),
+        icon: responseField(
+          { type: WidgetType.ICON, containerSize: "lg", iconSize: "base", borderRadius: "lg" },
+          iconSchema,
+        ),
+        content: objectField(
           {
             type: WidgetType.CONTAINER,
-            title: "app.api.agent.chat.favorites.get.response.favorite.title" as const,
-            layoutType: LayoutType.GRID,
-            columns: 2,
+            layoutType: LayoutType.STACKED,
+            gap: "0",
+            noCard: true,
           },
           { response: true },
           {
-            id: responseField(
-              {
-                type: WidgetType.TEXT,
-                content: "app.api.agent.chat.favorites.get.response.favorite.id.content" as const,
-              },
-              z.string().uuid(),
-            ),
-            characterId: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.get.response.favorite.characterId.content" as const,
-              },
-              z.string(),
-            ),
-            customName: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.get.response.favorite.customName.content" as const,
-              },
-              z.string().nullable(),
-            ),
-            customIcon: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.get.response.favorite.customIcon.content" as const,
-              },
-              z.enum(IconKeyDB).nullable(),
-            ),
-            voice: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.get.response.favorite.voice.content" as const,
-              },
-              z.enum(TtsVoiceDB).nullable(),
-            ),
-            modelSelection: objectUnionField(
+            titleRow: objectField(
               {
                 type: WidgetType.CONTAINER,
-                title:
-                  "app.api.agent.chat.favorites.get.response.favorite.modelSelection.title" as const,
-                layoutType: LayoutType.STACKED,
+                layoutType: LayoutType.INLINE,
+                gap: "2",
+                noCard: true,
               },
               { response: true },
-              "selectionType",
-              [
-                // Variant 1: Manual model selection
-                objectField(
-                  {
-                    type: WidgetType.CONTAINER,
-                    layoutType: LayoutType.STACKED,
-                  },
-                  { response: true },
-                  {
-                    selectionType: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.favorites.get.response.favorite.selectionType.content" as const,
-                      },
-                      z.literal(ModelSelectionType.MANUAL),
-                    ),
-                    manualModelId: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.favorites.get.response.favorite.manualModelId.content" as const,
-                      },
-                      z.enum(ModelId),
-                    ),
-                  },
+              {
+                name: responseField(
+                  { type: WidgetType.TEXT, size: "base", emphasis: "bold" },
+                  z.string(),
                 ),
-                // Variant 2: Filter-based selection
-                objectField(
-                  {
-                    type: WidgetType.CONTAINER,
-                    layoutType: LayoutType.STACKED,
-                  },
-                  { response: true },
-                  {
-                    selectionType: responseField(
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.favorites.get.response.favorite.selectionType.content" as const,
-                      },
-                      z.literal(ModelSelectionType.FILTERS),
-                    ),
-                    intelligenceRange: responseField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        layoutType: LayoutType.STACKED,
-                      },
-                      z
-                        .object({
-                          min: z.enum(IntelligenceLevelFilterDB).optional(),
-                          max: z.enum(IntelligenceLevelFilterDB).optional(),
-                        })
-                        .optional(),
-                    ),
-                    priceRange: responseField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        layoutType: LayoutType.STACKED,
-                      },
-                      z
-                        .object({
-                          min: z.enum(PriceLevelFilterDB).optional(),
-                          max: z.enum(PriceLevelFilterDB).optional(),
-                        })
-                        .optional(),
-                    ),
-                    contentRange: responseField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        layoutType: LayoutType.STACKED,
-                      },
-                      z
-                        .object({
-                          min: z.enum(ContentLevelFilterDB).optional(),
-                          max: z.enum(ContentLevelFilterDB).optional(),
-                        })
-                        .optional(),
-                    ),
-                    speedRange: responseField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        layoutType: LayoutType.STACKED,
-                      },
-                      z
-                        .object({
-                          min: z.enum(SpeedLevelFilterDB).optional(),
-                          max: z.enum(SpeedLevelFilterDB).optional(),
-                        })
-                        .optional(),
-                    ),
-                    preferredStrengths: responseArrayOptionalField(
-                      {
-                        type: WidgetType.DATA_LIST,
-                      },
-                      field(
-                        z.enum(ModelUtilityDB),
-                        { response: true },
-                        {
-                          type: WidgetType.TEXT,
-                          content:
-                            "app.api.agent.chat.favorites.get.response.favorite.preferredStrengths.content" as const,
-                        },
-                      ),
-                    ),
-                    ignoredWeaknesses: responseArrayOptionalField(
-                      {
-                        type: WidgetType.DATA_LIST,
-                      },
-                      field(
-                        z.enum(ModelUtilityDB),
-                        { response: true },
-                        {
-                          type: WidgetType.TEXT,
-                          content:
-                            "app.api.agent.chat.favorites.get.response.favorite.ignoredWeaknesses.content" as const,
-                        },
-                      ),
-                    ),
-                  },
+                tagline: responseField(
+                  { type: WidgetType.TEXT, size: "sm", variant: "muted" },
+                  z.string(),
                 ),
-              ],
-            ),
-            position: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.get.response.favorite.position.content" as const,
               },
-              z.number(),
             ),
-            color: responseField(
-              {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.get.response.favorite.color.content" as const,
-              },
-              z.string().nullable(),
+            description: responseField(
+              { type: WidgetType.TEXT, size: "xs", variant: "muted" },
+              z.string(),
             ),
-            useCount: responseField(
+            modelRow: objectField(
               {
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.favorites.get.response.favorite.useCount.content" as const,
+                type: WidgetType.CONTAINER,
+                layoutType: LayoutType.INLINE,
+                gap: "1",
+                noCard: true,
               },
-              z.number(),
+              { response: true },
+              {
+                modelIcon: responseField(
+                  {
+                    type: WidgetType.ICON,
+                    iconSize: "xs",
+                    noHover: true,
+                  },
+                  iconSchema,
+                ),
+                modelInfo: responseField(
+                  { type: WidgetType.TEXT, size: "xs", variant: "muted" },
+                  z.string(),
+                ),
+                separator1: widgetField(
+                  { type: WidgetType.TEXT, size: "xs", variant: "muted", content: "•" as const },
+                  { response: true },
+                ),
+                modelProvider: responseField(
+                  { type: WidgetType.TEXT, size: "xs", variant: "muted" },
+                  z.string(),
+                ),
+                separator2: widgetField(
+                  { type: WidgetType.TEXT, size: "xs", variant: "muted", content: "•" as const },
+                  { response: true },
+                ),
+                creditCost: responseField(
+                  { type: WidgetType.TEXT, size: "xs", variant: "muted" },
+                  z.string(),
+                ),
+              },
             ),
           },
         ),
@@ -339,35 +217,19 @@ const { GET } = createEndpoint({
   examples: {
     requests: undefined,
     responses: {
-      listAll: {
-        favorites: [
-          {
-            id: "550e8400-e29b-41d4-a716-446655440000",
-            characterId: "thea",
-            customName: "Thea (Smart)",
-            customIcon: null,
-            voice: null,
-            modelSelection: {
-              selectionType: ModelSelectionType.FILTERS,
-              intelligenceRange: {
-                min: IntelligenceLevelFilter.SMART,
-              },
-              priceRange: {
-                max: PriceLevelFilter.STANDARD,
-              },
-              contentRange: {
-                min: ContentLevelFilter.OPEN,
-              },
-              preferredStrengths: null,
-              ignoredWeaknesses: null,
-            },
-            position: 0,
-            color: null,
-            useCount: 50,
-          },
-        ],
-        hasCompanion: true,
-      },
+      listAll: [
+        {
+          id: "550e8400-e29b-41d4-a716-446655440000",
+          characterId: "default",
+          icon: "sparkles",
+          name: "Thea",
+          tagline: "Greek goddess of light",
+          description: "Devoted companion with ancient wisdom",
+          modelIcon: "sparkles",
+          modelInfo: "Claude Sonnet 4.5",
+          creditCost: "1.5 credits",
+        },
+      ],
     },
     urlPathParams: undefined,
   },
@@ -417,6 +279,16 @@ const { POST } = createEndpoint({
           columns: 6,
         },
         z.string().optional(),
+      ),
+      customIcon: requestDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.ICON,
+          label: "app.api.agent.chat.favorites.post.customIcon.label" as const,
+          description: "app.api.agent.chat.favorites.post.customIcon.description" as const,
+          columns: 6,
+        },
+        iconSchema.optional(),
       ),
       voice: requestDataField(
         {
@@ -594,7 +466,7 @@ const { POST } = createEndpoint({
                   options: ModelUtilityOptions,
                   columns: 6,
                 },
-                z.array(z.enum(ModelUtilityDB)).nullable(),
+                z.array(z.enum(ModelUtilityDB)).nullable().optional(),
               ),
               ignoredWeaknesses: requestDataField(
                 {
@@ -606,7 +478,7 @@ const { POST } = createEndpoint({
                   options: ModelUtilityOptions,
                   columns: 6,
                 },
-                z.array(z.enum(ModelUtilityDB)).nullable(),
+                z.array(z.enum(ModelUtilityDB)).nullable().optional(),
               ),
             },
           ),
@@ -717,11 +589,11 @@ export type FavoriteCreateRequestOutput = typeof POST.types.RequestOutput;
 export type FavoriteCreateResponseInput = typeof POST.types.ResponseInput;
 export type FavoriteCreateResponseOutput = typeof POST.types.ResponseOutput;
 
-// Individual favorite type from GET response
-export type Favorite = FavoritesListResponseOutput["favorites"][number];
+// Individual favorite card type from GET response (display fields only)
+export type FavoriteCard = FavoritesListResponseOutput[number];
 
-// Favorite field type aliases - only for complex objects
-export type FavoriteModelSelection = Favorite["modelSelection"];
+// Favorite field type alias for model selection (from POST request)
+export type FavoriteModelSelection = FavoriteCreateRequestOutput["modelSelection"];
 
 const definitions = { GET, POST };
 export { GET, POST };

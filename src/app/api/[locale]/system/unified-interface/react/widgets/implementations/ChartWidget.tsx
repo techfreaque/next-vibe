@@ -11,8 +11,12 @@ import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
-import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
+import { type ChartDataPoint, extractChartData } from "../../../shared/widgets/logic/chart";
+import type { ReactWidgetProps } from "../../../shared/widgets/types";
+import {
+  getSpacingClassName,
+  getTextSizeClassName,
+} from "../../../shared/widgets/utils/widget-helpers";
 
 // Color palette for charts
 const CHART_COLORS = [
@@ -28,140 +32,13 @@ const CHART_COLORS = [
   "#8b5cf6", // violet-500
 ];
 
-// Type for chart data
-interface ChartDataPoint<TTranslationKey extends string> {
-  x: string | number;
-  y: number;
-  label?: TTranslationKey;
-}
-
-interface ChartSeries<TTranslationKey extends string> {
-  name: string;
-  data: ChartDataPoint<TTranslationKey>[];
-  color?: string;
-}
-
-// Check if value looks like a ChartDataPoint
-function looksLikeChartDataPoint(item: WidgetData): boolean {
-  return (
-    typeof item === "object" &&
-    item !== null &&
-    !Array.isArray(item) &&
-    "x" in item &&
-    "y" in item &&
-    typeof (item as { y: WidgetData }).y === "number"
-  );
-}
-
-// Check if value looks like a ChartSeries
-function looksLikeChartSeries(item: WidgetData): boolean {
-  return (
-    typeof item === "object" &&
-    item !== null &&
-    !Array.isArray(item) &&
-    "name" in item &&
-    "data" in item &&
-    typeof (item as { name: WidgetData }).name === "string" &&
-    Array.isArray((item as { data: WidgetData }).data)
-  );
-}
-
-// Convert validated WidgetData to ChartDataPoint
-function toChartDataPoint<TTranslationKey extends string>(
-  item: WidgetData,
-): ChartDataPoint<TTranslationKey> {
-  const obj = item as { x: WidgetData; y: number; label?: WidgetData };
-  return {
-    x: String(obj.x),
-    y: obj.y,
-    label: obj.label !== undefined ? (String(obj.label) as TTranslationKey) : undefined,
-  };
-}
-
-// Convert validated WidgetData to ChartSeries
-function toChartSeries<TTranslationKey extends string>(
-  item: WidgetData,
-): ChartSeries<TTranslationKey> {
-  const obj = item as { name: string; data: WidgetData[]; color?: string };
-  return {
-    name: obj.name,
-    data: obj.data.filter(looksLikeChartDataPoint).map(toChartDataPoint<TTranslationKey>),
-    color: obj.color,
-  };
-}
-
-/**
- * Extract chart data from various value formats
- * Supports: array of points, object with series, raw numbers
- */
-function extractChartData<TTranslationKey extends string>(
-  value: WidgetData,
-): {
-  type: "single" | "series" | "pie";
-  data: ChartSeries<TTranslationKey>[];
-} | null {
-  if (!value) {
-    return null;
-  }
-
-  // Array of data points: [{x: "Jan", y: 100}, ...]
-  if (Array.isArray(value)) {
-    if (value.length === 0) {
-      return null;
-    }
-
-    // Check if it's array of series: [{name: "Series1", data: [...]}, ...]
-    if (value[0] && looksLikeChartSeries(value[0])) {
-      // Filter and convert to ChartSeries
-      const validSeries = value.filter(looksLikeChartSeries).map(toChartSeries<TTranslationKey>);
-      return {
-        type: "series",
-        data: validSeries,
-      };
-    }
-
-    // Single series of points - filter and convert to ChartDataPoint
-    const validPoints = value
-      .filter(looksLikeChartDataPoint)
-      .map(toChartDataPoint<TTranslationKey>);
-    if (validPoints.length > 0) {
-      return {
-        type: "single",
-        data: [{ name: "Value", data: validPoints }],
-      };
-    }
-  }
-
-  // Object with named series: {series1: [...], series2: [...]}
-  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const obj = value as { [key: string]: WidgetData };
-    const series: ChartSeries<TTranslationKey>[] = [];
-
-    for (const [key, val] of Object.entries(obj)) {
-      if (Array.isArray(val)) {
-        // Filter and convert to ChartDataPoint
-        const validPoints = val
-          .filter(looksLikeChartDataPoint)
-          .map(toChartDataPoint<TTranslationKey>);
-        if (validPoints.length > 0) {
-          series.push({
-            name: key,
-            data: validPoints,
-          });
-        }
-      }
-    }
-
-    if (series.length > 0) {
-      return { type: "series", data: series };
-    }
-  }
-
-  return null;
-}
-
 /**
  * Chart Widget - Renders various chart types from definition-driven data
+ *
+ * Supports multiple data formats:
+ * - Array of data points: `[{x: "Jan", y: 100}, {x: "Feb", y: 200}]`
+ * - Array of series: `[{name: "Series 1", data: [...]}, {name: "Series 2", data: [...]}]`
+ * - Object with named series: `{series1: [{x, y}], series2: [{x, y}]}`
  *
  * UI Config options:
  * - chartType: "line" | "bar" | "area" | "pie" | "donut" | "scatter"
@@ -180,7 +57,6 @@ export function ChartWidget<const TKey extends string>({
   context,
   className,
 }: ReactWidgetProps<typeof WidgetType.CHART, TKey>): JSX.Element {
-  const { t } = getTranslator(context);
   const { t: globalT } = simpleT(context.locale);
   const {
     chartType = "line",
@@ -191,12 +67,28 @@ export function ChartWidget<const TKey extends string>({
     height = 300,
     showLegend = true,
     animate = true,
+    titleTextSize,
+    descriptionTextSize,
+    emptyTextSize,
+    legendGap,
+    legendItemGap,
+    legendTextSize,
+    legendMarginTop,
   } = field.ui;
 
-  const title = labelKey ? t(labelKey as TranslationKey) : undefined;
-  const description = descriptionKey ? t(descriptionKey as TranslationKey) : undefined;
+  // Get classes from config (no hardcoding!)
+  const titleTextSizeClass = getTextSizeClassName(titleTextSize);
+  const descriptionTextSizeClass = getTextSizeClassName(descriptionTextSize);
+  const emptyTextSizeClass = getTextSizeClassName(emptyTextSize);
+  const legendGapClass = getSpacingClassName("gap", legendGap);
+  const legendItemGapClass = getSpacingClassName("gap", legendItemGap);
+  const legendTextSizeClass = getTextSizeClassName(legendTextSize);
+  const legendMarginTopClass = getSpacingClassName("margin", legendMarginTop);
 
-  // Extract chart data
+  const title = labelKey ? context.t(labelKey) : undefined;
+  const description = descriptionKey ? context.t(descriptionKey) : undefined;
+
+  // Extract chart data using shared logic
   const chartData = extractChartData<TKey>(value);
 
   // No data - show empty state
@@ -205,7 +97,9 @@ export function ChartWidget<const TKey extends string>({
       <Card className={cn("h-full", className)}>
         {title && (
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">{title}</CardTitle>
+            <CardTitle className={cn("font-medium", titleTextSizeClass || "text-sm")}>
+              {title}
+            </CardTitle>
           </CardHeader>
         )}
         <CardContent className="flex items-center justify-center">
@@ -218,7 +112,7 @@ export function ChartWidget<const TKey extends string>({
               width: "100%",
             }}
           >
-            <Span className="text-muted-foreground">
+            <Span className={cn("text-muted-foreground", emptyTextSizeClass)}>
               {globalT("app.api.system.unifiedInterface.widgets.chart.noDataAvailable")}
             </Span>
           </Div>
@@ -238,10 +132,10 @@ export function ChartWidget<const TKey extends string>({
         firstSeries?.data
           .filter((d: ChartDataPoint<TKey>) => d.y > 0) // Filter out zero values for pie chart
           .map((d: ChartDataPoint<TKey>) => {
-            // Translate labels - t() returns original string if key not found
+            // Translate labels - context.t() returns original string if key not found
             const rawLabel = String(d.label ?? d.x ?? "Unknown");
             return {
-              x: t(rawLabel as TranslationKey),
+              x: context.t(rawLabel as TranslationKey),
               y: d.y,
             };
           }) ?? [];
@@ -258,7 +152,7 @@ export function ChartWidget<const TKey extends string>({
               width: "100%",
             }}
           >
-            <Span className="text-muted-foreground">
+            <Span className={cn("text-muted-foreground", emptyTextSizeClass)}>
               {globalT("app.api.system.unifiedInterface.widgets.chart.noDataToDisplay")}
             </Span>
           </Div>
@@ -284,7 +178,7 @@ export function ChartWidget<const TKey extends string>({
     // Line/Bar/Area charts
     // Collect all unique x values for categorical axis (with translation)
     const allXValues = chartData.data.flatMap((series) =>
-      series.data.map((d) => t(String(d.label ?? d.x ?? "") as TranslationKey)),
+      series.data.map((d) => context.t(String(d.label ?? d.x ?? "") as TranslationKey)),
     );
     const uniqueXValues = [...new Set(allXValues)];
 
@@ -323,7 +217,7 @@ export function ChartWidget<const TKey extends string>({
           const color = series.color || CHART_COLORS[i % CHART_COLORS.length];
           // Use translated string labels for x values
           const data = series.data.map((d) => ({
-            x: t(String(d.label ?? d.x ?? "") as TranslationKey),
+            x: context.t(String(d.label ?? d.x ?? "") as TranslationKey),
             y: d.y,
           }));
 
@@ -370,8 +264,16 @@ export function ChartWidget<const TKey extends string>({
     <Card className={cn("h-full", className)}>
       {(title || description) && (
         <CardHeader className="pb-2">
-          {title && <CardTitle className="text-sm font-medium">{title}</CardTitle>}
-          {description && <Span className="text-xs text-muted-foreground">{description}</Span>}
+          {title && (
+            <CardTitle className={cn("font-medium", titleTextSizeClass || "text-sm")}>
+              {title}
+            </CardTitle>
+          )}
+          {description && (
+            <Span className={cn("text-muted-foreground", descriptionTextSizeClass || "text-xs")}>
+              {description}
+            </Span>
+          )}
         </CardHeader>
       )}
       <CardContent className="pt-0">
@@ -379,9 +281,18 @@ export function ChartWidget<const TKey extends string>({
 
         {/* Legend */}
         {showLegend && chartData.data.length > 1 && (
-          <Div className="flex flex-wrap justify-center gap-4 mt-4">
+          <Div
+            className={cn(
+              "flex flex-wrap justify-center",
+              legendGapClass || "gap-4",
+              legendMarginTopClass || "mt-4",
+            )}
+          >
             {chartData.data.map((series, i) => (
-              <Div key={series.name} className="flex items-center gap-2">
+              <Div
+                key={series.name}
+                className={cn("flex items-center", legendItemGapClass || "gap-2")}
+              >
                 <Div
                   style={{
                     backgroundColor: series.color || CHART_COLORS[i % CHART_COLORS.length],
@@ -390,7 +301,9 @@ export function ChartWidget<const TKey extends string>({
                     borderRadius: 9999,
                   }}
                 />
-                <Span className="text-xs text-muted-foreground">{series.name}</Span>
+                <Span className={cn("text-muted-foreground", legendTextSizeClass || "text-xs")}>
+                  {series.name}
+                </Span>
               </Div>
             ))}
           </Div>

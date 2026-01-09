@@ -12,7 +12,40 @@ import { extractMarkdownData } from "../../../shared/widgets/logic/markdown";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
 
 /**
- * Renders markdown content with optional sanitization.
+ * Markdown Widget - Renders markdown content with GitHub-flavored styling
+ *
+ * Displays markdown-formatted text with syntax highlighting, proper typography,
+ * and sanitization. Uses prose styling for consistent readable formatting.
+ *
+ * Features:
+ * - GitHub-flavored markdown rendering
+ * - Syntax highlighting for code blocks
+ * - Responsive typography with prose classes
+ * - Dark mode support
+ * - Automatic link styling with hover effects
+ * - Code snippet highlighting with background
+ * - Border and background for code blocks
+ *
+ * Styling:
+ * - Prose typography (headings, paragraphs, lists)
+ * - Semibold headings with tight tracking
+ * - Primary color links with hover underline
+ * - Muted background for inline code and code blocks
+ * - Responsive font sizes and spacing
+ *
+ * Data Format:
+ * - string: Raw markdown content to render
+ * - object: { content: string, sanitize?: boolean }
+ *   - content: Markdown text (NOT translated - raw content)
+ *   - sanitize: Optional HTML sanitization flag
+ * - null/undefined: Shows translated "no content" message
+ *
+ * Note: Markdown content is raw user/documentation content and is NOT translated.
+ * Only the "no content" fallback message uses translation.
+ *
+ * @param value - Markdown content (string or markdown object)
+ * @param context - Rendering context with locale for hardcoded messages
+ * @param className - Optional CSS classes
  */
 export function MarkdownWidget<const TKey extends string>({
   value,

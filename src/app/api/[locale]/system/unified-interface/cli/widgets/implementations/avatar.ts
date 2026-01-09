@@ -1,6 +1,11 @@
 /**
  * Avatar Widget Renderer
- * Handles AVATAR widget type for CLI display
+ *
+ * Handles AVATAR widget type for CLI display.
+ * Displays user initials in a styled bracket format since images aren't supported in CLI.
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All data extraction logic imported from shared.
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -12,6 +17,10 @@ import type { CLIWidgetProps } from "../core/types";
 export class AvatarWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.AVATAR> {
   readonly widgetType = WidgetType.AVATAR;
 
+  /**
+   * Render avatar as styled initials in brackets.
+   * In CLI, displays fallback text (initials) since images aren't supported.
+   */
   render(props: CLIWidgetProps<typeof WidgetType.AVATAR, string>): string {
     const { field, value, context } = props;
     const indent = this.createIndent(context.depth, context);

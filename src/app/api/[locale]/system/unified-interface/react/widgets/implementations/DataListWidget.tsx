@@ -27,11 +27,54 @@ import {
   type ListItem,
 } from "../../../shared/widgets/logic/data-list";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
-import { getTranslator } from "../../../shared/widgets/utils/field-helpers";
+import {
+  getSpacingClassName,
+  getTextSizeClassName,
+} from "../../../shared/widgets/utils/widget-helpers";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**
- * Displays data in either list view (table) or grid view with toggle.
+ * Data List Widget - Displays array data in switchable list (table) or grid views
+ *
+ * Renders arrays of objects as either a table with sortable columns or a responsive
+ * grid of cards. Supports pagination with "show more/less" controls. Automatically
+ * translates field labels and UI text.
+ *
+ * Features:
+ * - Dual view modes: list (table) and grid (cards)
+ * - Automatic field detection from array item schema
+ * - Pagination with configurable max items
+ * - Column headers from field labels
+ * - Responsive grid layout (1/2/3 columns)
+ * - Dark mode support
+ * - Hover effects on rows and cards
+ * - Simple value array support (inline badges)
+ *
+ * View Modes:
+ * - List: Table with headers and rows, optimal for many fields
+ * - Grid: Card layout with key-value pairs, optimal for visual browsing
+ *
+ * Data Format:
+ * - Array of objects: Each object rendered as row/card with field-driven cells
+ * - Array of primitives: Rendered as inline badge list
+ * - object: {
+ *     items: Array<Record<string, any>> - Data array
+ *     title?: string - Optional section title
+ *     maxItems?: number - Items to show before "show more" (default: all)
+ *   }
+ * - null/undefined: Shows translated "no data" message
+ *
+ * Field Detection:
+ * Extracts field definitions from array child schema to determine:
+ * - Column headers (from field.ui.label or key name)
+ * - Cell rendering (delegates to WidgetRenderer with field.ui.type)
+ * - Field order (object key order)
+ *
+ * @param value - Array data or data list object
+ * @param field - Field definition with array schema
+ * @param context - Rendering context with locale and translator
+ * @param className - Optional CSS classes
+ * @param endpoint - Endpoint context for nested widget rendering
  */
 export function DataListWidget<const TKey extends string>({
   value,
@@ -40,7 +83,43 @@ export function DataListWidget<const TKey extends string>({
   className,
   endpoint,
 }: ReactWidgetProps<typeof WidgetType.DATA_LIST, TKey>): JSX.Element {
-  const { t } = getTranslator(context);
+  const {
+    gap,
+    simpleArrayGap,
+    viewSwitcherGap,
+    viewSwitcherPadding,
+    buttonPadding,
+    tableHeadPadding,
+    tableCellPadding,
+    gridGap,
+    cardPadding,
+    cardInnerGap,
+    rowGap,
+    buttonSpacing,
+    tableHeadSize,
+    tableCellSize,
+    cardRowSize,
+    buttonSize,
+  } = field.ui;
+
+  // Get classes from config (no hardcoding!)
+  const gapClass = getSpacingClassName("gap", gap);
+  const simpleArrayGapClass = getSpacingClassName("gap", simpleArrayGap);
+  const viewSwitcherGapClass = getSpacingClassName("gap", viewSwitcherGap);
+  const viewSwitcherPaddingClass = getSpacingClassName("padding", viewSwitcherPadding);
+  const buttonPaddingClass = getSpacingClassName("padding", buttonPadding);
+  const tableHeadPaddingClass = getSpacingClassName("padding", tableHeadPadding);
+  const tableCellPaddingClass = getSpacingClassName("padding", tableCellPadding);
+  const gridGapClass = getSpacingClassName("gap", gridGap);
+  const cardPaddingClass = getSpacingClassName("padding", cardPadding);
+  const cardInnerGapClass = getSpacingClassName("gap", cardInnerGap);
+  const rowGapClass = getSpacingClassName("gap", rowGap);
+  const buttonSpacingClass = getSpacingClassName("margin", buttonSpacing);
+  const tableHeadSizeClass = getTextSizeClassName(tableHeadSize);
+  const tableCellSizeClass = getTextSizeClassName(tableCellSize);
+  const cardRowSizeClass = getTextSizeClassName(cardRowSize);
+  const buttonSizeClass = getTextSizeClassName(buttonSize);
+
   const { t: globalT } = simpleT(context.locale);
   const [showAll, setShowAll] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
@@ -85,7 +164,7 @@ export function DataListWidget<const TKey extends string>({
   // For simple value arrays, render as inline list
   if (isSimpleValueArray && childField) {
     return (
-      <Div className={cn("flex flex-wrap gap-2", className)}>
+      <Div className={cn("flex flex-wrap", simpleArrayGapClass || "gap-2", className)}>
         {displayItems.map((item, index: number) => (
           <WidgetRenderer
             key={index}
@@ -101,19 +180,25 @@ export function DataListWidget<const TKey extends string>({
   }
 
   return (
-    <Div className={cn("flex flex-col gap-3", className)}>
+    <Div className={cn("flex flex-col", gapClass || "gap-3", className)}>
       <Div className="flex items-center justify-between">
         {title && (
           <Title level={3} className="mb-0">
             {title}
           </Title>
         )}
-        <Div className="flex gap-1 rounded-md border border-gray-200 p-1 dark:border-gray-700">
+        <Div
+          className={cn(
+            "flex rounded-md border border-gray-200 dark:border-gray-700",
+            viewSwitcherGapClass || "gap-1",
+            viewSwitcherPaddingClass || "p-1",
+          )}
+        >
           <Button
             variant={viewMode === "list" ? "default" : "ghost"}
             size="sm"
             onClick={() => setViewMode("list")}
-            className="h-8 px-3"
+            className={cn("h-8", buttonPaddingClass || "px-3")}
           >
             {globalT("app.api.system.unifiedInterface.react.widgets.dataList.viewList")}
           </Button>
@@ -121,7 +206,7 @@ export function DataListWidget<const TKey extends string>({
             variant={viewMode === "grid" ? "default" : "ghost"}
             size="sm"
             onClick={() => setViewMode("grid")}
-            className="h-8 px-3"
+            className={cn("h-8", buttonPaddingClass || "px-3")}
           >
             {globalT("app.api.system.unifiedInterface.react.widgets.dataList.viewGrid")}
           </Button>
@@ -139,11 +224,11 @@ export function DataListWidget<const TKey extends string>({
                   let label = key;
                   if (fieldUi) {
                     if ("label" in fieldUi && typeof fieldUi.label === "string") {
-                      label = t(fieldUi.label);
+                      label = context.t(fieldUi.label);
                     } else if ("content" in fieldUi && typeof fieldUi.content === "string") {
-                      label = t(fieldUi.content);
+                      label = context.t(fieldUi.content);
                     } else if ("text" in fieldUi && typeof fieldUi.text === "string") {
-                      label = t(fieldUi.text);
+                      label = context.t(fieldUi.text);
                     } else if ("href" in fieldUi && typeof fieldUi.href === "string") {
                       // For LINK widgets that use href as the label key
                       label = fieldUi.href;
@@ -153,7 +238,11 @@ export function DataListWidget<const TKey extends string>({
                   return (
                     <TableHead
                       key={key}
-                      className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 dark:text-gray-400"
+                      className={cn(
+                        "text-left font-medium tracking-wider text-gray-500 dark:text-gray-400",
+                        tableHeadPaddingClass || "px-6 py-3",
+                        tableHeadSizeClass || "text-xs",
+                      )}
                     >
                       {label}
                     </TableHead>
@@ -175,7 +264,11 @@ export function DataListWidget<const TKey extends string>({
                       return (
                         <TableCell
                           key={key}
-                          className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100"
+                          className={cn(
+                            "whitespace-nowrap text-gray-900 dark:text-gray-100",
+                            tableCellPaddingClass || "px-6 py-4",
+                            tableCellSizeClass || "text-sm",
+                          )}
                         >
                           {fieldDef ? (
                             <WidgetRenderer
@@ -202,14 +295,16 @@ export function DataListWidget<const TKey extends string>({
       )}
 
       {viewMode === "grid" && (
-        <Div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <Div
+          className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3", gridGapClass || "gap-4")}
+        >
           {displayItems.map((card, index: number) => (
             <Div
               key={index}
               className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
             >
-              <Div className="p-4">
-                <Div className="flex flex-col gap-2">
+              <Div className={cn(cardPaddingClass || "p-4")}>
+                <Div className={cn("flex flex-col", cardInnerGapClass || "gap-2")}>
                   {card &&
                     typeof card === "object" &&
                     Object.entries(card).map(([key, cardValue]) => {
@@ -219,18 +314,25 @@ export function DataListWidget<const TKey extends string>({
                       let label = key;
                       if (fieldUi) {
                         if ("label" in fieldUi && typeof fieldUi.label === "string") {
-                          label = t(fieldUi.label);
+                          label = context.t(fieldUi.label);
                         } else if ("content" in fieldUi && typeof fieldUi.content === "string") {
-                          label = t(fieldUi.content);
+                          label = context.t(fieldUi.content);
                         } else if ("text" in fieldUi && typeof fieldUi.text === "string") {
-                          label = t(fieldUi.text);
+                          label = context.t(fieldUi.text);
                         } else if ("href" in fieldUi && typeof fieldUi.href === "string") {
                           label = fieldUi.href;
                         }
                       }
 
                       return (
-                        <Div key={key} className="flex justify-between gap-4 text-sm">
+                        <Div
+                          key={key}
+                          className={cn(
+                            "flex justify-between",
+                            rowGapClass || "gap-4",
+                            cardRowSizeClass || "text-sm",
+                          )}
+                        >
                           <Span className="font-medium text-gray-700 dark:text-gray-300">
                             {label}:
                           </Span>
@@ -263,7 +365,11 @@ export function DataListWidget<const TKey extends string>({
         <Button
           variant="ghost"
           onClick={() => setShowAll(true)}
-          className="mt-2 text-sm font-medium text-blue-600 hover:bg-gray-50 dark:text-blue-400 dark:hover:bg-gray-800"
+          className={cn(
+            "font-medium text-blue-600 hover:bg-gray-50 dark:text-blue-400 dark:hover:bg-gray-800",
+            buttonSpacingClass || "mt-2",
+            buttonSizeClass || "text-sm",
+          )}
         >
           {globalT("app.api.system.unifiedInterface.react.widgets.dataList.showMore", {
             count: remainingCount,
@@ -275,7 +381,11 @@ export function DataListWidget<const TKey extends string>({
         <Button
           variant="ghost"
           onClick={() => setShowAll(false)}
-          className="mt-2 text-sm font-medium text-blue-600 hover:bg-gray-50 dark:text-blue-400 dark:hover:bg-gray-800"
+          className={cn(
+            "font-medium text-blue-600 hover:bg-gray-50 dark:text-blue-400 dark:hover:bg-gray-800",
+            buttonSpacingClass || "mt-2",
+            buttonSizeClass || "text-sm",
+          )}
         >
           {globalT("app.api.system.unifiedInterface.react.widgets.dataList.showLess")}
         </Button>

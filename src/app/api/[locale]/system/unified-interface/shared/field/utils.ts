@@ -13,8 +13,10 @@ import type { EndpointLogger } from "../logger/endpoint";
 import type {
   ArrayField,
   ArrayOptionalField,
+  CreateApiEndpointAny,
   FieldUsageConfig,
   InferSchemaFromField,
+  NavigateButtonConfig,
   ObjectField,
   ObjectOptionalField,
   ObjectUnionField,
@@ -23,8 +25,8 @@ import type {
   WidgetField,
 } from "../types/endpoint";
 import type { CacheStrategy } from "../types/enums";
-import { FieldUsage } from "../types/enums";
-import type { WidgetConfig } from "../widgets/configs";
+import { FieldUsage, WidgetType } from "../types/enums";
+import type { NavigateButtonWidgetConfig, WidgetConfig } from "../widgets/configs";
 
 // ============================================================================
 // TYPE GUARDS
@@ -955,6 +957,33 @@ export function widgetField<
 >(ui: TUIConfig, usage: TUsage, cache?: CacheStrategy): WidgetField<TUsage, TKey, TUIConfig> {
   return {
     type: "widget" as const,
+    usage,
+    ui,
+    cache,
+  };
+}
+
+/**
+ * Create a widget-only object field (container with only widget children like button groups)
+ * This is like widgetField but for grouped widgets - renders based on usage pattern, not response data
+ */
+export function widgetObjectField<
+  TKey extends string = TranslationKey,
+  TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>> = Record<
+    string,
+    UnifiedField<string, z.ZodTypeAny>
+  >,
+  TUsage extends FieldUsageConfig = FieldUsageConfig,
+  const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
+>(
+  ui: TUIConfig,
+  usage: TUsage,
+  children: TChildren,
+  cache?: CacheStrategy,
+): ObjectField<TChildren, TUsage, TKey, TUIConfig> {
+  return {
+    type: "object" as const,
+    children,
     usage,
     ui,
     cache,
@@ -1907,4 +1936,162 @@ export function generateRequestUrlSchema<F>(
  */
 export function generateResponseSchema<F>(field: F): InferSchemaFromField<F, FieldUsage.Response> {
   return generateSchemaForUsage<F, FieldUsage.Response>(field, FieldUsage.Response);
+}
+
+// ============================================================================
+// NAVIGATION BUTTON FIELD HELPERS
+// ============================================================================
+
+/**
+ * Create a navigation button field for cross-definition navigation
+ * This is a UI-only field (no schema) that triggers navigation to another endpoint
+ *
+ * @template TSourceData - The data available in the source context (e.g., list item data)
+ * @template TTargetEndpoint - The target endpoint to navigate to
+ * @template TKey - Translation key type
+ *
+ * @param config - Navigation button configuration with type-safe parameter extraction
+ * @returns WidgetField configured for navigation
+ *
+ * @example
+ * ```typescript
+ * // In a list definition
+ * favorites: responseArrayField({
+ *   children: {
+ *     viewButton: navigateButtonField({
+ *       targetEndpoint: favoriteDetailEndpoint,
+ *       extractParams: (favorite) => ({ id: favorite.id }),
+ *       label: "view",
+ *       variant: "outline"
+ *     })
+ *   }
+ * })
+ * ```
+ */
+export function navigateButtonField<
+  TTargetEndpoint extends CreateApiEndpointAny,
+  TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
+  TKey extends string = TranslationKey,
+>(
+  config: NavigateButtonConfig<TTargetEndpoint, TGetEndpoint, TKey>,
+): WidgetField<
+  { response: true },
+  TKey,
+  NavigateButtonWidgetConfig<TTargetEndpoint, TGetEndpoint, TKey>
+> {
+  return {
+    type: "widget" as const,
+    usage: { response: true },
+    ui: {
+      type: WidgetType.NAVIGATE_BUTTON,
+      label: config.label,
+      icon: config.icon,
+      variant: config.variant,
+      // Store navigation config in metadata for widget access
+      metadata: {
+        targetEndpoint: config.targetEndpoint,
+        extractParams: config.extractParams,
+        prefillFromGet: config.prefillFromGet,
+        getEndpoint: config.getEndpoint,
+      },
+    },
+  };
+}
+
+/**
+ * Convenience helper for creating an edit button that navigates to an edit endpoint
+ * Automatically sets prefillFromGet: true to fetch current data before showing form
+ *
+ * @template TSourceData - The data available in the source context
+ * @template TTargetEndpoint - The edit endpoint to navigate to
+ * @template TKey - Translation key type
+ *
+ * @example
+ * ```typescript
+ * editButton: editButton({
+ *   targetEndpoint: favoriteEditEndpoint,
+ *   extractParams: (favorite) => ({ id: favorite.id })
+ * })
+ * ```
+ */
+export function editButton<
+  TTargetEndpoint extends CreateApiEndpointAny,
+  TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
+  TKey extends string = TranslationKey,
+>(
+  config: NavigateButtonConfig<TTargetEndpoint, TGetEndpoint, TKey> & {
+    getEndpoint?: TGetEndpoint;
+  },
+): WidgetField<
+  { response: true },
+  TKey,
+  NavigateButtonWidgetConfig<TTargetEndpoint, TGetEndpoint, TKey>
+> {
+  return navigateButtonField<TTargetEndpoint, TGetEndpoint, TKey>({
+    ...config,
+    prefillFromGet: true,
+  });
+}
+
+/**
+ * Convenience helper for creating a delete button that navigates to a delete endpoint
+ *
+ * @template TSourceData - The data available in the source context
+ * @template TTargetEndpoint - The delete endpoint to navigate to
+ * @template TKey - Translation key type
+ *
+ * @example
+ * ```typescript
+ * deleteButton: deleteButton({
+ *   targetEndpoint: favoriteDeleteEndpoint,
+ *   extractParams: (favorite) => ({ id: favorite.id })
+ * })
+ * ```
+ */
+export function deleteButton<
+  TTargetEndpoint extends CreateApiEndpointAny,
+  TKey extends string = TranslationKey,
+>(
+  config: NavigateButtonConfig<TTargetEndpoint, undefined, TKey>,
+): WidgetField<
+  { response: true },
+  TKey,
+  NavigateButtonWidgetConfig<TTargetEndpoint, undefined, TKey>
+> {
+  return navigateButtonField<TTargetEndpoint, undefined, TKey>({
+    ...config,
+    prefillFromGet: false,
+  });
+}
+
+/**
+ * Convenience helper for creating a back button that pops the navigation stack
+ * Sets targetEndpoint to null to trigger navigation.pop()
+ *
+ * @template TKey - Translation key type
+ *
+ * @example
+ * ```typescript
+ * backButton: backButton({ label: "back_to_list" })
+ * ```
+ */
+export function backButton<TKey extends string = TranslationKey>(
+  config?: Pick<NavigateButtonConfig<never, never, TKey>, "label" | "icon" | "variant">,
+): WidgetField<{ response: true }, TKey, WidgetConfig<TKey>> {
+  return {
+    type: "widget" as const,
+    usage: { response: true },
+    ui: {
+      type: WidgetType.NAVIGATE_BUTTON,
+      label: config?.label,
+      icon: config?.icon ?? "arrow-left",
+      variant: config?.variant,
+      // targetEndpoint: null signals back navigation
+      metadata: {
+        targetEndpoint: null,
+        extractParams: undefined,
+        prefillFromGet: false,
+      },
+    },
+  };
 }

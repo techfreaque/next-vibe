@@ -9,10 +9,10 @@ import type { JSX } from "react";
 import React from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
-import { getCharacterName } from "@/app/api/[locale]/agent/chat/characters/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -31,6 +31,7 @@ interface ThreadedMessageContentProps {
   collapseState?: ReturnType<typeof useCollapseState>;
   currentUserId?: string;
   onUserIdHover?: (userId: string | null, position: { x: number; y: number } | null) => void;
+  logger: EndpointLogger;
 }
 
 export function ThreadedMessageContent({
@@ -42,6 +43,7 @@ export function ThreadedMessageContent({
   collapseState,
   currentUserId,
   onUserIdHover,
+  logger,
 }: ThreadedMessageContentProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -144,6 +146,7 @@ export function ThreadedMessageContent({
                   threadId={msg.threadId}
                   messageId={msg.id}
                   collapseState={collapseState}
+                  logger={logger}
                 />
               );
             }

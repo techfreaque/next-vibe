@@ -17,24 +17,44 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import { WidgetType, type WidgetType as WidgetTypeEnum } from "../../../shared/types/enums";
 import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
+import { isFormInputField, isResponseField } from "../../../shared/widgets/utils/field-helpers";
 import {
-  getTranslator,
-  isFormInputField,
-  isResponseField,
-} from "../../../shared/widgets/utils/field-helpers";
+  hasChildren,
+  hasWidgetTypeInTree,
+  isObjectUnionField,
+  isPrimitiveField,
+} from "../../../shared/widgets/utils/field-type-guards";
 import {
+  getIconSizeClassName,
   getLayoutClassName,
+  getSpacingClassName,
+  getTextSizeClassName,
   type LayoutConfig,
 } from "../../../shared/widgets/utils/widget-helpers";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**
- * Displays container layouts with nested fields.
+ * Container Widget - Displays container layouts with nested fields
+ *
  * Renders field.children definitions - each widget decides if it should render based on data.
+ * Handles both regular object fields and discriminated union fields.
  *
  * Auto-features (enabled by default, can be disabled):
  * - showFormAlert: Shows FormAlert at top for error/success messages (default: true)
  * - showSubmitButton: Shows submit button at bottom when there are request fields (default: true)
+ *
+ * UI Config options:
+ * - layoutType: "stacked" | "grid" | "grid_2_columns" | "grid_3_columns" | "grid_4_columns" | "flex" | "horizontal"
+ * - columns: Number of columns for grid layout (1-12, default: 1)
+ * - gap: Spacing between elements ("0"-"8", default: "4")
+ * - paddingTop: Top padding ("0", "2", "3", "4", "6", "8")
+ * - title: Translation key for container title
+ * - description: Translation key for container description
+ * - noCard: Render without Card wrapper (default: false)
+ * - showFormAlert: Show automatic form alert (default: true)
+ * - showSubmitButton: Show automatic submit button (default: true)
+ * - submitButton: Custom submit button configuration
+ * - getCount: Function to calculate count for title badge
  */
 export function ContainerWidget<const TKey extends string>({
   value,
@@ -50,14 +70,16 @@ export function ContainerWidget<const TKey extends string>({
   submitButton,
   cancelButton,
 }: ReactWidgetProps<typeof WidgetTypeEnum.CONTAINER, TKey>): JSX.Element {
-  const { t } = getTranslator(context);
   const { t: globalT } = simpleT(context.locale);
 
   const {
     layoutType: layoutTypeRaw = "stacked",
     columns = 1,
     gap = "4",
+    alignItems,
     paddingTop,
+    paddingBottom,
+    borderBottom,
     title: titleKey,
     description: descriptionKey,
     noCard = false,
@@ -66,17 +88,25 @@ export function ContainerWidget<const TKey extends string>({
     // Auto-features: default to true, can be disabled
     showFormAlert = true,
     showSubmitButton = true,
+    // Styling config
+    titleAlign,
+    titleSize,
+    descriptionSize,
+    buttonGap,
+    iconSize,
+    iconSpacing,
+    contentPadding,
+    headerGap,
+    spacing = "normal",
   } = field.ui;
 
-  // Get field type info for hook setup (must be before any hooks)
-  const fieldWithChildren = field as UnifiedField<string> & {
-    type?: string;
-    children?: Record<string, UnifiedField<string>>;
-    discriminator?: string;
-    variants?: readonly UnifiedField<string>[];
-  };
-  const isUnionField = fieldWithChildren.type === "object-union";
-  const discriminator = fieldWithChildren.discriminator;
+  // Check if this is an array field
+  const isArrayField =
+    "type" in field && (field.type === "array" || field.type === "array-optional");
+
+  // Determine field type using type guards
+  const isUnionField = isObjectUnionField(field);
+  const discriminator = isUnionField ? field.discriminator : undefined;
 
   // Call useWatch unconditionally to satisfy React hooks rules
   // Disabled when not needed (non-union fields or missing form/fieldName)
@@ -110,7 +140,11 @@ export function ContainerWidget<const TKey extends string>({
     } else {
       conceptualColumns = 12;
     }
-  } else if (layoutTypeStr === "flex" || layoutTypeStr === "horizontal") {
+  } else if (
+    layoutTypeStr === "flex" ||
+    layoutTypeStr === "horizontal" ||
+    layoutTypeStr === "inline"
+  ) {
     layoutType = "flex";
   }
 
@@ -119,6 +153,7 @@ export function ContainerWidget<const TKey extends string>({
     type: layoutType,
     columns: layoutType === "grid" ? 12 : undefined,
     gap: String(gap),
+    alignItems,
   };
   const layoutClass = getLayoutClassName(layoutConfig);
 
@@ -126,18 +161,16 @@ export function ContainerWidget<const TKey extends string>({
   // E.g., if parent wants 4 columns, each child by default takes 12/4 = 3 grid columns
   const defaultChildSpan = layoutType === "grid" ? Math.floor(12 / conceptualColumns) : undefined;
 
-  let title = titleKey ? t(titleKey) : undefined;
-  const description = descriptionKey ? t(descriptionKey) : undefined;
+  // Translate title and description early (before any early returns)
+  let title = titleKey ? context.t(titleKey) : undefined;
+  const description = descriptionKey ? context.t(descriptionKey) : undefined;
 
   if (getCount && value && typeof value === "object" && !Array.isArray(value)) {
-    // getCount's type is generic and depends on field children, cast to runtime type
-    const getCountFn = getCount as (data: {
-      request?: { [key: string]: WidgetData };
-      response?: { [key: string]: WidgetData };
-    }) => number | undefined;
-    const count = getCountFn({
-      request: value as { [key: string]: WidgetData },
-      response: value as { [key: string]: WidgetData },
+    // Runtime type check for value object
+    const valueObj = value as Record<string, WidgetData>;
+    const count = getCount({
+      request: valueObj,
+      response: valueObj,
     });
     if (count !== undefined && title) {
       title = `${title} (${count})`;
@@ -149,20 +182,118 @@ export function ContainerWidget<const TKey extends string>({
 
   const buttonIcon = submitButtonConfig?.icon ? (submitButtonConfig.icon as IconKey) : undefined;
 
+  // Get classes from config (no hardcoding!)
+  const contentGap = getSpacingClassName("gap", spacing) || "space-y-6";
+  const topPadding = paddingTop ? getSpacingClassName("padding", paddingTop) : "";
+  const bottomPadding = paddingBottom ? getSpacingClassName("padding", paddingBottom) : "";
+  const bottomBorder = borderBottom ? "border-b" : "";
+  const titleAlignClass =
+    titleAlign === "center" ? "text-center" : titleAlign === "right" ? "text-right" : "text-left";
+  const titleSizeClass = getTextSizeClassName(titleSize);
+  const descriptionSizeClass = getTextSizeClassName(descriptionSize);
+  const buttonGapClass = getSpacingClassName("gap", buttonGap);
+  const iconSizeClass = getIconSizeClassName(iconSize);
+  const iconSpacingClass = getSpacingClassName("margin", iconSpacing);
+  const contentPaddingClass = getSpacingClassName("padding", contentPadding);
+  const headerGapClass = getSpacingClassName("gap", headerGap);
+
   const buttonText = submitButtonConfig?.text
-    ? t(submitButtonConfig.text)
+    ? context.t(submitButtonConfig.text)
     : globalT("app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit");
 
   const loadingText = submitButtonConfig?.loadingText
-    ? t(submitButtonConfig.loadingText)
+    ? context.t(submitButtonConfig.loadingText)
     : globalT("app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting");
+
+  // Handle array fields - render each item based on child field definition
+  if (isArrayField && Array.isArray(value)) {
+    // Get child field definition
+    const childField = "child" in field ? (field.child as UnifiedField<string>) : null;
+
+    if (!childField) {
+      if (noCard) {
+        return (
+          <Div className={cn("text-muted-foreground italic", className)}>
+            {globalT("app.api.system.unifiedInterface.react.widgets.container.noContent")}
+          </Div>
+        );
+      }
+      return (
+        <Card className={className}>
+          <CardContent>
+            <P className="italic text-muted-foreground">
+              {globalT("app.api.system.unifiedInterface.react.widgets.container.noContent")}
+            </P>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // Render each array item
+    const arrayContent = (
+      <Div className={layoutClass}>
+        {value.map((item, index) => (
+          <WidgetRenderer
+            key={index}
+            widgetType={childField.ui.type}
+            data={item}
+            field={childField}
+            context={context}
+            form={form}
+            onSubmit={onSubmit}
+            onCancel={onCancel}
+            isSubmitting={isSubmitting}
+            endpoint={endpoint}
+            submitButton={submitButton}
+            cancelButton={cancelButton}
+          />
+        ))}
+      </Div>
+    );
+
+    // If noCard, render without Card wrapper
+    if (noCard) {
+      return (
+        <Div className={cn(contentGap, topPadding, bottomPadding, bottomBorder, className)}>
+          {(title || description) && (
+            <Div className={titleAlignClass}>
+              {title && (
+                <H1 className={cn("font-bold", titleSizeClass || "text-3xl md:text-4xl")}>
+                  {title}
+                </H1>
+              )}
+              {description && (
+                <P className={cn(descriptionSizeClass || "text-lg")}>{description}</P>
+              )}
+            </Div>
+          )}
+          {arrayContent}
+        </Div>
+      );
+    }
+
+    // Render with Card wrapper
+    return (
+      <Card className={cn(topPadding, bottomPadding, bottomBorder, className)}>
+        {(title || description) && (
+          <CardHeader>
+            {title && <CardTitle>{title}</CardTitle>}
+            {description && <CardDescription>{description}</CardDescription>}
+          </CardHeader>
+        )}
+        <CardContent className={!title && !description ? contentPaddingClass || "pt-6" : ""}>
+          {arrayContent}
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Handle union fields - select variant based on discriminator value
   let children: Array<[string, UnifiedField<string>]> = [];
 
   if (isUnionField) {
     // Union field - need to select the correct variant
-    const variants = fieldWithChildren.variants;
+    const variants = field.variants;
 
     if (!discriminator || !variants || variants.length === 0) {
       // Invalid union configuration
@@ -188,59 +319,57 @@ export function ContainerWidget<const TKey extends string>({
     let discriminatorValue: string | undefined;
     if (watchedDiscriminator !== undefined && typeof watchedDiscriminator === "string") {
       discriminatorValue = watchedDiscriminator;
-    } else if (value && typeof value === "object" && discriminator in value) {
-      const valueObj = value as Record<string, string | undefined>;
-      discriminatorValue = valueObj[discriminator];
+    } else if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      discriminator in value
+    ) {
+      const valueObj = value as Record<string, WidgetData>;
+      const val = valueObj[discriminator];
+      discriminatorValue = typeof val === "string" ? val : undefined;
     }
 
     // Find matching variant based on discriminator value
     const selectedVariant = variants.find((variant) => {
-      const variantField = variant as UnifiedField<string> & {
-        children?: Record<string, UnifiedField<string>>;
-      };
-      if (!variantField.children) {
+      // Variants are ObjectField types, which have children
+      if (!hasChildren(variant)) {
         return false;
       }
 
       // Check if this variant has the discriminator field with matching value
-      const variantDiscriminator = variantField.children[discriminator];
-      const variantDiscriminatorWithSchema = variantDiscriminator as UnifiedField<string> & {
-        schema?: { _def?: { value?: string; values?: string[] } };
-      };
-
-      if (!variantDiscriminator || !variantDiscriminatorWithSchema.schema) {
+      const variantDiscriminator = variant.children[discriminator];
+      if (!variantDiscriminator) {
         return false;
       }
 
-      // For z.literal discriminators, check if the literal value matches
-      const schema = variantDiscriminatorWithSchema.schema;
-      // Zod's z.literal() stores the value in _def.value (string) or _def.values (array with single element)
-      const literalValue = schema._def?.value ?? schema._def?.values?.[0];
+      // For primitive fields with literals, check the schema value
+      if (isPrimitiveField(variantDiscriminator)) {
+        const schema = variantDiscriminator.schema;
+        // Zod's z.literal() stores the value in _def.value (string) or _def.values (array with single element)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const literalValue = (schema as any)._def?.value ?? (schema as any)._def?.values?.[0];
+        return literalValue === discriminatorValue;
+      }
 
-      const matches = literalValue === discriminatorValue;
-      return matches;
+      return false;
     });
 
     // Get discriminator field from first variant (they all have the same discriminator field)
-    const firstVariant = variants[0] as UnifiedField<string> & {
-      children?: Record<string, UnifiedField<string>>;
-    };
-    const discriminatorField = firstVariant.children?.[discriminator];
+    const firstVariant = variants[0];
+    const discriminatorField = hasChildren(firstVariant)
+      ? firstVariant.children[discriminator]
+      : undefined;
 
     // Build children array: discriminator field + selected variant's other fields
-    if (selectedVariant) {
-      const selectedVariantField = selectedVariant as UnifiedField<string> & {
-        children?: Record<string, UnifiedField<string>>;
-      };
-      if (selectedVariantField.children) {
-        // Add discriminator first, then other fields (excluding the discriminator to avoid duplication)
-        const variantFields = Object.entries(selectedVariantField.children).filter(
-          ([key]) => key !== discriminator,
-        );
-        children = discriminatorField
-          ? [[discriminator, discriminatorField], ...variantFields]
-          : variantFields;
-      }
+    if (selectedVariant && hasChildren(selectedVariant)) {
+      // Add discriminator first, then other fields (excluding the discriminator to avoid duplication)
+      const variantFields = Object.entries(selectedVariant.children).filter(
+        ([key]) => key !== discriminator,
+      );
+      children = discriminatorField
+        ? [[discriminator, discriminatorField], ...variantFields]
+        : variantFields;
     } else {
       // No variant selected yet - just show discriminator field
       if (discriminatorField) {
@@ -249,7 +378,7 @@ export function ContainerWidget<const TKey extends string>({
     }
   } else {
     // Regular container field with children
-    if (!fieldWithChildren.children) {
+    if (!hasChildren(field)) {
       if (noCard) {
         return (
           <Div className={cn("text-muted-foreground italic", className)}>
@@ -269,31 +398,13 @@ export function ContainerWidget<const TKey extends string>({
       );
     }
 
-    children = Object.entries(fieldWithChildren.children);
+    children = Object.entries(field.children);
   }
 
   // Check if there are any actual form input fields (FORM_FIELD widgets with request usage)
   // This determines if auto FormAlert and auto submit button should be shown
   // Only FORM_FIELD widgets count - not TEXT or other widgets with request usage
   const hasFormInputFields = children.some(([, childField]) => isFormInputField(childField));
-
-  // Recursive function to check if any widget in the subtree is of a specific type
-  const hasWidgetTypeInTree = (fieldToCheck: UnifiedField<string>, widgetType: string): boolean => {
-    // Check direct field
-    if (fieldToCheck.ui?.type === widgetType) {
-      return true;
-    }
-    // Check nested children
-    const fieldWithNestedChildren = fieldToCheck as UnifiedField<string> & {
-      children?: Record<string, UnifiedField<string>>;
-    };
-    if (fieldWithNestedChildren.children) {
-      return Object.values(fieldWithNestedChildren.children).some((child) =>
-        hasWidgetTypeInTree(child, widgetType),
-      );
-    }
-    return false;
-  };
 
   // Check if container or any nested child has explicit FORM_ALERT or SUBMIT_BUTTON widgets
   const hasExplicitFormAlert = children.some(([, childField]) =>
@@ -333,7 +444,7 @@ export function ContainerWidget<const TKey extends string>({
         message: {
           message: data.message as TranslationKey,
           messageParams:
-            "messageParams" in data
+            "messageParams" in data && typeof data.messageParams === "object"
               ? (data.messageParams as Record<string, string | number> | undefined)
               : undefined,
         },
@@ -341,7 +452,6 @@ export function ContainerWidget<const TKey extends string>({
     }
   }
 
-  // Auto submit button text
   const autoSubmitText = globalT(
     "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit",
   );
@@ -349,138 +459,165 @@ export function ContainerWidget<const TKey extends string>({
     "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
   );
 
-  const gapClassMap: Record<string, string> = {
-    "0": "space-y-0",
-    "1": "space-y-1",
-    "2": "space-y-2",
-    "3": "space-y-3",
-    "4": "space-y-4",
-    "6": "space-y-6",
-    "8": "space-y-8",
-  };
-  const contentGap = gapClassMap[String(gap)] ?? "space-y-6";
+  // Find backButton field to render it with submit button
+  const backButtonEntry = children.find(([childName]) => childName === "backButton");
+  const hasBackButton = backButtonEntry !== undefined;
 
-  const paddingTopClassMap: Record<string, string> = {
-    "0": "pt-0",
-    "2": "pt-2",
-    "3": "pt-3",
-    "4": "pt-4",
-    "6": "pt-6",
-    "8": "pt-8",
+  // Helper to render children based on layoutType
+  const renderChildren = (): (JSX.Element | null)[] => {
+    const getChildData = (childName: string): WidgetData => {
+      if (value && typeof value === "object" && !Array.isArray(value) && childName in value) {
+        const valueObj = value as Record<string, WidgetData>;
+        return valueObj[childName];
+      }
+      return null;
+    };
+
+    const result: (JSX.Element | null)[] = [];
+
+    for (const [childName, childField] of children) {
+      // Skip hidden fields
+      if (childField.ui?.hidden) {
+        continue;
+      }
+
+      // Skip backButton - it's rendered with submit button
+      if (childName === "backButton") {
+        continue;
+      }
+
+      const childData = getChildData(childName);
+
+      // Check if this is a widget field or widget-only object container
+      const isWidgetField = "type" in childField && childField.type === "widget";
+      const isWidgetOnlyObject =
+        "type" in childField &&
+        childField.type === "object" &&
+        "children" in childField &&
+        childField.children &&
+        Object.values(childField.children).every(
+          (child) => "type" in child && child.type === "widget",
+        );
+
+      // Skip response fields that don't have data (but not widget fields or widget-only objects - they render from UI config)
+      if (
+        !isWidgetField &&
+        !isWidgetOnlyObject &&
+        isResponseField(childField) &&
+        (childData === null || childData === undefined)
+      ) {
+        continue;
+      }
+
+      // Render field
+      const childFieldName = fieldName ? `${fieldName}.${childName}` : childName;
+      const childUi = childField.ui;
+      const isChildContainer = childUi.type === WidgetType.CONTAINER;
+      const childColumns =
+        isChildContainer || !("columns" in childUi) ? undefined : (childUi.columns as number);
+      const effectiveSpan =
+        layoutType === "grid" ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12) : undefined;
+
+      const colSpanMap: Record<number, string> = {
+        1: "col-span-1",
+        2: "col-span-2",
+        3: "col-span-3",
+        4: "col-span-4",
+        5: "col-span-5",
+        6: "col-span-6",
+        7: "col-span-7",
+        8: "col-span-8",
+        9: "col-span-9",
+        10: "col-span-10",
+        11: "col-span-11",
+        12: "col-span-12",
+      };
+
+      const colSpanClass =
+        layoutType === "grid" && effectiveSpan ? colSpanMap[effectiveSpan] : undefined;
+
+      result.push(
+        <WidgetRenderer
+          key={childName}
+          widgetType={childField.ui.type}
+          fieldName={childFieldName}
+          data={childData}
+          field={childField}
+          context={context}
+          form={form}
+          onSubmit={onSubmit}
+          isSubmitting={isSubmitting}
+          className={colSpanClass}
+          endpoint={endpoint}
+        />,
+      );
+    }
+
+    return result;
   };
-  const topPadding = paddingTop ? paddingTopClassMap[paddingTop] : "";
 
   // If noCard is true, render without Card wrapper
   if (noCard) {
     return (
-      <Div className={cn("space-y-6", topPadding, className)}>
+      <Div className={cn(contentGap, topPadding, bottomPadding, bottomBorder, className)}>
         {(title || description) && (
-          <Div className="text-center">
+          <Div className={titleAlignClass}>
             {title && (
-              <H1 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-r from-cyan-500 to-blue-600">
-                {title}
-              </H1>
+              <H1 className={cn("font-bold", titleSizeClass || "text-3xl md:text-4xl")}>{title}</H1>
             )}
-            {description && (
-              <P className="text-gray-600 dark:text-gray-300 text-lg mb-8">{description}</P>
-            )}
+            {description && <P className={cn(descriptionSizeClass || "text-lg")}>{description}</P>}
           </Div>
         )}
         {/* Auto FormAlert at top */}
         {shouldShowAutoFormAlert && <FormAlert alert={formAlertState} />}
-        <Div className={cn(layoutClass, contentGap)}>
-          {children.map(([childName, childField]) => {
-            // Get child data from value object
-            const childData =
-              typeof value === "object" && value !== null && childName in value
-                ? (value as Record<string, WidgetData>)[childName]
-                : null;
-
-            // Skip response fields that don't have data
-            if (isResponseField(childField) && (childData === null || childData === undefined)) {
-              return null;
-            }
-
-            // Build full field path
-            const childFieldName = fieldName ? `${fieldName}.${childName}` : childName;
-
-            // Extract column span from child field if in grid layout
-            // IMPORTANT: For CONTAINER widgets, `columns` means internal grid columns, NOT span
-            // For other widgets (STAT, CHART, FORM_FIELD, etc.), `columns` means span in parent grid
-            const childUi = childField.ui as { columns?: number; type?: string } | undefined;
-            const isChildContainer = childUi?.type === WidgetType.CONTAINER;
-            const childColumns = isChildContainer ? undefined : childUi?.columns;
-
-            // Calculate effective column span:
-            // - For containers: always use default span (their `columns` is for internal grid)
-            // - For other widgets: use explicit columns if set, otherwise default span
-            const effectiveSpan =
-              layoutType === "grid"
-                ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12)
-                : undefined;
-
-            // Map column numbers to Tailwind classes (JIT-safe)
-            const colSpanMap: Record<number, string> = {
-              1: "col-span-1",
-              2: "col-span-2",
-              3: "col-span-3",
-              4: "col-span-4",
-              5: "col-span-5",
-              6: "col-span-6",
-              7: "col-span-7",
-              8: "col-span-8",
-              9: "col-span-9",
-              10: "col-span-10",
-              11: "col-span-11",
-              12: "col-span-12",
-            };
-
-            const colSpanClass =
-              layoutType === "grid" && effectiveSpan ? colSpanMap[effectiveSpan] : undefined;
-
-            return (
-              <WidgetRenderer
-                key={childName}
-                widgetType={childField.ui.type}
-                fieldName={childFieldName}
-                data={childData}
-                field={childField}
-                context={context}
-                form={form}
-                onSubmit={onSubmit}
-                isSubmitting={isSubmitting}
-                className={colSpanClass}
-                endpoint={endpoint}
-              />
-            );
-          })}
-        </Div>
+        <Div className={layoutClass}>{renderChildren()}</Div>
         {/* Explicit submitButton config at bottom position */}
         {showBottomButton && (
-          <Button
-            type="button"
-            onClick={(): void => {
-              if (form && onSubmit) {
-                void form.handleSubmit(() => {
-                  onSubmit();
-                })();
+          <Div className="flex gap-2">
+            {/* Back button (left side) */}
+            {hasBackButton && backButtonEntry && (
+              <WidgetRenderer
+                widgetType={backButtonEntry[1].ui.type}
+                fieldName={backButtonEntry[0]}
+                data={null}
+                field={backButtonEntry[1]}
+                context={context}
+                form={form}
+                endpoint={endpoint}
+              />
+            )}
+            {/* Submit button (right side) */}
+            <Button
+              type="button"
+              onClick={(): void => {
+                if (form && onSubmit) {
+                  void form.handleSubmit(() => {
+                    onSubmit();
+                  })();
+                }
+              }}
+              disabled={isSubmitting}
+              variant={
+                (submitButtonConfig.variant === "primary"
+                  ? "default"
+                  : submitButtonConfig.variant) ?? "default"
               }
-            }}
-            disabled={isSubmitting}
-            variant={
-              (submitButtonConfig.variant === "primary" ? "default" : submitButtonConfig.variant) ??
-              "default"
-            }
-            size={submitButtonConfig.size ?? "default"}
-            className="w-full"
-          >
-            {buttonIcon && <Icon icon={buttonIcon} className="h-4 w-4 mr-2" />}
-            {isSubmitting ? loadingText : buttonText}
-          </Button>
+              size={submitButtonConfig.size ?? "default"}
+              className={hasBackButton ? "flex-1" : "w-full"}
+            >
+              {buttonIcon && (
+                <Icon
+                  icon={buttonIcon}
+                  className={cn(iconSizeClass || "h-4 w-4", iconSpacingClass || "mr-2")}
+                />
+              )}
+              {isSubmitting ? loadingText : buttonText}
+            </Button>
+          </Div>
         )}
         {/* Auto SubmitButton when no explicit config */}
         {shouldShowAutoSubmitButton && (
-          <Div className="flex gap-2">
+          <Div className={cn("flex", buttonGapClass || "gap-2")}>
             {onCancel && (
               <Button
                 type="button"
@@ -520,10 +657,10 @@ export function ContainerWidget<const TKey extends string>({
   }
 
   return (
-    <Card className={cn(topPadding, className)}>
+    <Card className={cn(topPadding, bottomPadding, bottomBorder, className)}>
       {(title ?? description ?? showHeaderButton) && (
         <CardHeader>
-          <Div className="flex items-center justify-between">
+          <Div className={cn("flex items-center justify-between", headerGapClass)}>
             <Div>
               {title && <CardTitle>{title}</CardTitle>}
               {description && <CardDescription>{description}</CardDescription>}
@@ -546,7 +683,12 @@ export function ContainerWidget<const TKey extends string>({
                 }
                 size={submitButtonConfig.size ?? "default"}
               >
-                {buttonIcon && <Icon icon={buttonIcon} className="h-4 w-4 mr-2" />}
+                {buttonIcon && (
+                  <Icon
+                    icon={buttonIcon}
+                    className={cn(iconSizeClass || "h-4 w-4", iconSpacingClass || "mr-2")}
+                  />
+                )}
                 {isSubmitting ? loadingText : buttonText}
               </Button>
             )}
@@ -561,106 +703,63 @@ export function ContainerWidget<const TKey extends string>({
       )}
       <CardContent
         className={
-          !title && !description && !showHeaderButton && !shouldShowAutoFormAlert ? "pt-6" : ""
+          !title && !description && !showHeaderButton && !shouldShowAutoFormAlert
+            ? contentPaddingClass || "pt-6"
+            : ""
         }
       >
-        <Div className={cn(layoutClass, contentGap)}>
-          {children.map(([childName, childField]) => {
-            // Get child data from value object
-            const childData =
-              typeof value === "object" && value !== null && childName in value
-                ? (value as Record<string, WidgetData>)[childName]
-                : null;
-
-            // Skip response fields that don't have data
-            if (isResponseField(childField) && (childData === null || childData === undefined)) {
-              return null;
-            }
-
-            // Build full field path
-            const childFieldName = fieldName ? `${fieldName}.${childName}` : childName;
-
-            // Extract column span from child field if in grid layout
-            // IMPORTANT: For CONTAINER widgets, `columns` means internal grid columns, NOT span
-            // For other widgets (STAT, CHART, FORM_FIELD, etc.), `columns` means span in parent grid
-            const childUi = childField.ui as { columns?: number; type?: string } | undefined;
-            const isChildContainer = childUi?.type === WidgetType.CONTAINER;
-            const childColumns = isChildContainer ? undefined : childUi?.columns;
-
-            // Calculate effective column span:
-            // - For containers: always use default span (their `columns` is for internal grid)
-            // - For other widgets: use explicit columns if set, otherwise default span
-            const effectiveSpan =
-              layoutType === "grid"
-                ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12)
-                : undefined;
-
-            // Map column numbers to Tailwind classes (JIT-safe)
-            const colSpanMap: Record<number, string> = {
-              1: "col-span-1",
-              2: "col-span-2",
-              3: "col-span-3",
-              4: "col-span-4",
-              5: "col-span-5",
-              6: "col-span-6",
-              7: "col-span-7",
-              8: "col-span-8",
-              9: "col-span-9",
-              10: "col-span-10",
-              11: "col-span-11",
-              12: "col-span-12",
-            };
-
-            const colSpanClass =
-              layoutType === "grid" && effectiveSpan ? colSpanMap[effectiveSpan] : undefined;
-
-            return (
-              <WidgetRenderer
-                key={childName}
-                widgetType={childField.ui.type}
-                fieldName={childFieldName}
-                data={childData}
-                field={childField}
-                context={context}
-                form={form}
-                onSubmit={onSubmit}
-                isSubmitting={isSubmitting}
-                className={colSpanClass}
-                endpoint={endpoint}
-              />
-            );
-          })}
-        </Div>
+        <Div className={layoutClass}>{renderChildren()}</Div>
       </CardContent>
       {/* Explicit submitButton config at bottom position */}
       {showBottomButton && (
         <CardContent className="pt-0">
-          <Button
-            type="button"
-            onClick={(): void => {
-              if (form && onSubmit) {
-                void form.handleSubmit(() => {
-                  onSubmit();
-                })();
+          <Div className="flex gap-2">
+            {/* Back button (left side) */}
+            {hasBackButton && backButtonEntry && (
+              <WidgetRenderer
+                widgetType={backButtonEntry[1].ui.type}
+                fieldName={backButtonEntry[0]}
+                data={null}
+                field={backButtonEntry[1]}
+                context={context}
+                form={form}
+                endpoint={endpoint}
+              />
+            )}
+            {/* Submit button (right side) */}
+            <Button
+              type="button"
+              onClick={(): void => {
+                if (form && onSubmit) {
+                  void form.handleSubmit(() => {
+                    onSubmit();
+                  })();
+                }
+              }}
+              disabled={isSubmitting}
+              variant={
+                (submitButtonConfig.variant === "primary"
+                  ? "default"
+                  : submitButtonConfig.variant) ?? "default"
               }
-            }}
-            disabled={isSubmitting}
-            variant={
-              (submitButtonConfig.variant === "primary" ? "default" : submitButtonConfig.variant) ??
-              "default"
-            }
-            size={submitButtonConfig.size ?? "default"}
-            className="w-full"
-          >
-            {buttonIcon && <Icon icon={buttonIcon} className="h-4 w-4 mr-2" />}
-            {isSubmitting ? loadingText : buttonText}
-          </Button>
+              size={submitButtonConfig.size ?? "default"}
+              className={hasBackButton ? "flex-1" : "w-full"}
+            >
+              {buttonIcon && (
+                <Icon
+                  icon={buttonIcon}
+                  className={cn(iconSizeClass || "h-4 w-4", iconSpacingClass || "mr-2")}
+                />
+              )}
+              {isSubmitting ? loadingText : buttonText}
+            </Button>
+          </Div>
         </CardContent>
       )}
       {/* Auto SubmitButton when no explicit config */}
       {shouldShowAutoSubmitButton && (
         <CardContent className="pt-0">
-          <Div className="flex gap-2">
+          <Div className={cn("flex", buttonGapClass || "gap-2")}>
             {onCancel && (
               <Button
                 type="button"

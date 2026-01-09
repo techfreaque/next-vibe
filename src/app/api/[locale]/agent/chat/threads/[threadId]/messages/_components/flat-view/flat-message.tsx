@@ -106,7 +106,7 @@ export function FlatMessage({
   // Get character name from characters map (fetched from server)
   const characterDisplayName =
     (message.role === "user" || message.role === "assistant") && message.character
-      ? characters[message.character]?.name || message.character
+      ? characters[message.character]?.content.name || message.character
       : t("app.chat.flatView.anonymous");
 
   // Determine display name for user messages
@@ -361,6 +361,7 @@ export function FlatMessage({
               threadId={message.threadId}
               messageId={message.id}
               collapseState={collapseState}
+              logger={logger}
             />
           )}
         </Div>
@@ -391,6 +392,7 @@ export function FlatMessage({
                   threadId={msg.threadId}
                   messageId={msg.id}
                   collapseState={collapseState}
+                  logger={logger}
                 />
               );
             }

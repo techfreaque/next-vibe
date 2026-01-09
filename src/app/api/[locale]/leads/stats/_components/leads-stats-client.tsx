@@ -49,6 +49,7 @@ export function LeadsStatsClient({ locale }: LeadsStatsClientProps): JSX.Element
             isSubmitting={endpoint.read.isLoading || false}
             data={endpoint.read.response?.success ? endpoint.read.response.data : undefined}
             submitButtonText="app.admin.common.actions.filter"
+            logger={logger}
           />
         </CardContent>
       </Card>

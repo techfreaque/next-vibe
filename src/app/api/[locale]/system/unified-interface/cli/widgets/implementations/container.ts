@@ -1,7 +1,18 @@
 /**
  * Container Widget Renderer
- * Pure rendering implementation - ANSI codes, styling, layout only
- * All business logic imported from shared
+ *
+ * Renders container widgets that group related fields together with optional labels and descriptions.
+ * Supports vertical and grid layouts with configurable column counts.
+ *
+ * Features:
+ * - Hierarchical field rendering with proper nesting
+ * - Grid and vertical layout modes
+ * - Optional title and description display
+ * - Icon support for container headers
+ * - Recursive rendering of child widgets
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All business logic imported from shared.
  */
 
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
@@ -12,7 +23,10 @@ import {
   getContainerConfig,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/container";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
-import { getTranslator } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
+import {
+  hasChildren,
+  isWidgetDataObject,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
 import { formatCamelCaseLabel } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
@@ -21,11 +35,16 @@ import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.CONTAINER> {
   readonly widgetType = WidgetType.CONTAINER;
 
+  /**
+   * Render container widget with optional title, description, and nested fields.
+   * Supports both object values with children and array values.
+   * Handles vertical and grid layouts based on configuration.
+   */
   render(props: CLIWidgetProps<typeof WidgetType.CONTAINER, string>): string {
     const { field, value, context } = props;
 
     // For container, we expect object values with children or named fields
-    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    if (isWidgetDataObject(value)) {
       return this.renderContainerObject(value, field, context);
     }
 
@@ -39,22 +58,27 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     }
 
     const label = this.formatLabel(field, context);
-    const valueStr = typeof value === "object" ? JSON.stringify(value) : String(value);
+    const valueStr = isWidgetDataObject(value) ? JSON.stringify(value) : String(value);
     return `${label}: ${valueStr}`;
   }
 
+  /**
+   * Render container object with optional title and description.
+   * Recursively renders child widgets or formats values.
+   */
   private renderContainerObject<const TKey extends string>(
     value: { [key: string]: WidgetData },
     field: UnifiedField<TKey>,
     context: WidgetRenderContext,
+    label?: string,
+    description?: string,
   ): string {
     // Use shared config extraction
     const config = getContainerConfig(field);
     const result: string[] = [];
-    const { t } = getTranslator(context);
 
-    if ("label" in field.ui && field.ui.label) {
-      const title = t(field.ui.label);
+    if (label) {
+      const title = context.t(label);
       const defaultIcon = context.options.useEmojis ? "📊 " : "";
       const titleIcon = config.icon || defaultIcon;
       const titleWithIcon = titleIcon + title;
@@ -62,9 +86,9 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
       result.push(styledTitle);
     }
 
-    if ("description" in field.ui && field.ui.description) {
-      const description = t(field.ui.description);
-      result.push(`   ${description}`);
+    if (description) {
+      const desc = context.t(description);
+      result.push(`   ${desc}`);
       result.push("");
     }
 
@@ -74,6 +98,10 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     return result.join("\n");
   }
 
+  /**
+   * Render container fields in vertical or grid layout.
+   * Recursively renders child widgets if field definitions exist.
+   */
   private renderFields<const TKey extends string>(
     data: { [key: string]: WidgetData },
     config: ContainerConfig,
@@ -92,7 +120,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
         continue;
       }
 
-      if (field?.type === "object" && field.children?.[key]) {
+      if (field && hasChildren(field) && field.children[key]) {
         const childField = field.children[key];
         const rendered = context.renderWidget(childField.ui.type, childField, value);
         if (rendered) {
@@ -107,6 +135,10 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     return result.join("\n");
   }
 
+  /**
+   * Render fields in multi-column grid layout.
+   * Each row contains up to the specified number of columns.
+   */
   private renderGridLayout<const TKey extends string>(
     data: { [key: string]: WidgetData },
     columns: number,
@@ -120,7 +152,7 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
       const chunk = entries.slice(i, i + columns);
       const row = chunk
         .map(([key, value]) => {
-          if (field?.type === "object" && field.children?.[key]) {
+          if (field && hasChildren(field) && field.children[key]) {
             const childField = field.children[key];
             return context.renderWidget(childField.ui.type, childField, value);
           }
@@ -134,42 +166,17 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   }
 
   /**
-   * Format a single container value (like a metric card) - RENDERING ONLY
+   * Format a single container value using centralized helpers
    */
   private formatContainerValue(
     key: string,
     value: WidgetData,
     context: WidgetRenderContext,
   ): string {
-    // Handle primitive values
-    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-      const icon = this.getMetricIcon(context);
-      // Use shared formatting utility
-      const label = formatCamelCaseLabel(key);
-      const formattedValue =
-        typeof value === "number" && Number.isInteger(value)
-          ? value.toString()
-          : typeof value === "number"
-            ? value.toFixed(2)
-            : String(value);
-      return `${icon}${label}: ${formattedValue}`;
-    }
-
-    // Handle complex values
+    // Use centralized value rendering
+    const icon = this.getValueIcon(value, context);
     const label = formatCamelCaseLabel(key);
-    return `${label}: ${JSON.stringify(value)}`;
-  }
-
-  /**
-   * Get icon for metric based on configuration (RENDERING ONLY)
-   */
-  private getMetricIcon(context: WidgetRenderContext): string {
-    if (!context.options.useEmojis) {
-      return "";
-    }
-
-    // Default icon for metrics
-    // eslint-disable-next-line i18next/no-literal-string
-    return "📊 ";
+    const formattedValue = this.renderValue(value, context);
+    return `${icon}${label}: ${formattedValue}`;
   }
 }

@@ -130,6 +130,18 @@ export type AutoPrefillDataType<T> =
 // Hook options interface with operation-specific configuration
 export interface UseEndpointOptions<T> {
   /**
+   * Storage mode configuration
+   * - api: Use API endpoints (default)
+   * - localStorage: Use local storage with callbacks
+   */
+  storage?: {
+    /** Storage mode - defaults to "api" */
+    mode: "api" | "localStorage";
+    /** Type-safe callbacks for localStorage mode (required when mode is localStorage) */
+    callbacks?: LocalStorageCallbacks<T>;
+  };
+
+  /**
    * Options for read (GET) operations
    * Supports all options from useEndpointRead hook
    */
@@ -623,4 +635,42 @@ export interface FormDataPriority<T> {
   dataSource: "default" | "server" | "localStorage" | "initialState";
   /** Whether local storage data was used (indicates unsaved changes) */
   hasUnsavedChanges: boolean;
+}
+
+/**
+ * Type-safe callbacks for localStorage mode
+ * All callbacks must return ResponseType to maintain consistency with API mode
+ */
+export interface LocalStorageCallbacks<T> {
+  /** Callback for GET/read operations */
+  read?: GetEndpointTypes<T> extends never
+    ? undefined
+    : (params: {
+        urlPathParams?: GetEndpointTypes<T>["urlPathParams"];
+        requestData?: GetEndpointTypes<T>["request"];
+      }) => Promise<ResponseType<GetEndpointTypes<T>["response"]>>;
+
+  /** Callback for POST/create operations */
+  create?: PrimaryMutationTypes<T> extends never
+    ? undefined
+    : (params: {
+        requestData: PrimaryMutationTypes<T>["request"];
+        urlPathParams?: PrimaryMutationTypes<T>["urlPathParams"];
+      }) => Promise<ResponseType<PrimaryMutationTypes<T>["response"]>>;
+
+  /** Callback for PATCH/update operations */
+  update?: PatchEndpointTypes<T> extends never
+    ? undefined
+    : (params: {
+        requestData: PatchEndpointTypes<T>["request"];
+        urlPathParams?: PatchEndpointTypes<T>["urlPathParams"];
+      }) => Promise<ResponseType<PatchEndpointTypes<T>["response"]>>;
+
+  /** Callback for DELETE operations */
+  delete?: DeleteEndpointTypes<T> extends never
+    ? undefined
+    : (params: {
+        requestData?: DeleteEndpointTypes<T>["request"];
+        urlPathParams?: DeleteEndpointTypes<T>["urlPathParams"];
+      }) => Promise<ResponseType<DeleteEndpointTypes<T>["response"]>>;
 }

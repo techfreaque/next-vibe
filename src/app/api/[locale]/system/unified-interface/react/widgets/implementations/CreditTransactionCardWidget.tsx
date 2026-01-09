@@ -21,8 +21,7 @@ export function CreditTransactionCardWidget<const TKey extends string>({
   context,
   className,
 }: ReactWidgetProps<typeof WidgetType.CREDIT_TRANSACTION_CARD, TKey>): JSX.Element {
-  const { t } = context.scopedT(context.locale);
-  const { t: globalT } = simpleT(context.locale);
+  const { t } = simpleT(context.locale);
 
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return <Div className={className}>—</Div>;
@@ -96,7 +95,7 @@ export function CreditTransactionCardWidget<const TKey extends string>({
             displayValue = (val > 0 ? "+" : "") + val;
           } else if (key === "balanceAfter" && typeof val === "number") {
             // Format balance with label
-            displayValue = globalT("app.subscription.subscription.history.balance", {
+            displayValue = t("app.subscription.subscription.history.balance", {
               count: val,
             });
           } else {

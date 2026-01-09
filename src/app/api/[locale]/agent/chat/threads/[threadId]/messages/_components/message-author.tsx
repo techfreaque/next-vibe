@@ -24,6 +24,8 @@ interface MessageAuthorProps {
   className?: string;
   /** Character used for this message */
   character?: string | null;
+  /** Character name from API data */
+  characterName?: string | null;
   locale: CountryLanguage;
   rootFolderId: DefaultFolderId;
 }
@@ -38,7 +40,7 @@ export function MessageAuthorInfo({
   edited = false,
   compact = false,
   className,
-  character,
+  characterName,
   locale,
   rootFolderId = DefaultFolderId.PRIVATE,
 }: MessageAuthorProps): JSX.Element {
@@ -64,10 +66,6 @@ export function MessageAuthorInfo({
         ? t("app.chat.messages.anonymous")
         : t("app.chat.messages.user");
   }
-
-  // Get character name if character is provided
-  const characterData = character ? getCharacterById(character) : null;
-  const characterName = characterData?.name ? t(characterData.name) : null;
 
   return (
     <Div className={cn("flex items-center gap-2", className)}>

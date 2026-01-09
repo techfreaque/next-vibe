@@ -4,22 +4,17 @@
  */
 
 import { relations } from "drizzle-orm";
-import { boolean, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import type { ModelUtilityValue } from "@/app/api/[locale]/agent/models/enum";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { users } from "@/app/api/[locale]/user/db";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { CharacterModelSelection } from "./create/definition";
-import type {
-  CharacterCategoryValue,
-  CharacterOwnershipTypeValue,
-  CharacterSourceValue,
-} from "./enum";
+import type { CharacterCategoryValue, CharacterOwnershipTypeValue } from "./enum";
 
 /**
  * Custom Characters Table
@@ -43,11 +38,6 @@ export const customCharacters = pgTable("custom_characters", {
 
   // Categorization
   category: text("category").$type<typeof CharacterCategoryValue>().notNull(),
-  source: text("source")
-    .$type<typeof CharacterSourceValue>()
-    .notNull()
-    .default("app.api.agent.chat.characters.enums.source.my"),
-  task: text("task").$type<ModelUtility>().notNull(),
 
   voice: text("voice")
     .$type<typeof TtsVoiceValue>()
@@ -58,11 +48,8 @@ export const customCharacters = pgTable("custom_characters", {
   // Model selection (discriminated union from API)
   modelSelection: jsonb("model_selection").$type<CharacterModelSelection>().notNull(),
 
-  // Ownership type
+  // Ownership type (determines visibility: USER=private, PUBLIC=shared, SYSTEM=built-in)
   ownershipType: text("ownership_type").$type<typeof CharacterOwnershipTypeValue>().notNull(),
-
-  // Sharing
-  isPublic: boolean("is_public").default(false).notNull(),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),

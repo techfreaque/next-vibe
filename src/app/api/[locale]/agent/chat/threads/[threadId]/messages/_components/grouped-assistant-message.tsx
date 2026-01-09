@@ -329,6 +329,7 @@ export function GroupedAssistantMessage({
                   }
                   parentId={primary.id}
                   decision={decision}
+                  logger={logger}
                 />
               );
             }

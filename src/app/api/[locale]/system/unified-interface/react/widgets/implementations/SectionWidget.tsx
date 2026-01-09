@@ -11,22 +11,42 @@ import { useState } from "react";
 
 import { simpleT } from "@/i18n/core/shared";
 
-import type { UnifiedField } from "../../../shared/types/endpoint";
 import { WidgetType } from "../../../shared/types/enums";
 import { extractSectionData } from "../../../shared/widgets/logic/section";
 import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
+import {
+  getIconSizeClassName,
+  getTextSizeClassName,
+} from "../../../shared/widgets/utils/widget-helpers";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**
- * Type guard to check if an object is a UnifiedField.
- */
-// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard: Must accept unknown to narrow any value to UnifiedField. This is the standard TypeScript pattern for type guards.
-function isUnifiedField(obj: unknown): obj is UnifiedField<string> {
-  return typeof obj === "object" && obj !== null && "ui" in obj && typeof obj.ui === "object";
-}
-
-/**
- * Displays titled content sections with optional collapsible behavior.
+ * Section Widget - Displays titled content sections with optional collapsible behavior
+ *
+ * Renders organized content sections with customizable headers and collapse functionality.
+ * Automatically detects and renders nested widget configurations or displays raw content as text.
+ *
+ * Data Format:
+ * ```json
+ * {
+ *   "title": "Section Title",
+ *   "content": {...},           // Widget config or raw data
+ *   "description": "Optional description",
+ *   "collapsible": true,        // Enable collapse/expand
+ *   "defaultExpanded": true     // Initial collapsed state
+ * }
+ * ```
+ *
+ * Content Structure:
+ * - Simple data: Rendered as text widget
+ * - Widget config: `{ type: "...", data: {...}, field: {...} }`
+ * - Nested fields: Automatically rendered with appropriate widget type
+ *
+ * UI Config options:
+ * - title: Translation key for section title
+ * - description: Translation key for section description
+ * - collapsible: Whether section can be collapsed (default: false)
+ * - defaultExpanded: Initial expanded state for collapsible sections (default: true)
  */
 export function SectionWidget<const TKey extends string>({
   value,
@@ -37,6 +57,21 @@ export function SectionWidget<const TKey extends string>({
   endpoint,
 }: ReactWidgetProps<typeof WidgetType.SECTION, TKey>): JSX.Element {
   const { t } = simpleT(context.locale);
+  const { emptyTextSize, chevronIconSize, chevronButtonSize } = field.ui;
+
+  // Get classes from config (no hardcoding!)
+  const emptyTextSizeClass = getTextSizeClassName(emptyTextSize);
+  const chevronIconSizeClass = getIconSizeClassName(chevronIconSize);
+
+  // Button size mapping
+  const chevronButtonSizeClass =
+    chevronButtonSize === "xs"
+      ? "h-6 w-6"
+      : chevronButtonSize === "sm"
+        ? "h-8 w-8"
+        : chevronButtonSize === "lg"
+          ? "h-10 w-10"
+          : "h-8 w-8";
 
   // Extract data using shared logic
   const data = extractSectionData(value);
@@ -58,7 +93,7 @@ export function SectionWidget<const TKey extends string>({
     return (
       <Card className={className}>
         <CardContent>
-          <Div className="text-muted-foreground italic">
+          <Div className={cn("text-muted-foreground italic", emptyTextSizeClass)}>
             {t("app.api.system.unifiedInterface.react.widgets.section.noData")}
           </Div>
         </CardContent>
@@ -76,8 +111,8 @@ export function SectionWidget<const TKey extends string>({
           : WidgetType.TEXT;
       const contentData = "data" in content ? (content.data as WidgetData) : content;
 
-      const contentField =
-        "field" in content && isUnifiedField(content.field) ? content.field : field;
+      // Always use parent field - field definitions come from schema, not data
+      const contentField = field;
 
       return (
         <WidgetRenderer
@@ -128,10 +163,16 @@ export function SectionWidget<const TKey extends string>({
                 <CardTitle>{title}</CardTitle>
                 {description && <CardDescription>{description}</CardDescription>}
               </Div>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" type="button">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(chevronButtonSizeClass, "p-0")}
+                type="button"
+              >
                 <ChevronDown
                   className={cn(
-                    "h-5 w-5 text-gray-500 transition-transform",
+                    "text-gray-500 transition-transform",
+                    chevronIconSizeClass || "h-5 w-5",
                     isExpanded && "rotate-180",
                   )}
                 />

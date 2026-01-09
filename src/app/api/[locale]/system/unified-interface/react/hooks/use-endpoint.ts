@@ -6,14 +6,7 @@ import { useMemo } from "react";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
 import { useTranslation } from "@/i18n/core/client";
-
-/**
- * Options record type for endpoint configuration
- * Uses WidgetData to avoid 'unknown' type restrictions
- */
-type OptionsRecord = Record<string, WidgetData>;
 
 import type { EndpointReturn, FormAlertState, UseEndpointOptions } from "./endpoint-types";
 import {
@@ -25,6 +18,11 @@ import {
 } from "./endpoint-utils";
 import { useEndpointCreate } from "./use-endpoint-create";
 import { useEndpointDelete } from "./use-endpoint-delete";
+import {
+  useLocalStorageCreate,
+  useLocalStorageDelete,
+  useLocalStorageRead,
+} from "./use-endpoint-localstorage";
 import { useEndpointRead } from "./use-endpoint-read";
 
 /**
@@ -67,10 +65,10 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   const deleteEndpoint = endpoints.DELETE ?? null;
 
   // Merge endpoint options with hook options (hook options take priority)
-  const mergedReadOptions = useMemo(() => {
-    const endpointReadOptions = readEndpoint?.options as OptionsRecord | undefined;
-    return mergeReadOptions(endpointReadOptions, options.read as OptionsRecord | undefined);
-  }, [readEndpoint?.options, options.read]);
+  const mergedReadOptions = useMemo(
+    () => mergeReadOptions(readEndpoint?.options, options.read),
+    [readEndpoint?.options, options.read],
+  );
 
   // Compute read options with defaults
   const readQueryEnabled =
@@ -92,8 +90,12 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
     true;
   const autoPrefillEnabled = options.autoPrefill ?? true;
 
-  // Use read hook for GET endpoints
-  const read = useEndpointRead(readEndpoint, logger, {
+  // Determine storage mode
+  const storageMode = options.storage?.mode ?? "api";
+  const isLocalStorageMode = storageMode === "localStorage";
+
+  // Use read hook for GET endpoints - conditionally use API or localStorage
+  const apiRead = useEndpointRead(isLocalStorageMode ? null : readEndpoint, logger, {
     formOptions: {
       persistForm: (mergedReadOptions.formOptions?.persistForm as boolean | undefined) ?? false,
       persistenceKey: mergedReadOptions.formOptions?.persistenceKey as string | undefined,
@@ -116,6 +118,19 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
     initialData: options.read?.initialData,
   });
 
+  const localStorageRead = useLocalStorageRead<T>(
+    isLocalStorageMode ? readEndpoint : null,
+    options.storage?.callbacks?.read,
+    {
+      urlPathParams: readUrlPathParams,
+      initialState: mergedReadOptions.initialState ?? options.filterOptions?.initialFilters,
+      enabled: readQueryEnabled,
+    },
+  );
+
+  // Use the appropriate read operation based on storage mode
+  const read = isLocalStorageMode ? localStorageRead : apiRead;
+
   // Use the appropriate operation based on endpoint type
   const autoPrefillData = useMemo(() => {
     if (autoPrefillEnabled && read?.response?.success) {
@@ -125,10 +140,10 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   }, [autoPrefillEnabled, read?.response]);
 
   // Merge endpoint create options with hook options (hook options take priority)
-  const mergedCreateOptions = useMemo(() => {
-    const endpointCreateOptions = primaryEndpoint?.options as OptionsRecord | undefined;
-    return mergeCreateOptions(endpointCreateOptions, options.create as OptionsRecord | undefined);
-  }, [primaryEndpoint?.options, options.create]);
+  const mergedCreateOptions = useMemo(
+    () => mergeCreateOptions(primaryEndpoint?.options, options.create),
+    [primaryEndpoint?.options, options.create],
+  );
 
   // Compute create options with defaults
   const createUrlPathParams =
@@ -154,8 +169,8 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   }, [autoPrefillData, createFormOptions.defaultValues]);
 
   // Always call the hook unconditionally - it handles null endpoints internally
-  const createOperation = useEndpointCreate<PrimaryEndpoint>(
-    primaryEndpoint as PrimaryEndpoint | null,
+  const apiCreateOperation = useEndpointCreate<PrimaryEndpoint>(
+    isLocalStorageMode ? null : (primaryEndpoint as PrimaryEndpoint | null),
     logger,
     {
       formOptions: createFormOptions,
@@ -167,21 +182,46 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
     } as Parameters<typeof useEndpointCreate<PrimaryEndpoint>>[2],
   );
 
-  // Merge endpoint delete options with hook options (hook options take priority)
-  const mergedDeleteOptions = useMemo(() => {
-    const endpointDeleteOptions = deleteEndpoint?.options as OptionsRecord | undefined;
-    return mergeDeleteOptions(endpointDeleteOptions, options.delete as OptionsRecord | undefined);
-  }, [deleteEndpoint?.options, options.delete]);
+  const localStorageCreateOperation = useLocalStorageCreate<T>(
+    isLocalStorageMode ? primaryEndpoint : null,
+    options.storage?.callbacks?.create ?? options.storage?.callbacks?.update,
+    {
+      urlPathParams: createUrlPathParams,
+      defaultValues: createFormOptions.defaultValues,
+      autoPrefillData:
+        autoPrefillData ?? mergedCreateOptions.autoPrefillData ?? options.create?.autoPrefillData,
+    },
+  );
 
-  const deleteOperation = useEndpointDelete(deleteEndpoint, logger, {
+  // Use the appropriate create operation based on storage mode
+  const createOperation = isLocalStorageMode ? localStorageCreateOperation : apiCreateOperation;
+
+  // Merge endpoint delete options with hook options (hook options take priority)
+  const mergedDeleteOptions = useMemo(
+    () => mergeDeleteOptions(deleteEndpoint?.options, options.delete),
+    [deleteEndpoint?.options, options.delete],
+  );
+
+  const apiDeleteOperation = useEndpointDelete(isLocalStorageMode ? null : deleteEndpoint, logger, {
     mutationOptions: mergedDeleteOptions.mutationOptions ?? {},
     urlPathParams: mergedDeleteOptions.urlPathParams ?? options.urlPathParams,
   });
 
+  const localStorageDeleteOperation = useLocalStorageDelete<T>(
+    isLocalStorageMode ? deleteEndpoint : null,
+    options.storage?.callbacks?.delete,
+    {
+      urlPathParams: mergedDeleteOptions.urlPathParams ?? options.urlPathParams,
+    },
+  );
+
+  // Use the appropriate delete operation based on storage mode
+  const deleteOperation = isLocalStorageMode ? localStorageDeleteOperation : apiDeleteOperation;
+
   const isLoading =
     read?.isLoading || createOperation?.isSubmitting || deleteOperation?.isSubmitting || false;
 
-  // Combined error state
+  // Combined error state - all hooks return compatible error types
   const error: ErrorResponseType | null =
     read?.error || createOperation?.submitError || deleteOperation?.error || null;
 
@@ -269,10 +309,10 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   const patchEndpoint = endpoints.PATCH ?? null;
 
   // Merge endpoint patch options with hook options (hook options take priority)
-  const mergedPatchOptions = useMemo(() => {
-    const endpointPatchOptions = patchEndpoint?.options as OptionsRecord | undefined;
-    return mergeCreateOptions(endpointPatchOptions, options.update as OptionsRecord | undefined);
-  }, [patchEndpoint?.options, options.update]);
+  const mergedPatchOptions = useMemo(
+    () => mergeCreateOptions(patchEndpoint?.options, options.update),
+    [patchEndpoint?.options, options.update],
+  );
 
   const patchUrlPathParams =
     mergedPatchOptions.urlPathParams ?? options.urlPathParams ?? readUrlPathParams;
@@ -292,8 +332,8 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
       : never
     : never;
 
-  const updateOperation = useEndpointCreate<PatchEndpoint>(
-    patchEndpoint as PatchEndpoint | null,
+  const apiUpdateOperation = useEndpointCreate<PatchEndpoint>(
+    isLocalStorageMode ? null : (patchEndpoint as PatchEndpoint | null),
     logger,
     {
       formOptions: patchFormOptions,
@@ -304,6 +344,20 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
       initialState: mergedPatchOptions.initialState,
     } as Parameters<typeof useEndpointCreate<PatchEndpoint>>[2],
   );
+
+  const localStorageUpdateOperation = useLocalStorageCreate<T>(
+    isLocalStorageMode ? patchEndpoint : null,
+    options.storage?.callbacks?.update,
+    {
+      urlPathParams: patchUrlPathParams,
+      defaultValues: patchFormOptions.defaultValues,
+      autoPrefillData:
+        autoPrefillData ?? mergedPatchOptions.autoPrefillData ?? options.update?.autoPrefillData,
+    },
+  );
+
+  // Use the appropriate update operation based on storage mode
+  const updateOperation = isLocalStorageMode ? localStorageUpdateOperation : apiUpdateOperation;
 
   const updateValues = updateOperation?.form.watch();
   const update = updateOperation

@@ -15,6 +15,7 @@ export interface ProcessedStatsGrid {
   stats: ProcessedMetricCard[];
   columns: number;
   title?: string;
+  layout?: "grid" | "flex";
 }
 
 /**
@@ -38,6 +39,10 @@ export function extractStatsGridData(value: WidgetData): ProcessedStatsGrid | nu
   // Extract optional properties
   const columns = "columns" in value && typeof value.columns === "number" ? value.columns : 3;
   const title = "title" in value && typeof value.title === "string" ? value.title : undefined;
+  const layout =
+    "layout" in value && (value.layout === "grid" || value.layout === "flex")
+      ? value.layout
+      : "grid";
 
   // Process each stat using metric card extractor
   const processedStats = stats
@@ -52,6 +57,7 @@ export function extractStatsGridData(value: WidgetData): ProcessedStatsGrid | nu
     stats: processedStats,
     columns: Math.max(1, Math.min(4, columns)),
     title,
+    layout,
   };
 }
 

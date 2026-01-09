@@ -64,6 +64,7 @@ export function LeadEditForm({ lead, locale, leadId }: LeadEditFormProps): JSX.E
             locale={locale}
             submitButtonText="app.admin.common.actions.save"
             onCancel={() => router.back()}
+            logger={logger}
           />
         </CardContent>
       </Card>

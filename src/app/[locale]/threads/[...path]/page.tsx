@@ -79,7 +79,14 @@ export default async function ThreadsPathPage({
   // Disambiguate between thread IDs and folder IDs
   // Both are UUIDs, so we need to check the database to determine which one it is
   // This happens when URL is /threads/[rootId]/[uuid] - could be either a thread or a folder
-  if (initialThreadId && !initialSubFolderId && isUUID(initialThreadId) && user) {
+  // SKIP for incognito mode - everything is localStorage-only, no server calls
+  if (
+    initialThreadId &&
+    !initialSubFolderId &&
+    isUUID(initialThreadId) &&
+    user &&
+    initialRootFolderId !== DefaultFolderId.INCOGNITO
+  ) {
     // Check if it's a thread first
     const threadResponse = await ThreadByIdRepository.getThreadById(
       initialThreadId,

@@ -10,13 +10,16 @@ import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import {
+  isWidgetDataArray,
+  isWidgetDataObject,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
 import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import { simpleT } from "@/i18n/core/shared";
 import type { TParams } from "@/i18n/core/static-types";
 
+import type { EndpointLogger } from "../../../shared/logger/endpoint";
 import type { WidgetData } from "../../../shared/widgets/types";
 import type { WidgetRegistry } from "../core/registry";
 import { defaultWidgetRegistry } from "../core/registry";
@@ -55,17 +58,16 @@ export class ModularCLIResponseRenderer {
     data: DataRecord,
     fields: Array<[string, UnifiedField<TKey>]>,
     locale: CountryLanguage,
-    scopedT: (locale: CountryLanguage) => {
-      t: (key: string, params?: TParams) => TranslatedKeyType;
-    },
+    t: (key: string, params?: TParams) => string,
+    logger: EndpointLogger,
   ): string {
     this.options.locale = locale;
-    const { t } = simpleT(locale);
 
     const context: WidgetRenderContext = {
       options: this.options,
       depth: 0,
       t,
+      logger,
       formatValue: (field, value) => this.formatFieldValue(field, value),
       getFieldIcon: (type) => this.getFieldIcon(type),
       renderEmptyState: (message) => this.renderEmptyState(message),
@@ -75,7 +77,6 @@ export class ModularCLIResponseRenderer {
       locale,
       isInteractive: false,
       permissions: [],
-      scopedT,
     };
 
     return this.renderFields(data, fields, context);
@@ -121,7 +122,7 @@ export class ModularCLIResponseRenderer {
       }
 
       // Special handling for arrays (like issues)
-      if (Array.isArray(value)) {
+      if (isWidgetDataArray(value)) {
         if (value.length === 0) {
           continue; // Skip empty arrays
         }
@@ -132,9 +133,9 @@ export class ModularCLIResponseRenderer {
         result.push(`${label}: ${formattedArray}`);
       }
       // Handle objects
-      else if (typeof value === "object") {
+      else if (isWidgetDataObject(value)) {
         const label = this.formatLabel(key);
-        const formattedObject = this.formatter.formatObject(value as Record<string, WidgetData>);
+        const formattedObject = this.formatter.formatObject(value);
         // eslint-disable-next-line i18next/no-literal-string
         result.push(`${label}:\n${formattedObject}`);
       }
@@ -174,11 +175,11 @@ export class ModularCLIResponseRenderer {
     if (typeof value === "string") {
       return value;
     }
-    if (Array.isArray(value)) {
+    if (isWidgetDataArray(value)) {
       return this.formatter.formatArray(value);
     }
-    if (typeof value === "object" && value !== null) {
-      return this.formatter.formatObject(value as Record<string, WidgetData>);
+    if (isWidgetDataObject(value)) {
+      return this.formatter.formatObject(value);
     }
     return "";
   }
@@ -192,9 +193,7 @@ export class ModularCLIResponseRenderer {
   ): string {
     if (value === null || value === undefined) {
       // eslint-disable-next-line i18next/no-literal-string
-      return this.styleText("(not set)", "dim", {
-        options: this.options,
-      } as WidgetRenderContext);
+      return this.styleText("(not set)", "dim", this.options);
     }
 
     const fieldName = "name" in field ? field.name : undefined;
@@ -227,12 +226,12 @@ export class ModularCLIResponseRenderer {
       return this.formatter.formatBoolean(value);
     }
 
-    if (Array.isArray(value)) {
+    if (isWidgetDataArray(value)) {
       return this.formatter.formatArray(value, { maxItems: 5 });
     }
 
-    if (typeof value === "object" && value !== null) {
-      return this.formatter.formatObject(value as Record<string, WidgetData>);
+    if (isWidgetDataObject(value)) {
+      return this.formatter.formatObject(value);
     }
 
     return String(value);
@@ -272,9 +271,7 @@ export class ModularCLIResponseRenderer {
   private renderEmptyState(message: string): string {
     // eslint-disable-next-line i18next/no-literal-string
     const icon = this.options.useEmojis ? "🔍 " : "";
-    const styledMessage = this.styleText(message, "dim", {
-      options: this.options,
-    } as WidgetRenderContext);
+    const styledMessage = this.styleText(message, "dim", this.options);
     return `${icon}${styledMessage}`;
   }
 
@@ -284,9 +281,9 @@ export class ModularCLIResponseRenderer {
   private styleText(
     text: string,
     style: "bold" | "dim" | "underline" | "red" | "green" | "yellow" | "blue",
-    context: WidgetRenderContext,
+    options: CLIRenderingOptions,
   ): string {
-    if (!context.options.useColors) {
+    if (!options.useColors) {
       return text;
     }
 

@@ -42,7 +42,6 @@ export const {
   ROLEPLAY: "app.api.agent.chat.characters.enums.category.roleplay",
   EDUCATION: "app.api.agent.chat.characters.enums.category.education",
   CONTROVERSIAL: "app.api.agent.chat.characters.enums.category.controversial",
-  CUSTOM: "app.api.agent.chat.characters.enums.category.custom",
 });
 
 /**
@@ -58,7 +57,6 @@ export const CharacterCategoryDB = [
   CharacterCategory.ROLEPLAY,
   CharacterCategory.EDUCATION,
   CharacterCategory.CONTROVERSIAL,
-  CharacterCategory.CUSTOM,
 ] as const;
 
 /**

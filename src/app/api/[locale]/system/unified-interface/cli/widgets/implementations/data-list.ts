@@ -1,6 +1,14 @@
 /**
  * Data List Widget Renderer
- * Handles DATA_LIST widget type for simple list rendering
+ *
+ * Handles DATA_LIST widget type for CLI display.
+ * Displays structured lists with special formatting for common patterns:
+ * - Command lists (command + description)
+ * - Option/flag lists (flag + description)
+ * - Generic key-value lists (fallback)
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All data extraction logic imported from shared.
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -16,6 +24,10 @@ import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 export class DataListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_LIST> {
   readonly widgetType = WidgetType.DATA_LIST;
 
+  /**
+   * Render data list with special formatting for commands, flags, and generic items.
+   * Uses shared extraction logic to process the data structure before rendering.
+   */
   render(props: CLIWidgetProps<typeof WidgetType.DATA_LIST, string>): string {
     const { value, context } = props;
 
@@ -31,6 +43,10 @@ export class DataListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     return this.renderDataList(data, context);
   }
 
+  /**
+   * Render the complete data list by processing each item.
+   * Joins all rendered items with newlines.
+   */
   private renderDataList(data: ProcessedDataList, context: WidgetRenderContext): string {
     const result: string[] = [];
 
@@ -44,6 +60,13 @@ export class DataListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     return result.join("\n");
   }
 
+  /**
+   * Render a single list item with format detection.
+   * Detects and applies special formatting for:
+   * - Command lists: blue-styled command (20 chars) + description
+   * - Flag/option lists: yellow-styled flag (25 chars) + description
+   * - Generic items: key-value pairs separated by commas
+   */
   private renderListItem(item: ListItem, context: WidgetRenderContext): string {
     // Special handling for command lists (command + description)
     if ("command" in item && "description" in item) {

@@ -8,7 +8,6 @@ import type { CreateApiEndpointAny } from "../../types/endpoint";
 import { Methods } from "../../types/enums";
 import type { Platform } from "../../types/platform";
 import { endpointToToolName } from "../../utils/path";
-import { getTranslatorFromEndpoint } from "../../widgets/utils/field-helpers";
 import { permissionsRegistry } from "../permissions/registry";
 
 type EndpointNode =
@@ -171,7 +170,7 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     locale: CountryLanguage,
   ): SerializableToolMetadata[] {
     return endpoints.map((definition) => {
-      const { t } = getTranslatorFromEndpoint(definition)(locale);
+      const { t } = definition.scopedTranslation.scopedT(locale);
 
       const method = definition.method;
       const toolName = endpointToToolName(definition);

@@ -95,11 +95,15 @@ export enum WidgetType {
   SECTION = "section",
   TABS = "tabs",
   ACCORDION = "accordion",
+  SEPARATOR = "separator",
 
   // Content widgets
   TITLE = "title",
   TEXT = "text",
+  DESCRIPTION = "description",
+  METADATA = "metadata",
   BADGE = "badge",
+  ICON = "icon",
   AVATAR = "avatar",
   MARKDOWN = "markdown",
   MARKDOWN_EDITOR = "markdown_editor",
@@ -122,6 +126,7 @@ export enum WidgetType {
 
   // Interactive widgets
   BUTTON = "button",
+  NAVIGATE_BUTTON = "navigate_button",
   BUTTON_GROUP = "button_group",
   ACTION_BAR = "action_bar",
   PAGINATION_INFO = "pagination_info",
@@ -260,6 +265,7 @@ export enum ActionType {
 export enum LayoutType {
   VERTICAL = "vertical",
   HORIZONTAL = "horizontal",
+  INLINE = "inline",
   GRID = "grid",
   FLEX = "flex",
   STACKED = "stacked",

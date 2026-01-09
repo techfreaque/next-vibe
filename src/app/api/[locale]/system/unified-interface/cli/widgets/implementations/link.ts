@@ -1,6 +1,13 @@
 /**
  * Link Widget Renderer
- * Handles LINK widget type for CLI display
+ *
+ * Handles LINK widget type for CLI display.
+ * Displays hyperlinks in a readable CLI format with:
+ * - Blue-styled URL (if text equals URL)
+ * - Blue-styled text + dimmed URL in parentheses (if text differs from URL)
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All data extraction logic imported from shared.
  */
 
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -15,6 +22,11 @@ import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 export class LinkWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.LINK> {
   readonly widgetType = WidgetType.LINK;
 
+  /**
+   * Render link with text and URL.
+   * Uses shared extraction logic to process the link data before rendering.
+   * Links are displayed in blue with optional dimmed URL in parentheses.
+   */
   render(props: CLIWidgetProps<typeof WidgetType.LINK, string>): string {
     const { value, context } = props;
     const t = context.t;
@@ -35,6 +47,15 @@ export class LinkWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.LIN
     return this.renderLink(data, context);
   }
 
+  /**
+   * Render link with appropriate formatting.
+   * - If text equals URL: just the blue-styled URL
+   * - If text differs: blue-styled text + dimmed URL in parentheses
+   *
+   * @param data Processed link data with url and text
+   * @param context Rendering context
+   * @returns Formatted link string
+   */
   private renderLink(data: ProcessedLink, context: WidgetRenderContext): string {
     const { url, text } = data;
 

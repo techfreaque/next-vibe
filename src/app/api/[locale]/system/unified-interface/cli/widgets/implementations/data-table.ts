@@ -1,9 +1,21 @@
 /**
  * Data Table Widget Renderer
- * Handles DATA_TABLE widget type with column definitions and formatting
+ *
+ * Handles DATA_TABLE widget type with column definitions and formatting.
+ * Supports both configured and auto-detected column layouts.
+ *
+ * Features:
+ * - Column-based rendering with type-aware formatters
+ * - Auto-column detection from data structure
+ * - Configurable column widths (fixed or percentage-based)
+ * - Type-specific formatting (numbers, dates, booleans, arrays, objects)
+ * - Pagination, sorting, and filtering support
+ * - Responsive column width calculation
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All type guards imported from shared.
  */
 
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import {
   FieldDataType,
   WidgetType,
@@ -16,7 +28,13 @@ import {
   type TableRow,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/data-table";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
-import { getTranslator } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-helpers";
+import {
+  isWidgetDataArray,
+  isWidgetDataBoolean,
+  isWidgetDataNumber,
+  isWidgetDataObject,
+  isWidgetDataString,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
@@ -25,6 +43,11 @@ import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_TABLE> {
   readonly widgetType = WidgetType.DATA_TABLE;
 
+  /**
+   * Render data table with configured or auto-detected columns.
+   * Supports pagination, sorting, and filtering configurations.
+   * Uses type-aware formatters for different data types.
+   */
   render(props: CLIWidgetProps<typeof WidgetType.DATA_TABLE, string>): string {
     const { field, value, context } = props;
     const t = context.t;
@@ -41,101 +64,47 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
       );
     }
 
-    const config = this.getTableConfig(field, context.options.locale);
+    // Extract config directly where types are properly narrowed
+    const ui = field.ui;
+    const locale = context.options.locale;
+    const configColumns = ui.columns;
+    const pagination = ui.pagination;
+    const sorting = ui.sorting;
+    const filtering = ui.filtering;
+
+    const columns: TableColumn<string>[] =
+      configColumns?.map(
+        (col): TableColumn<string> => ({
+          key: col.key,
+          label: col.label,
+          type: FieldDataType.TEXT,
+          width: typeof col.width === "number" ? String(col.width) : col.width,
+          align: col.align ?? "left",
+          formatter: this.getColumnFormatter(FieldDataType.TEXT, locale),
+        }),
+      ) ?? [];
+
+    const config: TableRenderConfig<string> = {
+      columns,
+      pagination: {
+        enabled: pagination?.enabled ?? false,
+        pageSize: pagination?.pageSize ?? 50,
+      },
+      sorting: {
+        enabled: sorting?.enabled ?? false,
+        defaultSort: Array.isArray(sorting?.defaultSort)
+          ? sorting?.defaultSort[0]
+          : sorting?.defaultSort,
+      },
+      filtering: {
+        enabled: filtering?.enabled ?? false,
+      },
+    };
 
     if (config.columns && config.columns.length > 0) {
       return this.renderTableWithColumns(data.rows, config, context);
     }
     return this.renderTableAutoColumns(data.rows, context);
-  }
-
-  private getTableConfig<const TKey extends string>(
-    field: UnifiedField<TKey>,
-    locale: CountryLanguage,
-  ): TableRenderConfig<TKey> {
-    if (field.ui.type !== WidgetType.DATA_TABLE) {
-      return {
-        columns: [],
-        pagination: { enabled: false, pageSize: 50 },
-        sorting: { enabled: false },
-        filtering: { enabled: false },
-      };
-    }
-
-    const config = field.ui;
-
-    const columns: TableColumn<TKey>[] =
-      config.columns?.map((col) => ({
-        key: col.key,
-        label: col.label,
-        type: FieldDataType.TEXT,
-        width: typeof col.width === "string" ? col.width : undefined,
-        align: col.align || ("left" as const),
-        formatter: this.getColumnFormatter(FieldDataType.TEXT, locale),
-      })) || [];
-
-    // Extract and type-check pagination config
-    const paginationValue = config.pagination;
-    let pagination: { enabled: boolean; pageSize: number } = {
-      enabled: false,
-      pageSize: 50,
-    };
-    if (
-      typeof paginationValue === "object" &&
-      paginationValue !== null &&
-      !Array.isArray(paginationValue)
-    ) {
-      const paginationObj = paginationValue;
-      if ("enabled" in paginationObj && "pageSize" in paginationObj) {
-        const enabledVal = paginationObj.enabled;
-        const pageSizeVal = paginationObj.pageSize;
-        if (typeof enabledVal === "boolean" && typeof pageSizeVal === "number") {
-          pagination = { enabled: enabledVal, pageSize: pageSizeVal };
-        }
-      }
-    }
-
-    // Extract and type-check sorting config
-    const sortingValue = config.sorting;
-    let sorting: {
-      enabled: boolean;
-      defaultSort?: { key: string; direction: "asc" | "desc" };
-    } = {
-      enabled: false,
-    };
-    if (typeof sortingValue === "object" && sortingValue !== null && !Array.isArray(sortingValue)) {
-      const sortingObj = sortingValue;
-      if ("enabled" in sortingObj) {
-        const enabledVal = sortingObj.enabled;
-        if (typeof enabledVal === "boolean") {
-          sorting.enabled = enabledVal;
-        }
-      }
-    }
-
-    // Extract and type-check filtering config
-    const filteringValue = config.filtering;
-    let filtering: { enabled: boolean } = { enabled: false };
-    if (
-      typeof filteringValue === "object" &&
-      filteringValue !== null &&
-      !Array.isArray(filteringValue)
-    ) {
-      const filteringObj = filteringValue;
-      if ("enabled" in filteringObj) {
-        const enabledVal = filteringObj.enabled;
-        if (typeof enabledVal === "boolean") {
-          filtering = { enabled: enabledVal };
-        }
-      }
-    }
-
-    return {
-      columns,
-      pagination,
-      sorting,
-      filtering,
-    };
   }
 
   private getColumnFormatter(
@@ -145,14 +114,14 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     switch (type) {
       case FieldDataType.NUMBER:
         return (value) => {
-          if (typeof value === "number") {
+          if (isWidgetDataNumber(value)) {
             return this.formatter.formatNumber(value, locale);
           }
           return formatCellValue(value);
         };
       case FieldDataType.BOOLEAN:
         return (value) => {
-          if (typeof value === "boolean") {
+          if (isWidgetDataBoolean(value)) {
             return this.formatter.formatBoolean(value);
           }
           return formatCellValue(value);
@@ -166,14 +135,14 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
         };
       case FieldDataType.ARRAY:
         return (value) => {
-          if (Array.isArray(value)) {
+          if (isWidgetDataArray(value)) {
             return this.formatter.formatArray(value, { maxItems: 3 });
           }
           return formatCellValue(value);
         };
       case FieldDataType.OBJECT:
         return (value) => {
-          if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+          if (isWidgetDataObject(value)) {
             return this.formatter.formatObject(value);
           }
           return formatCellValue(value);
@@ -194,9 +163,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     const indent = this.createIndent(context.depth, context);
 
     // Filter data to only TableRow objects
-    const typedData: TableRow[] = data.filter(
-      (item): item is TableRow => typeof item === "object" && item !== null && !Array.isArray(item),
-    );
+    const typedData: TableRow[] = data.filter((item): item is TableRow => isWidgetDataObject(item));
 
     // Calculate column widths
     const columnWidths = this.calculateColumnWidths(typedData, config, context);
@@ -220,7 +187,6 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     config: TableRenderConfig<TKey>,
     context: WidgetRenderContext,
   ): number[] {
-    const { t } = getTranslator(context);
     const maxWidth = context.options.maxWidth - context.depth * context.options.indentSize;
     const availableWidth = maxWidth - (config.columns.length - 1) * 3; // Account for separators
 
@@ -231,7 +197,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
       }
 
       // Auto-calculate based on content - always translate labels
-      const translatedLabel = t(col.label);
+      const translatedLabel = context.t(col.label);
       const headerWidth = translatedLabel.length;
       const maxContentWidth = Math.max(
         ...data.slice(0, 10).map((row) => {
@@ -250,10 +216,9 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     columnWidths: number[],
     context: WidgetRenderContext,
   ): string {
-    const { t } = getTranslator(context);
     const cells = config.columns.map((col, index) => {
       // Always translate column labels
-      const translatedLabel = t(col.label);
+      const translatedLabel = context.t(col.label);
       const styledLabel = this.styleText(translatedLabel, "bold", context);
       return this.padText(styledLabel, columnWidths[index], col.align);
     });
@@ -275,11 +240,10 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     columnWidths: number[],
     context: WidgetRenderContext,
   ): string {
-    const { t } = getTranslator(context);
     const cells = config.columns.map((col, index) => {
       const value = row[col.key];
       // Translate string values (handles translation keys in data)
-      const translatedValue = typeof value === "string" ? t(value) : value;
+      const translatedValue = isWidgetDataString(value, context);
       const formatted = col.formatter
         ? col.formatter(translatedValue)
         : formatCellValue(translatedValue);
@@ -306,7 +270,7 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
 
     // Auto-detect columns from first row
     const firstRow = data[0];
-    if (typeof firstRow !== "object" || firstRow === null || Array.isArray(firstRow)) {
+    if (!isWidgetDataObject(firstRow)) {
       return context.renderEmptyState(
         t(
           "app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.invalidDataFormat",
@@ -337,16 +301,16 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   }
 
   private detectFieldType(value: WidgetData): FieldDataType {
-    if (typeof value === "number") {
+    if (isWidgetDataNumber(value)) {
       return FieldDataType.NUMBER;
     }
-    if (typeof value === "boolean") {
+    if (isWidgetDataBoolean(value)) {
       return FieldDataType.BOOLEAN;
     }
-    if (Array.isArray(value)) {
+    if (isWidgetDataArray(value)) {
       return FieldDataType.ARRAY;
     }
-    if (value && typeof value === "object") {
+    if (isWidgetDataObject(value)) {
       return FieldDataType.OBJECT;
     }
     if (typeof value === "string" && !isNaN(Date.parse(value))) {

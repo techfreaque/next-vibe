@@ -13,6 +13,11 @@ import {
   sortBySeverity,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/code-quality-list";
 import {
+  isWidgetDataNumber,
+  isWidgetDataObject,
+  isWidgetDataString,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
+import {
   formatFilePath,
   formatLocation,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
@@ -56,33 +61,17 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
     const result: string[] = [itemsOutput];
 
     // Add truncation notice if data is truncated
-    if (
-      typeof value === "object" &&
-      value !== null &&
-      !Array.isArray(value) &&
-      "summary" in value &&
-      typeof value.summary === "object" &&
-      value.summary !== null
-    ) {
+    if (isWidgetDataObject(value) && isWidgetDataObject(value.summary)) {
       const summary = value.summary;
-      const totalIssues =
-        "totalIssues" in summary && typeof summary.totalIssues === "number"
-          ? summary.totalIssues
-          : 0;
-      const displayedIssues =
-        "displayedIssues" in summary && typeof summary.displayedIssues === "number"
-          ? summary.displayedIssues
-          : 0;
-      const totalFiles =
-        "totalFiles" in summary && typeof summary.totalFiles === "number" ? summary.totalFiles : 0;
-      const displayedFiles =
-        "displayedFiles" in summary && typeof summary.displayedFiles === "number"
-          ? summary.displayedFiles
-          : 0;
-      const totalErrors =
-        "totalErrors" in summary && typeof summary.totalErrors === "number"
-          ? summary.totalErrors
-          : 0;
+      const totalIssues = isWidgetDataNumber(summary.totalIssues) ? summary.totalIssues : 0;
+      const displayedIssues = isWidgetDataNumber(summary.displayedIssues)
+        ? summary.displayedIssues
+        : 0;
+      const totalFiles = isWidgetDataNumber(summary.totalFiles) ? summary.totalFiles : 0;
+      const displayedFiles = isWidgetDataNumber(summary.displayedFiles)
+        ? summary.displayedFiles
+        : 0;
+      const totalErrors = isWidgetDataNumber(summary.totalErrors) ? summary.totalErrors : 0;
 
       const displayedErrors = data.items.filter((item) => item.severity === "error").length;
 
@@ -102,30 +91,15 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
       }
     }
 
-    // Recursively render children (like summary) if field has children
-    if (
-      field.type === "object" &&
-      field.children &&
-      typeof value === "object" &&
-      value !== null &&
-      !Array.isArray(value)
-    ) {
-      for (const [key, childValue] of Object.entries(value)) {
-        // Skip items array (already rendered)
-        if (key === "items") {
-          continue;
-        }
+    // Use centralized renderChildren helper - eliminates duplication
+    if (isWidgetDataObject(value)) {
+      const renderedChildren = this.renderChildren(field, value, context, {
+        skipKeys: ["items"], // Items already rendered above
+      });
 
-        if (childValue !== undefined && childValue !== null) {
-          const childField = field.children[key];
-          if (childField) {
-            const rendered = context.renderWidget(childField.ui.type, childField, childValue);
-            if (rendered) {
-              result.push("");
-              result.push(rendered);
-            }
-          }
-        }
+      if (renderedChildren.length > 0) {
+        result.push("");
+        result.push(...renderedChildren);
       }
     }
 
@@ -237,13 +211,19 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
 
     // Message
     if (item.message) {
-      parts.push(item.message);
+      const message = isWidgetDataString(item.message, context);
+      if (message) {
+        parts.push(message);
+      }
     }
 
     // Rule name in dim if available
     if (item.rule && item.rule !== "unknown") {
-      const ruleText = this.styleText(`[${item.rule}]`, "dim", context);
-      parts.push(ruleText);
+      const rule = isWidgetDataString(item.rule, context);
+      if (rule) {
+        const ruleText = this.styleText(`[${rule}]`, "dim", context);
+        parts.push(ruleText);
+      }
     }
 
     return `  ${parts.join(" ")}`;

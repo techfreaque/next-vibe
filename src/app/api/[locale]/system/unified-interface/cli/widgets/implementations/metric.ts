@@ -1,9 +1,23 @@
 /**
  * Metric Widget Renderer
- * Handles METRIC_CARD widget type for displaying key metrics and statistics
+ *
+ * Handles METRIC_CARD widget type for displaying key metrics and statistics.
+ * Supports multiple value formats:
+ * - Numbers (with optional precision and units)
+ * - Percentages
+ * - Currency
+ * - Bytes (with automatic unit scaling)
+ *
+ * Features:
+ * - Threshold-based color coding (error/warning/success)
+ * - Custom icons and units
+ * - Special handling for lint summaries
+ * - Automatic formatting based on value type
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All business logic and type guards imported from shared.
  */
 
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { MetricCardWidgetConfig } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
 import {
@@ -11,6 +25,11 @@ import {
   formatMetricValue,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/logic/metric-card";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import {
+  isWidgetDataNumber,
+  isWidgetDataObject,
+  isWidgetDataPrimitive,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
@@ -18,9 +37,38 @@ import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.METRIC_CARD> {
   readonly widgetType = WidgetType.METRIC_CARD;
 
+  /**
+   * Render metric card with value formatting and threshold-based styling.
+   * Supports multiple formats: numbers, percentages, currency, bytes.
+   * Handles both standard metric card format and custom object formats.
+   */
   render(props: CLIWidgetProps<typeof WidgetType.METRIC_CARD, string>): string {
     const { field, value, context } = props;
-    const config = this.getMetricConfig(field);
+
+    // Extract config directly where types are properly narrowed
+    const ui = field.ui;
+    const icon = ui.icon;
+    const unit = ui.unit;
+    const precision = ui.precision ?? 2;
+    const threshold = ui.threshold;
+    const format = ui.format ?? "number";
+
+    // Validate format against allowed values
+    const validFormats = ["bytes", "currency", "number", "percentage"] as const;
+    const validatedFormat: "bytes" | "currency" | "number" | "percentage" = validFormats.includes(
+      format as (typeof validFormats)[number],
+    )
+      ? (format as (typeof validFormats)[number])
+      : "number";
+
+    const config = {
+      icon,
+      unit,
+      precision,
+      threshold,
+      format: validatedFormat,
+    };
+
     const indent = this.createIndent(context.depth, context);
 
     // Try to extract using shared logic for standard metric card format
@@ -29,22 +77,26 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     if (data) {
       // Use extracted data for standard metric card
       const formattedValue = formatMetricValue(data.value);
-      const icon = context.options.useEmojis && data.icon ? `${data.icon} ` : "";
-      return `${indent}${icon}${data.label}: ${formattedValue}`;
+      const iconStr = context.options.useEmojis && data.icon ? `${data.icon} ` : "";
+      return `${indent}${iconStr}${data.label}: ${formattedValue}`;
     }
 
     // Fallback to existing logic for non-standard formats
-    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    if (isWidgetDataObject(value)) {
       return this.renderMetricObject(value, config, context, indent);
     }
 
     const label = this.formatLabel(field, context);
     const formattedValue = this.formatMetricValueLocal(value, config, context);
-    const icon = this.getMetricIcon(config, value, context);
+    const iconStr = this.getMetricIcon(config, value, context);
 
-    return `${indent}${icon}${label}: ${formattedValue}`;
+    return `${indent}${iconStr}${label}: ${formattedValue}`;
   }
 
+  /**
+   * Render metric object with special handling for lint summaries.
+   * For generic objects, renders each primitive property as a metric line.
+   */
   private renderMetricObject<const TKey extends string>(
     value: { [key: string]: WidgetData },
     config: Pick<
@@ -63,7 +115,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
 
     // Generic object rendering
     for (const [key, val] of Object.entries(value)) {
-      if (typeof val === "string" || typeof val === "number" || typeof val === "boolean") {
+      if (isWidgetDataPrimitive(val) && val !== null && val !== undefined) {
         const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
         const formattedValue = this.formatMetricValueLocal(val, config, context);
         const icon = this.getMetricIcon(config, val, context);
@@ -74,6 +126,10 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     return lines.join("\n");
   }
 
+  /**
+   * Render lint summary with error, warning, and info counts.
+   * Displays color-coded issue counts or success message if no issues.
+   */
   private renderLintSummary(
     summary: { [key: string]: WidgetData },
     context: WidgetRenderContext,
@@ -134,38 +190,10 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     return parts.join("\n");
   }
 
-  private getMetricConfig<const TKey extends string>(
-    field: UnifiedField<TKey>,
-  ): Pick<MetricCardWidgetConfig<TKey>, "icon" | "unit" | "precision" | "threshold" | "format"> {
-    if (field.ui.type !== WidgetType.METRIC_CARD) {
-      return {
-        format: "number",
-        precision: 2,
-      };
-    }
-
-    const config = field.ui;
-
-    const formatValue = typeof config.format === "string" ? config.format : "number";
-    const validFormats = ["bytes", "currency", "number", "percentage"] as const;
-    const format: "bytes" | "currency" | "number" | "percentage" = validFormats.includes(
-      formatValue as (typeof validFormats)[number],
-    )
-      ? (formatValue as (typeof validFormats)[number])
-      : "number";
-
-    return {
-      icon: typeof config.icon === "string" ? config.icon : undefined,
-      unit: typeof config.unit === "string" ? config.unit : undefined,
-      precision: typeof config.precision === "number" ? config.precision : 2,
-      threshold:
-        config.threshold && typeof config.threshold === "object"
-          ? (config.threshold as { warning?: number; error?: number })
-          : undefined,
-      format,
-    };
-  }
-
+  /**
+   * Format metric value based on configured format and precision.
+   * Applies threshold-based color styling if configured.
+   */
   private formatMetricValueLocal<const TKey extends string>(
     value: WidgetData,
     config: Pick<
@@ -174,10 +202,10 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     >,
     context: WidgetRenderContext,
   ): string {
-    if (typeof value !== "string" && typeof value !== "number" && typeof value !== "boolean") {
+    if (!isWidgetDataPrimitive(value) || value === null || value === undefined) {
       return String(value);
     }
-    if (typeof value !== "number") {
+    if (!isWidgetDataNumber(value)) {
       return String(value);
     }
 
@@ -220,12 +248,16 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     return formatted;
   }
 
+  /**
+   * Get icon for metric based on config and threshold values.
+   * Returns custom icon if configured, otherwise threshold-based color icon.
+   */
   private getMetricIcon<const TKey extends string>(
     config: Pick<MetricCardWidgetConfig<TKey>, "icon" | "threshold">,
     value: WidgetData,
     context: WidgetRenderContext,
   ): string {
-    if (typeof value !== "string" && typeof value !== "number" && typeof value !== "boolean") {
+    if (!isWidgetDataPrimitive(value) || value === null || value === undefined) {
       return "";
     }
     if (!context.options.useEmojis) {
@@ -237,7 +269,7 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     }
 
     // Default icons based on thresholds
-    if (typeof value === "number" && config.threshold) {
+    if (isWidgetDataNumber(value) && config.threshold) {
       if (config.threshold.error && value >= config.threshold.error) {
         // eslint-disable-next-line i18next/no-literal-string
         return "🔴 ";
@@ -254,6 +286,9 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     return "📊 ";
   }
 
+  /**
+   * Format bytes with automatic unit scaling (B, KB, MB, GB, TB).
+   */
   private formatBytes(bytes: number): string {
     const units = ["B", "KB", "MB", "GB", "TB"];
     let size = bytes;

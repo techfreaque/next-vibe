@@ -21,7 +21,7 @@ import { routeExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint";
 import { Platform } from "../shared/types/platform";
 import { endpointToToolName, getPreferredToolName } from "../shared/utils/path";
-import { getTranslatorFromEndpoint } from "../shared/widgets/utils/field-helpers";
+import { simpleT } from "@/i18n/core/shared";
 
 /**
  * CoreTool type from AI SDK
@@ -45,7 +45,7 @@ function createToolFromEndpoint(
   },
   requiresConfirmation: boolean,
 ): CoreTool {
-  const { t } = getTranslatorFromEndpoint(endpoint)(context.locale);
+  const { t } = endpoint.scopedTranslation.scopedT(context.locale);
   // Generate description
   const description = t(endpoint.description || endpoint.title);
 
@@ -135,7 +135,7 @@ function createToolFromEndpoint(
         // Throw error for AI SDK with translated message
         const errorMessage = result.message
           ? t(result.message, result.messageParams)
-          : t("errors.toolExecutionFailed");
+          : simpleT(context.locale).t("errors.toolExecutionFailed");
         // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
         // eslint-disable-next-line @typescript-eslint/only-throw-error -- Tool error must be thrown for AI SDK
         throw new Error(errorMessage);

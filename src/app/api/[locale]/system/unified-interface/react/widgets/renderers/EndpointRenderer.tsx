@@ -28,6 +28,7 @@ import type { UnifiedField } from "../../../shared/types/endpoint";
 import { WidgetType } from "../../../shared/types/enums";
 import type { WidgetData, WidgetRenderContext } from "../../../shared/widgets/types";
 import { isResponseField } from "../../../shared/widgets/utils/field-helpers";
+import { useNavigationStack } from "../../hooks/use-navigation-stack";
 import { WidgetRenderer } from "./WidgetRenderer";
 
 /**
@@ -196,7 +197,11 @@ export function EndpointRenderer<
 }: EndpointRendererProps<TEndpoint, TFieldValues>): JSX.Element {
   // Check if endpoint.fields itself is a container widget
   const isRootContainer =
-    endpoint.fields.type === "object" && endpoint.fields.ui?.type === WidgetType.CONTAINER;
+    (endpoint.fields.type === "object" ||
+      endpoint.fields.type === "object-optional" ||
+      endpoint.fields.type === "array" ||
+      endpoint.fields.type === "array-optional") &&
+    endpoint.fields.ui?.type === WidgetType.CONTAINER;
 
   // Create internal form if none provided (for display-only mode like tool calls)
   const internalForm = useForm<TFieldValues>({
@@ -214,16 +219,20 @@ export function EndpointRenderer<
   // Use external form if provided, otherwise use internal form
   const form = externalForm ?? internalForm;
 
-  // Create render context
+  // Initialize navigation stack for cross-definition navigation
+  const navigation = useNavigationStack();
+
+  // Create render context with scoped translation from endpoint definition
   const context: WidgetRenderContext = {
     locale,
     isInteractive: true,
     permissions: [],
-    endpointFields: endpoint.fields, // Pass original fields for nested path lookup
-    disabled, // Pass disabled state to widgets
-    response, // Pass full ResponseType<T> to widgets (includes error state)
-    scopedT: endpoint.scopedTranslation.scopedT, // Pass scoped translation function for module-specific translations
-    endpointMutations, // Pass endpoint mutations for widgets to call directly
+    endpointFields: endpoint.fields,
+    disabled,
+    response,
+    endpointMutations,
+    t: endpoint.scopedTranslation.scopedT(locale).t,
+    navigation,
   };
 
   // Check if there are any request fields

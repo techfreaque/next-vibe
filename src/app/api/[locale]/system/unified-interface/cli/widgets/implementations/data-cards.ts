@@ -1,11 +1,31 @@
 /**
  * Data Cards Widget Renderer
- * Handles DATA_CARDS widget type with configurable templates for different display formats
+ *
+ * Handles DATA_CARDS widget type with configurable templates for different display formats.
+ * Supports multiple rendering modes:
+ * - ESLint-style issue cards (grouped by file)
+ * - Code issue cards (detailed format with file headers)
+ * - Default cards (generic key-value display)
+ *
+ * Features:
+ * - Automatic grouping by specified field
+ * - Severity-based styling and icons
+ * - Configurable layouts and spacing
+ * - Summary generation with custom templates
+ *
+ * Pure rendering implementation - ANSI codes, styling, layout only.
+ * All type guards imported from shared.
  */
 
-import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import {
+  isWidgetDataArray,
+  isWidgetDataBoolean,
+  isWidgetDataObject,
+  isWidgetDataPrimitive,
+  isWidgetDataString,
+} from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
 
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
@@ -59,7 +79,7 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     const t = context.t;
 
     // Type narrow to array for data cards
-    if (!Array.isArray(value) || value.length === 0) {
+    if (!isWidgetDataArray(value) || value.length === 0) {
       return context.renderEmptyState(
         t(
           "app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable",
@@ -68,8 +88,8 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     }
 
     // Extract data with type narrowing
-    const typedData: CardItem[] = value.filter(
-      (item): item is CardItem => typeof item === "object" && item !== null && !Array.isArray(item),
+    const typedData: CardItem[] = value.filter((item): item is CardItem =>
+      isWidgetDataObject(item),
     ) as CardItem[];
 
     if (typedData.length === 0) {
@@ -80,7 +100,23 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
       );
     }
 
-    const config = this.getCardsConfig(field);
+    // Extract config directly with proper types (field is already narrowed here)
+    const ui = field.ui;
+    const config: CardConfig = {
+      layout: {
+        columns: ui.layout?.columns ?? 2,
+        spacing: ui.layout?.spacing ?? "normal",
+      },
+      groupBy: ui.groupBy,
+      cardTemplate: ui.cardTemplate ?? "default",
+      showSummary: ui.showSummary ?? false,
+      summaryTemplate: ui.summaryTemplate,
+      itemConfig: {
+        template: ui.itemConfig?.template ?? "default",
+        size: ui.itemConfig?.size ?? "medium",
+        spacing: ui.itemConfig?.spacing ?? "normal",
+      },
+    };
 
     switch (config.cardTemplate) {
       case "eslint-issue":
@@ -90,67 +126,6 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
       default:
         return this.renderDefaultCards(typedData, context);
     }
-  }
-
-  private getCardsConfig<const TKey extends string>(field: UnifiedField<TKey>): CardConfig {
-    if (field.ui.type !== WidgetType.DATA_CARDS) {
-      return {
-        layout: { columns: 2, spacing: "normal" },
-        cardTemplate: "default",
-        showSummary: false,
-        itemConfig: { template: "default", size: "medium", spacing: "normal" },
-      };
-    }
-
-    const config = field.ui;
-
-    // Handle layout config - ensure it's an object
-    let layout: { columns: number; spacing: string } = {
-      columns: 2,
-      spacing: "normal",
-    };
-    if (
-      config.layout &&
-      typeof config.layout === "object" &&
-      "columns" in config.layout &&
-      "spacing" in config.layout
-    ) {
-      layout = {
-        columns: typeof config.layout.columns === "number" ? config.layout.columns : 2,
-        spacing: typeof config.layout.spacing === "string" ? config.layout.spacing : "normal",
-      };
-    }
-
-    return {
-      layout,
-      groupBy: config.groupBy !== undefined ? String(config.groupBy) : undefined,
-      cardTemplate: config.cardTemplate !== undefined ? String(config.cardTemplate) : "default",
-      showSummary: config.showSummary !== undefined ? Boolean(config.showSummary) : false,
-      summaryTemplate:
-        config.summaryTemplate !== undefined ? String(config.summaryTemplate) : undefined,
-      itemConfig:
-        config.itemConfig &&
-        typeof config.itemConfig === "object" &&
-        "template" in config.itemConfig &&
-        "size" in config.itemConfig &&
-        "spacing" in config.itemConfig
-          ? {
-              template:
-                typeof config.itemConfig.template === "string"
-                  ? config.itemConfig.template
-                  : "default",
-              size: typeof config.itemConfig.size === "string" ? config.itemConfig.size : "medium",
-              spacing:
-                typeof config.itemConfig.spacing === "string"
-                  ? config.itemConfig.spacing
-                  : "normal",
-            }
-          : {
-              template: "default",
-              size: "medium",
-              spacing: "normal",
-            },
-    };
   }
 
   /**
@@ -210,19 +185,22 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     }
 
     // Severity with icon and color
-    if (item.severity && typeof item.severity === "string") {
-      const severity = this.formatSeverity(item.severity, context);
+    const severityStr = isWidgetDataString(item.severity, context);
+    if (severityStr) {
+      const severity = this.formatSeverity(severityStr, context);
       parts.push(severity.padEnd(9));
     }
 
     // Message
-    if (item.message && typeof item.message === "string") {
-      parts.push(item.message);
+    const messageStr = isWidgetDataString(item.message, context);
+    if (messageStr) {
+      parts.push(messageStr);
     }
 
     // Rule (if available)
-    if (item.rule && typeof item.rule === "string") {
-      parts.push(this.styleText(item.rule, "dim", context));
+    const ruleStr = isWidgetDataString(item.rule, context);
+    if (ruleStr) {
+      parts.push(this.styleText(ruleStr, "dim", context));
     }
 
     return parts.join(" ");
@@ -263,15 +241,16 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     lines.push(header);
 
     // Severity and message
-    const severityStr = item.severity && typeof item.severity === "string" ? item.severity : "info";
+    const severityStr = isWidgetDataString(item.severity, context) || "info";
     const severity = this.formatSeverity(severityStr, context);
-    const message = item.message && typeof item.message === "string" ? item.message : "";
-    lines.push(`${severity} ${message}`);
+    const messageStr = isWidgetDataString(item.message, context) || "";
+    lines.push(`${severity} ${messageStr}`);
 
     // Rule if available
-    if (item.rule && typeof item.rule === "string") {
+    const ruleStr = isWidgetDataString(item.rule, context);
+    if (ruleStr) {
       // eslint-disable-next-line i18next/no-literal-string
-      const rule = this.styleText(`Rule: ${item.rule}`, "dim", context);
+      const rule = this.styleText(`Rule: ${ruleStr}`, "dim", context);
       lines.push(rule);
     }
 
@@ -294,25 +273,16 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   }
 
   /**
-   * Render default card format
+   * Render default card format.
+   * Uses centralized renderValue helper for consistent formatting.
    */
   private renderDefaultCard(item: CardItem, context: WidgetRenderContext): string {
     const lines: string[] = [];
 
     for (const [key, value] of Object.entries(item)) {
       const label = this.styleText(key, "bold", context);
-      let formattedValue = "";
-      if (typeof value === "string") {
-        formattedValue = value;
-      } else if (typeof value === "number") {
-        formattedValue = String(value);
-      } else if (typeof value === "boolean") {
-        formattedValue = value ? "true" : "false";
-      } else if (value === null) {
-        formattedValue = "null";
-      } else if (value === undefined) {
-        formattedValue = "undefined";
-      }
+      // Use centralized renderValue for consistent formatting across all value types
+      const formattedValue = this.renderValue(value, context);
       lines.push(`${label}: ${formattedValue}`);
     }
 
@@ -325,8 +295,9 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   private buildCardHeader(item: CardItem, context: WidgetRenderContext): string {
     const parts: string[] = [];
 
-    if (item.file && typeof item.file === "string") {
-      parts.push(this.styleText(item.file, "bold", context));
+    const fileStr = isWidgetDataString(item.file, context);
+    if (fileStr) {
+      parts.push(this.styleText(fileStr, "bold", context));
     }
 
     if (item.line || item.column) {
@@ -403,7 +374,7 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     config: CardConfig,
     context: WidgetRenderContext,
   ): string {
-    const severityCounts = this.countBySeverity(data);
+    const severityCounts = this.countBySeverity(data, context);
 
     if (config.summaryTemplate) {
       return this.renderCustomSummary(severityCounts, config.summaryTemplate);
@@ -476,14 +447,12 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     for (const item of data) {
       const groupValue = item[groupBy];
       let groupKey = "unknown";
-      if (typeof groupValue === "string") {
-        groupKey = groupValue;
-      } else if (typeof groupValue === "number") {
-        groupKey = String(groupValue);
-      } else if (typeof groupValue === "boolean") {
-        groupKey = groupValue ? "true" : "false";
-      } else if (groupValue !== null && groupValue !== undefined) {
-        groupKey = "unknown";
+      if (isWidgetDataPrimitive(groupValue) && groupValue !== null && groupValue !== undefined) {
+        if (isWidgetDataBoolean(groupValue)) {
+          groupKey = groupValue ? "true" : "false";
+        } else {
+          groupKey = String(groupValue);
+        }
       }
       if (!groups.has(groupKey)) {
         groups.set(groupKey, []);
@@ -497,15 +466,12 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Count items by severity
    */
-  private countBySeverity(data: CardItem[]): Record<string, number> {
+  private countBySeverity(data: CardItem[], context: WidgetRenderContext): Record<string, number> {
     const counts: Record<string, number> = { error: 0, warning: 0, info: 0 };
 
     for (const item of data) {
       const severityValue = item.severity;
-      let severity = "info";
-      if (typeof severityValue === "string") {
-        severity = severityValue;
-      }
+      const severity = isWidgetDataString(severityValue, context) || "info";
       if (severity in counts) {
         counts[severity]++;
       } else {
