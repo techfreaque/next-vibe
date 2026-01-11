@@ -71,7 +71,6 @@ export class VibeCheckRepository {
         skipSorting: true,
         limit: 999999,
         page: 1,
-        maxFilesInSummary: 999999,
       },
       logger,
       config,
@@ -101,7 +100,6 @@ export class VibeCheckRepository {
         skipSorting: true,
         limit: 999999,
         page: 1,
-        maxFilesInSummary: 999999,
       },
       logger,
       config,
@@ -129,7 +127,6 @@ export class VibeCheckRepository {
         disableFilter: false,
         limit: 999999,
         page: 1,
-        maxFilesInSummary: 999999,
       },
       logger,
       config,
@@ -242,7 +239,6 @@ export class VibeCheckRepository {
         timeout: data.timeout ?? defaults.timeout ?? 3600,
         limit: data.limit ?? defaults.limit ?? 200,
         page: data.page ?? 1,
-        maxFilesInSummary: data.maxFilesInSummary ?? defaults.maxFilesInSummary ?? 50,
       };
 
       const pathsToCheck = this.normalizePaths(effectiveData.paths);
@@ -333,7 +329,6 @@ export class VibeCheckRepository {
         sortedIssues,
         effectiveData.limit,
         effectiveData.page,
-        effectiveData.maxFilesInSummary,
         isMCP, // Skip files list for compact MCP responses
       );
 
@@ -432,7 +427,6 @@ export class VibeCheckRepository {
     allIssues: CheckIssue[],
     limit: number,
     page: number,
-    maxFilesInSummary: number,
     skipFiles = false,
   ): VibeCheckResponseOutput {
     const totalIssues = allIssues.length;
@@ -459,8 +453,7 @@ export class VibeCheckRepository {
 
     if (!skipFiles) {
       const fileStats = this.buildFileStats(allIssues);
-      const allFiles = this.formatFileStats(fileStats);
-      files = allFiles.slice(0, maxFilesInSummary);
+      files = this.formatFileStats(fileStats);
     }
 
     return {

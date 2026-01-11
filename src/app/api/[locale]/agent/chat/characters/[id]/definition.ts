@@ -8,14 +8,16 @@ import { z } from "zod";
 import { ModelId, ModelIdOptions } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   field,
   objectField,
   objectUnionField,
-  requestDataField,
   requestDataRangeField,
+  requestResponseField,
   requestUrlPathParamsField,
   responseArrayOptionalField,
-  responseField,
+  responseDataField,
+  responseRangeField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -25,30 +27,24 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { iconSchema } from "../../../../shared/types/common.schema";
-import { ModelUtilityDB, ModelUtilityOptions } from "../../../models/enum";
-import { TtsVoiceDB, TtsVoiceOptions } from "../../../text-to-speech/enum";
+import { ModelUtility, ModelUtilityDB, ModelUtilityOptions } from "../../../models/enum";
+import { TtsVoice, TtsVoiceDB, TtsVoiceOptions } from "../../../text-to-speech/enum";
 import {
   CONTENT_DISPLAY,
-  INTELLIGENCE_DISPLAY,
-  PRICE_DISPLAY,
-  SPEED_DISPLAY,
-} from "../../favorites/display-configs";
-import {
   ContentLevelFilterDB,
+  INTELLIGENCE_DISPLAY,
   IntelligenceLevelFilterDB,
   ModelSelectionType,
+  PRICE_DISPLAY,
   PriceLevelFilterDB,
+  SPEED_DISPLAY,
   SpeedLevelFilterDB,
 } from "../../favorites/enum";
-import { CategoryOptions } from "../config";
-import {
-  CharacterCategory,
-  CharacterCategoryDB,
-  CharacterSource,
-  CharacterSourceDB,
-} from "../enum";
+import { CategoryOptions } from "../enum";
+import { CharacterCategory, CharacterCategoryDB, CharacterOwnershipTypeDB } from "../enum";
 
 /**
  * Get Single Character Endpoint (GET)
@@ -74,240 +70,332 @@ const { GET } = createEndpoint({
     },
     { request: "urlPathParams", response: true },
     {
-      // === REQUEST URL PARAMS ===
-      id: requestUrlPathParamsField(
+      // === URL PARAMETERS ===
+      id: requestResponseField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label: "app.api.agent.chat.characters.id.patch.id.label" as const,
+          description: "app.api.agent.chat.characters.id.patch.id.description" as const,
+        },
+        z.string(),
+        true,
+      ),
+
+      // === RESPONSE DATA ===
+      name: responseDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.characters.id.get.id.label" as const,
-          description: "app.api.agent.chat.characters.id.get.id.description" as const,
+          label: "app.api.agent.chat.characters.id.patch.name.label" as const,
+          description: "app.api.agent.chat.characters.id.patch.name.description" as const,
+          columns: 6,
         },
-        z.string(), // Can be default character ID or UUID
+        z.string().min(1).max(100) as z.ZodType<TranslationKey>,
       ),
-
-      // === RESPONSE ===
-      character: objectField(
+      description: responseDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.agent.chat.characters.id.patch.description.label" as const,
+          description: "app.api.agent.chat.characters.id.patch.description.description" as const,
+          columns: 6,
+        },
+        z.string().min(1).max(500) as z.ZodType<TranslationKey>,
+      ),
+      icon: responseDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.ICON,
+          label: "app.api.agent.chat.characters.id.patch.icon.label" as const,
+          description: "app.api.agent.chat.characters.id.patch.icon.description" as const,
+          columns: 6,
+        },
+        iconSchema,
+      ),
+      systemPrompt: responseDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXTAREA,
+          label: "app.api.agent.chat.characters.id.patch.systemPrompt.label" as const,
+          description: "app.api.agent.chat.characters.id.patch.systemPrompt.description" as const,
+          columns: 12,
+        },
+        z.string().max(5000),
+      ),
+      category: responseDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.agent.chat.characters.id.patch.category.label" as const,
+          description: "app.api.agent.chat.characters.id.patch.category.description" as const,
+          options: CategoryOptions,
+          columns: 6,
+        },
+        z.enum(CharacterCategoryDB),
+      ),
+      tagline: responseDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.agent.chat.characters.id.patch.tagline.label" as const,
+          description: "app.api.agent.chat.characters.id.patch.tagline.description" as const,
+          columns: 6,
+        },
+        z.string().min(1).max(500) as z.ZodType<TranslationKey>,
+      ),
+      ownershipType: responseDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.agent.chat.characters.id.patch.ownershipType.label" as const,
+          description: "app.api.agent.chat.characters.id.patch.ownershipType.description" as const,
+          options: [
+            {
+              value: "app.api.agent.chat.characters.enums.ownershipType.system" as const,
+              label: "app.api.agent.chat.characters.enums.ownershipType.system" as const,
+            },
+            {
+              value: "app.api.agent.chat.characters.enums.ownershipType.user" as const,
+              label: "app.api.agent.chat.characters.enums.ownershipType.user" as const,
+            },
+            {
+              value: "app.api.agent.chat.characters.enums.ownershipType.public" as const,
+              label: "app.api.agent.chat.characters.enums.ownershipType.public" as const,
+            },
+          ],
+          columns: 6,
+          disabled: true,
+        },
+        z.enum(CharacterOwnershipTypeDB),
+      ),
+      // Model Selection - discriminated union between manual and filter-based (optional for PATCH)
+      modelSelection: objectUnionField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.agent.chat.characters.id.get.response.character.title" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
+          title: "app.api.agent.chat.characters.post.modelSelection.title" as const,
+          description: "app.api.agent.chat.characters.post.modelSelection.description" as const,
+          layoutType: LayoutType.STACKED,
+          showSubmitButton: false,
         },
         { response: true },
-        {
-          id: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.characters.id.get.response.character.id.content" as const,
-            },
-            z.string(),
-          ),
-          name: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.characters.id.get.response.character.name.content" as const,
-            },
-            z.string(),
-          ),
-          description: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.characters.id.get.response.character.description.content" as const,
-            },
-            z.string(),
-          ),
-          icon: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.characters.id.get.response.character.icon.content" as const,
-            },
-            iconSchema,
-          ),
-          systemPrompt: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.characters.id.get.response.character.systemPrompt.content" as const,
-            },
-            z.string(),
-          ),
-          category: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.characters.id.get.response.character.category.content" as const,
-            },
-            z.enum(CharacterCategoryDB),
-          ),
-          source: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.characters.id.get.response.character.source.content" as const,
-            },
-            z.enum(CharacterSourceDB),
-          ),
-          voice: responseField(
-            {
-              type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.characters.id.get.response.character.voice.content" as const,
-            },
-            z.enum(TtsVoiceDB),
-          ),
-          // Model selection union (same structure as PATCH request)
-          modelSelection: objectUnionField(
+        "selectionType",
+        [
+          // Variant 1: Manual model selection
+          objectField(
             {
               type: WidgetType.CONTAINER,
-              title:
-                "app.api.agent.chat.characters.id.get.response.character.modelSelection.title" as const,
               layoutType: LayoutType.STACKED,
             },
             { response: true },
-            "selectionType",
-            [
-              // Variant 1: Manual model selection
-              objectField(
-                {
-                  type: WidgetType.CONTAINER,
-                  layoutType: LayoutType.STACKED,
-                },
-                { response: true },
-                {
-                  selectionType: responseField(
-                    {
-                      type: WidgetType.TEXT,
-                      content:
-                        "app.api.agent.chat.characters.id.get.response.character.selectionType.content" as const,
-                    },
-                    z.literal(ModelSelectionType.MANUAL),
-                  ),
-                  manualModelId: responseField(
-                    {
-                      type: WidgetType.TEXT,
-                      content:
-                        "app.api.agent.chat.characters.id.get.response.character.manualModelId.content" as const,
-                    },
-                    z.enum(ModelId),
-                  ),
-                },
-              ),
-              // Variant 2: Filter-based selection
-              objectField(
-                {
-                  type: WidgetType.CONTAINER,
-                  layoutType: LayoutType.STACKED,
-                },
-                { response: true },
-                {
-                  selectionType: responseField(
-                    {
-                      type: WidgetType.TEXT,
-                      content:
-                        "app.api.agent.chat.characters.id.get.response.character.selectionType.content" as const,
-                    },
-                    z.literal(ModelSelectionType.FILTERS),
-                  ),
-                  intelligenceRange: responseField(
-                    {
-                      type: WidgetType.CONTAINER,
-                      layoutType: LayoutType.STACKED,
-                    },
-                    z
-                      .object({
-                        min: z.enum(IntelligenceLevelFilterDB).optional(),
-                        max: z.enum(IntelligenceLevelFilterDB).optional(),
-                      })
-                      .optional(),
-                  ),
-                  priceRange: responseField(
-                    {
-                      type: WidgetType.CONTAINER,
-                      layoutType: LayoutType.STACKED,
-                    },
-                    z
-                      .object({
-                        min: z.enum(PriceLevelFilterDB).optional(),
-                        max: z.enum(PriceLevelFilterDB).optional(),
-                      })
-                      .optional(),
-                  ),
-                  contentRange: responseField(
-                    {
-                      type: WidgetType.CONTAINER,
-                      layoutType: LayoutType.STACKED,
-                    },
-                    z
-                      .object({
-                        min: z.enum(ContentLevelFilterDB).optional(),
-                        max: z.enum(ContentLevelFilterDB).optional(),
-                      })
-                      .optional(),
-                  ),
-                  speedRange: responseField(
-                    {
-                      type: WidgetType.CONTAINER,
-                      layoutType: LayoutType.STACKED,
-                    },
-                    z
-                      .object({
-                        min: z.enum(SpeedLevelFilterDB).optional(),
-                        max: z.enum(SpeedLevelFilterDB).optional(),
-                      })
-                      .optional(),
-                  ),
-                  preferredStrengths: responseArrayOptionalField(
-                    {
-                      type: WidgetType.DATA_LIST,
-                    },
-                    field(
-                      z.enum(ModelUtilityDB),
-                      { response: true },
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.characters.id.get.response.character.preferredStrengths.content" as const,
-                      },
-                    ),
-                  ),
-                  ignoredWeaknesses: responseArrayOptionalField(
-                    {
-                      type: WidgetType.DATA_LIST,
-                    },
-                    field(
-                      z.enum(ModelUtilityDB),
-                      { response: true },
-                      {
-                        type: WidgetType.TEXT,
-                        content:
-                          "app.api.agent.chat.characters.id.get.response.character.ignoredWeaknesses.content" as const,
-                      },
-                    ),
-                  ),
-                },
-              ),
-            ],
-          ),
-          suggestedPrompts: responseArrayOptionalField(
             {
-              type: WidgetType.DATA_LIST,
+              selectionType: responseDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.FILTER_PILLS,
+                  label: "app.api.agent.chat.characters.post.selectionType.label" as const,
+                  options: [
+                    {
+                      value: ModelSelectionType.MANUAL,
+                      label: "app.api.agent.chat.characters.post.selectionType.manual" as const,
+                    },
+                    {
+                      value: ModelSelectionType.FILTERS,
+                      label: "app.api.agent.chat.characters.post.selectionType.filters" as const,
+                    },
+                  ],
+                  columns: 12,
+                },
+                z.literal(ModelSelectionType.MANUAL),
+              ),
+              manualModelId: responseDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.SELECT,
+                  label: "app.api.agent.chat.characters.post.manualModelId.label" as const,
+                  description:
+                    "app.api.agent.chat.characters.post.manualModelId.description" as const,
+                  options: ModelIdOptions,
+                  columns: 12,
+                },
+                z.enum(ModelId),
+              ),
             },
-            field(
-              z.string(),
-              { response: true },
-              {
-                type: WidgetType.BADGE,
-                content:
-                  "app.api.agent.chat.characters.id.get.response.character.suggestedPrompts.content" as const,
-              },
-            ),
           ),
-        },
+          // Variant 2: Filter-based selection
+          objectField(
+            {
+              type: WidgetType.CONTAINER,
+              layoutType: LayoutType.STACKED,
+            },
+            { response: true },
+            {
+              selectionType: responseDataField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.FILTER_PILLS,
+                  label: "app.api.agent.chat.characters.post.selectionType.label" as const,
+                  options: [
+                    {
+                      value: ModelSelectionType.MANUAL,
+                      label: "app.api.agent.chat.characters.post.selectionType.manual" as const,
+                    },
+                    {
+                      value: ModelSelectionType.FILTERS,
+                      label: "app.api.agent.chat.characters.post.selectionType.filters" as const,
+                    },
+                  ],
+                  columns: 12,
+                },
+                z.literal(ModelSelectionType.FILTERS),
+              ),
+              intelligenceRange: responseRangeField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.RANGE_SLIDER,
+                  label: "app.api.agent.chat.characters.post.intelligenceRange.label" as const,
+                  description:
+                    "app.api.agent.chat.characters.post.intelligenceRange.description" as const,
+                  options: INTELLIGENCE_DISPLAY.map((tier) => ({
+                    label: tier.label,
+                    value: tier.value,
+                    icon: tier.icon,
+                    description: tier.description,
+                  })),
+                  minLabel:
+                    "app.api.agent.chat.characters.post.intelligenceRange.minLabel" as const,
+                  maxLabel:
+                    "app.api.agent.chat.characters.post.intelligenceRange.maxLabel" as const,
+                  columns: 12,
+                },
+                z.enum(IntelligenceLevelFilterDB),
+              ),
+              priceRange: responseRangeField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.RANGE_SLIDER,
+                  label: "app.api.agent.chat.characters.post.priceRange.label" as const,
+                  description: "app.api.agent.chat.characters.post.priceRange.description" as const,
+                  options: PRICE_DISPLAY.map((tier) => ({
+                    label: tier.label,
+                    value: tier.value,
+                    icon: tier.icon,
+                    description: tier.description,
+                  })),
+                  minLabel: "app.api.agent.chat.characters.post.priceRange.minLabel" as const,
+                  maxLabel: "app.api.agent.chat.characters.post.priceRange.maxLabel" as const,
+                  columns: 12,
+                },
+                z.enum(PriceLevelFilterDB),
+              ),
+              contentRange: responseRangeField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.RANGE_SLIDER,
+                  label: "app.api.agent.chat.characters.post.contentRange.label" as const,
+                  description:
+                    "app.api.agent.chat.characters.post.contentRange.description" as const,
+                  options: CONTENT_DISPLAY.map((tier) => ({
+                    label: tier.label,
+                    value: tier.value,
+                    icon: tier.icon,
+                    description: tier.description,
+                  })),
+                  minLabel: "app.api.agent.chat.characters.post.contentRange.minLabel" as const,
+                  maxLabel: "app.api.agent.chat.characters.post.contentRange.maxLabel" as const,
+                  columns: 12,
+                },
+                z.enum(ContentLevelFilterDB),
+              ),
+              speedRange: responseRangeField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.RANGE_SLIDER,
+                  label: "app.api.agent.chat.characters.post.speedRange.label" as const,
+                  description: "app.api.agent.chat.characters.post.speedRange.description" as const,
+                  options: SPEED_DISPLAY.map((tier) => ({
+                    label: tier.label,
+                    value: tier.value,
+                    icon: tier.icon,
+                    description: tier.description,
+                  })),
+                  minLabel: "app.api.agent.chat.characters.post.speedRange.minLabel" as const,
+                  maxLabel: "app.api.agent.chat.characters.post.speedRange.maxLabel" as const,
+                  columns: 12,
+                },
+                z.enum(SpeedLevelFilterDB),
+              ),
+              preferredStrengths: responseArrayOptionalField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.MULTISELECT,
+                  label: "app.api.agent.chat.characters.post.preferredStrengths.label" as const,
+                  description:
+                    "app.api.agent.chat.characters.post.preferredStrengths.description" as const,
+                  options: ModelUtilityOptions,
+                  columns: 6,
+                },
+                field(
+                  z.enum(ModelUtilityDB),
+                  { response: true },
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.agent.chat.characters.post.preferredStrengths.item" as const,
+                  },
+                ),
+              ),
+              ignoredWeaknesses: responseArrayOptionalField(
+                {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.MULTISELECT,
+                  label: "app.api.agent.chat.characters.post.ignoredWeaknesses.label" as const,
+                  description:
+                    "app.api.agent.chat.characters.post.ignoredWeaknesses.description" as const,
+                  options: ModelUtilityOptions,
+                  columns: 6,
+                },
+                field(
+                  z.enum(ModelUtilityDB),
+                  { response: true },
+                  {
+                    type: WidgetType.TEXT,
+                    content: "app.api.agent.chat.characters.post.ignoredWeaknesses.item" as const,
+                  },
+                ),
+              ),
+            },
+          ),
+        ],
       ),
+      voice: responseDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.agent.chat.characters.post.voice.label" as const,
+          description: "app.api.agent.chat.characters.post.voice.description" as const,
+          options: TtsVoiceOptions,
+          columns: 6,
+        },
+        z.enum(TtsVoiceDB),
+      ),
+      suggestedPrompts: responseDataField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TAGS,
+          label: "app.api.agent.chat.characters.post.suggestedPrompts.label" as const,
+          description: "app.api.agent.chat.characters.post.suggestedPrompts.description" as const,
+          placeholder: "app.api.agent.chat.characters.post.suggestedPrompts.placeholder" as const,
+          columns: 12,
+          maxTags: 4,
+        },
+        z.array(z.string()).max(4),
+      ),
+      // Navigation - back to previous screen
+      backButton: backButton({
+        label: "app.api.agent.chat.characters.id.get.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+      }),
     },
   ),
 
@@ -360,38 +448,36 @@ const { GET } = createEndpoint({
     requests: undefined,
     responses: {
       getDefault: {
-        character: {
-          id: "default",
-          name: "Default",
-          description: "The models unmodified behavior",
-          icon: "🤖",
-          systemPrompt: "",
-          category: CharacterCategory.ASSISTANT,
-          source: CharacterSource.BUILT_IN,
-          voice: "app.api.agent.textToSpeech.voices.FEMALE",
-          suggestedPrompts: ["Help me brainstorm ideas"],
-          modelSelection: {
-            selectionType: ModelSelectionType.FILTERS,
-            preferredStrengths: null,
-            ignoredWeaknesses: null,
-          },
+        id: "default",
+        name: "Default",
+        description: "The models unmodified behavior",
+        icon: "🤖",
+        systemPrompt: "",
+        category: CharacterCategory.ASSISTANT,
+        tagline: "Pure AI, No Personality",
+        ownershipType: "app.api.agent.chat.characters.enums.ownershipType.system",
+        voice: "app.api.agent.textToSpeech.voices.FEMALE",
+        suggestedPrompts: ["Help me brainstorm ideas"],
+        modelSelection: {
+          selectionType: ModelSelectionType.FILTERS,
+          preferredStrengths: [ModelUtility.CHAT],
+          ignoredWeaknesses: [ModelUtility.CHAT],
         },
       },
       getCustom: {
-        character: {
-          id: "550e8400-e29b-41d4-a716-446655440000",
-          name: "Code Reviewer",
-          description: "Expert at reviewing code",
-          icon: "👨‍💻",
-          systemPrompt: "You are an expert code reviewer...",
-          category: CharacterCategory.CODING,
-          source: CharacterSource.MY,
-          voice: "app.api.agent.textToSpeech.voices.MALE",
-          suggestedPrompts: ["Review this code"],
-          modelSelection: {
-            selectionType: ModelSelectionType.MANUAL,
-            manualModelId: ModelId.GPT_5,
-          },
+        id: "550e8400-e29b-41d4-a716-446655440000",
+        name: "Code Reviewer",
+        description: "Expert at reviewing code",
+        icon: "👨‍💻",
+        systemPrompt: "You are an expert code reviewer...",
+        category: CharacterCategory.CODING,
+        tagline: "Code Review Expert",
+        ownershipType: "app.api.agent.chat.characters.enums.ownershipType.user",
+        voice: "app.api.agent.textToSpeech.voices.MALE",
+        suggestedPrompts: ["Review this code"],
+        modelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ModelId.GPT_5,
         },
       },
     },
@@ -435,8 +521,8 @@ const { PATCH } = createEndpoint({
     },
     { request: "data&urlPathParams", response: true },
     {
-      // === REQUEST URL PARAMS ===
-      id: requestUrlPathParamsField(
+      // === URL PARAMETERS ===
+      id: requestResponseField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
@@ -444,10 +530,11 @@ const { PATCH } = createEndpoint({
           description: "app.api.agent.chat.characters.id.patch.id.description" as const,
         },
         z.string(),
+        true,
       ),
 
-      // === REQUEST DATA (all optional for PATCH) ===
-      name: requestDataField(
+      // === REQUEST DATA ===
+      name: requestResponseField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -455,9 +542,9 @@ const { PATCH } = createEndpoint({
           description: "app.api.agent.chat.characters.id.patch.name.description" as const,
           columns: 6,
         },
-        z.string().min(1).max(100).optional(),
+        z.string().min(1).max(100) as z.ZodType<TranslationKey>,
       ),
-      description: requestDataField(
+      description: requestResponseField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
@@ -465,9 +552,9 @@ const { PATCH } = createEndpoint({
           description: "app.api.agent.chat.characters.id.patch.description.description" as const,
           columns: 6,
         },
-        z.string().min(1).max(500).optional(),
+        z.string().min(1).max(500) as z.ZodType<TranslationKey>,
       ),
-      icon: requestDataField(
+      icon: requestResponseField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.ICON,
@@ -475,9 +562,9 @@ const { PATCH } = createEndpoint({
           description: "app.api.agent.chat.characters.id.patch.icon.description" as const,
           columns: 6,
         },
-        iconSchema.optional(),
+        iconSchema,
       ),
-      systemPrompt: requestDataField(
+      systemPrompt: requestResponseField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXTAREA,
@@ -487,7 +574,7 @@ const { PATCH } = createEndpoint({
         },
         z.string().min(1).max(5000).optional(),
       ),
-      category: requestDataField(
+      category: requestResponseField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
@@ -496,7 +583,40 @@ const { PATCH } = createEndpoint({
           options: CategoryOptions,
           columns: 6,
         },
-        z.enum(CharacterCategoryDB).optional(),
+        z.enum(CharacterCategoryDB),
+      ),
+      tagline: requestResponseField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "app.api.agent.chat.characters.id.patch.tagline.label" as const,
+          description: "app.api.agent.chat.characters.id.patch.tagline.description" as const,
+          columns: 6,
+        },
+        z.string().min(1).max(500) as z.ZodType<TranslationKey>,
+      ),
+      ownershipType: requestResponseField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.SELECT,
+          label: "app.api.agent.chat.characters.id.patch.ownershipType.label" as const,
+          description: "app.api.agent.chat.characters.id.patch.ownershipType.description" as const,
+          options: [
+            {
+              value: "app.api.agent.chat.characters.enums.ownershipType.user" as const,
+              label: "app.api.agent.chat.characters.enums.ownershipType.user" as const,
+            },
+            {
+              value: "app.api.agent.chat.characters.enums.ownershipType.public" as const,
+              label: "app.api.agent.chat.characters.enums.ownershipType.public" as const,
+            },
+          ],
+          columns: 6,
+        },
+        z.enum([
+          "app.api.agent.chat.characters.enums.ownershipType.user",
+          "app.api.agent.chat.characters.enums.ownershipType.public",
+        ] as const),
       ),
       // Model Selection - discriminated union between manual and filter-based (optional for PATCH)
       modelSelection: objectUnionField(
@@ -507,7 +627,7 @@ const { PATCH } = createEndpoint({
           layoutType: LayoutType.STACKED,
           showSubmitButton: false,
         },
-        { request: "data" },
+        { request: "data", response: true },
         "selectionType",
         [
           // Variant 1: Manual model selection
@@ -516,9 +636,9 @@ const { PATCH } = createEndpoint({
               type: WidgetType.CONTAINER,
               layoutType: LayoutType.STACKED,
             },
-            { request: "data" },
+            { request: "data", response: true },
             {
-              selectionType: requestDataField(
+              selectionType: requestResponseField(
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.FILTER_PILLS,
@@ -537,7 +657,7 @@ const { PATCH } = createEndpoint({
                 },
                 z.literal(ModelSelectionType.MANUAL),
               ),
-              manualModelId: requestDataField(
+              manualModelId: requestResponseField(
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.SELECT,
@@ -557,9 +677,9 @@ const { PATCH } = createEndpoint({
               type: WidgetType.CONTAINER,
               layoutType: LayoutType.STACKED,
             },
-            { request: "data" },
+            { request: "data", response: true },
             {
-              selectionType: requestDataField(
+              selectionType: requestResponseField(
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.FILTER_PILLS,
@@ -654,7 +774,7 @@ const { PATCH } = createEndpoint({
                 },
                 z.enum(SpeedLevelFilterDB),
               ),
-              preferredStrengths: requestDataField(
+              preferredStrengths: requestResponseField(
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.MULTISELECT,
@@ -664,9 +784,9 @@ const { PATCH } = createEndpoint({
                   options: ModelUtilityOptions,
                   columns: 6,
                 },
-                z.array(z.enum(ModelUtilityDB)).optional(),
+                z.array(z.enum(ModelUtilityDB)).nullable().optional(),
               ),
-              ignoredWeaknesses: requestDataField(
+              ignoredWeaknesses: requestResponseField(
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.MULTISELECT,
@@ -676,13 +796,13 @@ const { PATCH } = createEndpoint({
                   options: ModelUtilityOptions,
                   columns: 6,
                 },
-                z.array(z.enum(ModelUtilityDB)).optional(),
+                z.array(z.enum(ModelUtilityDB)).nullable().optional(),
               ),
             },
           ),
         ],
       ),
-      voice: requestDataField(
+      voice: requestResponseField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
@@ -691,9 +811,9 @@ const { PATCH } = createEndpoint({
           options: TtsVoiceOptions,
           columns: 6,
         },
-        z.enum(TtsVoiceDB).optional(),
+        z.enum(TtsVoiceDB),
       ),
-      suggestedPrompts: requestDataField(
+      suggestedPrompts: requestResponseField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TAGS,
@@ -703,17 +823,14 @@ const { PATCH } = createEndpoint({
           columns: 12,
           maxTags: 4,
         },
-        z.array(z.string()).max(4).optional(),
+        z.array(z.string()).max(4),
       ),
-
-      // === RESPONSE ===
-      success: responseField(
-        {
-          type: WidgetType.TEXT,
-          content: "app.api.agent.chat.characters.id.patch.response.success.content" as const,
-        },
-        z.boolean(),
-      ),
+      // Navigation - back to previous screen
+      backButton: backButton({
+        label: "app.api.agent.chat.characters.id.patch.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+      }),
     },
   ),
 
@@ -768,6 +885,13 @@ const { PATCH } = createEndpoint({
       update: {
         name: "Updated Code Reviewer",
         description: "Updated description",
+        icon: "technologist",
+        systemPrompt: "Updated system prompt",
+        category: CharacterCategory.CODING,
+        tagline: "Updated tagline",
+        ownershipType: "app.api.agent.chat.characters.enums.ownershipType.user",
+        voice: TtsVoice.FEMALE,
+        suggestedPrompts: ["Review this code for bugs", "Suggest performance improvements"],
         modelSelection: {
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: ModelId.GPT_5,
@@ -776,11 +900,144 @@ const { PATCH } = createEndpoint({
     },
     responses: {
       update: {
-        success: true,
+        id: "550e8400-e29b-41d4-a716-446655440000",
+        name: "Updated Code Reviewer",
+        description: "Updated description",
+        icon: "technologist",
+        systemPrompt: "Updated system prompt",
+        category: CharacterCategory.CODING,
+        tagline: "Updated tagline",
+        ownershipType: "app.api.agent.chat.characters.enums.ownershipType.user",
+        voice: TtsVoice.FEMALE,
+        suggestedPrompts: ["Review this code for bugs", "Suggest performance improvements"],
+        modelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ModelId.GPT_5,
+        },
       },
     },
     urlPathParams: {
       update: { id: "550e8400-e29b-41d4-a716-446655440000" },
+    },
+  },
+});
+
+/**
+ * Delete Character Endpoint (DELETE)
+ * Deletes a custom character by ID
+ */
+const { DELETE } = createEndpoint({
+  method: Methods.DELETE,
+  path: ["agent", "chat", "characters", "[id]"],
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+
+  title: "app.api.agent.chat.characters.id.delete.title" as const,
+  description: "app.api.agent.chat.characters.id.delete.description" as const,
+  icon: "trash" as const,
+  category: "app.api.agent.chat.category" as const,
+  tags: ["app.api.agent.chat.tags.characters" as const],
+
+  fields: objectField(
+    {
+      type: WidgetType.CONTAINER,
+      title: "app.api.agent.chat.characters.id.delete.container.title" as const,
+      description: "app.api.agent.chat.characters.id.delete.container.description" as const,
+      layoutType: LayoutType.STACKED,
+      paddingTop: "6",
+      submitButton: {
+        text: "app.api.agent.chat.characters.id.delete.actions.delete" as const,
+        loadingText: "app.api.agent.chat.characters.id.delete.actions.deleting" as const,
+        position: "bottom" as const,
+        icon: "trash" as const,
+        variant: "destructive" as const,
+        size: "default" as const,
+      },
+    },
+    { request: "urlPathParams", response: true },
+    {
+      // === URL PARAMETERS ===
+      id: requestUrlPathParamsField(
+        {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.UUID,
+          label: "app.api.agent.chat.characters.id.delete.id.label" as const,
+          description: "app.api.agent.chat.characters.id.delete.id.description" as const,
+        },
+        z.string(),
+      ),
+
+      // === RESPONSE DATA ===
+      success: responseDataField(
+        {
+          type: WidgetType.TEXT,
+          content: "app.api.agent.chat.characters.id.delete.success.content" as const,
+        },
+        z.boolean(),
+      ),
+      // Navigation - back to previous screen
+      backButton: backButton({
+        label: "app.api.agent.chat.characters.id.delete.backButton.label" as const,
+        icon: "arrow-left",
+        variant: "outline",
+      }),
+    },
+  ),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "app.api.agent.chat.characters.id.delete.errors.validation.title" as const,
+      description: "app.api.agent.chat.characters.id.delete.errors.validation.description" as const,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "app.api.agent.chat.characters.id.delete.errors.network.title" as const,
+      description: "app.api.agent.chat.characters.id.delete.errors.network.description" as const,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "app.api.agent.chat.characters.id.delete.errors.unauthorized.title" as const,
+      description:
+        "app.api.agent.chat.characters.id.delete.errors.unauthorized.description" as const,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "app.api.agent.chat.characters.id.delete.errors.forbidden.title" as const,
+      description: "app.api.agent.chat.characters.id.delete.errors.forbidden.description" as const,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "app.api.agent.chat.characters.id.delete.errors.notFound.title" as const,
+      description: "app.api.agent.chat.characters.id.delete.errors.notFound.description" as const,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "app.api.agent.chat.characters.id.delete.errors.server.title" as const,
+      description: "app.api.agent.chat.characters.id.delete.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "app.api.agent.chat.characters.id.delete.errors.unknown.title" as const,
+      description: "app.api.agent.chat.characters.id.delete.errors.unknown.description" as const,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "app.api.agent.chat.characters.id.delete.errors.unsavedChanges.title" as const,
+      description:
+        "app.api.agent.chat.characters.id.delete.errors.unsavedChanges.description" as const,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "app.api.agent.chat.characters.id.delete.errors.conflict.title" as const,
+      description: "app.api.agent.chat.characters.id.delete.errors.conflict.description" as const,
+    },
+  },
+
+  successTypes: {
+    title: "app.api.agent.chat.characters.id.delete.success.title" as const,
+    description: "app.api.agent.chat.characters.id.delete.success.description" as const,
+  },
+
+  examples: {
+    requests: undefined,
+    responses: {
+      delete: {
+        success: true,
+      },
+    },
+    urlPathParams: {
+      delete: { id: "550e8400-e29b-41d4-a716-446655440000" },
     },
   },
 });
@@ -797,8 +1054,14 @@ export type CharacterUpdateRequestOutput = typeof PATCH.types.RequestOutput;
 export type CharacterUpdateResponseInput = typeof PATCH.types.ResponseInput;
 export type CharacterUpdateResponseOutput = typeof PATCH.types.ResponseOutput;
 
+// Type exports for DELETE endpoint
+export type CharacterDeleteRequestInput = typeof DELETE.types.RequestInput;
+export type CharacterDeleteRequestOutput = typeof DELETE.types.RequestOutput;
+export type CharacterDeleteResponseInput = typeof DELETE.types.ResponseInput;
+export type CharacterDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
+
 // Extract ModelFilters type from the filters variant of modelSelection
-type ModelSelectionUnion = CharacterGetResponseOutput["character"]["modelSelection"];
+type ModelSelectionUnion = CharacterGetResponseOutput["modelSelection"];
 type FiltersVariant = Extract<
   ModelSelectionUnion,
   { selectionType: typeof ModelSelectionType.FILTERS }
@@ -808,6 +1071,6 @@ export type ModelFilters = Omit<
   "selectionType" | "preferredStrengths" | "ignoredWeaknesses"
 >;
 
-const definitions = { GET, PATCH };
-export { GET, PATCH };
+const definitions = { GET, PATCH, DELETE };
+export { DELETE, GET, PATCH };
 export default definitions;

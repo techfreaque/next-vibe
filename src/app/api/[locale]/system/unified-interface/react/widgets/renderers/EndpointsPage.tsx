@@ -7,7 +7,9 @@
 
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
+import { useMemo } from "react";
 
+import { cn } from "@/app/api/[locale]/shared/utils/utils";
 import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { useNavigationStack } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
@@ -117,7 +119,10 @@ export function EndpointsPage<
 
   // Read configuration from endpoint definition with fallbacks
   const finalDebug = debug ?? activeEndpoint?.debug ?? false;
-  const logger = createEndpointLogger(finalDebug, Date.now(), locale);
+  const logger = useMemo(
+    () => createEndpointLogger(finalDebug, Date.now(), locale),
+    [finalDebug, locale],
+  );
 
   // Use the endpoint hook for base endpoint
   const endpointState = useEndpoint(endpoint, endpointOptions, logger);
@@ -167,8 +172,8 @@ export function EndpointsPage<
       : undefined,
     delete: endpointState.delete
       ? {
-          submit: async (data: Record<string, WidgetData>): Promise<void> => {
-            await endpointState.delete?.submit(data);
+          submit: async (): Promise<void> => {
+            await endpointState.delete?.submit();
             if (endpointState.read) {
               await endpointState.read.refetch();
             }
@@ -192,7 +197,7 @@ export function EndpointsPage<
   return (
     <>
       {/* Base endpoint layer - always mounted to preserve state */}
-      <Div className={className} style={{ display: isBaseVisible ? "block" : "none" }}>
+      <Div className={cn(className, !isBaseVisible && "hidden")}>
         {description && (
           <Div className="mb-6">
             <P className="text-gray-600 dark:text-gray-400">{description}</P>
@@ -220,6 +225,7 @@ export function EndpointsPage<
                 submitButton={submitButton}
                 response={response}
                 endpointMutations={endpointMutations}
+                logger={logger}
               />
             )}
             {isMutationEndpoint && endpointState.create && (
@@ -267,8 +273,7 @@ export function EndpointsPage<
             return (
               <Div
                 key={`nav-${entry.timestamp}-${index}`}
-                className={className}
-                style={{ display: isVisible ? "block" : "none" }}
+                className={cn(className, !isVisible && "hidden")}
               >
                 <EndpointsPage
                   endpoint={{ GET: entry.endpoint }}
@@ -281,7 +286,6 @@ export function EndpointsPage<
                   submitButton={submitButton}
                   debug={debug}
                   _disableNavigationStack={true}
-                  logger={logger}
                 />
               </Div>
             );
@@ -291,8 +295,7 @@ export function EndpointsPage<
             return (
               <Div
                 key={`nav-${entry.timestamp}-${index}`}
-                className={className}
-                style={{ display: isVisible ? "block" : "none" }}
+                className={cn(className, !isVisible && "hidden")}
               >
                 <EndpointsPage
                   endpoint={{ POST: entry.endpoint }}
@@ -306,7 +309,6 @@ export function EndpointsPage<
                   submitButton={submitButton}
                   debug={debug}
                   _disableNavigationStack={true}
-                  logger={logger}
                 />
               </Div>
             );
@@ -316,8 +318,7 @@ export function EndpointsPage<
             return (
               <Div
                 key={`nav-${entry.timestamp}-${index}`}
-                className={className}
-                style={{ display: isVisible ? "block" : "none" }}
+                className={cn(className, !isVisible && "hidden")}
               >
                 <EndpointsPage
                   endpoint={{ PATCH: entry.endpoint }}
@@ -340,8 +341,7 @@ export function EndpointsPage<
             return (
               <Div
                 key={`nav-${entry.timestamp}-${index}`}
-                className={className}
-                style={{ display: isVisible ? "block" : "none" }}
+                className={cn(className, !isVisible && "hidden")}
               >
                 <EndpointsPage
                   endpoint={{ DELETE: entry.endpoint }}
@@ -354,7 +354,6 @@ export function EndpointsPage<
                   submitButton={submitButton}
                   debug={debug}
                   _disableNavigationStack={true}
-                  logger={logger}
                 />
               </Div>
             );
@@ -364,8 +363,7 @@ export function EndpointsPage<
             return (
               <Div
                 key={`nav-${entry.timestamp}-${index}`}
-                className={className}
-                style={{ display: isVisible ? "block" : "none" }}
+                className={cn(className, !isVisible && "hidden")}
               >
                 <EndpointsPage
                   endpoint={{ PUT: entry.endpoint }}

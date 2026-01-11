@@ -10,7 +10,7 @@ import {
   INTELLIGENCE_DISPLAY,
   PRICE_DISPLAY,
   SPEED_DISPLAY,
-} from "@/app/api/[locale]/agent/chat/favorites/display-configs";
+} from "@/app/api/[locale]/agent/chat/favorites/enum";
 import { ModelUtilityDB, ModelUtilityOptions } from "@/app/api/[locale]/agent/models/enum";
 import { ModelId, ModelIdOptions } from "@/app/api/[locale]/agent/models/models";
 import { TtsVoiceDB, TtsVoiceOptions } from "@/app/api/[locale]/agent/text-to-speech/enum";

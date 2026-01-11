@@ -2,11 +2,7 @@
 
 import { create } from "zustand";
 
-import type {
-  CreateApiEndpointAny,
-  ExtractRequestParams,
-  NavigationStackEntry,
-} from "../../shared/types/endpoint";
+import type { CreateApiEndpointAny, NavigationStackEntry } from "../../shared/types/endpoint";
 
 /**
  * Navigation stack store interface
@@ -22,7 +18,10 @@ interface NavigationStackStore {
    */
   push: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
-    params: ExtractRequestParams<TEndpoint>,
+    params: {
+      urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
+      data?: Partial<TEndpoint["types"]["RequestOutput"]>;
+    },
     prefillFromGet?: boolean,
     getEndpoint?: CreateApiEndpointAny,
   ) => void;
@@ -42,7 +41,10 @@ export const useNavigationStore = create<NavigationStackStore>((set) => ({
 
   push: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
-    params: ExtractRequestParams<TEndpoint>,
+    params: {
+      urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
+      data?: Partial<TEndpoint["types"]["RequestOutput"]>;
+    },
     prefillFromGet = false,
     getEndpoint?: CreateApiEndpointAny,
   ): void => {
@@ -118,7 +120,10 @@ export const useNavigationStore = create<NavigationStackStore>((set) => ({
 export function useNavigationStack(): {
   push: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
-    params: ExtractRequestParams<TEndpoint>,
+    params: {
+      urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
+      data?: Partial<TEndpoint["types"]["RequestOutput"]>;
+    },
     prefillFromGet?: boolean,
     getEndpoint?: CreateApiEndpointAny,
   ) => void;

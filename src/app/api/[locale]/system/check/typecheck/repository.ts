@@ -639,10 +639,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     const totalErrors = allIssues.filter((issue) => issue.severity === "error").length;
 
     const fileStats = TypecheckRepositoryImpl.buildFileStats(allIssues);
-    const allFiles = TypecheckRepositoryImpl.formatFileStats(fileStats);
-    const limitedFiles = data.maxFilesInSummary
-      ? allFiles.slice(0, data.maxFilesInSummary)
-      : allFiles;
+    const files = TypecheckRepositoryImpl.formatFileStats(fileStats);
 
     const limit = data.limit;
     const currentPage = data.page;
@@ -657,7 +654,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     return {
       issues: {
         items: limitedIssues,
-        files: limitedFiles,
+        files,
         summary: {
           totalIssues,
           totalFiles,

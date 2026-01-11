@@ -74,6 +74,7 @@ export function ThreadedMessage({
     handleModelChange: onModelChange,
     setSelectedCharacter: onCharacterChange,
     ttsVoice,
+    characters,
   } = useChatContext();
 
   const { t } = simpleT(locale);
@@ -134,6 +135,12 @@ export function ThreadedMessage({
 
   // Get vote status
   const { userVote, voteScore } = getVoteStatus(message);
+
+  // Resolve character name from ID for assistant messages
+  const characterName =
+    message.role === "assistant" && message.character
+      ? (characters[message.character]?.content.name ?? null)
+      : null;
 
   // Minimal fixed indent - just THREAD_INDENT for any nested level (no increase with depth)
   const indent = depth > 0 ? LAYOUT.THREAD_INDENT * 2 : 0;
@@ -267,6 +274,7 @@ export function ThreadedMessage({
                   setUserCardPosition(position);
                 }}
                 logger={logger}
+                characterName={characterName}
               />
             )}
 

@@ -262,7 +262,7 @@ const { POST } = createEndpoint({
   },
 });
 
-const endpoints = { POST };
+const endpoints = { POST } as const;
 export default endpoints;
 
 // Export types

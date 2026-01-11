@@ -3,7 +3,7 @@
 import type { UseMutationResult } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
 import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
@@ -186,29 +186,29 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
     },
   });
 
-  // Function to set error type for backward compatibility
-  const setErrorType = (error: ErrorResponseType | null): void => {
+  // Stable setErrorType function
+  const setErrorType = useCallback((error: ErrorResponseType | null): void => {
     setLocalError(error);
-  };
+  }, []);
 
-  // Return enhanced mutation result with backward-compatible interface
-  return {
-    // React Query's useMutation properties
-    mutate: mutation.mutate,
-    mutateAsync: mutation.mutateAsync,
-    isPending: mutation.isPending,
-    isError: mutation.isError,
-    error: localError || mutation.error,
-    isSuccess: mutation.isSuccess,
-    data: mutation.data,
-    reset: mutation.reset,
-    status: mutation.status,
-
-    // Backward compatibility properties
-    setErrorType,
-    variables: mutation.variables,
-    failureCount: mutation.failureCount,
-    failureReason: mutation.failureReason,
-    context: mutation.context,
-  };
+  // Return enhanced mutation result with stable references
+  return useMemo(
+    () => ({
+      mutate: mutation.mutate,
+      mutateAsync: mutation.mutateAsync,
+      isPending: mutation.isPending,
+      isError: mutation.isError,
+      error: localError || mutation.error,
+      isSuccess: mutation.isSuccess,
+      data: mutation.data,
+      reset: mutation.reset,
+      status: mutation.status,
+      setErrorType,
+      variables: mutation.variables,
+      failureCount: mutation.failureCount,
+      failureReason: mutation.failureReason,
+      context: mutation.context,
+    }),
+    [mutation, localError, setErrorType],
+  );
 }

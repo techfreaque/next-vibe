@@ -12,7 +12,6 @@ import {
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
-  ComponentVariant,
   EndpointErrorTypes,
   LayoutType,
   Methods,
@@ -78,7 +77,6 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.BADGE,
           text: "app.api.manifest.response.display",
-          variant: ComponentVariant.DEFAULT,
         },
         z.string(),
       ),
@@ -100,7 +98,6 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.BADGE,
           text: "app.api.manifest.response.orientation",
-          variant: ComponentVariant.DEFAULT,
         },
         z.string(),
       ),
@@ -122,7 +119,6 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.BADGE,
           text: "app.api.manifest.response.categories",
-          variant: ComponentVariant.DEFAULT,
         },
         z.array(z.string()),
       ),
@@ -171,7 +167,6 @@ const { GET } = createEndpoint({
               {
                 type: WidgetType.BADGE,
                 text: "app.api.manifest.response.iconPurpose",
-                variant: ComponentVariant.DEFAULT,
               },
               z.string(),
             ),

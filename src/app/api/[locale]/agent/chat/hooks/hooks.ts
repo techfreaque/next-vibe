@@ -22,7 +22,7 @@ import { type CreditsGetResponseOutput } from "../../../credits/definition";
 import { useCredits } from "../../../credits/hooks";
 import { useAIStreamStore } from "../../ai-stream/hooks/store";
 import { useAIStream } from "../../ai-stream/hooks/use-ai-stream";
-import type { CharacterListResponseOutput } from "../characters/definition";
+import type { CharacterListItem } from "../characters/definition";
 import { useCharacters } from "../characters/hooks";
 import type { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
@@ -64,16 +64,7 @@ export interface UseChatReturn {
   messages: Record<string, ChatMessage>;
   folders: Record<string, ChatFolder>;
   rootFolderPermissions: RootFolderPermissions; // Server-computed permissions for current root folder
-  characters: Record<
-    string,
-    {
-      id: string;
-      name: string;
-      icon: IconKey;
-      systemPrompt: string;
-      voice?: typeof TtsVoiceValue;
-    }
-  >;
+  characters: Record<string, CharacterListItem>;
   activeThread: ChatThread | null;
   activeThreadMessages: ChatMessage[];
   isLoading: boolean;
@@ -388,34 +379,29 @@ export function useChat(
   );
 
   // Use modular hooks
-  useDataLoader(user, locale, logger, addThread, addMessage, addFolder, setDataLoaded);
+  useDataLoader(
+    user,
+    locale,
+    logger,
+    currentRootFolderId,
+    addThread,
+    addMessage,
+    addFolder,
+    setDataLoaded,
+  );
 
   useMessageLoader(locale, logger, activeThreadId, threads, addMessage, isDataLoaded);
 
-  // Compute characters map
+  // Compute characters map - flatten sections array into character cards
   const characters = useMemo(() => {
-    const response = charactersEndpoint.read?.response as CharacterListResponseOutput | undefined;
-    const charactersList = response?.characters;
-    const charactersMap: Record<
-      string,
-      {
-        id: string;
-        name: string;
-        icon: IconKey;
-        systemPrompt: string;
-        voice?: typeof TtsVoiceValue;
-      }
-    > = {};
+    const response = charactersEndpoint.read?.response;
+    const charactersMap: Record<string, CharacterListItem> = {};
 
-    if (charactersList && Array.isArray(charactersList)) {
-      charactersList.forEach((p) => {
-        charactersMap[p.id] = {
-          id: p.id,
-          name: p.name,
-          icon: p.icon,
-          systemPrompt: p.systemPrompt,
-          voice: p.voice,
-        };
+    if (response?.success && response.data?.sections) {
+      response.data.sections.forEach((section) => {
+        section.characters.forEach((char) => {
+          charactersMap[char.id] = char;
+        });
       });
     }
 
@@ -428,7 +414,7 @@ export function useChat(
       updateSettings,
       hydrateSettings,
     },
-    characters,
+    logger,
   });
 
   useStreamSync({

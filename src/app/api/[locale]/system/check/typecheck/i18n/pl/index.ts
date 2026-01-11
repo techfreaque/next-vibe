@@ -63,10 +63,6 @@ export const translations: typeof enTranslations = {
       label: "Strona",
       description: "Numer strony do paginacji",
     },
-    maxFilesInSummary: {
-      label: "Maks. plików w podsumowaniu",
-      description: "Maksymalna liczba plików w podsumowaniu",
-    },
     skipSorting: {
       label: "Pomiń sortowanie",
       description: "Pomiń sortowanie problemów (wydajność)",

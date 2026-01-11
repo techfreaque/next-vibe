@@ -8,8 +8,9 @@ import { useCallback, useEffect } from "react";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
-import { DEFAULT_TTS_VOICE } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import { useCharacter } from "../characters/[id]/hooks";
 import type { ChatSettings } from "./store";
 
 /**
@@ -38,34 +39,37 @@ export function useSettings(deps: {
     updateSettings: (updates: Partial<ChatSettings>) => void;
     hydrateSettings: () => Promise<void>;
   };
-  characters: Record<string, { voice?: typeof TtsVoiceValue }>;
+  logger: EndpointLogger;
 }): SettingsOperations {
-  const { chatStore, characters } = deps;
+  const { chatStore, logger } = deps;
   const { setTheme: setNextTheme } = useTheme();
 
   // Extract stable functions to avoid React Compiler warnings
   const updateSettings = chatStore.updateSettings;
   const hydrateSettings = chatStore.hydrateSettings;
 
+  // Fetch full character details for selected character
+  const selectedCharacterData = useCharacter(chatStore.settings.selectedCharacter, logger);
+
   // Hydrate settings from localStorage after mount
   useEffect(() => {
     void hydrateSettings();
   }, [hydrateSettings]);
 
+  // Auto-update voice when character data loads
+  useEffect(() => {
+    const characterVoice = selectedCharacterData.read?.data?.voice;
+    if (characterVoice && characterVoice !== chatStore.settings.ttsVoice) {
+      updateSettings({ ttsVoice: characterVoice });
+    }
+  }, [selectedCharacterData.read?.data?.voice, chatStore.settings.ttsVoice, updateSettings]);
+
   // Zustand store methods are stable, so we only depend on the specific method
   const setSelectedCharacter = useCallback(
     (character: string) => {
-      // Update TTS voice based on character's voice preference from API
-      const selectedChar = characters[character];
-      const voicePreference = selectedChar?.voice ?? DEFAULT_TTS_VOICE;
-
-      // Update selected character and voice together
-      updateSettings({
-        selectedCharacter: character,
-        ttsVoice: voicePreference,
-      });
+      updateSettings({ selectedCharacter: character });
     },
-    [updateSettings, characters],
+    [updateSettings],
   );
 
   const setSelectedModel = useCallback(

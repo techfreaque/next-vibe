@@ -5,33 +5,29 @@ import { useQuery } from "@tanstack/react-query";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import { executeQuery } from "./query-executor";
-import { buildQueryKey } from "./query-key-builder";
+import { buildKey } from "./query-key-builder";
 import { deserializeQueryParams, type FormQueryParams, queryClient, useApiStore } from "./store";
 import type { ApiQueryReturn } from "./types";
 
 /**
- * React Query hook for API queries with type-safe responses
+ * React Query hook for API queries
  *
- * This hook uses React Query as the single source of truth for query state.
- * It provides:
- * - Automatic caching and deduplication
- * - Background refetching
- * - Optimistic updates via queryClient.setQueryData
- * - Type-safe callbacks with our custom error/response shapes
+ * Cache key: endpoint.path + endpoint.method + urlPathParams
+ * Multiple calls with same urlPathParams share the same cache.
  *
  * @param endpoint - The endpoint to call
  * @param requestData - Request data for the API call
- * @param urlPathParams - URL parameters for the API call
+ * @param urlPathParams - URL path parameters
  * @param options - Query options
  * @param logger - Logger instance
- * @returns Enhanced query result with loading states and data
+ * @returns Query result with loading states and data
  */
 export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
   endpoint,
@@ -53,7 +49,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
         urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
       }) & {
     options: {
-      queryKey?: QueryKey;
+      queryKey?: string;
       enabled?: boolean;
       staleTime?: number;
       gcTime?: number;
@@ -92,14 +88,16 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     // persistToStorage will be used in Phase 3 when we setup persistQueryClient
   } = options;
 
-  // Create a stable query key using shared utility
-  // This queryKey serves dual purpose:
-  // 1. React Query cache identification
-  // 2. Persistence key (when persistQueryClient is setup)
-  const queryKey: QueryKey = useMemo(
-    () => buildQueryKey(endpoint, logger, requestData, urlPathParams, customQueryKey),
-    [endpoint, logger, requestData, urlPathParams, customQueryKey],
-  );
+  // State key: endpoint.path + endpoint.method + urlPathParams
+  // Shared across all calls with same urlPathParams
+  const queryKey: QueryKey = useMemo(() => {
+    if (customQueryKey) {
+      // Custom key is a string, wrap it in array for React Query
+      return [customQueryKey];
+    }
+    // buildKey returns a string, wrap it in array for React Query
+    return [buildKey("query", endpoint, urlPathParams, logger)];
+  }, [endpoint, logger, urlPathParams, customQueryKey]);
 
   // Use React Query's useQuery hook
   const query = useQuery({
@@ -161,17 +159,40 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
       : undefined,
   });
 
+  // Stable refetch function
+  const refetch = useCallback(async () => {
+    const result = await query.refetch();
+    return result.data ?? query.data ?? success(undefined as never);
+  }, [query]);
+
+  // Stable remove function
+  const remove = useCallback(() => {
+    queryClient.removeQueries({ queryKey });
+  }, [queryKey]);
+
+  // Stable setErrorType function
+  const setErrorType = useCallback(
+    (newError: ErrorResponseType | null) => {
+      if (newError) {
+        queryClient.setQueryData(
+          queryKey,
+          newError as ResponseType<TEndpoint["types"]["ResponseOutput"]>,
+        );
+      } else {
+        queryClient.setQueryData(queryKey, undefined);
+      }
+    },
+    [queryKey],
+  );
+
   // Map React Query state to our custom return type
   return useMemo(() => {
     type QueryStatus = "loading" | "error" | "success" | "idle";
 
-    // Extract data from React Query response
     const responseData = query.data;
     const data = responseData?.success ? responseData.data : undefined;
     const error = responseData?.success === false ? responseData : undefined;
 
-    // Map React Query states to our custom states
-    // React Query v5 uses "pending" but we map it to "loading" for compatibility
     const status: QueryStatus =
       query.status === "pending"
         ? "loading"
@@ -183,12 +204,11 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
 
     const isLoading = query.isLoading || query.isFetching;
     const isFetching = query.isFetching;
-    const isLoadingFresh = query.isLoading; // First load, no data yet
+    const isLoadingFresh = query.isLoading;
     const isCachedData = !!query.data && !query.isLoading;
     const isError = query.isError || responseData?.success === false;
     const isSuccess = query.isSuccess && responseData?.success === true;
 
-    // Create status message based on state
     const statusMessage = (
       !enabled
         ? "app.error.api.store.status.disabled"
@@ -203,10 +223,8 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
                 : undefined
     ) as ApiQueryReturn<TEndpoint["types"]["ResponseOutput"]>["statusMessage"];
 
-    const result: ApiQueryReturn<TEndpoint["types"]["ResponseOutput"]> = {
+    return {
       response: responseData,
-
-      // Backward compatibility properties
       data,
       error,
       isError,
@@ -216,33 +234,10 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
       isLoadingFresh,
       isCachedData,
       statusMessage,
-
-      // React Query properties
       status,
-      refetch: async () => {
-        const result = await query.refetch();
-        return result.data ?? responseData ?? success(undefined as never);
-      },
-      remove: () => {
-        // Remove the query from React Query cache
-        queryClient.removeQueries({ queryKey });
-      },
-
-      setErrorType: (newError: ErrorResponseType | null) => {
-        // Override the current response in React Query cache
-        if (newError) {
-          // Set error response
-          queryClient.setQueryData(
-            queryKey,
-            newError as ResponseType<TEndpoint["types"]["ResponseOutput"]>,
-          );
-        } else {
-          // Clear error by setting to undefined
-          queryClient.setQueryData(queryKey, undefined);
-        }
-      },
+      refetch,
+      remove,
+      setErrorType,
     };
-
-    return result;
-  }, [query, enabled, queryKey]);
+  }, [query, enabled, refetch, remove, setErrorType]);
 }

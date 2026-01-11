@@ -2,20 +2,24 @@
 
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { useMemo } from "react";
+import type { UseFormReturn } from "react-hook-form";
 
+import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { useTranslation } from "@/i18n/core/client";
 
-import type { EndpointReturn, FormAlertState, UseEndpointOptions } from "./endpoint-types";
-import {
-  mergeCreateOptions,
-  mergeDeleteOptions,
-  mergeReadOptions,
-  useAvailableMethods,
-  usePrimaryMutationMethod,
-} from "./endpoint-utils";
+import type {
+  DeleteEndpointTypes,
+  EndpointReturn,
+  FormAlertState,
+  PatchEndpointTypes,
+  PrimaryMutationTypes,
+  UseEndpointOptions,
+} from "./endpoint-types";
+import { useAvailableMethods, usePrimaryMutationMethod } from "./endpoint-utils";
+import type { ApiMutationOptions } from "./types";
 import { useEndpointCreate } from "./use-endpoint-create";
 import { useEndpointDelete } from "./use-endpoint-delete";
 import {
@@ -39,6 +43,7 @@ import { useEndpointRead } from "./use-endpoint-read";
  *
  * @param endpoints - Object containing endpoint definitions (e.g., { GET: endpoint, POST: endpoint })
  * @param options - Configuration options for forms and queries
+ * @param logger - Logger instance for debugging
  * @returns Object with all available operations based on endpoint methods
  */
 export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointAny>>>(
@@ -54,37 +59,22 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   // Extract endpoints
   const readEndpoint = endpoints.GET ?? null;
 
-  type PrimaryEndpoint = T[keyof T & Methods] extends infer E
-    ? E extends CreateApiEndpointAny
-      ? E
-      : never
-    : never;
-
   const primaryEndpoint = primaryMutationMethod ? (endpoints[primaryMutationMethod] ?? null) : null;
 
   const deleteEndpoint = endpoints.DELETE ?? null;
 
-  // Merge endpoint options with hook options (hook options take priority)
-  const mergedReadOptions = useMemo(
-    () => mergeReadOptions(readEndpoint?.options, options.read),
-    [readEndpoint?.options, options.read],
-  );
-
-  // Compute read options with defaults
+  // Use hook options directly (endpoint-level options not accessible due to dynamic endpoint selection)
   const readQueryEnabled =
-    (mergedReadOptions.queryOptions?.enabled as boolean | undefined) ??
-    options.enabled ??
-    options.queryOptions?.enabled ??
-    true;
+    options.read?.queryOptions?.enabled ?? options.enabled ?? options.queryOptions?.enabled ?? true;
   const readUrlPathParams =
-    mergedReadOptions.urlPathParams ?? options.urlPathParams ?? options.queryOptions?.urlPathParams;
+    options.read?.urlPathParams ?? options.urlPathParams ?? options.queryOptions?.urlPathParams;
   const readStaleTime =
-    (mergedReadOptions.queryOptions?.staleTime as number | undefined) ??
+    options.read?.queryOptions?.staleTime ??
     options.staleTime ??
     options.queryOptions?.staleTime ??
     5 * 60 * 1000;
   const readRefetchOnWindowFocus =
-    (mergedReadOptions.queryOptions?.refetchOnWindowFocus as boolean | undefined) ??
+    options.read?.queryOptions?.refetchOnWindowFocus ??
     options.refetchOnWindowFocus ??
     options.queryOptions?.refetchOnWindowFocus ??
     true;
@@ -97,10 +87,10 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   // Use read hook for GET endpoints - conditionally use API or localStorage
   const apiRead = useEndpointRead(isLocalStorageMode ? null : readEndpoint, logger, {
     formOptions: {
-      persistForm: (mergedReadOptions.formOptions?.persistForm as boolean | undefined) ?? false,
-      persistenceKey: mergedReadOptions.formOptions?.persistenceKey as string | undefined,
-      autoSubmit: mergedReadOptions.formOptions?.autoSubmit as boolean | undefined,
-      debounceMs: mergedReadOptions.formOptions?.debounceMs as number | undefined,
+      persistForm: options.read?.formOptions?.persistForm ?? false,
+      persistenceKey: options.read?.formOptions?.persistenceKey,
+      autoSubmit: options.read?.formOptions?.autoSubmit,
+      debounceMs: options.read?.formOptions?.debounceMs,
     },
     queryOptions: {
       enabled: readQueryEnabled,
@@ -114,7 +104,7 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
       showUnsavedChangesAlert: false,
       clearStorageAfterSubmit: false,
     },
-    initialState: mergedReadOptions.initialState ?? options.filterOptions?.initialFilters,
+    initialState: options.read?.initialState ?? options.filterOptions?.initialFilters,
     initialData: options.read?.initialData,
   });
 
@@ -123,7 +113,7 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
     options.storage?.callbacks?.read,
     {
       urlPathParams: readUrlPathParams,
-      initialState: mergedReadOptions.initialState ?? options.filterOptions?.initialFilters,
+      initialState: options.read?.initialState ?? options.filterOptions?.initialFilters,
       enabled: readQueryEnabled,
     },
   );
@@ -139,28 +129,56 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
     return;
   }, [autoPrefillEnabled, read?.response]);
 
-  // Merge endpoint create options with hook options (hook options take priority)
-  const mergedCreateOptions = useMemo(
-    () => mergeCreateOptions(primaryEndpoint?.options, options.create),
-    [primaryEndpoint?.options, options.create],
+  // Merge create options - only use hook-provided options (endpoint-level options not accessible due to dynamic endpoint selection)
+  const createFormOptions = useMemo(() => {
+    const hookOpts = options.create?.formOptions ?? options.formOptions;
+
+    return {
+      persistForm: hookOpts?.persistForm ?? false,
+      persistenceKey: hookOpts?.persistenceKey,
+      defaultValues: hookOpts?.defaultValues ?? options.defaultValues,
+    };
+  }, [options.create?.formOptions, options.formOptions, options.defaultValues]);
+
+  const createMutationOptions = useMemo(():
+    | ApiMutationOptions<
+        PrimaryMutationTypes<T>["request"],
+        PrimaryMutationTypes<T>["response"],
+        PrimaryMutationTypes<T>["urlPathParams"]
+      >
+    | undefined => {
+    return options.create?.mutationOptions;
+  }, [options.create?.mutationOptions]);
+
+  const createInitialState = useMemo(():
+    | DeepPartial<PrimaryMutationTypes<T>["request"]>
+    | undefined => {
+    return options.create?.initialState;
+  }, [options.create?.initialState]);
+
+  const createAutoPrefillData = useMemo(():
+    | DeepPartial<PrimaryMutationTypes<T>["request"]>
+    | undefined => {
+    return autoPrefillData ?? options.create?.autoPrefillData;
+  }, [autoPrefillData, options.create?.autoPrefillData]);
+
+  const createUrlPathParams =
+    options.create?.urlPathParams ?? options.urlPathParams ?? readUrlPathParams;
+
+  // Always call the hook unconditionally - it handles null endpoints internally
+  const apiCreateOperation = useEndpointCreate(
+    isLocalStorageMode ? null : primaryEndpoint,
+    logger,
+    {
+      formOptions: createFormOptions,
+      mutationOptions: createMutationOptions,
+      urlPathParams: createUrlPathParams,
+      autoPrefillData: createAutoPrefillData,
+      initialState: createInitialState,
+    },
   );
 
-  // Compute create options with defaults
-  const createUrlPathParams =
-    mergedCreateOptions.urlPathParams ?? options.urlPathParams ?? readUrlPathParams;
-
-  // Build create options - keep types flowing from original options
-  const createFormOptions = {
-    persistForm: (mergedCreateOptions.formOptions?.persistForm as boolean | undefined) ?? false,
-    persistenceKey: mergedCreateOptions.formOptions?.persistenceKey as string | undefined,
-    defaultValues:
-      mergedCreateOptions.formOptions?.defaultValues ??
-      options.defaultValues ??
-      options.formOptions?.defaultValues,
-  };
-
   // Calculate the appropriate reset data for form clearing
-  // Priority: autoPrefillData (loaded data) > defaultValues
   const resetData = useMemo(() => {
     if (autoPrefillData) {
       return autoPrefillData;
@@ -168,50 +186,46 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
     return createFormOptions.defaultValues;
   }, [autoPrefillData, createFormOptions.defaultValues]);
 
-  // Always call the hook unconditionally - it handles null endpoints internally
-  const apiCreateOperation = useEndpointCreate<PrimaryEndpoint>(
-    isLocalStorageMode ? null : (primaryEndpoint as PrimaryEndpoint | null),
-    logger,
-    {
-      formOptions: createFormOptions,
-      mutationOptions: mergedCreateOptions.mutationOptions,
-      urlPathParams: createUrlPathParams,
-      autoPrefillData:
-        autoPrefillData ?? mergedCreateOptions.autoPrefillData ?? options.create?.autoPrefillData,
-      initialState: mergedCreateOptions.initialState,
-    } as Parameters<typeof useEndpointCreate<PrimaryEndpoint>>[2],
-  );
-
   const localStorageCreateOperation = useLocalStorageCreate<T>(
     isLocalStorageMode ? primaryEndpoint : null,
     options.storage?.callbacks?.create ?? options.storage?.callbacks?.update,
     {
-      urlPathParams: createUrlPathParams,
-      defaultValues: createFormOptions.defaultValues,
-      autoPrefillData:
-        autoPrefillData ?? mergedCreateOptions.autoPrefillData ?? options.create?.autoPrefillData,
+      urlPathParams: options.create?.urlPathParams ?? options.urlPathParams ?? readUrlPathParams,
+      defaultValues:
+        options.create?.formOptions?.defaultValues ??
+        options.formOptions?.defaultValues ??
+        options.defaultValues,
+      autoPrefillData: autoPrefillData ?? options.create?.autoPrefillData,
     },
   );
 
   // Use the appropriate create operation based on storage mode
   const createOperation = isLocalStorageMode ? localStorageCreateOperation : apiCreateOperation;
 
-  // Merge endpoint delete options with hook options (hook options take priority)
-  const mergedDeleteOptions = useMemo(
-    () => mergeDeleteOptions(deleteEndpoint?.options, options.delete),
-    [deleteEndpoint?.options, options.delete],
-  );
+  // Merge delete options - only use hook-provided options (endpoint-level options not accessible due to dynamic endpoint selection)
+  const deleteMutationOptions = useMemo(():
+    | ApiMutationOptions<
+        DeleteEndpointTypes<T>["request"],
+        DeleteEndpointTypes<T>["response"],
+        DeleteEndpointTypes<T>["urlPathParams"]
+      >
+    | undefined => {
+    return options.delete?.mutationOptions;
+  }, [options.delete?.mutationOptions]);
 
+  const deleteUrlPathParams = options.delete?.urlPathParams ?? options.urlPathParams;
+
+  // Hook will merge endpoint options with passed options internally
   const apiDeleteOperation = useEndpointDelete(isLocalStorageMode ? null : deleteEndpoint, logger, {
-    mutationOptions: mergedDeleteOptions.mutationOptions ?? {},
-    urlPathParams: mergedDeleteOptions.urlPathParams ?? options.urlPathParams,
+    mutationOptions: deleteMutationOptions,
+    urlPathParams: deleteUrlPathParams,
   });
 
   const localStorageDeleteOperation = useLocalStorageDelete<T>(
     isLocalStorageMode ? deleteEndpoint : null,
     options.storage?.callbacks?.delete,
     {
-      urlPathParams: mergedDeleteOptions.urlPathParams ?? options.urlPathParams,
+      urlPathParams: deleteUrlPathParams,
     },
   );
 
@@ -225,23 +239,27 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   const error: ErrorResponseType | null =
     read?.error || createOperation?.submitError || deleteOperation?.error || null;
 
-  // Return the appropriate create operation
+  // Memoize create operation wrapper
   const createValues = createOperation?.form.watch();
-  const create = createOperation
-    ? {
-        ...createOperation,
-        values: createValues,
-        setValue: createOperation.form.setValue.bind(createOperation.form),
-        onSubmit: createOperation.submitForm,
-        reset: (): void => createOperation.form.reset(resetData || {}),
-        isSuccess: createOperation.isSubmitSuccessful,
-        isDirty: createOperation.form.formState.isDirty,
-        error:
-          createOperation.submitError && Object.keys(createOperation.submitError).length > 0
-            ? createOperation.submitError
-            : null,
-      }
-    : undefined;
+  const create = useMemo(() => {
+    if (!createOperation) {
+      return undefined;
+    }
+
+    return {
+      ...createOperation,
+      values: createValues,
+      setValue: createOperation.form.setValue.bind(createOperation.form),
+      onSubmit: createOperation.submitForm,
+      reset: (): void => createOperation.form.reset(resetData || {}),
+      isSuccess: createOperation.isSubmitSuccessful,
+      isDirty: createOperation.form.formState.isDirty,
+      error:
+        createOperation.submitError && Object.keys(createOperation.submitError).length > 0
+          ? createOperation.submitError
+          : null,
+    };
+  }, [createOperation, createValues, resetData]);
 
   // Generate alert state from success/error states and endpoint types
   const alert = useMemo((): FormAlertState | null => {
@@ -308,88 +326,107 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   // Handle PATCH endpoint as update operation
   const patchEndpoint = endpoints.PATCH ?? null;
 
-  // Merge endpoint patch options with hook options (hook options take priority)
-  const mergedPatchOptions = useMemo(
-    () => mergeCreateOptions(patchEndpoint?.options, options.update),
-    [patchEndpoint?.options, options.update],
-  );
+  // Merge update options - only use hook-provided options (endpoint-level options not accessible due to dynamic endpoint selection)
+  const updateFormOptions = useMemo(() => {
+    const hookOpts = options.update?.formOptions ?? options.formOptions;
 
-  const patchUrlPathParams =
-    mergedPatchOptions.urlPathParams ?? options.urlPathParams ?? readUrlPathParams;
+    return {
+      persistForm: hookOpts?.persistForm ?? false,
+      persistenceKey: hookOpts?.persistenceKey,
+      defaultValues: hookOpts?.defaultValues ?? options.defaultValues,
+    };
+  }, [options.update?.formOptions, options.formOptions, options.defaultValues]);
 
-  const patchFormOptions = {
-    persistForm: (mergedPatchOptions.formOptions?.persistForm as boolean | undefined) ?? false,
-    persistenceKey: mergedPatchOptions.formOptions?.persistenceKey as string | undefined,
-    defaultValues:
-      mergedPatchOptions.formOptions?.defaultValues ??
-      options.defaultValues ??
-      options.formOptions?.defaultValues,
-  };
+  const updateMutationOptions = useMemo(():
+    | ApiMutationOptions<
+        PatchEndpointTypes<T>["request"],
+        PatchEndpointTypes<T>["response"],
+        PatchEndpointTypes<T>["urlPathParams"]
+      >
+    | undefined => {
+    return options.update?.mutationOptions;
+  }, [options.update?.mutationOptions]);
 
-  type PatchEndpoint = T[keyof T & "PATCH"] extends infer E
-    ? E extends CreateApiEndpointAny
-      ? E
-      : never
-    : never;
+  const updateInitialState = useMemo(():
+    | DeepPartial<PatchEndpointTypes<T>["request"]>
+    | undefined => {
+    return options.update?.initialState;
+  }, [options.update?.initialState]);
 
-  const apiUpdateOperation = useEndpointCreate<PatchEndpoint>(
-    isLocalStorageMode ? null : (patchEndpoint as PatchEndpoint | null),
-    logger,
-    {
-      formOptions: patchFormOptions,
-      mutationOptions: mergedPatchOptions.mutationOptions,
-      urlPathParams: patchUrlPathParams,
-      autoPrefillData:
-        autoPrefillData ?? mergedPatchOptions.autoPrefillData ?? options.update?.autoPrefillData,
-      initialState: mergedPatchOptions.initialState,
-    } as Parameters<typeof useEndpointCreate<PatchEndpoint>>[2],
-  );
+  const updateAutoPrefillData = useMemo(():
+    | DeepPartial<PatchEndpointTypes<T>["request"]>
+    | undefined => {
+    return autoPrefillData ?? options.update?.autoPrefillData;
+  }, [autoPrefillData, options.update?.autoPrefillData]);
+
+  const updateUrlPathParams =
+    options.update?.urlPathParams ?? options.urlPathParams ?? readUrlPathParams;
+
+  // Hook will merge endpoint options with passed options internally
+  const apiUpdateOperation = useEndpointCreate(isLocalStorageMode ? null : patchEndpoint, logger, {
+    formOptions: updateFormOptions,
+    mutationOptions: updateMutationOptions,
+    urlPathParams: updateUrlPathParams,
+    autoPrefillData: updateAutoPrefillData,
+    initialState: updateInitialState,
+  });
 
   const localStorageUpdateOperation = useLocalStorageCreate<T>(
     isLocalStorageMode ? patchEndpoint : null,
     options.storage?.callbacks?.update,
     {
-      urlPathParams: patchUrlPathParams,
-      defaultValues: patchFormOptions.defaultValues,
-      autoPrefillData:
-        autoPrefillData ?? mergedPatchOptions.autoPrefillData ?? options.update?.autoPrefillData,
+      urlPathParams: updateUrlPathParams,
+      defaultValues: updateFormOptions.defaultValues,
+      autoPrefillData: updateAutoPrefillData,
     },
   );
 
   // Use the appropriate update operation based on storage mode
   const updateOperation = isLocalStorageMode ? localStorageUpdateOperation : apiUpdateOperation;
 
+  // Memoize update operation wrapper
   const updateValues = updateOperation?.form.watch();
-  const update = updateOperation
-    ? {
-        form: updateOperation.form,
-        response: updateOperation.response,
-        isSuccess: updateOperation.isSubmitSuccessful,
-        error:
-          updateOperation.submitError && Object.keys(updateOperation.submitError).length > 0
-            ? updateOperation.submitError
-            : null,
-        values: updateValues,
-        setValue: updateOperation.form.setValue.bind(updateOperation.form),
-        submit: async (data: PatchEndpoint["types"]["RequestOutput"]): Promise<void> => {
-          updateOperation.form.reset(data);
-          await updateOperation.submitForm();
-        },
-        reset: (): void => updateOperation.form.reset(resetData || {}),
-        isSubmitting: updateOperation.isSubmitting,
-        isDirty: updateOperation.form.formState.isDirty,
-        clearSavedForm: updateOperation.clearSavedForm,
-        setErrorType: updateOperation.setErrorType,
-      }
-    : undefined;
+  const update = useMemo(() => {
+    if (!updateOperation) {
+      return undefined;
+    }
 
-  return {
-    alert,
-    read: read ?? undefined,
-    create: create ?? undefined,
-    update: update ?? undefined,
-    delete: deleteOperation ?? undefined,
-    isLoading,
-    error,
-  } as EndpointReturn<T>;
+    return {
+      form: updateOperation.form,
+      response: updateOperation.response,
+      isSuccess: updateOperation.isSubmitSuccessful,
+      error:
+        updateOperation.submitError && Object.keys(updateOperation.submitError).length > 0
+          ? updateOperation.submitError
+          : null,
+      values: updateValues,
+      setValue: updateOperation.form.setValue.bind(updateOperation.form),
+      submit: async (
+        data: typeof updateOperation.form extends UseFormReturn<infer TValues> ? TValues : never,
+      ): Promise<void> => {
+        updateOperation.form.reset(data);
+        await updateOperation.submitForm();
+      },
+      reset: (): void => updateOperation.form.reset(resetData || {}),
+      isSubmitting: updateOperation.isSubmitting,
+      isDirty: updateOperation.form.formState.isDirty,
+      clearSavedForm: updateOperation.clearSavedForm,
+      setErrorType: updateOperation.setErrorType,
+    };
+  }, [updateOperation, updateValues, resetData]);
+
+  // Memoize return object for stable reference
+  return useMemo(
+    () =>
+      ({
+        alert,
+        read: read ?? undefined,
+        create,
+        update,
+        delete: deleteOperation ?? undefined,
+        isLoading,
+        error,
+      }) as EndpointReturn<T>,
+    [alert, read, create, update, deleteOperation, isLoading, error],
+  );
 }

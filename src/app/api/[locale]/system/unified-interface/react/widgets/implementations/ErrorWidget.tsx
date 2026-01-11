@@ -3,9 +3,11 @@
 import { cn } from "next-vibe/shared/utils";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import { Button } from "next-vibe-ui/ui/button";
+import { Details } from "next-vibe-ui/ui/details";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertCircle } from "next-vibe-ui/ui/icons";
 import { Pre } from "next-vibe-ui/ui/pre";
+import { Summary } from "next-vibe-ui/ui/summary";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
@@ -103,10 +105,10 @@ export function ErrorWidget<const TKey extends string>({
 
       {stack && (
         <Div className={sectionSpacingClass || "mt-3"}>
-          <details className={stackSizeClass || "text-xs"}>
-            <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
+          <Details className={stackSizeClass || "text-xs"}>
+            <Summary className="cursor-pointer text-muted-foreground hover:text-foreground">
               {context.t("system.ui.widgets.error.stackTrace")}
-            </summary>
+            </Summary>
             <Pre
               className={cn(
                 "bg-muted/50 rounded overflow-x-auto",
@@ -116,7 +118,7 @@ export function ErrorWidget<const TKey extends string>({
             >
               {stack}
             </Pre>
-          </details>
+          </Details>
         </Div>
       )}
 

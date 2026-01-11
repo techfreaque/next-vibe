@@ -28,7 +28,6 @@ const vibeCheck: CheckConfig["vibeCheck"] = {
   skipTypecheck: false,
   timeout: 3600,
   limit: 200,
-  maxFilesInSummary: 50,
 };
 
 // ============================================================

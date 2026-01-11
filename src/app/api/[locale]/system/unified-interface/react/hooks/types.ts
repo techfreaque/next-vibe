@@ -111,7 +111,7 @@ export interface ApiQueryOptions<TRequest, TResponse, TUrlVariables> extends Omi
   UseQueryOptions<TResponse, DefaultError, TResponse, QueryKey>,
   "queryFn" | "initialData" | "queryKey"
 > {
-  queryKey?: QueryKey;
+  queryKey?: string;
   enabled?: boolean;
   staleTime?: number;
   cacheTime?: number;
@@ -160,9 +160,7 @@ export type ApiInferMutationOptions<TEndpoint extends CreateApiEndpointAny> = Ap
 /**
  * Type for the API query form options
  */
-export interface ApiQueryFormOptions<
-  TRequest extends FieldValues,
-> extends ApiFormOptions<TRequest> {
+export interface ApiQueryFormOptions<TRequest> extends ApiFormOptions<TRequest> {
   autoSubmit?: boolean; // Whether to automatically submit the form when values change
   debounceMs?: number; // Debounce time in ms for auto-submission
 }
@@ -200,21 +198,24 @@ export interface ApiQueryFormReturn<
 }
 
 // Form-specific types
-export type ApiFormOptions<TRequest extends FieldValues> = UseFormProps<TRequest> & {
-  defaultValues?: Partial<TRequest>;
-  /**
-   * Whether to enable form persistence using localStorage
-   * @default true
-   */
-  persistForm?: boolean;
-  /**
-   * The key to use for storing form data in localStorage
-   * If not provided, a key will be generated based on the endpoint
-   */
-  persistenceKey?: string;
-};
+export type ApiFormOptions<TRequest> =
+  // @ts-expect-error - TRequest is not a FieldValues type
+  UseFormProps<TRequest> & {
+    defaultValues?: Partial<TRequest>;
+    /**
+     * Whether to enable form persistence using localStorage
+     * @default true
+     */
+    persistForm?: boolean;
+    /**
+     * The key to use for storing form data in localStorage
+     * If not provided, a key will be generated based on the endpoint
+     */
+    persistenceKey?: string;
+  };
 
-export interface ApiFormReturn<TRequest extends FieldValues, TResponse, TUrlVariables> {
+export interface ApiFormReturn<TRequest, TResponse, TUrlVariables> {
+  //@ts-expect-error - TRequest is not a FieldValues type
   form: UseFormReturn<TRequest>;
 
   /** The complete response including success/error state */

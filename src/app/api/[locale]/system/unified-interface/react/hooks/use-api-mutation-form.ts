@@ -7,12 +7,13 @@ import { parseError } from "next-vibe/shared/utils";
 import { isErrorResponseType } from "next-vibe/shared/utils/parse-error";
 import { storage } from "next-vibe-ui/lib/storage";
 import { useCallback, useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type UseFormProps } from "react-hook-form";
 
 import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
+import { buildKey } from "./query-key-builder";
 import { useApiStore } from "./store";
 import type {
   ApiFormOptions,
@@ -69,23 +70,22 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   const clearFormErrorStore = useApiStore((state) => state.clearFormError);
 
   // Create base configuration with resolver
-  type FormData = TEndpoint["types"]["RequestOutput"];
 
   // Auto-generate default values from schema if not provided
   // This ensures form fields start with empty strings instead of undefined
   const schemaDefaultValues = useMemo(() => {
-    const extracted = extractSchemaDefaults<FormData>(
+    const extracted = extractSchemaDefaults<TEndpoint["types"]["RequestOutput"]>(
       endpoint.requestSchema,
       logger,
       "",
       true, // forFormInit: return empty values for primitives
     );
-    const baseDefaults = (extracted ?? {}) as FormData;
+    const baseDefaults = extracted ?? {};
 
     // Pass through Zod's parse to validate and apply transformations
     const parsed = endpoint.requestSchema.safeParse(baseDefaults);
     if (parsed.success) {
-      return parsed.data as FormData;
+      return parsed.data;
     }
 
     // If validation fails, return the extracted defaults as-is
@@ -93,19 +93,35 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   }, [endpoint.requestSchema, logger]);
 
   // Merge schema defaults with provided defaultValues (provided values take priority)
-  const mergedDefaultValues = useMemo(() => {
-    const provided = options.defaultValues as FormData | undefined;
+  const mergedDefaultValues: TEndpoint["types"]["RequestOutput"] = useMemo(() => {
+    const provided = options.defaultValues;
     if (provided && Object.keys(provided).length > 0) {
       return { ...schemaDefaultValues, ...provided };
     }
     return schemaDefaultValues;
   }, [schemaDefaultValues, options.defaultValues]);
 
-  const formConfig = {
-    ...options,
-    resolver: zodResolver(endpoint.requestSchema),
+  // Extract persistence and custom options
+  const {
+    persistForm = true,
+    persistenceKey,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    defaultValues: _ignoredDefaultValues,
+    ...restFormOptions
+  } = options;
+
+  // Build form config with all options
+  // Type annotation matches UseFormProps to ensure compatibility with react-hook-form
+  const formConfig: UseFormProps<TEndpoint["types"]["RequestOutput"]> = {
+    resolver: zodResolver<
+      TEndpoint["types"]["RequestOutput"],
+      // oxlint-disable-next-line no-explicit-any
+      any,
+      TEndpoint["types"]["RequestOutput"]
+    >(endpoint.requestSchema),
     mode: "onSubmit" as const,
     reValidateMode: "onChange" as const,
+    ...restFormOptions,
     defaultValues: mergedDefaultValues,
   };
 
@@ -114,21 +130,18 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
     defaultValues: options.defaultValues,
     hasDefaultValues: !!options.defaultValues,
     defaultValuesKeys: options.defaultValues ? Object.keys(options.defaultValues) : [],
-    requestSchema: endpoint.requestSchema,
-    requestSchemaShape: endpoint.requestSchema?.shape
-      ? Object.keys(endpoint.requestSchema.shape)
-      : "no shape",
+    requestSchemaShape:
+      endpoint.requestSchema &&
+      "shape" in endpoint.requestSchema &&
+      typeof endpoint.requestSchema.shape === "object"
+        ? Object.keys(endpoint.requestSchema.shape as Record<string, never>)
+        : "no shape",
   });
 
-  // Extract persistence options
-  const { persistForm = true, persistenceKey } = options;
-
   // Generate a storage key based on the endpoint if not provided
-  const storageKey =
-    // eslint-disable-next-line i18next/no-literal-string
-    persistenceKey || `form-${endpoint.path.join("-")}-${endpoint.method}`;
+  const storageKey = persistenceKey || buildKey("query-form", endpoint, undefined, logger);
 
-  const formMethods = useForm<FormData>(formConfig);
+  const formMethods = useForm<TEndpoint["types"]["RequestOutput"]>(formConfig);
 
   // Implement form persistence directly
   const clearSavedForm = useCallback((): void => {

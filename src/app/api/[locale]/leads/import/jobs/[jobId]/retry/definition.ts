@@ -31,7 +31,7 @@ const { POST } = createEndpoint({
   description: "app.api.leads.import.jobs.jobId.retry.post.description",
   category: "app.api.leads.category",
   tags: ["app.api.leads.tags.leads", "app.api.leads.tags.management"],
-  allowedRoles: [UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.ADMIN],
   icon: "rotate-ccw",
 
   fields: objectField(
@@ -132,7 +132,6 @@ const { POST } = createEndpoint({
     urlPathParams: {
       default: { jobId: "550e8400-e29b-41d4-a716-446655440000" },
     },
-    requests: undefined,
     responses: {
       default: {
         result: { success: true, message: "Job retried successfully" },
@@ -157,10 +156,8 @@ export type ImportJobRetryResponseOutput = ImportJobRetryPostResponseOutput;
 /**
  * Export definitions
  */
-export { POST };
-
 const definitions = {
   POST,
-};
+} as const;
 
 export default definitions;

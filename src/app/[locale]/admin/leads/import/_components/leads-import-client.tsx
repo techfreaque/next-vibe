@@ -63,6 +63,7 @@ export function LeadsImportClient({ locale }: LeadsImportClientProps): React.JSX
                 : undefined
             }
             submitButtonText="app.admin.leads.leads.admin.import.actions.import"
+            logger={logger}
           />
         </CardContent>
       </Card>
@@ -84,6 +85,7 @@ export function LeadsImportClient({ locale }: LeadsImportClientProps): React.JSX
               statusEndpoint.read.response?.success ? statusEndpoint.read.response.data : undefined
             }
             submitButtonText="app.admin.common.actions.reset"
+            logger={logger}
           />
         </CardContent>
       </Card>

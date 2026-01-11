@@ -165,8 +165,8 @@ export function ToolCallRenderer({
     }
 
     // Get the request data schema from the definition
-    const requestDataSchema = definition.fields.requestData?.schema;
-    const requestUrlParamsSchema = definition.fields.requestUrlPathParams?.schema;
+    const requestDataSchema = definition.requestSchema;
+    const requestUrlParamsSchema = definition.requestUrlPathParamsSchema;
 
     if (!requestDataSchema && !requestUrlParamsSchema) {
       return;

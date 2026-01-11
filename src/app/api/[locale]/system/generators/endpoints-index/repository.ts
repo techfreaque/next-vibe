@@ -167,17 +167,12 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
 
   /**
    * Helper function to format path array
+   * Never split arrays - always keep them on one line
    */
   private formatPathArray(pathSegments: string[]): string {
     // eslint-disable-next-line i18next/no-literal-string
     const pathArrayElements = pathSegments.map((p) => `"${p}"`);
     const pathArrayLiteral = pathArrayElements.join(", ");
-    const shouldSplitArray = pathArrayElements.length > 7 || pathArrayLiteral.length > 70;
-
-    if (shouldSplitArray) {
-      // eslint-disable-next-line i18next/no-literal-string
-      return `[\n      ${pathArrayElements.join(",\n      ")},\n    ]`;
-    }
     return `[${pathArrayLiteral}]`;
   }
 
@@ -213,7 +208,8 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
 
         // eslint-disable-next-line i18next/no-literal-string
         const singleLine = `  setNestedPath(endpoints, ${arrayStr}, ${importName}.${method});`;
-        if (singleLine.length > 80 || arrayStr.includes("\n")) {
+        // Use multiline format for: 5+ segments, array already split, OR line > 100 chars
+        if (pathWithMethod.length >= 5 || arrayStr.includes("\n") || singleLine.length > 100) {
           // eslint-disable-next-line i18next/no-literal-string
           const multiLine = `  setNestedPath(\n    endpoints,\n    ${arrayStr},\n    ${importName}.${method},\n  );`;
           setNestedPathCalls.push(multiLine);

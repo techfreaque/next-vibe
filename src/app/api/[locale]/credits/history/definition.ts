@@ -14,7 +14,6 @@ import {
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
-  ActionType,
   EndpointErrorTypes,
   FieldDataType,
   LayoutType,
@@ -135,7 +134,6 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
-              onChange: [{ type: ActionType.REFETCH }],
             },
             z.coerce.number().optional().default(1),
           ),
@@ -143,7 +141,6 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
-              onChange: [{ type: ActionType.REFETCH }],
             },
             z.coerce.number().optional().default(50),
           ),

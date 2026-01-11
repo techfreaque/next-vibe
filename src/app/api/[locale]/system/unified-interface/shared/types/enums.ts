@@ -8,27 +8,6 @@
  */
 
 /**
- * Interface contexts where endpoints are consumed
- * These are the 5+ core interfaces that every endpoint must support
- */
-export enum InterfaceContext {
-  /** Web UI forms and components */
-  WEB_UI = "web_ui",
-  /** Command line interface */
-  CLI = "cli",
-  /** AI tool function calls */
-  AI_TOOLS = "ai_tools",
-  /** Chat confirmation interface for AI tool calls with editable forms */
-  CHAT_CONFIRMATION = "chat_confirmation",
-  /** Composable pages using EndpointPage */
-  COMPOSABLE_PAGES = "composable_pages",
-  /** Email interface */
-  EMAIL = "email",
-  /** Export interface */
-  EXPORT = "export",
-}
-
-/**
  * HTTP Methods
  */
 export enum Methods {
@@ -56,16 +35,7 @@ export const ALL_METHODS = [
 export enum FieldUsage {
   RequestData = "request-data",
   RequestUrlParams = "request-url-params",
-  Response = "response",
-}
-
-/**
- * Cache strategy options
- */
-export enum CacheStrategy {
-  None = "none",
-  Local = "local",
-  Persistent = "persistent",
+  ResponseData = "response",
 }
 
 /**
@@ -215,51 +185,6 @@ export enum FieldDataType {
 }
 
 /**
- * Action types for interactive elements
- */
-export enum ActionType {
-  // UI Actions
-  TOAST = "toast",
-  NOTIFICATION = "notification",
-  ALERT = "alert",
-  MODAL = "modal",
-  DRAWER = "drawer",
-
-  // Navigation Actions
-  ROUTER_PUSH = "router_push",
-  ROUTER_REPLACE = "router_replace",
-  ROUTER_BACK = "router_back",
-  REDIRECT = "redirect",
-
-  // Data Actions
-  REFETCH = "refetch",
-  INVALIDATE_CACHE = "invalidate_cache",
-  UPDATE_CACHE = "update_cache",
-  CLEAR_CACHE = "clear_cache",
-
-  // Form Actions
-  RESET_FORM = "reset_form",
-  CLEAR_FORM = "clear_form",
-  SET_FORM_VALUES = "set_form_values",
-  FOCUS_FIELD = "focus_field",
-
-  // State Actions
-  SET_STATE = "set_state",
-  TOGGLE_STATE = "toggle_state",
-  UPDATE_STATE = "update_state",
-
-  // External Actions
-  API_CALL = "api_call",
-  WEBHOOK = "webhook",
-  EMAIL = "email",
-  DOWNLOAD = "download",
-  COPY_TO_CLIPBOARD = "copy_to_clipboard",
-
-  // Custom Actions
-  CUSTOM = "custom",
-}
-
-/**
  * Layout types for containers and forms
  */
 export enum LayoutType {
@@ -273,33 +198,6 @@ export enum LayoutType {
   COLLAPSIBLE = "collapsible",
   GRID_2_COLUMNS = "grid_2_columns",
   GRID_ITEM = "grid_item",
-}
-
-/**
- * Component variants for theming
- */
-export enum ComponentVariant {
-  DEFAULT = "default",
-  PRIMARY = "primary",
-  SECONDARY = "secondary",
-  SUCCESS = "success",
-  WARNING = "warning",
-  ERROR = "error",
-  DESTRUCTIVE = "destructive",
-  GHOST = "ghost",
-  OUTLINE = "outline",
-  SEVERITY = "severity",
-  TYPE = "type",
-}
-
-/**
- * Component sizes
- */
-export enum ComponentSize {
-  SM = "sm",
-  MD = "md",
-  LG = "lg",
-  XL = "xl",
 }
 
 /**
@@ -332,45 +230,6 @@ export enum ChartType {
   SCATTER = "scatter",
   DONUT = "donut",
   HISTOGRAM = "histogram",
-}
-
-/**
- * Action execution timing
- */
-export enum ActionTiming {
-  IMMEDIATE = "immediate",
-  DEBOUNCED = "debounced",
-  THROTTLED = "throttled",
-  DELAYED = "delayed",
-}
-
-/**
- * Validation modes for form fields
- */
-export enum ValidationMode {
-  ON_CHANGE = "onChange",
-  ON_BLUR = "onBlur",
-  ON_SUBMIT = "onSubmit",
-  ON_TOUCHED = "onTouched",
-}
-
-/**
- * Table density options
- */
-export enum TableDensity {
-  COMPACT = "compact",
-  NORMAL = "normal",
-  COMFORTABLE = "comfortable",
-}
-
-/**
- * Card layout types
- */
-export enum CardLayout {
-  COMPACT = "compact",
-  DETAILED = "detailed",
-  MEDIA = "media",
-  CUSTOM = "custom",
 }
 
 /**

@@ -180,10 +180,14 @@ export interface UseEndpointOptions<T> {
       PrimaryMutationTypes<T> extends never ? never : PrimaryMutationTypes<T>["request"]
     >;
     /** Mutation options for create/update operations */
-    mutationOptions?: UseEndpointMutationOptions<T>;
+    mutationOptions?: ApiMutationOptions<
+      PrimaryMutationTypes<T> extends never ? never : PrimaryMutationTypes<T>["request"],
+      PrimaryMutationTypes<T> extends never ? never : PrimaryMutationTypes<T>["response"],
+      PrimaryMutationTypes<T> extends never ? never : PrimaryMutationTypes<T>["urlPathParams"]
+    >;
     /** URL path parameters for the create endpoint */
     urlPathParams?: PrimaryMutationTypes<T> extends never
-      ? undefined
+      ? never
       : PrimaryMutationTypes<T>["urlPathParams"];
     /** Data to auto-prefill the form with (supports nested partial data) */
     autoPrefillData?: PrimaryMutationTypes<T> extends never
@@ -212,7 +216,7 @@ export interface UseEndpointOptions<T> {
     >;
     /** URL path parameters for the update endpoint */
     urlPathParams?: PatchEndpointTypes<T> extends never
-      ? undefined
+      ? never
       : PatchEndpointTypes<T>["urlPathParams"];
     /** Data to auto-prefill the form with (supports nested partial data) */
     autoPrefillData?: PatchEndpointTypes<T> extends never
@@ -401,7 +405,7 @@ export type DeleteOperationReturn<T> = T extends {
   ? {
       /** The complete response including success/error state */
       response:
-        | ResponseType<ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>>
+        | ResponseType<ExtractOutput<InferSchemaFromField<TFields, FieldUsage.ResponseData>>>
         | undefined;
 
       // Backward compatibility properties
@@ -536,7 +540,7 @@ export type EndpointReturn<T> = Prettify<{
     ? {
         /** The complete response including success/error state */
         response:
-          | ResponseType<ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>>
+          | ResponseType<ExtractOutput<InferSchemaFromField<TFields, FieldUsage.ResponseData>>>
           | undefined;
 
         // Backward compatibility properties

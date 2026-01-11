@@ -77,10 +77,6 @@ export const translations = {
       label: "Page",
       description: "Page number for paginated results (starts at 1)",
     },
-    maxFilesInSummary: {
-      label: "Max Files in Summary",
-      description: "Maximum number of files to show in the affected files list (1-1000)",
-    },
   },
 
   response: {

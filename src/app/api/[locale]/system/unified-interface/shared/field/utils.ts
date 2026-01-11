@@ -24,7 +24,6 @@ import type {
   UnifiedField,
   WidgetField,
 } from "../types/endpoint";
-import type { CacheStrategy } from "../types/enums";
 import { FieldUsage, WidgetType } from "../types/enums";
 import type { NavigateButtonWidgetConfig, WidgetConfig } from "../widgets/configs";
 
@@ -279,13 +278,12 @@ export interface FieldBuilder<TKey extends string = TranslationKey> {
     schema: TSchema,
     usage: TUsage,
     ui: TUIConfig,
-    cache?: CacheStrategy,
   ): PrimitiveField<TSchema, TUsage, TKey, TUIConfig>;
 
   requestResponseField<const TUIConfig extends WidgetConfig<TKey>, TSchema extends z.ZodTypeAny>(
     ui: TUIConfig,
     schema: TSchema,
-    cache?: CacheStrategy,
+
     requestAsUrlParams?: boolean,
   ): PrimitiveField<
     TSchema,
@@ -297,14 +295,12 @@ export interface FieldBuilder<TKey extends string = TranslationKey> {
   requestDataField<const TUIConfig extends WidgetConfig<TKey>, TSchema extends z.ZodTypeAny>(
     ui: TUIConfig,
     schema: TSchema,
-    cache?: CacheStrategy,
   ): PrimitiveField<TSchema, { request: "data" }, TKey, TUIConfig>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   requestDataRangeField<const TUIConfig extends WidgetConfig<TKey>, TEnum extends z.ZodEnum<any>>(
     ui: TUIConfig,
     enumSchema: TEnum,
-    cache?: CacheStrategy,
   ): PrimitiveField<z.ZodTypeAny, { request: "data" }, TKey, TUIConfig>;
 
   requestUrlPathParamsField<
@@ -313,39 +309,34 @@ export interface FieldBuilder<TKey extends string = TranslationKey> {
   >(
     ui: TUIConfig,
     schema: TSchema,
-    cache?: CacheStrategy,
   ): PrimitiveField<TSchema, { request: "urlPathParams"; response?: never }, TKey, TUIConfig>;
 
   responseField<TSchema extends z.ZodTypeAny, const TUIConfig extends WidgetConfig<TKey>>(
     ui: TUIConfig,
     schema: TSchema,
-    cache?: CacheStrategy,
   ): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig>;
 
   // Widget fields
   widgetField<TUsage extends FieldUsageConfig, const TUIConfig extends WidgetConfig<TKey>>(
     ui: TUIConfig,
     usage: TUsage,
-    cache?: CacheStrategy,
   ): WidgetField<TUsage, TKey, TUIConfig>;
 
   // Object fields
   objectField<
-    TChildren extends Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+    TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
     TUsage extends FieldUsageConfig,
     const TUIConfig extends WidgetConfig<TKey>,
   >(
     ui: TUIConfig,
     usage: TUsage,
     children: TChildren,
-    cache?: CacheStrategy,
   ): ObjectField<TChildren, TUsage, TKey, TUIConfig>;
 
   objectOptionalField<C, U extends FieldUsageConfig, const TUIConfig extends WidgetConfig<TKey>>(
     ui: TUIConfig,
     usage: U,
     children: C,
-    cache?: CacheStrategy,
   ): ObjectOptionalField<C, U, TKey, TUIConfig>;
 
   objectUnionField<
@@ -371,7 +362,6 @@ export interface FieldBuilder<TKey extends string = TranslationKey> {
     usage: TUsage,
     discriminator: TDiscriminator,
     variants: TVariants,
-    cache?: CacheStrategy,
   ): ObjectUnionField<TDiscriminator, TKey, TVariants, TUsage, TUIConfig>;
 
   // Array fields
@@ -379,38 +369,32 @@ export interface FieldBuilder<TKey extends string = TranslationKey> {
     usage: FieldUsageConfig,
     ui: TUIConfig,
     child: Child,
-    cache?: CacheStrategy,
   ): ArrayField<Child, FieldUsageConfig, TKey, TUIConfig>;
 
   requestDataArrayField<Child, const TUIConfig extends WidgetConfig<TKey>>(
     ui: TUIConfig,
     child: Child,
-    cache?: CacheStrategy,
   ): ArrayField<Child, { request: "data" }, TKey, TUIConfig>;
 
   responseArrayField<Child, const TUIConfig extends WidgetConfig<TKey>>(
     ui: TUIConfig,
     child: Child,
-    cache?: CacheStrategy,
   ): ArrayField<Child, { response: true }, TKey, TUIConfig>;
 
   arrayOptionalField<Child, const TUIConfig extends WidgetConfig<TKey>>(
     usage: FieldUsageConfig,
     ui: TUIConfig,
     child: Child,
-    cache?: CacheStrategy,
   ): ArrayOptionalField<Child, FieldUsageConfig, TKey, TUIConfig>;
 
   requestDataArrayOptionalField<Child, const TUIConfig extends WidgetConfig<TKey>>(
     ui: TUIConfig,
     child: Child,
-    cache?: CacheStrategy,
   ): ArrayOptionalField<Child, { request: "data" }, TKey, TUIConfig>;
 
   responseArrayOptionalField<Child, const TUIConfig extends WidgetConfig<TKey>>(
     ui: TUIConfig,
     child: Child,
-    cache?: CacheStrategy,
   ): ArrayOptionalField<Child, { response: true }, TKey, TUIConfig>;
 }
 
@@ -428,13 +412,11 @@ export function createFieldBuilder<TKey extends string = TranslationKey>(): Fiel
       schema: TSchema,
       usage: TUsage,
       ui: TUIConfig,
-      cache?: CacheStrategy,
     ): PrimitiveField<TSchema, TUsage, TKey, TUIConfig> => ({
       type: "primitive" as const,
       schema,
       usage,
       ui,
-      cache,
     }),
 
     requestResponseField: <
@@ -443,7 +425,7 @@ export function createFieldBuilder<TKey extends string = TranslationKey>(): Fiel
     >(
       ui: TUIConfig,
       schema: TSchema,
-      cache?: CacheStrategy,
+
       requestAsUrlParams?: boolean,
     ): PrimitiveField<
       TSchema,
@@ -457,20 +439,17 @@ export function createFieldBuilder<TKey extends string = TranslationKey>(): Fiel
         schema,
         usage: { request: requestType, response: true },
         ui,
-        cache,
       };
     },
 
     requestDataField: <const TUIConfig extends WidgetConfig<TKey>, TSchema extends z.ZodTypeAny>(
       ui: TUIConfig,
       schema: TSchema,
-      cache?: CacheStrategy,
     ): PrimitiveField<TSchema, { request: "data" }, TKey, TUIConfig> => ({
       type: "primitive" as const,
       schema,
       usage: { request: "data" },
       ui,
-      cache,
     }),
 
     requestDataRangeField: <
@@ -479,7 +458,6 @@ export function createFieldBuilder<TKey extends string = TranslationKey>(): Fiel
     >(
       ui: TUIConfig,
       enumSchema: TEnum,
-      cache?: CacheStrategy,
     ): PrimitiveField<z.ZodTypeAny, { request: "data" }, TKey, TUIConfig> => {
       const rangeSchema = z
         .object({
@@ -493,7 +471,6 @@ export function createFieldBuilder<TKey extends string = TranslationKey>(): Fiel
         schema: rangeSchema,
         usage: { request: "data" },
         ui,
-        cache,
       };
     },
 
@@ -503,7 +480,6 @@ export function createFieldBuilder<TKey extends string = TranslationKey>(): Fiel
     >(
       ui: TUIConfig,
       schema: TSchema,
-      cache?: CacheStrategy,
     ): PrimitiveField<
       TSchema,
       { request: "urlPathParams"; response?: never },
@@ -514,47 +490,40 @@ export function createFieldBuilder<TKey extends string = TranslationKey>(): Fiel
       schema,
       usage: { request: "urlPathParams" },
       ui,
-      cache,
     }),
 
     responseField: <TSchema extends z.ZodTypeAny, const TUIConfig extends WidgetConfig<TKey>>(
       ui: TUIConfig,
       schema: TSchema,
-      cache?: CacheStrategy,
     ): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig> => ({
       type: "primitive" as const,
       schema,
       usage: { response: true },
       ui,
-      cache,
     }),
 
     widgetField: <TUsage extends FieldUsageConfig, const TUIConfig extends WidgetConfig<TKey>>(
       ui: TUIConfig,
       usage: TUsage,
-      cache?: CacheStrategy,
     ): WidgetField<TUsage, TKey, TUIConfig> => ({
       type: "widget" as const,
       usage,
       ui,
-      cache,
     }),
 
     objectField: <
-      TChildren extends Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+      TChildren extends Record<string, UnifiedField<string, z.ZodTypeAny>>,
       TUsage extends FieldUsageConfig,
       const TUIConfig extends WidgetConfig<TKey>,
     >(
       ui: TUIConfig,
       usage: TUsage,
       children: TChildren,
-      cache?: CacheStrategy,
     ): ObjectField<TChildren, TUsage, TKey, TUIConfig> => ({
       type: "object" as const,
       children,
       usage,
       ui,
-      cache,
     }),
 
     objectOptionalField: <
@@ -565,13 +534,11 @@ export function createFieldBuilder<TKey extends string = TranslationKey>(): Fiel
       ui: TUIConfig,
       usage: U,
       children: C,
-      cache?: CacheStrategy,
     ): ObjectOptionalField<C, U, TKey, TUIConfig> => ({
       type: "object-optional" as const,
       children,
       usage,
       ui,
-      cache,
     }),
 
     objectUnionField: <
@@ -597,88 +564,74 @@ export function createFieldBuilder<TKey extends string = TranslationKey>(): Fiel
       usage: TUsage,
       discriminator: TDiscriminator,
       variants: TVariants,
-      cache?: CacheStrategy,
     ): ObjectUnionField<TDiscriminator, TKey, TVariants, TUsage, TUIConfig> => ({
       type: "object-union" as const,
       discriminator,
       variants,
       usage,
       ui,
-      cache,
     }),
 
     arrayField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
       usage: FieldUsageConfig,
       ui: TUIConfig,
       child: Child,
-      cache?: CacheStrategy,
     ): ArrayField<Child, FieldUsageConfig, TKey, TUIConfig> => ({
       type: "array" as const,
       child,
       usage,
       ui,
-      cache,
     }),
 
     requestDataArrayField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
       ui: TUIConfig,
       child: Child,
-      cache?: CacheStrategy,
     ): ArrayField<Child, { request: "data" }, TKey, TUIConfig> => ({
       type: "array" as const,
       child,
       usage: { request: "data" },
       ui,
-      cache,
     }),
 
     responseArrayField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
       ui: TUIConfig,
       child: Child,
-      cache?: CacheStrategy,
     ): ArrayField<Child, { response: true }, TKey, TUIConfig> => ({
       type: "array" as const,
       child,
       usage: { response: true },
       ui,
-      cache,
     }),
 
     arrayOptionalField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
       usage: FieldUsageConfig,
       ui: TUIConfig,
       child: Child,
-      cache?: CacheStrategy,
     ): ArrayOptionalField<Child, FieldUsageConfig, TKey, TUIConfig> => ({
       type: "array-optional" as const,
       child,
       usage,
       ui,
-      cache,
     }),
 
     requestDataArrayOptionalField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
       ui: TUIConfig,
       child: Child,
-      cache?: CacheStrategy,
     ): ArrayOptionalField<Child, { request: "data" }, TKey, TUIConfig> => ({
       type: "array-optional" as const,
       child,
       usage: { request: "data" },
       ui,
-      cache,
     }),
 
     responseArrayOptionalField: <Child, const TUIConfig extends WidgetConfig<TKey>>(
       ui: TUIConfig,
       child: Child,
-      cache?: CacheStrategy,
     ): ArrayOptionalField<Child, { response: true }, TKey, TUIConfig> => ({
       type: "array-optional" as const,
       child,
       usage: { response: true },
       ui,
-      cache,
     }),
   };
 }
@@ -695,18 +648,12 @@ export function field<
   const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
   const TSchema extends z.ZodTypeAny = z.ZodTypeAny,
   const TUsage extends FieldUsageConfig = FieldUsageConfig,
->(
-  schema: TSchema,
-  usage: TUsage,
-  ui: TUIConfig,
-  cache?: CacheStrategy,
-): PrimitiveField<TSchema, TUsage, TKey, TUIConfig> {
+>(schema: TSchema, usage: TUsage, ui: TUIConfig): PrimitiveField<TSchema, TUsage, TKey, TUIConfig> {
   return {
     type: "primitive" as const,
     schema,
     usage,
     ui,
-    cache,
   };
 }
 
@@ -721,7 +668,6 @@ export function requestResponseField<
   ui: TUIConfig,
   schema: TSchema,
   requestAsUrlParams?: false,
-  cache?: CacheStrategy,
 ): PrimitiveField<TSchema, { request: "data"; response: true }, TKey, TUIConfig>;
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<
@@ -732,7 +678,6 @@ export function requestResponseField<
   ui: TUIConfig,
   schema: TSchema,
   requestAsUrlParams?: true,
-  cache?: CacheStrategy,
 ): PrimitiveField<TSchema, { request: "urlPathParams"; response: true }, TKey, TUIConfig>;
 // eslint-disable-next-line no-redeclare
 export function requestResponseField<
@@ -743,7 +688,6 @@ export function requestResponseField<
   ui: TUIConfig,
   schema: TSchema,
   requestAsUrlParams?: boolean,
-  cache?: CacheStrategy,
 ): PrimitiveField<TSchema, { request: "data" | "urlPathParams"; response: true }, TKey, TUIConfig> {
   const requestType = requestAsUrlParams ? "urlPathParams" : "data";
   return {
@@ -751,7 +695,6 @@ export function requestResponseField<
     schema,
     usage: { request: requestType, response: true },
     ui,
-    cache,
   };
 }
 
@@ -762,17 +705,12 @@ export function requestDataField<
   TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
->(
-  ui: TUIConfig,
-  schema: TSchema,
-  cache?: CacheStrategy,
-): PrimitiveField<TSchema, { request: "data" }, TKey, TUIConfig> {
+>(ui: TUIConfig, schema: TSchema): PrimitiveField<TSchema, { request: "data" }, TKey, TUIConfig> {
   return {
     type: "primitive" as const,
     schema,
     usage: { request: "data" },
     ui,
-    cache,
   };
 }
 
@@ -783,17 +721,12 @@ export function responseDataField<
   TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
->(
-  ui: TUIConfig,
-  schema: TSchema,
-  cache?: CacheStrategy,
-): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig> {
+>(ui: TUIConfig, schema: TSchema): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig> {
   return {
     type: "primitive" as const,
     schema,
     usage: { response: true },
     ui,
-    cache,
   };
 }
 
@@ -820,7 +753,6 @@ export function requestDataRangeField<
 >(
   ui: TUIConfig,
   enumSchema: TEnum,
-  cache?: CacheStrategy,
 ): PrimitiveField<
   z.ZodOptional<z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>>,
   { request: "data" },
@@ -839,7 +771,6 @@ export function requestDataRangeField<
     schema: rangeSchema,
     usage: { request: "data" },
     ui,
-    cache,
   };
 }
 
@@ -851,7 +782,6 @@ export function requestResponseRangeField<
 >(
   ui: TUIConfig,
   enumSchema: TEnum,
-  cache?: CacheStrategy,
 ): PrimitiveField<
   z.ZodOptional<z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>>,
   { request: "data"; response: true },
@@ -870,7 +800,6 @@ export function requestResponseRangeField<
     schema: rangeSchema,
     usage: { request: "data", response: true },
     ui,
-    cache,
   };
 }
 
@@ -882,7 +811,6 @@ export function responseRangeField<
 >(
   ui: TUIConfig,
   enumSchema: TEnum,
-  cache?: CacheStrategy,
 ): PrimitiveField<
   z.ZodOptional<z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>>,
   { response: true },
@@ -901,7 +829,6 @@ export function responseRangeField<
     schema: rangeSchema,
     usage: { response: true },
     ui,
-    cache,
   };
 }
 
@@ -915,14 +842,12 @@ export function requestUrlPathParamsField<
 >(
   ui: TUIConfig,
   schema: TSchema,
-  cache?: CacheStrategy,
 ): PrimitiveField<TSchema, { request: "urlPathParams"; response?: never }, TKey, TUIConfig> {
   return {
     type: "primitive" as const,
     schema,
     usage: { request: "urlPathParams" },
     ui,
-    cache,
   };
 }
 
@@ -933,17 +858,12 @@ export function responseField<
   TKey extends string = TranslationKey,
   TSchema extends z.ZodTypeAny = z.ZodTypeAny,
   const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
->(
-  ui: TUIConfig,
-  schema: TSchema,
-  cache?: CacheStrategy,
-): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig> {
+>(ui: TUIConfig, schema: TSchema): PrimitiveField<TSchema, { response: true }, TKey, TUIConfig> {
   return {
     type: "primitive" as const,
     schema,
     usage: { response: true },
     ui,
-    cache,
   };
 }
 
@@ -954,12 +874,11 @@ export function widgetField<
   TKey extends string = TranslationKey,
   TUsage extends FieldUsageConfig = FieldUsageConfig,
   const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
->(ui: TUIConfig, usage: TUsage, cache?: CacheStrategy): WidgetField<TUsage, TKey, TUIConfig> {
+>(ui: TUIConfig, usage: TUsage): WidgetField<TUsage, TKey, TUIConfig> {
   return {
     type: "widget" as const,
     usage,
     ui,
-    cache,
   };
 }
 
@@ -979,14 +898,12 @@ export function widgetObjectField<
   ui: TUIConfig,
   usage: TUsage,
   children: TChildren,
-  cache?: CacheStrategy,
 ): ObjectField<TChildren, TUsage, TKey, TUIConfig> {
   return {
     type: "object" as const,
     children,
     usage,
     ui,
-    cache,
   };
 }
 
@@ -1008,14 +925,12 @@ export function objectField<
   ui: TUIConfig,
   usage: TUsage,
   children: TChildren,
-  cache?: CacheStrategy,
 ): ObjectField<TChildren, TUsage, TKey, TUIConfig> {
   return {
     type: "object" as const,
     children,
     usage,
     ui,
-    cache,
   };
 }
 
@@ -1052,14 +967,12 @@ export function scopedObjectField<
   ui: TUIConfig,
   usage: TUsage,
   children: TChildren,
-  cache?: CacheStrategy,
 ): ObjectField<TChildren, TUsage, TScopedTranslation["ScopedTranslationKey"], TUIConfig> {
   return {
     type: "object" as const,
     children,
     usage,
     ui,
-    cache,
   };
 }
 
@@ -1075,7 +988,6 @@ export function scopedRequestDataField<
   _scopedTranslation: TScopedTranslation,
   ui: TUIConfig,
   schema: TSchema,
-  cache?: CacheStrategy,
 ): PrimitiveField<
   TSchema,
   { request: "data" },
@@ -1087,7 +999,6 @@ export function scopedRequestDataField<
     schema,
     usage: { request: "data" },
     ui,
-    cache,
   };
 }
 
@@ -1103,7 +1014,6 @@ export function scopedResponseField<
   _scopedTranslation: TScopedTranslation,
   ui: TUIConfig,
   schema: TSchema,
-  cache?: CacheStrategy,
 ): PrimitiveField<
   TSchema,
   { response: true },
@@ -1115,7 +1025,6 @@ export function scopedResponseField<
     schema,
     usage: { response: true },
     ui,
-    cache,
   };
 }
 
@@ -1131,7 +1040,6 @@ export function scopedResponseArrayOptionalField<
   _scopedTranslation: TScopedTranslation,
   ui: TUIConfig,
   child: Child,
-  cache?: CacheStrategy,
 ): ArrayOptionalField<
   Child,
   { response: true },
@@ -1143,7 +1051,6 @@ export function scopedResponseArrayOptionalField<
     child,
     usage: { response: true },
     ui,
-    cache,
   };
 }
 
@@ -1158,14 +1065,12 @@ export function arrayField<
   usage: FieldUsageConfig,
   ui: TUIConfig,
   child: Child,
-  cache?: CacheStrategy,
 ): ArrayField<Child, FieldUsageConfig, TKey, TUIConfig> {
   return {
     type: "array" as const,
     child,
     usage,
     ui,
-    cache,
   };
 }
 
@@ -1176,17 +1081,12 @@ export function requestDataArrayField<
   Child,
   const TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
->(
-  ui: TUIConfig,
-  child: Child,
-  cache?: CacheStrategy,
-): ArrayField<Child, { request: "data" }, TKey, TUIConfig> {
+>(ui: TUIConfig, child: Child): ArrayField<Child, { request: "data" }, TKey, TUIConfig> {
   return {
     type: "array" as const,
     child,
     usage: { request: "data" },
     ui,
-    cache,
   };
 }
 
@@ -1197,17 +1097,12 @@ export function responseArrayField<
   Child,
   const TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
->(
-  ui: TUIConfig,
-  child: Child,
-  cache?: CacheStrategy,
-): ArrayField<Child, { response: true }, TKey, TUIConfig> {
+>(ui: TUIConfig, child: Child): ArrayField<Child, { response: true }, TKey, TUIConfig> {
   return {
     type: "array" as const,
     child,
     usage: { response: true },
     ui,
-    cache,
   };
 }
 
@@ -1219,18 +1114,12 @@ export function objectOptionalField<
   U extends FieldUsageConfig = FieldUsageConfig,
   const TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
->(
-  ui: TUIConfig,
-  usage: U,
-  children: C,
-  cache?: CacheStrategy,
-): ObjectOptionalField<C, U, TKey, TUIConfig> {
+>(ui: TUIConfig, usage: U, children: C): ObjectOptionalField<C, U, TKey, TUIConfig> {
   return {
     type: "object-optional" as const,
     children,
     usage,
     ui,
-    cache,
   };
 }
 
@@ -1261,7 +1150,6 @@ export function objectUnionField<
   usage: TUsage,
   discriminator: TDiscriminator,
   variants: TVariants,
-  cache?: CacheStrategy,
 ): ObjectUnionField<TDiscriminator, TKey, TVariants, TUsage, TUIConfig> {
   return {
     type: "object-union" as const,
@@ -1269,7 +1157,6 @@ export function objectUnionField<
     variants,
     usage,
     ui,
-    cache,
   };
 }
 
@@ -1284,14 +1171,12 @@ export function arrayOptionalField<
   usage: FieldUsageConfig,
   ui: TUIConfig,
   child: Child,
-  cache?: CacheStrategy,
 ): ArrayOptionalField<Child, FieldUsageConfig, TKey, TUIConfig> {
   return {
     type: "array-optional" as const,
     child,
     usage,
     ui,
-    cache,
   };
 }
 
@@ -1302,17 +1187,12 @@ export function requestDataArrayOptionalField<
   Child,
   const TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
->(
-  ui: TUIConfig,
-  child: Child,
-  cache?: CacheStrategy,
-): ArrayOptionalField<Child, { request: "data" }, TKey, TUIConfig> {
+>(ui: TUIConfig, child: Child): ArrayOptionalField<Child, { request: "data" }, TKey, TUIConfig> {
   return {
     type: "array-optional" as const,
     child,
     usage: { request: "data" },
     ui,
-    cache,
   };
 }
 
@@ -1323,17 +1203,12 @@ export function responseArrayOptionalField<
   Child,
   const TKey extends string = TranslationKey,
   const TUIConfig extends WidgetConfig<TKey> = WidgetConfig<TKey>,
->(
-  ui: TUIConfig,
-  child: Child,
-  cache?: CacheStrategy,
-): ArrayOptionalField<Child, { response: true }, TKey, TUIConfig> {
+>(ui: TUIConfig, child: Child): ArrayOptionalField<Child, { response: true }, TKey, TUIConfig> {
   return {
     type: "array-optional" as const,
     child,
     usage: { response: true },
     ui,
-    cache,
   };
 }
 
@@ -1456,7 +1331,7 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
         type: "primitive";
         usage: infer U;
       }
-      ? Usage extends FieldUsage.Response
+      ? Usage extends FieldUsage.ResponseData
         ? HasResponseUsage<U> extends true
           ? z.output<TSchema>
           : never
@@ -1474,7 +1349,7 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
             child: infer Child;
             usage: infer U;
           }
-        ? Usage extends FieldUsage.Response
+        ? Usage extends FieldUsage.ResponseData
           ? HasResponseUsage<U> extends true
             ? MakeOptional<Array<InferFieldType<Child, Usage, TKey>>, IsOptionalField<F>>
             : never
@@ -1498,7 +1373,7 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
               TKey,
               WidgetConfig<TKey>
             >[]
-            ? Usage extends FieldUsage.Response
+            ? Usage extends FieldUsage.ResponseData
               ? HasResponseUsage<U> extends true
                 ? InferUnionType<TKey, TVariants, Usage>
                 : never
@@ -1517,7 +1392,7 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
                 children: infer C;
                 usage: infer U;
               }
-            ? Usage extends FieldUsage.Response
+            ? Usage extends FieldUsage.ResponseData
               ? HasResponseUsage<U> extends true
                 ? MakeOptional<InferObjectType<C, Usage, TKey>, IsOptionalField<F>>
                 : never
@@ -1544,7 +1419,7 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
  * Checks each field's optional flag to make properties optional in the resulting type
  */
 export type InferObjectType<C, Usage extends FieldUsage, TKey extends string> =
-  C extends Record<string, UnifiedField<TKey, z.ZodTypeAny>>
+  C extends Record<string, UnifiedField<string, z.ZodTypeAny>>
     ? {
         -readonly [K in keyof C as InferFieldType<C[K], Usage, TKey> extends never
           ? never
@@ -1586,7 +1461,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
     }
 
     switch (targetUsage) {
-      case FieldUsage.Response:
+      case FieldUsage.ResponseData:
         return "response" in usage && usage.response === true;
       case FieldUsage.RequestData:
         return (
@@ -1686,7 +1561,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         // This is more efficient and avoids issues with z.never() detection
         if (childField.usage) {
           const childHasUsage =
-            targetUsage === FieldUsage.Response
+            targetUsage === FieldUsage.ResponseData
               ? "response" in childField.usage && childField.usage.response === true
               : targetUsage === FieldUsage.RequestData
                 ? "request" in childField.usage &&
@@ -1934,8 +1809,10 @@ export function generateRequestUrlSchema<F>(
 /**
  * Generate response schema with proper input/output type differentiation
  */
-export function generateResponseSchema<F>(field: F): InferSchemaFromField<F, FieldUsage.Response> {
-  return generateSchemaForUsage<F, FieldUsage.Response>(field, FieldUsage.Response);
+export function generateResponseSchema<F>(
+  field: F,
+): InferSchemaFromField<F, FieldUsage.ResponseData> {
+  return generateSchemaForUsage<F, FieldUsage.ResponseData>(field, FieldUsage.ResponseData);
 }
 
 // ============================================================================
@@ -1979,22 +1856,24 @@ export function navigateButtonField<
   TKey,
   NavigateButtonWidgetConfig<TTargetEndpoint, TGetEndpoint, TKey>
 > {
+  const widgetConfig: NavigateButtonWidgetConfig<TTargetEndpoint, TGetEndpoint, TKey> = {
+    type: WidgetType.NAVIGATE_BUTTON,
+    label: config.label,
+    icon: config.icon,
+    variant: config.variant,
+    // Store navigation config in metadata for widget access
+    metadata: {
+      targetEndpoint: config.targetEndpoint,
+      extractParams: config.extractParams,
+      prefillFromGet: config.prefillFromGet,
+      getEndpoint: config.getEndpoint,
+    },
+  };
+
   return {
     type: "widget" as const,
     usage: { response: true },
-    ui: {
-      type: WidgetType.NAVIGATE_BUTTON,
-      label: config.label,
-      icon: config.icon,
-      variant: config.variant,
-      // Store navigation config in metadata for widget access
-      metadata: {
-        targetEndpoint: config.targetEndpoint,
-        extractParams: config.extractParams,
-        prefillFromGet: config.prefillFromGet,
-        getEndpoint: config.getEndpoint,
-      },
-    },
+    ui: widgetConfig,
   };
 }
 
@@ -2077,7 +1956,7 @@ export function deleteButton<
  */
 export function backButton<TKey extends string = TranslationKey>(
   config?: Pick<NavigateButtonConfig<never, never, TKey>, "label" | "icon" | "variant">,
-): WidgetField<{ response: true }, TKey, WidgetConfig<TKey>> {
+): WidgetField<{ response: true }, TKey, NavigateButtonWidgetConfig<null, undefined, TKey>> {
   return {
     type: "widget" as const,
     usage: { response: true },
@@ -2089,8 +1968,6 @@ export function backButton<TKey extends string = TranslationKey>(
       // targetEndpoint: null signals back navigation
       metadata: {
         targetEndpoint: null,
-        extractParams: undefined,
-        prefillFromGet: false,
       },
     },
   };

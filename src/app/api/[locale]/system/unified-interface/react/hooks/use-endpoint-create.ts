@@ -5,10 +5,11 @@
 
 import { useEffect, useMemo } from "react";
 
+import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 
-import { mergeFormData } from "./endpoint-utils";
+import { deepMerge } from "./endpoint-utils";
 import type { ApiFormOptions, ApiFormReturn, ApiMutationOptions } from "./types";
 import { useApiForm } from "./use-api-mutation-form";
 
@@ -39,8 +40,8 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
       TEndpoint["types"]["UrlVariablesOutput"]
     >;
     urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
-    autoPrefillData?: Partial<TEndpoint["types"]["RequestOutput"]>;
-    initialState?: Partial<TEndpoint["types"]["RequestOutput"]>;
+    autoPrefillData?: DeepPartial<TEndpoint["types"]["RequestOutput"]>;
+    initialState?: DeepPartial<TEndpoint["types"]["RequestOutput"]>;
   } = {},
 ): ApiFormReturn<
   TEndpoint["types"]["RequestOutput"],
@@ -51,42 +52,55 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
   if (!primaryEndpoint) {
     return null;
   }
-  const {
-    formOptions = { persistForm: true },
-    mutationOptions = {},
-    autoPrefillData,
-    initialState,
-  } = options;
 
-  // Merge all form data sources (defaultValues < autoPrefillData < initialState < savedData)
-  const enhancedFormOptions = useMemo(() => {
-    if (!primaryEndpoint) {
-      return formOptions;
-    }
+  // Merge endpoint and hook options (hook takes priority)
+  // Merge defaultValues separately to combine autoPrefillData and initialState
+  const mergedFormOptions = useMemo(() => {
+    const merged = deepMerge<ApiFormOptions<TEndpoint["types"]["RequestOutput"]>>(
+      primaryEndpoint.options?.formOptions,
+      options.formOptions,
+    );
 
-    // No local storage - savedData is always null
-
-    const mergedDefaultValues = mergeFormData(
-      formOptions.defaultValues,
-      autoPrefillData,
-      initialState,
+    // Merge defaultValues priority: endpoint < hook < autoPrefill < initialState
+    const mergedDefaultValues = deepMerge(
+      primaryEndpoint.options?.formOptions?.defaultValues,
+      options.formOptions?.defaultValues,
+      options.autoPrefillData,
+      options.initialState,
     );
 
     return {
-      ...formOptions,
+      ...merged,
       defaultValues: mergedDefaultValues,
-    } as ApiFormOptions<TEndpoint["types"]["RequestOutput"]>;
-  }, [formOptions, autoPrefillData, initialState, primaryEndpoint]);
+    };
+  }, [primaryEndpoint.options, options.formOptions, options.autoPrefillData, options.initialState]);
 
-  // Use the existing mutation form hook with enhanced options
-  const formResult = useApiForm(primaryEndpoint, logger, enhancedFormOptions, mutationOptions);
+  const mergedMutationOptions = useMemo(() => {
+    return deepMerge<
+      ApiMutationOptions<
+        TEndpoint["types"]["RequestOutput"],
+        TEndpoint["types"]["ResponseOutput"],
+        TEndpoint["types"]["UrlVariablesOutput"]
+      >
+    >(primaryEndpoint.options?.mutationOptions, options.mutationOptions);
+  }, [primaryEndpoint.options, options.mutationOptions]);
 
-  // Reset form when autoPrefillData becomes available (after initial render)
+  // Use the existing mutation form hook with merged options
+  const formResult = useApiForm(primaryEndpoint, logger, mergedFormOptions, mergedMutationOptions);
+
+  // Reset form when autoPrefillData or initialState changes (after initial render)
+  // This handles cases where data is loaded asynchronously after mount
   useEffect(() => {
-    if (autoPrefillData && formResult?.form && Object.keys(autoPrefillData).length > 0) {
-      formResult.form.reset(autoPrefillData as never);
+    if (formResult?.form && (options.autoPrefillData || options.initialState)) {
+      const dataToReset = {
+        ...options.autoPrefillData,
+        ...options.initialState,
+      };
+      if (Object.keys(dataToReset).length > 0) {
+        formResult.form.reset(dataToReset);
+      }
     }
-  }, [autoPrefillData, formResult?.form]);
+  }, [options.autoPrefillData, options.initialState, formResult?.form]);
 
   // If no URL parameters are needed, return the form result as-is
   if (!options.urlPathParams) {
@@ -100,7 +114,7 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
     const wrappedSubmitForm = (): Promise<void> | void => {
       return originalSubmitForm({
         urlParamVariables: options.urlPathParams,
-      } as never);
+      });
     };
 
     return {

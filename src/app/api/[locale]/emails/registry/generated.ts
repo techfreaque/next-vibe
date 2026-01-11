@@ -6,12 +6,12 @@
  */
 
 import type emailTemplate0 from "@/app/api/[locale]/contact/email";
-import type emailTemplate2 from "@/app/api/[locale]/newsletter/subscribe/email";
-import type emailTemplate1 from "@/app/api/[locale]/newsletter/unsubscribe/email";
-import type emailTemplate6 from "@/app/api/[locale]/subscription/email";
-import type emailTemplate3 from "@/app/api/[locale]/user/public/reset-password/confirm/email";
-import type emailTemplate4 from "@/app/api/[locale]/user/public/reset-password/request/email";
-import type emailTemplate5 from "@/app/api/[locale]/user/public/signup/email";
+import type emailTemplate1 from "@/app/api/[locale]/newsletter/subscribe/email";
+import type emailTemplate2 from "@/app/api/[locale]/newsletter/unsubscribe/email";
+import type emailTemplate3 from "@/app/api/[locale]/subscription/email";
+import type emailTemplate4 from "@/app/api/[locale]/user/public/reset-password/confirm/email";
+import type emailTemplate5 from "@/app/api/[locale]/user/public/reset-password/request/email";
+import type emailTemplate6 from "@/app/api/[locale]/user/public/signup/email";
 import type emailTemplate7 from "@/app/api/[locale]/users/create/email";
 
 import type { TemplateCachedMetadata } from "./types";

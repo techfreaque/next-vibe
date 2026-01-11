@@ -308,6 +308,11 @@ type Test5_1_Result =
   Test5_1_LoginFields extends UnifiedField<TranslationKey, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
 const test5_1: Test5_1_Result = "✓ PASS";
 
+// Test 5.1b: Does UnifiedField<TranslationKey, z.ZodTypeAny> extend UnifiedField<string, z.ZodTypeAny>?
+type Test5_1b_Result =
+  Test5_1_LoginFields extends UnifiedField<string, z.ZodTypeAny> ? "✓ PASS" : "✗ FAIL";
+const test5_1b: Test5_1b_Result = "✓ PASS";
+
 // Test 5.2: CreateApiEndpoint with login fields
 type Test5_2_LoginEndpoint = CreateApiEndpoint<
   "default",
@@ -328,6 +333,32 @@ type Test5_2_Result =
     ? "✓ PASS"
     : "✗ FAIL";
 const test5_2: Test5_2_Result = "✓ PASS";
+
+// Test 5.2b: Does Test5_2_LoginEndpoint extend CreateApiEndpointAny?
+type Test5_2b_Result = Test5_2_LoginEndpoint extends CreateApiEndpointAny ? "✓ PASS" : "✗ FAIL";
+const test5_2b: Test5_2b_Result = "✓ PASS";
+
+// Test 5.2c: Breaking down - does the TFields parameter work?
+type Test5_2c_GenericEndpoint = CreateApiEndpoint<
+  "default",
+  Methods.POST,
+  readonly UserRoleValue[],
+  string,
+  Test5_1_LoginFields
+>;
+type Test5_2c_Result = Test5_2c_GenericEndpoint extends CreateApiEndpointAny ? "✓ PASS" : "✗ FAIL";
+const test5_2c: Test5_2c_Result = "✓ PASS";
+
+// Test 5.2d: With TranslationKey as TScopedTranslationKey and matching TKey in fields
+type Test5_2d_MatchingTKeys = CreateApiEndpoint<
+  string,
+  Methods,
+  readonly UserRoleValue[],
+  TranslationKey, // Specific translation key
+  UnifiedField<TranslationKey, z.ZodTypeAny> // Matching TKey in fields
+>;
+type Test5_2d_Result = Test5_2d_MatchingTKeys extends CreateApiEndpointAny ? "✓ PASS" : "✗ FAIL";
+const test5_2d: Test5_2d_Result = "✓ PASS";
 
 // ============================================================================
 // LEVEL 6: Test constraint checking in different positions
@@ -1170,7 +1201,11 @@ export interface AllTests {
   test4_1: typeof test4_1;
   test4_2: typeof test4_2;
   test5_1: typeof test5_1;
+  test5_1b: typeof test5_1b;
   test5_2: typeof test5_2;
+  test5_2b: typeof test5_2b;
+  test5_2c: typeof test5_2c;
+  test5_2d: typeof test5_2d;
   test6_1: typeof test6_1;
   test6_2: typeof test6_2;
   test6_3: typeof test6_3;

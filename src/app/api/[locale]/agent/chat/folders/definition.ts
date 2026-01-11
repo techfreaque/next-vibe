@@ -79,13 +79,11 @@ const { GET } = createEndpoint({
               value: DefaultFolderId.PUBLIC,
               label: "app.api.agent.chat.config.folders.public" as const,
             },
-            {
-              value: DefaultFolderId.INCOGNITO,
-              label: "app.api.agent.chat.config.folders.incognito" as const,
-            },
           ],
         },
-        z.enum(DefaultFolderId).optional(),
+        z
+          .enum([DefaultFolderId.PRIVATE, DefaultFolderId.SHARED, DefaultFolderId.PUBLIC])
+          .describe("Root folder to filter folders (incognito not allowed - local-only)"),
       ),
 
       // === RESPONSE ===

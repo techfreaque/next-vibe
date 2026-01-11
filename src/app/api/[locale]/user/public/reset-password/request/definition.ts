@@ -223,9 +223,7 @@ const { POST } = createEndpoint({
  */
 const resetPasswordRequestEndpoints = {
   POST,
-};
-
-export { POST };
+} as const;
 
 export default resetPasswordRequestEndpoints;
 

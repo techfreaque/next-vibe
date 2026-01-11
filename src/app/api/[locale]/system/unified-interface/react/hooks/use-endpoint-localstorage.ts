@@ -5,6 +5,8 @@ import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/res
 import { useCallback, useState } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
 
+import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
+
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import type {
   DeleteEndpointTypes,
@@ -132,8 +134,10 @@ export function useLocalStorageCreate<T>(
     urlPathParams?:
       | PrimaryMutationTypes<T>["urlPathParams"]
       | PatchEndpointTypes<T>["urlPathParams"];
-    defaultValues?: Partial<PrimaryMutationTypes<T>["request"] | PatchEndpointTypes<T>["request"]>;
-    autoPrefillData?: Partial<
+    defaultValues?: DeepPartial<
+      PrimaryMutationTypes<T>["request"] | PatchEndpointTypes<T>["request"]
+    >;
+    autoPrefillData?: DeepPartial<
       PrimaryMutationTypes<T>["request"] | PatchEndpointTypes<T>["request"]
     >;
   } = {},

@@ -16,6 +16,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { ErrorMessageBubble } from "../error-message-bubble";
 import type { useCollapseState } from "../hooks/use-collapse-state";
@@ -32,6 +33,7 @@ interface ThreadedMessageContentProps {
   currentUserId?: string;
   onUserIdHover?: (userId: string | null, position: { x: number; y: number } | null) => void;
   logger: EndpointLogger;
+  characterName: TranslationKey | null;
 }
 
 export function ThreadedMessageContent({
@@ -44,6 +46,7 @@ export function ThreadedMessageContent({
   currentUserId,
   onUserIdHover,
   logger,
+  characterName,
 }: ThreadedMessageContentProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -116,12 +119,10 @@ export function ThreadedMessageContent({
           </Span>
 
           {/* Character - only for AI messages */}
-          {message.role === "assistant" && message.character && (
+          {message.role === "assistant" && characterName && (
             <>
               <Span>•</Span>
-              <Span className="text-muted-foreground/80">
-                {getCharacterName(message.character)}
-              </Span>
+              <Span className="text-muted-foreground/80">{t(characterName)}</Span>
             </>
           )}
 

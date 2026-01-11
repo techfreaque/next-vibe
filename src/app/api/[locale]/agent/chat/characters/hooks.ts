@@ -11,7 +11,7 @@ import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { Character } from "./config";
+import type { CharacterGetResponseOutput } from "./[id]/definition";
 import definitions from "./definition";
 import { CharactersRepositoryClient } from "./repository-client";
 
@@ -41,7 +41,7 @@ export function useCharacters(
  */
 export function useCompatibleModels(
   models: ModelOption[],
-  character: Character | null,
+  character: CharacterGetResponseOutput | null,
 ): ModelOption[] {
   return useMemo(() => {
     if (!character) {
@@ -56,7 +56,7 @@ export function useCompatibleModels(
  */
 export function useRecommendedModels(
   models: ModelOption[],
-  character: Character | null,
+  character: CharacterGetResponseOutput | null,
   limit = 5,
 ): ModelOption[] {
   return useMemo(() => {

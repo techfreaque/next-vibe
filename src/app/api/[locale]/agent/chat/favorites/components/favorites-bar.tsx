@@ -6,112 +6,42 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import { useMemo } from "react";
 
-import type { CharacterListResponseOutput } from "@/app/api/[locale]/agent/chat/characters/definition";
-import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
-import type { FavoritesListResponseOutput } from "@/app/api/[locale]/agent/chat/favorites/definition";
-import {
-  type ModelOption,
-  modelOptions,
-  modelProviders,
-} from "@/app/api/[locale]/agent/models/models";
-import { Icon, type IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { useIsMobile } from "@/hooks/use-media-query";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-/**
- * Favorite item type inferred from API definition
- */
-export type FavoriteItem = FavoritesListResponseOutput["favorites"][number];
-
 interface FavoritesBarProps {
-  favorites: FavoriteItem[];
+  favorites: FavoriteCard[];
   activeFavoriteId: string | null;
   onFavoriteSelect: (favoriteId: string) => void;
   onSettingsClick: (favoriteId: string) => void;
   onAddClick: () => void;
   locale: CountryLanguage;
-  characters: Record<string, CharacterListResponseOutput["characters"][number]>;
   className?: string;
 }
 
 /**
- * Get display info for a favorite
- */
-interface FavoriteDisplay {
-  character: CharacterListResponseOutput["characters"][number] | null;
-  resolvedModel: ModelOption | null;
-  displayName: string;
-  displayIcon: IconKey;
-}
-
-function useFavoriteDisplay(
-  favorite: FavoriteItem,
-  locale: CountryLanguage,
-  characters: Record<string, CharacterListResponseOutput["characters"][number]>,
-): FavoriteDisplay {
-  const { t } = simpleT(locale);
-  const allModels = useMemo(() => Object.values(modelOptions), []);
-
-  const character = useMemo(
-    () => CharactersRepositoryClient.getCharacterById(characters, favorite.characterId),
-    [favorite.characterId, characters],
-  );
-
-  const resolvedModel = useMemo(() => {
-    return CharactersRepositoryClient.resolveModelForSelection(
-      favorite.modelSelection,
-      character ?? null,
-      allModels,
-    );
-  }, [character, favorite.modelSelection, allModels]);
-
-  // Display name and icon - consolidated logic
-  const displayName = useMemo(
-    () => CharactersRepositoryClient.getDisplayName(favorite, character, resolvedModel, t),
-    [favorite, character, resolvedModel, t],
-  );
-
-  const displayIcon = useMemo(
-    () => CharactersRepositoryClient.getDisplayIcon(favorite, character, resolvedModel),
-    [favorite, character, resolvedModel],
-  );
-
-  return { character, resolvedModel, displayName, displayIcon };
-}
-
-/**
  * Single favorite row in the list
+ * Display fields are pre-computed in the definition response
  */
 function FavoriteRow({
   favorite,
   onSelect,
   onEdit,
   locale,
-  characters,
   isActive,
 }: {
-  favorite: FavoriteItem;
+  favorite: FavoriteCard;
   onSelect: () => void;
   onEdit: () => void;
   locale: CountryLanguage;
-  characters: Record<string, CharacterListResponseOutput["characters"][number]>;
   isActive: boolean;
 }): JSX.Element {
   const { t } = simpleT(locale);
   const isTouchDevice = useIsMobile();
-  const { character, resolvedModel, displayName, displayIcon } = useFavoriteDisplay(
-    favorite,
-    locale,
-    characters,
-  );
-  const providerName = resolvedModel
-    ? (modelProviders[resolvedModel.provider]?.name ?? resolvedModel.provider)
-    : null;
-
-  const isModelOnly = !character;
 
   return (
     <Div
@@ -166,40 +96,33 @@ function FavoriteRow({
           isActive ? "bg-primary/15 text-primary" : "bg-muted group-hover:bg-primary/10",
         )}
       >
-        <Icon icon={displayIcon} className="h-5 w-5" />
+        <Icon icon={favorite.icon} className="h-5 w-5" />
       </Div>
 
       {/* Info - Full Width */}
       <Div className="flex-1 min-w-0">
         <Div className="flex items-center gap-2 pr-20">
           <Div className={cn("font-medium text-base", isActive && "text-primary")}>
-            {displayName}
+            {t(favorite.content.titleRow.name)}
           </Div>
           {isActive && (
             <Badge variant="default" className="text-[9px] h-4 px-1.5 shrink-0">
               {t("app.chat.selector.active")}
             </Badge>
           )}
-          {isModelOnly && !isActive && (
-            <Badge variant="outline" className="text-[9px] h-4 px-1.5 shrink-0 opacity-60">
-              {t("app.chat.selector.modelOnly")}
-            </Badge>
-          )}
         </Div>
-        {resolvedModel && (
+        {favorite.content.modelRow.modelInfo && (
           <Div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
-            <Icon icon={resolvedModel.icon} className="h-3 w-3" />
-            <Span className="truncate">{resolvedModel.name}</Span>
-            {providerName && (
+            <Icon icon={favorite.content.modelRow.modelIcon} className="h-3 w-3" />
+            <Span className="truncate">{favorite.content.modelRow.modelInfo}</Span>
+            {favorite.content.modelRow.modelProvider && (
               <>
                 <Span className="text-muted-foreground/40">•</Span>
-                <Span className="shrink-0">{providerName}</Span>
+                <Span className="shrink-0">{favorite.content.modelRow.modelProvider}</Span>
               </>
             )}
             <Span className="text-muted-foreground/40">•</Span>
-            <Span className="shrink-0">
-              {CharactersRepositoryClient.formatCreditCost(resolvedModel.creditCost, t)}
-            </Span>
+            <Span className="shrink-0">{favorite.content.modelRow.creditCost}</Span>
           </Div>
         )}
       </Div>
@@ -217,7 +140,6 @@ export function FavoritesBar({
   onSettingsClick,
   onAddClick,
   locale,
-  characters,
   className,
 }: FavoritesBarProps): JSX.Element {
   const { t } = simpleT(locale);
@@ -250,7 +172,6 @@ export function FavoritesBar({
             onSelect={() => onFavoriteSelect(favorite.id)}
             onEdit={() => onSettingsClick(favorite.id)}
             locale={locale}
-            characters={characters}
             isActive={favorite.id === activeFavoriteId}
           />
         ))}

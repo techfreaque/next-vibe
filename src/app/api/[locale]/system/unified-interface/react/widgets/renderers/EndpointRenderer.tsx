@@ -23,6 +23,7 @@ import type { ResponseType } from "@/app/api/[locale]/shared/types/response.sche
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { EndpointLogger } from "../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint";
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import { WidgetType } from "../../../shared/types/enums";
@@ -75,8 +76,8 @@ export interface EndpointRendererProps<
   onSubmit?: (data: TFieldValues) => void | Promise<void>;
   /** Cancel handler - when provided, shows Cancel button alongside Submit */
   onCancel?: () => void;
-  /** Data to populate fields with */
-  data?: Record<string, WidgetData>;
+  /** Data to populate fields with (can be object for multiple fields or any WidgetData for single field) */
+  data?: WidgetData;
   /** Whether the form is submitting */
   isSubmitting?: boolean;
   /** Submit button text translation key (deprecated - use submitButton.text) */
@@ -97,6 +98,8 @@ export interface EndpointRendererProps<
   response?: ResponseType<WidgetData>;
   /** Endpoint mutations for widgets to trigger directly */
   endpointMutations?: WidgetRenderContext["endpointMutations"];
+  /** Logger instance for widgets to use directly */
+  logger: EndpointLogger;
 }
 
 /**
@@ -226,6 +229,7 @@ export function EndpointRenderer<
   const context: WidgetRenderContext = {
     locale,
     isInteractive: true,
+    logger,
     permissions: [],
     endpointFields: endpoint.fields,
     disabled,
@@ -262,7 +266,7 @@ export function EndpointRenderer<
 
     const rootWidget = (
       <WidgetRenderer
-        widgetType={WidgetType.CONTAINER}
+        widgetType={endpoint.fields.ui.type}
         fieldName=""
         data={data ?? null}
         field={endpoint.fields}

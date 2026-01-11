@@ -12,7 +12,6 @@
  * - Support for all 5 interfaces
  */
 
-import type { FieldValues } from "react-hook-form";
 import type { z } from "zod";
 
 import type {
@@ -28,7 +27,6 @@ import type {
   ExtractInput,
   ExtractOutput,
   InferSchemaFromField,
-  LifecycleActions,
   UnifiedField,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type {
@@ -49,13 +47,17 @@ type ExtractSchemaType<F> = F extends { schema: z.ZodType<infer T> } ? T : never
  * Options for read (GET) operations at the endpoint level
  * These options will be merged with hook-provided options (hook options take priority)
  */
-export interface EndpointReadOptions<TRequest extends FieldValues, TResponse, TUrlVariables> {
+export interface EndpointReadOptions<TRequest, TResponse, TUrlVariables> {
   /** Form options for query forms (filtering, search, etc.) */
-  formOptions?: ApiQueryFormOptions<TRequest>;
+  formOptions?: ApiQueryFormOptions<TRequest> | ApiFormOptions<TRequest>;
   /** Query options for data fetching */
   queryOptions?: ApiQueryOptions<TRequest, TResponse, TUrlVariables>;
+  /** Mutation options - not used for read endpoints */
+  mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
   /** URL path parameters for the read endpoint */
   urlPathParams?: TUrlVariables;
+  /** Data to auto-prefill the form with */
+  autoPrefillData?: Partial<TRequest>;
   /** Initial state for the form */
   initialState?: Partial<TRequest>;
 }
@@ -64,7 +66,7 @@ export interface EndpointReadOptions<TRequest extends FieldValues, TResponse, TU
  * Options for create/update (POST/PUT/PATCH) operations at the endpoint level
  * These options will be merged with hook-provided options (hook options take priority)
  */
-export interface EndpointCreateOptions<TRequest extends FieldValues, TResponse, TUrlVariables> {
+export interface EndpointCreateOptions<TRequest, TResponse, TUrlVariables> {
   /** Form options for mutation forms */
   formOptions?: ApiFormOptions<TRequest>;
   /** Mutation options for create/update operations */
@@ -82,10 +84,16 @@ export interface EndpointCreateOptions<TRequest extends FieldValues, TResponse, 
  * These options will be merged with hook-provided options (hook options take priority)
  */
 export interface EndpointDeleteOptions<TRequest, TResponse, TUrlVariables> {
+  /** Form options - can be used if delete needs confirmation form */
+  formOptions?: ApiFormOptions<TRequest>;
   /** Mutation options for delete operations */
   mutationOptions?: ApiMutationOptions<TRequest, TResponse, TUrlVariables>;
   /** URL path parameters for the delete endpoint */
   urlPathParams?: TUrlVariables;
+  /** Data to auto-prefill */
+  autoPrefillData?: Partial<TRequest>;
+  /** Initial state */
+  initialState?: Partial<TRequest>;
 }
 
 /**
@@ -105,14 +113,11 @@ export interface EndpointDeleteOptions<TRequest, TResponse, TUrlVariables> {
  *
  */
 export interface ApiEndpoint<
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly UserRoleValue[],
-  TScopedTranslationKey extends string = TranslationKey,
-  TFields extends UnifiedField<string, z.ZodTypeAny> = UnifiedField<
-    TScopedTranslationKey,
-    z.ZodTypeAny
-  >,
+  out TExampleKey extends string,
+  out TMethod extends Methods,
+  out TUserRoleValue extends readonly UserRoleValue[],
+  out TScopedTranslationKey extends string = TranslationKey,
+  out TFields extends UnifiedField<string, z.ZodTypeAny> = UnifiedField<string, z.ZodTypeAny>,
 > {
   // Core endpoint metadata - all required for type safety
   readonly method: TMethod;
@@ -159,15 +164,13 @@ export interface ApiEndpoint<
   // Unified fields for schema generation
   readonly fields: TFields;
 
-  lifecycle?: LifecycleActions;
-
   readonly examples: (ExtractInput<
     InferSchemaFromField<TFields, FieldUsage.RequestData>
   > extends undefined
-    ? { requests?: undefined }
+    ? { requests?: never }
     : ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>> extends never
       ? {
-          requests?: undefined;
+          requests?: never;
         }
       : {
           requests: ExamplesList<
@@ -176,10 +179,10 @@ export interface ApiEndpoint<
           >;
         }) &
     (ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>> extends undefined
-      ? { urlPathParams?: undefined }
+      ? { urlPathParams?: never }
       : ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>> extends never
         ? {
-            urlPathParams?: undefined;
+            urlPathParams?: never;
           }
         : {
             urlPathParams: ExamplesList<
@@ -187,15 +190,15 @@ export interface ApiEndpoint<
               TExampleKey
             >;
           }) &
-    (ExtractInput<InferSchemaFromField<TFields, FieldUsage.Response>> extends undefined
-      ? { responses?: undefined }
-      : ExtractInput<InferSchemaFromField<TFields, FieldUsage.Response>> extends never
+    (ExtractInput<InferSchemaFromField<TFields, FieldUsage.ResponseData>> extends undefined
+      ? { responses?: never }
+      : ExtractInput<InferSchemaFromField<TFields, FieldUsage.ResponseData>> extends never
         ? {
-            responses?: undefined;
+            responses?: never;
           }
         : {
             responses: ExamplesList<
-              ExtractInput<InferSchemaFromField<TFields, FieldUsage.Response>>,
+              ExtractInput<InferSchemaFromField<TFields, FieldUsage.ResponseData>>,
               TExampleKey
             >;
           });
@@ -270,7 +273,7 @@ type HasRequestUrlParamsUsage<U> = U extends { request: "urlPathParams" } ? true
 // Direct field type inference that forces evaluation
 export type InferFieldType<F, Usage extends FieldUsage> =
   FieldCore<F> extends { type: "primitive"; usage: infer U }
-    ? Usage extends FieldUsage.Response
+    ? Usage extends FieldUsage.ResponseData
       ? HasResponseUsage<U> extends true
         ? ExtractSchemaType<F>
         : never
@@ -290,7 +293,7 @@ export type InferFieldType<F, Usage extends FieldUsage> =
             child: infer Child;
             usage: infer U;
           }
-        ? Usage extends FieldUsage.Response
+        ? Usage extends FieldUsage.ResponseData
           ? HasResponseUsage<U> extends true
             ? Array<InferFieldType<Child, Usage>>
             : never
@@ -330,23 +333,25 @@ function generateRequestUrlSchema<F>(
   return generateSchemaForUsage<F, FieldUsage.RequestUrlParams>(field, FieldUsage.RequestUrlParams);
 }
 
-function generateResponseSchema<F>(field: F): InferSchemaFromField<F, FieldUsage.Response> {
-  return generateSchemaForUsage<F, FieldUsage.Response>(field, FieldUsage.Response);
+function generateResponseSchema<F>(field: F): InferSchemaFromField<F, FieldUsage.ResponseData> {
+  return generateSchemaForUsage<F, FieldUsage.ResponseData>(field, FieldUsage.ResponseData);
 }
 
-export type CreateApiEndpoint<
-  TExampleKey extends string,
-  TMethod extends Methods,
-  TUserRoleValue extends readonly UserRoleValue[],
-  TScopedTranslationKey extends string,
-  TFields extends UnifiedField<string, z.ZodTypeAny>,
-  RequestInput = ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
-  RequestOutput = ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
-  ResponseInput = ExtractInput<InferSchemaFromField<TFields, FieldUsage.Response>>,
-  ResponseOutput = ExtractOutput<InferSchemaFromField<TFields, FieldUsage.Response>>,
-  UrlVariablesInput = ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>>,
-  UrlVariablesOutput = ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>>,
-> = ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TScopedTranslationKey, TFields> & {
+export interface CreateApiEndpoint<
+  out TExampleKey extends string,
+  out TMethod extends Methods,
+  out TUserRoleValue extends readonly UserRoleValue[],
+  out TScopedTranslationKey extends string,
+  out TFields extends UnifiedField<string, z.ZodTypeAny>,
+  out RequestInput = ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
+  out RequestOutput = ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
+  out ResponseInput = ExtractInput<InferSchemaFromField<TFields, FieldUsage.ResponseData>>,
+  out ResponseOutput = ExtractOutput<InferSchemaFromField<TFields, FieldUsage.ResponseData>>,
+  out UrlVariablesInput = ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>>,
+  out UrlVariablesOutput = ExtractOutput<
+    InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+  >,
+> extends ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TScopedTranslationKey, TFields> {
   readonly scopedTranslation: {
     readonly ScopedTranslationKey: TScopedTranslationKey;
     readonly scopedT: (locale: CountryLanguage) => {
@@ -355,9 +360,18 @@ export type CreateApiEndpoint<
   };
   readonly requestSchema: InferSchemaFromField<TFields, FieldUsage.RequestData>;
   readonly requestUrlPathParamsSchema: InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>;
-  readonly responseSchema: InferSchemaFromField<TFields, FieldUsage.Response>;
+  readonly responseSchema: InferSchemaFromField<TFields, FieldUsage.ResponseData>;
 
   readonly requiresAuthentication: () => boolean;
+
+  // Override options to use computed type parameters
+  readonly options?: TMethod extends Methods.GET
+    ? EndpointReadOptions<RequestOutput, ResponseOutput, UrlVariablesOutput>
+    : TMethod extends Methods.POST | Methods.PUT | Methods.PATCH
+      ? EndpointCreateOptions<RequestOutput, ResponseOutput, UrlVariablesOutput>
+      : TMethod extends Methods.DELETE
+        ? EndpointDeleteOptions<RequestOutput, ResponseOutput, UrlVariablesOutput>
+        : never;
 
   readonly types: {
     RequestInput: RequestInput;
@@ -372,7 +386,7 @@ export type CreateApiEndpoint<
     UserRoleValue: TUserRoleValue;
     ScopedTranslationKey: TScopedTranslationKey;
   };
-};
+}
 /**
  * Return type for createEndpoint with full type inference from fields
  */
@@ -404,11 +418,8 @@ export function createEndpoint<
   const TExampleKey extends string,
   const TMethod extends Methods,
   const TUserRoleValue extends readonly UserRoleValue[],
-  const TScopedTranslationKey extends string = TranslationKey,
-  TFields extends UnifiedField<string, z.ZodTypeAny> = UnifiedField<
-    TScopedTranslationKey,
-    z.ZodTypeAny
-  >,
+  TScopedTranslationKey extends string = TranslationKey,
+  TFields extends UnifiedField<string, z.ZodTypeAny> = UnifiedField<string, z.ZodTypeAny>,
 >(
   config: ApiEndpoint<TExampleKey, TMethod, TUserRoleValue, TScopedTranslationKey, TFields>,
 ): CreateEndpointReturnInMethod<
@@ -480,9 +491,11 @@ export function createEndpoint<
       RequestOutput: undefined! as ExtractOutput<
         InferSchemaFromField<TFields, FieldUsage.RequestData>
       >,
-      ResponseInput: undefined! as ExtractInput<InferSchemaFromField<TFields, FieldUsage.Response>>,
+      ResponseInput: undefined! as ExtractInput<
+        InferSchemaFromField<TFields, FieldUsage.ResponseData>
+      >,
       ResponseOutput: undefined! as ExtractOutput<
-        InferSchemaFromField<TFields, FieldUsage.Response>
+        InferSchemaFromField<TFields, FieldUsage.ResponseData>
       >,
       UrlVariablesInput: undefined! as ExtractInput<
         InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>

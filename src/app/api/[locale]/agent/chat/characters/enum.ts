@@ -60,29 +60,6 @@ export const CharacterCategoryDB = [
 ] as const;
 
 /**
- * Character Source Enum
- * Where the character comes from
- */
-export const {
-  enum: CharacterSource,
-  options: CharacterSourceOptions,
-  Value: CharacterSourceValue,
-} = createEnumOptions({
-  BUILT_IN: "app.api.agent.chat.characters.enums.source.builtIn",
-  MY: "app.api.agent.chat.characters.enums.source.my",
-  COMMUNITY: "app.api.agent.chat.characters.enums.source.community",
-});
-
-/**
- * Database enum array for Drizzle
- */
-export const CharacterSourceDB = [
-  CharacterSource.BUILT_IN,
-  CharacterSource.MY,
-  CharacterSource.COMMUNITY,
-] as const;
-
-/**
  * Character Ownership Type Enum
  * Who owns/controls the character
  */

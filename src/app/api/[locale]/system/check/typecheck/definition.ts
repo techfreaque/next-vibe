@@ -110,17 +110,6 @@ const { POST } = createEndpoint({
         z.coerce.number().min(1).optional().default(1),
       ),
 
-      maxFilesInSummary: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.check.typecheck.fields.maxFilesInSummary.label",
-          description: "app.api.system.check.typecheck.fields.maxFilesInSummary.description",
-          columns: 4,
-        },
-        z.coerce.number().min(1).default(50),
-      ),
-
       skipSorting: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
@@ -306,7 +295,6 @@ const { POST } = createEndpoint({
       default: {
         limit: 100,
         page: 1,
-        maxFilesInSummary: 50,
       },
     },
     responses: {

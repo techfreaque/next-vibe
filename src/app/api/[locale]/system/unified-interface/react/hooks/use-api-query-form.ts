@@ -7,7 +7,7 @@ import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/respon
 import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/lib/storage";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type UseFormProps } from "react-hook-form";
 
 import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -18,6 +18,7 @@ import type {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { buildKey } from "./query-key-builder";
 import type { ApiStore, FormQueryParams } from "./store";
 import { useApiStore } from "./store";
 import { deserializeQueryParams } from "./store";
@@ -135,25 +136,26 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
 
   // For query state - use number type instead of NodeJS.Timeout
   const debounceTimerRef = useRef<number | null>(null);
-
-  // Create base form configuration
-  type FormData = ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>;
-
   // Recursively extract default values from the Zod schema
   // This traverses the entire schema tree and builds an object with all default values
   // Works even when the top-level schema has required fields without defaults
-  const schemaDefaultValues = useMemo(() => {
+  const schemaDefaultValues = useMemo<TEndpoint["types"]["RequestOutput"]>(() => {
     // Step 1: Extract defaults recursively from schema structure
     // Use forFormInit=true to get empty defaults for primitives (e.g., "" for strings)
     // This ensures required fields are initialized with proper empty values
-    const extracted = extractSchemaDefaults<FormData>(endpoint.requestSchema, logger, "", true);
-    const baseDefaults = (extracted ?? {}) as FormData;
+    const extracted = extractSchemaDefaults<TEndpoint["types"]["RequestOutput"]>(
+      endpoint.requestSchema,
+      logger,
+      "",
+      true,
+    );
+    const baseDefaults = (extracted ?? {}) as TEndpoint["types"]["RequestOutput"];
 
     // Step 2: Pass through Zod's parse to validate and apply transformations
     // This ensures coercions (z.coerce.number()) and other transforms work
     const parsed = endpoint.requestSchema.safeParse(baseDefaults);
     if (parsed.success) {
-      return parsed.data as FormData;
+      return parsed.data as TEndpoint["types"]["RequestOutput"];
     }
 
     // If validation fails, return the extracted defaults as-is
@@ -161,11 +163,14 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   }, [endpoint.requestSchema, logger]);
 
   // Merge schema defaults with provided defaultValues
-  const mergedDefaultValues = useMemo(() => {
-    const provided = restFormOptions.defaultValues as FormData | undefined;
-    if (provided && Object.keys(provided).length > 0) {
+  const mergedDefaultValues = useMemo<TEndpoint["types"]["RequestOutput"]>(() => {
+    const provided = restFormOptions.defaultValues;
+    if (provided && typeof provided === "object" && Object.keys(provided).length > 0) {
       // Merge provided values over schema defaults
-      return { ...schemaDefaultValues, ...provided };
+      return {
+        ...schemaDefaultValues,
+        ...provided,
+      } as TEndpoint["types"]["RequestOutput"];
     }
     return schemaDefaultValues;
   }, [schemaDefaultValues, restFormOptions.defaultValues]);
@@ -188,16 +193,12 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   const rawQueryParams = useApiStore(rawQueryParamsSelector);
 
   // Deserialize outside selector to avoid infinite loop from new object references
-  const queryParams = useMemo((): ExtractOutput<
-    InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-  > => {
+  const queryParams = useMemo((): TEndpoint["types"]["RequestOutput"] => {
     if (!rawQueryParams) {
       return defaultQueryParams;
     }
     // Deserialize JSON-stringified nested objects back to their original form
-    return deserializeQueryParams<
-      ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>
-    >(rawQueryParams);
+    return deserializeQueryParams<TEndpoint["types"]["RequestOutput"]>(rawQueryParams);
   }, [rawQueryParams, defaultQueryParams]);
 
   // Create a function to update query params in the store
@@ -268,24 +269,23 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   const setFormErrorStore = useApiStore((state) => state.setFormError);
   const clearFormErrorStore = useApiStore((state) => state.clearFormError);
 
-  // Create form configuration with schema defaults
-  const formConfig = {
-    ...restFormOptions,
-    resolver: zodResolver(endpoint.requestSchema),
-    defaultValues: mergedDefaultValues,
-  };
-
   // Generate a storage key based on the endpoint if not provided
-  const storageKey = persistenceKey || `query-form-${endpoint.path.join("-")}-${endpoint.method}`;
+  const storageKey = persistenceKey || buildKey("query-form", endpoint, undefined, logger);
 
-  // Note: formConfig already includes merged default values
-  const formConfigWithDefaults = {
-    ...formConfig,
+  // Create form configuration with schema defaults
+  const formConfigWithDefaults: UseFormProps<TEndpoint["types"]["RequestOutput"]> = {
+    ...restFormOptions,
+    resolver: zodResolver<
+      TEndpoint["types"]["RequestOutput"],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      any,
+      TEndpoint["types"]["RequestOutput"]
+    >(endpoint.requestSchema),
     defaultValues: mergedDefaultValues,
   };
 
   // Initialize form with the proper configuration including schema defaults
-  const formMethods = useForm<FormData>(formConfigWithDefaults);
+  const formMethods = useForm<TEndpoint["types"]["RequestOutput"]>(formConfigWithDefaults);
   const { watch } = formMethods;
 
   // Implement form persistence directly
@@ -299,11 +299,9 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         // Clear from storage
         await storage.removeItem(storageKey);
         // Reset the form to default values if available, otherwise empty
-        const resetData =
-          (restFormOptions.defaultValues as ExtractOutput<
-            InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>
-          >) ||
-          ({} as ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>);
+        const resetData: TEndpoint["types"]["RequestOutput"] =
+          (restFormOptions.defaultValues as TEndpoint["types"]["RequestOutput"]) ||
+          ({} as TEndpoint["types"]["RequestOutput"]);
         formMethods.reset(resetData);
         // Update query params with reset data
         setQueryParams(resetData);
@@ -523,19 +521,19 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   // Create a submit handler that validates and submits the form
   const submitForm: SubmitFormFunction<
     ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>,
-    ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>>,
+    ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.ResponseData>>,
     ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>>
   > = (
     inputOptions?: SubmitFormFunctionOptions<
       ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>,
-      ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>>,
+      ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.ResponseData>>,
       ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>>
     >,
   ): void => {
     // Create a properly typed options object with urlParamVariables
     const options: SubmitFormFunctionOptions<
       ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestData>>,
-      ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.Response>>,
+      ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.ResponseData>>,
       ExtractOutput<InferSchemaFromField<TEndpoint["fields"], FieldUsage.RequestUrlParams>>
     > = {
       ...(inputOptions || {}),

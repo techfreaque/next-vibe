@@ -1,5 +1,6 @@
 import type React from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
+import type { ZodTypeAny } from "zod";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -82,7 +83,7 @@ export interface WidgetRenderContext {
     | typeof Platform.CLI
     | typeof Platform.CLI_PACKAGE;
   theme?: "light" | "dark" | "system";
-  endpointFields?: Record<string, WidgetData>; // Original endpoint fields for nested path lookup
+  endpointFields?: UnifiedField<string, ZodTypeAny>; // Original endpoint fields for nested path lookup
   disabled?: boolean; // Disable all form inputs
   response?: ResponseType<WidgetData>; // Full ResponseType from endpoint (includes success/error state)
   /**
@@ -142,7 +143,7 @@ export interface WidgetComponentProps<
 /**
  * Field type with narrowed widget config based on WidgetType discriminator.
  */
-export type NarrowedField<TKey extends string, T extends WidgetType> = UnifiedField<TKey> & {
+type NarrowedField<TKey extends string, T extends WidgetType> = UnifiedField<TKey> & {
   ui: ExtractWidgetConfig<T, TKey>;
 };
 
@@ -159,19 +160,6 @@ export interface BaseWidgetProps<TKey extends string, T extends WidgetType> {
   field: NarrowedField<TKey, T>;
   value: WidgetData;
 }
-
-/**
- * Maps each WidgetType to its base props.
- * Used to create discriminated unions that TypeScript can narrow automatically.
- */
-export type WidgetPropsMap<TKey extends string> = {
-  [T in WidgetType]: BaseWidgetProps<TKey, T>;
-};
-
-/**
- * Union of all widget props - TypeScript narrows this in switch statements.
- */
-export type WidgetPropsUnion<TKey extends string> = WidgetPropsMap<TKey>[WidgetType];
 
 /**
  * React-specific widget props. Extends base props with React context and form handling.

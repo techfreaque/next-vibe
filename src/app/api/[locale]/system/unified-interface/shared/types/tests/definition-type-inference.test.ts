@@ -353,35 +353,38 @@ type Test11a_SimpleField = PrimitiveField<
   "test.key",
   WidgetConfig<"test.key">
 >;
-type Test11a_InferredSchema = InferSchemaFromField<Test11a_SimpleField, FieldUsage.Response>;
+type Test11a_InferredSchema = InferSchemaFromField<Test11a_SimpleField, FieldUsage.ResponseData>;
 type Test11a_IsNotNever = Test11a_InferredSchema extends z.ZodNever ? false : true;
 // Should be true if pattern matching works with exact TKey match
 
 // Test 11b: InferSchemaFromField with string TKey (widest)
-type Test11b_InferredSchemaString = InferSchemaFromField<Test11a_SimpleField, FieldUsage.Response>;
+type Test11b_InferredSchemaString = InferSchemaFromField<
+  Test11a_SimpleField,
+  FieldUsage.ResponseData
+>;
 type Test11b_IsNotNever = Test11b_InferredSchemaString extends z.ZodNever ? false : true;
 // Should be true if covariance works
 
 // Test 11c: InferSchemaFromField with union TKey that includes the field's key
 type Test11c_UnionKey = "test.key" | "other.key";
-type Test11c_InferredSchema = InferSchemaFromField<Test11a_SimpleField, FieldUsage.Response>;
+type Test11c_InferredSchema = InferSchemaFromField<Test11a_SimpleField, FieldUsage.ResponseData>;
 type Test11c_IsNotNever = Test11c_InferredSchema extends z.ZodNever ? false : true;
 // Should be true if covariance works
 
 // Test 11d: InferSchemaFromField with union TKey that does NOT include the field's key
 type Test11d_UnionKey = "other.key" | "another.key";
-type Test11d_InferredSchema = InferSchemaFromField<Test11a_SimpleField, FieldUsage.Response>;
+type Test11d_InferredSchema = InferSchemaFromField<Test11a_SimpleField, FieldUsage.ResponseData>;
 type Test11d_IsNotNever = Test11d_InferredSchema extends z.ZodNever ? false : true;
 // This depends on how covariance works - "test.key" does NOT extend this union
 
 // Test 11e: InferSchemaFromField on actual IMAP fields
 type Test11e_ImapFields = typeof imapAccountsListDefinition.GET.fields;
 type Test11e_ScopedKey = typeof imapAccountsListDefinition.GET.types.ScopedTranslationKey;
-type Test11e_InferredSchema = InferSchemaFromField<Test11e_ImapFields, FieldUsage.Response>;
+type Test11e_InferredSchema = InferSchemaFromField<Test11e_ImapFields, FieldUsage.ResponseData>;
 type Test11e_IsNotNever = Test11e_InferredSchema extends z.ZodNever ? false : true;
 
 // Test 11f: Try with string as TTranslationKey
-type Test11f_InferredSchema = InferSchemaFromField<Test11e_ImapFields, FieldUsage.Response>;
+type Test11f_InferredSchema = InferSchemaFromField<Test11e_ImapFields, FieldUsage.ResponseData>;
 type Test11f_IsNotNever = Test11f_InferredSchema extends z.ZodNever ? false : true;
 
 // ============================================================================
@@ -418,11 +421,11 @@ type Test12b_ExtractTKey =
     : "no-match";
 
 // Test 12c: Check if InferSchemaFromField works on this simple field
-type Test12c_InferredSchema = InferSchemaFromField<Test12b_ContainerField, FieldUsage.Response>;
+type Test12c_InferredSchema = InferSchemaFromField<Test12b_ContainerField, FieldUsage.ResponseData>;
 type Test12c_IsNotNever = Test12c_InferredSchema extends z.ZodNever ? false : true;
 
 // Test 12d: Check with the extracted TKey
-type Test12d_InferredSchema = InferSchemaFromField<Test12b_ContainerField, FieldUsage.Response>;
+type Test12d_InferredSchema = InferSchemaFromField<Test12b_ContainerField, FieldUsage.ResponseData>;
 type Test12d_IsNotNever = Test12d_InferredSchema extends z.ZodNever ? false : true;
 
 // ============================================================================

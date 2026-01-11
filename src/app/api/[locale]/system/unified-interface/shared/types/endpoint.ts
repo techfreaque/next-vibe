@@ -4,25 +4,15 @@
  * Fundamental type definitions used throughout the endpoint types system.
  */
 
-import type { Route } from "next";
 import type { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { IconKey } from "../../react/icons";
 import type { CreateApiEndpoint } from "../endpoints/definition/create";
 import type { WidgetConfig } from "../widgets/configs";
 import type { WidgetData } from "../widgets/types";
-import type {
-  ActionTiming,
-  ActionType,
-  CacheStrategy,
-  ComponentSize,
-  ComponentVariant,
-  InterfaceContext,
-  Methods,
-} from "./enums";
+import type { Methods } from "./enums";
 import type { FieldUsage } from "./enums";
 
 // ============================================================================
@@ -32,14 +22,27 @@ import type { FieldUsage } from "./enums";
 /**
  * Type alias for CreateApiEndpoint - accepts any generic parameters
  * This is a branded type that any CreateApiEndpoint can be assigned to
+ * Uses string for TScopedTranslationKey to accept any translation key type
+ * Explicitly provides any for computed type parameters to accept any specific computed types
  */
 export type CreateApiEndpointAny = CreateApiEndpoint<
   string,
   Methods,
   readonly UserRoleValue[],
   string,
+  UnifiedField<string, z.ZodTypeAny>,
   // oxlint-disable-next-line no-explicit-any
-  any
+  any, // RequestInput
+  // oxlint-disable-next-line no-explicit-any
+  any, // RequestOutput
+  // oxlint-disable-next-line no-explicit-any
+  any, // ResponseInput
+  // oxlint-disable-next-line no-explicit-any
+  any, // ResponseOutput
+  // oxlint-disable-next-line no-explicit-any
+  any, // UrlVariablesInput
+  // oxlint-disable-next-line no-explicit-any
+  any // UrlVariablesOutput
 >;
 
 /**
@@ -125,7 +128,7 @@ type IsMethodSpecificUsage<TUsage> =
 type AnyMethodSupportsUsage<
   TUsage,
   TTargetUsage extends FieldUsage,
-> = TTargetUsage extends FieldUsage.Response
+> = TTargetUsage extends FieldUsage.ResponseData
   ? // Use union types to check all possibilities in parallel
     // String key syntax (primary)
     TUsage extends { POST: { response: true } }
@@ -194,7 +197,7 @@ type MatchesUsage<TUsage, TTargetUsage extends FieldUsage> =
         ? TUsage extends { request: "urlPathParams" | "data&urlPathParams" }
           ? true
           : false
-        : TTargetUsage extends FieldUsage.Response
+        : TTargetUsage extends FieldUsage.ResponseData
           ? TUsage extends { response: true }
             ? true
             : false
@@ -369,26 +372,6 @@ export type InferSchemaFromField<F, Usage extends FieldUsage> =
                 : z.ZodNever;
 
 /**
- * Infer the exact input type from a field structure for a specific usage
- */
-export type InferInputFromField<
-  TTranslationKey extends string,
-  F extends UnifiedField<TTranslationKey, TSchema>,
-  Usage extends FieldUsage,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-> = ExtractInput<InferSchemaFromField<F, Usage>>;
-
-/**
- * Infer the exact output type from a field structure for a specific usage
- */
-export type InferOutputFromField<
-  TTranslationKey extends string,
-  F extends UnifiedField<TTranslationKey, TSchema>,
-  Usage extends FieldUsage,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-> = ExtractOutput<InferSchemaFromField<F, Usage>>;
-
-/**
  * METHOD-SPECIFIC USAGE MATCHING: Check if usage matches for a specific method
  * This is the core logic that enables method-specific type inference
  */
@@ -406,7 +389,7 @@ type MatchesUsageForMethod<TUsage, TMethod extends Methods, TTargetUsage extends
             }
             ? true
             : false
-          : TTargetUsage extends FieldUsage.Response
+          : TTargetUsage extends FieldUsage.ResponseData
             ? TMethodUsage extends { response: true }
               ? true
               : false
@@ -421,7 +404,7 @@ type MatchesUsageForMethod<TUsage, TMethod extends Methods, TTargetUsage extends
         ? TUsage extends { request: "urlPathParams" | "data&urlPathParams" }
           ? true
           : false
-        : TTargetUsage extends FieldUsage.Response
+        : TTargetUsage extends FieldUsage.ResponseData
           ? TUsage extends { response: true }
             ? true
             : false
@@ -577,31 +560,6 @@ export type InferOutputFromFieldForMethod<
 // ============================================================================
 
 /**
- * Extract request parameters type from an endpoint
- * Uses ExtractInput to get the input type from the endpoint's request schema
- */
-export type ExtractRequestParams<TEndpoint> = TEndpoint extends {
-  requestSchema: infer TSchema;
-}
-  ? TSchema extends z.ZodTypeAny
-    ? ExtractInput<TSchema>
-    : never
-  : never;
-
-/**
- * Extract URL path parameters type from an endpoint
- * Extracts only the urlPathParams portion of the request schema
- */
-export type ExtractUrlPathParams<TEndpoint> =
-  ExtractRequestParams<TEndpoint> extends {
-    urlPathParams: infer TUrlParams;
-  }
-    ? TUrlParams
-    : ExtractRequestParams<TEndpoint> extends { urlPathParams?: infer TUrlParams }
-      ? TUrlParams
-      : never;
-
-/**
  * Type-safe navigation button configuration
  * Enforces type safety at the definition level
  *
@@ -614,17 +572,15 @@ export interface NavigateButtonConfig<
   TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
   TKey extends string = string,
 > {
-  /** Target endpoint to navigate to (null for back navigation) */
-  targetEndpoint: TTargetEndpoint | null;
+  /** Target endpoint to navigate to */
+  targetEndpoint: TTargetEndpoint;
   /**
    * Extract parameters from source data
    * Source: Row data from parent (WidgetData values - allows strings, numbers, booleans, etc.)
    * Return: Partial urlPathParams (for navigation) and partial data (for prefilling)
    */
-  extractParams: (
-    source: Record<string, WidgetData>,
-  ) => TTargetEndpoint extends CreateApiEndpointAny
-    ? {
+  extractParams: TTargetEndpoint extends CreateApiEndpointAny
+    ? (source: Record<string, WidgetData>) => {
         urlPathParams?: Partial<TTargetEndpoint["types"]["UrlVariablesOutput"]>;
         data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
       }
@@ -648,50 +604,18 @@ export interface NavigationStackEntry<
   TEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny,
 > {
   endpoint: TEndpoint;
-  params: ExtractRequestParams<TEndpoint>;
+  params: {
+    urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
+    data?: Partial<TEndpoint["types"]["RequestOutput"]>;
+  };
   timestamp: number;
   getEndpoint?: CreateApiEndpointAny;
   prefillFromGet?: boolean;
 }
 
-/**
- * Navigation context provided to widgets
- * Typed navigation methods with compile-time validation
- */
-export interface NavigationContext {
-  /**
-   * Navigate to a new endpoint
-   * @param endpoint - Target endpoint
-   * @param params - Type-safe parameters extracted from source
-   * @param prefillFromGet - Whether to fetch GET before showing form
-   */
-  push: <TEndpoint extends CreateApiEndpointAny>(
-    endpoint: TEndpoint,
-    params: ExtractRequestParams<TEndpoint>,
-    prefillFromGet?: boolean,
-  ) => void;
-  /**
-   * Go back to previous endpoint in stack
-   */
-  pop: () => void;
-  /**
-   * Current navigation stack
-   */
-  stack: readonly NavigationStackEntry[];
-  /**
-   * Whether there are items in the stack to go back to
-   */
-  canGoBack: boolean;
-}
-
 // ============================================================================
 // BASIC TYPE UTILITIES
 // ============================================================================
-
-/**
- * Field value types that can be handled by the system
- */
-export type FieldValue = string | number | boolean | Date | null | undefined;
 
 /**
  * Field usage configuration
@@ -804,229 +728,13 @@ export type FieldUsageConfig =
       response?: never;
     };
 
+/**
+ * Examples list using mapped type
+ * TypeScript infers covariance naturally for mapped types in readonly positions
+ */
 export type ExamplesList<T, TExampleKey extends string> = {
-  [exampleKey in TExampleKey]: T; // & { id?: string };
+  readonly [K in TExampleKey]: T;
 };
-
-// ============================================================================
-// ACTION SYSTEM TYPES
-// ============================================================================
-
-/**
- * Action condition for conditional execution
- */
-export interface ActionCondition {
-  field: string;
-  operator:
-    | "equals"
-    | "not_equals"
-    | "contains"
-    | "not_contains"
-    | "exists"
-    | "not_exists"
-    | "greater_than"
-    | "less_than";
-  value?: FieldValue;
-}
-
-/**
- * Base action configuration
- */
-export interface BaseActionConfig {
-  type: ActionType;
-  timing?: ActionTiming;
-  delay?: number;
-  conditions?: ActionCondition[];
-  contexts?: InterfaceContext[];
-}
-
-/**
- * Toast/Notification action
- */
-export interface ToastActionConfig extends BaseActionConfig {
-  type: ActionType.TOAST | ActionType.NOTIFICATION | ActionType.ALERT;
-  message: TranslationKey;
-  variant?: ComponentVariant;
-  duration?: number;
-  title?: TranslationKey;
-  description?: TranslationKey;
-}
-
-/**
- * Navigation action
- */
-export interface NavigationActionConfig extends BaseActionConfig {
-  type:
-    | ActionType.ROUTER_PUSH
-    | ActionType.ROUTER_REPLACE
-    | ActionType.ROUTER_BACK
-    | ActionType.REDIRECT;
-  path?: string;
-  route?: Route;
-  params?: Record<string, string>;
-  query?: Record<string, string>;
-  replace?: boolean;
-  external?: boolean;
-}
-
-/**
- * Data/Cache action
- */
-export interface RefetchActionConfig extends BaseActionConfig {
-  type:
-    | ActionType.REFETCH
-    | ActionType.INVALIDATE_CACHE
-    | ActionType.UPDATE_CACHE
-    | ActionType.CLEAR_CACHE;
-  queryKeys?: string[][];
-  exact?: boolean;
-  data?: Record<string, FieldValue>;
-}
-
-/**
- * Form action
- */
-export interface FormActionConfig extends BaseActionConfig {
-  type:
-    | ActionType.RESET_FORM
-    | ActionType.CLEAR_FORM
-    | ActionType.SET_FORM_VALUES
-    | ActionType.FOCUS_FIELD;
-  formId?: string;
-  values?: Record<string, FieldValue>;
-  fieldName?: string;
-  resetToDefaults?: boolean;
-}
-
-/**
- * State action
- */
-export interface StateActionConfig extends BaseActionConfig {
-  type: ActionType.SET_STATE | ActionType.TOGGLE_STATE | ActionType.UPDATE_STATE;
-  key: string;
-  value?: FieldValue;
-  updater?: (current: FieldValue) => FieldValue;
-}
-
-/**
- * Custom action
- */
-export interface CustomActionConfig extends BaseActionConfig {
-  type: ActionType.CUSTOM;
-  handler: string | ((context: ActionContext) => Promise<ActionResult>);
-  payload?: Record<string, FieldValue>;
-}
-
-/**
- * Union type for all action configurations
- */
-export type ActionConfig =
-  | ToastActionConfig
-  | NavigationActionConfig
-  | RefetchActionConfig
-  | FormActionConfig
-  | StateActionConfig
-  | CustomActionConfig;
-
-/**
- * Action execution context
- */
-export interface ActionContext {
-  context: InterfaceContext;
-  data?: Record<string, FieldValue>;
-  error?: Error;
-  endpoint?: Record<string, FieldValue>;
-  timestamp: string;
-  user: {
-    id: string;
-    roles: string[];
-  };
-  metadata?: Record<string, FieldValue>;
-  formValues?: Record<string, FieldValue>;
-  fieldValue?: FieldValue;
-}
-
-/**
- * Action execution result
- */
-export interface ActionResult {
-  success: boolean;
-  data?: Record<string, FieldValue>;
-  error?: string;
-  metadata?: Record<string, FieldValue>;
-}
-
-/**
- * Lifecycle actions
- */
-export interface LifecycleActions {
-  onSuccess?: ActionConfig[];
-  onError?: ActionConfig[];
-  onLoading?: ActionConfig[];
-  onComplete?: ActionConfig[];
-  onMount?: ActionConfig[];
-  onUnmount?: ActionConfig[];
-}
-
-/**
- * Interactive actions
- */
-export interface InteractiveActions {
-  onClick?: ActionConfig[];
-  onDoubleClick?: ActionConfig[];
-  onHover?: ActionConfig[];
-  onFocus?: ActionConfig[];
-  onBlur?: ActionConfig[];
-}
-
-/**
- * Form field actions
- */
-export interface FieldActions {
-  onChange?: ActionConfig[];
-  onValidation?: ActionConfig[];
-  onError?: ActionConfig[];
-  onClear?: ActionConfig[];
-}
-
-/**
- * Button action configuration
- */
-export interface ButtonAction {
-  label: TranslationKey;
-  icon?: IconKey;
-  variant?: ComponentVariant;
-  size?: ComponentSize;
-  actions: ActionConfig[];
-  conditions?: ActionCondition[];
-  disabled?: boolean;
-  loading?: boolean;
-}
-
-/**
- * Context menu action
- */
-export interface ContextMenuAction {
-  label: TranslationKey;
-  icon?: IconKey;
-  actions: ActionConfig[];
-  separator?: boolean;
-  disabled?: boolean;
-  dangerous?: boolean;
-}
-
-/**
- * Bulk action for data tables
- */
-export interface BulkAction {
-  label: TranslationKey;
-  icon?: IconKey;
-  variant?: ComponentVariant;
-  actions: ActionConfig[];
-  confirmationMessage?: TranslationKey;
-  requiresSelection?: boolean;
-  maxSelection?: number;
-}
 
 // ============================================================================
 // FIELD SYSTEM TYPES
@@ -1038,13 +746,13 @@ export interface BulkAction {
 export interface PrimitiveField<
   out TSchema extends z.ZodTypeAny,
   out TUsage extends FieldUsageConfig,
-  TKey extends string,
+  out TKey extends string,
   out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "primitive";
   schema: TSchema;
   usage: TUsage;
-  cache?: CacheStrategy;
+
   ui: TUIConfig;
   apiKey?: string;
   uiKey?: string;
@@ -1056,12 +764,12 @@ export interface PrimitiveField<
 export interface ObjectField<
   out TChildren,
   out TUsage extends FieldUsageConfig,
-  TKey extends string,
+  out TKey extends string,
   out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "object";
   usage: TUsage;
-  cache?: CacheStrategy;
+
   ui: TUIConfig;
   children: TChildren;
 }
@@ -1072,12 +780,12 @@ export interface ObjectField<
 export interface ObjectOptionalField<
   out TChildren,
   out TUsage extends FieldUsageConfig,
-  TKey extends string,
+  out TKey extends string,
   out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "object-optional";
   usage: TUsage;
-  cache?: CacheStrategy;
+
   ui: TUIConfig;
   children: TChildren;
 }
@@ -1087,7 +795,7 @@ export interface ObjectOptionalField<
  */
 export interface ObjectUnionField<
   out TDiscriminator extends string,
-  TKey extends string,
+  out TKey extends string,
   out TVariants extends readonly [
     ObjectField<
       Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
@@ -1109,7 +817,7 @@ export interface ObjectUnionField<
   discriminator: TDiscriminator;
   variants: TVariants;
   usage: TUsage;
-  cache?: CacheStrategy;
+
   ui: TUIConfig;
 }
 
@@ -1119,12 +827,12 @@ export interface ObjectUnionField<
 export interface ArrayField<
   out TChild,
   out TUsage extends FieldUsageConfig,
-  TKey extends string,
+  out TKey extends string,
   out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "array";
   usage: TUsage;
-  cache?: CacheStrategy;
+
   ui: TUIConfig;
   child: TChild;
 }
@@ -1135,12 +843,12 @@ export interface ArrayField<
 export interface ArrayOptionalField<
   out TChild,
   out TUsage extends FieldUsageConfig,
-  TKey extends string,
+  out TKey extends string,
   out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "array-optional";
   usage: TUsage;
-  cache?: CacheStrategy;
+
   ui: TUIConfig;
   child: TChild;
 }
@@ -1150,12 +858,12 @@ export interface ArrayOptionalField<
  */
 export interface WidgetField<
   out TUsage extends FieldUsageConfig,
-  TKey extends string,
+  out TKey extends string,
   out TUIConfig extends WidgetConfig<TKey>,
 > {
   type: "widget";
   usage: TUsage;
-  cache?: CacheStrategy;
+
   ui: TUIConfig;
 }
 
@@ -1174,13 +882,13 @@ export interface WidgetField<
 export type UnifiedField<TKey extends string, TSchema extends z.ZodTypeAny = z.ZodTypeAny> =
   | PrimitiveField<TSchema, FieldUsageConfig, TKey, WidgetConfig<TKey>>
   | ObjectField<
-      Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+      { [key: string]: UnifiedField<TKey, z.ZodTypeAny> },
       FieldUsageConfig,
       TKey,
       WidgetConfig<TKey>
     >
   | ObjectOptionalField<
-      Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+      { [key: string]: UnifiedField<TKey, z.ZodTypeAny> },
       FieldUsageConfig,
       TKey,
       WidgetConfig<TKey>
@@ -1190,13 +898,13 @@ export type UnifiedField<TKey extends string, TSchema extends z.ZodTypeAny = z.Z
       TKey,
       readonly [
         ObjectField<
-          Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+          { [key: string]: UnifiedField<TKey, z.ZodTypeAny> },
           FieldUsageConfig,
           TKey,
           WidgetConfig<TKey>
         >,
         ...ObjectField<
-          Record<string, UnifiedField<TKey, z.ZodTypeAny>>,
+          { [key: string]: UnifiedField<TKey, z.ZodTypeAny> },
           FieldUsageConfig,
           TKey,
           WidgetConfig<TKey>

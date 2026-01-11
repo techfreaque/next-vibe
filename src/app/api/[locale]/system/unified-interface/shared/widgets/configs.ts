@@ -76,7 +76,7 @@ export interface PrefillDisplayConfig<TKey extends string> {
  * TKey allows using either global TranslationKey or scoped translation keys
  * TKey is inferred from label/description values, then validated against expected type
  */
-interface BaseFormFieldWidgetConfig<TKey extends string> extends BaseWidgetConfig {
+interface BaseFormFieldWidgetConfig<out TKey extends string> extends BaseWidgetConfig {
   type: WidgetType.FORM_FIELD;
   label?: NoInfer<TKey>;
   description?: NoInfer<TKey>;
@@ -103,28 +103,28 @@ interface BaseFormFieldWidgetConfig<TKey extends string> extends BaseWidgetConfi
 
 // Text input
 export interface TextFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TEXT;
 }
 
 // Email input
 export interface EmailFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.EMAIL;
 }
 
 // Password input
 export interface PasswordFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.PASSWORD;
 }
 
 // Number input
 export interface NumberFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.NUMBER;
 }
@@ -139,7 +139,7 @@ export interface BooleanFieldWidgetConfig<TKey extends string> extends Omit<
 
 // Select dropdown
 export interface SelectFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.SELECT;
   options: Array<{ label: NoInfer<TKey>; value: string | number }>;
@@ -147,7 +147,7 @@ export interface SelectFieldWidgetConfig<
 
 // Multi-select
 export interface MultiSelectFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.MULTISELECT;
   options: Array<{ label: NoInfer<TKey>; value: string | number }>;
@@ -155,7 +155,7 @@ export interface MultiSelectFieldWidgetConfig<
 
 // Filter pills (like select but displayed as pills)
 export interface FilterPillsFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.FILTER_PILLS;
   options: Array<{
@@ -168,7 +168,7 @@ export interface FilterPillsFieldWidgetConfig<
 
 // Range slider (min-max selection with visual slider)
 export interface RangeSliderFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.RANGE_SLIDER;
   options: Array<{
@@ -185,14 +185,14 @@ export interface RangeSliderFieldWidgetConfig<
 
 // Textarea
 export interface TextareaFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TEXTAREA;
 }
 
 // Phone input
 export interface PhoneFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.PHONE;
 }
@@ -209,42 +209,42 @@ export interface IntFieldWidgetConfig<TKey extends string> extends BaseFormField
 
 // Date input
 export interface DateFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.DATE;
 }
 
 // DateTime input
 export interface DateTimeFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.DATETIME;
 }
 
 // Time input
 export interface TimeFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TIME;
 }
 
 // File input
 export interface FileFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.FILE;
 }
 
 // UUID input
 export interface UuidFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.UUID;
 }
 
 // JSON input
 export interface JsonFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.JSON;
 }
@@ -267,28 +267,28 @@ export interface TimeRangeFieldWidgetConfig<TKey extends string> extends Omit<
 
 // Timezone select
 export interface TimezoneFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TIMEZONE;
 }
 
 // Currency select
 export interface CurrencySelectFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.CURRENCY_SELECT;
 }
 
 // Language select
 export interface LanguageSelectFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.LANGUAGE_SELECT;
 }
 
 // Country select
 export interface CountrySelectFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.COUNTRY_SELECT;
 }
@@ -303,7 +303,7 @@ export interface ColorFieldWidgetConfig<TKey extends string> extends Omit<
 
 // Icon picker
 export interface IconFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.ICON;
 }
@@ -318,14 +318,14 @@ export interface SliderFieldWidgetConfig<TKey extends string> extends Omit<
 
 // Tags input
 export interface TagsFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TAGS;
 }
 
 // Text array input
 export interface TextArrayFieldWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends BaseFormFieldWidgetConfig<TKey> {
   fieldType: FieldDataType.TEXT_ARRAY;
 }
@@ -595,7 +595,7 @@ interface InferSchemasFromChildren<
   response: z.output<
     InferSchemaFromField<
       ObjectField<TChildren, TUsage, TTranslationKey, ContainerWidgetConfig<TTranslationKey>>,
-      FieldUsage.Response
+      FieldUsage.ResponseData
     >
   >;
 }
@@ -694,7 +694,7 @@ interface ContainerWidgetConfigBase<TKey extends string> extends BaseWidgetConfi
  * getCount accepts any data structure to allow proper inference in objectField
  */
 export interface ContainerWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
 > extends ContainerWidgetConfigBase<TKey> {
   /**
    * Function to extract count from data for title display (e.g., "Leads (42)")
@@ -716,7 +716,7 @@ export interface ContainerWidgetConfig<
  * TKey allows using either global TranslationKey or scoped translation keys
  */
 export interface TypedContainerWidgetConfig<
-  TKey extends string,
+  out TKey extends string,
   TChildren = Record<string, never>,
   TUsage extends FieldUsageConfig = FieldUsageConfig,
 > extends ContainerWidgetConfigBase<TKey> {
@@ -1113,7 +1113,7 @@ export interface ButtonWidgetConfig<TKey extends string> extends BaseWidgetConfi
 }
 
 export interface NavigateButtonWidgetConfig<
-  out TTargetEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny,
+  out TTargetEndpoint extends CreateApiEndpointAny | null = CreateApiEndpointAny,
   out TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
   TKey extends string = string,
 > extends BaseWidgetConfig {
@@ -1121,16 +1121,10 @@ export interface NavigateButtonWidgetConfig<
   label?: NoInfer<TKey>;
   icon?: IconKey;
   variant?: "default" | "primary" | "secondary" | "destructive" | "ghost" | "outline";
-  /**
-   * Navigation configuration stored in metadata
-   * extractParams: Returns partial urlPathParams and partial data for prefilling
-   */
   metadata?: {
-    targetEndpoint?: TTargetEndpoint | null;
-    extractParams?: (
-      source: Record<string, WidgetData>,
-    ) => TTargetEndpoint extends CreateApiEndpointAny
-      ? {
+    targetEndpoint: TTargetEndpoint;
+    extractParams?: TTargetEndpoint extends CreateApiEndpointAny
+      ? (source: Record<string, WidgetData>) => {
           urlPathParams?: Partial<TTargetEndpoint["types"]["UrlVariablesOutput"]>;
           data?: Partial<TTargetEndpoint["types"]["RequestOutput"]>;
         }
@@ -1138,9 +1132,7 @@ export interface NavigateButtonWidgetConfig<
     prefillFromGet?: boolean;
     getEndpoint?: TGetEndpoint;
   };
-  /** Icon size */
   iconSize?: "xs" | "sm" | "base" | "lg";
-  /** Spacing to the right of icon */
   iconSpacing?: SpacingSize;
 }
 
@@ -1497,7 +1489,7 @@ export type WidgetConfig<TKey extends string> =
   | PaginationWidgetConfig
   // Interactive widgets
   | ButtonWidgetConfig<TKey>
-  | NavigateButtonWidgetConfig<CreateApiEndpointAny, CreateApiEndpointAny | undefined, TKey>
+  | NavigateButtonWidgetConfig<CreateApiEndpointAny | null, CreateApiEndpointAny | undefined, TKey>
   | ButtonGroupWidgetConfig<TKey>
   | ActionBarWidgetConfig<TKey>
   | PaginationInfoWidgetConfig

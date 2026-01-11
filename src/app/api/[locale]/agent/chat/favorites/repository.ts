@@ -11,13 +11,20 @@ import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/respon
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
-import { CharacterCategory } from "../characters/enum";
-import { getCharacterById } from "../characters/repository";
-import { chatFavorites } from "./db";
+import type { ModelOption } from "../../models/models";
+import { modelOptions, modelProviders } from "../../models/models";
+import type { CharacterGetResponseOutput } from "../characters/[id]/definition";
+import { CharactersRepository } from "../characters/repository";
+import { CharactersRepositoryClient } from "../characters/repository-client";
+import { type ChatFavorite, chatFavorites } from "./db";
 import type {
+  FavoriteCard,
   FavoriteCreateRequestOutput,
   FavoriteCreateResponseOutput,
   FavoritesListResponseOutput,
@@ -33,12 +40,13 @@ export class ChatFavoritesRepository {
   static async getFavorites(
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FavoritesListResponseOutput>> {
     const userId = user.id;
 
     if (!userId) {
       logger.debug("No user ID, returning empty favorites");
-      return success({ favorites: [], hasCompanion: false });
+      return success({ favoritesList: [] });
     }
 
     try {
@@ -50,22 +58,18 @@ export class ChatFavoritesRepository {
         .where(eq(chatFavorites.userId, userId))
         .orderBy(asc(chatFavorites.createdAt));
 
-      // Check if user has at least one companion favorite
-      let hasCompanion = false;
-      for (const favorite of favorites) {
-        if (favorite.characterId) {
-          const character = await getCharacterById(favorite.characterId, userId);
-          if (character?.category === CharacterCategory.COMPANION) {
-            hasCompanion = true;
-            break;
-          }
-        }
-      }
+      // Compute display fields for all favorites
+      const favoritesCards = await Promise.all(
+        favorites.map(async (favorite) => {
+          return await ChatFavoritesRepository.computeFavoriteDisplayFields(
+            favorite,
+            userId,
+            locale,
+          );
+        }),
+      );
 
-      return success({
-        favorites,
-        hasCompanion,
-      });
+      return success({ favoritesList: favoritesCards });
     } catch (error) {
       logger.error("Failed to fetch favorites", parseError(error));
       return fail({
@@ -147,5 +151,93 @@ export class ChatFavoritesRepository {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
+  }
+
+  /**
+   * Compute display fields for a favorite card
+   */
+  static async computeFavoriteDisplayFields(
+    favorite: ChatFavorite,
+    userId: string | null,
+    locale: CountryLanguage,
+  ): Promise<FavoriteCard> {
+    const { t } = simpleT(locale);
+    const allModels = Object.values(modelOptions);
+
+    // Get character if favorite has one
+    const character: CharacterGetResponseOutput | null = favorite.characterId
+      ? await CharactersRepository.getCharacterByIdSimple(favorite.characterId, userId ?? undefined)
+      : null;
+
+    // Resolve model for this favorite
+    const resolvedModel: ModelOption | null = CharactersRepositoryClient.resolveModelForSelection(
+      favorite.modelSelection,
+      allModels,
+    );
+
+    // Compute display icon
+    let icon: IconKey;
+    if (favorite.customIcon) {
+      icon = favorite.customIcon as IconKey;
+    } else if (character) {
+      icon = character.icon;
+    } else if (resolvedModel) {
+      icon = resolvedModel.icon;
+    } else {
+      icon = "sparkles";
+    }
+
+    // Compute display name (without translation)
+    let name: string;
+    if (favorite.customName) {
+      name = favorite.customName;
+    } else if (character) {
+      name = character.name;
+    } else if (resolvedModel) {
+      name = resolvedModel.name;
+    } else {
+      name = "Model Only";
+    }
+
+    // Compute tagline
+    const tagline = character?.tagline ?? "";
+
+    // Compute description
+    let description: string;
+    if (character) {
+      description = character.description;
+    } else if (resolvedModel) {
+      description = `AI model for chat and content generation`;
+    } else {
+      description = "Custom chat configuration";
+    }
+
+    const modelIcon = resolvedModel?.icon ?? ("sparkles" as IconKey);
+    const modelInfo = resolvedModel?.name ?? "Default Model";
+    const modelProvider = resolvedModel?.provider
+      ? (modelProviders[resolvedModel.provider]?.name ?? "Unknown")
+      : "Unknown";
+    const creditCost = resolvedModel
+      ? CharactersRepositoryClient.formatCreditCost(resolvedModel.creditCost, t)
+      : "—";
+
+    return {
+      id: favorite.id,
+      characterId: favorite.characterId,
+      icon,
+      content: {
+        titleRow: {
+          name,
+          tagline,
+        },
+        description,
+        modelRow: {
+          modelIcon,
+          modelInfo,
+          modelProvider,
+          creditCost,
+        },
+      },
+    };
   }
 }

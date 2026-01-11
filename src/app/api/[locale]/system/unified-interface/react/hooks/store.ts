@@ -13,7 +13,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint";
 import { executeQuery } from "./query-executor";
-import { buildQueryKey } from "./query-key-builder";
+import { buildKey } from "./query-key-builder";
 import type { ApiMutationOptions, ApiQueryOptions } from "./types";
 
 // Create a single QueryClient instance
@@ -133,22 +133,13 @@ export interface ApiStore {
   }) => string;
   getFormId: (endpoint: { readonly method: Methods; readonly path: readonly string[] }) => string;
 
-  // React Query integration methods
-  invalidateQueries: (queryKey: QueryKey) => Promise<void>;
-  refetchQuery: <TResponse>(queryKey: QueryKey) => Promise<ResponseType<TResponse | undefined>>;
-
   /**
-   * Refetch endpoint queries by invalidating all queries for this endpoint
-   * This will cause all matching queries to refetch with their stored parameters
-   */
-  refetchEndpoint: <TEndpoint extends CreateApiEndpointAny>(
-    endpoint: TEndpoint,
-    logger: EndpointLogger,
-  ) => Promise<void>;
-
-  /**
-   * Update endpoint data in React Query cache (for optimistic updates)
-   * This is the ONLY way to update query data - no Zustand involved
+   * Update cached endpoint data optimistically
+   *
+   * @param endpoint - The endpoint definition
+   * @param logger - Logger for debugging
+   * @param updater - Function to update the cached data
+   * @param urlPathParams - URL path parameters (undefined if endpoint has none)
    */
   updateEndpointData: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
@@ -166,8 +157,7 @@ export interface ApiStore {
           data: TEndpoint["types"]["ResponseOutput"];
         }
       | undefined,
-    requestData?: TEndpoint["types"]["RequestOutput"],
-    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"],
+    urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
   ) => void;
 }
 
@@ -228,51 +218,6 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     // eslint-disable-next-line i18next/no-literal-string
   }): string => `form-${endpoint.path.join("-")}-${endpoint.method}`,
 
-  // executeQuery and executeMutation have been removed
-  // They are now standalone functions: query-executor.ts and mutation-executor.ts (to be created)
-  // Use useApiQuery and useApiMutation hooks instead
-
-  invalidateQueries: async (queryKey: QueryKey): Promise<void> => {
-    // Invalidate in React Query
-    await queryClient.invalidateQueries({ queryKey });
-  },
-
-  refetchQuery: async <TResponse>(
-    queryKey: QueryKey,
-  ): Promise<ResponseType<TResponse | undefined>> => {
-    // Refetch using React Query
-    await queryClient.refetchQueries({ queryKey });
-
-    // Get the updated data from React Query cache
-    const data = queryClient.getQueryData<ResponseType<TResponse>>(queryKey);
-    return data ?? success(undefined);
-  },
-
-  refetchEndpoint: async <TEndpoint extends CreateApiEndpointAny>(
-    endpoint: TEndpoint,
-    logger: EndpointLogger,
-  ): Promise<void> => {
-    // Build the endpoint key prefix
-    const endpointKeyPrefix = `query-${endpoint.path.join("-")}-${endpoint.method}`;
-
-    logger.debug("Invalidating endpoint queries", { endpointKeyPrefix });
-
-    // Get all queries from cache that match this endpoint
-    const matchingQueries = queryClient.getQueryCache().findAll({
-      predicate: (query) => query.queryKey[0] === endpointKeyPrefix,
-    });
-
-    logger.debug("Found queries to invalidate", {
-      count: matchingQueries.length,
-    });
-
-    // Invalidate each query using its exact stored queryKey
-    // The queryKey contains [endpointKey, requestDataKey, urlPathParamsKey]
-    // where requestDataKey and urlPathParamsKey are JSON stringified
-    for (const query of matchingQueries) {
-      await queryClient.invalidateQueries({ queryKey: query.queryKey });
-    }
-  },
 
   // Form-related methods
   setFormError: (formId: string, error: ErrorResponseType | null): void => {
@@ -317,8 +262,23 @@ export const useApiStore = create<ApiStore>((set, get) => ({
   },
 
   /**
-   * Update query data for an endpoint
-   * This is useful for optimistic updates or updating cache after mutations/streams
+   * Update cached endpoint data optimistically
+   *
+   * Cache key: endpoint.path + endpoint.method + urlPathParams
+   * Multiple useEndpoint calls with same urlPathParams share the same cache.
+   *
+   * @param endpoint - The endpoint definition
+   * @param logger - Logger for debugging
+   * @param updater - Function to update the cached data
+   * @param urlPathParams - URL path parameters (undefined if endpoint has none)
+   *
+   * @example
+   * store.updateEndpointData(
+   *   creditsDefinition.GET,
+   *   logger,
+   *   (oldData) => ({ ...oldData, data: { ...oldData.data, total: newTotal } }),
+   *   undefined
+   * );
    */
   updateEndpointData: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
@@ -336,13 +296,16 @@ export const useApiStore = create<ApiStore>((set, get) => ({
           data: TEndpoint["types"]["ResponseOutput"];
         }
       | undefined,
-    requestData?: TEndpoint["types"]["RequestOutput"],
-    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"],
+    urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
   ): void => {
-    // Generate the query key using shared utility (same format as useApiQuery)
-    const queryKey = buildQueryKey(endpoint, logger, requestData, urlPathParams);
+    // buildKey returns string, wrap in array for React Query
+    const stateKey = [buildKey("query", endpoint, urlPathParams, logger)];
 
-    // Update React Query cache (single source of truth)
+    logger.debug("Updating endpoint data in cache", {
+      endpointPath: endpoint.path.join("/"),
+      stateKey: JSON.stringify(stateKey),
+    });
+
     type CachedData =
       | {
           success: boolean;
@@ -350,7 +313,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
         }
       | undefined;
 
-    queryClient.setQueryData(queryKey, (oldData: CachedData) => {
+    queryClient.setQueryData(stateKey, (oldData: CachedData) => {
       return updater(oldData);
     });
   },
@@ -513,7 +476,7 @@ export const apiClient = {
    * Invalidate a query to force refetch on next access
    */
   invalidateQueries: async (queryKey: QueryKey): Promise<void> => {
-    await useApiStore.getState().invalidateQueries(queryKey);
+    await queryClient.invalidateQueries({ queryKey });
   },
 
   /**
@@ -526,7 +489,13 @@ export const apiClient = {
     endpoint: TEndpoint,
     logger: EndpointLogger,
   ): Promise<void> => {
-    return useApiStore.getState().refetchEndpoint(endpoint, logger);
+    const keyPrefix = buildKey("query", endpoint, undefined, logger);
+    await queryClient.invalidateQueries({
+      predicate: (query) => {
+        const key = query.queryKey[0];
+        return typeof key === "string" && key.startsWith(keyPrefix);
+      },
+    });
   },
 
   /**
@@ -557,28 +526,24 @@ export const apiClient = {
   },
 
   /**
-   * Update query data for an endpoint
-   * This is useful for optimistic updates or updating cache after mutations/streams
+   * Update cached endpoint data optimistically
    *
-   * @param endpoint - The endpoint definition (GET endpoint)
-   * @param updater - Function that receives the old data and returns the new data
-   * @param requestData - Optional request data (query params)
-   * @param urlPathParams - Optional URL parameters
+   * Cache key: endpoint.path + endpoint.method + urlPathParams
+   *
+   * @param endpoint - The endpoint definition
+   * @param logger - Logger for debugging
+   * @param updater - Function to update the cached data
+   * @param urlPathParams - URL path parameters (undefined if endpoint has none)
    *
    * @example
-   * // Update credit balance after AI response completes
    * apiClient.updateEndpointData(
    *   creditsDefinition.GET,
-   *   (oldData) => {
-   *     if (!oldData?.data) return oldData;
-   *     return {
-   *       ...oldData,
-   *       data: {
-   *         ...oldData.data,
-   *         total: oldData.data.total - creditCost,
-   *       });
-   *     };
-   *   }
+   *   logger,
+   *   (oldData) => ({
+   *     ...oldData,
+   *     data: { ...oldData.data, total: oldData.data.total - creditCost }
+   *   }),
+   *   undefined
    * );
    */
   updateEndpointData: <TEndpoint extends CreateApiEndpointAny>(
@@ -597,11 +562,8 @@ export const apiClient = {
           data: TEndpoint["types"]["ResponseOutput"];
         }
       | undefined,
-    requestData?: TEndpoint["types"]["RequestOutput"],
-    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"],
+    urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
   ): void => {
-    useApiStore
-      .getState()
-      .updateEndpointData(endpoint, logger, updater, requestData, urlPathParams);
+    useApiStore.getState().updateEndpointData(endpoint, logger, updater, urlPathParams);
   },
 };

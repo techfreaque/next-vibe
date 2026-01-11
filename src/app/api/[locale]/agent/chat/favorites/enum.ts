@@ -4,6 +4,9 @@
  */
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+import type { TranslationKey } from "@/i18n/core/static-types";
+
+import type { IconKey } from "../../../system/unified-interface/react/icons";
 
 /**
  * Model Selection Mode Enum
@@ -196,3 +199,118 @@ export const SpeedLevelFilterDB = [
   SpeedLevelFilter.BALANCED,
   SpeedLevelFilter.THOROUGH,
 ] as const;
+
+interface TierDisplayConfig<T extends string> {
+  value: T;
+  label: TranslationKey;
+  icon: IconKey;
+  description?: TranslationKey;
+}
+
+export const INTELLIGENCE_DISPLAY: TierDisplayConfig<typeof IntelligenceLevelFilterValue>[] = [
+  {
+    value: IntelligenceLevelFilter.ANY,
+    label: "app.chat.tiers.any",
+    icon: "circle-dashed",
+    description: "app.chat.tiers.anyDesc",
+  },
+  {
+    value: IntelligenceLevelFilter.QUICK,
+    label: "app.chat.tiers.intelligence.quick",
+    icon: "zap",
+    description: "app.chat.tiers.intelligence.quickDesc",
+  },
+  {
+    value: IntelligenceLevelFilter.SMART,
+    label: "app.chat.tiers.intelligence.smart",
+    icon: "lightbulb",
+    description: "app.chat.tiers.intelligence.smartDesc",
+  },
+  {
+    value: IntelligenceLevelFilter.BRILLIANT,
+    label: "app.chat.tiers.intelligence.brilliant",
+    icon: "sparkles",
+    description: "app.chat.tiers.intelligence.brilliantDesc",
+  },
+];
+
+export const PRICE_DISPLAY: TierDisplayConfig<typeof PriceLevelFilterValue>[] = [
+  {
+    value: PriceLevelFilter.ANY,
+    label: "app.chat.tiers.any",
+    icon: "circle-dashed",
+    description: "app.chat.tiers.anyDesc",
+  },
+  {
+    value: PriceLevelFilter.CHEAP,
+    label: "app.chat.tiers.price.cheap",
+    icon: "coins",
+    description: "app.chat.tiers.price.cheapDesc",
+  },
+  {
+    value: PriceLevelFilter.STANDARD,
+    label: "app.chat.tiers.price.standard",
+    icon: "coins",
+    description: "app.chat.tiers.price.standardDesc",
+  },
+  {
+    value: PriceLevelFilter.PREMIUM,
+    label: "app.chat.tiers.price.premium",
+    icon: "crown",
+    description: "app.chat.tiers.price.premiumDesc",
+  },
+];
+
+export const CONTENT_DISPLAY: TierDisplayConfig<typeof ContentLevelFilterValue>[] = [
+  {
+    value: ContentLevelFilter.ANY,
+    label: "app.chat.tiers.any",
+    icon: "circle-dashed",
+    description: "app.chat.tiers.anyDesc",
+  },
+  {
+    value: ContentLevelFilter.MAINSTREAM,
+    label: "app.chat.tiers.content.mainstream",
+    icon: "home",
+    description: "app.chat.tiers.content.mainstreamDesc",
+  },
+  {
+    value: ContentLevelFilter.OPEN,
+    label: "app.chat.tiers.content.open",
+    icon: "log-out",
+    description: "app.chat.tiers.content.openDesc",
+  },
+  {
+    value: ContentLevelFilter.UNCENSORED,
+    label: "app.chat.tiers.content.uncensored",
+    icon: "shield-off",
+    description: "app.chat.tiers.content.uncensoredDesc",
+  },
+];
+
+export const SPEED_DISPLAY: TierDisplayConfig<typeof SpeedLevelFilterValue>[] = [
+  {
+    value: SpeedLevelFilter.ANY,
+    label: "app.chat.tiers.any",
+    icon: "circle-dashed",
+    description: "app.chat.tiers.anyDesc",
+  },
+  {
+    value: SpeedLevelFilter.FAST,
+    label: "app.chat.tiers.speed.fast",
+    icon: "zap",
+    description: "app.chat.tiers.speed.fastDesc",
+  },
+  {
+    value: SpeedLevelFilter.BALANCED,
+    label: "app.chat.tiers.speed.balanced",
+    icon: "scale",
+    description: "app.chat.tiers.speed.balancedDesc",
+  },
+  {
+    value: SpeedLevelFilter.THOROUGH,
+    label: "app.chat.tiers.speed.thorough",
+    icon: "microscope",
+    description: "app.chat.tiers.speed.thoroughDesc",
+  },
+];

@@ -14,15 +14,18 @@ import { useTourState } from "@/app/api/[locale]/agent/chat/_components/welcome-
 import { CharacterBrowser } from "@/app/api/[locale]/agent/chat/characters/components/character-browser";
 import { CreateCharacterForm } from "@/app/api/[locale]/agent/chat/characters/components/create-character-form";
 import { EditCharacterModal } from "@/app/api/[locale]/agent/chat/characters/components/edit-character-modal";
-import charactersDefinition, {
-  type CharacterListResponseOutput,
-} from "@/app/api/[locale]/agent/chat/characters/definition";
+import charactersDefinition from "@/app/api/[locale]/agent/chat/characters/definition";
 import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
-import type { FavoriteUpdateRequestOutput } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
-import {
-  type FavoriteItem,
-  FavoritesBar,
-} from "@/app/api/[locale]/agent/chat/favorites/components/favorites-bar";
+import type {
+  FavoriteGetResponseOutput,
+  FavoriteUpdateRequestOutput,
+} from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import favoriteDetailDefinition from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import { FavoritesBar } from "@/app/api/[locale]/agent/chat/favorites/components/favorites-bar";
+import type {
+  FavoriteCard,
+  FavoriteCreateRequestOutput,
+} from "@/app/api/[locale]/agent/chat/favorites/definition";
 import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks";
 import { type ModelId, modelOptions } from "@/app/api/[locale]/agent/models/models";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
@@ -64,6 +67,7 @@ export function Selector({
   modelId,
   onCharacterChange,
   onModelChange,
+  onActiveFavoriteChange,
   locale,
   user,
   logger,

@@ -223,9 +223,36 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
     const cases: string[] = [];
     for (const path of allPaths) {
       const { importPath, method } = pathMap[path];
-      // eslint-disable-next-line i18next/no-literal-string
-      cases.push(`    case "${path}":
+      // Calculate line lengths for different wrapping strategies
+      const returnWithDefault = `      return (await import("${importPath}")).default`;
+      const returnWithParen = `      return (await import("${importPath}"))`;
+      const fullLine = `      return (await import("${importPath}")).default.${method};`;
+
+      if (fullLine.length <= 100) {
+        // Short (<=100 chars): keep on one line
+        // eslint-disable-next-line i18next/no-literal-string
+        cases.push(`    case "${path}":
       return (await import("${importPath}")).default.${method};`);
+      } else if (returnWithDefault.length <= 100) {
+        // Wrap after .default (returnWithDefault <=100, but fullLine >100)
+        // eslint-disable-next-line i18next/no-literal-string
+        cases.push(`    case "${path}":
+      return (await import("${importPath}")).default
+        .${method};`);
+      } else if (returnWithParen.length <= 100) {
+        // Wrap after import paren (returnWithParen <=100, but returnWithDefault >100)
+        // eslint-disable-next-line i18next/no-literal-string
+        cases.push(`    case "${path}":
+      return (await import("${importPath}"))
+        .default.${method};`);
+      } else {
+        // Very long: wrap import statement itself (returnWithParen >100)
+        // eslint-disable-next-line i18next/no-literal-string
+        cases.push(`    case "${path}":
+      return (
+        await import("${importPath}")
+      ).default.${method};`);
+      }
     }
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -236,11 +263,22 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
       "Total paths (with aliases)": allPaths.length,
     });
 
-    // Generate alias map entries
-    const aliasMapEntries = Object.entries(aliasToPathMap)
-      .toSorted(([a], [b]) => a.localeCompare(b))
-      .map(([alias, fullPath]) => `  "${alias}": "${fullPath}"`)
-      .join(",\n");
+    // Generate alias map entries (with trailing commas)
+    // Only quote keys when they contain special characters (hyphens, etc.)
+    // Split long lines at 100+ characters
+    const entries = Object.entries(aliasToPathMap).toSorted(([a], [b]) => a.localeCompare(b));
+    const aliasMapEntries = entries
+      .map(([alias, fullPath]) => {
+        const needsQuotes = /[^a-zA-Z0-9_$]/.test(alias);
+        const key = needsQuotes ? `"${alias}"` : alias;
+        const singleLine = `  ${key}: "${fullPath}",`;
+        // Check if line is 100+ chars, if so split it
+        if (singleLine.length >= 100) {
+          return `  ${key}:\n    "${fullPath}",`;
+        }
+        return singleLine;
+      })
+      .join("\n");
 
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
@@ -263,7 +301,9 @@ ${aliasMapEntries}
  * @param aliasOrPath - An alias or full path
  * @returns The canonical full path, or null if not found
  */
-export function getFullPath(aliasOrPath: string): typeof aliasToPathMap[keyof typeof aliasToPathMap] | null {
+export function getFullPath(
+  aliasOrPath: string,
+): (typeof aliasToPathMap)[keyof typeof aliasToPathMap] | null {
   return aliasToPathMap[aliasOrPath as keyof typeof aliasToPathMap] ?? null;
 }
 

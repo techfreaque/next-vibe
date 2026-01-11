@@ -59,6 +59,7 @@ export function HelpListDisplay({ locale }: HelpListDisplayProps): JSX.Element {
             endpoint={helpListEndpoints.POST}
             locale={locale}
             data={mutation.data.data}
+            logger={logger}
           />
         )}
 

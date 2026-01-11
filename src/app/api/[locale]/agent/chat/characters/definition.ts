@@ -178,6 +178,10 @@ const { GET } = createEndpoint({
                         { type: WidgetType.TEXT, size: "xs", variant: "muted" },
                         z.string() as z.ZodType<TranslationKey>,
                       ),
+                      tagline: responseField(
+                        { type: WidgetType.TEXT, size: "xs", variant: "muted" },
+                        z.string() as z.ZodType<TranslationKey>,
+                      ),
                       modelRow: objectField(
                         {
                           type: WidgetType.CONTAINER,
@@ -312,6 +316,7 @@ const { GET } = createEndpoint({
                 category: "app.api.agent.chat.characters.enums.category.assistant",
                 content: {
                   name: "app.api.agent.chat.characters.default.name",
+                  tagline: "app.api.agent.chat.characters.default.tagline",
                   description: "app.api.agent.chat.characters.default.description",
                   modelRow: {
                     modelIcon: "sparkles",
@@ -336,6 +341,7 @@ const { GET } = createEndpoint({
                 category: "app.api.agent.chat.characters.enums.category.coding",
                 content: {
                   name: "app.api.agent.chat.characters.custom.name",
+                  tagline: "app.api.agent.chat.characters.custom.tagline",
                   description: "app.api.agent.chat.characters.custom.description",
                   modelRow: {
                     modelIcon: "sparkles",

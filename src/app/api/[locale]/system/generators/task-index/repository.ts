@@ -256,7 +256,11 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
 /* eslint-disable prettier/prettier */
 /* eslint-disable simple-import-sort/imports */
 
-import type { Task, TaskRegistry, TaskRunnerManager } from "../unified-interface/tasks/types/repository";
+import type {
+  Task,
+  TaskRegistry,
+  TaskRunnerManager,
+} from "../unified-interface/tasks/types/repository";
 import { UnifiedTaskRunnerRepositoryImpl } from "../unified-interface/tasks/unified-runner/repository";
 
 ${imports.join("\n")}
@@ -266,18 +270,23 @@ ${taskExports.join("\n")}
 ${taskRunnerExports.join("\n")}
 ];
 
-const cronTasks = allTasks.filter((task): task is Task & { type: 'cron' } => task.type === 'cron');
-const sideTasks = allTasks.filter((task): task is Task & { type: 'side' } => task.type === 'side');
-const taskRunners = allTasks.filter((task): task is Task & { type: 'task-runner' } => task.type === 'task-runner');
+const cronTasks = allTasks.filter((task): task is Task & { type: "cron" } => task.type === "cron");
+const sideTasks = allTasks.filter((task): task is Task & { type: "side" } => task.type === "side");
+const taskRunners = allTasks.filter(
+  (task): task is Task & { type: "task-runner" } => task.type === "task-runner",
+);
 
-const tasksByCategory: Record<string, Task[]> = allTasks.reduce<Record<string, Task[]>>((acc, task) => {
-  const category = String(task.category);
-  if (!acc[category]) {
-    acc[category] = [];
-  }
-  acc[category].push(task);
-  return acc;
-}, {});
+const tasksByCategory: Record<string, Task[]> = allTasks.reduce<Record<string, Task[]>>(
+  (acc, task) => {
+    const category = String(task.category);
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(task);
+    return acc;
+  },
+  {},
+);
 
 const tasksByName: Record<string, Task> = allTasks.reduce<Record<string, Task>>((acc, task) => {
   acc[task.name] = task;

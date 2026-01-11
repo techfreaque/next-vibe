@@ -595,10 +595,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     const totalErrors = allIssues.filter((issue) => issue.severity === "error").length;
 
     const fileStats = this.buildFileStats(allIssues);
-    const allFiles = this.formatFileStats(fileStats);
-    const limitedFiles = data.maxFilesInSummary
-      ? allFiles.slice(0, data.maxFilesInSummary)
-      : allFiles;
+    const files = this.formatFileStats(fileStats);
 
     const limit = data.limit;
     const currentPage = data.page;
@@ -613,7 +610,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     return {
       issues: {
         items: limitedIssues,
-        files: limitedFiles,
+        files,
         summary: {
           totalIssues,
           totalFiles,

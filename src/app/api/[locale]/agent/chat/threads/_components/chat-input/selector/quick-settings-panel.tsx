@@ -19,17 +19,15 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import type { Character } from "@/app/api/[locale]/agent/chat/characters/definition";
+import type { CharacterListItem } from "@/app/api/[locale]/agent/chat/characters/definition";
 import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
-import type { FavoriteItem } from "@/app/api/[locale]/agent/chat/favorites/components/favorites-bar";
+import type { FavoriteGetResponseOutput } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/favorites/enum";
 import {
   CONTENT_DISPLAY,
   INTELLIGENCE_DISPLAY,
   PRICE_DISPLAY,
-} from "@/app/api/[locale]/agent/chat/favorites/display-configs";
-import {
-  IntelligenceLevelFilter,
-  ModelSelectionType,
+  SPEED_DISPLAY,
 } from "@/app/api/[locale]/agent/chat/favorites/enum";
 import {
   type ModelId,
@@ -43,15 +41,15 @@ import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 interface QuickSettingsPanelProps {
-  favorite: FavoriteItem;
-  onSave: (settings: FavoriteItem["modelSelection"], saveMode: SaveMode) => void;
+  favorite: FavoriteGetResponseOutput;
+  onSave: (settings: FavoriteGetResponseOutput["modelSelection"], saveMode: SaveMode) => void;
   onCancel: () => void;
   onDelete?: () => void;
-  onEditCharacter?: (characterData: Character) => void;
+  onEditCharacter?: (characterId: string) => void;
   onSwitchCharacterView?: () => void;
   onCharacterSwitch?: (characterId: string, keepSettings: boolean) => void;
-  /** Characters fetched from API - used for editing custom characters */
-  characters?: Record<string, Character>;
+  /** Characters fetched from API - compact cards for display */
+  characters?: Record<string, CharacterListItem>;
   isAuthenticated?: boolean;
   locale: CountryLanguage;
 }

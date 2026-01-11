@@ -9,7 +9,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import type { ApiMutationOptions } from "./types";
-import { useApiMutation } from "./use-api-mutation";
+import { type MutationVariables, useApiMutation } from "./use-api-mutation";
 
 /**
  * Hook for delete operations
@@ -50,17 +50,20 @@ export function useEndpointDelete<TEndpoint extends CreateApiEndpointAny>(
     return null;
   }
 
-  const { mutationOptions = {}, urlPathParams = {} as TEndpoint["types"]["UrlVariablesOutput"] } =
-    options;
+  const { urlPathParams } = options;
 
+  // Use hook-provided options directly (endpoint-level options not accessible due to dynamic endpoint selection)
   // Use the existing mutation hook for consistency
-  const mutation = useApiMutation(deleteEndpoint, logger, mutationOptions);
+  const mutation = useApiMutation(deleteEndpoint, logger, options.mutationOptions ?? {});
 
   // Create a submit function that calls the mutation
   const submit = useCallback(
-    async (data?: TEndpoint["types"]["RequestOutput"]): Promise<void> => {
-      const mutationVariables = {
-        requestData: data || ({} as TEndpoint["types"]["RequestOutput"]),
+    async (data: TEndpoint["types"]["RequestOutput"]): Promise<void> => {
+      const mutationVariables: MutationVariables<
+        TEndpoint["types"]["RequestOutput"],
+        TEndpoint["types"]["UrlVariablesOutput"]
+      > = {
+        requestData: data,
         urlPathParams: urlPathParams,
       };
       await mutation.mutateAsync(mutationVariables);

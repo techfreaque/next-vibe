@@ -38,51 +38,65 @@ export function NavigateButtonWidget<const TKey extends string>({
   const buttonIcon = icon ? (icon as IconKey) : undefined;
   const buttonText = label ? context.t(label) : undefined;
 
-  // Extract navigation config from metadata (already properly typed in field.ui)
-  const targetEndpoint = metadata?.targetEndpoint ?? null;
-  const extractParams = metadata?.extractParams;
-  const prefillFromGet = Boolean(metadata?.prefillFromGet);
-  const getEndpoint = metadata?.getEndpoint;
+  // Don't render if no metadata
+  if (!metadata) {
+    return <></>;
+  }
 
-  // Don't render back button if there's nothing to navigate back to
-  if (targetEndpoint === null && (!context.navigation || !context.navigation.canGoBack)) {
+  // Back navigation
+  if (metadata.targetEndpoint === null) {
+    // Don't render back button if there's nothing to navigate back to
+    if (!context.navigation || !context.navigation.canGoBack) {
+      return <></>;
+    }
+
+    const handleClick = (): void => {
+      context.navigation?.pop();
+    };
+
+    return (
+      <Button
+        type="button"
+        onClick={handleClick}
+        variant={variant === "primary" ? "default" : variant}
+        className={className}
+      >
+        {buttonIcon && (
+          <Icon
+            icon={buttonIcon}
+            className={cn(iconSizeClass || "h-4 w-4", buttonText ? iconSpacingClass || "mr-2" : "")}
+          />
+        )}
+        {buttonText}
+      </Button>
+    );
+  }
+
+  // Forward navigation - check if extractParams exists and targetEndpoint is not null
+  if (!metadata.extractParams || metadata.targetEndpoint === null) {
+    context.logger.error(
+      "NavigateButtonWidget: Forward navigation without extractParams or targetEndpoint",
+    );
     return <></>;
   }
 
   const handleClick = (): void => {
-    if (!context.navigation) {
-      // eslint-disable-next-line no-console
-      console.warn("NavigateButtonWidget: No navigation context available");
+    if (!context.navigation || !metadata.extractParams || metadata.targetEndpoint === null) {
+      context.logger.warn(
+        "NavigateButtonWidget: No navigation context, extractParams, or targetEndpoint",
+      );
       return;
     }
 
-    // Back navigation (targetEndpoint is null)
-    if (targetEndpoint === null) {
-      context.navigation.pop();
-      return;
-    }
-
-    // Forward navigation to target endpoint
-    if (!targetEndpoint) {
-      // eslint-disable-next-line no-console
-      console.warn("NavigateButtonWidget: No target endpoint specified");
-      return;
-    }
-
-    if (!extractParams) {
-      // eslint-disable-next-line no-console
-      console.warn("NavigateButtonWidget: No extractParams function specified");
-      return;
-    }
-
-    // Extract params from source data (value contains the item data)
-    // For global buttons (not in list context), value may be null/undefined
-    // extractParams should handle this case (e.g., () => ({}) for buttons without params)
+    // Extract params and navigate
     const sourceData = isWidgetDataObject(value) ? (value as Record<string, WidgetData>) : {};
-    const params = extractParams(sourceData);
-
-    // Navigate to target endpoint with extracted params
-    context.navigation.push(targetEndpoint, params, prefillFromGet, getEndpoint);
+    const params = metadata.extractParams(sourceData);
+    context.navigation.push(
+      metadata.targetEndpoint,
+      params,
+      metadata.prefillFromGet,
+      metadata.getEndpoint,
+    );
   };
 
   return (

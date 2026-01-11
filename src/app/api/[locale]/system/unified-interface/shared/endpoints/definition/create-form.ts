@@ -69,7 +69,7 @@ export interface CachedMethodSchemas<
     TScopedTranslationKey,
     TFields,
     TMethod,
-    FieldUsage.Response
+    FieldUsage.ResponseData
   >;
   urlParams: InferSchemaFromFieldForMethod<
     TScopedTranslationKey,
@@ -143,7 +143,7 @@ export type FormExamples<
               TScopedTranslationKey,
               TFields,
               Methods.GET,
-              FieldUsage.Response
+              FieldUsage.ResponseData
             >
           >,
           TExampleKey
@@ -198,7 +198,7 @@ export type FormExamples<
               TScopedTranslationKey,
               TFields,
               Methods.POST,
-              FieldUsage.Response
+              FieldUsage.ResponseData
             >
           >,
           TExampleKey
@@ -253,7 +253,7 @@ export type FormExamples<
               TScopedTranslationKey,
               TFields,
               Methods.PATCH,
-              FieldUsage.Response
+              FieldUsage.ResponseData
             >
           >,
           TExampleKey
@@ -308,7 +308,7 @@ export type FormExamples<
               TScopedTranslationKey,
               TFields,
               Methods.DELETE,
-              FieldUsage.Response
+              FieldUsage.ResponseData
             >
           >,
           TExampleKey
@@ -415,7 +415,7 @@ type SupportsMethodAndUsage<
             }
             ? true
             : false
-          : TTargetUsage extends FieldUsage.Response
+          : TTargetUsage extends FieldUsage.ResponseData
             ? TMethodUsage extends { response: true }
               ? true
               : false
@@ -430,7 +430,7 @@ type SupportsMethodAndUsage<
         ? TUsage extends { request: "urlPathParams" | "data&urlPathParams" }
           ? true
           : false
-        : TTargetUsage extends FieldUsage.Response
+        : TTargetUsage extends FieldUsage.ResponseData
           ? TUsage extends { response: true }
             ? true
             : false
@@ -498,8 +498,8 @@ export type MethodSpecificEndpoint<
   // Override type parameters with method-specific inference
   InferInputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.RequestData>,
   InferOutputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.RequestData>,
-  InferInputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.Response>,
-  InferOutputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.Response>,
+  InferInputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.ResponseData>,
+  InferOutputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.ResponseData>,
   InferInputFromFieldForMethod<
     TScopedTranslationKey,
     TFields,
@@ -547,7 +547,7 @@ export type GetResponseSchemaFromFields<
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
   TMethod extends Methods,
-> = InferSchemaFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.Response>;
+> = InferSchemaFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.ResponseData>;
 
 /**
  * Return type for createFormEndpoint - provides GET, POST, PATCH, and DELETE endpoints
@@ -702,7 +702,7 @@ export type ExtractMethodResponseOutput<
               : TMethodKey extends "PATCH"
                 ? Methods.PATCH
                 : Methods.DELETE,
-          FieldUsage.Response
+          FieldUsage.ResponseData
         >
       : never
     : never
@@ -956,7 +956,7 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
     }
 
     switch (targetUsage) {
-      case FieldUsage.Response:
+      case FieldUsage.ResponseData:
         return "response" in usage && usage.response === true;
       case FieldUsage.RequestData:
         return (
@@ -1032,7 +1032,7 @@ export function generateRequestDataSchemaForMethod<F>(field: F, method: Methods)
  * Generate response schema for a specific HTTP method using proper method-specific filtering
  */
 export function generateResponseSchemaForMethod<F>(field: F, method: Methods): z.ZodTypeAny {
-  return generateSchemaForMethodAndUsage(field, method, FieldUsage.Response);
+  return generateSchemaForMethodAndUsage(field, method, FieldUsage.ResponseData);
 }
 
 /**
@@ -1105,7 +1105,7 @@ export function createFormEndpoint<
       TScopedTranslationKey,
       TFields,
       TMethod,
-      FieldUsage.Response
+      FieldUsage.ResponseData
     >,
     urlSchema: InferSchemaFromFieldForMethod<
       TScopedTranslationKey,
@@ -1176,7 +1176,7 @@ export function createFormEndpoint<
               TScopedTranslationKey,
               TFields,
               TMethod,
-              FieldUsage.Response
+              FieldUsage.ResponseData
             >
           >,
           TExampleKey
@@ -1226,13 +1226,13 @@ export function createFormEndpoint<
           TScopedTranslationKey,
           TFields,
           TMethod,
-          FieldUsage.Response
+          FieldUsage.ResponseData
         >,
         ResponseOutput: undefined! as InferOutputFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           TMethod,
-          FieldUsage.Response
+          FieldUsage.ResponseData
         >,
         UrlVariablesInput: undefined! as InferInputFromFieldForMethod<
           TScopedTranslationKey,
@@ -1273,7 +1273,7 @@ export function createFormEndpoint<
           TScopedTranslationKey,
           TFields,
           Methods.GET,
-          FieldUsage.Response
+          FieldUsage.ResponseData
         >,
         generateRequestUrlSchemaForMethod(fields, Methods.GET) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
@@ -1303,7 +1303,7 @@ export function createFormEndpoint<
           TScopedTranslationKey,
           TFields,
           Methods.POST,
-          FieldUsage.Response
+          FieldUsage.ResponseData
         >,
         generateRequestUrlSchemaForMethod(fields, Methods.POST) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
@@ -1333,7 +1333,7 @@ export function createFormEndpoint<
           TScopedTranslationKey,
           TFields,
           Methods.PATCH,
-          FieldUsage.Response
+          FieldUsage.ResponseData
         >,
         generateRequestUrlSchemaForMethod(fields, Methods.PATCH) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
@@ -1363,7 +1363,7 @@ export function createFormEndpoint<
           TScopedTranslationKey,
           TFields,
           Methods.DELETE,
-          FieldUsage.Response
+          FieldUsage.ResponseData
         >,
         generateRequestUrlSchemaForMethod(fields, Methods.DELETE) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,

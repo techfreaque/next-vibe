@@ -12,9 +12,9 @@ import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { CharacterBrowserCore } from "@/app/api/[locale]/agent/chat/characters/components/character-browser";
-import type { CharacterListResponseOutput } from "@/app/api/[locale]/agent/chat/characters/definition";
+import type { CharacterListItem } from "@/app/api/[locale]/agent/chat/characters/definition";
 import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
-import type { FavoriteItem } from "@/app/api/[locale]/agent/chat/favorites/components/favorites-bar";
+import type { FavoriteCard } from "@/app/api/[locale]/agent/chat/favorites/definition";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -23,8 +23,8 @@ interface SelectorOnboardingProps {
   onSelect: (characterId: string) => void;
   onSaveFavorite?: (characterId: string) => Promise<void>;
   onCustomize: (characterId: string) => void;
-  favorites: FavoriteItem[];
-  characters: Record<string, CharacterListResponseOutput["characters"][number]>;
+  favorites: FavoriteCard[];
+  characters: Record<string, CharacterListItem>;
   locale: CountryLanguage;
   initialStep?: OnboardingStep;
   onStepChange?: (step: OnboardingStep) => void;
@@ -85,7 +85,7 @@ function CompanionCard({
   isSelected,
   locale,
 }: {
-  character: CharacterListResponseOutput["characters"][number];
+  character: CharacterListItem;
   onSelect: () => void;
   isSelected: boolean;
   locale: CountryLanguage;
@@ -123,16 +123,15 @@ function CompanionCard({
       </Div>
 
       {/* Name */}
-      <Span className="text-lg font-bold text-center mb-1">{t(character.name)}</Span>
+      <Span className="text-lg font-bold text-center mb-2">{t(character.content.name)}</Span>
 
       {/* Tagline */}
       <Span className="text-sm font-medium text-primary text-center mb-2">
-        {t(character.tagline)}
+        {t(character.content.tagline)}
       </Span>
-
       {/* Description */}
       <P className="text-xs text-muted-foreground text-center leading-relaxed">
-        {t(character.description)}
+        {t(character.content.description)}
       </P>
     </Div>
   );
@@ -194,7 +193,7 @@ function PickStep({
   selectedId: string | null;
   setSelectedId: (id: string) => void;
   isSaving: boolean;
-  characters: Record<string, CharacterListResponseOutput["characters"][number]>;
+  characters: Record<string, CharacterListItem>;
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
@@ -259,13 +258,13 @@ function SpecialistStep({
   onAddSpecialist: (characterId: string) => Promise<void>;
   onCustomize: (characterId: string) => void;
   onStartChatting: () => void;
-  favorites: FavoriteItem[];
-  characters: Record<string, CharacterListResponseOutput["characters"][number]>;
+  favorites: FavoriteCard[];
+  characters: Record<string, CharacterListItem>;
   locale: CountryLanguage;
 }): JSX.Element {
   const { t } = simpleT(locale);
   const character = characters[selectedCharacterId];
-  const characterName = character ? t(character.name) : "";
+  const characterName = character ? t(character.content.name) : "";
 
   return (
     <Div className="flex flex-col flex-1 overflow-hidden">

@@ -202,50 +202,72 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
    * Generate server-side registry content with lazy imports and metadata cache
    */
   private generateServerContent(templates: TemplateInfo[]): string {
-    // Sort templates by ID for consistent output
-    const sortedTemplates = templates.toSorted((a, b) => a.id.localeCompare(b.id));
+    // Sort templates by import path for consistent import order
+    const templatesByPath = templates.toSorted((a, b) => a.importPath.localeCompare(b.importPath));
+    // Sort templates by ID for loader and metadata order
+    const templatesById = templates.toSorted((a, b) => a.id.localeCompare(b.id));
 
-    // Generate individual imports for each template (not type imports - we need the value)
-    const importStatements = sortedTemplates
+    // Generate individual type imports for each template (sorted by path)
+    const importStatements = templatesByPath
       .map((t, index) => {
         const varName = `emailTemplate${index}`;
         // eslint-disable-next-line i18next/no-literal-string
-        return `import ${varName} from "${t.importPath}";`;
+        return `import type ${varName} from "${t.importPath}";`;
       })
       .join("\n");
 
-    // Generate union type using typeof the imported values
-    const templateTypeUnion = Array.from({ length: sortedTemplates.length })
+    // Generate union type using typeof the imported values (path order)
+    const templateTypeUnion = Array.from({ length: templatesByPath.length })
 
       // oxlint-disable-next-line no-unused-vars
       .map((_, index) => `  | typeof emailTemplate${index}`)
       .join("\n");
 
-    // Generate template loaders
-    const loaderEntries = sortedTemplates
-      .map(
-        (t) =>
+    // Generate template loaders (with trailing commas) - sorted by ID
+    const loaderEntries = templatesById
+      .map((t) => {
+        const singleLine = `  "${t.id}": async () => (await import("${t.importPath}")).default,`;
+        // Wrap long lines (100+ chars)
+        if (singleLine.length >= 100) {
           // eslint-disable-next-line i18next/no-literal-string
-          `  "${t.id}": async () => (await import("${t.importPath}")).default`,
-      )
-      .join(",\n");
+          return `  "${t.id}": async () =>\n    (await import("${t.importPath}")).default,`;
+        }
+        return singleLine;
+      })
+      .join("\n");
 
-    // Generate metadata map
-    const metadataEntries = sortedTemplates
-      .map(
-        (t) =>
-          // eslint-disable-next-line i18next/no-literal-string
-          `  "${t.id}": {
+    // Generate metadata map - sorted by ID
+    const metadataEntries = templatesById
+      .map((t) => {
+        // Format exampleProps: single line for small objects (no quotes on keys), multiline for large (no quotes on keys)
+        const propsKeys = Object.keys(t.metadata.exampleProps || {});
+        let examplePropsStr: string;
+        if (propsKeys.length <= 2) {
+          // Single line: { key: value }
+          const entries = Object.entries(t.metadata.exampleProps)
+            .map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
+            .join(", ");
+          examplePropsStr = `{ ${entries} }`;
+        } else {
+          // Multiline: each property on its own line (with trailing commas)
+          const entries = Object.entries(t.metadata.exampleProps)
+            .map(([k, v]) => `      ${k}: ${JSON.stringify(v)},`)
+            .join("\n");
+          examplePropsStr = `{\n${entries}\n    }`;
+        }
+
+        // eslint-disable-next-line i18next/no-literal-string
+        return `  "${t.id}": {
     id: "${t.metadata.id}",
     version: "${t.metadata.version}",
     name: "${t.metadata.name}",
     description: "${t.metadata.description}",
     category: "${t.metadata.category}",
     path: "${t.metadata.path}",
-    exampleProps: ${JSON.stringify(t.metadata.exampleProps)},
-  }`,
-      )
-      .join(",\n");
+    exampleProps: ${examplePropsStr},
+  },`;
+      })
+      .join("\n");
 
     // eslint-disable-next-line i18next/no-literal-string
     const autoGenTitle = "AUTO-GENERATED FILE - DO NOT EDIT";
@@ -257,9 +279,9 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
 
-import type { TemplateCachedMetadata } from "./types";
-
 ${importStatements}
+
+import type { TemplateCachedMetadata } from "./types";
 
 /**
  * Union type of all email template definitions
@@ -321,9 +343,7 @@ export function getAllTemplateMetadata(): TemplateCachedMetadata[] {
 /**
  * Get templates by category (metadata only)
  */
-export function getTemplatesByCategory(
-  category: string,
-): TemplateCachedMetadata[] {
+export function getTemplatesByCategory(category: string): TemplateCachedMetadata[] {
   return getAllTemplateMetadata().filter((t) => t.category === category);
 }
 
@@ -342,24 +362,40 @@ export function hasTemplate(id: string): boolean {
    */
   private generateClientContent(templates: TemplateInfo[]): string {
     // Sort templates by ID for consistent output
-    const sortedTemplates = templates.toSorted((a, b) => a.id.localeCompare(b.id));
+    const templatesById = templates.toSorted((a, b) => a.id.localeCompare(b.id));
 
     // Generate metadata map (same as server version)
-    const metadataEntries = sortedTemplates
-      .map(
-        (t) =>
-          // eslint-disable-next-line i18next/no-literal-string
-          `  "${t.id}": {
+    const metadataEntries = templatesById
+      .map((t) => {
+        // Format exampleProps: single line for small objects (no quotes on keys), multiline for large (no quotes on keys)
+        const propsKeys = Object.keys(t.metadata.exampleProps || {});
+        let examplePropsStr: string;
+        if (propsKeys.length <= 2) {
+          // Single line: { key: value }
+          const entries = Object.entries(t.metadata.exampleProps)
+            .map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
+            .join(", ");
+          examplePropsStr = `{ ${entries} }`;
+        } else {
+          // Multiline: each property on its own line (with trailing commas)
+          const entries = Object.entries(t.metadata.exampleProps)
+            .map(([k, v]) => `      ${k}: ${JSON.stringify(v)},`)
+            .join("\n");
+          examplePropsStr = `{\n${entries}\n    }`;
+        }
+
+        // eslint-disable-next-line i18next/no-literal-string
+        return `  "${t.id}": {
     id: "${t.metadata.id}",
     version: "${t.metadata.version}",
     name: "${t.metadata.name}",
     description: "${t.metadata.description}",
     category: "${t.metadata.category}",
     path: "${t.metadata.path}",
-    exampleProps: ${JSON.stringify(t.metadata.exampleProps)},
-  }`,
-      )
-      .join(",\n");
+    exampleProps: ${examplePropsStr},
+  },`;
+      })
+      .join("\n");
 
     // eslint-disable-next-line i18next/no-literal-string
     const autoGenTitle = "AUTO-GENERATED FILE - DO NOT EDIT - CLIENT-SAFE";
@@ -401,9 +437,7 @@ export function getAllTemplateMetadata(): TemplateCachedMetadata[] {
 /**
  * Get templates by category (metadata only)
  */
-export function getTemplatesByCategory(
-  category: string,
-): TemplateCachedMetadata[] {
+export function getTemplatesByCategory(category: string): TemplateCachedMetadata[] {
   return getAllTemplateMetadata().filter((t) => t.category === category);
 }
 `;
