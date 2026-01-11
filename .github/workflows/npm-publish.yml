@@ -10,6 +10,10 @@ on:
     branches:
       - vibe-check
 
+permissions:
+  id-token: write
+  contents: read   
+
 jobs:
   # Run checks on PRs and non-tag pushes
   check:
