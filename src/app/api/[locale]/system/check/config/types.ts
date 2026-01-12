@@ -580,8 +580,6 @@ export interface VibeCheckConfig {
   timeout?: number;
   /** Max issues to display per page (default: 200) */
   limit?: number;
-  /** Max files to show in summary (default: 50) */
-  maxFilesInSummary?: number;
 }
 
 // ============================================================

@@ -79,10 +79,6 @@ export const translations: typeof enTranslations = {
       label: "Strona",
       description: "Numer strony dla paginowanych wyników (zaczyna się od 1)",
     },
-    maxFilesInSummary: {
-      label: "Maks. Plików w Podsumowaniu",
-      description: "Maksymalna liczba plików na liście dotkniętych plików (1-1000)",
-    },
   },
 
   response: {

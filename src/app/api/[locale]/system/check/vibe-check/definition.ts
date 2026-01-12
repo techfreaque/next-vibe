@@ -136,18 +136,6 @@ const { POST } = createEndpoint({
         z.coerce.number().min(1).optional().default(1),
       ),
 
-      // Default: check.config.ts vibeCheck.maxFilesInSummary ?? 50
-      maxFilesInSummary: requestDataField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.check.vibeCheck.fields.maxFilesInSummary.label",
-          description: "app.api.system.check.vibeCheck.fields.maxFilesInSummary.description",
-          columns: 4,
-        },
-        z.coerce.number().min(1).optional(),
-      ),
-
       // === RESPONSE FIELDS ===
       issues: objectField(
         {
@@ -330,32 +318,27 @@ const { POST } = createEndpoint({
         fix: true,
         limit: 100,
         page: 1,
-        maxFilesInSummary: 50,
       },
       success: {
         fix: false,
         limit: 100,
         page: 1,
-        maxFilesInSummary: 50,
       },
       withErrors: {
         fix: true,
         limit: 100,
         page: 1,
-        maxFilesInSummary: 50,
       },
       quickCheck: {
         fix: false,
         limit: 100,
         page: 1,
-        maxFilesInSummary: 50,
       },
       specificPaths: {
         fix: true,
         paths: ["src/components", "src/utils"],
         limit: 100,
         page: 1,
-        maxFilesInSummary: 50,
       },
     },
     responses: {

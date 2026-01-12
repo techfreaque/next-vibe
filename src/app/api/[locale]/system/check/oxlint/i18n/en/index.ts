@@ -57,10 +57,6 @@ export const translations = {
       label: "Page",
       description: "Page number for pagination",
     },
-    maxFilesInSummary: {
-      label: "Max Files in Summary",
-      description: "Maximum number of files to show in summary",
-    },
     skipSorting: {
       label: "Skip Sorting",
       description: "Skip sorting issues (for performance)",

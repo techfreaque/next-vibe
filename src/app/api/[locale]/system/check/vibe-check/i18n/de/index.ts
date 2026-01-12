@@ -79,10 +79,6 @@ export const translations: typeof enTranslations = {
       label: "Seite",
       description: "Seitennummer für paginierte Ergebnisse (beginnt bei 1)",
     },
-    maxFilesInSummary: {
-      label: "Max. Dateien in Zusammenfassung",
-      description: "Maximale Anzahl der Dateien in der betroffenen Dateiliste (1-1000)",
-    },
   },
 
   response: {
