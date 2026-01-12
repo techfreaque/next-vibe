@@ -11,7 +11,7 @@ Run Oxlint, ESLint, and TypeScript in parallel. Fast caching, auto-fix by defaul
 - **Smart caching** - 10x faster on large projects (41s → 4s)
 - **Auto-fix** - Fixes issues by default
 - **100+ rules** - React, TypeScript, a11y, Next.js, Node.js, custom plugins
-- **MCP server** - Integrate with Claude via Model Context Protocol
+- **MCP server** - Integrate with your AI agent via Model Context Protocol
 - **Fast type checking** - tsgo (2-3x faster than tsc)
 
 ## Performance
