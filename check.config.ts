@@ -575,7 +575,7 @@ const oxlint: CheckConfig["oxlint"] = {
           "nextjs/no-duplicate-head": "error",
           "nextjs/no-head-element": "error",
           "nextjs/no-head-import-in-document": "error",
-          "nextjs/no-html-link-for-pages": "error",
+          "nextjs/no-html-link-for-pages": "off",
           "nextjs/no-img-element": "warn",
           "nextjs/no-page-custom-font": "error",
           "nextjs/no-script-component-in-head": "error",

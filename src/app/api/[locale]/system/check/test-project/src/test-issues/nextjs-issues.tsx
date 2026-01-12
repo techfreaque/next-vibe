@@ -14,17 +14,6 @@ export function ImgElement(): React.ReactElement {
   );
 }
 
-// nextjs/no-html-link-for-pages - Using <a> for internal navigation
-export function HtmlLink(): React.ReactElement {
-  return (
-    <nav>
-      <a href="/about">About</a>
-      <a href="/contact">Contact</a>
-      <a href="/dashboard/settings">Settings</a>
-    </nav>
-  );
-}
-
 // nextjs/no-head-element - Using <head> instead of next/head
 export function HeadElement(): React.ReactElement {
   return (

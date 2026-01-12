@@ -125,7 +125,6 @@ const EXPECTED_COUNTS = {
 
     // Next.js rules
     "eslint-plugin-next(no-img-element)": 4,
-    "eslint-plugin-next(no-html-link-for-pages)": 4,
     "eslint-plugin-next(no-sync-scripts)": 1,
     "eslint-plugin-next(no-css-tags)": 1,
     "eslint-plugin-next(google-font-display)": 1,
@@ -718,13 +717,6 @@ describe("Vibe Check Complete Test Suite", () => {
       );
     });
 
-    it("should detect no-html-link-for-pages", () => {
-      const count = countOccurrences(vibeCheckOutput, "eslint-plugin-next(no-html-link-for-pages)");
-      expect(count).toBeGreaterThanOrEqual(
-        EXPECTED_COUNTS.rules["eslint-plugin-next(no-html-link-for-pages)"],
-      );
-    });
-
     it("should detect no-sync-scripts", () => {
       expect(vibeCheckOutput).toContain("eslint-plugin-next(no-sync-scripts)");
     });
@@ -864,7 +856,6 @@ describe("Vibe Check Complete Test Suite", () => {
       { name: "eslint-plugin-react(self-closing-comp)", min: 4 },
       { name: "eslint-plugin-jsx-a11y(click-events-have-key-events)", min: 4 },
       { name: "eslint-plugin-next(no-img-element)", min: 4 },
-      { name: "eslint-plugin-next(no-html-link-for-pages)", min: 4 },
     ];
 
     for (const rule of highVolumeRules) {
