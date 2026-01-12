@@ -70,20 +70,13 @@
   ],
   "type": "module",
   "main": "./.dist/bin/vibe-runtime.js",
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./src/app/api/[locale]/*"
-      ]
-    }
-  },
   "exports": {
     ".": {
       "import": "./dist/bin/vibe-runtime.js",
       "default": "./dist/bin/vibe-runtime.js"
     },
     "./*": {
-      "types": "./src/app/api/[locale]/*",
+      "types": "./src/app/api/[locale]/*.ts",
       "import": "./src/app/api/[locale]/*",
       "default": "./src/app/api/[locale]/*"
     }
