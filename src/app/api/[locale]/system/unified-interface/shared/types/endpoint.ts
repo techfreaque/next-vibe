@@ -4,7 +4,6 @@
  * Fundamental type definitions used throughout the endpoint types system.
  */
 
-import type { Route } from "next";
 import type { z } from "zod";
 
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
@@ -745,7 +744,6 @@ export interface NavigationActionConfig extends BaseActionConfig {
     | ActionType.ROUTER_BACK
     | ActionType.REDIRECT;
   path?: string;
-  route?: Route;
   params?: Record<string, string>;
   query?: Record<string, string>;
   replace?: boolean;

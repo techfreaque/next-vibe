@@ -5,8 +5,6 @@
  * For widget configurations, import from widget-configs.ts.
  */
 
-import type { Route } from "next";
-
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { IconKey } from "../../react/icons";
@@ -87,7 +85,6 @@ export interface NavigationActionConfig extends BaseActionConfig {
     | ActionType.ROUTER_BACK
     | ActionType.REDIRECT;
   path?: string;
-  route?: Route;
   params?: Record<string, string>;
   query?: Record<string, string>;
   replace?: boolean;

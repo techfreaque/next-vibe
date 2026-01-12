@@ -5,7 +5,6 @@
  * This ensures type safety across CLI and React implementations.
  */
 
-import type { Route } from "next";
 import type { z } from "zod";
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
@@ -696,7 +695,7 @@ export interface MarkdownEditorWidgetConfig<TKey extends string> extends BaseWid
 
 export interface LinkWidgetConfig<TKey extends string> extends BaseWidgetConfig {
   type: WidgetType.LINK;
-  href: Route | string; // URL path or route
+  href: string; // URL path or route
   text?: NoInfer<TKey>; // Link text to display
   label?: NoInfer<TKey>; // Accessible label (aria-label) - use if text is not descriptive
   external?: boolean; // Opens in new tab if true
@@ -704,7 +703,7 @@ export interface LinkWidgetConfig<TKey extends string> extends BaseWidgetConfig 
 
 export interface LinkCardWidgetConfig<TKey extends string> extends BaseWidgetConfig {
   type: WidgetType.LINK_CARD;
-  href: Route | string;
+  href: string;
   title: NoInfer<TKey>;
   description?: NoInfer<TKey>;
   external?: boolean;
@@ -714,7 +713,7 @@ export interface LinkListWidgetConfig<TKey extends string> extends BaseWidgetCon
   type: WidgetType.LINK_LIST;
   title?: NoInfer<TKey>;
   links?: Array<{
-    href: Route | string;
+    href: string;
     text: NoInfer<TKey>;
     external?: boolean;
   }>;
