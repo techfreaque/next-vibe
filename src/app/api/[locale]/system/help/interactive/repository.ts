@@ -871,6 +871,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
         session.locale,
         session.options?.verbose || false,
         logger,
+        context,
       );
 
       logger.info(formattedResult);
@@ -919,6 +920,7 @@ class InteractiveRepositoryImpl implements InteractiveRepository {
         session.locale,
         session.options?.verbose || false,
         logger,
+        context,
       );
 
       logger.info(formattedResult);

@@ -16,6 +16,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { modelOptions, modelProviders } from "../../models/models";
+import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import type {
   CharacterGetResponseOutput,
   CharacterUpdateRequestOutput,
@@ -30,47 +31,8 @@ import { customCharacters } from "./db";
 import type { CharacterListItem, CharacterListResponseOutput } from "./definition";
 import type { CharacterCategoryDB } from "./enum";
 import { type CharacterCategoryValue, CharacterOwnershipType } from "./enum";
+import { CATEGORY_CONFIG } from "./enum";
 import { CharactersRepositoryClient } from "./repository-client";
-
-/**
- * Format credit cost for display (server-side version, no i18n)
- */
-function formatCreditCost(cost: number): string {
-  if (cost === 0) {
-    return "Free";
-  }
-  if (cost === 1) {
-    return "1 credit";
-  }
-  return `${cost} credits`;
-}
-
-/**
- * Compute display fields for a character
- */
-function computeCharacterDisplayFields(character: {
-  modelSelection: CharacterGetResponseOutput["modelSelection"];
-}): {
-  modelIcon: IconKey;
-  modelInfo: string;
-  modelProvider: string;
-  creditCost: string;
-} {
-  const allModels = Object.values(modelOptions);
-  const resolvedModel = CharactersRepositoryClient.resolveModelForSelection(
-    character.modelSelection,
-    allModels,
-  );
-
-  return {
-    modelIcon: resolvedModel?.icon ?? ("sparkles" as IconKey),
-    modelInfo: resolvedModel?.name ?? "Default Model",
-    modelProvider: resolvedModel?.provider
-      ? (modelProviders[resolvedModel.provider]?.name ?? "Unknown")
-      : "Unknown",
-    creditCost: resolvedModel ? formatCreditCost(resolvedModel.creditCost) : "—",
-  };
-}
 
 /**
  * Characters Repository - Static class pattern
@@ -94,22 +56,43 @@ export class CharactersRepository {
       };
     }
 
-    // Check custom characters (requires authenticated user)
-    if (!userId) {
-      return null;
-    }
-
+    // Check custom characters
+    // Return character if:
+    // 1. User owns it (any ownershipType)
+    // 2. It's PUBLIC (regardless of owner)
     const [customCharacter] = await db
       .select()
       .from(customCharacters)
-      .where(and(eq(customCharacters.id, characterId), eq(customCharacters.userId, userId)))
+      .where(
+        and(
+          eq(customCharacters.id, characterId),
+          userId
+            ? or(
+                eq(customCharacters.userId, userId),
+                eq(customCharacters.ownershipType, CharacterOwnershipType.PUBLIC),
+              )
+            : eq(customCharacters.ownershipType, CharacterOwnershipType.PUBLIC),
+        ),
+      )
       .limit(1);
 
     if (!customCharacter) {
       return null;
     }
 
-    return customCharacter;
+    return {
+      id: customCharacter.id,
+      name: customCharacter.name,
+      description: customCharacter.description,
+      icon: customCharacter.icon,
+      systemPrompt: customCharacter.systemPrompt,
+      category: customCharacter.category,
+      tagline: customCharacter.tagline,
+      ownershipType: customCharacter.ownershipType,
+      modelSelection: customCharacter.modelSelection,
+      voice: customCharacter.voice || DEFAULT_TTS_VOICE,
+      suggestedPrompts: customCharacter.suggestedPrompts,
+    };
   }
 
   /**
@@ -146,47 +129,15 @@ export class CharactersRepository {
             ),
           );
 
-        // Map custom characters to card display fields only
-        const customCharactersCards = customCharactersList.map((char) => {
-          const displayFields = computeCharacterDisplayFields(char);
-          return {
-            id: char.id,
-            category: char.category as (typeof CharacterCategoryDB)[number],
-            icon: char.icon,
-            content: {
-              name: char.name,
-              description: char.description,
-              tagline: char.tagline,
-              modelRow: {
-                modelIcon: displayFields.modelIcon,
-                modelInfo: displayFields.modelInfo,
-                modelProvider: displayFields.modelProvider,
-                creditCost: displayFields.creditCost,
-              },
-            },
-          };
-        });
+        // Map custom characters to card display fields
+        const customCharactersCards = customCharactersList.map(
+          CharactersRepository.mapCharacterToListItem,
+        );
 
-        // Map default characters to card display fields only
-        const defaultCharactersCards = DEFAULT_CHARACTERS.map((char) => {
-          const displayFields = computeCharacterDisplayFields(char);
-          return {
-            id: char.id,
-            category: char.category as (typeof CharacterCategoryDB)[number],
-            icon: char.icon,
-            content: {
-              name: char.name,
-              description: char.description,
-              tagline: char.tagline,
-              modelRow: {
-                modelIcon: displayFields.modelIcon,
-                modelInfo: displayFields.modelInfo,
-                modelProvider: displayFields.modelProvider,
-                creditCost: displayFields.creditCost,
-              },
-            },
-          };
-        });
+        // Map default characters to card display fields
+        const defaultCharactersCards = DEFAULT_CHARACTERS.map(
+          CharactersRepository.mapCharacterToListItem,
+        );
 
         // Combine all characters
         const allCharacters = [...defaultCharactersCards, ...customCharactersCards];
@@ -201,25 +152,9 @@ export class CharactersRepository {
 
       // For public/lead users, return only default characters as card display fields
       logger.debug("Getting default characters for public user");
-      const defaultCharactersCards = DEFAULT_CHARACTERS.map((char) => {
-        const displayFields = computeCharacterDisplayFields(char);
-        return {
-          id: char.id,
-          category: char.category as (typeof CharacterCategoryDB)[number],
-          icon: char.icon,
-          content: {
-            name: char.name,
-            description: char.description,
-            tagline: char.tagline,
-            modelRow: {
-              modelIcon: displayFields.modelIcon,
-              modelInfo: displayFields.modelInfo,
-              modelProvider: displayFields.modelProvider,
-              creditCost: displayFields.creditCost,
-            },
-          },
-        };
-      });
+      const defaultCharactersCards = DEFAULT_CHARACTERS.map(
+        CharactersRepository.mapCharacterToListItem,
+      );
 
       // Group characters by category into sections
       const sections = this.groupCharactersIntoSections(defaultCharactersCards);
@@ -242,9 +177,6 @@ export class CharactersRepository {
   private static groupCharactersIntoSections(
     characters: CharacterListItem[],
   ): CharacterListResponseOutput["sections"] {
-    // Import CATEGORY_CONFIG locally to avoid circular dependencies
-    const { CATEGORY_CONFIG } = require("./enum");
-
     // Group characters by category
     const groupedByCategory = new Map<typeof CharacterCategoryValue, CharacterListItem[]>();
 
@@ -307,18 +239,24 @@ export class CharactersRepository {
         return success(characterData);
       }
 
-      // Check custom characters (requires authenticated user)
-      if (!userId) {
-        return fail({
-          message: "app.api.agent.chat.characters.id.get.errors.notFound.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
+      // Check custom characters
+      // Return character if:
+      // 1. User owns it (any ownershipType)
+      // 2. It's PUBLIC (regardless of owner)
       const [customCharacter] = await db
         .select()
         .from(customCharacters)
-        .where(and(eq(customCharacters.id, characterId), eq(customCharacters.userId, userId)))
+        .where(
+          and(
+            eq(customCharacters.id, characterId),
+            userId
+              ? or(
+                  eq(customCharacters.userId, userId),
+                  eq(customCharacters.ownershipType, CharacterOwnershipType.PUBLIC),
+                )
+              : eq(customCharacters.ownershipType, CharacterOwnershipType.PUBLIC),
+          ),
+        )
         .limit(1);
 
       if (!customCharacter) {
@@ -339,7 +277,7 @@ export class CharactersRepository {
         tagline: customCharacter.tagline,
         ownershipType: customCharacter.ownershipType,
         modelSelection: customCharacter.modelSelection,
-        voice: customCharacter.voice,
+        voice: customCharacter.voice || DEFAULT_TTS_VOICE,
         suggestedPrompts: customCharacter.suggestedPrompts,
       });
     } catch (error) {
@@ -374,8 +312,17 @@ export class CharactersRepository {
       const [character] = await db
         .insert(customCharacters)
         .values({
-          ...data,
           userId,
+          name: data.name,
+          description: data.description,
+          tagline: data.tagline,
+          icon: data.icon,
+          systemPrompt: data.systemPrompt,
+          category: data.category,
+          voice: data.voice,
+          suggestedPrompts: data.suggestedPrompts || [],
+          modelSelection: data.modelSelection,
+          ownershipType: data.ownershipType,
         })
         .returning();
 
@@ -446,7 +393,7 @@ export class CharactersRepository {
           updated.ownershipType === "app.api.agent.chat.characters.enums.ownershipType.system"
             ? "app.api.agent.chat.characters.enums.ownershipType.user"
             : updated.ownershipType,
-        voice: updated.voice,
+        voice: updated.voice || DEFAULT_TTS_VOICE,
         suggestedPrompts: updated.suggestedPrompts,
         modelSelection: updated.modelSelection,
       });
@@ -500,5 +447,77 @@ export class CharactersRepository {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
+  }
+  /**
+   * Format credit cost for display (server-side version, no i18n)
+   */
+  private static formatCreditCost(cost: number): string {
+    if (cost === 0) {
+      return "Free";
+    }
+    if (cost === 1) {
+      return "1 credit";
+    }
+    return `${cost} credits`;
+  }
+
+  /**
+   * Compute display fields for a character
+   */
+  private static computeCharacterDisplayFields(character: {
+    modelSelection: CharacterGetResponseOutput["modelSelection"];
+  }): {
+    modelIcon: IconKey;
+    modelInfo: string;
+    modelProvider: string;
+    creditCost: string;
+  } {
+    const allModels = Object.values(modelOptions);
+    const resolvedModel = CharactersRepositoryClient.resolveModelForSelection(
+      character.modelSelection,
+      allModels,
+    );
+
+    return {
+      modelIcon: resolvedModel?.icon ?? ("sparkles" as IconKey),
+      modelInfo: resolvedModel?.name ?? "Default Model",
+      modelProvider: resolvedModel?.provider
+        ? (modelProviders[resolvedModel.provider]?.name ?? "Unknown")
+        : "Unknown",
+      creditCost: resolvedModel
+        ? CharactersRepository.formatCreditCost(resolvedModel.creditCost)
+        : "—",
+    };
+  }
+
+  /**
+   * Map a character to a list item card
+   */
+  private static mapCharacterToListItem(char: {
+    id: string;
+    category: string;
+    icon: string;
+    name: string;
+    description: string;
+    tagline: string;
+    modelSelection: CharacterGetResponseOutput["modelSelection"];
+  }): CharacterListItem {
+    const displayFields = CharactersRepository.computeCharacterDisplayFields(char);
+    return {
+      id: char.id,
+      category: char.category as (typeof CharacterCategoryDB)[number],
+      icon: char.icon as IconKey,
+      content: {
+        name: char.name,
+        description: char.description,
+        tagline: char.tagline,
+        modelRow: {
+          modelIcon: displayFields.modelIcon,
+          modelInfo: displayFields.modelInfo,
+          modelProvider: displayFields.modelProvider,
+          creditCost: displayFields.creditCost,
+        },
+      },
+    };
   }
 }

@@ -14,7 +14,7 @@ import type {
   RootPermissionsGetRequestOutput,
   RootPermissionsGetResponseOutput,
 } from "./definition";
-import { GET as getRootPermissionsEndpoint } from "./definition";
+import definitions from "./definition";
 import type { RootFolderPermissionsRepositoryType } from "./repository";
 
 /**
@@ -28,7 +28,7 @@ export class RootFolderPermissionsRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<RootPermissionsGetResponseOutput>> {
-    const response = await nativeEndpoint(getRootPermissionsEndpoint, { data }, logger, locale);
+    const response = await nativeEndpoint(definitions.GET, { data }, logger, locale);
 
     if (response.success) {
       return {

@@ -18,6 +18,12 @@ import { findRouteFiles } from "@/app/api/[locale]/system/unified-interface/shar
 
 import { parseError } from "../../../shared/utils";
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
+import {
+  formatCount,
+  formatDuration,
+  formatGenerator,
+  formatWarning,
+} from "../../unified-interface/shared/logger/formatters";
 
 // RouteFileStructure represents a route module with HTTP method handlers
 interface RouteFileStructure {
@@ -108,29 +114,43 @@ export async function generateTRPCRouter(
   errors: string[];
   warnings: string[];
 }> {
+  const startTime = Date.now();
   // Debug: generateTRPCRouter started with config
   const { apiDir, outputFile, includeWarnings = true, excludePatterns = [] } = config;
   const errors: string[] = [];
   const warnings: string[] = [];
   const routeFiles: RouteFileInfo[] = [];
 
-  // Add default exclude patterns for standalone packages
-  // These packages have their own node_modules and shouldn't be processed as API routes
-  const defaultExcludePatterns = [
-    "system/builder",
-    "system/launchpad",
-    "system/release-tool",
-    "system/guard",
-    "system/check",
-  ];
-  const allExcludePatterns = [...defaultExcludePatterns, ...excludePatterns];
-
   try {
     // Debug: Starting tRPC router generation
 
     // Scan for route files
-    const discoveredFiles = scanForRouteFiles(apiDir, allExcludePatterns);
-    // Debug: Found route files
+    const discoveredRouteFiles = scanForRouteFiles(apiDir, excludePatterns);
+
+    const routesWithoutDefinition: string[] = [];
+    const discoveredFiles: string[] = [];
+
+    for (const routeFile of discoveredRouteFiles) {
+      const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
+      // Check if definition exists by trying to construct the path
+      const fs = await import("node:fs");
+      if (fs.existsSync(definitionPath)) {
+        discoveredFiles.push(routeFile);
+      } else {
+        routesWithoutDefinition.push(routeFile);
+      }
+    }
+
+    if (routesWithoutDefinition.length > 0) {
+      const routeList = routesWithoutDefinition
+        .map((r) => `    • ${r.replace(process.cwd(), "").replace(/^\//, "")}`)
+        .join("\n");
+      logger.debug(
+        formatWarning(
+          `Skipped ${formatCount(routesWithoutDefinition.length, "route")} without matching definition:\n${routeList}`,
+        ),
+      );
+    }
 
     // Validate and process each route file
     // Debug: Processing routes
@@ -176,17 +196,35 @@ export async function generateTRPCRouter(
 
     // Generate router code
     const validRoutes = routeFiles.filter((f) => f.validation.isValid);
-    // Debug: Generating router code
+    const invalidRoutes = routeFiles.filter((f) => !f.validation.isValid);
 
-    logger.debug(`Valid routes: ${validRoutes.length}, Total routes: ${routeFiles.length}`);
+    // Log invalid routes with reasons
+    if (invalidRoutes.length > 0) {
+      const invalidList = invalidRoutes
+        .map((r) => {
+          const errors = r.validation.errors.join(", ");
+          return `    • ${r.relativePath}\n      ${errors}`;
+        })
+        .join("\n");
+      logger.warn(
+        formatWarning(
+          `Invalid tRPC ${formatCount(invalidRoutes.length, "route")}:\n${invalidList}`,
+        ),
+      );
+    }
+
     const routerCode = generateRouterCode(validRoutes, outputFile);
 
     // Write to output file
-
-    logger.debug(`Writing router to: ${outputFile}`);
     writeRouterFile(outputFile, routerCode);
 
-    logger.debug(`Router written successfully`);
+    const duration = Date.now() - startTime;
+    logger.info(
+      formatGenerator(
+        `Generated tRPC router with ${formatCount(validRoutes.length, "route")} in ${formatDuration(duration)}`,
+        "🔀",
+      ),
+    );
 
     // Debug: tRPC router generation completed
 
@@ -329,7 +367,7 @@ function generateRouterCode(validRouteFiles: RouteFileInfo[], outputFile: string
       .replaceAll("\\", "/");
 
     // eslint-disable-next-line i18next/no-literal-string
-    imports.push(`import { tools as ${toolsVarName} } from '${importPath}';`);
+    imports.push(`import { tools as ${toolsVarName} } from "${importPath}";`);
     // eslint-disable-next-line i18next/no-literal-string
     // Convert generic handlers to tRPC procedures using the wrapper utility
     constants.push(`const ${varName} = wrapToolsForTRPC(${toolsVarName});`);
@@ -351,8 +389,8 @@ function generateRouterCode(validRouteFiles: RouteFileInfo[], outputFile: string
 /* eslint-disable simple-import-sort/imports */
 /* eslint-disable prettier/prettier */
 
-import { router } from '@/app/api/[locale]/system/unified-interface/trpc/setup';
-import { wrapToolsForTRPC } from '@/app/api/[locale]/system/unified-interface/trpc/wrapper';
+import { router } from "@/app/api/[locale]/system/unified-interface/trpc/setup";
+import { wrapToolsForTRPC } from "@/app/api/[locale]/system/unified-interface/trpc/wrapper";
 ${imports.join("\n")}
 
 ${constants.join("\n")}

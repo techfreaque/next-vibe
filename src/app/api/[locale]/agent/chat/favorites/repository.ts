@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, max } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -102,27 +102,27 @@ export class ChatFavoritesRepository {
         characterId: data.characterId,
       });
 
-      // Verify character exists
-      const character = await getCharacterById(data.characterId, userId);
-      if (!character) {
-        return fail({
-          message: "app.api.agent.chat.favorites.post.errors.notFound.title",
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
+      // Verify character exists and user has access to it
+      if (data.characterId) {
+        const character = await CharactersRepository.getCharacterByIdSimple(
+          data.characterId,
+          userId,
+        );
+        if (!character) {
+          return fail({
+            message: "app.api.agent.chat.favorites.post.errors.characterNotFound.title",
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
       }
 
-      // Get current max position
-      const existing = await db
-        .select()
+      // Get current max position using database aggregation
+      const [maxPositionResult] = await db
+        .select({ maxPosition: max(chatFavorites.position) })
         .from(chatFavorites)
         .where(eq(chatFavorites.userId, userId));
 
-      let maxPosition = -1;
-      for (const f of existing) {
-        if (f.position > maxPosition) {
-          maxPosition = f.position;
-        }
-      }
+      const nextPosition = (maxPositionResult?.maxPosition ?? -1) + 1;
 
       const [favorite] = await db
         .insert(chatFavorites)
@@ -132,7 +132,7 @@ export class ChatFavoritesRepository {
           customName: data.customName,
           voice: data.voice,
           modelSelection: data.modelSelection,
-          position: maxPosition + 1,
+          position: nextPosition,
         })
         .returning();
 

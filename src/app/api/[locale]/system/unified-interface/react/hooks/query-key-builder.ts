@@ -4,9 +4,9 @@
  * Uses ONLY: endpoint.path + endpoint.method + urlPathParams
  */
 
+import { parseError } from "@/app/api/[locale]/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { parseError } from "@/app/api/[locale]/shared/utils";
 
 /**
  * Build cache/storage key - SINGLE implementation

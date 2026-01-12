@@ -381,8 +381,5 @@ export type ImapFoldersListResponseOutput = typeof GET.types.ResponseOutput;
 
 const endpoints = {
   GET,
-};
-
-// Export individual endpoints
-export { GET };
+} as const;
 export default endpoints;

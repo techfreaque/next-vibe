@@ -921,4 +921,3 @@ export type ThreadDeleteUrlParamsTypeOutput = typeof DELETE.types.UrlVariablesOu
 
 const definitions = { GET, PATCH, DELETE };
 export default definitions;
-export { DELETE, GET, PATCH };

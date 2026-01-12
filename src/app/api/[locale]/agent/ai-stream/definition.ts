@@ -587,5 +587,4 @@ const definitions = {
   POST,
 };
 
-export { POST };
 export default definitions;

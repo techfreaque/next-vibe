@@ -32,7 +32,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { iconSchema } from "../../../shared/types/common.schema";
 import { ModelUtilityDB, ModelUtilityOptions } from "../../models/enum";
 import { TtsVoiceDB, TtsVoiceOptions } from "../../text-to-speech/enum";
-import { DELETE as FavoriteDELETE, PATCH as FavoritePATCH } from "./[id]/definition";
+import favoriteDefinition from "./[id]/definition";
 import {
   ContentLevelFilter,
   ContentLevelFilterDB,
@@ -152,6 +152,13 @@ const { POST } = createEndpoint({
                 },
                 z.literal(ModelSelectionType.MANUAL),
               ),
+              modelDisplay: widgetField(
+                {
+                  type: WidgetType.MODEL_DISPLAY,
+                  columns: 12,
+                },
+                { request: "data" },
+              ),
               manualModelId: requestDataField(
                 {
                   type: WidgetType.FORM_FIELD,
@@ -192,6 +199,13 @@ const { POST } = createEndpoint({
                   columns: 12,
                 },
                 z.literal(ModelSelectionType.FILTERS),
+              ),
+              modelDisplay: widgetField(
+                {
+                  type: WidgetType.MODEL_DISPLAY,
+                  columns: 12,
+                },
+                { request: "data" },
               ),
               intelligenceRange: requestDataRangeField(
                 {
@@ -554,12 +568,12 @@ const { GET } = createEndpoint({
               },
             ),
             editButton: navigateButtonField({
-              targetEndpoint: FavoritePATCH,
+              targetEndpoint: favoriteDefinition.PATCH,
               extractParams: (favorite) => ({ urlPathParams: { id: String(favorite.id) } }),
               prefillFromGet: true,
             }),
             deleteButton: navigateButtonField({
-              targetEndpoint: FavoriteDELETE,
+              targetEndpoint: favoriteDefinition.DELETE,
               extractParams: (favorite) => ({ urlPathParams: { id: String(favorite.id) } }),
               prefillFromGet: false,
             }),
@@ -662,5 +676,4 @@ export type FavoriteCard = FavoritesListResponseOutput["favoritesList"][number];
 export type FavoriteModelSelection = FavoriteCreateRequestOutput["modelSelection"];
 
 const definitions = { GET, POST };
-export { GET, POST };
 export default definitions;

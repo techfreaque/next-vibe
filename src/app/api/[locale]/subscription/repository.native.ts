@@ -17,7 +17,7 @@ import type {
   SubscriptionPutRequestOutput,
   SubscriptionPutResponseOutput,
 } from "./definition";
-import { GET as getSubscriptionEndpoint } from "./definition";
+import subscriptionEndpoints from "./definition";
 import type { SubscriptionRepositoryType } from "./repository";
 
 /**
@@ -30,7 +30,7 @@ export class SubscriptionRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<SubscriptionGetResponseOutput>> {
-    const response = await nativeEndpoint(getSubscriptionEndpoint, {}, logger, locale);
+    const response = await nativeEndpoint(subscriptionEndpoints.GET, {}, logger, locale);
 
     if (response.success) {
       return {

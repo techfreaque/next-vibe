@@ -26,7 +26,6 @@ import {
   CronTaskPriority,
   CronTaskPriorityDB,
   CronTaskPriorityOptions,
-  CronTaskStatus,
   CronTaskStatusDB,
   CronTaskStatusOptions,
   TaskCategory,
@@ -204,7 +203,23 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.taskDescription",
               },
-              z.string().optional(),
+              z.string().nullable(),
+            ),
+            version: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.version",
+              },
+              z.string(),
+            ),
+            category: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.category",
+              },
+              z.string(),
             ),
             schedule: responseField(
               {
@@ -213,6 +228,14 @@ const { GET } = createEndpoint({
                   "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.schedule",
               },
               z.string(),
+            ),
+            timezone: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.timezone",
+              },
+              z.string().nullable(),
             ),
             enabled: responseField(
               {
@@ -230,45 +253,101 @@ const { GET } = createEndpoint({
               },
               z.enum(CronTaskPriorityDB),
             ),
-            status: responseField(
+            timeout: responseField(
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.status",
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.timeout",
               },
-              z.enum(CronTaskStatusDB),
+              z.number().nullable(),
             ),
-            category: responseField(
+            retries: responseField(
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.category",
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.retries",
               },
-              z.enum(TaskCategoryDB),
+              z.number().nullable(),
             ),
-            lastRun: responseField(
+            retryDelay: responseField(
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.lastRun",
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.retryDelay",
               },
-              z.string().optional(),
+              z.number().nullable(),
             ),
-            nextRun: responseField(
+            lastExecutedAt: responseField(
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.nextRun",
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.lastExecutedAt",
               },
-              z.string().optional(),
+              z.string().nullable(),
             ),
-            version: responseField(
+            lastExecutionStatus: responseField(
               {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.version",
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.lastExecutionStatus",
               },
-              z.coerce.number(),
+              z.enum(CronTaskStatusDB).nullable(),
+            ),
+            lastExecutionError: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.lastExecutionError",
+              },
+              z.string().nullable(),
+            ),
+            lastExecutionDuration: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.lastExecutionDuration",
+              },
+              z.number().nullable(),
+            ),
+            nextExecutionAt: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.nextExecutionAt",
+              },
+              z.string().nullable(),
+            ),
+            executionCount: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.executionCount",
+              },
+              z.number(),
+            ),
+            successCount: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.successCount",
+              },
+              z.number(),
+            ),
+            errorCount: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.errorCount",
+              },
+              z.number(),
+            ),
+            averageExecutionTime: responseField(
+              {
+                type: WidgetType.TEXT,
+                content:
+                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.averageExecutionTime",
+              },
+              z.number().nullable(),
             ),
             createdAt: responseField(
               {
@@ -511,16 +590,25 @@ const { POST } = createEndpoint({
         z.object({
           id: z.string(),
           name: z.string(),
-          description: z.string().optional(),
+          description: z.string().nullable(),
+          version: z.string(),
+          category: z.string(),
           schedule: z.string(),
+          timezone: z.string().nullable(),
           enabled: z.boolean(),
           priority: z.enum(CronTaskPriorityDB),
-          status: z.enum(CronTaskStatusDB),
-          category: z.enum(TaskCategoryDB),
-          timeout: z.coerce.number(),
-          retries: z.coerce.number(),
-          retryDelay: z.coerce.number(),
-          version: z.coerce.number(),
+          timeout: z.number().nullable(),
+          retries: z.number().nullable(),
+          retryDelay: z.number().nullable(),
+          lastExecutedAt: z.string().nullable(),
+          lastExecutionStatus: z.enum(CronTaskStatusDB).nullable(),
+          lastExecutionError: z.string().nullable(),
+          lastExecutionDuration: z.number().nullable(),
+          nextExecutionAt: z.string().nullable(),
+          executionCount: z.number(),
+          successCount: z.number(),
+          errorCount: z.number(),
+          averageExecutionTime: z.number().nullable(),
           createdAt: z.string(),
           updatedAt: z.string(),
         }),
@@ -601,15 +689,24 @@ const { POST } = createEndpoint({
           id: "task-123",
           name: "Daily Cleanup Task",
           description: "Cleans up old data",
+          version: "1.0.0",
+          category: TaskCategory.MAINTENANCE,
           schedule: "0 0 * * *",
+          timezone: "UTC",
           enabled: true,
           priority: CronTaskPriority.MEDIUM,
-          status: CronTaskStatus.PENDING,
-          category: TaskCategory.MAINTENANCE,
           timeout: 300000,
           retries: 3,
           retryDelay: 5000,
-          version: 1,
+          lastExecutedAt: null,
+          lastExecutionStatus: null,
+          lastExecutionError: null,
+          lastExecutionDuration: null,
+          nextExecutionAt: null,
+          executionCount: 0,
+          successCount: 0,
+          errorCount: 0,
+          averageExecutionTime: null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },

@@ -412,6 +412,28 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       enabled: finalEnabled,
       // Respect staleTime and cacheTime from queryOptions
       // Don't hardcode to 0 as this breaks caching for all read endpoints
+      // Custom onSuccess handler to merge response data into form
+      onSuccess: (data): void | ErrorResponseType | Promise<void | ErrorResponseType> => {
+        // Merge response data into form so FormFieldWidget can display it
+        const responseData = data.responseData;
+        const currentFormData = formMethods.getValues();
+
+        // Merge response data into form - preserve request fields
+        const mergedData = {
+          ...currentFormData,
+          ...responseData,
+        } as TEndpoint["types"]["RequestOutput"];
+
+        // Update form with merged data
+        // This will trigger auto-submit watcher, but watcher filters through requestSchema
+        // so only request fields are sent back to API (preventing 431 error)
+        formMethods.reset(mergedData, { keepDirty: false, keepTouched: false });
+
+        // Call the user's onSuccess handler if provided
+        if (queryOptions.onSuccess) {
+          return queryOptions.onSuccess(data);
+        }
+      },
       // Use a custom onError handler
       onError: ({ error }): void => {
         if (queryOptions.onError) {
@@ -482,8 +504,13 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
             }
 
             if (formData) {
+              // Filter formData through requestSchema to remove response-only fields
+              // This prevents sending response data back to the API as query params
+              const parsed = endpoint.requestSchema.safeParse(formData);
+              const requestOnlyData = parsed.success ? parsed.data : formData;
+
               lastSubmitTime = Date.now();
-              setQueryParams(formData);
+              setQueryParams(requestOnlyData);
             }
           }, adjustedDebounce);
         } else {
@@ -494,8 +521,13 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
             }
 
             if (formData) {
+              // Filter formData through requestSchema to remove response-only fields
+              // This prevents sending response data back to the API as query params
+              const parsed = endpoint.requestSchema.safeParse(formData);
+              const requestOnlyData = parsed.success ? parsed.data : formData;
+
               lastSubmitTime = Date.now();
-              setQueryParams(formData);
+              setQueryParams(requestOnlyData);
             }
           }, debounceMs);
         }
@@ -511,7 +543,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       };
     }
     return;
-  }, [watch, autoSubmit, debounceMs, setQueryParams]);
+  }, [watch, autoSubmit, debounceMs, setQueryParams, endpoint.requestSchema]);
 
   // Track the last submission time to prevent excessive API calls
   const lastSubmitTimeRef = useRef<number>(0);

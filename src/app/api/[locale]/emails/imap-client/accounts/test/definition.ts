@@ -217,10 +217,8 @@ export type ImapAccountTestPostResponseInput = typeof POST.types.ResponseInput;
 export type ImapAccountTestPostResponseOutput = typeof POST.types.ResponseOutput;
 
 // Export individual endpoints
-export { POST };
 
 const imapAccountTestEndpoints = {
   POST,
-};
-
+} as const;
 export default imapAccountTestEndpoints;

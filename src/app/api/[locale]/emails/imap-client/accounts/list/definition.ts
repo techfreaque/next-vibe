@@ -455,10 +455,8 @@ export type ImapAccountsListResponseInput = typeof GET.types.ResponseInput;
 export type ImapAccountsListResponseOutput = typeof GET.types.ResponseOutput;
 
 // Export individual endpoints
-export { GET };
 
 const definitions = {
   GET,
-};
-
+} as const;
 export default definitions;

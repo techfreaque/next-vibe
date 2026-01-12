@@ -209,12 +209,6 @@ interface TierDisplayConfig<T extends string> {
 
 export const INTELLIGENCE_DISPLAY: TierDisplayConfig<typeof IntelligenceLevelFilterValue>[] = [
   {
-    value: IntelligenceLevelFilter.ANY,
-    label: "app.chat.tiers.any",
-    icon: "circle-dashed",
-    description: "app.chat.tiers.anyDesc",
-  },
-  {
     value: IntelligenceLevelFilter.QUICK,
     label: "app.chat.tiers.intelligence.quick",
     icon: "zap",
@@ -235,12 +229,6 @@ export const INTELLIGENCE_DISPLAY: TierDisplayConfig<typeof IntelligenceLevelFil
 ];
 
 export const PRICE_DISPLAY: TierDisplayConfig<typeof PriceLevelFilterValue>[] = [
-  {
-    value: PriceLevelFilter.ANY,
-    label: "app.chat.tiers.any",
-    icon: "circle-dashed",
-    description: "app.chat.tiers.anyDesc",
-  },
   {
     value: PriceLevelFilter.CHEAP,
     label: "app.chat.tiers.price.cheap",
@@ -263,12 +251,6 @@ export const PRICE_DISPLAY: TierDisplayConfig<typeof PriceLevelFilterValue>[] = 
 
 export const CONTENT_DISPLAY: TierDisplayConfig<typeof ContentLevelFilterValue>[] = [
   {
-    value: ContentLevelFilter.ANY,
-    label: "app.chat.tiers.any",
-    icon: "circle-dashed",
-    description: "app.chat.tiers.anyDesc",
-  },
-  {
     value: ContentLevelFilter.MAINSTREAM,
     label: "app.chat.tiers.content.mainstream",
     icon: "home",
@@ -289,12 +271,6 @@ export const CONTENT_DISPLAY: TierDisplayConfig<typeof ContentLevelFilterValue>[
 ];
 
 export const SPEED_DISPLAY: TierDisplayConfig<typeof SpeedLevelFilterValue>[] = [
-  {
-    value: SpeedLevelFilter.ANY,
-    label: "app.chat.tiers.any",
-    icon: "circle-dashed",
-    description: "app.chat.tiers.anyDesc",
-  },
   {
     value: SpeedLevelFilter.FAST,
     label: "app.chat.tiers.speed.fast",

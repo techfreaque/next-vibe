@@ -20,7 +20,7 @@ export default async function LeadsImportPage({
 }): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
-  await requireAdminUser(locale, `/${locale}/admin/leads/import`);
+  const user = await requireAdminUser(locale, `/${locale}/admin/leads/import`);
 
   return (
     <Div className="flex flex-col gap-6">
@@ -32,7 +32,7 @@ export default async function LeadsImportPage({
       </Div>
 
       {/* Client Component handles all interactions */}
-      <LeadsImportClient locale={locale} />
+      <LeadsImportClient locale={locale} user={user} />
     </Div>
   );
 }

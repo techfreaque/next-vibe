@@ -91,11 +91,13 @@ export function MultiSelect(props: MultiSelectProps): React.JSX.Element {
               selectedOptions.map((option) => (
                 <Badge key={option.value} variant="secondary" className="mr-1 mb-1">
                   {option.label}
-                  <button
-                    type="button"
-                    className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  <span
+                    role="button" // eslint-disable-line jsx-a11y/prefer-tag-over-role
+                    tabIndex={0}
+                    className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
                         handleRemove(option.value);
                       }
                     }}
@@ -110,7 +112,7 @@ export function MultiSelect(props: MultiSelectProps): React.JSX.Element {
                     }}
                   >
                     <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
-                  </button>
+                  </span>
                 </Badge>
               ))
             )}

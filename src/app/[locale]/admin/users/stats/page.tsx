@@ -6,6 +6,7 @@
 import type { Metadata } from "next";
 import type React from "react";
 
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -31,6 +32,7 @@ export default async function UsersStatsPage({
   params,
 }: UsersStatsPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
+  const user = await requireAdminUser(locale, `/${locale}/admin/users/stats`);
 
-  return <UsersStatsClientPage locale={locale} />;
+  return <UsersStatsClientPage locale={locale} user={user} />;
 }

@@ -7,12 +7,9 @@
 
 import { parseError } from "next-vibe/shared/utils";
 
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import { INTERACTIVE_MODE_ALIAS } from "../../../help/interactive/definition";
-import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/handler";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CliObject } from "./parsing";
 import type {
@@ -30,15 +27,13 @@ interface CliExecutionOptions {
     positionalArgs: string[];
     namedArgs: CliObject;
   };
-  user?: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
   locale: CountryLanguage;
   /** Platform identifier (CLI or CLI_PACKAGE) */
   platform: CliCompatiblePlatform;
   dryRun?: boolean;
   interactive?: boolean;
   verbose?: boolean;
-  output?: "json" | "table" | "pretty";
-  userType?: string;
+  output?: "json" | "pretty";
   category?: string;
   format?: string;
   examples?: boolean;
@@ -57,22 +52,19 @@ class CliEntryPoint {
     command: string,
     options: CliExecutionOptions,
     logger: EndpointLogger,
-    t: TFunction,
     locale: CountryLanguage,
   ): Promise<RouteExecutionResult> {
     // Default to interactive mode if no command provided
     const resolvedCommand = command || INTERACTIVE_MODE_ALIAS;
 
     // Get CLI user for authentication if not provided
-    let cliUser = options.user;
+    let cliUser = undefined;
 
-    if (!cliUser) {
-      const { getCliUser } = await import("../auth/cli-user");
-      const cliUserResult = await getCliUser(logger, options.locale);
+    const { getCliUser } = await import("../auth/cli-user");
+    const cliUserResult = await getCliUser(logger, options.locale);
 
-      if (cliUserResult.success) {
-        cliUser = cliUserResult.data;
-      }
+    if (cliUserResult.success) {
+      cliUser = cliUserResult.data;
     }
 
     const dataForContext: CliRequestData = options.data || {};
@@ -105,11 +97,6 @@ class CliEntryPoint {
 
       return result;
     } catch (error) {
-      process.stderr.write(
-        t("app.api.system.unifiedInterface.cli.vibe.errors.executionFailed", {
-          error: parseError(error).message,
-        }),
-      );
       logger.error("Command execution failed", {
         command: resolvedCommand,
         error: parseError(error),

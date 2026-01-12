@@ -70,10 +70,10 @@ export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
 
   // Merge all form data sources with proper priority handling
   const enhancedFormOptions = useMemo(() => {
-    // Prepare data sources
+    // Prepare data sources - include initialData as server data source
     const dataSources: FormDataSources<TEndpoint["types"]["ResponseOutput"]> = {
       defaultValues: formOptions.defaultValues as Partial<TEndpoint["types"]["ResponseOutput"]>,
-      serverData: autoPrefillData as TEndpoint["types"]["ResponseOutput"],
+      serverData: (autoPrefillData || initialData) as TEndpoint["types"]["ResponseOutput"],
       localStorageData: undefined,
       initialState: initialState as Partial<TEndpoint["types"]["ResponseOutput"]>,
     };
@@ -81,9 +81,17 @@ export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
     // Determine final data with proper priority
     const { finalData } = determineFormDataPriority(dataSources, autoPrefillConfig);
 
+    // Merge urlPathParams into defaultValues for GET endpoints
+    // This ensures form initializes with path/query params (e.g., { id: "thea" })
+    // which triggers auto-submit to fetch the full data
+    const defaultValuesWithUrlParams = {
+      ...finalData,
+      ...(urlPathParams as Partial<TEndpoint["types"]["RequestOutput"]>),
+    } as TEndpoint["types"]["RequestOutput"];
+
     return {
       ...formOptions,
-      defaultValues: finalData,
+      defaultValues: defaultValuesWithUrlParams,
       // Store additional metadata for unsaved changes detection
       _dataSources: dataSources,
       _autoPrefillConfig: autoPrefillConfig,
@@ -91,7 +99,7 @@ export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
       _dataSources: FormDataSources<TEndpoint["types"]["ResponseOutput"]>;
       _autoPrefillConfig: AutoPrefillConfig;
     };
-  }, [formOptions, autoPrefillData, initialState, autoPrefillConfig]);
+  }, [formOptions, autoPrefillData, initialData, initialState, autoPrefillConfig, urlPathParams]);
 
   // Enhanced query options with initial data support
   const enhancedQueryOptions = useMemo(() => {

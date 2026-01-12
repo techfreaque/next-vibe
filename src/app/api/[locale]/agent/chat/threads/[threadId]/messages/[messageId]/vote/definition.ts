@@ -253,7 +253,7 @@ const { POST } = createEndpoint({
 /**
  * Export definitions
  */
-export const definitions = { POST };
+const definitions = { POST };
 
 /**
  * Export type definitions

@@ -919,6 +919,4 @@ const definitions = {
   GET,
   POST,
 } as const;
-
-export { GET, POST };
 export default definitions;

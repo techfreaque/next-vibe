@@ -508,8 +508,6 @@ export type ImportJobUpdateResponseOutput = ImportJobPatchResponseOutput;
 /**
  * Export definitions
  */
-export { DELETE, PATCH };
-
 const definitions = {
   PATCH,
   DELETE,

@@ -134,8 +134,11 @@ export const DataCardsWidget = <const TKey extends string>({
           "w-full relative border transition-all",
           cardBorderRadiusClass || "rounded-xl",
           cardPaddingClass || "p-4",
-          "hover:bg-muted/50 hover:border-primary/20 cursor-pointer group",
+          onCardClickMetadata
+            ? "hover:bg-muted/50 hover:border-primary/20 cursor-pointer group"
+            : "",
         )}
+        onClick={onCardClickMetadata ? handleCardClick : undefined}
       >
         {/* Render the card's object field which has CONTAINER layout */}
         {childField ? (

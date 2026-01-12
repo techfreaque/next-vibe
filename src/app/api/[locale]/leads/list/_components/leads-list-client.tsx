@@ -10,17 +10,20 @@ import type React from "react";
 import { LeadSortField, SortOrder } from "@/app/api/[locale]/leads/enum";
 import leadsListEndpoints from "@/app/api/[locale]/leads/list/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface LeadsListClientProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
-export function LeadsListClient({ locale }: LeadsListClientProps): React.JSX.Element {
+export function LeadsListClient({ locale, user }: LeadsListClientProps): React.JSX.Element {
   return (
     <EndpointsPage
       endpoint={leadsListEndpoints}
       locale={locale}
+      user={user}
       endpointOptions={{
         queryOptions: {
           enabled: true,

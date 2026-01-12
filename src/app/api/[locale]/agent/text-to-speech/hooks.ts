@@ -165,7 +165,7 @@ export function useTTSAudio({
         // Submit form
         void endpoint.create!.submitForm({
           onSuccess: ({ responseData }) => {
-            const audioDataUrl = responseData.response.audioUrl;
+            const audioDataUrl = responseData.audioUrl;
             logger.debug(`TTS: Got audio for chunk ${chunkIndex + 1}`, {
               urlLength: audioDataUrl.length,
             });

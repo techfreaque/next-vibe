@@ -10,7 +10,11 @@ import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/en
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
-export const { env: cliEnv } = defineEnv({
+export const {
+  env: cliEnv,
+  schema: cliEnvSchema,
+  examples: cliEnvExamples,
+} = defineEnv({
   VIBE_CLI_USER_EMAIL: {
     schema: z.string().email().optional(),
     example: "admin@example.com",

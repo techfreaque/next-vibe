@@ -823,7 +823,6 @@ const subscriptionDefinition = {
   POST,
   PUT,
   DELETE,
-};
+} as const;
 
-export { DELETE, GET, POST, PUT };
 export default subscriptionDefinition;

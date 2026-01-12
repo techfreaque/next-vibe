@@ -31,6 +31,7 @@ export function ThreadList({
     handleSelectThread: onSelectThread,
     handleDeleteThread: onDeleteThread,
     updateThread,
+    user,
   } = chat;
 
   // Create wrapper callbacks for thread operations
@@ -78,6 +79,7 @@ export function ThreadList({
           compact={compact}
           locale={locale}
           logger={logger}
+          user={user}
         />
       ))}
     </Div>

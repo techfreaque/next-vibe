@@ -98,6 +98,9 @@ export default async function LoginPage({ params, searchParams }: Props): Promis
   if (!loginOptionsResponse.success) {
     return <Div>{t(loginOptionsResponse.message, loginOptionsResponse.messageParams)}</Div>;
   }
+  if (!verifiedUserResponse.success) {
+    return <Div>{t("app.user.other.login.errors.failedToLoadBrowserIdentity")}</Div>;
+  }
 
   return (
     <>
@@ -108,7 +111,7 @@ export default async function LoginPage({ params, searchParams }: Props): Promis
         <ArrowLeft className="mr-2 h-4 w-4" />
         {t("app.user.common.backToHome")}
       </Link>
-      <LoginForm locale={locale} callbackUrl={callbackUrl} />
+      <LoginForm locale={locale} callbackUrl={callbackUrl} user={verifiedUserResponse.data} />
     </>
   );
 }

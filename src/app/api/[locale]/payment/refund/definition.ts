@@ -332,7 +332,5 @@ export type PaymentRefundResponseOutput = typeof POST.types.ResponseOutput;
  */
 const refundEndpoints = {
   POST,
-};
-
-export { POST };
+} as const;
 export default refundEndpoints;

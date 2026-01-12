@@ -16,14 +16,16 @@ import importJobsStatusEndpoints from "@/app/api/[locale]/leads/import/status/de
 import { useImportJobsStatusEndpoint } from "@/app/api/[locale]/leads/import/status/hooks";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface LeadsImportClientProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
-export function LeadsImportClient({ locale }: LeadsImportClientProps): React.JSX.Element {
+export function LeadsImportClient({ locale, user }: LeadsImportClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 
@@ -55,6 +57,7 @@ export function LeadsImportClient({ locale }: LeadsImportClientProps): React.JSX
           <EndpointRenderer
             endpoint={leadsImportEndpoints.POST}
             form={importEndpoint.create.form}
+            user={user}
             onSubmit={handleImportSubmit}
             locale={locale}
             data={
@@ -81,6 +84,7 @@ export function LeadsImportClient({ locale }: LeadsImportClientProps): React.JSX
             form={statusEndpoint.read.form}
             onSubmit={handleStatusRefresh}
             locale={locale}
+            user={user}
             data={
               statusEndpoint.read.response?.success ? statusEndpoint.read.response.data : undefined
             }

@@ -27,6 +27,20 @@ interface NavigationStackStore {
   ) => void;
 
   /**
+   * Replace the top of the stack with a new endpoint
+   * Useful for redirecting after successful creation (e.g., POST -> GET)
+   */
+  replace: <TEndpoint extends CreateApiEndpointAny>(
+    endpoint: TEndpoint,
+    params: {
+      urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
+      data?: Partial<TEndpoint["types"]["RequestOutput"]>;
+    },
+    prefillFromGet?: boolean,
+    getEndpoint?: CreateApiEndpointAny,
+  ) => void;
+
+  /**
    * Go back to previous endpoint in navigation stack
    */
   pop: () => void;
@@ -66,6 +80,37 @@ export const useNavigationStore = create<NavigationStackStore>((set) => ({
       // eslint-disable-next-line no-console
       console.log("Navigation: Prefill from GET requested for:", endpoint, "using:", getEndpoint);
     }
+  },
+
+  replace: <TEndpoint extends CreateApiEndpointAny>(
+    endpoint: TEndpoint,
+    params: {
+      urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
+      data?: Partial<TEndpoint["types"]["RequestOutput"]>;
+    },
+    prefillFromGet = false,
+    getEndpoint?: CreateApiEndpointAny,
+  ): void => {
+    const entry: NavigationStackEntry<TEndpoint> = {
+      endpoint,
+      params,
+      timestamp: Date.now(),
+      prefillFromGet,
+      getEndpoint,
+    };
+
+    set((state) => {
+      if (state.stack.length === 0) {
+        // If stack is empty, just push the new entry
+        return {
+          stack: [entry as NavigationStackEntry],
+        };
+      }
+      // Replace the top of the stack
+      return {
+        stack: [...state.stack.slice(0, -1), entry as NavigationStackEntry],
+      };
+    });
   },
 
   pop: (): void => {
@@ -127,6 +172,15 @@ export function useNavigationStack(): {
     prefillFromGet?: boolean,
     getEndpoint?: CreateApiEndpointAny,
   ) => void;
+  replace: <TEndpoint extends CreateApiEndpointAny>(
+    endpoint: TEndpoint,
+    params: {
+      urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
+      data?: Partial<TEndpoint["types"]["RequestOutput"]>;
+    },
+    prefillFromGet?: boolean,
+    getEndpoint?: CreateApiEndpointAny,
+  ) => void;
   pop: () => void;
   stack: NavigationStackEntry[];
   canGoBack: boolean;
@@ -134,6 +188,7 @@ export function useNavigationStack(): {
 } {
   const stack = useNavigationStore((state) => state.stack);
   const push = useNavigationStore((state) => state.push);
+  const replace = useNavigationStore((state) => state.replace);
   const pop = useNavigationStore((state) => state.pop);
 
   const canGoBack = stack.length > 0;
@@ -141,6 +196,7 @@ export function useNavigationStack(): {
 
   return {
     push,
+    replace,
     pop,
     stack,
     canGoBack,

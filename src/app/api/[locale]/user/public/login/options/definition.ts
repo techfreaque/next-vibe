@@ -414,8 +414,6 @@ export type LoginOptionsGetResponseOutput = typeof GET.types.ResponseOutput;
 
 const loginOptionsDefinitions = {
   GET,
-};
-
-export { GET };
+} as const;
 
 export default loginOptionsDefinitions;

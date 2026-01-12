@@ -8,6 +8,9 @@ import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type { JSX } from "react";
 
 import { HelpListView } from "@/app/api/[locale]/system/help/list/_components/help-list-view";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -20,10 +23,21 @@ export default async function HelpListPage({ params }: HelpListPageProps): Promi
   if (env.NODE_ENV === "production") {
     notFound();
   }
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const userResponse = await UserRepository.getUserByAuth(
+    {
+      detailLevel: UserDetailLevel.MINIMAL,
+    },
+    locale,
+    logger,
+  );
+  if (!userResponse.success) {
+    notFound();
+  }
 
   return (
     <PageLayout scrollable={true}>
-      <HelpListView locale={locale} />
+      <HelpListView locale={locale} user={userResponse.data} />
     </PageLayout>
   );
 }

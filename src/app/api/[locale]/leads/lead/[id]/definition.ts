@@ -1153,11 +1153,9 @@ export type LeadUpdateResponseOutput = LeadPatchResponseOutput;
 /**
  * Export endpoint definitions
  */
-export { GET, PATCH };
-
 const definitions = {
   GET,
   PATCH,
-};
+} as const;
 
 export default definitions;

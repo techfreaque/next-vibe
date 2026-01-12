@@ -8,7 +8,11 @@ import { z } from "zod";
 
 import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 
-export const { env: paymentEnv } = defineEnv({
+export const {
+  env: paymentEnv,
+  schema: paymentEnvSchema,
+  examples: paymentEnvExamples,
+} = defineEnv({
   // Stripe
   STRIPE_SECRET_KEY: {
     schema: z.string().min(1),

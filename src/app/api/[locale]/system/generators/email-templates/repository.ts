@@ -16,6 +16,7 @@ import {
   formatCount,
   formatDuration,
   formatGenerator,
+  formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
 import { findFilesRecursively, generateFileHeader, writeGeneratedFile } from "../shared/utils";
@@ -65,14 +66,14 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
 
     try {
       const outputFile = data.outputFile;
-      logger.debug("Starting email template generation", { outputFile });
+      logger.debug(`Starting email template generation: ${outputFile}`);
 
       // Discover template files in all api/[locale] subdirectories
       // eslint-disable-next-line i18next/no-literal-string
       const apiPath = ["src", "app", "api", "[locale]"];
       const startDir = join(process.cwd(), ...apiPath);
 
-      logger.debug("Discovering email template files", { startDir });
+      logger.debug(`Discovering email template files in: ${startDir}`);
 
       // Find both email.tsx and *.email.tsx files recursively
       const emailTsxFiles = findFilesRecursively(startDir, "email.tsx");
@@ -85,7 +86,7 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
       logger.debug(`Found ${templateFiles.length} template files`);
 
       if (templateFiles.length === 0) {
-        logger.warn("No email templates found");
+        logger.warn(formatWarning("No email templates found"));
         return success({
           success: true,
           message: "No email templates found",
@@ -162,7 +163,7 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
         const templateDef = templateModule.default;
 
         if (!templateDef?.meta) {
-          logger.warn(`Template missing metadata: ${file}`);
+          logger.warn(formatWarning(`Template missing metadata: ${file}`));
           continue;
         }
 
@@ -189,9 +190,7 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
           },
         });
       } catch (error) {
-        logger.warn(`Failed to load template: ${file}`, {
-          error: parseError(error),
-        });
+        logger.warn(formatWarning(`Failed to load template: ${file}\n    ${parseError(error)}`));
       }
     }
 

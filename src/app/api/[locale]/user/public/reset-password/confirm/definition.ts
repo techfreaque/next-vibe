@@ -309,9 +309,7 @@ const { POST } = createEndpoint({
  */
 const resetPasswordConfirmEndpoints = {
   POST,
-};
-
-export { POST };
+} as const;
 
 export default resetPasswordConfirmEndpoints;
 

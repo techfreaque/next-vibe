@@ -14,8 +14,15 @@ import { simpleT } from "@/i18n/core/shared";
 
 import { createEndpointLogger } from "../shared/logger/endpoint";
 import { type EnvironmentResult, loadEnvironment } from "./runtime/environment";
-import { ErrorHandler, setupGlobalErrorHandlers } from "./runtime/execution-errors";
-import { parseCliArguments, parseCliArgumentsSimple, type ParsedCliData } from "./runtime/parsing";
+import {
+  ErrorHandler,
+  setupGlobalErrorHandlers,
+} from "./runtime/execution-errors";
+import {
+  parseCliArguments,
+  parseCliArgumentsSimple,
+  type ParsedCliData,
+} from "./runtime/parsing";
 
 export const binaryStartTime = Date.now();
 
@@ -36,9 +43,8 @@ export const projectRoot: string | null = environmentResult.projectRoot;
  */
 interface CliOptions {
   data?: string;
-  userType?: string;
   locale: CountryLanguage;
-  output?: "json" | "table" | "pretty";
+  output?: "json" | "pretty";
   verbose?: boolean;
   debug?: boolean;
   interactive?: boolean;
@@ -61,19 +67,25 @@ const { t: earlyT } = simpleT(cliEnv.VIBE_CLI_LOCALE);
 
 program
   .name(CLI_NAME)
-  .description(earlyT("app.api.system.unifiedInterface.cli.vibe.help.description"))
+  .description(
+    earlyT("app.api.system.unifiedInterface.cli.vibe.help.description"),
+  )
   .version(CLI_VERSION);
 
 // Main command - execute any route with schema-driven UI
 
 program
-  .argument("[command]", earlyT("app.api.system.unifiedInterface.cli.vibe.help.usage"))
-  .argument("[args...]", earlyT("app.api.system.unifiedInterface.cli.vibe.help.commands"))
-  .option("-d, --data <json>", earlyT("app.api.system.unifiedInterface.cli.vibe.executeCommand"))
+  .argument(
+    "[command]",
+    earlyT("app.api.system.unifiedInterface.cli.vibe.help.usage"),
+  )
+  .argument(
+    "[args...]",
+    earlyT("app.api.system.unifiedInterface.cli.vibe.help.commands"),
+  )
   .option(
-    "-u, --user-type <type>",
-    earlyT("app.api.system.unifiedInterface.cli.vibe.help.userType"),
-    "ADMIN",
+    "-d, --data <json>",
+    earlyT("app.api.system.unifiedInterface.cli.vibe.executeCommand"),
   )
   .option(
     "-l, --locale <locale>",
@@ -101,7 +113,11 @@ program
     earlyT("app.api.system.unifiedInterface.cli.vibe.help.interactive"),
     false,
   )
-  .option("--dry-run", earlyT("app.api.system.unifiedInterface.cli.vibe.help.dryRun"), false)
+  .option(
+    "--dry-run",
+    earlyT("app.api.system.unifiedInterface.cli.vibe.help.dryRun"),
+    false,
+  )
   .allowUnknownOption() // Allow dynamic CLI arguments
   .action(
     async (
@@ -122,7 +138,11 @@ program
       }
 
       const debug = options.debug || options.verbose;
-      const logger = createEndpointLogger(debug ?? false, Date.now(), options.locale);
+      const logger = createEndpointLogger(
+        debug ?? false,
+        Date.now(),
+        options.locale,
+      );
       const { t } = simpleT(options.locale);
       // Setup global error handlers
       setupGlobalErrorHandlers(logger);
@@ -151,7 +171,6 @@ program
           const helpResult = await cliEntryPoint.executeCommand(
             "help",
             {
-              user: undefined, // Let route executor handle authentication via getCliUser()
               locale: options.locale,
               platform: cliPlatform,
               output: options.output ?? DEFAULT_OUTPUT,
@@ -160,7 +179,6 @@ program
               dryRun: options.dryRun ?? false,
             },
             logger,
-            t,
             options.locale,
           );
           performanceMonitor.mark("routeEnd");
@@ -171,7 +189,11 @@ program
           }
           performanceMonitor.mark("renderEnd");
 
-          await cliResourceManager.cleanupAndExit(logger, debug ?? false, helpResult);
+          await cliResourceManager.cleanupAndExit(
+            logger,
+            debug ?? false,
+            helpResult,
+          );
           return;
         }
 
@@ -213,16 +235,14 @@ program
               positionalArgs: parsedArgs.positionalArgs,
               namedArgs: parsedArgs.namedArgs,
             },
-            user: undefined, // Let route executor handle authentication via getCliUser()
             locale: options.locale,
             platform: cliPlatform,
-            output: (options.output ?? DEFAULT_OUTPUT) as "table" | "pretty" | "json",
+            output: options.output ?? DEFAULT_OUTPUT,
             verbose: debug ?? false,
             interactive: options.interactive ?? false,
             dryRun: options.dryRun ?? false,
           },
           logger,
-          t,
           options.locale,
         );
         performanceMonitor.mark("routeEnd");
@@ -242,7 +262,9 @@ program
 
         if (debug) {
           logger.error(
-            t("app.api.system.unifiedInterface.cli.vibe.errors.executionFailed"),
+            t(
+              "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+            ),
             error as Error,
           );
         }
@@ -250,7 +272,8 @@ program
         // Cleanup and exit with error code
         await cliResourceManager.cleanupAndExit(logger, debug ?? false, {
           success: false,
-          error: "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+          error:
+            "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
           errorParams: {
             error: handled.message,
           },

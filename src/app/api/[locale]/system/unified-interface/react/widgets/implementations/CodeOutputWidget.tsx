@@ -25,7 +25,6 @@ import {
 export function CodeOutputWidget<const TKey extends string>({
   value,
   field,
-  context,
   className,
 }: ReactWidgetProps<typeof WidgetType.CODE_OUTPUT, TKey>): JSX.Element {
   const {
@@ -63,7 +62,7 @@ export function CodeOutputWidget<const TKey extends string>({
             ? "rounded-xl"
             : "rounded-lg";
 
-  const data = extractCodeOutputData(value, context.theme ?? "light");
+  const data = extractCodeOutputData(value);
 
   if (!data) {
     return (
@@ -73,7 +72,7 @@ export function CodeOutputWidget<const TKey extends string>({
     );
   }
 
-  const { code, language, showLineNumbers, highlightLines, theme } = data;
+  const { code, language, showLineNumbers, highlightLines } = data;
   const lines = splitCodeIntoLines(code);
 
   return (
@@ -81,7 +80,7 @@ export function CodeOutputWidget<const TKey extends string>({
       className={cn(
         "overflow-hidden border border-border",
         borderRadiusClass,
-        theme === "dark" ? "bg-slate-900" : "bg-slate-50",
+        "dark:bg-slate-900 light:bg-slate-50",
         className,
       )}
     >
@@ -105,7 +104,7 @@ export function CodeOutputWidget<const TKey extends string>({
           "overflow-x-auto font-mono",
           codePaddingClass || "p-4",
           codeTextSizeClass || "text-sm",
-          theme === "dark" ? "text-slate-100" : "text-slate-900",
+          "dark:text-slate-100 light:text-slate-900",
         )}
       >
         <Code>

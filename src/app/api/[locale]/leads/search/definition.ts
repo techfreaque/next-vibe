@@ -275,7 +275,5 @@ export type LeadSearchGetResponseOutput = typeof GET.types.ResponseOutput;
  */
 const definitions = {
   GET,
-};
-
-export { GET };
+} as const;
 export default definitions;

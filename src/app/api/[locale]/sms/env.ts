@@ -11,7 +11,11 @@ import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/en
 import { AwsSnsAwsRegions } from "./providers/aws-sns-enum";
 import { SmsProviders } from "./utils-enum";
 
-export const { env: smsEnv } = defineEnv({
+export const {
+  env: smsEnv,
+  schema: smsEnvSchema,
+  examples: smsEnvExamples,
+} = defineEnv({
   // Core SMS config
   SMS_PROVIDER: {
     schema: z.enum([

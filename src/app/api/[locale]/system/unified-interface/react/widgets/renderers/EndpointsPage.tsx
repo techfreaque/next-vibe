@@ -5,6 +5,7 @@
 
 "use client";
 
+import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import { useMemo } from "react";
@@ -20,6 +21,7 @@ import {
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/types";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
@@ -48,8 +50,12 @@ export interface EndpointsPageProps<
   debug?: boolean;
   /** Custom className for outer wrapper */
   className?: string;
+  /** User object for permission checks */
+  user: JwtPayloadType;
   /** Internal: Disable navigation stack rendering (used for stacked instances) */
   _disableNavigationStack?: boolean;
+  /** Force which endpoint method to render when multiple are present (e.g., both GET and PATCH) */
+  forceMethod?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 }
 
 /**
@@ -101,21 +107,34 @@ export function EndpointsPage<
   submitButton,
   debug,
   className,
+  user,
   _disableNavigationStack = false,
+  forceMethod,
 }: EndpointsPageProps<T>): React.JSX.Element {
   // Check navigation stack to render stacked endpoints (only for base layer)
   const navigation = useNavigationStack();
 
   // Determine which endpoint to use for base layer
-  const isGetEndpoint = !!endpoint.GET;
-  const isMutationEndpoint = !!(endpoint.POST ?? endpoint.PUT ?? endpoint.PATCH) && !endpoint.GET;
-  const isDeleteEndpoint =
-    !!endpoint.DELETE && !endpoint.GET && !endpoint.POST && !endpoint.PUT && !endpoint.PATCH;
+  // If forceMethod is provided, use that; otherwise use default priority
+  const forcedEndpoint = forceMethod ? endpoint[forceMethod] : undefined;
+
+  const isGetEndpoint = forcedEndpoint ? forceMethod === "GET" : !!endpoint.GET;
+  const isMutationEndpoint = forcedEndpoint
+    ? forceMethod === "POST" || forceMethod === "PUT" || forceMethod === "PATCH"
+    : !!(endpoint.POST ?? endpoint.PUT ?? endpoint.PATCH) && !endpoint.GET;
+  const isDeleteEndpoint = forcedEndpoint
+    ? forceMethod === "DELETE"
+    : !!endpoint.DELETE && !endpoint.GET && !endpoint.POST && !endpoint.PUT && !endpoint.PATCH;
 
   // Get the active endpoint definition for rendering response data
-  // Priority: GET (for response rendering) > POST/PUT/PATCH (for form) > DELETE
+  // Priority: Forced method > GET (for response rendering) > POST/PUT/PATCH (for form) > DELETE
   const activeEndpoint =
-    endpoint.GET ?? endpoint.POST ?? endpoint.PUT ?? endpoint.PATCH ?? endpoint.DELETE;
+    forcedEndpoint ??
+    endpoint.GET ??
+    endpoint.POST ??
+    endpoint.PUT ??
+    endpoint.PATCH ??
+    endpoint.DELETE;
 
   // Read configuration from endpoint definition with fallbacks
   const finalDebug = debug ?? activeEndpoint?.debug ?? false;
@@ -124,8 +143,59 @@ export function EndpointsPage<
     [finalDebug, locale],
   );
 
+  // Build mutation options with onSuccess callback for navigation
+  const mutationOptionsWithNav = useMemo(() => {
+    const existingMutationOptions = endpointOptions?.create?.mutationOptions;
+
+    // For POST endpoints, navigate to GET endpoint after successful creation if GET exists
+    if (isMutationEndpoint && endpoint.GET && endpoint.POST) {
+      const targetGetEndpoint = endpoint.GET;
+
+      return {
+        ...existingMutationOptions,
+        onSuccess: ({
+          responseData,
+          requestData,
+          pathParams,
+        }): void | ErrorResponseType | Promise<void | ErrorResponseType> => {
+          // Call existing onSuccess first
+          const existingResult = existingMutationOptions?.onSuccess?.({
+            responseData,
+            requestData,
+            pathParams,
+          });
+
+          // Navigate to GET endpoint with ID from response
+          if (responseData && typeof responseData === "object" && "id" in responseData) {
+            const id = String(responseData.id);
+            navigation.replace(targetGetEndpoint, { urlPathParams: { id } as never });
+          }
+
+          return existingResult;
+        },
+      };
+    }
+
+    return existingMutationOptions;
+  }, [isMutationEndpoint, endpoint.GET, endpointOptions?.create?.mutationOptions, navigation]);
+
+  // Merge navigation-aware mutation options into endpoint options
+  const finalEndpointOptions = useMemo(() => {
+    if (!mutationOptionsWithNav) {
+      return endpointOptions;
+    }
+
+    return {
+      ...endpointOptions,
+      create: {
+        ...endpointOptions?.create,
+        mutationOptions: mutationOptionsWithNav,
+      },
+    };
+  }, [endpointOptions, mutationOptionsWithNav]);
+
   // Use the endpoint hook for base endpoint
-  const endpointState = useEndpoint(endpoint, endpointOptions, logger);
+  const endpointState = useEndpoint(endpoint, finalEndpointOptions, logger);
 
   // Extract response and data based on endpoint type
   let response;
@@ -137,11 +207,36 @@ export function EndpointsPage<
     response = read.response;
     responseData = read.response?.success === true ? read.response.data : undefined;
     isLoading = read.isLoading;
-  } else if (isMutationEndpoint && endpointState.create) {
-    const create = endpointState.create;
-    response = create.response;
-    responseData = create.response?.success === true ? create.response.data : undefined;
-    isLoading = create.isSubmitting;
+  } else if (isMutationEndpoint && (endpointState.create || endpointState.update)) {
+    const operation = endpointState.update ?? endpointState.create;
+    if (operation) {
+      response = operation.response;
+      responseData = operation.response?.success === true ? operation.response.data : undefined;
+      isLoading = operation.isSubmitting;
+    }
+
+    // CRITICAL: For mutations with prefillFromGet (GET + PATCH/PUT), use GET data for prefilling
+    // The mutation response data is for showing success/error, not for prefilling the form
+    if (endpointState.read) {
+      const readResponse = endpointState.read.response;
+      const readData = readResponse?.success === true ? readResponse.data : undefined;
+      console.log("EndpointsPage PATCH/PUT with GET prefill", {
+        hasRead: true,
+        isLoading: endpointState.read.isLoading,
+        readResponse,
+        readData,
+        readDataKeys: readData ? Object.keys(readData as object) : [],
+        currentResponseData: responseData,
+        mutationResponse: operation?.response,
+      });
+      if (readData) {
+        responseData = readData;
+      }
+    } else {
+      console.log("EndpointsPage PATCH/PUT without GET", {
+        hasRead: false,
+      });
+    }
   } else if (isDeleteEndpoint && endpointState.delete) {
     const deleteOp = endpointState.delete;
     response = deleteOp.response;
@@ -226,14 +321,36 @@ export function EndpointsPage<
                 response={response}
                 endpointMutations={endpointMutations}
                 logger={logger}
+                user={user}
               />
             )}
-            {isMutationEndpoint && endpointState.create && (
+            {isMutationEndpoint && (endpointState.create || endpointState.update) && (
               <EndpointRenderer
                 endpoint={activeEndpoint}
-                form={endpointState.create.form}
+                form={endpointState.update?.form ?? endpointState.create?.form}
                 onSubmit={(): void => {
-                  void endpointState.create?.onSubmit();
+                  if (endpointState.update) {
+                    void endpointState.update.submit(endpointState.update.form.getValues());
+                  } else {
+                    void endpointState.create?.onSubmit();
+                  }
+                }}
+                locale={locale}
+                isSubmitting={endpointState.update?.isSubmitting ?? isLoading}
+                data={responseData}
+                submitButton={submitButton}
+                response={response}
+                endpointMutations={endpointMutations}
+                logger={logger}
+                user={user}
+              />
+            )}
+            {isDeleteEndpoint && endpointState.delete && (
+              <EndpointRenderer
+                endpoint={activeEndpoint}
+                form={endpointState.delete.form}
+                onSubmit={(): void => {
+                  void endpointState.delete?.submitForm();
                 }}
                 locale={locale}
                 isSubmitting={isLoading}
@@ -242,19 +359,7 @@ export function EndpointsPage<
                 response={response}
                 endpointMutations={endpointMutations}
                 logger={logger}
-              />
-            )}
-            {isDeleteEndpoint && endpointState.delete && (
-              <EndpointRenderer
-                endpoint={activeEndpoint}
-                onSubmit={undefined}
-                locale={locale}
-                isSubmitting={isLoading}
-                data={responseData}
-                submitButton={submitButton}
-                response={response}
-                endpointMutations={endpointMutations}
-                logger={logger}
+                user={user}
               />
             )}
           </>
@@ -280,11 +385,12 @@ export function EndpointsPage<
                   locale={locale}
                   endpointOptions={{
                     read: {
-                      urlPathParams: entry.params,
+                      urlPathParams: entry.params.urlPathParams,
                     },
                   }}
                   submitButton={submitButton}
                   debug={debug}
+                  user={user}
                   _disableNavigationStack={true}
                 />
               </Div>
@@ -298,12 +404,13 @@ export function EndpointsPage<
                 className={cn(className, !isVisible && "hidden")}
               >
                 <EndpointsPage
+                  user={user}
                   endpoint={{ POST: entry.endpoint }}
                   locale={locale}
                   endpointOptions={{
                     create: {
-                      urlPathParams: entry.params,
-                      autoPrefillData: entry.params,
+                      urlPathParams: entry.params.urlPathParams,
+                      autoPrefillData: entry.params.data,
                     },
                   }}
                   submitButton={submitButton}
@@ -315,18 +422,35 @@ export function EndpointsPage<
           }
 
           if (method === "PATCH") {
+            // If prefillFromGet is true and getEndpoint exists, include GET endpoint for auto-prefill
+            const endpointConfig =
+              entry.prefillFromGet && entry.getEndpoint
+                ? { GET: entry.getEndpoint, PATCH: entry.endpoint }
+                : { PATCH: entry.endpoint };
+
             return (
               <Div
                 key={`nav-${entry.timestamp}-${index}`}
                 className={cn(className, !isVisible && "hidden")}
               >
                 <EndpointsPage
-                  endpoint={{ PATCH: entry.endpoint }}
+                  user={user}
+                  endpoint={endpointConfig}
                   locale={locale}
+                  forceMethod={method}
                   endpointOptions={{
+                    // CRITICAL: Pass read options whenever prefillFromGet is true
+                    // getEndpoint might be undefined if it was auto-detected, but we still need the urlPathParams
+                    ...(entry.prefillFromGet
+                      ? {
+                          read: {
+                            urlPathParams: entry.params.urlPathParams as never,
+                          },
+                        }
+                      : {}),
                     update: {
-                      urlPathParams: entry.params,
-                      autoPrefillData: entry.params,
+                      urlPathParams: entry.params.urlPathParams,
+                      autoPrefillData: entry.params.data,
                     },
                   }}
                   submitButton={submitButton}
@@ -344,11 +468,13 @@ export function EndpointsPage<
                 className={cn(className, !isVisible && "hidden")}
               >
                 <EndpointsPage
+                  user={user}
                   endpoint={{ DELETE: entry.endpoint }}
                   locale={locale}
                   endpointOptions={{
                     delete: {
-                      urlPathParams: entry.params,
+                      urlPathParams: entry.params.urlPathParams,
+                      autoPrefillData: entry.params.urlPathParams,
                     },
                   }}
                   submitButton={submitButton}
@@ -360,18 +486,35 @@ export function EndpointsPage<
           }
 
           if (method === "PUT") {
+            // If prefillFromGet is true and getEndpoint exists, include GET endpoint for auto-prefill
+            const endpointConfig =
+              entry.prefillFromGet && entry.getEndpoint
+                ? { GET: entry.getEndpoint, PUT: entry.endpoint }
+                : { PUT: entry.endpoint };
+
             return (
               <Div
                 key={`nav-${entry.timestamp}-${index}`}
                 className={cn(className, !isVisible && "hidden")}
               >
                 <EndpointsPage
-                  endpoint={{ PUT: entry.endpoint }}
+                  user={user}
+                  endpoint={endpointConfig}
                   locale={locale}
+                  forceMethod={method}
                   endpointOptions={{
+                    // CRITICAL: Pass read options whenever prefillFromGet is true
+                    // getEndpoint might be undefined if it was auto-detected, but we still need the urlPathParams
+                    ...(entry.prefillFromGet
+                      ? {
+                          read: {
+                            urlPathParams: entry.params.urlPathParams as never,
+                          },
+                        }
+                      : {}),
                     create: {
-                      urlPathParams: entry.params,
-                      autoPrefillData: entry.params,
+                      urlPathParams: entry.params.urlPathParams,
+                      autoPrefillData: entry.params.data,
                     },
                   }}
                   submitButton={submitButton}

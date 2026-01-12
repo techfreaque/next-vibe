@@ -22,65 +22,10 @@ import type {
 import { cronTaskExecutions, cronTasks, cronTaskSchedules } from "./db";
 
 /**
- * Public Interface for Cron Tasks Repository
- */
-export interface ICronTasksRepository {
-  // Task management
-  getAllTasks(logger: EndpointLogger): Promise<ResponseType<CronTask[]>>;
-  getTaskById(id: string, logger: EndpointLogger): Promise<ResponseType<CronTask | null>>;
-  getTaskByName(name: string, logger: EndpointLogger): Promise<ResponseType<CronTask | null>>;
-  createTask(task: NewCronTask, logger: EndpointLogger): Promise<ResponseType<CronTask>>;
-  updateTask(
-    id: string,
-    updates: Partial<CronTask>,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTask>>;
-  deleteTask(id: string, logger: EndpointLogger): Promise<ResponseType<void>>;
-
-  // Execution management
-  createExecution(
-    execution: NewCronTaskExecution,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskExecution>>;
-  updateExecution(
-    id: string,
-    updates: Partial<CronTaskExecution>,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskExecution>>;
-  getExecutionsByTaskId(
-    taskId: string,
-    limit: number | undefined,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskExecution[]>>;
-  getRecentExecutions(
-    limit: number | undefined,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskExecution[]>>;
-
-  // Schedule management
-  getTaskSchedules(logger: EndpointLogger): Promise<ResponseType<CronTaskSchedule[]>>;
-  updateSchedule(
-    taskId: string,
-    updates: Partial<CronTaskSchedule>,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskSchedule>>;
-
-  // Statistics
-  getTaskStatistics(logger: EndpointLogger): Promise<
-    ResponseType<{
-      totalTasks: number;
-      enabledTasks: number;
-      disabledTasks: number;
-      averageExecutionTime: number;
-    }>
-  >;
-}
-
-/**
  * Implementation of Cron Tasks Repository
  */
-export class CronTasksRepository implements ICronTasksRepository {
-  async getAllTasks(logger: EndpointLogger): Promise<ResponseType<CronTask[]>> {
+export class CronTasksRepository {
+  static async getAllTasks(logger: EndpointLogger): Promise<ResponseType<CronTask[]>> {
     try {
       logger.debug("Fetching all cron tasks");
       const tasks = await db.select().from(cronTasks).orderBy(desc(cronTasks.createdAt));
@@ -99,13 +44,48 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async getTaskById(id: string, logger: EndpointLogger): Promise<ResponseType<CronTask | null>> {
+  static async getTaskById(id: string, logger: EndpointLogger) {
     try {
       logger.debug("Fetching cron task by ID", { id });
-      const task = await db.select().from(cronTasks).where(eq(cronTasks.id, id)).limit(1);
-      const result: CronTask | null = (task[0] as CronTask) || null;
-      logger.info(`Cron task ${result ? "found" : "not found"}`, { id });
-      return success<CronTask | null>(result);
+      const tasks = await db.select().from(cronTasks).where(eq(cronTasks.id, id)).limit(1);
+      const task = tasks[0];
+
+      if (!task) {
+        return fail({
+          message:
+            "app.api.system.unifiedInterface.tasks.cronSystem.task.get.errors.notFound.title",
+          errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: { taskId: id },
+        });
+      }
+
+      return success({
+        task: {
+          id: task.id,
+          name: task.name,
+          description: task.description,
+          version: task.version,
+          category: task.category,
+          schedule: task.schedule,
+          timezone: task.timezone,
+          enabled: task.enabled,
+          priority: task.priority,
+          timeout: task.timeout,
+          retries: task.retries,
+          retryDelay: task.retryDelay,
+          lastExecutedAt: task.lastExecutedAt?.toISOString() || null,
+          lastExecutionStatus: task.lastExecutionStatus,
+          lastExecutionError: task.lastExecutionError,
+          lastExecutionDuration: task.lastExecutionDuration,
+          nextExecutionAt: task.nextExecutionAt?.toISOString() || null,
+          executionCount: task.executionCount,
+          successCount: task.successCount,
+          errorCount: task.errorCount,
+          averageExecutionTime: task.averageExecutionTime,
+          createdAt: task.createdAt.toISOString(),
+          updatedAt: task.updatedAt.toISOString(),
+        },
+      });
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch cron task by ID", {
@@ -120,7 +100,7 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async getTaskByName(
+  static async getTaskByName(
     name: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTask | null>> {
@@ -144,7 +124,10 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async createTask(task: NewCronTask, logger: EndpointLogger): Promise<ResponseType<CronTask>> {
+  static async createTask(
+    task: NewCronTask,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CronTask>> {
     try {
       logger.debug("Creating new cron task", { name: task.name });
       const [newTask] = await db.insert(cronTasks).values(task).returning();
@@ -167,27 +150,50 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async updateTask(
-    id: string,
-    updates: Partial<CronTask>,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTask>> {
+  static async updateTask(id: string, updates: Partial<CronTask>, logger: EndpointLogger) {
     try {
       logger.debug("Updating cron task", { id, updates: Object.keys(updates) });
-      const [updatedTask] = await db
+      const [task] = await db
         .update(cronTasks)
         .set({ ...updates, updatedAt: new Date() })
         .where(eq(cronTasks.id, id))
         .returning();
 
-      if (!updatedTask) {
+      if (!task) {
         return fail({
           message: ErrorResponseTypes.NOT_FOUND.errorKey,
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
-      return success(updatedTask as CronTask);
+      return success({
+        task: {
+          id: task.id,
+          name: task.name,
+          description: task.description,
+          version: task.version,
+          category: task.category,
+          schedule: task.schedule,
+          timezone: task.timezone,
+          enabled: task.enabled,
+          priority: task.priority,
+          timeout: task.timeout,
+          retries: task.retries,
+          retryDelay: task.retryDelay,
+          lastExecutedAt: task.lastExecutedAt?.toISOString() || null,
+          lastExecutionStatus: task.lastExecutionStatus,
+          lastExecutionError: task.lastExecutionError,
+          lastExecutionDuration: task.lastExecutionDuration,
+          nextExecutionAt: task.nextExecutionAt?.toISOString() || null,
+          executionCount: task.executionCount,
+          successCount: task.successCount,
+          errorCount: task.errorCount,
+          averageExecutionTime: task.averageExecutionTime,
+          createdAt: task.createdAt.toISOString(),
+          updatedAt: task.updatedAt.toISOString(),
+        },
+        success: true,
+      });
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to update cron task", {
@@ -202,12 +208,15 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async deleteTask(id: string, logger: EndpointLogger): Promise<ResponseType<void>> {
+  static async deleteTask(
+    id: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ success: boolean; message: string }>> {
     try {
       logger.debug("Deleting cron task", { id });
       await db.delete(cronTasks).where(eq(cronTasks.id, id));
       logger.info("Successfully deleted cron task", { id });
-      return success();
+      return success({ success: true, message: "Task deleted successfully" });
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to delete cron task", {
@@ -222,7 +231,7 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async createExecution(
+  static async createExecution(
     execution: NewCronTaskExecution,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskExecution>> {
@@ -246,7 +255,7 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async updateExecution(
+  static async updateExecution(
     id: string,
     updates: Partial<CronTaskExecution>,
     logger: EndpointLogger,
@@ -284,7 +293,7 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async getExecutionsByTaskId(
+  static async getExecutionsByTaskId(
     taskId: string,
     limit = 50,
     logger: EndpointLogger,
@@ -314,7 +323,7 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async getRecentExecutions(
+  static async getRecentExecutions(
     limit = 100,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskExecution[]>> {
@@ -342,7 +351,7 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async getTaskSchedules(logger: EndpointLogger): Promise<ResponseType<CronTaskSchedule[]>> {
+  static async getTaskSchedules(logger: EndpointLogger): Promise<ResponseType<CronTaskSchedule[]>> {
     try {
       logger.debug("Fetching task schedules");
       const schedules = await db
@@ -363,7 +372,7 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async updateSchedule(
+  static async updateSchedule(
     taskId: string,
     updates: Partial<CronTaskSchedule>,
     logger: EndpointLogger,
@@ -401,7 +410,7 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 
-  async getTaskStatistics(logger: EndpointLogger): Promise<
+  static async getTaskStatistics(logger: EndpointLogger): Promise<
     ResponseType<{
       totalTasks: number;
       enabledTasks: number;
@@ -439,6 +448,3 @@ export class CronTasksRepository implements ICronTasksRepository {
     }
   }
 }
-
-// Export singleton instance
-export const cronTasksRepository = new CronTasksRepository();

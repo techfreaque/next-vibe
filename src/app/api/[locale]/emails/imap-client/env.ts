@@ -8,7 +8,11 @@ import { z } from "zod";
 
 import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 
-export const { env: imapClientEnv } = defineEnv({
+export const {
+  env: imapClientEnv,
+  schema: imapClientEnvSchema,
+  examples: imapClientEnvExamples,
+} = defineEnv({
   IMAP_SEED_ACCOUNT_NAME: {
     schema: z.string().optional(),
     example: "Your IMAP Account",

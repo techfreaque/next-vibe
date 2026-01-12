@@ -826,10 +826,7 @@ const { DELETE } = createEndpoint({
  * User Me API endpoints
  * Combines all me endpoints into a single object
  */
-const meEndpoints = { GET, POST, DELETE };
-
-export { DELETE, GET, POST };
-
+const meEndpoints = { GET, POST, DELETE } as const;
 export default meEndpoints;
 
 // Export types as required by migration guide

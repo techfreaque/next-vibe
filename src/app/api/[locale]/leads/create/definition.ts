@@ -494,10 +494,8 @@ export type LeadCreateResponseTypeInput = LeadCreatePostResponseInput;
 export type LeadCreateResponseTypeOutput = LeadCreatePostResponseOutput;
 
 // Export individual endpoints
-export { POST };
 
 const definitions = {
   POST,
-};
-
+} as const;
 export default definitions;

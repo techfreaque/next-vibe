@@ -9,6 +9,10 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import {
+  type EmailCampaignStageValues,
+  type EmailJourneyVariantValues,
+} from "@/app/api/[locale]/leads/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -17,10 +21,54 @@ import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 import { CampaignType } from "../smtp-client/enum";
 import { SmtpRepository } from "../smtp-client/repository";
 import type { SmtpSelectionCriteria, SmtpSendParams } from "../smtp-client/sending/types";
-import type {
-  EmailServiceSendPostRequestOutput,
-  EmailServiceSendPostResponseOutput,
-} from "./definition";
+
+/**
+ * Email Service Send Request Type
+ */
+export interface EmailServiceSendProps {
+  recipientInfo: {
+    to: string;
+    toName?: string;
+  };
+  emailContent: {
+    subject: string;
+    html: string;
+    text?: string;
+  };
+  senderSettings: {
+    senderName: string;
+    replyTo?: string;
+  };
+  campaignSettings: {
+    campaignType?: (typeof CampaignType)[keyof typeof CampaignType];
+    unsubscribeUrl?: string;
+    emailJourneyVariant?: typeof EmailJourneyVariantValues | null;
+    emailCampaignStage?: typeof EmailCampaignStageValues | null;
+    leadId?: string;
+    campaignId?: string;
+  };
+  advancedOptions: {
+    skipRateLimitCheck?: boolean;
+  };
+}
+
+/**
+ * Email Service Send Response Type
+ */
+export interface EmailServiceSendResponse {
+  result: {
+    success: boolean;
+    messageId: string;
+    accountId: string;
+    accountName: string;
+    response: string;
+    sentAt: string;
+  };
+  deliveryStatus: {
+    accepted: string[];
+    rejected: string[];
+  };
+}
 
 /**
  * Email Service Repository
@@ -28,11 +76,11 @@ import type {
  */
 export class EmailServiceRepository {
   static async sendEmail(
-    data: EmailServiceSendPostRequestOutput,
+    data: EmailServiceSendProps,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<EmailServiceSendPostResponseOutput>> {
+  ): Promise<ResponseType<EmailServiceSendResponse>> {
     try {
       logger.debug("Email service: Sending email", {
         to: data.recipientInfo.to,

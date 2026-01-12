@@ -332,5 +332,4 @@ export type MemoryAddResponseInput = typeof POST.types.ResponseInput;
 export type MemoryAddResponseOutput = typeof POST.types.ResponseOutput;
 
 const definitions = { GET, POST };
-export { GET, POST };
 export default definitions;

@@ -303,6 +303,36 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         })(),
       );
 
+      // 6. Env Generator
+      generatorPromises.push(
+        (async (): Promise<string | null> => {
+          try {
+            outputLines.push("⚙️ Generating env files...");
+            const { envGeneratorRepository } = await import("../env/repository");
+
+            const result = await envGeneratorRepository.generateEnv(
+              {
+                outputDir: "src/app/api/[locale]/system/generated",
+                verbose: false,
+                dryRun: false,
+              },
+              logger,
+            );
+
+            if (result.success) {
+              outputLines.push("✅ Env files generated successfully");
+              generatorsRun++;
+              return "env";
+            }
+            outputLines.push(`❌ Env generation failed: ${result.message || "Unknown error"}`);
+            return null;
+          } catch (error) {
+            outputLines.push(`❌ Env generator failed: ${parseError(error).message}`);
+            return null;
+          }
+        })(),
+      );
+
       // Wait for all generators to complete
       const results = await Promise.allSettled(generatorPromises);
       const completedGenerators: string[] = [];
@@ -322,7 +352,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generationCompleted: true,
         output: outputLines.join("\n"),
         generationStats: {
-          totalGenerators: 7,
+          totalGenerators: 8,
           generatorsRun,
           generatorsSkipped,
           outputDirectory: data.outputDir || "src/app/api/[locale]/system/generated",

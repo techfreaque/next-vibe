@@ -383,7 +383,5 @@ export type ImapMessageResponseType = ImapMessagesListGetResponseOutput["message
  */
 const definitions = {
   GET,
-};
-
-export { GET };
+} as const;
 export default definitions;

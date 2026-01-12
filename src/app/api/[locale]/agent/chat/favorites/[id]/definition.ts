@@ -25,6 +25,7 @@ import {
   requestResponseField,
   requestUrlPathParamsField,
   responseField,
+  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -420,6 +421,13 @@ const { PATCH } = createEndpoint({
                 },
                 z.literal(ModelSelectionType.MANUAL),
               ),
+              modelDisplay: widgetField(
+                {
+                  type: WidgetType.MODEL_DISPLAY,
+                  columns: 12,
+                },
+                { request: "data" },
+              ),
               manualModelId: requestDataField(
                 {
                   type: WidgetType.FORM_FIELD,
@@ -460,6 +468,13 @@ const { PATCH } = createEndpoint({
                   columns: 12,
                 },
                 z.literal(ModelSelectionType.FILTERS),
+              ),
+              modelDisplay: widgetField(
+                {
+                  type: WidgetType.MODEL_DISPLAY,
+                  columns: 12,
+                },
+                { request: "data" },
               ),
               intelligenceRange: requestDataRangeField(
                 {
@@ -814,6 +829,5 @@ export type FavoriteDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 // Full favorite configuration type (from GET response)
 export type FavoriteItem = FavoriteGetResponseOutput;
 
-const definitions = { GET, PATCH, DELETE };
-export { DELETE, GET, PATCH };
+const definitions = { GET, PATCH, DELETE } as const;
 export default definitions;

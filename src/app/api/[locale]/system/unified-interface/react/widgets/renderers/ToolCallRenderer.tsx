@@ -601,6 +601,7 @@ export function ToolCallRenderer({
                     )}
 
                     <EndpointRenderer
+                      user={user}
                       endpoint={definition}
                       locale={locale}
                       data={mergedData}

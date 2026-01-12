@@ -18,8 +18,10 @@ import type { JSX } from "react";
 import { useEffect } from "react";
 import type { DefaultValues, FieldValues, UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import type { ZodTypeAny } from "zod";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
@@ -100,6 +102,8 @@ export interface EndpointRendererProps<
   endpointMutations?: WidgetRenderContext["endpointMutations"];
   /** Logger instance for widgets to use directly */
   logger: EndpointLogger;
+  /** User object for permission checks */
+  user: JwtPayloadType;
 }
 
 /**
@@ -197,8 +201,10 @@ export function EndpointRenderer<
   endpointMutations,
   submitButton,
   cancelButton,
+  logger,
+  user,
 }: EndpointRendererProps<TEndpoint, TFieldValues>): JSX.Element {
-  // Check if endpoint.fields itself is a container widget
+  // Check if endpoint.fields itself is a container or array widget (render directly)
   const isRootContainer =
     (endpoint.fields.type === "object" ||
       endpoint.fields.type === "object-optional" ||
@@ -208,7 +214,7 @@ export function EndpointRenderer<
 
   // Create internal form if none provided (for display-only mode like tool calls)
   const internalForm = useForm<TFieldValues>({
-    resolver: zodResolver(endpoint.requestSchema),
+    resolver: zodResolver<TFieldValues, ZodTypeAny, TFieldValues>(endpoint.requestSchema),
     defaultValues: (data ?? {}) as DefaultValues<TFieldValues>,
   });
 
@@ -230,13 +236,15 @@ export function EndpointRenderer<
     locale,
     isInteractive: true,
     logger,
-    permissions: [],
+    user,
+    platform: Platform.NEXT_PAGE,
     endpointFields: endpoint.fields,
     disabled,
     response,
     endpointMutations,
     t: endpoint.scopedTranslation.scopedT(locale).t,
     navigation,
+    currentEndpoint: endpoint,
   };
 
   // Check if there are any request fields
@@ -317,7 +325,8 @@ export function EndpointRenderer<
   const visibleFields = fields.filter(([fieldName, field]) => {
     if (isResponseField(field)) {
       // Only show response fields with data
-      const fieldData = data?.[fieldName];
+      const fieldData =
+        data && typeof data === "object" && !Array.isArray(data) ? data[fieldName] : undefined;
       return fieldData !== null && fieldData !== undefined;
     }
     // Always show request fields
@@ -332,20 +341,24 @@ export function EndpointRenderer<
     : undefined;
 
   // Render all widgets in sorted order (respecting order property across request/response)
-  const allWidgets = visibleFields.map(([fieldName, field]) => (
-    <WidgetRenderer
-      key={fieldName}
-      widgetType={field.ui.type}
-      fieldName={fieldName}
-      data={data?.[fieldName] ?? null}
-      field={field}
-      context={context}
-      form={form as UseFormReturn<FieldValues>}
-      onSubmit={handleWidgetSubmit}
-      isSubmitting={isSubmitting}
-      endpoint={endpoint}
-    />
-  ));
+  const allWidgets = visibleFields.map(([fieldName, field]) => {
+    const fieldData =
+      data && typeof data === "object" && !Array.isArray(data) ? data[fieldName] : null;
+    return (
+      <WidgetRenderer
+        key={fieldName}
+        widgetType={field.ui.type}
+        fieldName={fieldName}
+        data={fieldData}
+        field={field}
+        context={context}
+        form={form as UseFormReturn<FieldValues>}
+        onSubmit={handleWidgetSubmit}
+        isSubmitting={isSubmitting}
+        endpoint={endpoint}
+      />
+    );
+  });
 
   // Always wrap in Form if we have form fields (request fields)
   if (hasRequest) {

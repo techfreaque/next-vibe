@@ -426,4 +426,4 @@ export type MessageCreateResponseOutput = typeof POST.types.ResponseOutput;
 /**
  * Export definitions
  */
-export default { GET, POST };
+export default { GET, POST } as const;

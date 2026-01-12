@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { type CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
@@ -13,6 +14,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
+import { simpleT } from "@/i18n/core/shared";
 
 import { HistoryPageClient } from "./_components/history-page-client";
 
@@ -38,6 +40,7 @@ export async function generateMetadata({ params }: HistoryPageProps): Promise<Me
 
 export default async function HistoryPage({ params }: HistoryPageProps): Promise<JSX.Element> {
   const { locale } = await params;
+  const { t } = simpleT(locale);
 
   // Check authentication
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -101,8 +104,13 @@ export default async function HistoryPage({ params }: HistoryPageProps): Promise
   const products = productsRepository.getProducts(locale);
   const FREE_CREDITS = products[ProductIds.FREE_TIER].credits;
 
+  if (!userResponse.success) {
+    return <Div>{t("app.subscription.history.errors.failedToLoadUser")}</Div>;
+  }
+
   return (
     <HistoryPageClient
+      user={userResponse.data}
       locale={locale}
       isAuthenticated={isAuthenticated}
       initialCredits={credits}

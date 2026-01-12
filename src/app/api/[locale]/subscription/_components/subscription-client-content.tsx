@@ -9,8 +9,13 @@ import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
+import type { CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
+import type { CreditBalance } from "@/app/api/[locale]/credits/repository";
 import { ProductIds, productsRepository } from "@/app/api/[locale]/products/repository-client";
+import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { BuyCreditsTab } from "./buy-credits-tab";
 import { CreditBalanceCard } from "./credit-balance-card";
@@ -19,7 +24,15 @@ import { OverviewTab } from "./overview-tab";
 import { PaymentStatusAlert } from "./payment-status-alert";
 import { SubscriptionHeader } from "./subscription-header";
 import { SubscriptionStatusCard } from "./subscription-status-card";
-import type { SubscriptionClientContentProps } from "./types";
+
+export interface SubscriptionClientContentProps {
+  locale: CountryLanguage;
+  initialCredits: CreditBalance | null;
+  initialHistory: CreditsHistoryGetResponseOutput | null;
+  initialSubscription: SubscriptionGetResponseOutput | null;
+  isAuthenticated: boolean;
+  user: JwtPayloadType;
+}
 
 export function SubscriptionClientContent({
   locale,
@@ -27,6 +40,7 @@ export function SubscriptionClientContent({
   initialHistory,
   initialSubscription,
   isAuthenticated,
+  user,
 }: SubscriptionClientContentProps): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
@@ -165,7 +179,7 @@ export function SubscriptionClientContent({
 
         {/* Usage History Tab */}
         <TabsContent value="history" className="flex flex-col gap-6">
-          <HistoryTab locale={locale} initialData={initialHistory} />
+          <HistoryTab locale={locale} initialData={initialHistory} user={user} />
         </TabsContent>
       </Tabs>
     </Container>

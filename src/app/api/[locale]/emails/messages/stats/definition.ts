@@ -588,7 +588,5 @@ export type EmailStatsGetResponseTypeOutput = typeof GET.types.ResponseOutput;
  */
 const emailStatsEndpoints = {
   GET,
-};
-
-export { GET };
+} as const;
 export default emailStatsEndpoints;

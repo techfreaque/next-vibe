@@ -239,12 +239,7 @@ const { GET } = createEndpoint({
  */
 const resetPasswordValidateEndpoints = {
   GET,
-};
-
-export { GET };
-
-export const resetPasswordValidateEndpoint = resetPasswordValidateEndpoints;
-
+} as const;
 export default resetPasswordValidateEndpoints;
 
 // Export types as required by migration guide

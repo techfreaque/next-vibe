@@ -12,7 +12,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NewUser } from "./db";
 import { UserDetailLevel } from "./enum";
-import { GET as getUserMeEndpoint } from "./private/me/definition";
+import userProfileEndpoints from "./private/me/definition";
 import type { UserRepositoryType } from "./repository";
 import type {
   ExtendedUserDetailLevel,
@@ -65,7 +65,7 @@ export class UserRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserType<T>>> {
-    const response = await nativeEndpoint(getUserMeEndpoint, {}, logger, locale);
+    const response = await nativeEndpoint(userProfileEndpoints.GET, {}, logger, locale);
 
     if (response.success) {
       return {

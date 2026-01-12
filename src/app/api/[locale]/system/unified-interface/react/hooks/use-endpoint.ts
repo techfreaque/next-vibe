@@ -215,10 +215,17 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
 
   const deleteUrlPathParams = options.delete?.urlPathParams ?? options.urlPathParams;
 
+  const deleteAutoPrefillData = useMemo(():
+    | DeepPartial<DeleteEndpointTypes<T>["request"]>
+    | undefined => {
+    return options.delete?.autoPrefillData;
+  }, [options.delete?.autoPrefillData]);
+
   // Hook will merge endpoint options with passed options internally
   const apiDeleteOperation = useEndpointDelete(isLocalStorageMode ? null : deleteEndpoint, logger, {
     mutationOptions: deleteMutationOptions,
     urlPathParams: deleteUrlPathParams,
+    autoPrefillData: deleteAutoPrefillData,
   });
 
   const localStorageDeleteOperation = useLocalStorageDelete<T>(
@@ -237,7 +244,7 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
 
   // Combined error state - all hooks return compatible error types
   const error: ErrorResponseType | null =
-    read?.error || createOperation?.submitError || deleteOperation?.error || null;
+    read?.error || createOperation?.submitError || deleteOperation?.submitError || null;
 
   // Memoize create operation wrapper
   const createValues = createOperation?.form.watch();

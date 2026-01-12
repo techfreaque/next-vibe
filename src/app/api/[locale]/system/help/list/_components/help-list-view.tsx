@@ -9,6 +9,7 @@ import { useMemo, useState } from "react";
 import { useApiForm } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation-form";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -17,13 +18,14 @@ import helpListEndpoints from "../definition";
 
 interface HelpListViewProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 /**
  * Help List View Component
  * Shows form to filter commands, then displays results
  */
-export function HelpListView({ locale }: HelpListViewProps): JSX.Element {
+export function HelpListView({ locale, user }: HelpListViewProps): JSX.Element {
   const { t } = simpleT(locale);
   const [responseData, setResponseData] = useState<HelpListResponseOutput | null>(null);
   const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
@@ -61,6 +63,7 @@ export function HelpListView({ locale }: HelpListViewProps): JSX.Element {
         <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg mb-8">
           <CardContent className="mt-6">
             <EndpointRenderer
+              user={user}
               endpoint={helpListEndpoints.POST}
               form={form}
               onSubmit={() => submitForm()}

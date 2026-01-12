@@ -171,7 +171,5 @@ export type PaymentPortalResponseOutput = typeof POST.types.ResponseOutput;
  */
 const portalEndpoints = {
   POST,
-};
-
-export { POST };
+} as const;
 export default portalEndpoints;

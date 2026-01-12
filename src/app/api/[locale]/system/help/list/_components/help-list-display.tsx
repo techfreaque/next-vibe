@@ -15,14 +15,16 @@ import helpListEndpoints from "@/app/api/[locale]/system/help/list/definition";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 export interface HelpListDisplayProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
-export function HelpListDisplay({ locale }: HelpListDisplayProps): JSX.Element {
+export function HelpListDisplay({ locale, user }: HelpListDisplayProps): JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 
@@ -56,6 +58,7 @@ export function HelpListDisplay({ locale }: HelpListDisplayProps): JSX.Element {
         mutation.data.success &&
         mutation.data.data && (
           <EndpointRenderer
+            user={user}
             endpoint={helpListEndpoints.POST}
             locale={locale}
             data={mutation.data.data}

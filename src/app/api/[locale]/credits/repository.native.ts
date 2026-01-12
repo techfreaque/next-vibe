@@ -11,7 +11,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CreditPackCheckoutSession } from "../payment/providers/types";
-import { GET as getCreditsEndpoint } from "./definition";
+import creditsDefinitions from "./definition";
 import type { CreditTypeIdentifierValue } from "./enum";
 import type {
   CreditBalance,
@@ -31,7 +31,7 @@ export class CreditRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditBalance>> {
-    const response = await nativeEndpoint(getCreditsEndpoint, {}, logger, locale);
+    const response = await nativeEndpoint(creditsDefinitions.GET, {}, logger, locale);
     if (response.success) {
       return { success: true, data: response.data, message: response.message };
     }

@@ -64,7 +64,7 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
 
     try {
       const outputFile = join(data.outputDir, "seeds.ts");
-      logger.debug("Starting seeds generation", { outputFile });
+      logger.debug(`Starting seeds generation: ${outputFile}`);
 
       // Discover seed files
       // eslint-disable-next-line i18next/no-literal-string

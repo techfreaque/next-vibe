@@ -30,7 +30,7 @@ export default async function LeadEditPage({
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Require admin user authentication
-  await requireAdminUser(locale, `/${locale}/admin/leads/${id}/edit`);
+  const user = await requireAdminUser(locale, `/${locale}/admin/leads/${id}/edit`);
 
   // Fetch lead data
   const leadResponse = await LeadsRepository.getLeadByIdInternal(id, logger);
@@ -53,7 +53,7 @@ export default async function LeadEditPage({
       </Div>
 
       {/* Edit Form */}
-      <LeadEditForm locale={locale} leadId={id} lead={leadResponse.data} />
+      <LeadEditForm locale={locale} leadId={id} lead={leadResponse.data} user={user} />
     </Div>
   );
 }

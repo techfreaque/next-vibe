@@ -306,7 +306,5 @@ export type PulseExecuteResponseOutput = typeof POST.types.ResponseOutput;
  */
 const pulseExecuteEndpoints = {
   POST,
-};
-
-export { POST };
+} as const;
 export default pulseExecuteEndpoints;

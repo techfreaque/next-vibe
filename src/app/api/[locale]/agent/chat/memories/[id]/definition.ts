@@ -288,5 +288,4 @@ export type MemoryDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type MemoryDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 
 const definitions = { PATCH, DELETE };
-export { DELETE, PATCH };
 export default definitions;

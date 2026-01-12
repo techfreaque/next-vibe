@@ -12,7 +12,6 @@ import { CronTaskEditClient } from "@/app/api/[locale]/system/unified-interface/
 import type { IndividualCronTaskType } from "@/app/api/[locale]/system/unified-interface/tasks/cron/task/[id]/definition";
 import {
   CronTaskPriority,
-  CronTaskStatus,
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
@@ -41,16 +40,24 @@ export default async function CronTaskEditPage({
     id,
     name: "Sample Task", // eslint-disable-line i18next/no-literal-string -- Stub data
     description: "Task description", // eslint-disable-line i18next/no-literal-string -- Stub data
-    version: 1,
+    version: "1.0.0", // eslint-disable-line i18next/no-literal-string -- Stub data
+    category: TaskCategory.SYSTEM,
     schedule: "0 * * * *", // eslint-disable-line i18next/no-literal-string -- Stub data
+    timezone: "UTC", // eslint-disable-line i18next/no-literal-string -- Stub data
     enabled: true,
     priority: CronTaskPriority.MEDIUM,
-    status: CronTaskStatus.PENDING,
-    category: TaskCategory.SYSTEM,
     timeout: 3600,
     retries: 3,
-    lastRun: undefined,
-    nextRun: undefined,
+    retryDelay: 5000,
+    lastExecutedAt: null,
+    lastExecutionStatus: null,
+    lastExecutionError: null,
+    lastExecutionDuration: null,
+    nextExecutionAt: null,
+    executionCount: 0,
+    successCount: 0,
+    errorCount: 0,
+    averageExecutionTime: null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };

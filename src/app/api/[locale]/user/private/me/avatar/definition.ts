@@ -374,10 +374,7 @@ const { DELETE } = createEndpoint({
 const avatarEndpoints = {
   POST,
   DELETE,
-};
-
-export { DELETE, POST };
-
+} as const;
 export default avatarEndpoints;
 
 // Export types as required by migration guide

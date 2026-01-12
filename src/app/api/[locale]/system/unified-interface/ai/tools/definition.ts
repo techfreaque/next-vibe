@@ -121,8 +121,6 @@ const { GET } = createEndpoint({
 
 const toolsDefinition = { GET };
 
-export { GET };
-
 export default toolsDefinition;
 
 // Export types as required by migration guide

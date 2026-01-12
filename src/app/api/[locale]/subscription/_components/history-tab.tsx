@@ -6,14 +6,16 @@ import type { JSX } from "react";
 import type { CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
 import creditsHistoryDefinitions from "@/app/api/[locale]/credits/history/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface HistoryTabProps {
   locale: CountryLanguage;
   initialData: CreditsHistoryGetResponseOutput | null;
+  user: JwtPayloadType;
 }
 
-export function HistoryTab({ locale, initialData }: HistoryTabProps): JSX.Element {
+export function HistoryTab({ locale, initialData, user }: HistoryTabProps): JSX.Element {
   return (
     <MotionDiv
       initial={{ opacity: 0, y: 20 }}
@@ -23,6 +25,7 @@ export function HistoryTab({ locale, initialData }: HistoryTabProps): JSX.Elemen
       <EndpointsPage
         endpoint={creditsHistoryDefinitions}
         locale={locale}
+        user={user}
         endpointOptions={{
           read: {
             queryOptions: {

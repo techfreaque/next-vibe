@@ -86,67 +86,65 @@ export function useCredits(
         return;
       }
 
-      apiClient.updateEndpointData(definitions.GET, logger, (oldData) => {
-        if (!oldData?.success) {
-          return oldData;
-        }
+      apiClient.updateEndpointData(
+        definitions.GET,
+        logger,
+        (oldData) => {
+          if (!oldData?.success) {
+            return oldData;
+          }
 
-        const data = oldData.data;
+          const data = oldData.data;
 
-        // Ensure we don't go negative
-        if (data.total < creditCost) {
-          return oldData;
-        }
+          if (data.total < creditCost) {
+            return oldData;
+          }
 
-        // Deduct credits in the correct order: free → expiring → permanent → earned
-        let remaining = creditCost;
-        let newFree = data.free;
-        let newExpiring = data.expiring;
-        let newPermanent = data.permanent;
-        let newEarned = data.earned;
+          // Deduct credits: free → expiring → permanent → earned
+          let remaining = creditCost;
+          let newFree = data.free;
+          let newExpiring = data.expiring;
+          let newPermanent = data.permanent;
+          let newEarned = data.earned;
 
-        // Step 1: Deduct from free credits first (includes lead credits)
-        if (remaining > 0 && newFree > 0) {
-          const deduction = Math.min(newFree, remaining);
-          newFree -= deduction;
-          remaining -= deduction;
-        }
+          if (remaining > 0 && newFree > 0) {
+            const deduction = Math.min(newFree, remaining);
+            newFree -= deduction;
+            remaining -= deduction;
+          }
 
-        // Step 2: Deduct from expiring credits (subscription)
-        if (remaining > 0 && newExpiring > 0) {
-          const deduction = Math.min(newExpiring, remaining);
-          newExpiring -= deduction;
-          remaining -= deduction;
-        }
+          if (remaining > 0 && newExpiring > 0) {
+            const deduction = Math.min(newExpiring, remaining);
+            newExpiring -= deduction;
+            remaining -= deduction;
+          }
 
-        // Step 3: Deduct from permanent credits
-        if (remaining > 0 && newPermanent > 0) {
-          const deduction = Math.min(newPermanent, remaining);
-          newPermanent -= deduction;
-          remaining -= deduction;
-        }
+          if (remaining > 0 && newPermanent > 0) {
+            const deduction = Math.min(newPermanent, remaining);
+            newPermanent -= deduction;
+            remaining -= deduction;
+          }
 
-        // Step 4: Deduct from earned credits (lowest priority)
-        if (remaining > 0 && newEarned > 0) {
-          const deduction = Math.min(newEarned, remaining);
-          newEarned -= deduction;
-          remaining -= deduction;
-        }
+          if (remaining > 0 && newEarned > 0) {
+            const deduction = Math.min(newEarned, remaining);
+            newEarned -= deduction;
+            remaining -= deduction;
+          }
 
-        const newTotal = newFree + newExpiring + newPermanent + newEarned;
-
-        return {
-          success: true,
-          data: {
-            total: newTotal,
-            expiring: newExpiring,
-            permanent: newPermanent,
-            earned: newEarned,
-            free: newFree,
-            expiresAt: data.expiresAt,
-          },
-        };
-      });
+          return {
+            success: true,
+            data: {
+              total: newFree + newExpiring + newPermanent + newEarned,
+              expiring: newExpiring,
+              permanent: newPermanent,
+              earned: newEarned,
+              free: newFree,
+              expiresAt: data.expiresAt,
+            },
+          };
+        },
+        undefined,
+      );
     },
     [logger],
   );

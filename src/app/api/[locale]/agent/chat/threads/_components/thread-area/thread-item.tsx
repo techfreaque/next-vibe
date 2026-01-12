@@ -45,6 +45,7 @@ import type { UseChatReturn } from "@/app/api/[locale]/agent/chat/hooks/hooks";
 import type { ChatThread } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -67,6 +68,7 @@ export interface ThreadItemProps {
   compact?: boolean;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  user: JwtPayloadType;
 }
 
 export function ThreadItem({
@@ -81,6 +83,7 @@ export function ThreadItem({
   compact = false,
   locale,
   logger,
+  user,
 }: ThreadItemProps): JSX.Element {
   const router = useRouter();
   const isTouch = useTouchDevice();
@@ -455,6 +458,7 @@ export function ThreadItem({
 
       {/* Share Dialog */}
       <ThreadShareDialog
+        user={user}
         open={shareDialogOpen}
         onOpenChange={setShareDialogOpen}
         threadId={thread.id}

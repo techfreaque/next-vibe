@@ -414,6 +414,5 @@ export type UserListResponseOutput = typeof GET.types.ResponseOutput;
 export type UsersQueryType = UserListRequestOutput;
 export type UserListResponseType = UserListResponseOutput;
 
-const definitions = { GET };
-export { GET };
+const definitions = { GET } as const;
 export default definitions;

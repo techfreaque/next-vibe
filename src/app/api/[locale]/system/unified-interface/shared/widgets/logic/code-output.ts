@@ -42,7 +42,6 @@ export interface ProcessedCodeOutput {
   language: string;
   showLineNumbers: boolean;
   highlightLines: number[];
-  theme: string;
 }
 
 /**
@@ -217,10 +216,7 @@ export function buildTableData(data: CodeOutputItem[]): {
  * Extract and validate code output data from WidgetData
  * Handles both string (simple code) and object (full config) formats
  */
-export function extractCodeOutputData(
-  value: WidgetData,
-  defaultTheme = "light",
-): ProcessedCodeOutput | null {
+export function extractCodeOutputData(value: WidgetData): ProcessedCodeOutput | null {
   // Handle string value directly (simple code string)
   if (typeof value === "string") {
     return {
@@ -228,7 +224,6 @@ export function extractCodeOutputData(
       language: "text",
       showLineNumbers: false,
       highlightLines: [],
-      theme: defaultTheme,
     };
   }
 
@@ -249,8 +244,6 @@ export function extractCodeOutputData(
       (item): item is number => typeof item === "number",
     );
 
-    const theme = "theme" in value && typeof value.theme === "string" ? value.theme : defaultTheme;
-
     if (!code) {
       return null;
     }
@@ -260,7 +253,6 @@ export function extractCodeOutputData(
       language,
       showLineNumbers,
       highlightLines,
-      theme,
     };
   }
 

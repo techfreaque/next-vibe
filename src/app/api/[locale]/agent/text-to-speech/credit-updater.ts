@@ -5,7 +5,6 @@
 
 "use client";
 
-import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import creditsDefinition from "@/app/api/[locale]/credits/definition";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -24,26 +23,26 @@ export function updateCreditBalanceForTTS(logger: EndpointLogger): void {
     return;
   }
 
-  apiClient.updateEndpointData(creditsDefinition.GET, logger, (oldData) => {
-    if (!oldData?.success) {
-      return oldData;
-    }
+  apiClient.updateEndpointData(
+    creditsDefinition.GET,
+    logger,
+    (oldData) => {
+      if (!oldData?.success) {
+        return oldData;
+      }
 
-    const data = oldData.data as CreditsGetResponseOutput;
-    const newTotal = Math.max(0, data.total - creditCost);
+      const data = oldData.data;
 
-    return {
-      success: true,
-      data: {
-        total: newTotal,
-        expiring: data.expiring,
-        permanent: data.permanent,
-        earned: data.earned,
-        free: data.free,
-        expiresAt: data.expiresAt,
-      },
-    };
-  });
+      return {
+        success: true,
+        data: {
+          ...data,
+          total: Math.max(0, data.total - creditCost),
+        },
+      };
+    },
+    undefined,
+  );
 
   logger.debug("Credit balance updated in cache after TTS", {
     creditCost,

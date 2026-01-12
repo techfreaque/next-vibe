@@ -210,9 +210,7 @@ const { GET } = createEndpoint({
   },
 });
 
-const fetchUrlContentDefinition = { GET };
-
-export { GET };
+const fetchUrlContentDefinition = { GET } as const;
 
 export default fetchUrlContentDefinition;
 

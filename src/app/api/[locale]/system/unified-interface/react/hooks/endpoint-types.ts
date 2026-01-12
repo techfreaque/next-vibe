@@ -243,6 +243,10 @@ export interface UseEndpointOptions<T> {
     urlPathParams?: DeleteEndpointTypes<T> extends never
       ? undefined
       : DeleteEndpointTypes<T>["urlPathParams"];
+    /** Data to auto-prefill the form with */
+    autoPrefillData?: DeleteEndpointTypes<T> extends never
+      ? undefined
+      : DeepPartial<DeleteEndpointTypes<T>["request"]>;
   };
 
   /**
@@ -538,20 +542,28 @@ export type EndpointReturn<T> = Prettify<{
     DELETE: CreateApiEndpoint<string, Methods, readonly UserRoleValue[], string, infer TFields>;
   }
     ? {
+        /** React Hook Form instance */
+        form: UseFormReturn<ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>>;
         /** The complete response including success/error state */
         response:
           | ResponseType<ExtractOutput<InferSchemaFromField<TFields, FieldUsage.ResponseData>>>
           | undefined;
+        /** Submit error from mutation */
+        submitError: ErrorResponseType | null;
+        /** Whether submission was successful */
+        isSubmitSuccessful: boolean;
 
         // Backward compatibility properties
         /** @deprecated Use response?.success === true instead */
         isSuccess: boolean;
-        /** @deprecated Use response?.success === false ? response : null instead */
+        /** @deprecated Use submitError instead */
         error: ErrorResponseType | null;
 
         submit: (
           data?: ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
         ) => Promise<void>;
+        /** Submit form function (calls form.handleSubmit) */
+        submitForm: () => Promise<void>;
         isSubmitting: boolean;
       }
     : undefined;

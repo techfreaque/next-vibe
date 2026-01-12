@@ -6,7 +6,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { PasswordRepository } from "../repository";
-import { resetPasswordValidateEndpoint } from "./definition";
+import resetPasswordValidateEndpoint from "./definition";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: resetPasswordValidateEndpoint,

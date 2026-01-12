@@ -113,8 +113,6 @@ const { POST } = createEndpoint({
 
 const serveDefinition = { POST };
 
-export { POST };
-
 export default serveDefinition;
 
 // Export types

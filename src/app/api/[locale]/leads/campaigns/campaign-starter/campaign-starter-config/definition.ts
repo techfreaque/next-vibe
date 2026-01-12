@@ -742,7 +742,5 @@ export type CampaignStarterConfigType = CampaignStarterConfigGetResponseOutput["
 const definitions = {
   GET,
   PUT,
-};
-
-export { GET, PUT };
+} as const;
 export default definitions;

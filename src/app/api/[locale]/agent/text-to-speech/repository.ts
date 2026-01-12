@@ -21,7 +21,7 @@ import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 import { CreditRepository } from "../../credits/repository";
 import { TTS_COST_PER_CHARACTER } from "../../products/repository-client";
 import type { JwtPayloadType } from "../../user/auth/types";
-import type { TextToSpeechPostRequestOutput } from "./definition";
+import type { TextToSpeechPostRequestOutput, TextToSpeechPostResponseOutput } from "./definition";
 import { TtsVoice } from "./enum";
 
 /**
@@ -75,11 +75,7 @@ export class TextToSpeechRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<
-    ResponseType<{
-      response: { success: boolean; audioUrl: string; provider: string };
-    }>
-  > {
+  ): Promise<ResponseType<TextToSpeechPostResponseOutput>> {
     // Server-side configuration
     const provider = "openai";
     const language = mapLocaleToLanguage(locale);
@@ -245,11 +241,7 @@ export class TextToSpeechRepository {
       });
 
       return success({
-        response: {
-          success: true,
-          audioUrl,
-          provider,
-        },
+        audioUrl,
       });
     } catch (error) {
       const errorMessage = parseError(error).message;

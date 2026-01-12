@@ -82,7 +82,7 @@ export interface RouteExecutionContext extends Omit<BaseExecutionContext<InputDa
   };
 
   /** More specific user type for CLI */
-  user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> | undefined;
+  user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
 
   /** CLI-specific options */
   options?: {
@@ -249,6 +249,7 @@ export class RouteDelegationHandler {
         locale,
         context.options?.verbose || false,
         logger,
+        context,
       );
 
       // 9. Return result with formatted output
@@ -278,6 +279,7 @@ export class RouteDelegationHandler {
         locale,
         context.options?.verbose || false,
         logger,
+        context,
       );
 
       return {
@@ -428,6 +430,7 @@ export class RouteDelegationHandler {
     locale: CountryLanguage,
     verbose = false,
     logger: EndpointLogger,
+    context: RouteExecutionContext,
   ): string {
     if (!result.success) {
       // Translate error message if it's a translation key
@@ -502,6 +505,7 @@ export class RouteDelegationHandler {
               endpointDefinition,
               locale,
               logger,
+              context,
             );
           } else {
             // Fallback to JSON without endpoint definition
@@ -737,6 +741,7 @@ export class RouteDelegationHandler {
     endpointDefinition: CreateApiEndpointAny,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    context: RouteExecutionContext,
   ): string {
     try {
       // Extract response fields from endpoint definition
@@ -749,6 +754,7 @@ export class RouteDelegationHandler {
         locale,
         endpointDefinition.scopedTranslation.scopedT(locale).t,
         logger,
+        context.user,
       );
     } catch (error) {
       // Fallback to basic formatting
@@ -756,7 +762,7 @@ export class RouteDelegationHandler {
         error: parseError(error),
       });
       // eslint-disable-next-line i18next/no-literal-string
-      return `📊 Result:\n${this.formatPretty(data, locale, endpointDefinition.scopedTranslation.scopedT(locale).t, logger)}`;
+      return `📊 Result:\n${this.formatPretty(data, locale, endpointDefinition.scopedTranslation.scopedT(locale).t, logger, context)}`;
     }
   }
 
@@ -768,6 +774,7 @@ export class RouteDelegationHandler {
     locale: CountryLanguage,
     t: (key: string, params?: TParams) => string,
     logger: EndpointLogger,
+    context: RouteExecutionContext,
   ): string {
     // Use the enhanced modular CLI response renderer for pretty formatting
     try {
@@ -777,6 +784,7 @@ export class RouteDelegationHandler {
         locale,
         t,
         logger,
+        context.user,
       );
     } catch {
       // Fallback to JSON if enhanced rendering fails

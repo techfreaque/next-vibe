@@ -1095,6 +1095,11 @@ export interface PaginationWidgetConfig extends BaseWidgetConfig {
   iconSize?: "xs" | "sm" | "base" | "lg";
 }
 
+export interface ModelDisplayWidgetConfig extends BaseWidgetConfig {
+  type: WidgetType.MODEL_DISPLAY;
+  columns?: number;
+}
+
 // ============================================================================
 // INTERACTIVE WIDGETS
 // ============================================================================
@@ -1487,6 +1492,7 @@ export type WidgetConfig<TKey extends string> =
   | CreditTransactionCardWidgetConfig
   | CreditTransactionListWidgetConfig
   | PaginationWidgetConfig
+  | ModelDisplayWidgetConfig
   // Interactive widgets
   | ButtonWidgetConfig<TKey>
   | NavigateButtonWidgetConfig<CreateApiEndpointAny | null, CreateApiEndpointAny | undefined, TKey>

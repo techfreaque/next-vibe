@@ -39,6 +39,7 @@ import { LinkWidget } from "../implementations/LinkWidget";
 import { MarkdownWidget } from "../implementations/MarkdownWidget";
 import { MetadataWidget } from "../implementations/MetadataWidget";
 import { MetricCardWidget } from "../implementations/MetricCardWidget";
+import { ModelDisplayWidget } from "../implementations/ModelDisplayWidget";
 import { NavigateButtonWidget } from "../implementations/NavigateButtonWidget";
 import { PaginationWidget } from "../implementations/PaginationWidget";
 import { PasswordStrengthWidget } from "../implementations/PasswordStrengthWidget";
@@ -256,6 +257,13 @@ function renderWidget<const TKey extends string>(
       return (
         <PaginationWidget
           {...(baseProps as ReactWidgetProps<typeof WidgetType.PAGINATION, TKey>)}
+        />
+      );
+
+    case WidgetType.MODEL_DISPLAY:
+      return (
+        <ModelDisplayWidget
+          {...(baseProps as ReactWidgetProps<typeof WidgetType.MODEL_DISPLAY, TKey>)}
         />
       );
 

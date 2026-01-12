@@ -317,7 +317,5 @@ export type ManifestResponseOutput = typeof GET.types.ResponseOutput;
  */
 const manifestEndpoints = {
   GET,
-};
-
-export { GET };
+} as const;
 export default manifestEndpoints;

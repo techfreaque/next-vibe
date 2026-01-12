@@ -10,6 +10,7 @@ import { BarChart3 } from "next-vibe-ui/ui/icons";
 import type React from "react";
 
 import { LeadsStatsClient } from "@/app/api/[locale]/leads/stats/_components/leads-stats-client";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -34,6 +35,7 @@ export default async function LeadsStatsPage({
 }: LeadsStatsPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
+  const user = await requireAdminUser(locale, `/${locale}/admin/leads/stats`);
 
   return (
     <Div className="flex flex-col gap-6">
@@ -46,7 +48,7 @@ export default async function LeadsStatsPage({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <LeadsStatsClient locale={locale} />
+          <LeadsStatsClient locale={locale} user={user} />
         </CardContent>
       </Card>
     </Div>

@@ -85,6 +85,8 @@ export interface ValidationResult {
   errors: EnvValidationError[];
   module?: EnvModuleInfo;
   exportName?: string;
+  schemaExportName?: string;
+  examplesExportName?: string;
 }
 
 /**
@@ -97,10 +99,12 @@ export function validateEnvFileExports(filePath: string, isClient: boolean): Val
   try {
     const content = readFileSync(filePath, "utf8");
 
-    // Check for defineEnv or defineEnvClient pattern
+    // Check for defineEnv or defineEnvClient pattern with schema and examples export
+    // Matches: { env: name, schema: schemaName, examples: examplesName } (supports multi-line)
+    // Using [\s\S] to match any character including newlines, and making it non-greedy
     const definePattern = isClient
-      ? /export\s+const\s*\{\s*envClient:\s*(\w+)\s*\}\s*=\s*defineEnvClient/
-      : /export\s+const\s*\{\s*env:\s*(\w+)\s*\}\s*=\s*defineEnv/;
+      ? /export\s+const\s*\{[\s\S]*?envClient(?::\s*(\w+))?[\s\S]*?schema:\s*(\w+)[\s\S]*?examples:\s*(\w+)[\s\S]*?\}\s*=\s*defineEnvClient/
+      : /export\s+const\s*\{[\s\S]*?env(?::\s*(\w+))?[\s\S]*?schema:\s*(\w+)[\s\S]*?examples:\s*(\w+)[\s\S]*?\}\s*=\s*defineEnv/;
 
     const exportMatch = content.match(definePattern);
 
@@ -108,17 +112,20 @@ export function validateEnvFileExports(filePath: string, isClient: boolean): Val
       errors.push({
         type: EnvValidationErrorType.MISSING_EXPORT,
         filePath,
-        message: `File must export using ${isClient ? "defineEnvClient" : "defineEnv"}`,
+        message: `File must export env, schema, and examples using ${isClient ? "defineEnvClient" : "defineEnv"}`,
         details: {
           hint: isClient
-            ? "Add: export const { envClient: myEnv } = defineEnvClient({ ... })"
-            : "Add: export const { env: myEnv } = defineEnv({ ... })",
+            ? "Add: export const { envClient: myEnv, schema: myEnvSchema, examples: myEnvExamples } = defineEnvClient({ ... })"
+            : "Add: export const { env: myEnv, schema: myEnvSchema, examples: myEnvExamples } = defineEnv({ ... })",
         },
       });
       return { isValid: false, errors };
     }
 
-    const exportName = exportMatch[1];
+    // If shorthand is used (no explicit name), derive from schema name or use default
+    const exportName = exportMatch[1] || (isClient ? "envClient" : "env");
+    const schemaExportName = exportMatch[2];
+    const examplesExportName = exportMatch[3];
 
     // Derive module name from export name (e.g., smsEnv -> sms)
     const moduleName = exportName.replace(/Env$/, "").replace(/Client$/, "");
@@ -131,7 +138,14 @@ export function validateEnvFileExports(filePath: string, isClient: boolean): Val
       envExampleEntries: envExampleEntries.length > 0 ? envExampleEntries : undefined,
     };
 
-    return { isValid: true, errors: [], module: envModule, exportName };
+    return {
+      isValid: true,
+      errors: [],
+      module: envModule,
+      exportName,
+      schemaExportName,
+      examplesExportName,
+    };
   } catch (error) {
     errors.push({
       type: EnvValidationErrorType.INVALID_SCHEMA,
@@ -149,10 +163,20 @@ export function validateEnvFileExports(filePath: string, isClient: boolean): Val
 export function formatValidationErrors(errors: EnvValidationError[]): string {
   return errors
     .map((err) => {
-      let msg = `\n[${err.type}] ${err.filePath}\n  ${err.message}`;
+      const relativePath = err.filePath.replace(process.cwd(), "").replace(/^\//, "");
+      let msg = `    • ${relativePath}`;
+      msg += `\n      ${err.message}`;
+
+      // Format details nicely without JSON
       if (err.details) {
-        const detailsStr = JSON.stringify(err.details, null, 2).split("\n").join("\n  ");
-        msg += `\n  Details: ${detailsStr}`;
+        if ("hint" in err.details) {
+          msg += `\n      💡 ${err.details.hint}`;
+        } else if ("error" in err.details) {
+          msg += `\n      ⚠️  ${err.details.error}`;
+        } else if ("existingFile" in err.details && "duplicateFile" in err.details) {
+          const existing = err.details.existingFile.replace(process.cwd(), "").replace(/^\//, "");
+          msg += `\n      ⚠️  Conflicts with: ${existing}`;
+        }
       }
       return msg;
     })

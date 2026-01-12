@@ -677,10 +677,8 @@ export type ImapAccountCreateResponseInput = ImapAccountCreatePostResponseInput;
 export type ImapAccountCreateResponseOutput = ImapAccountCreatePostResponseOutput;
 
 // Export individual endpoints
-export { POST };
 
 const definitions = {
   POST,
-};
-
+} as const;
 export default definitions;

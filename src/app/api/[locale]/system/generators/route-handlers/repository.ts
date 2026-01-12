@@ -16,6 +16,7 @@ import {
   formatCount,
   formatDuration,
   formatGenerator,
+  formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import { PATH_SEPARATOR } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
@@ -64,9 +65,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
 
     try {
       const outputFile = data.outputFile;
-      logger.debug("Starting route handlers generation", {
-        outputFile,
-      });
+      logger.debug(`Starting route handlers generation: ${outputFile}`);
 
       // Discover route files
       // eslint-disable-next-line i18next/no-literal-string
@@ -78,8 +77,33 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
 
       logger.debug(`Found ${routeFiles.length} route files`);
 
-      // Generate content
-      const content = await this.generateContent(routeFiles);
+      // Check for routes without definitions - filter them out
+      const definitionFiles = findFilesRecursively(startDir, "definition.ts");
+      const routesWithoutDefinition: string[] = [];
+      const validRouteFiles: string[] = [];
+
+      for (const routeFile of routeFiles) {
+        const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
+        if (!definitionFiles.includes(definitionPath)) {
+          routesWithoutDefinition.push(routeFile);
+        } else {
+          validRouteFiles.push(routeFile);
+        }
+      }
+
+      if (routesWithoutDefinition.length > 0) {
+        const routeList = routesWithoutDefinition
+          .map((r) => `    • ${r.replace(process.cwd(), "").replace(/^\//, "")}`)
+          .join("\n");
+        logger.debug(
+          formatWarning(
+            `Skipped ${formatCount(routesWithoutDefinition.length, "route")} without matching definition:\n${routeList}`,
+          ),
+        );
+      }
+
+      // Generate content with only valid route files
+      const content = await this.generateContent(validRouteFiles, logger);
 
       // Write file
       await writeGeneratedFile(outputFile, content, data.dryRun);
@@ -88,7 +112,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
 
       logger.info(
         formatGenerator(
-          `Generated route handlers file with ${formatCount(routeFiles.length, "route")} in ${formatDuration(duration)}`,
+          `Generated route handlers file with ${formatCount(validRouteFiles.length, "route")} in ${formatDuration(duration)}`,
           "🔗",
         ),
       );
@@ -184,7 +208,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
    * Main paths include method suffix (e.g., "core/agent/ai-stream/POST")
    * Aliases also include method from their definition
    */
-  private async generateContent(routeFiles: string[]): Promise<string> {
+  private async generateContent(routeFiles: string[], logger: EndpointLogger): Promise<string> {
     const pathMap: Record<string, { importPath: string; method: string }> = {};
     const allPaths: string[] = [];
 
@@ -195,6 +219,15 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
 
       // Get methods for this route from definition file
       const methods = await this.extractMethodsFromDefinition(routeFile);
+
+      if (methods.length === 0) {
+        logger.warn(
+          formatWarning(
+            `No methods found: ${routeFile.replace(process.cwd(), "").replace(/^\//, "")}`,
+          ),
+        );
+        continue;
+      }
 
       // Add main path with method suffix for each method (e.g., "v1_core_agent_ai-stream_POST")
       for (const method of methods) {

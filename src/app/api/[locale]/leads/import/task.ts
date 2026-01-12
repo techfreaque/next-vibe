@@ -224,30 +224,6 @@ async function executeCsvProcessor(
 }
 
 /**
- * Validate function for the task
- */
-async function validateCsvProcessor(): Promise<ResponseType<boolean>> {
-  try {
-    // Basic validation - check if database is accessible
-    await db.select().from(csvImportJobs).limit(1);
-    return success(true);
-  } catch {
-    return fail({
-      message: "app.api.leads.import.post.errors.server.title",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
-}
-
-/**
- * Rollback function for the task
- */
-function rollbackCsvProcessor(): ResponseType<boolean> {
-  // No rollback needed for CSV processor
-  return success(true);
-}
-
-/**
  * CSV Processor Task (Unified Format)
  */
 const csvProcessorTask: Task = {
@@ -298,32 +274,3 @@ const csvProcessorTask: Task = {
 export const tasks: Task[] = [csvProcessorTask];
 
 export default tasks;
-
-/**
- * Legacy exports for backward compatibility
- */
-export const taskDefinition = {
-  name: "csv-processor",
-  description: "tasks.csv_processor.description",
-  version: "1.0.0",
-  schedule: CRON_SCHEDULES.EVERY_MINUTE, // Every minute
-  timezone: "UTC",
-  enabled: false,
-  timeout: TASK_TIMEOUTS.LONG, // 10 minutes
-  retries: 3,
-  retryDelay: 5000,
-  priority: CronTaskPriority.MEDIUM,
-  defaultConfig: {
-    maxJobsPerRun: 5,
-    maxRetriesPerJob: 3,
-    dryRun: false,
-  },
-  configSchema: taskConfigSchema,
-  resultSchema: taskResultSchema,
-  tags: ["csv", "import", "leads"],
-  dependencies: [],
-};
-
-export const execute = executeCsvProcessor;
-export const validate = validateCsvProcessor;
-export const rollback = rollbackCsvProcessor;

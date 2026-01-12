@@ -474,15 +474,108 @@ export function ContainerWidget<const TKey extends string>({
     };
 
     const result: (JSX.Element | null)[] = [];
+    let inlineGroup: Array<{
+      name: string;
+      field: UnifiedField<string>;
+      data: WidgetData;
+    }> = [];
+
+    const flushInlineGroup = (): void => {
+      if (inlineGroup.length === 0) {
+        return;
+      }
+
+      if (inlineGroup.length === 1) {
+        // Single inline field - render normally
+        const { name, field, data } = inlineGroup[0];
+        const childFieldName = fieldName ? `${fieldName}.${name}` : name;
+        const childUi = field.ui;
+        const isChildContainer = childUi.type === WidgetType.CONTAINER;
+        const childColumns =
+          isChildContainer || !("columns" in childUi) ? undefined : (childUi.columns as number);
+        const effectiveSpan =
+          layoutType === "grid" ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12) : undefined;
+
+        const colSpanMap: Record<number, string> = {
+          1: "col-span-1",
+          2: "col-span-2",
+          3: "col-span-3",
+          4: "col-span-4",
+          5: "col-span-5",
+          6: "col-span-6",
+          7: "col-span-7",
+          8: "col-span-8",
+          9: "col-span-9",
+          10: "col-span-10",
+          11: "col-span-11",
+          12: "col-span-12",
+        };
+
+        const colSpanClass =
+          layoutType === "grid" && effectiveSpan ? colSpanMap[effectiveSpan] : undefined;
+
+        // For NAVIGATE_BUTTON widgets, pass parent value so extractParams can access all fields
+        const dataToPass = childUi.type === WidgetType.NAVIGATE_BUTTON ? value : data;
+
+        result.push(
+          <WidgetRenderer
+            key={name}
+            widgetType={field.ui.type}
+            fieldName={childFieldName}
+            data={dataToPass}
+            field={field}
+            context={context}
+            form={form}
+            onSubmit={onSubmit}
+            isSubmitting={isSubmitting}
+            className={colSpanClass}
+            endpoint={endpoint}
+          />,
+        );
+      } else {
+        // Multiple inline fields - wrap in flex container
+        result.push(
+          <Div key={`inline-group-${inlineGroup[0].name}`} className="flex items-center gap-2">
+            {inlineGroup.map(({ name, field, data }) => {
+              const childFieldName = fieldName ? `${fieldName}.${name}` : name;
+              const childUi = field.ui;
+              // For NAVIGATE_BUTTON widgets, pass parent value so extractParams can access all fields
+              const dataToPass = childUi.type === WidgetType.NAVIGATE_BUTTON ? value : data;
+
+              return (
+                <WidgetRenderer
+                  key={name}
+                  widgetType={field.ui.type}
+                  fieldName={childFieldName}
+                  data={dataToPass}
+                  field={field}
+                  context={context}
+                  form={form}
+                  onSubmit={onSubmit}
+                  isSubmitting={isSubmitting}
+                  endpoint={endpoint}
+                />
+              );
+            })}
+          </Div>,
+        );
+      }
+
+      inlineGroup = [];
+    };
 
     for (const [childName, childField] of children) {
       // Skip hidden fields
       if (childField.ui?.hidden) {
+        context.logger.debug(`ContainerWidget: Skipping hidden field "${childName}"`);
         continue;
       }
 
-      // Skip backButton - it's rendered with submit button
-      if (childName === "backButton") {
+      // Skip backButton only at root level - it's rendered with submit button
+      // In nested containers (like topActions), backButton should render normally
+      // fieldName is empty/undefined at root level, has a value in nested containers
+      if (childName === "backButton" && !fieldName) {
+        context.logger.debug(`ContainerWidget: Skipping backButton at root level`);
         continue;
       }
 
@@ -506,52 +599,101 @@ export function ContainerWidget<const TKey extends string>({
         isResponseField(childField) &&
         (childData === null || childData === undefined)
       ) {
+        context.logger.debug(
+          `ContainerWidget: Skipping response field without data "${childName}"`,
+          {
+            isWidgetField,
+            isWidgetOnlyObject,
+            isResponseField: isResponseField(childField),
+            childData,
+          },
+        );
         continue;
       }
 
-      // Render field
-      const childFieldName = fieldName ? `${fieldName}.${childName}` : childName;
-      const childUi = childField.ui;
-      const isChildContainer = childUi.type === WidgetType.CONTAINER;
-      const childColumns =
-        isChildContainer || !("columns" in childUi) ? undefined : (childUi.columns as number);
-      const effectiveSpan =
-        layoutType === "grid" ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12) : undefined;
+      context.logger.debug(`ContainerWidget: Rendering child "${childName}"`, {
+        widgetType: childField.ui?.type,
+        childData,
+        isWidgetField,
+        isWidgetOnlyObject,
+      });
 
-      const colSpanMap: Record<number, string> = {
-        1: "col-span-1",
-        2: "col-span-2",
-        3: "col-span-3",
-        4: "col-span-4",
-        5: "col-span-5",
-        6: "col-span-6",
-        7: "col-span-7",
-        8: "col-span-8",
-        9: "col-span-9",
-        10: "col-span-10",
-        11: "col-span-11",
-        12: "col-span-12",
-      };
+      // Check if this field should be inline
+      const isInline = childField.ui?.inline === true;
 
-      const colSpanClass =
-        layoutType === "grid" && effectiveSpan ? colSpanMap[effectiveSpan] : undefined;
+      if (isInline) {
+        // Add to inline group
+        inlineGroup.push({
+          name: childName,
+          field: childField,
+          data: childData,
+        });
+      } else {
+        // Flush any pending inline group
+        flushInlineGroup();
 
-      result.push(
-        <WidgetRenderer
-          key={childName}
-          widgetType={childField.ui.type}
-          fieldName={childFieldName}
-          data={childData}
-          field={childField}
-          context={context}
-          form={form}
-          onSubmit={onSubmit}
-          isSubmitting={isSubmitting}
-          className={colSpanClass}
-          endpoint={endpoint}
-        />,
-      );
+        // Render this field normally
+        const childFieldName = fieldName ? `${fieldName}.${childName}` : childName;
+        const childUi = childField.ui;
+        const isChildContainer = childUi.type === WidgetType.CONTAINER;
+        const childColumns =
+          isChildContainer || !("columns" in childUi) ? undefined : (childUi.columns as number);
+        const effectiveSpan =
+          layoutType === "grid" ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12) : undefined;
+
+        const colSpanMap: Record<number, string> = {
+          1: "col-span-1",
+          2: "col-span-2",
+          3: "col-span-3",
+          4: "col-span-4",
+          5: "col-span-5",
+          6: "col-span-6",
+          7: "col-span-7",
+          8: "col-span-8",
+          9: "col-span-9",
+          10: "col-span-10",
+          11: "col-span-11",
+          12: "col-span-12",
+        };
+
+        const colSpanClass =
+          layoutType === "grid" && effectiveSpan ? colSpanMap[effectiveSpan] : undefined;
+
+        // For NAVIGATE_BUTTON widgets, pass parent value so extractParams can access all fields
+        // For widget-only containers (like topActions), also pass parent value so nested navigate buttons work
+        const isWidgetOnlyContainer =
+          isChildContainer &&
+          "type" in childField &&
+          childField.type === "object" &&
+          "children" in childField &&
+          childField.children &&
+          Object.values(childField.children).every(
+            (child) => "type" in child && child.type === "widget",
+          );
+
+        const dataToPass =
+          childUi.type === WidgetType.NAVIGATE_BUTTON || isWidgetOnlyContainer ? value : childData;
+
+        result.push(
+          <WidgetRenderer
+            key={childName}
+            widgetType={childField.ui.type}
+            fieldName={childFieldName}
+            data={dataToPass}
+            field={childField}
+            context={context}
+            form={form}
+            onSubmit={onSubmit}
+            isSubmitting={isSubmitting}
+            className={colSpanClass}
+            endpoint={endpoint}
+          />,
+        );
+      }
     }
+
+    // Flush any remaining inline group
+    flushInlineGroup();
 
     return result;
   };

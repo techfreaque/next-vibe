@@ -71,39 +71,12 @@ const { POST } = createEndpoint({
         z.string().default(DEFAULT_TTS_VOICE),
       ),
 
-      // === RESPONSE FIELDS ===
-      response: objectField(
+      audioUrl: responseField(
         {
-          type: WidgetType.CONTAINER,
-          title: "app.api.agent.textToSpeech.post.response.title",
-          description: "app.api.agent.textToSpeech.post.response.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
+          type: WidgetType.TEXT,
+          content: "app.api.agent.textToSpeech.post.response.audioUrl",
         },
-        { response: true },
-        {
-          success: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.agent.textToSpeech.post.response.success",
-            },
-            z.boolean(),
-          ),
-          audioUrl: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.agent.textToSpeech.post.response.audioUrl",
-            },
-            z.string(),
-          ),
-          provider: responseField(
-            {
-              type: WidgetType.TEXT,
-              content: "app.api.agent.textToSpeech.post.response.provider",
-            },
-            z.string(),
-          ),
-        },
+        z.string(),
       ),
     },
   ),
@@ -161,11 +134,7 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        response: {
-          success: true,
-          audioUrl: "https://example.com/audio.mp3",
-          provider: "amazon",
-        },
+        audioUrl: "https://example.com/audio.mp3",
       },
     },
     urlPathParams: undefined,
@@ -183,7 +152,5 @@ export type TextToSpeechPostResponseOutput = typeof POST.types.ResponseOutput;
  */
 const definitions = {
   POST,
-};
-
-export { POST };
+} as const;
 export default definitions;

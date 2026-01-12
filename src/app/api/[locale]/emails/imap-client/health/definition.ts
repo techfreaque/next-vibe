@@ -247,7 +247,5 @@ export type ImapHealthGetResponseOutput = typeof GET.types.ResponseOutput;
  */
 const imapHealthEndpoints = {
   GET,
-};
-
-export { GET };
+} as const;
 export default imapHealthEndpoints;

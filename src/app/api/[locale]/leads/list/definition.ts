@@ -687,7 +687,5 @@ export type LeadListGetResponseTypeOutput = typeof GET.types.ResponseOutput;
  */
 const definitions = {
   GET,
-};
-
-export { GET };
+} as const;
 export default definitions;

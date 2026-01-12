@@ -9,7 +9,6 @@ import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
-  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -102,52 +101,3 @@ const sessionCleanupTask: Task = {
 export const tasks: Task[] = [sessionCleanupTask];
 
 export default tasks;
-
-/**
- * Legacy exports for backward compatibility
- */
-export const taskDefinition = {
-  name: "user-session-cleanup",
-  description: "app.api.user.sessionCleanup.task.description",
-  version: "1.0.0",
-  schedule: CRON_SCHEDULES.DAILY_6AM, // Daily at 6 AM
-  timezone: "UTC",
-  enabled: true,
-  timeout: TASK_TIMEOUTS.MEDIUM, // 5 minutes
-  retries: 2,
-  retryDelay: 5000,
-  priority: CronTaskPriority.MEDIUM,
-  defaultConfig: sessionCleanupRepository.getDefaultConfig(),
-  tags: ["security", "cleanup", "authentication"],
-  dependencies: [],
-  monitoring: {
-    alertOnFailure: true,
-    alertOnLongExecution: false,
-    maxExecutionTime: 120000, // 2 minutes
-  },
-  documentation: {
-    purpose: "app.api.user.sessionCleanup.task.purpose",
-    impact: "app.api.user.sessionCleanup.task.impact",
-    rollback: "app.api.user.sessionCleanup.task.rollback",
-  },
-};
-
-export const execute = executeTask;
-
-export const validate = async (
-  config: {
-    sessionRetentionDays: number;
-    tokenRetentionDays: number;
-    batchSize: number;
-    dryRun: boolean;
-  },
-  logger: EndpointLogger,
-): Promise<ResponseType<boolean>> => await sessionCleanupRepository.validateConfig(config, logger);
-
-/**
- * Rollback function (not applicable for cleanup operations)
- */
-export function rollback(): ResponseType<boolean> {
-  // This task only deletes expired data, so rollback is not applicable
-  return success(true);
-}

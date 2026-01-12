@@ -705,6 +705,10 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Charakter erstellen",
     description: "Einen neuen benutzerdefinierten Charakter erstellen",
+    submitButton: {
+      text: "Benutzerdefinierten Charakter erstellen",
+      loadingText: "Charakter wird erstellt...",
+    },
     container: {
       title: "Neuen Charakter erstellen",
       description: "Einen neuen benutzerdefinierten Charakter definieren",

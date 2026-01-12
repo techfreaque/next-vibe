@@ -14,7 +14,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import type { FolderListResponseOutput } from "../folders/definition";
-import { GET as foldersGetEndpoint } from "../folders/definition";
+import foldersDefinition from "../folders/definition";
 import threadsDefinition, { type ThreadListResponseOutput } from "../threads/definition";
 
 /**
@@ -182,7 +182,7 @@ async function loadFoldersFromServer(
 ): Promise<void> {
   try {
     const foldersResponse = await apiClient.fetch(
-      foldersGetEndpoint,
+      foldersDefinition.GET,
       logger,
       {
         rootFolderId,

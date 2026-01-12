@@ -12,17 +12,41 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { SmsSendRequestOutput, SmsSendResponseOutput } from "./definition";
+import type { CampaignType } from "../smtp-client/enum";
+
+/**
+ * SMS Send Request Type
+ */
+export interface SmsSendProps {
+  to: string;
+  message: string;
+  campaignType?: (typeof CampaignType)[keyof typeof CampaignType];
+  leadId?: string;
+  templateName?: string;
+}
+
+/**
+ * SMS Send Response Type
+ */
+export interface SmsSendResponse {
+  result: {
+    success: boolean;
+    messageId: string;
+    sentAt: string;
+    provider?: string;
+    cost?: number;
+  };
+}
 
 /**
  * SMS Service Repository Interface
  */
 export interface SmsServiceRepository {
   sendSms(
-    data: SmsSendRequestOutput,
+    data: SmsSendProps,
     user: JwtPayloadType,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmsSendResponseOutput>>;
+  ): Promise<ResponseType<SmsSendResponse>>;
 }
 
 /**
@@ -31,10 +55,10 @@ export interface SmsServiceRepository {
  */
 export class SmsServiceRepositoryImpl implements SmsServiceRepository {
   async sendSms(
-    data: SmsSendRequestOutput,
+    data: SmsSendProps,
     user: JwtPayloadType,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmsSendResponseOutput>> {
+  ): Promise<ResponseType<SmsSendResponse>> {
     try {
       logger.debug("SMS service: Sending SMS notification", {
         to: data.to,
@@ -94,7 +118,7 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
    * This would integrate with actual SMS providers (Twilio, AWS SNS, etc.)
    */
   private async sendSmsInternal(
-    data: SmsSendRequestOutput,
+    data: SmsSendProps,
     logger: EndpointLogger,
   ): Promise<{ messageId: string; provider: string; cost: number }> {
     logger.debug("SMS service: Processing SMS send request", {

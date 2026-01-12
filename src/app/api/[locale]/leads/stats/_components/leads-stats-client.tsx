@@ -14,14 +14,16 @@ import leadsStatsEndpoints from "@/app/api/[locale]/leads/stats/definition";
 import { useLeadsStatsEndpoint } from "@/app/api/[locale]/leads/stats/hooks";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface LeadsStatsClientProps {
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
-export function LeadsStatsClient({ locale }: LeadsStatsClientProps): JSX.Element {
+export function LeadsStatsClient({ locale, user }: LeadsStatsClientProps): JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
   const endpoint = useLeadsStatsEndpoint(logger);
@@ -42,6 +44,7 @@ export function LeadsStatsClient({ locale }: LeadsStatsClientProps): JSX.Element
         </CardHeader>
         <CardContent>
           <EndpointRenderer
+            user={user}
             endpoint={leadsStatsEndpoints.GET}
             form={endpoint.read.form}
             onSubmit={handleSubmit}

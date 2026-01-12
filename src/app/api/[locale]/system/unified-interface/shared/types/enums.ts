@@ -93,6 +93,7 @@ export enum WidgetType {
   CREDIT_TRANSACTION_CARD = "credit_transaction_card",
   CREDIT_TRANSACTION_LIST = "credit_transaction_list",
   PAGINATION = "pagination",
+  MODEL_DISPLAY = "model_display",
 
   // Interactive widgets
   BUTTON = "button",

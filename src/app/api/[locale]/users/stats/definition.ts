@@ -911,7 +911,6 @@ export type UserStatsResponseOutput = typeof GET.types.ResponseOutput;
  */
 const definitions = {
   GET,
-};
+} as const;
 
-export { GET };
 export default definitions;

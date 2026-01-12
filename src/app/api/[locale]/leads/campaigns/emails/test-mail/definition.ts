@@ -396,7 +396,5 @@ export type TestEmailResponseOutput = typeof POST.types.ResponseOutput;
  */
 const definitions = {
   POST,
-};
-
-export { POST };
+} as const;
 export default definitions;

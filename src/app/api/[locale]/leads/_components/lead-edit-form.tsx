@@ -17,6 +17,7 @@ import { useLeadByIdEndpoint } from "@/app/api/[locale]/leads/lead/[id]/hooks";
 import type { LeadDetailResponse } from "@/app/api/[locale]/leads/types";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -24,9 +25,10 @@ interface LeadEditFormProps {
   lead: LeadDetailResponse;
   locale: CountryLanguage;
   leadId: string;
+  user: JwtPayloadType;
 }
 
-export function LeadEditForm({ lead, locale, leadId }: LeadEditFormProps): JSX.Element {
+export function LeadEditForm({ lead, locale, leadId, user }: LeadEditFormProps): JSX.Element {
   const router = useRouter();
   const { t } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -58,6 +60,7 @@ export function LeadEditForm({ lead, locale, leadId }: LeadEditFormProps): JSX.E
         </CardHeader>
         <CardContent>
           <EndpointRenderer
+            user={user}
             endpoint={leadEndpoints.PATCH}
             form={form}
             onSubmit={onSubmit}

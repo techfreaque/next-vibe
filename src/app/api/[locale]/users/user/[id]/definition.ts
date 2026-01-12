@@ -872,7 +872,6 @@ const definitions = {
   GET,
   PUT,
   DELETE,
-};
+} as const;
 
-export { DELETE, GET, PUT };
 export default definitions;

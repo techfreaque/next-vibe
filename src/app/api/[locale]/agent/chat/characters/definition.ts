@@ -26,12 +26,8 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { iconSchema } from "../../../shared/types/common.schema";
-import {
-  DELETE as CharacterDELETE,
-  GET as CharacterGET,
-  PATCH as CharacterPATCH,
-} from "./[id]/definition";
-import { POST as CharacterPOST } from "./create/definition";
+import characterSingleDefinitions from "./[id]/definition";
+import createCharacterDefinitions from "./create/definition";
 import { CharacterCategoryDB } from "./enum";
 
 /**
@@ -70,7 +66,7 @@ const { GET } = createEndpoint({
         {
           backButton: backButton(),
           createButton: navigateButtonField({
-            targetEndpoint: CharacterPOST,
+            targetEndpoint: createCharacterDefinitions.POST,
             extractParams: () => ({}),
             prefillFromGet: false,
             label: "app.api.agent.chat.characters.get.createButton.label" as const,
@@ -132,6 +128,14 @@ const { GET } = createEndpoint({
                 type: WidgetType.DATA_CARDS,
                 layout: { type: LayoutType.GRID, columns: 1, spacing: "normal" },
                 maxItems: 3,
+                metadata: {
+                  onCardClick: {
+                    targetEndpoint: characterSingleDefinitions.GET,
+                    extractParams: (character: Record<string, unknown>) => ({
+                      urlPathParams: { id: String(character.id) },
+                    }),
+                  },
+                },
               },
               objectField(
                 {
@@ -245,6 +249,25 @@ const { GET } = createEndpoint({
                       ),
                     },
                   ),
+                  editButton: navigateButtonField({
+                    targetEndpoint: characterSingleDefinitions.PATCH,
+                    extractParams: (character) => ({
+                      urlPathParams: { id: String(character.id) },
+                    }),
+                    prefillFromGet: true,
+                    getEndpoint: characterSingleDefinitions.GET,
+                    icon: "pencil",
+                    variant: "ghost",
+                  }),
+                  deleteButton: navigateButtonField({
+                    targetEndpoint: characterSingleDefinitions.DELETE,
+                    extractParams: (character) => ({
+                      urlPathParams: { id: String(character.id) },
+                    }),
+                    prefillFromGet: false,
+                    icon: "trash",
+                    variant: "ghost",
+                  }),
                 },
               ),
             ),
@@ -370,6 +393,5 @@ export type CharacterListResponseOutput = typeof GET.types.ResponseOutput;
 export type CharacterListItem =
   CharacterListResponseOutput["sections"][number]["characters"][number];
 
-const definitions = { GET };
-export { GET };
+const definitions = { GET } as const;
 export default definitions;

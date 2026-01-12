@@ -565,6 +565,7 @@ export function HelpInteractiveView({
                 key={getEndpointId(selectedEndpoint)}
                 endpoint={wrapEndpoint(selectedEndpoint)}
                 locale={locale}
+                user={user}
                 endpointOptions={{
                   queryOptions: {
                     enabled: selectedEndpoint.method.toUpperCase() === "GET",

@@ -15,6 +15,7 @@ import {
   isWidgetDataObject,
 } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/field-type-guards";
 import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 import type { TParams } from "@/i18n/core/static-types";
@@ -60,6 +61,7 @@ export class ModularCLIResponseRenderer {
     locale: CountryLanguage,
     t: (key: string, params?: TParams) => string,
     logger: EndpointLogger,
+    user: JwtPayloadType,
   ): string {
     this.options.locale = locale;
 
@@ -76,7 +78,7 @@ export class ModularCLIResponseRenderer {
         this.widgetRegistry.renderWidget(widgetType, field, value, context),
       locale,
       isInteractive: false,
-      permissions: [],
+      user,
     };
 
     return this.renderFields(data, fields, context);

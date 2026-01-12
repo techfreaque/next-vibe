@@ -31,7 +31,6 @@ import {
   useToggleCronTask,
 } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/hooks";
 import { formatCronSchedule } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
-import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getDefaultTimezone } from "@/i18n/core/localization-utils";
 import { simpleT } from "@/i18n/core/shared";
@@ -178,40 +177,24 @@ export function CronTasksTable({
       return <Badge variant="secondary">{t("app.admin.cron.table.statusBadge.disabled")}</Badge>;
     }
 
-    // Use the status field from the task
-    switch (task.status) {
-      case CronTaskStatus.RUNNING:
-        return (
-          <Badge variant="default" className="bg-blue-500">
-            {t("app.admin.cron.table.statusBadge.running")}
-          </Badge>
-        );
-      case CronTaskStatus.COMPLETED:
-        return (
-          <Badge variant="default" className="bg-green-500">
-            {t("app.admin.cron.table.statusBadge.completed")}
-          </Badge>
-        );
-      case CronTaskStatus.FAILED:
-      case CronTaskStatus.ERROR:
-      case CronTaskStatus.TIMEOUT:
-        return <Badge variant="destructive">{t("app.admin.cron.table.statusBadge.failed")}</Badge>;
-      case CronTaskStatus.PENDING:
-      case CronTaskStatus.SCHEDULED:
-        return <Badge variant="outline">{t("app.admin.cron.table.statusBadge.pending")}</Badge>;
-      case CronTaskStatus.CANCELLED:
-      case CronTaskStatus.STOPPED:
-      case CronTaskStatus.SKIPPED:
-        return <Badge variant="secondary">{t("app.admin.cron.table.statusBadge.cancelled")}</Badge>;
-      case CronTaskStatus.BLOCKED:
-        return (
-          <Badge variant="outline" className="bg-yellow-100">
-            {t("app.admin.cron.table.statusBadge.blocked")}
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">{t("app.admin.cron.table.statusBadge.unknown")}</Badge>;
+    // Compute status from DB fields
+    if (!task.lastExecutedAt) {
+      return <Badge variant="secondary">{t("app.admin.cron.table.statusBadge.pending")}</Badge>;
     }
+
+    if (task.lastExecutionError) {
+      return <Badge variant="destructive">{t("app.admin.cron.table.statusBadge.error")}</Badge>;
+    }
+
+    if (task.successCount > 0) {
+      return (
+        <Badge variant="default" className="bg-green-500">
+          {t("app.admin.cron.table.statusBadge.completed")}
+        </Badge>
+      );
+    }
+
+    return <Badge variant="outline">{t("app.admin.cron.table.statusBadge.unknown")}</Badge>;
   };
 
   if (loading) {
@@ -279,15 +262,15 @@ export function CronTasksTable({
                 <TableCell>{getStatusBadge(task)}</TableCell>
                 <TableCell>
                   <Div className="text-sm">
-                    {task.lastRun
-                      ? new Date(task.lastRun).toLocaleString(locale)
+                    {task.lastExecutedAt
+                      ? new Date(task.lastExecutedAt).toLocaleString(locale)
                       : t("app.admin.cron.table.statusBadge.never")}
                   </Div>
                 </TableCell>
                 <TableCell>
                   <Div className="text-sm">
-                    {task.nextRun
-                      ? new Date(task.nextRun).toLocaleString(locale)
+                    {task.nextExecutionAt
+                      ? new Date(task.nextExecutionAt).toLocaleString(locale)
                       : t("app.admin.cron.table.statusBadge.notScheduled")}
                   </Div>
                 </TableCell>

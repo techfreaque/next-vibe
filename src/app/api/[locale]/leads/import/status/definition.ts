@@ -380,7 +380,6 @@ export type ImportJobsListResponseOutput = ImportJobsStatusGetResponseOutput;
 /**
  * Export definitions
  */
-export { GET };
 
 const definitions = {
   GET,

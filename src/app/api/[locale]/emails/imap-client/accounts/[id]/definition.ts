@@ -770,8 +770,5 @@ const imapAccountEndpoints = {
   GET,
   PUT,
   DELETE,
-};
-
-// Export individual endpoints
-export { DELETE, GET, PUT };
+} as const;
 export default imapAccountEndpoints;

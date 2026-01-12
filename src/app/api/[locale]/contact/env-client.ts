@@ -6,7 +6,11 @@ import { z } from "zod";
 
 import { defineEnvClient } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env-client";
 
-export const { envClient: contactClientEnv } = defineEnvClient({
+export const {
+  envClient: contactClientEnv,
+  schema: contactClientEnvSchema,
+  examples: contactClientEnvExamples,
+} = defineEnvClient({
   NEXT_PUBLIC_SUPPORT_EMAIL_DE: {
     schema: z.string().email(),
     value: process.env.NEXT_PUBLIC_SUPPORT_EMAIL_DE,

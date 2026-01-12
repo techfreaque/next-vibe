@@ -348,8 +348,5 @@ export type ImapMessageUpdateResponseOutput = typeof PATCH.types.ResponseOutput;
 const imapMessageEndpoints = {
   GET,
   PATCH,
-};
-
-// Export individual endpoints
-export { GET, PATCH };
+} as const;
 export default imapMessageEndpoints;

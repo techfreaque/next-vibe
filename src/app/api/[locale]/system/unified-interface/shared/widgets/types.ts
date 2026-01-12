@@ -4,7 +4,7 @@ import type { ZodTypeAny } from "zod";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TParams } from "@/i18n/core/static-types";
 
@@ -71,26 +71,27 @@ export interface WidgetAction {
 export interface WidgetRenderContext {
   locale: CountryLanguage;
   isInteractive: boolean;
-  permissions: readonly UserRoleValue[];
+  user: JwtPayloadType;
   logger: EndpointLogger;
 
-  onNavigate?: (url: string) => void;
-
-  platform?:
+  platform:
     | typeof Platform.TRPC
     | typeof Platform.NEXT_PAGE
     | typeof Platform.NEXT_API
     | typeof Platform.CLI
     | typeof Platform.CLI_PACKAGE;
-  theme?: "light" | "dark" | "system";
-  endpointFields?: UnifiedField<string, ZodTypeAny>; // Original endpoint fields for nested path lookup
-  disabled?: boolean; // Disable all form inputs
-  response?: ResponseType<WidgetData>; // Full ResponseType from endpoint (includes success/error state)
+  endpointFields: UnifiedField<string, ZodTypeAny>; // Original endpoint fields for nested path lookup
+  disabled: boolean; // Disable all form inputs
+  response: ResponseType<WidgetData> | undefined; // Full ResponseType from endpoint (includes success/error state)
   /**
    * Navigation context for cross-definition navigation
    * Provides type-safe navigation methods (push/pop) for endpoint navigation
    */
-  navigation?: UseNavigationStackReturn;
+  navigation: UseNavigationStackReturn;
+  /**
+   * Current endpoint being rendered (for self-referencing navigation)
+   */
+  currentEndpoint: CreateApiEndpointAny;
   /**
    * Translation function for widgets to use directly
    * This is the scoped translation from the endpoint definition

@@ -3,6 +3,7 @@
  * Centralized character definitions for consistent behavior across the application
  * This file contains default/built-in characters that are read-only
  */
+import "server-only"; // we only want to use the api on client
 
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";

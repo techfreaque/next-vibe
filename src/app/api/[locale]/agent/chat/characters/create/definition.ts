@@ -8,11 +8,13 @@ import { z } from "zod";
 import { ModelId, ModelIdOptions } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  backButton,
   objectField,
   objectUnionField,
   requestDataField,
   requestDataRangeField,
   responseField,
+  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -70,9 +72,16 @@ const { POST } = createEndpoint({
       layoutType: LayoutType.STACKED,
       border: false,
       paddingTop: "6",
+      submitButton: {
+        text: "app.api.agent.chat.characters.post.submitButton.text" as const,
+        loadingText: "app.api.agent.chat.characters.post.submitButton.loadingText" as const,
+        position: "bottom",
+      },
     },
     { request: "data", response: true },
     {
+      // Back button navigation
+      backButton: backButton(),
       // === REQUEST ===
       name: requestDataField(
         {
@@ -113,7 +122,7 @@ const { POST } = createEndpoint({
           description: "app.api.agent.chat.characters.post.systemPrompt.description" as const,
           columns: 12,
         },
-        z.string().min(1).max(5000),
+        z.string().min(1).max(5000).optional(),
       ),
       category: requestDataField(
         {
@@ -196,6 +205,13 @@ const { POST } = createEndpoint({
                 },
                 z.literal(ModelSelectionType.MANUAL),
               ),
+              modelDisplay: widgetField(
+                {
+                  type: WidgetType.MODEL_DISPLAY,
+                  columns: 12,
+                },
+                { request: "data" },
+              ),
               manualModelId: requestDataField(
                 {
                   type: WidgetType.FORM_FIELD,
@@ -236,6 +252,13 @@ const { POST } = createEndpoint({
                   columns: 12,
                 },
                 z.literal(ModelSelectionType.FILTERS),
+              ),
+              modelDisplay: widgetField(
+                {
+                  type: WidgetType.MODEL_DISPLAY,
+                  columns: 12,
+                },
+                { request: "data" },
               ),
               intelligenceRange: requestDataRangeField(
                 {
@@ -514,6 +537,5 @@ export type CharacterCreateResponseOutput = typeof POST.types.ResponseOutput;
 // Character field type aliases
 export type CharacterModelSelection = CharacterCreateRequestOutput["modelSelection"];
 
-const definitions = { POST };
-export { POST };
+const definitions = { POST } as const;
 export default definitions;

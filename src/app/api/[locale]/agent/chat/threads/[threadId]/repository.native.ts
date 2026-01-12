@@ -16,7 +16,7 @@ import type {
   ThreadPatchRequestOutput,
   ThreadPatchResponseOutput,
 } from "./definition";
-import { GET as getThreadEndpoint } from "./definition";
+import threadByIdEndpoints from "./definition";
 import type { ThreadByIdRepositoryType } from "./repository";
 
 /**
@@ -31,7 +31,7 @@ export class ThreadByIdRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadGetResponseOutput>> {
     const response = await nativeEndpoint(
-      getThreadEndpoint,
+      threadByIdEndpoints.GET,
       { urlPathParams: { threadId } },
       logger,
       locale,

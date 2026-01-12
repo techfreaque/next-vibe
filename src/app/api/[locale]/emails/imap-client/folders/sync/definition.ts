@@ -200,8 +200,5 @@ export type FoldersSyncRequestOutput = typeof POST.types.RequestOutput;
 export type FoldersSyncResponseInput = typeof POST.types.ResponseInput;
 export type FoldersSyncResponseOutput = typeof POST.types.ResponseOutput;
 
-const endpoints = { POST };
-
-// Export individual endpoints
-export { POST };
+const endpoints = { POST } as const;
 export default endpoints;

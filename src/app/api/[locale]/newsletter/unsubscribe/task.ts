@@ -232,31 +232,6 @@ async function executeNewsletterUnsubscribeSync(
 }
 
 /**
- * Validate function for the task
- */
-async function validateNewsletterUnsubscribeSync(): Promise<ResponseType<boolean>> {
-  try {
-    // Basic validation - check if database tables are accessible
-    await db.select().from(leads).limit(1);
-    await db.select().from(newsletterSubscriptions).limit(1);
-    return success(true);
-  } catch {
-    return fail({
-      message: "app.api.newsletter.error.default",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
-}
-
-/**
- * Rollback function for the task
- */
-function rollbackNewsletterUnsubscribeSync(): ResponseType<boolean> {
-  // No rollback needed for status sync task
-  return success(true);
-}
-
-/**
  * Newsletter Unsubscribe Sync Task (Unified Format)
  */
 const newsletterUnsubscribeSyncTask: Task = {
@@ -304,31 +279,3 @@ const newsletterUnsubscribeSyncTask: Task = {
 export const tasks: Task[] = [newsletterUnsubscribeSyncTask];
 
 export default tasks;
-
-/**
- * Legacy exports for backward compatibility
- */
-export const taskDefinition = {
-  name: "newsletter-unsubscribe-sync",
-  description: "tasks.newsletter_unsubscribe_sync.description",
-  version: "1.0.0",
-  schedule: CRON_SCHEDULES.EVERY_6_HOURS, // Every 6 hours
-  timezone: "UTC",
-  enabled: false,
-  timeout: TASK_TIMEOUTS.MEDIUM, // 5 minutes
-  retries: 2,
-  retryDelay: 5000,
-  priority: CronTaskPriority.LOW,
-  defaultConfig: {
-    batchSize: 500,
-    dryRun: false,
-  },
-  configSchema: taskConfigSchema,
-  resultSchema: taskResultSchema,
-  tags: ["newsletter", "unsubscribe", "sync", "leads"],
-  dependencies: [],
-};
-
-export const execute = executeNewsletterUnsubscribeSync;
-export const validate = validateNewsletterUnsubscribeSync;
-export const rollback = rollbackNewsletterUnsubscribeSync;

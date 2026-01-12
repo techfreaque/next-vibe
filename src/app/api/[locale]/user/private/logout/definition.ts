@@ -148,10 +148,7 @@ const { POST } = createEndpoint({
   },
 });
 
-const logoutEndpoints = { POST };
-
-export { POST };
-
+const logoutEndpoints = { POST } as const;
 export default logoutEndpoints;
 
 // Export types as required by migration guide

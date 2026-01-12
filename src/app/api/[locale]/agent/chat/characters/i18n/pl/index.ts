@@ -702,6 +702,10 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Utwórz postacię",
     description: "Utwórz nową niestandardową postacię",
+    submitButton: {
+      text: "Utwórz niestandardową postacię",
+      loadingText: "Tworzenie postacię...",
+    },
     container: {
       title: "Utwórz nową postacię",
       description: "Zdefiniuj nową niestandardową postacię",

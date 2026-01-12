@@ -16,6 +16,7 @@ import {
   formatCount,
   formatDuration,
   formatGenerator,
+  formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 
@@ -63,7 +64,7 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
 
     try {
       const outputFile = data.outputFile;
-      logger.debug("Starting endpoints index generation", { outputFile });
+      logger.debug(`Starting endpoints index generation: ${outputFile}`);
 
       // Discover definition files
       // eslint-disable-next-line i18next/no-literal-string
@@ -75,8 +76,33 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
 
       logger.debug(`Found ${definitionFiles.length} definition files`);
 
+      // Filter to only definitions with matching route files
+      const routeFiles = findFilesRecursively(startDir, "route.ts");
+      const definitionsWithoutRoute: string[] = [];
+      const validDefinitionFiles: string[] = [];
+
+      for (const defFile of definitionFiles) {
+        const routePath = defFile.replace("/definition.ts", "/route.ts");
+        if (!routeFiles.includes(routePath)) {
+          definitionsWithoutRoute.push(defFile);
+        } else {
+          validDefinitionFiles.push(defFile);
+        }
+      }
+
+      if (definitionsWithoutRoute.length > 0) {
+        const defList = definitionsWithoutRoute
+          .map((d) => `    • ${d.replace(process.cwd(), "").replace(/^\//, "")}`)
+          .join("\n");
+        logger.warn(
+          formatWarning(
+            `Skipped ${formatCount(definitionsWithoutRoute.length, "definition")} without matching route:\n${defList}`,
+          ),
+        );
+      }
+
       // Generate content
-      const content = await this.generateContent(definitionFiles, outputFile);
+      const content = await this.generateContent(validDefinitionFiles, outputFile);
 
       // Write file
       await writeGeneratedFile(outputFile, content, data.dryRun);
@@ -85,7 +111,7 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
 
       logger.info(
         formatGenerator(
-          `Generated endpoints index with ${formatCount(definitionFiles.length, "endpoint")} in ${formatDuration(duration)}`,
+          `Generated endpoints index with ${formatCount(validDefinitionFiles.length, "endpoint")} in ${formatDuration(duration)}`,
           "📋",
         ),
       );

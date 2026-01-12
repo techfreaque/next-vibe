@@ -155,7 +155,6 @@ export type ImportJobStopResponseOutput = ImportJobStopPostResponseOutput;
 /**
  * Export definitions
  */
-export { POST };
 
 const definitions = {
   POST,

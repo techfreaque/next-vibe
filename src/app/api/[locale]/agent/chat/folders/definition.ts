@@ -808,6 +808,5 @@ export type FolderCreateRequestOutput = typeof POST.types.RequestOutput;
 export type FolderCreateResponseInput = typeof POST.types.ResponseInput;
 export type FolderCreateResponseOutput = typeof POST.types.ResponseOutput;
 
-const definitions = { GET, POST };
-export { GET, POST };
+const definitions = { GET, POST } as const;
 export default definitions;

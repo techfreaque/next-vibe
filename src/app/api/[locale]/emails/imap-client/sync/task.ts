@@ -11,7 +11,6 @@ import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/respon
 import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
@@ -106,37 +105,6 @@ async function executeImapSync(
 }
 
 /**
- * Validate function for the task
- */
-function validateImapSync(logger: EndpointLogger): ResponseType<boolean> {
-  try {
-    // Use the repository to validate the IMAP sync task
-    const validationResult = imapSyncTaskRepository.validateImapSync(logger);
-
-    if (validationResult.success && validationResult.data) {
-      return success(validationResult.data.isValid);
-    }
-    return fail({
-      message: "app.api.emails.error.default",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  } catch {
-    return fail({
-      message: "app.api.emails.error.default",
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
-}
-
-/**
- * Rollback function for the task
- */
-function rollbackImapSync(): ResponseType<boolean> {
-  // No rollback needed for IMAP sync
-  return success(true);
-}
-
-/**
  * IMAP Sync Task (Unified Format)
  */
 const imapSyncTask: Task = {
@@ -187,33 +155,3 @@ const imapSyncTask: Task = {
 export const tasks: Task[] = [imapSyncTask];
 
 export default tasks;
-
-/**
- * Legacy exports for backward compatibility
- */
-export const taskDefinition = {
-  name: "imap-sync",
-  description: "tasks.imap_sync.description",
-  version: "1.0.0",
-  schedule: CRON_SCHEDULES.EVERY_15_MINUTES, // Every 15 minutes
-  timezone: "UTC",
-  enabled: false,
-  timeout: TASK_TIMEOUTS.EXTENDED, // 30 minutes
-  retries: 2,
-  retryDelay: 10000,
-  priority: CronTaskPriority.MEDIUM,
-  defaultConfig: {
-    maxAccountsPerRun: 10,
-    enableFolderSync: true,
-    enableMessageSync: true,
-    dryRun: false,
-  },
-  configSchema: taskConfigSchema,
-  resultSchema: taskResultSchema,
-  tags: ["email", "imap", "sync"],
-  dependencies: [],
-};
-
-export const execute = executeImapSync;
-export const validate = validateImapSync;
-export const rollback = rollbackImapSync;

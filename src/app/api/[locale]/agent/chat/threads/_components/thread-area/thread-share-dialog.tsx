@@ -9,6 +9,7 @@ import React from "react";
 
 import definitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointsPage";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -18,6 +19,7 @@ interface ThreadShareDialogProps {
   threadId: string;
   threadTitle: string;
   locale: CountryLanguage;
+  user: JwtPayloadType;
 }
 
 export function ThreadShareDialog({
@@ -26,6 +28,7 @@ export function ThreadShareDialog({
   threadId,
   threadTitle,
   locale,
+  user,
 }: ThreadShareDialogProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -39,6 +42,7 @@ export function ThreadShareDialog({
 
         <ScrollArea className="flex-1 -mx-6 px-6 overflow-y-auto">
           <EndpointsPage
+            user={user}
             endpoint={definitions}
             locale={locale}
             endpointOptions={{

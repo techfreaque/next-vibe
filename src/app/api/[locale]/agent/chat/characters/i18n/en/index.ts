@@ -702,6 +702,10 @@ export const translations = {
   post: {
     title: "Create Character",
     description: "Create a new custom character",
+    submitButton: {
+      text: "Create Custom Character",
+      loadingText: "Creating Character...",
+    },
     container: {
       title: "Create New Character",
       description: "Define a new custom character",

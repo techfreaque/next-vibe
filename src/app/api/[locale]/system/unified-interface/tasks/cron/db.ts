@@ -45,9 +45,6 @@ export const cronTasks = pgTable("cron_tasks", {
 
   // Metadata
   tags: jsonb("tags").notNull().default([]),
-  dependencies: jsonb("dependencies").notNull().default([]),
-  monitoring: jsonb("monitoring"),
-  documentation: jsonb("documentation"),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),

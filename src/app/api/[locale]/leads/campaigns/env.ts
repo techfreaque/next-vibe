@@ -8,7 +8,11 @@ import { z } from "zod";
 
 import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 
-export const { env: leadsCampaignsEnv } = defineEnv({
+export const {
+  env: leadsCampaignsEnv,
+  schema: leadsCampaignsEnvSchema,
+  examples: leadsCampaignsEnvExamples,
+} = defineEnv({
   LEADS_EMAIL_FROM_EMAIL: {
     schema: z.string().email(),
     example: "leads@example.com",

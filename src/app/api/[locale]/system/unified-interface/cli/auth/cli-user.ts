@@ -241,8 +241,6 @@ export async function getCliUser(
       },
     };
   } catch (error) {
-    // Database error - use debug level as CLI_AUTH_BYPASS routes will still work
-    // This avoids polluting CLI output for routes that don't require auth
     logger.debug(
       `[CLI AUTH] Error getting CLI user from database (error: ${parseError(error).message}, email: ${cliUserEmail})`,
     );

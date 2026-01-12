@@ -11,7 +11,7 @@ import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/en
 
 import { createSchema } from "./env-client";
 
-export const { env } = defineEnv({
+export const { env, schema: envSchema } = defineEnv({
   NODE_ENV: {
     schema: createSchema(z.enum(Environment), z.enum(Environment).default(Environment.DEVELOPMENT)),
     example: "development",

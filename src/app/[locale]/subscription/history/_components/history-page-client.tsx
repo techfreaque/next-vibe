@@ -16,6 +16,7 @@ import { SubscriptionHeader } from "@/app/api/[locale]/subscription/_components/
 import { SubscriptionStatusCard } from "@/app/api/[locale]/subscription/_components/subscription-status-card";
 import { SubscriptionTabsNav } from "@/app/api/[locale]/subscription/_components/subscription-tabs-nav";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -26,6 +27,7 @@ interface HistoryPageClientProps {
   initialHistory: CreditsHistoryGetResponseOutput | null;
   initialSubscription: SubscriptionGetResponseOutput | null;
   freeCredits: number;
+  user: JwtPayloadType;
 }
 
 export function HistoryPageClient({
@@ -35,6 +37,7 @@ export function HistoryPageClient({
   initialHistory,
   initialSubscription,
   freeCredits,
+  user,
 }: HistoryPageClientProps): JSX.Element {
   const { t } = simpleT(locale);
   const router = useRouter();
@@ -117,7 +120,7 @@ export function HistoryPageClient({
       <SubscriptionTabsNav locale={locale} />
 
       {/* History Tab Content */}
-      <HistoryTab locale={locale} initialData={initialHistory} />
+      <HistoryTab locale={locale} initialData={initialHistory} user={user} />
     </Container>
   );
 }

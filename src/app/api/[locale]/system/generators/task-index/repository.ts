@@ -16,6 +16,11 @@ import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/respon
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  formatCount,
+  formatDuration,
+  formatGenerator,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
 import {
   findFilesRecursively,
@@ -50,7 +55,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
 
     try {
       const outputFile = data.outputFile;
-      logger.debug("Starting task index generation", { outputFile });
+      logger.debug(`Starting task index generation: ${outputFile}`);
 
       // Discover task files
       const startDir = join(process.cwd(), "src", "app", "api");
@@ -88,6 +93,13 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
 
       const duration = Date.now() - startTime;
       const tasksFound = taskFiles.length + taskRunnerFiles.length;
+
+      logger.info(
+        formatGenerator(
+          `Generated task index with ${formatCount(tasksFound, "task")} in ${formatDuration(duration)}`,
+          "📝",
+        ),
+      );
 
       return success({
         success: true,

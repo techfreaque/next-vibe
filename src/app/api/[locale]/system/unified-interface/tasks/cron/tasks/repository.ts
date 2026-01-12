@@ -10,20 +10,12 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import { z } from "zod";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { cronTasks } from "../../cron/db";
-import {
-  CronTaskPriority,
-  CronTaskPriorityDB,
-  CronTaskStatus,
-  CronTaskStatusDB,
-  TaskCategory,
-  TaskCategoryDB,
-} from "../../enum";
+import { CronTaskPriority, TaskCategory } from "../../enum";
 import type {
   CronTaskCreateRequestOutput,
   CronTaskCreateResponseOutput,
@@ -33,137 +25,36 @@ import type {
 } from "./definition";
 
 /**
- * Default cron schedule for tasks without a specific schedule
- */
-const DEFAULT_CRON_SCHEDULE = "0 0 * * *";
-
-/**
  * Database error message pattern for unique constraint violations
  */
 const UNIQUE_CONSTRAINT_ERROR = "unique constraint";
 
 /**
- * Calculate next execution time for a cron schedule
- * Implements basic cron parsing for common patterns
- */
-function calculateNextExecutionTime(cronExpression?: string): Date | null {
-  if (!cronExpression) {
-    return null;
-  }
-
-  try {
-    const now = new Date();
-    const parts = cronExpression.trim().split(/\s+/);
-
-    // Basic validation - should have 5 parts (minute hour day month weekday)
-    if (parts.length !== 5) {
-      return null;
-    }
-
-    const [minute, hour] = parts;
-
-    // Handle simple cases
-    if (cronExpression === "0 0 * * *") {
-      // Daily at midnight
-      const next = new Date(now);
-      next.setHours(0, 0, 0, 0);
-      next.setDate(next.getDate() + 1);
-      return next;
-    }
-
-    if (cronExpression.startsWith("*/")) {
-      // Every N minutes/hours
-      const interval = parseInt(cronExpression.split("/")[1].split(" ")[0], 10);
-      if (minute.startsWith("*/")) {
-        return new Date(now.getTime() + interval * 60 * 1000);
-      }
-      if (hour.startsWith("*/")) {
-        return new Date(now.getTime() + interval * 60 * 60 * 1000);
-      }
-    }
-
-    // For complex expressions, calculate next hour as fallback
-    const next = new Date(now);
-    next.setHours(next.getHours() + 1, 0, 0, 0);
-    return next;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Determine task status based on execution data
- */
-function determineTaskStatus(
-  task: typeof cronTasks.$inferSelect,
-): (typeof CronTaskStatus)[keyof typeof CronTaskStatus] {
-  if (!task.enabled) {
-    return CronTaskStatus.STOPPED;
-  }
-
-  // If task has never run
-  if (!task.lastExecutedAt) {
-    return CronTaskStatus.PENDING;
-  }
-
-  // If task has errors in recent execution
-  if (task.lastExecutionError) {
-    return CronTaskStatus.ERROR;
-  }
-
-  // If task has more errors than successes
-  if (task.errorCount > task.successCount) {
-    return CronTaskStatus.FAILED;
-  }
-
-  // Check if task is currently running (nextExecutionAt is in the past but no recent completion)
-  const now = new Date();
-  if (task.nextExecutionAt && task.nextExecutionAt < now) {
-    // If nextExecutionAt is overdue, task might be running or stuck
-    const timeSinceNextRun = now.getTime() - task.nextExecutionAt.getTime();
-    const timeout = task.timeout || 300000; // Default 5 minutes
-
-    if (timeSinceNextRun < timeout) {
-      return CronTaskStatus.RUNNING;
-    }
-    return CronTaskStatus.TIMEOUT;
-  }
-
-  // If task completed successfully
-  if (task.successCount > 0) {
-    return CronTaskStatus.COMPLETED;
-  }
-
-  return CronTaskStatus.PENDING;
-}
-
-/**
- * Format task response with computed fields
- * Uses Zod validation to ensure database enum values match expected types
+ * Format task response with DB fields
  */
 function formatTaskResponse(task: typeof cronTasks.$inferSelect): CronTaskResponseType {
-  // Validate enum values from database using Zod schemas
-  // This provides runtime validation and type narrowing without type assertions
-  const prioritySchema = z.enum(CronTaskPriorityDB);
-  const statusSchema = z.enum(CronTaskStatusDB);
-  const categorySchema = z.enum(TaskCategoryDB);
-
   const formatted: CronTaskResponseType = {
     id: task.id,
     name: task.name,
-    description: task.description || undefined,
-    schedule: task.schedule || DEFAULT_CRON_SCHEDULE,
+    description: task.description,
+    version: task.version,
+    category: task.category,
+    schedule: task.schedule,
+    timezone: task.timezone,
     enabled: task.enabled,
-    priority: prioritySchema.parse(task.priority),
-    status: statusSchema.parse(determineTaskStatus(task)),
-    category: categorySchema.parse(task.category),
-    lastRun: task.lastExecutedAt?.toISOString(),
-    nextRun:
-      task.nextExecutionAt?.toISOString() ||
-      (task.enabled
-        ? calculateNextExecutionTime(task.schedule || undefined)?.toISOString()
-        : undefined),
-    version: parseInt(task.version.split(".")[0] || "1", 10),
+    priority: task.priority,
+    timeout: task.timeout,
+    retries: task.retries,
+    retryDelay: task.retryDelay,
+    lastExecutedAt: task.lastExecutedAt?.toISOString() || null,
+    lastExecutionStatus: task.lastExecutionStatus,
+    lastExecutionError: task.lastExecutionError,
+    lastExecutionDuration: task.lastExecutionDuration,
+    nextExecutionAt: task.nextExecutionAt?.toISOString() || null,
+    executionCount: task.executionCount,
+    successCount: task.successCount,
+    errorCount: task.errorCount,
+    averageExecutionTime: task.averageExecutionTime,
     createdAt: task.createdAt.toISOString(),
     updatedAt: task.updatedAt.toISOString(),
   };
@@ -306,9 +197,6 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         });
       }
 
-      // Calculate next execution time
-      const nextRun = calculateNextExecutionTime(data.schedule);
-
       // Prepare task data for insertion
       const taskData = {
         name: data.name,
@@ -322,7 +210,6 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         retryDelay: data.retryDelay ?? 5000,
         version: "1.0.0",
         defaultConfig: {},
-        nextExecutionAt: nextRun || undefined,
         executionCount: 0,
         successCount: 0,
         errorCount: 0,
@@ -352,16 +239,25 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         task: {
           id: createdTask.id,
           name: createdTask.name,
-          description: createdTask.description || undefined,
-          schedule: createdTask.schedule || DEFAULT_CRON_SCHEDULE,
+          description: createdTask.description,
+          version: createdTask.version,
+          category: createdTask.category,
+          schedule: createdTask.schedule,
+          timezone: createdTask.timezone,
           enabled: createdTask.enabled,
-          priority: z.enum(CronTaskPriorityDB).parse(createdTask.priority),
-          status: CronTaskStatus.PENDING, // New tasks are always pending
-          category: z.enum(TaskCategoryDB).parse(createdTask.category),
-          timeout: createdTask.timeout || 300000,
-          retries: createdTask.retries || 3,
-          retryDelay: createdTask.retryDelay || 5000,
-          version: parseInt(createdTask.version.split(".")[0], 10) || 1,
+          priority: createdTask.priority,
+          timeout: createdTask.timeout,
+          retries: createdTask.retries,
+          retryDelay: createdTask.retryDelay,
+          lastExecutedAt: createdTask.lastExecutedAt?.toISOString() || null,
+          lastExecutionStatus: createdTask.lastExecutionStatus,
+          lastExecutionError: createdTask.lastExecutionError,
+          lastExecutionDuration: createdTask.lastExecutionDuration,
+          nextExecutionAt: createdTask.nextExecutionAt?.toISOString() || null,
+          executionCount: createdTask.executionCount,
+          successCount: createdTask.successCount,
+          errorCount: createdTask.errorCount,
+          averageExecutionTime: createdTask.averageExecutionTime,
           createdAt: createdTask.createdAt.toISOString(),
           updatedAt: createdTask.updatedAt.toISOString(),
         },

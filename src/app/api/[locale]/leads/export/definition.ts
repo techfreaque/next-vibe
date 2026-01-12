@@ -315,7 +315,5 @@ export interface ExportResponseType {
  */
 const definitions = {
   GET,
-};
-
-export { GET };
+} as const;
 export default definitions;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next-vibe-ui/lib/redirect";
+import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
@@ -85,6 +86,9 @@ export default async function SignUpPage({ params }: Props): Promise<JSX.Element
       initialReferralCode = referralResult.data.referralCode;
     }
   }
+  if (!user.success) {
+    return <Div>{t("app.user.signup.errors.failedToLoadBrowserIdentity")}</Div>;
+  }
 
   return (
     <>
@@ -95,7 +99,11 @@ export default async function SignUpPage({ params }: Props): Promise<JSX.Element
         <ArrowLeft className="mr-2 h-4 w-4" />
         {t("app.user.common.backToHome")}
       </Link>
-      <SignUpForm locale={locale} initialReferralCode={initialReferralCode ?? null} />
+      <SignUpForm
+        locale={locale}
+        initialReferralCode={initialReferralCode ?? null}
+        user={user.data}
+      />
     </>
   );
 }

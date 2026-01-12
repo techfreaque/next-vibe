@@ -8,7 +8,11 @@ import { z } from "zod";
 
 import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 
-export const { env: hostingEnv } = defineEnv({
+export const {
+  env: hostingEnv,
+  schema: hostingEnvSchema,
+  examples: hostingEnvExamples,
+} = defineEnv({
   // Vercel
   VERCEL: { schema: z.string().optional(), example: "1" },
   VERCEL_REGION: { schema: z.string().optional(), example: "iad1" },

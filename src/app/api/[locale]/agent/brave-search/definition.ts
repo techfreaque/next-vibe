@@ -334,8 +334,6 @@ const { GET } = createEndpoint({
 
 const braveSearchDefinition = { GET };
 
-export { GET };
-
 export default braveSearchDefinition;
 
 // Export types

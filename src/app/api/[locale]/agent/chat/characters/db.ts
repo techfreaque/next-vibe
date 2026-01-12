@@ -34,15 +34,12 @@ export const customCharacters = pgTable("custom_characters", {
   description: text("description").$type<TranslationKey>().notNull(),
   tagline: text("tagline").$type<TranslationKey>().notNull(),
   icon: text("icon").$type<IconKey>().notNull(),
-  systemPrompt: text("system_prompt").notNull(),
+  systemPrompt: text("system_prompt"),
 
   // Categorization
   category: text("category").$type<typeof CharacterCategoryValue>().notNull(),
 
-  voice: text("voice")
-    .$type<typeof TtsVoiceValue>()
-    .notNull()
-    .default("app.api.agent.textToSpeech.voices.FEMALE"),
+  voice: text("voice").$type<typeof TtsVoiceValue>(),
   suggestedPrompts: jsonb("suggested_prompts").$type<string[]>().default([]).notNull(),
 
   // Model selection (discriminated union from API)

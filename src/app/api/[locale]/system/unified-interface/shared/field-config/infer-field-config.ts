@@ -157,6 +157,17 @@ function extractFieldConfig<TKey extends string>(
           })) || [],
       };
 
+    case FieldDataType.RANGE_SLIDER:
+      return {
+        ...baseConfig,
+        type: "range_slider" as const,
+        options: widget.options,
+        minLabel: widget.minLabel,
+        maxLabel: widget.maxLabel,
+        minDefault: widget.minDefault,
+        maxDefault: widget.maxDefault,
+      };
+
     default:
       // Fallback to text field
       return { ...baseConfig, type: "text" as const };

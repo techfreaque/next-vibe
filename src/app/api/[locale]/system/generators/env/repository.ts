@@ -34,6 +34,8 @@ interface EnvFileInfo {
   description?: string;
   isClient: boolean;
   exportName: string;
+  schemaExportName: string;
+  examplesExportName: string;
   envExampleEntries?: EnvExampleEntry[];
 }
 
@@ -58,6 +60,7 @@ import {
   formatCount,
   formatDuration,
   formatGenerator,
+  formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
 import {
@@ -113,12 +116,11 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
     const startTime = Date.now();
 
     try {
-      logger.debug("Starting env generation", { outputDir: data.outputDir });
+      logger.debug(`Starting env generation: ${data.outputDir}`);
 
       // eslint-disable-next-line i18next/no-literal-string
       const apiCorePath = ["src", "app", "api", "[locale]"];
       const apiDir = join(process.cwd(), ...apiCorePath);
-      const configDir = join(process.cwd(), "src", "config");
 
       const excludeDirs = [
         "node_modules",
@@ -129,19 +131,25 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
         "shared", // Exclude the shared/env utilities
       ];
 
-      // Discover server env files from both locations
+      // Discover server env files (only from API directory, not manual config)
       logger.debug("Discovering server env files");
-      const serverEnvFilePaths = [
-        ...findFilesRecursively(apiDir, "env.ts", excludeDirs),
-        ...findFilesRecursively(configDir, "env.ts", excludeDirs),
-      ];
+      const serverEnvFilePaths = findFilesRecursively(apiDir, "env.ts", excludeDirs).filter(
+        (filePath) => {
+          // Exclude the generated output file itself
+          const serverOutputPath = join(data.outputDir, "env.ts");
+          return filePath !== join(process.cwd(), serverOutputPath);
+        },
+      );
 
-      // Discover client env files from both locations
+      // Discover client env files (only from API directory, not manual config)
       logger.debug("Discovering client env files");
-      const clientEnvFilePaths = [
-        ...findFilesRecursively(apiDir, "env-client.ts", excludeDirs),
-        ...findFilesRecursively(configDir, "env-client.ts", excludeDirs),
-      ];
+      const clientEnvFilePaths = findFilesRecursively(apiDir, "env-client.ts", excludeDirs).filter(
+        (filePath) => {
+          // Exclude the generated output file itself
+          const clientOutputPath = join(data.outputDir, "env-client.ts");
+          return filePath !== join(process.cwd(), clientOutputPath);
+        },
+      );
 
       if (data.verbose) {
         logger.debug(`Found ${serverEnvFilePaths.length} server env files`);
@@ -156,7 +164,13 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       // Validate server files
       for (const filePath of serverEnvFilePaths) {
         const result = validateEnvFileExports(filePath, false);
-        if (result.isValid && result.module && result.exportName) {
+        if (
+          result.isValid &&
+          result.module &&
+          result.exportName &&
+          result.schemaExportName &&
+          result.examplesExportName
+        ) {
           const outputFile = join(process.cwd(), data.outputDir, "env.ts");
           validServerModules.push({
             filePath,
@@ -165,6 +179,8 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
             description: result.module.description,
             isClient: false,
             exportName: result.exportName,
+            schemaExportName: result.schemaExportName,
+            examplesExportName: result.examplesExportName,
             envExampleEntries: result.module.envExampleEntries,
           });
         } else {
@@ -175,7 +191,13 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       // Validate client files
       for (const filePath of clientEnvFilePaths) {
         const result = validateEnvFileExports(filePath, true);
-        if (result.isValid && result.module && result.exportName) {
+        if (
+          result.isValid &&
+          result.module &&
+          result.exportName &&
+          result.schemaExportName &&
+          result.examplesExportName
+        ) {
           const outputFile = join(process.cwd(), data.outputDir, "env-client.ts");
           validClientModules.push({
             filePath,
@@ -184,6 +206,8 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
             description: result.module.description,
             isClient: true,
             exportName: result.exportName,
+            schemaExportName: result.schemaExportName,
+            examplesExportName: result.examplesExportName,
             envExampleEntries: result.module.envExampleEntries,
           });
         } else {
@@ -191,32 +215,37 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
         }
       }
 
-      // Check for duplicate module names
-      const duplicateErrors = checkDuplicateModuleNames([
-        ...validServerModules.map((m) => ({
+      // Check for duplicate module names (separately for server and client)
+      const serverDuplicates = checkDuplicateModuleNames(
+        validServerModules.map((m) => ({
           moduleName: m.moduleName,
           filePath: m.filePath,
         })),
-        ...validClientModules.map((m) => ({
+      );
+      const clientDuplicates = checkDuplicateModuleNames(
+        validClientModules.map((m) => ({
           moduleName: m.moduleName,
           filePath: m.filePath,
         })),
-      ]);
-      allErrors.push(...duplicateErrors);
+      );
+      allErrors.push(...serverDuplicates, ...clientDuplicates);
 
-      // Fail if there are validation errors
+      // Log validation errors as warnings (don't fail, just skip invalid files)
       if (allErrors.length > 0) {
         const errorMessage = formatValidationErrors(allErrors);
-        logger.error("Env file validation failed", {
-          errorCount: allErrors.length,
-          details: errorMessage,
-        });
+        logger.warn(
+          formatWarning(
+            `Skipped ${formatCount(allErrors.length, "invalid env file")}:\n${errorMessage}`,
+          ),
+        );
+      }
+
+      // If no valid modules at all, fail
+      if (validServerModules.length === 0 && validClientModules.length === 0) {
+        logger.error("No valid env files found");
         return fail({
-          message: "app.api.system.generators.env.error.validation_failed",
+          message: "app.api.system.generators.env.error.no_valid_files",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
-            details: errorMessage,
-          },
         });
       }
 
@@ -241,7 +270,7 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
         await writeGeneratedFile(join(process.cwd(), clientOutputPath), clientContent, false);
 
         // Generate .env.example file
-        const envExampleContent = this.generateEnvExampleContent([
+        const envExampleContent = await this.generateEnvExampleContent([
           ...validServerModules,
           ...validClientModules,
         ]);
@@ -301,22 +330,21 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
     const imports: string[] = [];
     for (const mod of modules) {
       const relativePath = getRelativeImportPath(mod.filePath, outputFile);
-      imports.push(`import { ${mod.exportName} } from "${relativePath}";`);
+      imports.push(`import { ${mod.exportName}, ${mod.schemaExportName} } from "${relativePath}";`);
     }
 
     // Generate module names for registry
-    const moduleEntries = modules.map((m) => `  "${m.moduleName}": ${m.exportName},`).join("\n");
+    const moduleEntries = modules
+      .map((m) => `  "${m.moduleName}": { env: ${m.exportName}, schema: ${m.schemaExportName} },`)
+      .join("\n");
 
     // Generate schema merge chain
     const schemaChain = modules
-      .map((m, i) => (i === 0 ? `${m.exportName}.schema` : `.merge(${m.exportName}.schema)`))
+      .map((m, i) => (i === 0 ? `${m.schemaExportName}` : `.merge(${m.schemaExportName})`))
       .join("\n  ");
 
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
-
-/* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 
 import "server-only";
 
@@ -358,17 +386,17 @@ export function validateAllEnv(): Env {
 }
 
 /**
- * Validate a specific module's env vars
- * Useful for lazy validation or testing
+ * Validated environment variables (singleton)
  */
-export function validateModuleEnv<K extends keyof typeof envModules>(
+export const env: Env = validateAllEnv();
+
+/**
+ * Get a specific module's validated env vars from the singleton
+ */
+export function getModuleEnv<K extends keyof typeof envModules>(
   moduleName: K,
-): z.infer<(typeof envModules)[K]["schema"]> {
-  return validateEnv(
-    { ...process.env, platform },
-    envModules[moduleName].schema,
-    envValidationLogger,
-  );
+): (typeof envModules)[K]["env"] {
+  return envModules[moduleName].env;
 }
 
 /**
@@ -392,22 +420,21 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
     const imports: string[] = [];
     for (const mod of modules) {
       const relativePath = getRelativeImportPath(mod.filePath, outputFile);
-      imports.push(`import { ${mod.exportName} } from "${relativePath}";`);
+      imports.push(`import { ${mod.exportName}, ${mod.schemaExportName} } from "${relativePath}";`);
     }
 
     // Generate module names for registry
-    const moduleEntries = modules.map((m) => `  "${m.moduleName}": ${m.exportName},`).join("\n");
+    const moduleEntries = modules
+      .map((m) => `  "${m.moduleName}": { env: ${m.exportName}, schema: ${m.schemaExportName} },`)
+      .join("\n");
 
     // Generate schema merge chain
     const schemaChain = modules
-      .map((m, i) => (i === 0 ? `${m.exportName}.schema` : `.merge(${m.exportName}.schema)`))
+      .map((m, i) => (i === 0 ? `${m.schemaExportName}` : `.merge(${m.schemaExportName})`))
       .join("\n  ");
 
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
-
-/* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 
 import { validateEnv } from "next-vibe/shared/utils/env-util";
 import { z } from "zod";
@@ -433,6 +460,9 @@ export const envClientModules = {
 ${moduleEntries}
 } as const;
 
+// Export platform for external use
+export { platform };
+
 // Combined client schema
 export const envClientSchema = ${schemaChain || "z.object({})"};
 
@@ -450,6 +480,11 @@ export function validateAllClientEnv(): EnvClient {
 }
 
 /**
+ * Validated client environment variables (singleton)
+ */
+export const envClient: EnvClient = validateAllClientEnv();
+
+/**
  * Get list of all registered client env modules
  */
 export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
@@ -461,34 +496,36 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
   /**
    * Generate .env.example file content
    */
-  private generateEnvExampleContent(modules: EnvFileInfo[]): string {
+  private async generateEnvExampleContent(modules: EnvFileInfo[]): Promise<string> {
     const lines: string[] = [
       "# ============================================================================",
       "# AUTO-GENERATED FILE - DO NOT EDIT MANUALLY",
-      "# Generated by: vibe generate:env",
+      "# Generated by: vibe generate",
       "# This file is auto-generated from environment module definitions.",
-      "# To add new environment variables, add envExampleEntries to your env module.",
       "# ============================================================================",
       "",
     ];
 
-    // Group modules by whether they have envExampleEntries
-    const modulesWithEntries = modules.filter(
-      (m) => m.envExampleEntries && m.envExampleEntries.length > 0,
-    );
+    for (const mod of modules) {
+      // Import examples from the module
+      const moduleImport = await import(mod.filePath);
+      const examples = moduleImport[mod.examplesExportName];
 
-    for (const mod of modulesWithEntries) {
-      // Add section header with description
-      lines.push(`# ============================================================================`);
-      lines.push(`# ${mod.description || mod.moduleName}`);
-      lines.push(`# ============================================================================`);
+      if (!examples || examples.length === 0) {
+        continue;
+      }
 
-      // Add each entry
-      for (const entry of mod.envExampleEntries || []) {
+      // Add source file comment
+      const relativeSourcePath = mod.filePath.replace(process.cwd(), "").replace(/^\//, "");
+      lines.push(`# Source: ${relativeSourcePath}`);
+      lines.push(`# ${mod.moduleName}`);
+
+      // Add each example
+      for (const entry of examples) {
         if (entry.comment) {
           lines.push(`# ${entry.comment}`);
         }
-        lines.push(`${entry.key}="${entry.exampleValue}"`);
+        lines.push(`${entry.key}="${entry.example}"`);
       }
 
       lines.push("");

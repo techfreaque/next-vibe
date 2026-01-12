@@ -639,10 +639,7 @@ const { GET } = createEndpoint({
  */
 const userSearchEndpoints = {
   GET,
-};
-
-export { GET };
-
+} as const;
 export default userSearchEndpoints;
 
 // Export types as required by migration guide

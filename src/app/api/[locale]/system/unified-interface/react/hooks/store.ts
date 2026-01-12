@@ -1,7 +1,6 @@
 import type { QueryKey } from "@tanstack/react-query";
 import { QueryClient } from "@tanstack/react-query";
 import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
-import { success } from "next-vibe/shared/types/response.schema";
 import { z } from "zod";
 import { create } from "zustand";
 
@@ -217,7 +216,6 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     readonly path: readonly string[];
     // eslint-disable-next-line i18next/no-literal-string
   }): string => `form-${endpoint.path.join("-")}-${endpoint.method}`,
-
 
   // Form-related methods
   setFormError: (formId: string, error: ErrorResponseType | null): void => {

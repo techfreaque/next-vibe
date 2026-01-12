@@ -236,10 +236,14 @@ export function useLocalStorageDelete<T>(
     urlPathParams?: DeleteEndpointTypes<T>["urlPathParams"];
   } = {},
 ): {
+  form: UseFormReturn<DeleteEndpointTypes<T>["request"]>;
   response: ResponseType<DeleteEndpointTypes<T>["response"]> | undefined;
+  submitError: ErrorResponseType | null;
+  isSubmitSuccessful: boolean;
   isSuccess: boolean;
   error: ErrorResponseType | null;
   submit: (requestData?: DeleteEndpointTypes<T>["request"]) => Promise<void>;
+  submitForm: () => Promise<void>;
   isSubmitting: boolean;
 } | null {
   type RequestType = DeleteEndpointTypes<T>["request"];
@@ -247,6 +251,12 @@ export function useLocalStorageDelete<T>(
 
   const [response, setResponse] = useState<ResponseType<ResponseDataType> | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Create form instance for localStorage mode (similar to API mode)
+  const form = useForm<RequestType>({
+    resolver: endpoint ? (zodResolver(endpoint.requestSchema) as never) : undefined,
+    defaultValues: {} as RequestType,
+  });
 
   const submit = useCallback(
     async (requestData?: RequestType) => {
@@ -256,8 +266,9 @@ export function useLocalStorageDelete<T>(
 
       setIsSubmitting(true);
       try {
+        const dataToSubmit = requestData ?? form.getValues();
         const result = await callback({
-          requestData,
+          requestData: dataToSubmit,
           urlPathParams: options.urlPathParams,
         });
         setResponse(result as ResponseType<ResponseDataType>);
@@ -265,18 +276,30 @@ export function useLocalStorageDelete<T>(
         setIsSubmitting(false);
       }
     },
-    [callback, options.urlPathParams],
+    [callback, options.urlPathParams, form],
   );
+
+  const submitForm = useCallback(async (): Promise<void> => {
+    await form.handleSubmit(async (data) => {
+      await submit(data);
+    })();
+  }, [form, submit]);
 
   if (!endpoint) {
     return null;
   }
 
+  const submitError = response?.success === false ? response : null;
+
   return {
+    form,
     response,
+    submitError,
+    isSubmitSuccessful: response?.success === true,
     isSuccess: response?.success === true,
-    error: response?.success === false ? response : null,
+    error: submitError,
     submit,
+    submitForm,
     isSubmitting,
   };
 }

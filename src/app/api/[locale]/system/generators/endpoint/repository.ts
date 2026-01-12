@@ -16,6 +16,7 @@ import {
   formatCount,
   formatDuration,
   formatGenerator,
+  formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import { endpointToToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 
@@ -62,7 +63,7 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
 
     try {
       const outputFile = data.outputFile;
-      logger.debug("Starting endpoint generation", { outputFile });
+      logger.debug(`Starting endpoint generation: ${outputFile}`);
 
       // Discover definition files
       // eslint-disable-next-line i18next/no-literal-string
@@ -74,8 +75,24 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
 
       logger.debug(`Found ${definitionFiles.length} definition files`);
 
-      // Generate content
-      const content = await this.generateContent(definitionFiles);
+      // Check for definitions without routes - filter them out
+      const routeFiles = findFilesRecursively(startDir, "route.ts");
+      const definitionsWithoutRoute: string[] = [];
+      const validDefinitionFiles: string[] = [];
+
+      for (const defFile of definitionFiles) {
+        const routePath = defFile.replace("/definition.ts", "/route.ts");
+        if (!routeFiles.includes(routePath)) {
+          definitionsWithoutRoute.push(defFile);
+        } else {
+          validDefinitionFiles.push(defFile);
+        }
+      }
+
+      // Skip definitions without route (warning shown by endpoints-index generator)
+
+      // Generate content with only valid definition files
+      const content = await this.generateContent(validDefinitionFiles, logger);
 
       // Write file
       await writeGeneratedFile(outputFile, content, data.dryRun);
@@ -84,7 +101,7 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
 
       logger.info(
         formatGenerator(
-          `Generated endpoint file with ${formatCount(definitionFiles.length, "endpoint")} in ${formatDuration(duration)}`,
+          `Generated endpoint file with ${formatCount(validDefinitionFiles.length, "endpoint")} in ${formatDuration(duration)}`,
           "📄",
         ),
       );
@@ -118,7 +135,10 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
    * Main paths include method suffix (e.g., "core/agent/ai-stream/POST")
    * Aliases also include method from their definition
    */
-  private async generateContent(definitionFiles: string[]): Promise<string> {
+  private async generateContent(
+    definitionFiles: string[],
+    logger: EndpointLogger,
+  ): Promise<string> {
     const pathMap: Record<string, { importPath: string; method: string }> = {};
     const allPaths: string[] = [];
 
@@ -127,10 +147,27 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
       const importPath = generateAbsoluteImportPath(defFile, "definition");
 
       // Load the actual definition - let TypeScript infer the concrete type
-      const definition = await import(defFile);
+      let definition;
+      try {
+        definition = await import(defFile);
+      } catch (error) {
+        // Log import errors and skip - same pattern as route-handlers generator
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        logger.warn(
+          formatWarning(
+            `Import error: ${defFile.replace(process.cwd(), "").replace(/^\//, "")}\n    ${errorMsg}`,
+          ),
+        );
+        continue;
+      }
       const defaultExport = definition.default;
 
       if (!defaultExport) {
+        logger.warn(
+          formatWarning(
+            `No default export: ${defFile.replace(process.cwd(), "").replace(/^\//, "")}`,
+          ),
+        );
         continue;
       }
 
@@ -179,7 +216,13 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
 
     for (const defFile of definitionFiles) {
       // Load the actual definition - let TypeScript infer the concrete type
-      const definition = await import(defFile);
+      let definition;
+      try {
+        definition = await import(defFile);
+      } catch (error) {
+        // Skip files with import errors (already logged above)
+        continue;
+      }
       const defaultExport = definition.default;
 
       if (!defaultExport) {
