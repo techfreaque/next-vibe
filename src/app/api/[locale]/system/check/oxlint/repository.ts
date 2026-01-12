@@ -43,7 +43,6 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<OxlintResponseOutput>> {
     try {
-      // eslint-disable-next-line i18next/no-literal-string
       logger.debug(
         `[OXLINT] Starting execution (path: ${data.path || "./"}, fix: ${data.fix})`,
       );
@@ -124,7 +123,6 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
           : [data.path]
         : ["./"];
 
-      // eslint-disable-next-line i18next/no-literal-string
       logger.debug(
         `[OXLINT] Running on ${targetPaths.length} path(s): ${targetPaths.join(", ")}`,
       );
@@ -144,7 +142,6 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         data,
       );
 
-      // eslint-disable-next-line i18next/no-literal-string
       logger.debug(
         `[OXLINT] Execution completed (${response.issues.items.length} issues found)`,
       );
@@ -242,14 +239,13 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       // Run both oxlint --fix and oxfmt in parallel
       const [oxlintResult, oxfmtResult] = await Promise.allSettled([
         this.runOxlintCommand(fixArgs, timeout, logger),
-        this.runOxfmt(paths, logger),
+        this.runOxfmt(paths, logger, this.config.oxlint.configPath),
       ]);
 
       // Handle oxlint result
       if (oxlintResult.status === "fulfilled") {
         // Log oxfmt result if it failed
         if (oxfmtResult.status === "rejected") {
-          // eslint-disable-next-line i18next/no-literal-string
           logger.warn(
             `[OXLINT] Oxfmt formatting failed: ${String(oxfmtResult.reason)}`,
           );
@@ -273,12 +269,12 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   private async runOxfmt(
     paths: string[],
     logger: EndpointLogger,
+    configPath: string,
   ): Promise<void> {
     if (paths.length === 0) {
       return;
     }
 
-    // eslint-disable-next-line i18next/no-literal-string
     logger.debug(
       `[OXLINT] Executing Oxfmt command: bunx oxfmt ${paths.join(" ")}`,
     );
@@ -287,7 +283,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
 
     return await new Promise((resolve, reject) => {
       /* eslint-disable i18next/no-literal-string */
-      const child = spawn("bunx", ["oxfmt", ...paths], {
+      const child = spawn("bunx", ["oxfmt", "--config", configPath, ...paths], {
         cwd: process.cwd(),
         stdio: ["ignore", "pipe", "pipe"],
         shell: false,
