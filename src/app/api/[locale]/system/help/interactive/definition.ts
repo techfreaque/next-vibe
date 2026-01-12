@@ -32,7 +32,12 @@ const { POST } = createEndpoint({
     "app.api.system.help.interactive.post.tags.help",
   ],
   icon: "book",
-  allowedRoles: [UserRole.PRODUCTION_OFF, UserRole.AI_TOOL_OFF, UserRole.CLI_AUTH_BYPASS, UserRole.MCP_OFF],
+  allowedRoles: [
+    UserRole.PRODUCTION_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.CLI_AUTH_BYPASS,
+    UserRole.MCP_OFF,
+  ],
   aliases: [INTERACTIVE_MODE_ALIAS, "i"],
 
   fields: objectField(
