@@ -232,13 +232,13 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     /* eslint-enable i18next/no-literal-string */
 
     // If fix is requested, run oxlint --fix and oxfmt in parallel
-    if (fix) {
+    if (fix && this.config?.prettier.enabled) {
       const fixArgs = [...baseArgs, "--fix"];
 
       // Run both oxlint --fix and oxfmt in parallel
       const [oxlintResult, oxfmtResult] = await Promise.allSettled([
         this.runOxlintCommand(fixArgs, timeout, logger),
-        this.runOxfmt(paths, logger, this.config.oxlint.configPath),
+        this.runOxfmt(paths, logger, this.config.prettier.configPath),
       ]);
 
       // Handle oxlint result
@@ -272,16 +272,17 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     if (paths.length === 0) {
       return;
     }
+    const command =  ["oxfmt", "--config", configPath, ...paths];
 
     logger.debug(
-      `[OXLINT] Executing Oxfmt command: bunx oxfmt ${paths.join(" ")}`,
+      `[OXLINT] Executing Oxfmt command: bunx ${command.join(" ")}`,
     );
 
     const { spawn } = await import("node:child_process");
 
     return await new Promise((resolve, reject) => {
       /* eslint-disable i18next/no-literal-string */
-      const child = spawn("bunx", ["oxfmt", "--config", configPath, ...paths], {
+      const child = spawn("bunx", command, {
         cwd: process.cwd(),
         stdio: ["ignore", "pipe", "pipe"],
         shell: false,
