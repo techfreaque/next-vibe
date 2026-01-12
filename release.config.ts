@@ -40,8 +40,7 @@ const releaseConfig: ReleaseFileConfig = {
       updateDeps: true,
       clean: false,
       lint: false, // linter runs with typecheck
-      // typecheck: "bun run vibe check",
-      typecheck: false,
+      typecheck: "bun check",
       build: true,
       test: false,
       snyk: false, // Enable when Snyk is configured
