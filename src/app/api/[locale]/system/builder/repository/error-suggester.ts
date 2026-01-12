@@ -27,15 +27,21 @@ export class ErrorSuggester implements IErrorSuggester {
 
     if (lowerError.includes("not found") || lowerError.includes("enoent")) {
       suggestions.push(t("app.api.system.builder.suggestions.checkFilePaths"));
-      suggestions.push(t("app.api.system.builder.suggestions.runFromProjectRoot"));
+      suggestions.push(
+        t("app.api.system.builder.suggestions.runFromProjectRoot"),
+      );
     }
 
     if (lowerError.includes("permission") || lowerError.includes("eacces")) {
-      suggestions.push(t("app.api.system.builder.suggestions.checkPermissions"));
+      suggestions.push(
+        t("app.api.system.builder.suggestions.checkPermissions"),
+      );
     }
 
     if (lowerError.includes("module") || lowerError.includes("import")) {
-      suggestions.push(t("app.api.system.builder.suggestions.checkDependencies"));
+      suggestions.push(
+        t("app.api.system.builder.suggestions.checkDependencies"),
+      );
       suggestions.push(t("app.api.system.builder.suggestions.runInstall"));
     }
 
@@ -51,7 +57,9 @@ export class ErrorSuggester implements IErrorSuggester {
 
     if (lowerError.includes("timeout")) {
       suggestions.push(t("app.api.system.builder.suggestions.increaseTimeout"));
-      suggestions.push(t("app.api.system.builder.suggestions.checkNetworkConnection"));
+      suggestions.push(
+        t("app.api.system.builder.suggestions.checkNetworkConnection"),
+      );
     }
 
     if (lowerError.includes("disk") || lowerError.includes("enospc")) {

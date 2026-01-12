@@ -18,7 +18,9 @@ export class EditableTextWidgetRenderer extends BaseWidgetRenderer<
 > {
   readonly widgetType = WidgetType.MARKDOWN_EDITOR;
 
-  render(props: CLIWidgetProps<typeof WidgetType.MARKDOWN_EDITOR, string>): string {
+  render(
+    props: CLIWidgetProps<typeof WidgetType.MARKDOWN_EDITOR, string>,
+  ): string {
     const { field, value, context } = props;
     const t = context.t;
 
@@ -51,11 +53,15 @@ export class EditableTextWidgetRenderer extends BaseWidgetRenderer<
     const displayValue = value || placeholder || "";
 
     // Show readonly indicator if applicable
-    const readonlyIndicator = readonly ? this.styleText(" [readonly]", "dim", context) : "";
+    const readonlyIndicator = readonly
+      ? this.styleText(" [readonly]", "dim", context)
+      : "";
 
     // Show max length if specified
     const lengthInfo =
-      maxLength && value ? this.styleText(` (${value.length}/${maxLength})`, "dim", context) : "";
+      maxLength && value
+        ? this.styleText(` (${value.length}/${maxLength})`, "dim", context)
+        : "";
 
     if (multiline) {
       // Multiline text

@@ -28,8 +28,14 @@ export function validateLocale(
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): ResponseType<CountryLanguage> {
-  const localeValidation = validateData(locale, z.enum(CountryLanguageValues).optional(), logger);
-  const validatedLocale = localeValidation.success ? localeValidation.data : undefined;
+  const localeValidation = validateData(
+    locale,
+    z.enum(CountryLanguageValues).optional(),
+    logger,
+  );
+  const validatedLocale = localeValidation.success
+    ? localeValidation.data
+    : undefined;
   if (!validatedLocale) {
     logger.error("Invalid locale provided:", locale);
     return fail({
@@ -82,9 +88,14 @@ export function validateHandlerRequestData<
     requestSchema: TRequestSchema;
     requestUrlPathParamsSchema: TUrlSchema;
   },
-  context: HandlerValidationContext<z.input<TRequestSchema>, z.input<TUrlSchema>>,
+  context: HandlerValidationContext<
+    z.input<TRequestSchema>,
+    z.input<TUrlSchema>
+  >,
   logger: EndpointLogger,
-): ResponseType<ValidatedRequestData<z.output<TRequestSchema>, z.output<TUrlSchema>>> {
+): ResponseType<
+  ValidatedRequestData<z.output<TRequestSchema>, z.output<TUrlSchema>>
+> {
   try {
     // Validate locale
     const localeResult = validateLocale(context.locale, logger);
@@ -108,7 +119,11 @@ export function validateHandlerRequestData<
     }
 
     // Now validate the final merged data
-    const requestValidation = validateData(context.requestData, endpoint.requestSchema, logger);
+    const requestValidation = validateData(
+      context.requestData,
+      endpoint.requestSchema,
+      logger,
+    );
     if (!requestValidation.success) {
       logger.error("Request validation failed", {
         error: requestValidation.message,

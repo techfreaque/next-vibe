@@ -119,8 +119,14 @@ attachments: responseArrayOptionalField(
     { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 2 },
     { response: true },
     {
-      filename: responseField({ type: WidgetType.TEXT, content: "..." }, z.string()),
-      size: responseField({ type: WidgetType.TEXT, content: "..." }, z.coerce.number()),
+      filename: responseField(
+        { type: WidgetType.TEXT, content: "..." },
+        z.string(),
+      ),
+      size: responseField(
+        { type: WidgetType.TEXT, content: "..." },
+        z.coerce.number(),
+      ),
     },
   ),
 );
@@ -440,7 +446,8 @@ Response fields display data (not for user input):
 responseField(
   {
     type: WidgetType.TEXT,
-    content: "app.api.agent.chat.characters.get.response.characters.persona.name.content",
+    content:
+      "app.api.agent.chat.characters.get.response.characters.persona.name.content",
   },
   z.string(),
 );
@@ -453,14 +460,18 @@ responseArrayField(
   objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.characters.get.response.characters.persona.title",
+      title:
+        "app.api.agent.chat.characters.get.response.characters.persona.title",
       layoutType: LayoutType.GRID,
       columns: 2,
     },
     { response: true },
     {
       id: responseField({ type: WidgetType.TEXT, content: "..." }, z.string()),
-      name: responseField({ type: WidgetType.TEXT, content: "..." }, z.string()),
+      name: responseField(
+        { type: WidgetType.TEXT, content: "..." },
+        z.string(),
+      ),
     },
   ),
 );
@@ -709,10 +720,11 @@ description: "app.api.agent.chat.characters.id.get.description";
 ### Enum Translation Keys
 
 ```typescript
-export const { enum: LeadStatus, options: LeadStatusOptions } = createEnumOptions({
-  NEW: "app.api.leads.enums.leadStatus.new",
-  PENDING: "app.api.leads.enums.leadStatus.pending",
-});
+export const { enum: LeadStatus, options: LeadStatusOptions } =
+  createEnumOptions({
+    NEW: "app.api.leads.enums.leadStatus.new",
+    PENDING: "app.api.leads.enums.leadStatus.pending",
+  });
 ```
 
 ## Import Paths
@@ -767,7 +779,11 @@ export const {
 });
 
 // Database enum for Drizzle
-export const LeadStatusDB = [LeadStatus.NEW, LeadStatus.PENDING, LeadStatus.ACTIVE] as const;
+export const LeadStatusDB = [
+  LeadStatus.NEW,
+  LeadStatus.PENDING,
+  LeadStatus.ACTIVE,
+] as const;
 ```
 
 ### Using Enums

@@ -51,7 +51,9 @@ interface CardItem {
   file?: string;
 }
 
-export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_CARDS> {
+export class DataCardsWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.DATA_CARDS
+> {
   readonly widgetType = WidgetType.DATA_CARDS;
 
   render(props: CLIWidgetProps<typeof WidgetType.DATA_CARDS, string>): string {
@@ -69,7 +71,8 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
 
     // Extract data with type narrowing
     const typedData: CardItem[] = value.filter(
-      (item): item is CardItem => typeof item === "object" && item !== null && !Array.isArray(item),
+      (item): item is CardItem =>
+        typeof item === "object" && item !== null && !Array.isArray(item),
     ) as CardItem[];
 
     if (typedData.length === 0) {
@@ -92,7 +95,9 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     }
   }
 
-  private getCardsConfig<const TKey extends string>(field: UnifiedField<TKey>): CardConfig {
+  private getCardsConfig<const TKey extends string>(
+    field: UnifiedField<TKey>,
+  ): CardConfig {
     if (field.ui.type !== WidgetType.DATA_CARDS) {
       return {
         layout: { columns: 2, spacing: "normal" },
@@ -116,18 +121,29 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
       "spacing" in config.layout
     ) {
       layout = {
-        columns: typeof config.layout.columns === "number" ? config.layout.columns : 2,
-        spacing: typeof config.layout.spacing === "string" ? config.layout.spacing : "normal",
+        columns:
+          typeof config.layout.columns === "number" ? config.layout.columns : 2,
+        spacing:
+          typeof config.layout.spacing === "string"
+            ? config.layout.spacing
+            : "normal",
       };
     }
 
     return {
       layout,
-      groupBy: config.groupBy !== undefined ? String(config.groupBy) : undefined,
-      cardTemplate: config.cardTemplate !== undefined ? String(config.cardTemplate) : "default",
-      showSummary: config.showSummary !== undefined ? Boolean(config.showSummary) : false,
+      groupBy:
+        config.groupBy !== undefined ? String(config.groupBy) : undefined,
+      cardTemplate:
+        config.cardTemplate !== undefined
+          ? String(config.cardTemplate)
+          : "default",
+      showSummary:
+        config.showSummary !== undefined ? Boolean(config.showSummary) : false,
       summaryTemplate:
-        config.summaryTemplate !== undefined ? String(config.summaryTemplate) : undefined,
+        config.summaryTemplate !== undefined
+          ? String(config.summaryTemplate)
+          : undefined,
       itemConfig:
         config.itemConfig &&
         typeof config.itemConfig === "object" &&
@@ -139,7 +155,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
                 typeof config.itemConfig.template === "string"
                   ? config.itemConfig.template
                   : "default",
-              size: typeof config.itemConfig.size === "string" ? config.itemConfig.size : "medium",
+              size:
+                typeof config.itemConfig.size === "string"
+                  ? config.itemConfig.size
+                  : "medium",
               spacing:
                 typeof config.itemConfig.spacing === "string"
                   ? config.itemConfig.spacing
@@ -200,7 +219,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Render individual ESLint issue
    */
-  private renderESLintIssue(item: CardItem, context: WidgetRenderContext): string {
+  private renderESLintIssue(
+    item: CardItem,
+    context: WidgetRenderContext,
+  ): string {
     const parts: string[] = [];
 
     // Location (line:column)
@@ -255,7 +277,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Render individual code issue card
    */
-  private renderCodeIssueCard(item: CardItem, context: WidgetRenderContext): string {
+  private renderCodeIssueCard(
+    item: CardItem,
+    context: WidgetRenderContext,
+  ): string {
     const lines: string[] = [];
 
     // Header with file and location
@@ -263,9 +288,13 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     lines.push(header);
 
     // Severity and message
-    const severityStr = item.severity && typeof item.severity === "string" ? item.severity : "info";
+    const severityStr =
+      item.severity && typeof item.severity === "string"
+        ? item.severity
+        : "info";
     const severity = this.formatSeverity(severityStr, context);
-    const message = item.message && typeof item.message === "string" ? item.message : "";
+    const message =
+      item.message && typeof item.message === "string" ? item.message : "";
     lines.push(`${severity} ${message}`);
 
     // Rule if available
@@ -281,7 +310,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Render default cards format
    */
-  private renderDefaultCards(data: CardItem[], context: WidgetRenderContext): string {
+  private renderDefaultCards(
+    data: CardItem[],
+    context: WidgetRenderContext,
+  ): string {
     const result: string[] = [];
     const indent = this.createIndent(context.depth, context);
 
@@ -296,7 +328,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Render default card format
    */
-  private renderDefaultCard(item: CardItem, context: WidgetRenderContext): string {
+  private renderDefaultCard(
+    item: CardItem,
+    context: WidgetRenderContext,
+  ): string {
     const lines: string[] = [];
 
     for (const [key, value] of Object.entries(item)) {
@@ -322,7 +357,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Build card header with file and location info
    */
-  private buildCardHeader(item: CardItem, context: WidgetRenderContext): string {
+  private buildCardHeader(
+    item: CardItem,
+    context: WidgetRenderContext,
+  ): string {
     const parts: string[] = [];
 
     if (item.file && typeof item.file === "string") {
@@ -359,8 +397,13 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Format severity with colors and icons
    */
-  private formatSeverity(severity: string, context: WidgetRenderContext): string {
-    const icon = context.options.useEmojis ? this.getSeverityIcon(severity) : "";
+  private formatSeverity(
+    severity: string,
+    context: WidgetRenderContext,
+  ): string {
+    const icon = context.options.useEmojis
+      ? this.getSeverityIcon(severity)
+      : "";
     const text = severity;
 
     if (!context.options.useColors) {
@@ -415,7 +458,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Render custom summary using template
    */
-  private renderCustomSummary(counts: Record<string, number>, template: string): string {
+  private renderCustomSummary(
+    counts: Record<string, number>,
+    template: string,
+  ): string {
     let summary = template;
     for (const [key, value] of Object.entries(counts)) {
       // Use replaceAll for better performance than RegExp in loop
@@ -433,7 +479,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     context: WidgetRenderContext,
   ): string {
     const t = context.t;
-    const totalCount = Object.values(counts).reduce((sum, count) => sum + count, 0);
+    const totalCount = Object.values(counts).reduce(
+      (sum, count) => sum + count,
+      0,
+    );
 
     if (totalCount === 0) {
       const icon = context.options.useEmojis ? SEVERITY_ICONS.SUCCESS : "";
@@ -470,7 +519,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Group data by specified field
    */
-  private groupData(data: CardItem[], groupBy: string): Map<string, CardItem[]> {
+  private groupData(
+    data: CardItem[],
+    groupBy: string,
+  ): Map<string, CardItem[]> {
     const groups = new Map<string, CardItem[]>();
 
     for (const item of data) {

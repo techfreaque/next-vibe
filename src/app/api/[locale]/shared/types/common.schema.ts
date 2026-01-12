@@ -23,7 +23,9 @@ export const idSchema = z.object({
 });
 export type IdType = z.infer<typeof idSchema>;
 
-export const stringToIntSchema = (errorMessage: string): ReturnType<typeof z.coerce.number> => {
+export const stringToIntSchema = (
+  errorMessage: string,
+): ReturnType<typeof z.coerce.number> => {
   return z.coerce.number().int({
     message: errorMessage,
   });

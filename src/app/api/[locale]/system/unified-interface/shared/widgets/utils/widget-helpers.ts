@@ -42,14 +42,17 @@ export type TrendDirection = "up" | "down" | "neutral";
  * Used by: ContainerWidget
  */
 export function extractLayoutConfig(value: WidgetData): LayoutConfig {
-  const isObject = typeof value === "object" && value !== null && !Array.isArray(value);
+  const isObject =
+    typeof value === "object" && value !== null && !Array.isArray(value);
 
   if (!isObject) {
     return { type: "stack", gap: "4" };
   }
 
   const layoutRaw =
-    "layout" in value && typeof value.layout === "object" && value.layout !== null
+    "layout" in value &&
+    typeof value.layout === "object" &&
+    value.layout !== null
       ? value.layout
       : null;
 
@@ -59,7 +62,9 @@ export function extractLayoutConfig(value: WidgetData): LayoutConfig {
       : "stack";
 
   const layoutGap =
-    layoutRaw && "gap" in layoutRaw && typeof layoutRaw.gap === "string" ? layoutRaw.gap : "4";
+    layoutRaw && "gap" in layoutRaw && typeof layoutRaw.gap === "string"
+      ? layoutRaw.gap
+      : "4";
 
   const layoutColumns =
     layoutRaw && "columns" in layoutRaw && typeof layoutRaw.columns === "number"
@@ -120,7 +125,9 @@ export function getLayoutClassName(config: LayoutConfig): string {
 
   switch (type) {
     case "grid": {
-      const gridColsClass = columns ? (gridColsMap[columns] ?? "grid-cols-1") : "grid-cols-1";
+      const gridColsClass = columns
+        ? (gridColsMap[columns] ?? "grid-cols-1")
+        : "grid-cols-1";
       return `grid ${gapClass} ${gridColsClass}`;
     }
     case "flex":
@@ -167,18 +174,28 @@ export interface LinkCardExtras {
 }
 
 export function extractLinkCardExtras(value: WidgetData): LinkCardExtras {
-  const isObject = typeof value === "object" && value !== null && !Array.isArray(value);
+  const isObject =
+    typeof value === "object" && value !== null && !Array.isArray(value);
 
   if (!isObject) {
     return { openInNewTab: true };
   }
 
   return {
-    snippet: "snippet" in value && typeof value.snippet === "string" ? value.snippet : undefined,
-    age: "age" in value && typeof value.age === "string" ? value.age : undefined,
-    source: "source" in value && typeof value.source === "string" ? value.source : undefined,
+    snippet:
+      "snippet" in value && typeof value.snippet === "string"
+        ? value.snippet
+        : undefined,
+    age:
+      "age" in value && typeof value.age === "string" ? value.age : undefined,
+    source:
+      "source" in value && typeof value.source === "string"
+        ? value.source
+        : undefined,
     thumbnail:
-      "thumbnail" in value && typeof value.thumbnail === "string" ? value.thumbnail : undefined,
+      "thumbnail" in value && typeof value.thumbnail === "string"
+        ? value.thumbnail
+        : undefined,
     openInNewTab:
       "openInNewTab" in value && typeof value.openInNewTab === "boolean"
         ? value.openInNewTab
@@ -191,13 +208,16 @@ export function extractLinkCardExtras(value: WidgetData): LinkCardExtras {
  * Used by: MetricCardWidget
  */
 export function extractMetricUnit(value: WidgetData): string | undefined {
-  const isObject = typeof value === "object" && value !== null && !Array.isArray(value);
+  const isObject =
+    typeof value === "object" && value !== null && !Array.isArray(value);
 
   if (!isObject) {
     return undefined;
   }
 
-  return "unit" in value && typeof value.unit === "string" ? value.unit : undefined;
+  return "unit" in value && typeof value.unit === "string"
+    ? value.unit
+    : undefined;
 }
 
 /**
@@ -242,7 +262,10 @@ export interface ColumnConfig {
   format?: (value: WidgetData) => WidgetData;
 }
 
-export function extractColumnConfig(value: WidgetData, columnKey: string): ColumnConfig {
+export function extractColumnConfig(
+  value: WidgetData,
+  columnKey: string,
+): ColumnConfig {
   const defaultConfig: ColumnConfig = {
     align: "text-left",
     sortable: false,
@@ -259,7 +282,8 @@ export function extractColumnConfig(value: WidgetData, columnKey: string): Colum
   }
 
   const rawColumn = value.columns.find(
-    (c: WidgetData) => typeof c === "object" && c !== null && "key" in c && c.key === columnKey,
+    (c: WidgetData) =>
+      typeof c === "object" && c !== null && "key" in c && c.key === columnKey,
   );
 
   if (!rawColumn || typeof rawColumn !== "object" || rawColumn === null) {
@@ -272,7 +296,9 @@ export function extractColumnConfig(value: WidgetData, columnKey: string): Colum
       : "text-left";
 
   const sortable =
-    "sortable" in rawColumn && typeof rawColumn.sortable === "boolean" ? rawColumn.sortable : false;
+    "sortable" in rawColumn && typeof rawColumn.sortable === "boolean"
+      ? rawColumn.sortable
+      : false;
 
   const width =
     "width" in rawColumn &&
@@ -336,19 +362,24 @@ export interface TableSortConfig {
 }
 
 export function extractTableSortConfig(value: WidgetData): TableSortConfig {
-  const isObject = typeof value === "object" && value !== null && !Array.isArray(value);
+  const isObject =
+    typeof value === "object" && value !== null && !Array.isArray(value);
 
   if (!isObject) {
     return { sortBy: null, sortOrder: "asc" };
   }
 
   const totalRows =
-    "totalRows" in value && typeof value.totalRows === "number" ? value.totalRows : undefined;
+    "totalRows" in value && typeof value.totalRows === "number"
+      ? value.totalRows
+      : undefined;
 
-  const sortBy = "sortBy" in value && typeof value.sortBy === "string" ? value.sortBy : null;
+  const sortBy =
+    "sortBy" in value && typeof value.sortBy === "string" ? value.sortBy : null;
 
   const sortOrder =
-    "sortOrder" in value && (value.sortOrder === "asc" || value.sortOrder === "desc")
+    "sortOrder" in value &&
+    (value.sortOrder === "asc" || value.sortOrder === "desc")
       ? value.sortOrder
       : "asc";
 
@@ -379,7 +410,9 @@ export function isTextareaField(field: {
  * Get placeholder from field UI config
  * Used by: TextWidget
  */
-export function getFieldPlaceholder(field: { ui: { placeholder?: string } }): string | undefined {
+export function getFieldPlaceholder(field: {
+  ui: { placeholder?: string };
+}): string | undefined {
   return "placeholder" in field.ui && typeof field.ui.placeholder === "string"
     ? field.ui.placeholder
     : undefined;
@@ -400,7 +433,9 @@ export function getFieldName(field: { name?: string }): string {
  * Get format class name for text display
  * Used by: TextWidget
  */
-export function getTextFormatClassName(format: "code" | "pre" | "normal" | undefined): string {
+export function getTextFormatClassName(
+  format: "code" | "pre" | "normal" | undefined,
+): string {
   switch (format) {
     case "code":
       return "font-mono text-sm bg-muted px-1 py-0.5 rounded";
@@ -417,11 +452,14 @@ export function getTextFormatClassName(format: "code" | "pre" | "normal" | undef
  * Used by: ContainerWidget
  */
 export function extractContainerDescription(value: WidgetData): string {
-  const isObject = typeof value === "object" && value !== null && !Array.isArray(value);
+  const isObject =
+    typeof value === "object" && value !== null && !Array.isArray(value);
 
   if (!isObject) {
     return "";
   }
 
-  return "description" in value && typeof value.description === "string" ? value.description : "";
+  return "description" in value && typeof value.description === "string"
+    ? value.description
+    : "";
 }

@@ -34,7 +34,9 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
 > {
   readonly widgetType = WidgetType.CODE_QUALITY_LIST;
 
-  render(props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_LIST, string>): string {
+  render(
+    props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_LIST, string>,
+  ): string {
     const { field, value, context } = props;
     const t = context.t;
 
@@ -70,13 +72,17 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
           ? summary.totalIssues
           : 0;
       const displayedIssues =
-        "displayedIssues" in summary && typeof summary.displayedIssues === "number"
+        "displayedIssues" in summary &&
+        typeof summary.displayedIssues === "number"
           ? summary.displayedIssues
           : 0;
       const totalFiles =
-        "totalFiles" in summary && typeof summary.totalFiles === "number" ? summary.totalFiles : 0;
+        "totalFiles" in summary && typeof summary.totalFiles === "number"
+          ? summary.totalFiles
+          : 0;
       const displayedFiles =
-        "displayedFiles" in summary && typeof summary.displayedFiles === "number"
+        "displayedFiles" in summary &&
+        typeof summary.displayedFiles === "number"
           ? summary.displayedFiles
           : 0;
       const totalErrors =
@@ -84,7 +90,9 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
           ? summary.totalErrors
           : 0;
 
-      const displayedErrors = data.items.filter((item) => item.severity === "error").length;
+      const displayedErrors = data.items.filter(
+        (item) => item.severity === "error",
+      ).length;
 
       if (displayedIssues < totalIssues || displayedFiles < totalFiles) {
         const hiddenIssues = totalIssues - displayedIssues;
@@ -119,7 +127,11 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
         if (childValue !== undefined && childValue !== null) {
           const childField = field.children[key];
           if (childField) {
-            const rendered = context.renderWidget(childField.ui.type, childField, childValue);
+            const rendered = context.renderWidget(
+              childField.ui.type,
+              childField,
+              childValue,
+            );
             if (rendered) {
               result.push("");
               result.push(rendered);
@@ -206,13 +218,18 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
   /**
    * Render a single code quality issue
    */
-  private renderIssue(item: CodeQualityItem, context: WidgetRenderContext): string {
+  private renderIssue(
+    item: CodeQualityItem,
+    context: WidgetRenderContext,
+  ): string {
     const parts: string[] = [];
 
     // OSC 8 Approach 2: vscode://file/ protocol with absolute path
     if (item.line !== undefined || item.column !== undefined) {
       // Convert to absolute path
-      const absolutePath = item.file.startsWith("/") ? item.file : `${process.cwd()}/${item.file}`;
+      const absolutePath = item.file.startsWith("/")
+        ? item.file
+        : `${process.cwd()}/${item.file}`;
 
       // Build URL with vscode://file/ protocol and line/column
       let vscodeUrl = `vscode://file${absolutePath}:${item.line || 1}:${item.column || 1}`;

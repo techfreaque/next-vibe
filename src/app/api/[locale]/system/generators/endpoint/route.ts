@@ -12,7 +12,10 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: async (props) => {
-      return await endpointGeneratorRepository.generateEndpoint(props.data, props.logger);
+      return await endpointGeneratorRepository.generateEndpoint(
+        props.data,
+        props.logger,
+      );
     },
   },
 });

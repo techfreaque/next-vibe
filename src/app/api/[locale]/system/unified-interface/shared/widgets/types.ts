@@ -126,7 +126,10 @@ export interface WidgetComponentProps<TKey extends string> {
 /**
  * Field type with narrowed widget config based on WidgetType discriminator.
  */
-export type NarrowedField<TKey extends string, T extends WidgetType> = UnifiedField<TKey> & {
+export type NarrowedField<
+  TKey extends string,
+  T extends WidgetType,
+> = UnifiedField<TKey> & {
   ui: ExtractWidgetConfig<T, TKey>;
 };
 
@@ -155,7 +158,8 @@ export type WidgetPropsMap<TKey extends string> = {
 /**
  * Union of all widget props - TypeScript narrows this in switch statements.
  */
-export type WidgetPropsUnion<TKey extends string> = WidgetPropsMap<TKey>[WidgetType];
+export type WidgetPropsUnion<TKey extends string> =
+  WidgetPropsMap<TKey>[WidgetType];
 
 /**
  * React-specific widget props. Extends base props with React context and form handling.
@@ -195,7 +199,8 @@ export type ReactWidgetPropsMap<TKey extends string> = {
 /**
  * Union of all React widget props.
  */
-export type ReactWidgetPropsUnion<TKey extends string> = ReactWidgetPropsMap<TKey>[WidgetType];
+export type ReactWidgetPropsUnion<TKey extends string> =
+  ReactWidgetPropsMap<TKey>[WidgetType];
 
 export type WidgetRenderer<TKey extends string> = (
   props: WidgetComponentProps<TKey>,
@@ -203,7 +208,9 @@ export type WidgetRenderer<TKey extends string> = (
 
 export interface WidgetRegistryEntry<TKey extends string> {
   type: WidgetType;
-  component: React.ComponentType<WidgetComponentProps<TKey>> | WidgetRenderer<TKey>;
+  component:
+    | React.ComponentType<WidgetComponentProps<TKey>>
+    | WidgetRenderer<TKey>;
   platforms?: Array<
     | typeof Platform.TRPC
     | typeof Platform.NEXT_PAGE

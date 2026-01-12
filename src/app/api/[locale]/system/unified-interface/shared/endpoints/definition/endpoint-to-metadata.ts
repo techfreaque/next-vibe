@@ -34,7 +34,12 @@ export function zodSchemaToJsonSchema(schema: z.ZodTypeAny): any {
       jsonSchema.required = jsonSchema.required.filter((fieldName: string) => {
         const field = jsonSchema.properties?.[fieldName];
         // Keep field as required only if it doesn't have a default value
-        return !field || typeof field !== "object" || field === null || !("default" in field);
+        return (
+          !field ||
+          typeof field !== "object" ||
+          field === null ||
+          !("default" in field)
+        );
       });
 
       // Remove required array if it's empty

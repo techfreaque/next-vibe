@@ -12,7 +12,11 @@ import { type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { simpleT } from "@/i18n/core/shared";
-import type { TFunction, TParams, TranslationKey } from "@/i18n/core/static-types";
+import type {
+  TFunction,
+  TParams,
+  TranslationKey,
+} from "@/i18n/core/static-types";
 
 import { isEmptySchema } from "../../../../shared/utils/validation";
 import { definitionLoader } from "../../shared/endpoints/definition/loader";
@@ -20,7 +24,10 @@ import type { BaseExecutionContext } from "../../shared/endpoints/route/executor
 import { routeExecutionExecutor } from "../../shared/endpoints/route/executor";
 import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/handler";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
-import type { CreateApiEndpointAny, UnifiedField } from "../../shared/types/endpoint";
+import type {
+  CreateApiEndpointAny,
+  UnifiedField,
+} from "../../shared/types/endpoint";
 import type { Platform } from "../../shared/types/platform";
 import { getCliUser } from "../auth/cli-user";
 import { modularCLIResponseRenderer } from "../widgets/renderers/response-renderer";
@@ -47,7 +54,14 @@ interface CollectedInputData {
 
 // CLI data types
 export interface CliRequestData {
-  [key: string]: string | number | boolean | null | undefined | CliRequestData | CliRequestData[];
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | null
+    | undefined
+    | CliRequestData
+    | CliRequestData[];
 }
 
 interface CliUrlParams {
@@ -58,7 +72,14 @@ interface CliUrlParams {
 type CliNamedArgs = CliObject;
 
 interface CliResponseData {
-  [key: string]: string | number | boolean | null | undefined | CliResponseData | CliResponseData[];
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | null
+    | undefined
+    | CliResponseData
+    | CliResponseData[];
 }
 
 /** CLI-compatible platforms for type assertions */
@@ -72,7 +93,10 @@ export type CliCompatiblePlatform =
  * Route execution context
  * Extends BaseExecutionContext with CLI-specific fields
  */
-export interface RouteExecutionContext extends Omit<BaseExecutionContext<InputData>, "user"> {
+export interface RouteExecutionContext extends Omit<
+  BaseExecutionContext<InputData>,
+  "user"
+> {
   /** URL path parameters */
   urlPathParams?: CliUrlParams;
 
@@ -186,7 +210,11 @@ export class RouteDelegationHandler {
       if (context.options?.dryRun) {
         logger.info("🔍 Dry run - would execute with:");
         logger.info(
-          JSON.stringify({ data: inputData.data, urlPathParams: inputData.urlPathParams }, null, 2),
+          JSON.stringify(
+            { data: inputData.data, urlPathParams: inputData.urlPathParams },
+            null,
+            2,
+          ),
         );
         return {
           success: true,
@@ -207,8 +235,13 @@ export class RouteDelegationHandler {
       if (context.options?.verbose) {
         logger.info(`🎯 Executing route: ${resolvedCommand}`);
         logger.info(`Data: ${JSON.stringify(inputData.data, null, 2)}`);
-        if (inputData.urlPathParams && Object.keys(inputData.urlPathParams).length > 0) {
-          logger.info(`URL Params: ${JSON.stringify(inputData.urlPathParams, null, 2)}`);
+        if (
+          inputData.urlPathParams &&
+          Object.keys(inputData.urlPathParams).length > 0
+        ) {
+          logger.info(
+            `URL Params: ${JSON.stringify(inputData.urlPathParams, null, 2)}`,
+          );
         }
       }
 
@@ -226,7 +259,9 @@ export class RouteDelegationHandler {
       // 7. Convert ResponseType to RouteExecutionResult
       const routeResult: RouteExecutionResult = {
         success: result.success,
-        data: result.success ? (result.data as CliResponseData | undefined) : undefined,
+        data: result.success
+          ? (result.data as CliResponseData | undefined)
+          : undefined,
         error: result.success ? undefined : result.message,
         errorParams: result.success ? undefined : result.messageParams,
         metadata: {
@@ -237,9 +272,15 @@ export class RouteDelegationHandler {
         },
         // Pass through isErrorResponse from API response for CLI exit code handling
         // Note: isErrorResponse can be true even when result.success is true (e.g., vibe check found errors)
-        isErrorResponse: "isErrorResponse" in result && result.isErrorResponse ? true : undefined,
+        isErrorResponse:
+          "isErrorResponse" in result && result.isErrorResponse
+            ? true
+            : undefined,
         // Pass through performance metadata from API response for execution summary
-        performance: "performance" in result && result.performance ? result.performance : undefined,
+        performance:
+          "performance" in result && result.performance
+            ? result.performance
+            : undefined,
       };
 
       // 8. Format result for CLI output
@@ -260,7 +301,8 @@ export class RouteDelegationHandler {
     } catch (error) {
       const errorResult: RouteExecutionResult = {
         success: false,
-        error: "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+        error:
+          "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
         errorParams: {
           error: parseError(error).message,
         },
@@ -347,11 +389,21 @@ export class RouteDelegationHandler {
         logger,
       );
 
-      if (missingRequired.length > 0 && context.options?.interactive && !contextData && endpoint) {
+      if (
+        missingRequired.length > 0 &&
+        context.options?.interactive &&
+        !contextData &&
+        endpoint
+      ) {
         // Some required fields missing AND no data was provided, use interactive mode
         logger.info("📝 Request Data:");
-        logger.warn(`⚠️  Missing required fields: ${missingRequired.join(", ")}`);
-        const formData = await this.generateFormFromEndpoint(endpoint, "request");
+        logger.warn(
+          `⚠️  Missing required fields: ${missingRequired.join(", ")}`,
+        );
+        const formData = await this.generateFormFromEndpoint(
+          endpoint,
+          "request",
+        );
 
         // Merge with existing data and options
         inputData.data = routeExecutionExecutor.mergeData(
@@ -360,7 +412,10 @@ export class RouteDelegationHandler {
           formData,
         );
       }
-    } else if (endpoint?.requestSchema && context.options?.interactive !== false) {
+    } else if (
+      endpoint?.requestSchema &&
+      context.options?.interactive !== false
+    ) {
       // No data provided and interactive mode allowed
       logger.info("📝 Request Data:");
       const formData = await this.generateFormFromEndpoint(endpoint, "request");
@@ -385,7 +440,10 @@ export class RouteDelegationHandler {
       // Check if schema is empty
       if (!isEmptySchema(endpoint.requestUrlPathParamsSchema)) {
         logger.info("🔗 URL Parameters:");
-        inputData.urlPathParams = await this.generateFormFromEndpoint(endpoint, "urlPathParams");
+        inputData.urlPathParams = await this.generateFormFromEndpoint(
+          endpoint,
+          "urlPathParams",
+        );
       }
     } else if (context.urlPathParams) {
       inputData.urlPathParams = context.urlPathParams;
@@ -402,7 +460,9 @@ export class RouteDelegationHandler {
     formType: "request" | "urlPathParams" = "request",
   ): Promise<InputData> {
     const schema =
-      formType === "request" ? endpoint.requestSchema : endpoint.requestUrlPathParamsSchema;
+      formType === "request"
+        ? endpoint.requestSchema
+        : endpoint.requestUrlPathParamsSchema;
 
     if (!schema) {
       return {};
@@ -434,7 +494,8 @@ export class RouteDelegationHandler {
       // Translate error message if it's a translation key
       const { t } = simpleT(locale);
       let errorMessage = t(
-        result.error || "app.api.system.unifiedInterface.cli.vibe.errors.unknownError",
+        result.error ||
+          "app.api.system.unifiedInterface.cli.vibe.errors.unknownError",
         result.errorParams,
       );
 
@@ -538,19 +599,25 @@ export class RouteDelegationHandler {
 
     // Format cause error message - ErrorResponseType uses 'message' field
     const causeTranslationKey: TranslationKey =
-      result.cause.message || "app.api.system.unifiedInterface.cli.vibe.errors.unknownError";
+      result.cause.message ||
+      "app.api.system.unifiedInterface.cli.vibe.errors.unknownError";
 
     const causeMessage = t(causeTranslationKey, result.cause.messageParams);
 
     // Show error type in verbose mode or for root cause
     const errorTypeInfo =
-      verbose || !result.cause.cause ? ` [${result.cause.errorType.errorKey}]` : "";
+      verbose || !result.cause.cause
+        ? ` [${result.cause.errorType.errorKey}]`
+        : "";
 
     // eslint-disable-next-line i18next/no-literal-string
     output += `\n\n${indent}↳ Caused by${errorTypeInfo}: ${causeMessage}`;
 
     // Add cause error params - ErrorResponseType uses 'messageParams' field
-    if (result.cause.messageParams && Object.keys(result.cause.messageParams).length > 0) {
+    if (
+      result.cause.messageParams &&
+      Object.keys(result.cause.messageParams).length > 0
+    ) {
       for (const [key, value] of Object.entries(result.cause.messageParams)) {
         // eslint-disable-next-line i18next/no-literal-string
         output += `\n${indent}  • ${key}: ${value}`;
@@ -573,13 +640,22 @@ export class RouteDelegationHandler {
   /**
    * Sanitize data for renderer to match expected type
    */
-  private sanitizeDataForRenderer(data: CliResponseData): Record<string, WidgetData> {
+  private sanitizeDataForRenderer(
+    data: CliResponseData,
+  ): Record<string, WidgetData> {
     if (typeof data !== "object" || data === null) {
       return { result: String(data) };
     }
 
     const sanitizeValue = (
-      value: CliResponseData | CliResponseData[] | string | number | boolean | null | undefined,
+      value:
+        | CliResponseData
+        | CliResponseData[]
+        | string
+        | number
+        | boolean
+        | null
+        | undefined,
     ): WidgetData => {
       if (value === undefined || value === null) {
         return undefined;
@@ -703,7 +779,11 @@ export class RouteDelegationHandler {
 
     // Extract fields that have usage.response = true
     for (const [fieldName, fieldDef] of Object.entries(children)) {
-      if ("usage" in fieldDef && typeof fieldDef.usage === "object" && fieldDef.usage !== null) {
+      if (
+        "usage" in fieldDef &&
+        typeof fieldDef.usage === "object" &&
+        fieldDef.usage !== null
+      ) {
         const usage = fieldDef.usage;
         let hasResponse = false;
 
@@ -803,13 +883,21 @@ export class RouteDelegationHandler {
 
     // Handle firstCliArgKey mapping - safely access nested properties
     const cliConfig =
-      endpoint && typeof endpoint === "object" && "cli" in endpoint ? endpoint.cli : null;
+      endpoint && typeof endpoint === "object" && "cli" in endpoint
+        ? endpoint.cli
+        : null;
     const firstCliArgKey =
-      cliConfig && typeof cliConfig === "object" && "firstCliArgKey" in cliConfig
+      cliConfig &&
+      typeof cliConfig === "object" &&
+      "firstCliArgKey" in cliConfig
         ? cliConfig.firstCliArgKey
         : null;
 
-    if (firstCliArgKey && typeof firstCliArgKey === "string" && positionalArgs.length > 0) {
+    if (
+      firstCliArgKey &&
+      typeof firstCliArgKey === "string" &&
+      positionalArgs.length > 0
+    ) {
       // If there's only one positional arg, use it as a string for backward compatibility
       // If there are multiple positional args, use them as an array
       const firstArg = positionalArgs[0];
@@ -872,8 +960,14 @@ export class RouteDelegationHandler {
       );
 
       // Convert string boolean values to actual booleans if not already parsed
-      let convertedValue: string | number | boolean | null | undefined | InputData | InputData[] =
-        value;
+      let convertedValue:
+        | string
+        | number
+        | boolean
+        | null
+        | undefined
+        | InputData
+        | InputData[] = value;
       if (typeof value === "string") {
         const lowerValue = value.toLowerCase();
         if (lowerValue === "true") {

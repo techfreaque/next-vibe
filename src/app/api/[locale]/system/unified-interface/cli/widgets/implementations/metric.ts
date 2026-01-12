@@ -15,7 +15,9 @@ import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/sha
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.METRIC_CARD> {
+export class MetricWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.METRIC_CARD
+> {
   readonly widgetType = WidgetType.METRIC_CARD;
 
   render(props: CLIWidgetProps<typeof WidgetType.METRIC_CARD, string>): string {
@@ -29,7 +31,8 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     if (data) {
       // Use extracted data for standard metric card
       const formattedValue = formatMetricValue(data.value);
-      const icon = context.options.useEmojis && data.icon ? `${data.icon} ` : "";
+      const icon =
+        context.options.useEmojis && data.icon ? `${data.icon} ` : "";
       return `${indent}${icon}${data.label}: ${formattedValue}`;
     }
 
@@ -63,9 +66,17 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
 
     // Generic object rendering
     for (const [key, val] of Object.entries(value)) {
-      if (typeof val === "string" || typeof val === "number" || typeof val === "boolean") {
+      if (
+        typeof val === "string" ||
+        typeof val === "number" ||
+        typeof val === "boolean"
+      ) {
         const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
-        const formattedValue = this.formatMetricValueLocal(val, config, context);
+        const formattedValue = this.formatMetricValueLocal(
+          val,
+          config,
+          context,
+        );
         const icon = this.getMetricIcon(config, val, context);
         lines.push(`${indent}${icon}${formattedKey}: ${formattedValue}`);
       }
@@ -136,7 +147,10 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
 
   private getMetricConfig<const TKey extends string>(
     field: UnifiedField<TKey>,
-  ): Pick<MetricCardWidgetConfig<TKey>, "icon" | "unit" | "precision" | "threshold" | "format"> {
+  ): Pick<
+    MetricCardWidgetConfig<TKey>,
+    "icon" | "unit" | "precision" | "threshold" | "format"
+  > {
     if (field.ui.type !== WidgetType.METRIC_CARD) {
       return {
         format: "number",
@@ -146,13 +160,13 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
 
     const config = field.ui;
 
-    const formatValue = typeof config.format === "string" ? config.format : "number";
+    const formatValue =
+      typeof config.format === "string" ? config.format : "number";
     const validFormats = ["bytes", "currency", "number", "percentage"] as const;
-    const format: "bytes" | "currency" | "number" | "percentage" = validFormats.includes(
-      formatValue as (typeof validFormats)[number],
-    )
-      ? (formatValue as (typeof validFormats)[number])
-      : "number";
+    const format: "bytes" | "currency" | "number" | "percentage" =
+      validFormats.includes(formatValue as (typeof validFormats)[number])
+        ? (formatValue as (typeof validFormats)[number])
+        : "number";
 
     return {
       icon: typeof config.icon === "string" ? config.icon : undefined,
@@ -174,7 +188,11 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     >,
     context: WidgetRenderContext,
   ): string {
-    if (typeof value !== "string" && typeof value !== "number" && typeof value !== "boolean") {
+    if (
+      typeof value !== "string" &&
+      typeof value !== "number" &&
+      typeof value !== "boolean"
+    ) {
       return String(value);
     }
     if (typeof value !== "number") {
@@ -225,7 +243,11 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     value: WidgetData,
     context: WidgetRenderContext,
   ): string {
-    if (typeof value !== "string" && typeof value !== "number" && typeof value !== "boolean") {
+    if (
+      typeof value !== "string" &&
+      typeof value !== "number" &&
+      typeof value !== "boolean"
+    ) {
       return "";
     }
     if (!context.options.useEmojis) {

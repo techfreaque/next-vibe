@@ -31,7 +31,10 @@ import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint";
 import type { Platform } from "../../types/platform";
 import { permissionsRegistry } from "../permissions/registry";
-import { validateHandlerRequestData, validateResponseData } from "./request-validator";
+import {
+  validateHandlerRequestData,
+  validateResponseData,
+} from "./request-validator";
 
 /**
  * Type helper to infer JWT payload type based on user roles
@@ -40,7 +43,9 @@ import { validateHandlerRequestData, validateResponseData } from "./request-vali
  * - Mixed roles (includes PUBLIC + others) → JwtPayloadType (union)
  */
 export type InferJwtPayloadType<TUserRoleValue extends UserRoleValue> =
-  TUserRoleValue extends typeof UserRole.PUBLIC ? JWTPublicPayloadType : JwtPayloadType;
+  TUserRoleValue extends typeof UserRole.PUBLIC
+    ? JWTPublicPayloadType
+    : JwtPayloadType;
 
 /**
  * Type helper for arrays of user roles
@@ -51,7 +56,9 @@ export type InferJwtPayloadType<TUserRoleValue extends UserRoleValue> =
  * - If TRoles[number] includes "PUBLIC" (check with Extract) → JwtPayloadType (mixed)
  * - Otherwise → JwtPrivatePayloadType (no PUBLIC, guaranteed authenticated)
  */
-export type InferJwtPayloadTypeFromRoles<TRoles extends readonly UserRoleValue[]> =
+export type InferJwtPayloadTypeFromRoles<
+  TRoles extends readonly UserRoleValue[],
+> =
   Exclude<TRoles[number], typeof UserRole.PUBLIC> extends never
     ? JWTPublicPayloadType
     : Extract<TRoles[number], typeof UserRole.PUBLIC> extends never
@@ -106,7 +113,12 @@ export type ApiHandlerFunction<
   TUserRoleValue extends readonly UserRoleValue[],
   TPlatform extends Platform,
 > = (
-  props: ApiHandlerProps<TRequestOutput, TUrlVariablesOutput, TUserRoleValue, TPlatform>,
+  props: ApiHandlerProps<
+    TRequestOutput,
+    TUrlVariablesOutput,
+    TUserRoleValue,
+    TPlatform
+  >,
 ) =>
   | Promise<ResponseType<TResponseOutput> | StreamingResponse | FileResponse>
   | ResponseType<TResponseOutput>
@@ -208,7 +220,11 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     locale,
     logger,
     platform,
-  }): Promise<ResponseType<T["types"]["ResponseOutput"]> | StreamingResponse | FileResponse> => {
+  }): Promise<
+    | ResponseType<T["types"]["ResponseOutput"]>
+    | StreamingResponse
+    | FileResponse
+  > => {
     const { t } = simpleT(locale);
 
     // 1. Authenticate user - call authRepository directly if user not provided
@@ -231,7 +247,11 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     }
 
     // 2. Validate endpoint access (platform + permissions)
-    const accessValidation = permissionsRegistry.validateEndpointAccess(endpoint, user, platform);
+    const accessValidation = permissionsRegistry.validateEndpointAccess(
+      endpoint,
+      user,
+      platform,
+    );
 
     if (!accessValidation.success) {
       logger.warn(`[Generic Handler] Endpoint access denied`, {
@@ -248,7 +268,9 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       {
         method: endpoint.method,
         requestData: data as z.input<typeof endpoint.requestSchema>,
-        urlParameters: urlPathParams as z.input<typeof endpoint.requestUrlPathParamsSchema>,
+        urlParameters: urlPathParams as z.input<
+          typeof endpoint.requestUrlPathParamsSchema
+        >,
         locale,
       },
       logger,
@@ -262,7 +284,8 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
 
     const result = await handler({
       data: validationResult.data.requestData as T["types"]["RequestOutput"],
-      urlPathParams: validationResult.data.urlPathParams as T["types"]["UrlVariablesOutput"],
+      urlPathParams: validationResult.data
+        .urlPathParams as T["types"]["UrlVariablesOutput"],
       user,
       t,
       locale: validationResult.data.locale,
@@ -288,11 +311,9 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     }
 
     // 7. Validate response data using request validator
-    const responseValidation = validateResponseData<T["types"]["ResponseOutput"]>(
-      result.data,
-      endpoint.responseSchema,
-      logger,
-    );
+    const responseValidation = validateResponseData<
+      T["types"]["ResponseOutput"]
+    >(result.data, endpoint.responseSchema, logger);
 
     if (!responseValidation.success) {
       return responseValidation;

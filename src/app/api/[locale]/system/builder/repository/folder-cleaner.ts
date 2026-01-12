@@ -47,7 +47,9 @@ export class FolderCleaner implements IFolderCleaner {
     dryRun?: boolean,
   ): Promise<void> {
     output.push(
-      outputFormatter.formatSection(t("app.api.system.builder.messages.cleaningFolders")),
+      outputFormatter.formatSection(
+        t("app.api.system.builder.messages.cleaningFolders"),
+      ),
     );
 
     for (const folder of folders) {
@@ -55,7 +57,10 @@ export class FolderCleaner implements IFolderCleaner {
       const exists = existsSync(folderPath);
 
       output.push(
-        outputFormatter.formatItem(folder, exists ? "✓ will be deleted" : "⊘ not found, skipping"),
+        outputFormatter.formatItem(
+          folder,
+          exists ? "✓ will be deleted" : "⊘ not found, skipping",
+        ),
       );
       logger.info("Cleaning folder", { folder: folderPath, exists, dryRun });
 

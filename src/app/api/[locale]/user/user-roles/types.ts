@@ -23,7 +23,9 @@ export const userRoleRestaurantResponseSchema = z.object({
   role: userRoleTypeSchema,
   userId: z.uuid(),
 });
-export type UserRoleRestaurantResponseType = z.input<typeof userRoleRestaurantResponseSchema>;
+export type UserRoleRestaurantResponseType = z.input<
+  typeof userRoleRestaurantResponseSchema
+>;
 
 export const userRoleResponseSchema = z.object({
   id: z.uuid(),

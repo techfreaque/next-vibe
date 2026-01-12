@@ -45,10 +45,16 @@ export function extractTextData(value: WidgetData): ProcessedText | null {
 
   // Handle object value with text properties
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const text = "text" in value && typeof value.text === "string" ? value.text : "";
+    const text =
+      "text" in value && typeof value.text === "string" ? value.text : "";
     const truncate =
-      "truncate" in value && typeof value.truncate === "number" ? value.truncate : undefined;
-    const format = "format" in value && typeof value.format === "string" ? value.format : "plain";
+      "truncate" in value && typeof value.truncate === "number"
+        ? value.truncate
+        : undefined;
+    const format =
+      "format" in value && typeof value.format === "string"
+        ? value.format
+        : "plain";
 
     if (!text) {
       return null;
@@ -57,7 +63,10 @@ export function extractTextData(value: WidgetData): ProcessedText | null {
     return {
       text,
       truncate,
-      format: format === "code" || format === "pre" || format === "plain" ? format : "plain",
+      format:
+        format === "code" || format === "pre" || format === "plain"
+          ? format
+          : "plain",
     };
   }
 

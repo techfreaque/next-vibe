@@ -8,7 +8,11 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
@@ -75,7 +79,10 @@ export class ChangelogGenerator implements IChangelogGenerator {
       }
 
       // Parse commits by type
-      const grouped: Record<string, Array<{ hash: string; message: string; author: string }>> = {
+      const grouped: Record<
+        string,
+        Array<{ hash: string; message: string; author: string }>
+      > = {
         feat: [],
         fix: [],
         docs: [],

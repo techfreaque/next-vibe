@@ -213,7 +213,9 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
         category: category || undefined,
         tags: translatedTags,
         toolName,
-        allowedRoles: definition.allowedRoles ? [...definition.allowedRoles] : [],
+        allowedRoles: definition.allowedRoles
+          ? [...definition.allowedRoles]
+          : [],
         aliases: definition.aliases ? [...definition.aliases] : undefined,
         requiresConfirmation: definition.requiresConfirmation,
       };
@@ -243,7 +245,10 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
       userId: user.isPublic ? undefined : user.id,
     });
 
-    const serializableTools = this.serializeEndpoints(filteredEndpoints, locale);
+    const serializableTools = this.serializeEndpoints(
+      filteredEndpoints,
+      locale,
+    );
 
     logger.info("[Definitions Registry] Serialized tools", {
       count: serializableTools.length,

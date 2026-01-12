@@ -11,7 +11,8 @@ export const translations: typeof enTranslations = {
     remove_failed: "Nie udało się usunąć roli od użytkownika",
     check_failed: "Sprawdzenie czy użytkownik ma rolę nie powiodło się",
     delete_failed: "Nie udało się usunąć ról użytkownika",
-    endpoint_not_created: "Endpoint ról użytkownika nie został jeszcze utworzony",
+    endpoint_not_created:
+      "Endpoint ról użytkownika nie został jeszcze utworzony",
   },
   post: {
     title: "Role użytkowników",

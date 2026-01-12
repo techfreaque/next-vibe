@@ -152,7 +152,8 @@ export const MESSAGES = {
   SNYK_MONITOR_PASSED: "Snyk monitor completed",
   SNYK_MONITOR_FAILED: "Snyk monitor failed",
   SNYK_CLI_NOT_FOUND: "Snyk CLI not found, skipping security scan",
-  SNYK_TOKEN_REQUIRED: "SNYK_TOKEN environment variable required for monitoring",
+  SNYK_TOKEN_REQUIRED:
+    "SNYK_TOKEN environment variable required for monitoring",
   SNYK_ORG_REQUIRED: "SNYK_ORG_KEY environment variable required",
 
   // -------------------------------------------------------------------------

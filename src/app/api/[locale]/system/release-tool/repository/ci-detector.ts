@@ -120,7 +120,9 @@ export class CIDetector implements ICIDetector {
         commit: env.GITHUB_SHA ?? null,
         pr:
           env.GITHUB_EVENT_NAME === "pull_request"
-            ? (env.GITHUB_PR_NUMBER ?? env.GITHUB_REF?.match(/refs\/pull\/(\d+)/)?.[1] ?? null)
+            ? (env.GITHUB_PR_NUMBER ??
+              env.GITHUB_REF?.match(/refs\/pull\/(\d+)/)?.[1] ??
+              null)
             : null,
         tag: env.GITHUB_REF?.startsWith("refs/tags/")
           ? env.GITHUB_REF.replace("refs/tags/", "")
@@ -189,7 +191,9 @@ export class CIDetector implements ICIDetector {
         branch: env.CIRCLE_BRANCH ?? null,
         commit: env.CIRCLE_SHA1 ?? null,
         pr: env.CIRCLE_PULL_REQUEST
-          ? (env.CIRCLE_PR_NUMBER ?? env.CIRCLE_PULL_REQUEST.split("/").pop() ?? null)
+          ? (env.CIRCLE_PR_NUMBER ??
+            env.CIRCLE_PULL_REQUEST.split("/").pop() ??
+            null)
           : null,
         tag: env.CIRCLE_TAG ?? null,
         buildId: env.CIRCLE_WORKFLOW_ID ?? null,
@@ -207,7 +211,10 @@ export class CIDetector implements ICIDetector {
         provider: "travis",
         branch: env.TRAVIS_BRANCH ?? null,
         commit: env.TRAVIS_COMMIT ?? null,
-        pr: env.TRAVIS_PULL_REQUEST !== "false" ? (env.TRAVIS_PULL_REQUEST ?? null) : null,
+        pr:
+          env.TRAVIS_PULL_REQUEST !== "false"
+            ? (env.TRAVIS_PULL_REQUEST ?? null)
+            : null,
         tag: env.TRAVIS_TAG ?? null,
         buildId: env.TRAVIS_BUILD_ID ?? null,
         buildNumber: env.TRAVIS_BUILD_NUMBER ?? null,
@@ -225,11 +232,15 @@ export class CIDetector implements ICIDetector {
         branch: env.BUILD_SOURCEBRANCHNAME ?? null,
         commit: env.BUILD_SOURCEVERSION ?? null,
         pr: env.SYSTEM_PULLREQUEST_PULLREQUESTID ?? null,
-        tag: sourceBranch.startsWith("refs/tags/") ? sourceBranch.replace("refs/tags/", "") : null,
+        tag: sourceBranch.startsWith("refs/tags/")
+          ? sourceBranch.replace("refs/tags/", "")
+          : null,
         buildId: env.BUILD_BUILDID ?? null,
         buildNumber: env.BUILD_BUILDNUMBER ?? null,
         buildUrl:
-          env.SYSTEM_TEAMFOUNDATIONSERVERURI && env.SYSTEM_TEAMPROJECT && env.BUILD_BUILDID
+          env.SYSTEM_TEAMFOUNDATIONSERVERURI &&
+          env.SYSTEM_TEAMPROJECT &&
+          env.BUILD_BUILDID
             ? `${env.SYSTEM_TEAMFOUNDATIONSERVERURI}${env.SYSTEM_TEAMPROJECT}/_build/results?buildId=${env.BUILD_BUILDID}`
             : null,
         repoUrl: env.BUILD_REPOSITORY_URI ?? null,
@@ -281,7 +292,10 @@ export class CIDetector implements ICIDetector {
         provider: "buildkite",
         branch: env.BUILDKITE_BRANCH ?? null,
         commit: env.BUILDKITE_COMMIT ?? null,
-        pr: env.BUILDKITE_PULL_REQUEST !== "false" ? (env.BUILDKITE_PULL_REQUEST ?? null) : null,
+        pr:
+          env.BUILDKITE_PULL_REQUEST !== "false"
+            ? (env.BUILDKITE_PULL_REQUEST ?? null)
+            : null,
         tag: env.BUILDKITE_TAG ?? null,
         buildId: env.BUILDKITE_BUILD_ID ?? null,
         buildNumber: env.BUILDKITE_BUILD_NUMBER ?? null,
@@ -293,7 +307,10 @@ export class CIDetector implements ICIDetector {
     }
 
     // Woodpecker CI (Drone fork)
-    if (!this.cachedEnvironment && (env.CI === "woodpecker" || env.WOODPECKER === "true")) {
+    if (
+      !this.cachedEnvironment &&
+      (env.CI === "woodpecker" || env.WOODPECKER === "true")
+    ) {
       this.cachedEnvironment = {
         isCI: true,
         provider: "woodpecker",
@@ -342,7 +359,10 @@ export class CIDetector implements ICIDetector {
     }
 
     // AppVeyor
-    if (!this.cachedEnvironment && (env.APPVEYOR === "True" || env.APPVEYOR === "true")) {
+    if (
+      !this.cachedEnvironment &&
+      (env.APPVEYOR === "True" || env.APPVEYOR === "true")
+    ) {
       this.cachedEnvironment = {
         isCI: true,
         provider: "appveyor",
@@ -362,7 +382,8 @@ export class CIDetector implements ICIDetector {
       this.cachedEnvironment = {
         isCI: true,
         provider: "codebuild",
-        branch: env.CODEBUILD_WEBHOOK_HEAD_REF?.replace("refs/heads/", "") ?? null,
+        branch:
+          env.CODEBUILD_WEBHOOK_HEAD_REF?.replace("refs/heads/", "") ?? null,
         commit: env.CODEBUILD_RESOLVED_SOURCE_VERSION ?? null,
         pr: env.CODEBUILD_WEBHOOK_TRIGGER?.startsWith("pr/")
           ? env.CODEBUILD_WEBHOOK_TRIGGER.replace("pr/", "")
@@ -436,7 +457,10 @@ export class CIDetector implements ICIDetector {
     }
 
     // Vercel
-    if (!this.cachedEnvironment && (env.VERCEL === "1" || env.NOW_BUILDER === "1")) {
+    if (
+      !this.cachedEnvironment &&
+      (env.VERCEL === "1" || env.NOW_BUILDER === "1")
+    ) {
       this.cachedEnvironment = {
         isCI: true,
         provider: "vercel",
@@ -466,7 +490,9 @@ export class CIDetector implements ICIDetector {
     // Generic CI detection
     if (
       !this.cachedEnvironment &&
-      (env.CI === "true" || env.CI === "1" || env.CONTINUOUS_INTEGRATION === "true")
+      (env.CI === "true" ||
+        env.CI === "1" ||
+        env.CONTINUOUS_INTEGRATION === "true")
     ) {
       this.cachedEnvironment = {
         isCI: true,

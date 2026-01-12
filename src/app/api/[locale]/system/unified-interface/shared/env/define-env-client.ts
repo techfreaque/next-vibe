@@ -31,13 +31,17 @@ type InferEnv<T extends Fields> = {
  *   },
  * });
  */
-export function defineEnvClient<T extends Fields>(fields: T): { envClient: InferEnv<T> } {
+export function defineEnvClient<T extends Fields>(
+  fields: T,
+): { envClient: InferEnv<T> } {
   const schemaShape = Object.fromEntries(
     Object.entries(fields).map(([key, def]) => [key, def.schema]),
   );
   const schema = zod.object(schemaShape);
 
-  const values = Object.fromEntries(Object.entries(fields).map(([key, def]) => [key, def.value]));
+  const values = Object.fromEntries(
+    Object.entries(fields).map(([key, def]) => [key, def.value]),
+  );
 
   const envClient = schema.parse(values) as InferEnv<T>;
 

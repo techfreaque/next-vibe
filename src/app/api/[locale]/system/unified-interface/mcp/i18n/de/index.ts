@@ -8,7 +8,8 @@ export const translations: typeof enTranslations = {
     },
     get: {
       title: "MCP-Tools auflisten",
-      description: "Alle verfügbaren MCP-Tools für den aktuellen Benutzer abrufen",
+      description:
+        "Alle verfügbaren MCP-Tools für den aktuellen Benutzer abrufen",
       fields: {
         name: "Tool-Name",
         description: "Beschreibung",
@@ -75,7 +76,8 @@ export const translations: typeof enTranslations = {
         description: "Parameter für die Tool-Ausführung",
         name: {
           title: "Tool-Name",
-          description: "Name des auszuführenden Tools (z.B. core:system:db:ping)",
+          description:
+            "Name des auszuführenden Tools (z.B. core:system:db:ping)",
           placeholder: "core:system:db:ping",
         },
         arguments: {

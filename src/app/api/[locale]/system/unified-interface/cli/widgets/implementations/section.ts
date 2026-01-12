@@ -10,7 +10,9 @@ import { getTranslator } from "@/app/api/[locale]/system/unified-interface/share
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class SectionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.SECTION> {
+export class SectionWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.SECTION
+> {
   readonly widgetType = WidgetType.SECTION;
 
   render(props: CLIWidgetProps<typeof WidgetType.SECTION, string>): string {
@@ -52,7 +54,11 @@ export class SectionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.
 
       if (field.type === "object" && field.children?.[key]) {
         const childField = field.children[key];
-        const rendered = context.renderWidget(childField.ui.type, childField, val);
+        const rendered = context.renderWidget(
+          childField.ui.type,
+          childField,
+          val,
+        );
         if (rendered) {
           result.push(rendered);
         }

@@ -50,7 +50,9 @@ export class FileCopier implements IFileCopier {
     dryRun?: boolean,
   ): Promise<void> {
     output.push(
-      outputFormatter.formatSection(t("app.api.system.builder.messages.copyingAdditionalFiles")),
+      outputFormatter.formatSection(
+        t("app.api.system.builder.messages.copyingAdditionalFiles"),
+      ),
     );
     logger.info("Copying files", { count: filesToCopy.length });
 
@@ -60,12 +62,18 @@ export class FileCopier implements IFileCopier {
       const destDir = dirname(destPath);
 
       if (!existsSync(srcPath)) {
-        output.push(outputFormatter.formatWarning(`${fileData.input} → skipped (not found)`));
+        output.push(
+          outputFormatter.formatWarning(
+            `${fileData.input} → skipped (not found)`,
+          ),
+        );
         logger.warn("Source file not found, skipping", { src: srcPath });
         continue;
       }
 
-      output.push(outputFormatter.formatItem(fileData.input, `→ ${fileData.output}`));
+      output.push(
+        outputFormatter.formatItem(fileData.input, `→ ${fileData.output}`),
+      );
 
       if (!dryRun) {
         if (!existsSync(destDir)) {

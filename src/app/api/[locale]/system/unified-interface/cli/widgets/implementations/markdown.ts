@@ -13,7 +13,9 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.MARKDOWN> {
+export class MarkdownWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.MARKDOWN
+> {
   readonly widgetType = WidgetType.MARKDOWN;
 
   render(props: CLIWidgetProps<typeof WidgetType.MARKDOWN, string>): string {
@@ -36,7 +38,10 @@ export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     return this.renderMarkdown(data, context);
   }
 
-  private renderMarkdown(data: ProcessedMarkdown, context: WidgetRenderContext): string {
+  private renderMarkdown(
+    data: ProcessedMarkdown,
+    context: WidgetRenderContext,
+  ): string {
     const { content } = data;
     const indent = this.createIndent(context.depth, context);
 
@@ -52,7 +57,10 @@ export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
    * Convert markdown to plain text with basic ANSI formatting
    * Supports: headings, bold, italic, code blocks, inline code, lists
    */
-  private convertMarkdownToPlainText(content: string, context: WidgetRenderContext): string {
+  private convertMarkdownToPlainText(
+    content: string,
+    context: WidgetRenderContext,
+  ): string {
     let result = content;
 
     // Convert headings (# Heading)

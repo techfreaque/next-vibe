@@ -13,7 +13,9 @@ export class CodeQualitySummaryWidgetRenderer extends BaseWidgetRenderer<
 > {
   readonly widgetType = WidgetType.CODE_QUALITY_SUMMARY;
 
-  render(props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_SUMMARY, string>): string {
+  render(
+    props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_SUMMARY, string>,
+  ): string {
     const { value, context } = props;
 
     if (typeof value !== "object" || value === null || Array.isArray(value)) {
@@ -33,21 +35,28 @@ export class CodeQualitySummaryWidgetRenderer extends BaseWidgetRenderer<
 
     // Extract values
     const totalFiles =
-      "totalFiles" in value && typeof value.totalFiles === "number" ? value.totalFiles : 0;
+      "totalFiles" in value && typeof value.totalFiles === "number"
+        ? value.totalFiles
+        : 0;
     const displayedFiles =
       "displayedFiles" in value && typeof value.displayedFiles === "number"
         ? value.displayedFiles
         : 0;
     const totalIssues =
-      "totalIssues" in value && typeof value.totalIssues === "number" ? value.totalIssues : 0;
+      "totalIssues" in value && typeof value.totalIssues === "number"
+        ? value.totalIssues
+        : 0;
     const displayedIssues =
       "displayedIssues" in value && typeof value.displayedIssues === "number"
         ? value.displayedIssues
         : 0;
     const totalErrors =
-      "totalErrors" in value && typeof value.totalErrors === "number" ? value.totalErrors : 0;
+      "totalErrors" in value && typeof value.totalErrors === "number"
+        ? value.totalErrors
+        : 0;
 
-    const isTruncated = displayedIssues < totalIssues || displayedFiles < totalFiles;
+    const isTruncated =
+      displayedIssues < totalIssues || displayedFiles < totalFiles;
 
     // Files stat
     if (isTruncated) {
@@ -55,7 +64,9 @@ export class CodeQualitySummaryWidgetRenderer extends BaseWidgetRenderer<
         `   ${this.styleText("Files:", "dim", context).padEnd(12)} ${displayedFiles} of ${totalFiles}`,
       );
     } else {
-      result.push(`   ${this.styleText("Files:", "dim", context).padEnd(12)} ${totalFiles}`);
+      result.push(
+        `   ${this.styleText("Files:", "dim", context).padEnd(12)} ${totalFiles}`,
+      );
     }
 
     // Issues stat
@@ -64,7 +75,9 @@ export class CodeQualitySummaryWidgetRenderer extends BaseWidgetRenderer<
         `   ${this.styleText("Issues:", "dim", context).padEnd(12)} ${displayedIssues} of ${totalIssues}`,
       );
     } else {
-      result.push(`   ${this.styleText("Issues:", "dim", context).padEnd(12)} ${totalIssues}`);
+      result.push(
+        `   ${this.styleText("Issues:", "dim", context).padEnd(12)} ${totalIssues}`,
+      );
     }
 
     // Errors

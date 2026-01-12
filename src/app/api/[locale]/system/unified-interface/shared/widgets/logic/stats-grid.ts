@@ -20,24 +20,32 @@ export interface ProcessedStatsGrid {
 /**
  * Extract and validate stats grid data from WidgetData
  */
-export function extractStatsGridData(value: WidgetData): ProcessedStatsGrid | null {
+export function extractStatsGridData(
+  value: WidgetData,
+): ProcessedStatsGrid | null {
   // Narrow to object type first
-  const isObject = typeof value === "object" && value !== null && !Array.isArray(value);
+  const isObject =
+    typeof value === "object" && value !== null && !Array.isArray(value);
 
   if (!isObject) {
     return null;
   }
 
   // Extract stats array
-  const stats = "stats" in value && Array.isArray(value.stats) ? value.stats : [];
+  const stats =
+    "stats" in value && Array.isArray(value.stats) ? value.stats : [];
 
   if (stats.length === 0) {
     return null;
   }
 
   // Extract optional properties
-  const columns = "columns" in value && typeof value.columns === "number" ? value.columns : 3;
-  const title = "title" in value && typeof value.title === "string" ? value.title : undefined;
+  const columns =
+    "columns" in value && typeof value.columns === "number" ? value.columns : 3;
+  const title =
+    "title" in value && typeof value.title === "string"
+      ? value.title
+      : undefined;
 
   // Process each stat using metric card extractor
   const processedStats = stats

@@ -9,7 +9,11 @@
 import "server-only";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import {
@@ -66,13 +70,15 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               const { endpointsIndexGeneratorRepository } =
                 await import("../endpoints-index/repository");
 
-              const result = await endpointsIndexGeneratorRepository.generateEndpointsIndex(
-                {
-                  outputFile: "src/app/api/[locale]/system/generated/endpoints.ts",
-                  dryRun: false,
-                },
-                logger,
-              );
+              const result =
+                await endpointsIndexGeneratorRepository.generateEndpointsIndex(
+                  {
+                    outputFile:
+                      "src/app/api/[locale]/system/generated/endpoints.ts",
+                    dryRun: false,
+                  },
+                  logger,
+                );
 
               if (result.success) {
                 outputLines.push("✅ Endpoints index generated successfully");
@@ -84,7 +90,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               );
               return null;
             } catch (error) {
-              outputLines.push(`❌ Endpoints index generator failed: ${parseError(error).message}`);
+              outputLines.push(
+                `❌ Endpoints index generator failed: ${parseError(error).message}`,
+              );
               return null;
             }
           })(),
@@ -99,11 +107,13 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           (async (): Promise<string | null> => {
             try {
               outputLines.push("📝 Generating endpoint (dynamic imports)...");
-              const { endpointGeneratorRepository } = await import("../endpoint/repository");
+              const { endpointGeneratorRepository } =
+                await import("../endpoint/repository");
 
               const result = await endpointGeneratorRepository.generateEndpoint(
                 {
-                  outputFile: "src/app/api/[locale]/system/generated/endpoint.ts",
+                  outputFile:
+                    "src/app/api/[locale]/system/generated/endpoint.ts",
                   dryRun: false,
                 },
                 logger,
@@ -119,7 +129,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               );
               return null;
             } catch (error) {
-              outputLines.push(`❌ Endpoint generator failed: ${parseError(error).message}`);
+              outputLines.push(
+                `❌ Endpoint generator failed: ${parseError(error).message}`,
+              );
               return null;
             }
           })(),
@@ -131,17 +143,21 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              outputLines.push("📝 Generating route handlers (dynamic imports)...");
+              outputLines.push(
+                "📝 Generating route handlers (dynamic imports)...",
+              );
               const { routeHandlersGeneratorRepository } =
                 await import("../route-handlers/repository");
 
-              const result = await routeHandlersGeneratorRepository.generateRouteHandlers(
-                {
-                  outputFile: "src/app/api/[locale]/system/generated/route-handlers.ts",
-                  dryRun: false,
-                },
-                logger,
-              );
+              const result =
+                await routeHandlersGeneratorRepository.generateRouteHandlers(
+                  {
+                    outputFile:
+                      "src/app/api/[locale]/system/generated/route-handlers.ts",
+                    dryRun: false,
+                  },
+                  logger,
+                );
 
               if (result.success) {
                 outputLines.push("✅ Route handlers generated successfully");
@@ -153,7 +169,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               );
               return null;
             } catch (error) {
-              outputLines.push(`❌ Route handlers generator failed: ${parseError(error).message}`);
+              outputLines.push(
+                `❌ Route handlers generator failed: ${parseError(error).message}`,
+              );
               return null;
             }
           })(),
@@ -194,7 +212,8 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
           totalGenerators: 7,
           generatorsRun,
           generatorsSkipped,
-          outputDirectory: data.outputDir || "src/app/api/[locale]/system/generated",
+          outputDirectory:
+            data.outputDir || "src/app/api/[locale]/system/generated",
           functionalGeneratorsCompleted,
         },
       });
@@ -204,7 +223,8 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       outputLines.push(`❌ Generation failed: ${errorMessage}`);
 
       return fail({
-        message: "app.api.system.generators.generateAll.post.errors.internal.title",
+        message:
+          "app.api.system.generators.generateAll.post.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage.message },
       });

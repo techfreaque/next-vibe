@@ -8,7 +8,8 @@ export const translations = {
   fields: {
     createMcpConfig: {
       label: "Utwórz konfigurację MCP",
-      description: "Utwórz plik konfiguracyjny .mcp.json dla integracji Model Context Protocol",
+      description:
+        "Utwórz plik konfiguracyjny .mcp.json dla integracji Model Context Protocol",
     },
     updateVscodeSettings: {
       label: "Zaktualizuj ustawienia VSCode",
@@ -17,7 +18,8 @@ export const translations = {
     },
     updatePackageJson: {
       label: "Zaktualizuj skrypty package.json",
-      description: "Dodaj/zaktualizuj skrypty package.json dla poleceń check, lint i typecheck",
+      description:
+        "Dodaj/zaktualizuj skrypty package.json dla poleceń check, lint i typecheck",
     },
     enableEslint: {
       label: "Włącz ESLint",
@@ -26,19 +28,23 @@ export const translations = {
     },
     enableReactRules: {
       label: "Włącz reguły React",
-      description: "Włącz reguły lintowania specyficzne dla React (react-hooks, jsx-a11y)",
+      description:
+        "Włącz reguły lintowania specyficzne dla React (react-hooks, jsx-a11y)",
     },
     enableNextjsRules: {
       label: "Włącz reguły Next.js",
-      description: "Włącz reguły lintowania i konfiguracje specyficzne dla Next.js",
+      description:
+        "Włącz reguły lintowania i konfiguracje specyficzne dla Next.js",
     },
     enableI18nRules: {
       label: "Włącz reguły i18n",
-      description: "Włącz reguły lintowania internacjonalizacji (eslint-plugin-i18next)",
+      description:
+        "Włącz reguły lintowania internacjonalizacji (eslint-plugin-i18next)",
     },
     jsxCapitalization: {
       label: "Kapitalizacja JSX",
-      description: "Wymuszaj wielkie litery w nazwach komponentów JSX (react/jsx-pascal-case)",
+      description:
+        "Wymuszaj wielkie litery w nazwach komponentów JSX (react/jsx-pascal-case)",
     },
     enablePromiseRules: {
       label: "Włącz reguły Promise",
@@ -50,11 +56,13 @@ export const translations = {
     },
     enableUnicornRules: {
       label: "Włącz reguły Unicorn",
-      description: "Włącz nowoczesne najlepsze praktyki JavaScript (eslint-plugin-unicorn)",
+      description:
+        "Włącz nowoczesne najlepsze praktyki JavaScript (eslint-plugin-unicorn)",
     },
     enablePedanticRules: {
       label: "Włącz reguły pedantyczne",
-      description: "Włącz bardziej rygorystyczne reguły lintowania dla wyższej jakości kodu",
+      description:
+        "Włącz bardziej rygorystyczne reguły lintowania dla wyższej jakości kodu",
     },
     enableRestrictedSyntax: {
       label: "Włącz ograniczoną składnię",
@@ -79,17 +87,20 @@ export const translations = {
     welcome: "🔧 Interaktywna konfiguracja",
     description:
       "Skonfigurujmy twoje narzędzia jakości kodu! Odpowiedz na kilka pytań, aby dostosować konfigurację.",
-    createMcpConfig: "Utworzyć konfigurację MCP (.mcp.json) dla integracji narzędzi AI?",
+    createMcpConfig:
+      "Utworzyć konfigurację MCP (.mcp.json) dla integracji narzędzi AI?",
     updateVscodeSettings:
       "Zaktualizować ustawienia VSCode (.vscode/settings.json) z zalecanymi ustawieniami formattera?",
-    updatePackageJson: "Zaktualizować skrypty package.json (check, lint, typecheck)?",
+    updatePackageJson:
+      "Zaktualizować skrypty package.json (check, lint, typecheck)?",
     enableReactRules: "Włączyć reguły lintowania specyficzne dla React?",
     enableNextjsRules: "Włączyć reguły lintowania specyficzne dla Next.js?",
     enableI18nRules: "Włączyć reguły lintowania internacjonalizacji (i18n)?",
     jsxCapitalization: "Wymuszać wielkie litery w nazwach komponentów JSX?",
     enablePromiseRules: "Włączyć reguły najlepszych praktyk Promise?",
     enableNodeRules: "Włączyć reguły specyficzne dla Node.js?",
-    enableUnicornRules: "Włączyć nowoczesne najlepsze praktyki JavaScript (Unicorn)?",
+    enableUnicornRules:
+      "Włączyć nowoczesne najlepsze praktyki JavaScript (Unicorn)?",
     enablePedanticRules: "Włączyć bardziej rygorystyczne reguły?",
     enableRestrictedSyntax: "Ogranicz użycie throw, unknown i typów object?",
     enableTsgo: "Użyć tsgo zamiast tsc do sprawdzania typów?",
@@ -140,7 +151,8 @@ export const translations = {
     },
     conflict: {
       title: "Konfiguracja już istnieje",
-      description: "Plik konfiguracyjny już istnieje. Użyj --force, aby nadpisać.",
+      description:
+        "Plik konfiguracyjny już istnieje. Użyj --force, aby nadpisać.",
     },
     configCreation: "Nie udało się utworzyć check.config.ts: {{error}}",
     unexpected: "Wystąpił nieoczekiwany błąd: {{error}}",

@@ -4,7 +4,8 @@ export const translations = {
   interactive: {
     post: {
       title: "Interactive Mode",
-      description: "Start interactive file explorer mode for navigating and executing routes",
+      description:
+        "Start interactive file explorer mode for navigating and executing routes",
       category: "System Help",
       tags: {
         system: "system",
@@ -96,7 +97,8 @@ export const translations = {
   fields: {
     command: {
       label: "Command",
-      description: "Specific command to get help for (leave empty for general help)",
+      description:
+        "Specific command to get help for (leave empty for general help)",
       placeholder: "e.g., check, list, db:ping",
     },
     header: {
@@ -152,7 +154,8 @@ export const translations = {
   list: {
     post: {
       title: "List Available Commands",
-      description: "Show all available CLI commands with their descriptions and aliases",
+      description:
+        "Show all available CLI commands with their descriptions and aliases",
       form: {
         title: "Command List Options",
         description: "Configure how commands are displayed",

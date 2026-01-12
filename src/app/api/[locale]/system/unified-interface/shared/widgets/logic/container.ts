@@ -40,7 +40,9 @@ export interface ProcessedContainer {
 /**
  * Extract and validate container data from WidgetData
  */
-export function extractContainerData(value: WidgetData): ProcessedContainer | null {
+export function extractContainerData(
+  value: WidgetData,
+): ProcessedContainer | null {
   // Handle array value directly (children only)
   if (Array.isArray(value)) {
     return {
@@ -51,12 +53,22 @@ export function extractContainerData(value: WidgetData): ProcessedContainer | nu
 
   // Handle object value with container properties
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const children = "children" in value && Array.isArray(value.children) ? value.children : [];
-    const title = "title" in value && typeof value.title === "string" ? value.title : undefined;
+    const children =
+      "children" in value && Array.isArray(value.children)
+        ? value.children
+        : [];
+    const title =
+      "title" in value && typeof value.title === "string"
+        ? value.title
+        : undefined;
     const layout =
-      "layout" in value && typeof value.layout === "string" ? value.layout : "vertical";
+      "layout" in value && typeof value.layout === "string"
+        ? value.layout
+        : "vertical";
     const spacing =
-      "spacing" in value && typeof value.spacing === "number" ? value.spacing : undefined;
+      "spacing" in value && typeof value.spacing === "number"
+        ? value.spacing
+        : undefined;
 
     if (children.length === 0) {
       return null;
@@ -66,7 +78,9 @@ export function extractContainerData(value: WidgetData): ProcessedContainer | nu
       children,
       title,
       layout:
-        layout === "horizontal" || layout === "grid" || layout === "vertical" ? layout : "vertical",
+        layout === "horizontal" || layout === "grid" || layout === "vertical"
+          ? layout
+          : "vertical",
       spacing,
     };
   }
@@ -101,7 +115,9 @@ export function getContainerConfig<TKey extends string>(
   const icon = typeof config.icon === "string" ? config.icon : undefined;
   const border = typeof config.border === "boolean" ? config.border : false;
   const spacing =
-    config.spacing === "compact" || config.spacing === "normal" || config.spacing === "relaxed"
+    config.spacing === "compact" ||
+    config.spacing === "normal" ||
+    config.spacing === "relaxed"
       ? config.spacing
       : "normal";
 

@@ -9,7 +9,9 @@ import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/sha
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class StatsGridWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.STATS_GRID> {
+export class StatsGridWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.STATS_GRID
+> {
   readonly widgetType = WidgetType.STATS_GRID;
 
   render(props: CLIWidgetProps<typeof WidgetType.STATS_GRID, string>): string {
@@ -22,7 +24,11 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     }
 
     // Handle single stat value
-    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    if (
+      typeof value === "string" ||
+      typeof value === "number" ||
+      typeof value === "boolean"
+    ) {
       const label = this.formatLabel(field, context);
       const formattedValue = this.formatStatValue(value, context);
       const icon = this.getStatIcon(value, context);
@@ -31,7 +37,9 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     }
 
     const stringValue =
-      typeof value === "object" && value !== null ? JSON.stringify(value) : String(value);
+      typeof value === "object" && value !== null
+        ? JSON.stringify(value)
+        : String(value);
     return `${indent}${stringValue}`;
   }
 
@@ -74,7 +82,10 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     return lines.join("\n");
   }
 
-  private formatStatValue(value: WidgetData, context: WidgetRenderContext): string {
+  private formatStatValue(
+    value: WidgetData,
+    context: WidgetRenderContext,
+  ): string {
     if (typeof value === "number") {
       // Format large numbers with commas
       if (value >= 1000) {

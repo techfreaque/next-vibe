@@ -83,7 +83,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.system.check.lint.fields.timeoutSeconds.label",
-          description: "app.api.system.check.lint.fields.timeoutSeconds.description",
+          description:
+            "app.api.system.check.lint.fields.timeoutSeconds.description",
           columns: 3,
         },
         z.coerce.number().min(1).max(3600).default(3600),
@@ -127,7 +128,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.check.lint.fields.skipSorting.label",
-          description: "app.api.system.check.lint.fields.skipSorting.description",
+          description:
+            "app.api.system.check.lint.fields.skipSorting.description",
           columns: 3,
         },
         z.boolean().default(false),
@@ -149,7 +151,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.system.check.lint.response.issues.title",
-              description: "app.api.system.check.lint.response.issues.emptyState.description",
+              description:
+                "app.api.system.check.lint.response.issues.emptyState.description",
               layoutType: LayoutType.GRID,
               columns: 12,
             },
@@ -157,7 +160,8 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.CONTAINER,
                 title: "app.api.system.check.lint.response.issues.title",
-                description: "app.api.system.check.lint.response.issues.emptyState.description",
+                description:
+                  "app.api.system.check.lint.response.issues.emptyState.description",
                 layoutType: LayoutType.GRID,
                 columns: 12,
               },

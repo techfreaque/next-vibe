@@ -12,7 +12,12 @@ import { getTranslator } from "@/app/api/[locale]/system/unified-interface/share
 import { getBaseFormatter } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/formatting";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CLIWidgetProps, DataFormatter, WidgetRenderContext, WidgetRenderer } from "./types";
+import type {
+  CLIWidgetProps,
+  DataFormatter,
+  WidgetRenderContext,
+  WidgetRenderer,
+} from "./types";
 
 /**
  * Base widget renderer with common utilities.
@@ -42,7 +47,15 @@ export abstract class BaseWidgetRenderer<
    */
   protected styleText(
     text: string,
-    style: "bold" | "dim" | "underline" | "italic" | "red" | "green" | "yellow" | "blue",
+    style:
+      | "bold"
+      | "dim"
+      | "underline"
+      | "italic"
+      | "red"
+      | "green"
+      | "yellow"
+      | "blue",
     context: WidgetRenderContext,
   ): string {
     if (!context.options.useColors) {
@@ -74,7 +87,11 @@ export abstract class BaseWidgetRenderer<
   /**
    * Add icon if emojis are enabled
    */
-  protected addIcon(icon: string, text: string, context: WidgetRenderContext): string {
+  protected addIcon(
+    icon: string,
+    text: string,
+    context: WidgetRenderContext,
+  ): string {
     if (!context.options.useEmojis) {
       return text;
     }
@@ -199,7 +216,10 @@ class DefaultDataFormatter implements DataFormatter {
     return this.baseFormatter.formatDate(value, locale, {});
   }
 
-  formatArray(value: WidgetData[], options?: { separator?: string; maxItems?: number }): string {
+  formatArray(
+    value: WidgetData[],
+    options?: { separator?: string; maxItems?: number },
+  ): string {
     const separator = options?.separator ?? ", ";
     const maxItems = options?.maxItems ?? 10;
 
@@ -209,7 +229,11 @@ class DefaultDataFormatter implements DataFormatter {
         if (typeof item === "object" && item !== null && !Array.isArray(item)) {
           return JSON.stringify(item);
         }
-        if (typeof item === "string" || typeof item === "number" || typeof item === "boolean") {
+        if (
+          typeof item === "string" ||
+          typeof item === "number" ||
+          typeof item === "boolean"
+        ) {
           return String(item);
         }
         if (item === null || item === undefined) {

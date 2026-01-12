@@ -24,7 +24,8 @@ const config: BuildConfig = {
   // Build the CLI as an executable using Bun
   filesToCompile: [
     {
-      input: "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
+      input:
+        "src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
       output: ".dist/bin/vibe-runtime.js",
       type: BunBuildTypeEnum.EXECUTABLE,
       modulesToExternalize: [
@@ -54,7 +55,8 @@ const config: BuildConfig = {
       },
     },
     {
-      input: "src/app/api/[locale]/system/check/oxlint/plugins/restricted-syntax/src/index.ts",
+      input:
+        "src/app/api/[locale]/system/check/oxlint/plugins/restricted-syntax/src/index.ts",
       output: ".dist/oxlint-plugins/restricted-syntax.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: [],
@@ -67,7 +69,8 @@ const config: BuildConfig = {
       },
     },
     {
-      input: "src/app/api/[locale]/system/check/oxlint/plugins/jsx-capitalization/src/index.ts",
+      input:
+        "src/app/api/[locale]/system/check/oxlint/plugins/jsx-capitalization/src/index.ts",
       output: ".dist/oxlint-plugins/jsx-capitalization.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: [],
@@ -79,7 +82,8 @@ const config: BuildConfig = {
       },
     },
     {
-      input: "src/app/api/[locale]/system/check/oxlint/plugins/i18n/src/index.ts",
+      input:
+        "src/app/api/[locale]/system/check/oxlint/plugins/i18n/src/index.ts",
       output: ".dist/oxlint-plugins/i18n.js",
       type: BunBuildTypeEnum.MODULE,
       modulesToExternalize: [],

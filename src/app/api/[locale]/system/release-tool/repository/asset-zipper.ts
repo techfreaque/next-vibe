@@ -73,7 +73,12 @@ export class AssetZipper implements IAssetZipper {
         .replaceAll("%VERSION%", newTag)
         .replaceAll(
           "%TIMESTAMP%",
-          new Date().toISOString().replaceAll(/[:.T]/g, "-").split("-").slice(0, 6).join("-"),
+          new Date()
+            .toISOString()
+            .replaceAll(/[:.T]/g, "-")
+            .split("-")
+            .slice(0, 6)
+            .join("-"),
         );
 
       const outputDir = dirname(resolve(process.cwd(), zipConfig.output));
@@ -91,7 +96,8 @@ export class AssetZipper implements IAssetZipper {
       try {
         const output = createWriteStream(outputPath);
         const archiverPkg = "archiver";
-        const archiver = (await import(/* webpackIgnore: true */ archiverPkg)).default;
+        const archiver = (await import(/* webpackIgnore: true */ archiverPkg))
+          .default;
         const archive = archiver("zip", { zlib: { level: 9 } });
 
         await new Promise<void>((resolve, reject) => {

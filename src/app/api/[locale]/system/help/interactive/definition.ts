@@ -63,7 +63,8 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.help.interactive.errors.unauthorized.title",
-      description: "app.api.system.help.interactive.errors.unauthorized.description",
+      description:
+        "app.api.system.help.interactive.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.help.interactive.errors.server.title",
@@ -71,11 +72,13 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.help.interactive.errors.unauthorized.title",
-      description: "app.api.system.help.interactive.errors.unauthorized.description",
+      description:
+        "app.api.system.help.interactive.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.help.interactive.errors.unauthorized.title",
-      description: "app.api.system.help.interactive.errors.unauthorized.description",
+      description:
+        "app.api.system.help.interactive.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.help.interactive.errors.server.title",

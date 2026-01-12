@@ -9,7 +9,10 @@ import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { UserPermissionRole, type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  UserPermissionRole,
+  type UserRoleValue,
+} from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cliEnv } from "../env";
@@ -31,7 +34,9 @@ export function getCliUserEmail(): string | null {
  * Create a default CLI user payload for auth bypass scenarios
  * Used for commands that don't require authenticated user (e.g., seed, dev)
  */
-export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> {
+export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<
+  readonly UserRoleValue[]
+> {
   return {
     isPublic: false,
     id: DEFAULT_CLI_USER_ID,
@@ -43,7 +48,9 @@ export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<readonly Us
  * Create a public CLI user payload
  * Used when VIBE_CLI_USER_EMAIL is not configured
  */
-export function createPublicCliUser(): InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> {
+export function createPublicCliUser(): InferJwtPayloadTypeFromRoles<
+  readonly UserRoleValue[]
+> {
   return {
     isPublic: true,
     leadId: DEFAULT_CLI_USER_ID,
@@ -81,7 +88,9 @@ export function createMockUser(): {
 export async function getCliUser(
   logger: EndpointLogger,
   locale: CountryLanguage,
-): Promise<ResponseType<InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>>> {
+): Promise<
+  ResponseType<InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>>
+> {
   logger.debug(
     `[CLI AUTH] Starting authentication flow (locale: ${locale}, cwd: ${process.cwd()}, env: ${process.env.NODE_ENV})`,
   );
@@ -89,7 +98,9 @@ export async function getCliUser(
   // Step 1: Session verification removed - AuthRepository deleted
 
   // Step 2: Check VIBE_CLI_USER_EMAIL environment variable
-  logger.debug("[CLI AUTH] Step 2: Checking VIBE_CLI_USER_EMAIL environment variable");
+  logger.debug(
+    "[CLI AUTH] Step 2: Checking VIBE_CLI_USER_EMAIL environment variable",
+  );
   const cliUserEmail = getCliUserEmail();
 
   logger.debug(
@@ -98,7 +109,9 @@ export async function getCliUser(
 
   // Step 3: If VIBE_CLI_USER_EMAIL is not set, return public user
   if (!cliUserEmail) {
-    logger.debug("[CLI AUTH] Step 3: CLI user email not configured, creating public user");
+    logger.debug(
+      "[CLI AUTH] Step 3: CLI user email not configured, creating public user",
+    );
 
     // Minimal checker package: use default ID without lead creation
     logger.debug("Using default CLI user (minimal checker package)");

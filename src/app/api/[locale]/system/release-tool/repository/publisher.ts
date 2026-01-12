@@ -6,7 +6,11 @@
 import { execSync } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
@@ -140,10 +144,16 @@ export class Publisher implements IPublisher {
     }
 
     const tag = npmConfig?.tag ?? packageJson.publishConfig?.tag ?? "latest";
-    const access = npmConfig?.access ?? packageJson.publishConfig?.access ?? "public";
+    const access =
+      npmConfig?.access ?? packageJson.publishConfig?.access ?? "public";
     const registry = npmConfig?.registry ?? packageJson.publishConfig?.registry;
 
-    const commandParts = ["npm", "publish", `--tag ${tag}`, `--access ${access}`];
+    const commandParts = [
+      "npm",
+      "publish",
+      `--tag ${tag}`,
+      `--access ${access}`,
+    ];
 
     if (registry) {
       commandParts.push(`--registry ${registry}`);
@@ -155,7 +165,9 @@ export class Publisher implements IPublisher {
         commandParts.push("--provenance");
         logger.info("NPM provenance enabled");
       } else {
-        logger.warn(`NPM provenance not supported for CI provider: ${ciEnv.provider}`);
+        logger.warn(
+          `NPM provenance not supported for CI provider: ${ciEnv.provider}`,
+        );
       }
     }
 

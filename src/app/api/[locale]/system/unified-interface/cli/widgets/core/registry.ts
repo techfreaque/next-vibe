@@ -38,7 +38,11 @@ import { StatsGridWidgetRenderer } from "../implementations/stats-grid";
 import { TabsWidgetRenderer } from "../implementations/tabs";
 import { TextWidgetRenderer } from "../implementations/text";
 import { TitleWidgetRenderer } from "../implementations/title";
-import type { AnyWidgetRenderer, CLIWidgetProps, WidgetRenderContext } from "./types";
+import type {
+  AnyWidgetRenderer,
+  CLIWidgetProps,
+  WidgetRenderContext,
+} from "./types";
 
 // Singleton instances for each renderer
 const textRenderer = new TextWidgetRenderer();

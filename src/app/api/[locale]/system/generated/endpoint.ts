@@ -61,12 +61,15 @@ export const aliasToPathMap = {
   system_check_oxlint_POST: "system_check_oxlint_POST",
   system_check_typecheck_POST: "system_check_typecheck_POST",
   "system_check_vibe-check_POST": "system_check_vibe-check_POST",
-  "system_generators_email-templates_POST": "system_generators_email-templates_POST",
+  "system_generators_email-templates_POST":
+    "system_generators_email-templates_POST",
   system_generators_endpoint_POST: "system_generators_endpoint_POST",
   system_generators_endpoints_POST: "system_generators_endpoints_POST",
-  "system_generators_endpoints-index_POST": "system_generators_endpoints-index_POST",
+  "system_generators_endpoints-index_POST":
+    "system_generators_endpoints-index_POST",
   "system_generators_generate-all_POST": "system_generators_generate-all_POST",
-  "system_generators_route-handlers_POST": "system_generators_route-handlers_POST",
+  "system_generators_route-handlers_POST":
+    "system_generators_route-handlers_POST",
   system_help_interactive_POST: "system_help_interactive_POST",
   system_help_list_POST: "system_help_list_POST",
   system_help_POST: "system_help_POST",
@@ -76,7 +79,8 @@ export const aliasToPathMap = {
   system_setup_update_POST: "system_setup_update_POST",
   "system_unified-interface_cli_setup_install_POST":
     "system_unified-interface_cli_setup_install_POST",
-  "system_unified-interface_mcp_serve_POST": "system_unified-interface_mcp_serve_POST",
+  "system_unified-interface_mcp_serve_POST":
+    "system_unified-interface_mcp_serve_POST",
   tc: "system_check_typecheck_POST",
   typecheck: "system_check_typecheck_POST",
   uninstall: "system_setup_uninstall_POST",
@@ -99,85 +103,123 @@ export function getFullPath(
  * @param path - The endpoint path (e.g., "core/agent/chat/threads")
  * @returns The endpoint definition or null if not found
  */
-export async function getEndpoint(path: string): Promise<CreateApiEndpointAny | null> {
+export async function getEndpoint(
+  path: string,
+): Promise<CreateApiEndpointAny | null> {
   switch (path) {
     case "build":
-      return (await import("@/app/api/[locale]/system/builder/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/builder/definition"))
+        .default.POST;
     case "builder":
-      return (await import("@/app/api/[locale]/system/builder/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/builder/definition"))
+        .default.POST;
     case "bundle":
-      return (await import("@/app/api/[locale]/system/builder/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/builder/definition"))
+        .default.POST;
     case "c":
-      return (await import("@/app/api/[locale]/system/check/vibe-check/definition")).default.POST;
+      return (
+        await import("@/app/api/[locale]/system/check/vibe-check/definition")
+      ).default.POST;
     case "cc":
-      return (await import("@/app/api/[locale]/system/check/config/create/definition")).default
-        .POST;
+      return (
+        await import("@/app/api/[locale]/system/check/config/create/definition")
+      ).default.POST;
     case "check":
-      return (await import("@/app/api/[locale]/system/check/vibe-check/definition")).default.POST;
+      return (
+        await import("@/app/api/[locale]/system/check/vibe-check/definition")
+      ).default.POST;
     case "commands":
-      return (await import("@/app/api/[locale]/system/help/list/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/help/list/definition"))
+        .default.POST;
     case "config-create":
-      return (await import("@/app/api/[locale]/system/check/config/create/definition")).default
-        .POST;
+      return (
+        await import("@/app/api/[locale]/system/check/config/create/definition")
+      ).default.POST;
     case "create-config":
-      return (await import("@/app/api/[locale]/system/check/config/create/definition")).default
-        .POST;
+      return (
+        await import("@/app/api/[locale]/system/check/config/create/definition")
+      ).default.POST;
     case "el":
-      return (await import("@/app/api/[locale]/system/check/lint/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/check/lint/definition"))
+        .default.POST;
     case "elint":
-      return (await import("@/app/api/[locale]/system/check/lint/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/check/lint/definition"))
+        .default.POST;
     case "eslint":
-      return (await import("@/app/api/[locale]/system/check/lint/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/check/lint/definition"))
+        .default.POST;
     case "gen":
-      return (await import("@/app/api/[locale]/system/generators/generate-all/definition")).default
-        .POST;
+      return (
+        await import("@/app/api/[locale]/system/generators/generate-all/definition")
+      ).default.POST;
     case "generate":
-      return (await import("@/app/api/[locale]/system/generators/generate-all/definition")).default
-        .POST;
+      return (
+        await import("@/app/api/[locale]/system/generators/generate-all/definition")
+      ).default.POST;
     case "generate-all":
-      return (await import("@/app/api/[locale]/system/generators/generate-all/definition")).default
-        .POST;
+      return (
+        await import("@/app/api/[locale]/system/generators/generate-all/definition")
+      ).default.POST;
     case "h":
-      return (await import("@/app/api/[locale]/system/help/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/help/definition")).default
+        .POST;
     case "help":
-      return (await import("@/app/api/[locale]/system/help/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/help/definition")).default
+        .POST;
     case "i":
-      return (await import("@/app/api/[locale]/system/help/interactive/definition")).default.POST;
+      return (
+        await import("@/app/api/[locale]/system/help/interactive/definition")
+      ).default.POST;
     case "install":
       return (
         await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/definition")
       ).default.POST;
     case "interactive":
-      return (await import("@/app/api/[locale]/system/help/interactive/definition")).default.POST;
+      return (
+        await import("@/app/api/[locale]/system/help/interactive/definition")
+      ).default.POST;
     case "l":
-      return (await import("@/app/api/[locale]/system/check/oxlint/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
+        .default.POST;
     case "lint":
-      return (await import("@/app/api/[locale]/system/check/oxlint/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
+        .default.POST;
     case "list":
-      return (await import("@/app/api/[locale]/system/help/list/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/help/list/definition"))
+        .default.POST;
     case "ls":
-      return (await import("@/app/api/[locale]/system/help/list/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/help/list/definition"))
+        .default.POST;
     case "mcp":
-      return (await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition"))
-        .default.POST;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition")
+      ).default.POST;
     case "mcp:serve":
-      return (await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition"))
-        .default.POST;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition")
+      ).default.POST;
     case "mcp:start":
-      return (await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition"))
-        .default.POST;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition")
+      ).default.POST;
     case "ox":
-      return (await import("@/app/api/[locale]/system/check/oxlint/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
+        .default.POST;
     case "oxlint":
-      return (await import("@/app/api/[locale]/system/check/oxlint/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
+        .default.POST;
     case "package":
-      return (await import("@/app/api/[locale]/system/builder/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/builder/definition"))
+        .default.POST;
     case "pub":
-      return (await import("@/app/api/[locale]/system/release-tool/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/release-tool/definition"))
+        .default.POST;
     case "publish":
-      return (await import("@/app/api/[locale]/system/release-tool/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/release-tool/definition"))
+        .default.POST;
     case "release":
-      return (await import("@/app/api/[locale]/system/release-tool/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/release-tool/definition"))
+        .default.POST;
     case "setup":
       return (
         await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/definition")
@@ -195,48 +237,67 @@ export async function getEndpoint(path: string): Promise<CreateApiEndpointAny | 
         await import("@/app/api/[locale]/system/unified-interface/cli/setup/update/definition")
       ).default.POST;
     case "start-mcp":
-      return (await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition"))
-        .default.POST;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition")
+      ).default.POST;
     case "status":
       return (
         await import("@/app/api/[locale]/system/unified-interface/cli/setup/status/definition")
       ).default.POST;
     case "system_builder_POST":
-      return (await import("@/app/api/[locale]/system/builder/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/builder/definition"))
+        .default.POST;
     case "system_check_config_create_POST":
-      return (await import("@/app/api/[locale]/system/check/config/create/definition")).default
-        .POST;
+      return (
+        await import("@/app/api/[locale]/system/check/config/create/definition")
+      ).default.POST;
     case "system_check_lint_POST":
-      return (await import("@/app/api/[locale]/system/check/lint/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/check/lint/definition"))
+        .default.POST;
     case "system_check_oxlint_POST":
-      return (await import("@/app/api/[locale]/system/check/oxlint/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
+        .default.POST;
     case "system_check_typecheck_POST":
-      return (await import("@/app/api/[locale]/system/check/typecheck/definition")).default.POST;
+      return (
+        await import("@/app/api/[locale]/system/check/typecheck/definition")
+      ).default.POST;
     case "system_check_vibe-check_POST":
-      return (await import("@/app/api/[locale]/system/check/vibe-check/definition")).default.POST;
+      return (
+        await import("@/app/api/[locale]/system/check/vibe-check/definition")
+      ).default.POST;
     case "system_generators_endpoint_POST":
-      return (await import("@/app/api/[locale]/system/generators/endpoint/definition")).default
-        .POST;
+      return (
+        await import("@/app/api/[locale]/system/generators/endpoint/definition")
+      ).default.POST;
     case "system_generators_endpoints-index_POST":
-      return (await import("@/app/api/[locale]/system/generators/endpoints-index/definition"))
-        .default.POST;
+      return (
+        await import("@/app/api/[locale]/system/generators/endpoints-index/definition")
+      ).default.POST;
     case "system_generators_endpoints_POST":
-      return (await import("@/app/api/[locale]/system/generators/endpoints/definition")).default
-        .POST;
+      return (
+        await import("@/app/api/[locale]/system/generators/endpoints/definition")
+      ).default.POST;
     case "system_generators_generate-all_POST":
-      return (await import("@/app/api/[locale]/system/generators/generate-all/definition")).default
-        .POST;
+      return (
+        await import("@/app/api/[locale]/system/generators/generate-all/definition")
+      ).default.POST;
     case "system_generators_route-handlers_POST":
-      return (await import("@/app/api/[locale]/system/generators/route-handlers/definition"))
-        .default.POST;
+      return (
+        await import("@/app/api/[locale]/system/generators/route-handlers/definition")
+      ).default.POST;
     case "system_help_POST":
-      return (await import("@/app/api/[locale]/system/help/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/help/definition")).default
+        .POST;
     case "system_help_interactive_POST":
-      return (await import("@/app/api/[locale]/system/help/interactive/definition")).default.POST;
+      return (
+        await import("@/app/api/[locale]/system/help/interactive/definition")
+      ).default.POST;
     case "system_help_list_POST":
-      return (await import("@/app/api/[locale]/system/help/list/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/help/list/definition"))
+        .default.POST;
     case "system_release-tool_POST":
-      return (await import("@/app/api/[locale]/system/release-tool/definition")).default.POST;
+      return (await import("@/app/api/[locale]/system/release-tool/definition"))
+        .default.POST;
     case "system_setup_status_POST":
       return (
         await import("@/app/api/[locale]/system/unified-interface/cli/setup/status/definition")
@@ -254,12 +315,17 @@ export async function getEndpoint(path: string): Promise<CreateApiEndpointAny | 
         await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/definition")
       ).default.POST;
     case "system_unified-interface_mcp_serve_POST":
-      return (await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition"))
-        .default.POST;
+      return (
+        await import("@/app/api/[locale]/system/unified-interface/mcp/serve/definition")
+      ).default.POST;
     case "tc":
-      return (await import("@/app/api/[locale]/system/check/typecheck/definition")).default.POST;
+      return (
+        await import("@/app/api/[locale]/system/check/typecheck/definition")
+      ).default.POST;
     case "typecheck":
-      return (await import("@/app/api/[locale]/system/check/typecheck/definition")).default.POST;
+      return (
+        await import("@/app/api/[locale]/system/check/typecheck/definition")
+      ).default.POST;
     case "uninstall":
       return (
         await import("@/app/api/[locale]/system/unified-interface/cli/setup/uninstall/definition")

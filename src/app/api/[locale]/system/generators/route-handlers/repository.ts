@@ -8,7 +8,11 @@ import "server-only";
 import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -121,7 +125,9 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
    * Extract HTTP methods from definition file (async)
    * We extract from definition instead of route because route files have server-only dependencies
    */
-  private async extractMethodsFromDefinition(routeFile: string): Promise<string[]> {
+  private async extractMethodsFromDefinition(
+    routeFile: string,
+  ): Promise<string[]> {
     const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
     try {
       const definition = (await import(definitionPath)) as {
@@ -135,7 +141,9 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
 
       // Get all HTTP methods from the definition
       const methods = Object.keys(defaultExport).filter((key) =>
-        ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(key),
+        ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(
+          key,
+        ),
       );
       return methods;
     } catch {
@@ -206,7 +214,8 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       }
 
       // Extract and add real aliases from definition file (with their method)
-      const definitionAliases = await this.extractAliasesFromDefinition(routeFile);
+      const definitionAliases =
+        await this.extractAliasesFromDefinition(routeFile);
       for (const { alias, method } of definitionAliases) {
         // Only add if not already present (first wins)
         if (!pathMap[alias]) {
@@ -264,4 +273,5 @@ ${cases.join("\n")}
   }
 }
 
-export const routeHandlersGeneratorRepository = new RouteHandlersGeneratorRepositoryImpl();
+export const routeHandlersGeneratorRepository =
+  new RouteHandlersGeneratorRepositoryImpl();

@@ -100,20 +100,26 @@ export function success<TResponse>(
 
 export const messageResponseSchema = z.object({
   message: z.string() as z.ZodType<TranslationKey>,
-  messageParams: z.record(z.string(), z.union([z.string(), z.coerce.number()])).optional(),
+  messageParams: z
+    .record(z.string(), z.union([z.string(), z.coerce.number()]))
+    .optional(),
 });
 
 export const errorResponseSchema = z.object({
   success: z.literal(false),
   message: z.string() as z.ZodType<TranslationKey>,
-  messageParams: z.record(z.string(), z.union([z.string(), z.coerce.number()])).optional(),
+  messageParams: z
+    .record(z.string(), z.union([z.string(), z.coerce.number()]))
+    .optional(),
   errorType: z.object({
     errorKey: z.string(),
     errorCode: z.coerce.number(),
   }),
 });
 
-export type ResponseType<TResponseData> = SuccessResponseType<TResponseData> | ErrorResponseType;
+export type ResponseType<TResponseData> =
+  | SuccessResponseType<TResponseData>
+  | ErrorResponseType;
 
 /**
  * Streaming response marker

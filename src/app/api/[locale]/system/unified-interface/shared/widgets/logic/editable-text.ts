@@ -20,7 +20,9 @@ export interface ProcessedEditableText {
 /**
  * Extract and validate editable text data from WidgetData
  */
-export function extractEditableTextData(value: WidgetData): ProcessedEditableText | null {
+export function extractEditableTextData(
+  value: WidgetData,
+): ProcessedEditableText | null {
   // Handle string value directly
   if (typeof value === "string") {
     return {
@@ -52,11 +54,17 @@ export function extractEditableTextData(value: WidgetData): ProcessedEditableTex
         ? value.placeholder
         : undefined;
     const multiline =
-      "multiline" in value && typeof value.multiline === "boolean" ? value.multiline : false;
+      "multiline" in value && typeof value.multiline === "boolean"
+        ? value.multiline
+        : false;
     const maxLength =
-      "maxLength" in value && typeof value.maxLength === "number" ? value.maxLength : undefined;
+      "maxLength" in value && typeof value.maxLength === "number"
+        ? value.maxLength
+        : undefined;
     const readonly =
-      "readonly" in value && typeof value.readonly === "boolean" ? value.readonly : false;
+      "readonly" in value && typeof value.readonly === "boolean"
+        ? value.readonly
+        : false;
 
     return {
       value: textValue,

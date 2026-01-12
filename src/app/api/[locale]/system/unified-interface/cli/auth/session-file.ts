@@ -2,7 +2,11 @@ import { promises as fs } from "node:fs";
 import { join } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
@@ -50,7 +54,9 @@ function getSessionFilePath(): string {
 /**
  * Read session data from .vibe.session file
  */
-export async function readSessionFile(logger: EndpointLogger): Promise<ResponseType<SessionData>> {
+export async function readSessionFile(
+  logger: EndpointLogger,
+): Promise<ResponseType<SessionData>> {
   try {
     const sessionPath = getSessionFilePath();
     const projectRoot = getProjectRoot();
@@ -70,7 +76,9 @@ export async function readSessionFile(logger: EndpointLogger): Promise<ResponseT
     } catch (accessError) {
       const errorMsg = parseError(accessError).message;
 
-      logger.debug(`[SESSION FILE] File does not exist at path: ${sessionPath} (${errorMsg})`);
+      logger.debug(
+        `[SESSION FILE] File does not exist at path: ${sessionPath} (${errorMsg})`,
+      );
     }
 
     const fileContent = await fs.readFile(sessionPath, "utf-8");
@@ -84,7 +92,8 @@ export async function readSessionFile(logger: EndpointLogger): Promise<ResponseT
       !sessionData.expiresAt
     ) {
       return fail({
-        message: "app.api.system.unifiedInterface.cli.vibe.errors.invalidFormat",
+        message:
+          "app.api.system.unifiedInterface.cli.vibe.errors.invalidFormat",
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: { path: sessionPath },
       });
@@ -93,9 +102,12 @@ export async function readSessionFile(logger: EndpointLogger): Promise<ResponseT
     // Check if session is expired
     const expiresAt = new Date(sessionData.expiresAt);
     if (expiresAt < new Date()) {
-      logger.debug(`[SESSION FILE] Session expired (expiresAt: ${sessionData.expiresAt})`);
+      logger.debug(
+        `[SESSION FILE] Session expired (expiresAt: ${sessionData.expiresAt})`,
+      );
       return fail({
-        message: "app.api.system.unifiedInterface.cli.vibe.errors.sessionExpired",
+        message:
+          "app.api.system.unifiedInterface.cli.vibe.errors.sessionExpired",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: { expiresAt: sessionData.expiresAt },
       });
@@ -177,7 +189,9 @@ export async function writeSessionFile(
   } catch (error) {
     const parsedError = parseError(error);
 
-    logger.error(`[SESSION FILE] Error writing session file: ${parsedError.message}`);
+    logger.error(
+      `[SESSION FILE] Error writing session file: ${parsedError.message}`,
+    );
     return fail({
       message: "app.api.system.unifiedInterface.cli.vibe.errors.writeFailed",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -189,7 +203,9 @@ export async function writeSessionFile(
 /**
  * Delete session file
  */
-export async function deleteSessionFile(logger: EndpointLogger): Promise<ResponseType<void>> {
+export async function deleteSessionFile(
+  logger: EndpointLogger,
+): Promise<ResponseType<void>> {
   try {
     const sessionPath = getSessionFilePath();
 
@@ -211,7 +227,9 @@ export async function deleteSessionFile(logger: EndpointLogger): Promise<Respons
       return success();
     }
 
-    logger.error(`[SESSION FILE] Error deleting session file: ${parsedError.message}`);
+    logger.error(
+      `[SESSION FILE] Error deleting session file: ${parsedError.message}`,
+    );
     return fail({
       message: "app.api.system.unifiedInterface.cli.vibe.errors.deleteFailed",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,

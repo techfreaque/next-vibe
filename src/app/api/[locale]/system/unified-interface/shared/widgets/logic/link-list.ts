@@ -33,7 +33,9 @@ export interface ProcessedLinkList {
 /**
  * Extract and validate link list data from WidgetData
  */
-export function extractLinkListData(value: WidgetData): ProcessedLinkList | null {
+export function extractLinkListData(
+  value: WidgetData,
+): ProcessedLinkList | null {
   let items: WidgetData[] = [];
   let title = "";
   let description = "";
@@ -47,11 +49,20 @@ export function extractLinkListData(value: WidgetData): ProcessedLinkList | null
   // Handle object format with items property
   else if (typeof value === "object" && value !== null) {
     items = "items" in value && Array.isArray(value.items) ? value.items : [];
-    title = "title" in value && typeof value.title === "string" ? value.title : "";
+    title =
+      "title" in value && typeof value.title === "string" ? value.title : "";
     description =
-      "description" in value && typeof value.description === "string" ? value.description : "";
-    layout = "layout" in value && typeof value.layout === "string" ? value.layout : "list";
-    columns = "columns" in value && typeof value.columns === "number" ? value.columns : 1;
+      "description" in value && typeof value.description === "string"
+        ? value.description
+        : "";
+    layout =
+      "layout" in value && typeof value.layout === "string"
+        ? value.layout
+        : "list";
+    columns =
+      "columns" in value && typeof value.columns === "number"
+        ? value.columns
+        : 1;
   } else {
     return null;
   }
@@ -72,11 +83,18 @@ export function extractLinkListData(value: WidgetData): ProcessedLinkList | null
         return null;
       }
 
-      const title = "title" in item && typeof item.title === "string" ? item.title : "";
+      const title =
+        "title" in item && typeof item.title === "string" ? item.title : "";
       const description =
-        "description" in item && typeof item.description === "string" ? item.description : "";
-      const icon = "icon" in item && typeof item.icon === "string" ? item.icon : "";
-      const favicon = "favicon" in item && typeof item.favicon === "string" ? item.favicon : "";
+        "description" in item && typeof item.description === "string"
+          ? item.description
+          : "";
+      const icon =
+        "icon" in item && typeof item.icon === "string" ? item.icon : "";
+      const favicon =
+        "favicon" in item && typeof item.favicon === "string"
+          ? item.favicon
+          : "";
 
       return {
         url,

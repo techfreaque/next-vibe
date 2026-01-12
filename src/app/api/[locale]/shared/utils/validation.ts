@@ -78,17 +78,25 @@ export function validateData<TSchema extends z.ZodType>(
  * @returns A formatted error string array
  */
 function formatZodErrors(zodError: ZodError): string[] {
-  if (!zodError?.issues || !Array.isArray(zodError.issues) || zodError.issues.length === 0) {
+  if (
+    !zodError?.issues ||
+    !Array.isArray(zodError.issues) ||
+    zodError.issues.length === 0
+  ) {
     return ["error.general.unknown_validation_error"];
   }
-  return zodError.issues.map((err: ZodIssue) => `${err.path.join(".")}: ${err.message}`);
+  return zodError.issues.map(
+    (err: ZodIssue) => `${err.path.join(".")}: ${err.message}`,
+  );
 }
 
 /**
  * Check if request schema is an empty object
  */
 export function isEmptyObjectSchema(schema: z.ZodSchema): boolean {
-  return schema instanceof z.ZodObject && Object.keys(schema.shape).length === 0;
+  return (
+    schema instanceof z.ZodObject && Object.keys(schema.shape).length === 0
+  );
 }
 
 /**
@@ -96,7 +104,9 @@ export function isEmptyObjectSchema(schema: z.ZodSchema): boolean {
  */
 export function isEmptySchema(schema: z.ZodSchema): boolean {
   return (
-    schema instanceof z.ZodUndefined || schema instanceof z.ZodNever || schema instanceof z.ZodVoid
+    schema instanceof z.ZodUndefined ||
+    schema instanceof z.ZodNever ||
+    schema instanceof z.ZodVoid
   );
 }
 

@@ -14,7 +14,14 @@ import { PATH_SEPARATOR } from "@/app/api/[locale]/system/unified-interface/shar
 /**
  * Default directories to exclude from scanning
  */
-export const DEFAULT_EXCLUDE_DIRS = ["node_modules", ".git", ".next", "dist", ".dist", "generated"];
+export const DEFAULT_EXCLUDE_DIRS = [
+  "node_modules",
+  ".git",
+  ".next",
+  "dist",
+  ".dist",
+  "generated",
+];
 
 /**
  * Recursively find files with specific filename in a directory
@@ -42,7 +49,9 @@ export function findFilesRecursively(
 
     if (entry.isDirectory()) {
       // Recursively search subdirectories
-      results.push(...findFilesRecursively(fullPath, targetFilename, excludeDirs));
+      results.push(
+        ...findFilesRecursively(fullPath, targetFilename, excludeDirs),
+      );
     } else if (entry.isFile() && entry.name === targetFilename) {
       // Found a matching file
       results.push(fullPath);
@@ -55,7 +64,10 @@ export function findFilesRecursively(
 /**
  * Get relative import path from source file to output file
  */
-export function getRelativeImportPath(sourceFile: string, outputFile: string): string {
+export function getRelativeImportPath(
+  sourceFile: string,
+  outputFile: string,
+): string {
   const outputDir = dirname(outputFile);
   let relativePath = relative(outputDir, sourceFile);
 
@@ -119,7 +131,10 @@ export function extractNestedPath(
  * Example: .../core/leads/seeds.ts -> "leads"
  * Example: .../core/emails/smtp-client/seeds.ts -> "smtp-client"
  */
-export function extractModuleName(filePath: string, coreMarker = "core"): string {
+export function extractModuleName(
+  filePath: string,
+  coreMarker = "core",
+): string {
   const pathParts = filePath.split("/");
   const coreIndex = pathParts.findIndex((p) => p === coreMarker);
 
@@ -193,7 +208,10 @@ function sanitizePathSegment(segment: string): string {
  * Uses PATH_SEPARATOR constant for consistency
  * Sanitizes path segments to match endpointToToolName behavior
  */
-export function extractPathKey(filePath: string, startMarker = "[locale]"): { path: string } {
+export function extractPathKey(
+  filePath: string,
+  startMarker = "[locale]",
+): { path: string } {
   const nestedPath = extractNestedPath(filePath, startMarker);
   // Sanitize each segment to remove brackets from dynamic routes
   const sanitizedPath = nestedPath.map(sanitizePathSegment);

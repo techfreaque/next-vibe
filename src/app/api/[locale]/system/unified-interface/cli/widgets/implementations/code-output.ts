@@ -30,7 +30,9 @@ const DEFAULT_SEVERITY_ICONS = {
   SPARKLE: "✨ ",
 } as const;
 
-export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.CODE_OUTPUT> {
+export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.CODE_OUTPUT
+> {
   readonly widgetType = WidgetType.CODE_OUTPUT;
 
   render(props: CLIWidgetProps<typeof WidgetType.CODE_OUTPUT, string>): string {
@@ -69,7 +71,9 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
 
   private renderEmptyState(context: WidgetRenderContext): string {
     const t = context.t;
-    const icon = context.options.useEmojis ? DEFAULT_SEVERITY_ICONS.SPARKLE : "";
+    const icon = context.options.useEmojis
+      ? DEFAULT_SEVERITY_ICONS.SPARKLE
+      : "";
     const text = t(
       "app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
     );
@@ -125,7 +129,9 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
     config: CodeOutputConfig,
     context: WidgetRenderContext,
   ): string {
-    return data.map((item) => this.renderDataItem(item, config, context)).join("\n");
+    return data
+      .map((item) => this.renderDataItem(item, config, context))
+      .join("\n");
   }
 
   private renderDataItem(
@@ -207,7 +213,9 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
     const totalCount = data.length;
 
     if (totalCount === 0) {
-      const icon = context.options.useEmojis ? DEFAULT_SEVERITY_ICONS.SPARKLE : "";
+      const icon = context.options.useEmojis
+        ? DEFAULT_SEVERITY_ICONS.SPARKLE
+        : "";
       const text = t(
         "app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noIssuesFound",
       );
@@ -216,7 +224,9 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
 
     const parts: string[] = [];
     const icons = config.severityIcons || {};
-    const icon = context.options.useEmojis ? icons.error || DEFAULT_SEVERITY_ICONS.ERROR : "";
+    const icon = context.options.useEmojis
+      ? icons.error || DEFAULT_SEVERITY_ICONS.ERROR
+      : "";
 
     if (severityCounts.error > 0) {
       const errorText = `${severityCounts.error} error${severityCounts.error === 1 ? "" : "s"}`;
@@ -239,7 +249,10 @@ export class CodeOutputWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTy
     return `${icon}${totalCount} issue${totalCount === 1 ? "" : "s"}`;
   }
 
-  private renderCustomSummary(data: CodeOutputItem[], config: CodeOutputConfig): string {
+  private renderCustomSummary(
+    data: CodeOutputItem[],
+    config: CodeOutputConfig,
+  ): string {
     // Use shared counting and template processing logic
     const severityCounts = countCodeOutputBySeverity(data);
     const variables = {

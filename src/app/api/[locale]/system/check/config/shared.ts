@@ -85,14 +85,20 @@ export function globToRegex(pattern: string): string {
  * @param patterns - Array of glob patterns
  * @returns True if path matches any pattern
  */
-export function matchesGlobPattern(relativePath: string, patterns: string[]): boolean {
+export function matchesGlobPattern(
+  relativePath: string,
+  patterns: string[],
+): boolean {
   for (const pattern of patterns) {
     if (pattern.includes("*")) {
       const regexPattern = globToRegex(pattern);
       if (new RegExp(regexPattern).test(relativePath)) {
         return true;
       }
-    } else if (relativePath.includes(`/${pattern}/`) || relativePath.startsWith(`${pattern}/`)) {
+    } else if (
+      relativePath.includes(`/${pattern}/`) ||
+      relativePath.startsWith(`${pattern}/`)
+    ) {
       return true;
     }
   }
@@ -108,7 +114,11 @@ export function matchesGlobPattern(relativePath: string, patterns: string[]): bo
  * @param ignores - Array of ignore patterns
  * @returns True if path should be ignored
  */
-export function shouldIgnorePath(name: string, fullPath: string, ignores: string[]): boolean {
+export function shouldIgnorePath(
+  name: string,
+  fullPath: string,
+  ignores: string[],
+): boolean {
   // Get relative path from cwd
   const relativePath = relative(process.cwd(), fullPath);
 
@@ -166,7 +176,10 @@ export interface FileDiscoveryOptions {
  * @param extensions - Array of allowed extensions
  * @returns True if file extension is in the allowed list
  */
-export function hasLintableExtension(filePath: string, extensions: string[]): boolean {
+export function hasLintableExtension(
+  filePath: string,
+  extensions: string[],
+): boolean {
   const ext = extname(filePath);
   return extensions.includes(ext);
 }
@@ -206,12 +219,17 @@ export async function scanDirectory(
 
         if (stats.isDirectory()) {
           await scanDirectory(fullPath, files, logger, options);
-        } else if (stats.isFile() && hasLintableExtension(fullPath, options.extensions)) {
+        } else if (
+          stats.isFile() &&
+          hasLintableExtension(fullPath, options.extensions)
+        ) {
           files.push(fullPath);
         }
       } catch (statError) {
         const error = parseError(statError);
-        if (PERMISSION_ERROR_CODES.some((code) => error.message.includes(code))) {
+        if (
+          PERMISSION_ERROR_CODES.some((code) => error.message.includes(code))
+        ) {
           logger.debug(`Permission denied accessing: ${fullPath}`);
         } else {
           logger.warn(`Failed to stat path: ${fullPath}`, {
@@ -222,7 +240,9 @@ export async function scanDirectory(
     }
   } catch (error) {
     const parsedError = parseError(error);
-    if (PERMISSION_ERROR_CODES.some((code) => parsedError.message.includes(code))) {
+    if (
+      PERMISSION_ERROR_CODES.some((code) => parsedError.message.includes(code))
+    ) {
       logger.debug(`Permission denied scanning directory: ${dirPath}`);
     } else {
       logger.warn(`Failed to scan directory: ${dirPath}`, {
@@ -277,7 +297,10 @@ export async function discoverFiles(
  * @param workerCount - Number of workers
  * @returns Array of file arrays, one per worker
  */
-export function distributeFilesAcrossWorkers(files: string[], workerCount: number): string[][] {
+export function distributeFilesAcrossWorkers(
+  files: string[],
+  workerCount: number,
+): string[][] {
   const result: string[][] = [];
   const filesPerWorker = Math.ceil(files.length / workerCount);
 
@@ -342,7 +365,10 @@ export function sortIssuesByLocation<T extends BaseIssue>(issues: T[]): T[] {
 /**
  * Create a worker failed error message.
  */
-export function createWorkerFailedMessage(workerId: number, reason: string): string {
+export function createWorkerFailedMessage(
+  workerId: number,
+  reason: string,
+): string {
   // eslint-disable-next-line i18next/no-literal-string
   return `Worker ${workerId} failed: ${reason}`;
 }
@@ -350,7 +376,10 @@ export function createWorkerFailedMessage(workerId: number, reason: string): str
 /**
  * Create a worker timeout error message.
  */
-export function createWorkerTimeoutMessage(workerId: number, timeout: number): string {
+export function createWorkerTimeoutMessage(
+  workerId: number,
+  timeout: number,
+): string {
   // eslint-disable-next-line i18next/no-literal-string
   return `Worker ${workerId} timed out after ${timeout}s`;
 }
@@ -358,7 +387,10 @@ export function createWorkerTimeoutMessage(workerId: number, timeout: number): s
 /**
  * Create a worker exit code error message.
  */
-export function createWorkerExitCodeMessage(workerId: number, exitCode: number): string {
+export function createWorkerExitCodeMessage(
+  workerId: number,
+  exitCode: number,
+): string {
   // eslint-disable-next-line i18next/no-literal-string
   return `Worker ${workerId} failed with exit code ${exitCode}`;
 }

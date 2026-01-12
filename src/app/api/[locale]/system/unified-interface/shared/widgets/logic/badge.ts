@@ -42,12 +42,16 @@ export function extractBadgeData(value: WidgetData): ProcessedBadge | null {
 
   // Handle object value with badge properties
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const text = "text" in value && typeof value.text === "string" ? value.text : "";
+    const text =
+      "text" in value && typeof value.text === "string" ? value.text : "";
     const variant =
       "variant" in value && typeof value.variant === "string"
         ? (value.variant as BadgeVariant)
         : "default";
-    const icon = "icon" in value && typeof value.icon === "string" ? value.icon : undefined;
+    const icon =
+      "icon" in value && typeof value.icon === "string"
+        ? value.icon
+        : undefined;
 
     if (!text) {
       return null;

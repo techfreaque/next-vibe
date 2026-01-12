@@ -8,15 +8,18 @@ export const translations = {
   fields: {
     createMcpConfig: {
       label: "Create MCP Config",
-      description: "Create .mcp.json configuration file for Model Context Protocol integration",
+      description:
+        "Create .mcp.json configuration file for Model Context Protocol integration",
     },
     updateVscodeSettings: {
       label: "Update VSCode Settings",
-      description: "Update .vscode/settings.json with recommended ESLint and formatter settings",
+      description:
+        "Update .vscode/settings.json with recommended ESLint and formatter settings",
     },
     updatePackageJson: {
       label: "Update package.json Scripts",
-      description: "Add/update package.json scripts for check, lint, and typecheck commands",
+      description:
+        "Add/update package.json scripts for check, lint, and typecheck commands",
     },
     enableEslint: {
       label: "Enable ESLint",
@@ -25,7 +28,8 @@ export const translations = {
     },
     enableReactRules: {
       label: "Enable React Rules",
-      description: "Enable React-specific linting rules (react-hooks, jsx-a11y)",
+      description:
+        "Enable React-specific linting rules (react-hooks, jsx-a11y)",
     },
     enableNextjsRules: {
       label: "Enable Next.js Rules",
@@ -33,15 +37,18 @@ export const translations = {
     },
     enableI18nRules: {
       label: "Enable i18n Rules",
-      description: "Enable internationalization linting rules (eslint-plugin-i18next)",
+      description:
+        "Enable internationalization linting rules (eslint-plugin-i18next)",
     },
     jsxCapitalization: {
       label: "JSX Capitalization",
-      description: "Enforce capitalization of JSX component names (react/jsx-pascal-case)",
+      description:
+        "Enforce capitalization of JSX component names (react/jsx-pascal-case)",
     },
     enablePromiseRules: {
       label: "Enable Promise Rules",
-      description: "Enable Promise best practices and async/await linting rules",
+      description:
+        "Enable Promise best practices and async/await linting rules",
     },
     enableNodeRules: {
       label: "Enable Node.js Rules",
@@ -49,11 +56,13 @@ export const translations = {
     },
     enableUnicornRules: {
       label: "Enable Unicorn Rules",
-      description: "Enable modern JavaScript best practices (eslint-plugin-unicorn)",
+      description:
+        "Enable modern JavaScript best practices (eslint-plugin-unicorn)",
     },
     enablePedanticRules: {
       label: "Enable Pedantic Rules",
-      description: "Enable stricter/pedantic linting rules for higher code quality",
+      description:
+        "Enable stricter/pedantic linting rules for higher code quality",
     },
     enableRestrictedSyntax: {
       label: "Enable Restricted Syntax",
@@ -69,7 +78,8 @@ export const translations = {
     },
     interactive: {
       label: "Interactive Mode",
-      description: "Run in interactive mode and ask for each configuration option step by step",
+      description:
+        "Run in interactive mode and ask for each configuration option step by step",
     },
   },
 
@@ -138,7 +148,8 @@ export const translations = {
     },
     conflict: {
       title: "Configuration Already Exists",
-      description: "Configuration file already exists. Use --force to overwrite.",
+      description:
+        "Configuration file already exists. Use --force to overwrite.",
     },
     configCreation: "Failed to create check.config.ts: {{error}}",
     unexpected: "An unexpected error occurred: {{error}}",

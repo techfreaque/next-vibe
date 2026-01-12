@@ -59,7 +59,8 @@ export const translations: typeof enTranslations = {
     creation_failed: "Benutzer konnte nicht erstellt werden",
     no_data_returned: "Keine Daten von der Datenbank zurückgegeben",
     password_hashing_failed: "Passwort-Hashing fehlgeschlagen",
-    not_implemented_on_native: "Diese Funktion ist in React Native nicht implementiert",
+    not_implemented_on_native:
+      "Diese Funktion ist in React Native nicht implementiert",
     count_failed: "Fehler beim Abrufen der Benutzeranzahl: {{error}}",
   },
   notifications: {
@@ -69,7 +70,8 @@ export const translations: typeof enTranslations = {
     },
     updateFailed: {
       title: "Aktualisierung fehlgeschlagen",
-      description: "Ihr Profil konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
+      description:
+        "Ihr Profil konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
     },
   },
 };

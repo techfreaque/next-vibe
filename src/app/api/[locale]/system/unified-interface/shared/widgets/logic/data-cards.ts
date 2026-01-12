@@ -59,7 +59,9 @@ export interface ProcessedDataCards {
 /**
  * Get card configuration from field
  */
-export function getCardsConfig<TKey extends string>(field: UnifiedField<TKey>): CardConfig {
+export function getCardsConfig<TKey extends string>(
+  field: UnifiedField<TKey>,
+): CardConfig {
   const defaultConfig: CardConfig = {
     layout: { columns: 2, spacing: "normal" },
     cardTemplate: "default",
@@ -85,18 +87,28 @@ export function getCardsConfig<TKey extends string>(field: UnifiedField<TKey>): 
     "spacing" in config.layout
   ) {
     layout = {
-      columns: typeof config.layout.columns === "number" ? config.layout.columns : 2,
-      spacing: typeof config.layout.spacing === "string" ? config.layout.spacing : "normal",
+      columns:
+        typeof config.layout.columns === "number" ? config.layout.columns : 2,
+      spacing:
+        typeof config.layout.spacing === "string"
+          ? config.layout.spacing
+          : "normal",
     };
   }
 
   return {
     layout,
     groupBy: config.groupBy !== undefined ? String(config.groupBy) : undefined,
-    cardTemplate: config.cardTemplate !== undefined ? String(config.cardTemplate) : "default",
-    showSummary: config.showSummary !== undefined ? Boolean(config.showSummary) : false,
+    cardTemplate:
+      config.cardTemplate !== undefined
+        ? String(config.cardTemplate)
+        : "default",
+    showSummary:
+      config.showSummary !== undefined ? Boolean(config.showSummary) : false,
     summaryTemplate:
-      config.summaryTemplate !== undefined ? String(config.summaryTemplate) : undefined,
+      config.summaryTemplate !== undefined
+        ? String(config.summaryTemplate)
+        : undefined,
     itemConfig:
       config.itemConfig &&
       typeof config.itemConfig === "object" &&
@@ -108,9 +120,14 @@ export function getCardsConfig<TKey extends string>(field: UnifiedField<TKey>): 
               typeof config.itemConfig.template === "string"
                 ? config.itemConfig.template
                 : "default",
-            size: typeof config.itemConfig.size === "string" ? config.itemConfig.size : "medium",
+            size:
+              typeof config.itemConfig.size === "string"
+                ? config.itemConfig.size
+                : "medium",
             spacing:
-              typeof config.itemConfig.spacing === "string" ? config.itemConfig.spacing : "normal",
+              typeof config.itemConfig.spacing === "string"
+                ? config.itemConfig.spacing
+                : "normal",
           }
         : {
             template: "default",
@@ -123,7 +140,10 @@ export function getCardsConfig<TKey extends string>(field: UnifiedField<TKey>): 
 /**
  * Group card data by specified field
  */
-export function groupCardData(data: CardItem[], groupBy: string): Map<string, CardItem[]> {
+export function groupCardData(
+  data: CardItem[],
+  groupBy: string,
+): Map<string, CardItem[]> {
   const groups = new Map<string, CardItem[]>();
 
   for (const item of data) {
@@ -172,7 +192,9 @@ export function countBySeverity(data: CardItem[]): Record<string, number> {
 /**
  * Extract and validate data cards from WidgetData
  */
-export function extractDataCardsData(value: WidgetData): ProcessedDataCards | null {
+export function extractDataCardsData(
+  value: WidgetData,
+): ProcessedDataCards | null {
   // Handle array of cards directly
   if (Array.isArray(value)) {
     if (value.length === 0) {
@@ -198,12 +220,20 @@ export function extractDataCardsData(value: WidgetData): ProcessedDataCards | nu
 
   // Handle object with cards array
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const cards = "cards" in value && Array.isArray(value.cards) ? value.cards : [];
-    const columns = "columns" in value && typeof value.columns === "number" ? value.columns : 3;
-    const title = "title" in value && typeof value.title === "string" ? value.title : undefined;
+    const cards =
+      "cards" in value && Array.isArray(value.cards) ? value.cards : [];
+    const columns =
+      "columns" in value && typeof value.columns === "number"
+        ? value.columns
+        : 3;
+    const title =
+      "title" in value && typeof value.title === "string"
+        ? value.title
+        : undefined;
 
     const validCards = cards.filter(
-      (item): item is CardItem => typeof item === "object" && item !== null && !Array.isArray(item),
+      (item): item is CardItem =>
+        typeof item === "object" && item !== null && !Array.isArray(item),
     );
 
     if (validCards.length === 0) {

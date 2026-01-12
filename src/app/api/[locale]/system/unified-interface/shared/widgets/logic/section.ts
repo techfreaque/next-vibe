@@ -52,7 +52,8 @@ export function extractSectionData(value: WidgetData): ProcessedSection | null {
   }
 
   // Extract required title
-  const title = "title" in value && typeof value.title === "string" ? value.title : "";
+  const title =
+    "title" in value && typeof value.title === "string" ? value.title : "";
 
   if (!title) {
     return null;
@@ -67,9 +68,13 @@ export function extractSectionData(value: WidgetData): ProcessedSection | null {
 
   // Extract optional properties
   const description =
-    "description" in value && typeof value.description === "string" ? value.description : undefined;
+    "description" in value && typeof value.description === "string"
+      ? value.description
+      : undefined;
   const collapsible =
-    "collapsible" in value && typeof value.collapsible === "boolean" ? value.collapsible : false;
+    "collapsible" in value && typeof value.collapsible === "boolean"
+      ? value.collapsible
+      : false;
   const defaultExpanded =
     "defaultExpanded" in value && typeof value.defaultExpanded === "boolean"
       ? value.defaultExpanded

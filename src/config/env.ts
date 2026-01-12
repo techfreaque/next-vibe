@@ -13,7 +13,10 @@ import { createSchema } from "./env-client";
 
 export const { env } = defineEnv({
   NODE_ENV: {
-    schema: createSchema(z.enum(Environment), z.enum(Environment).default(Environment.DEVELOPMENT)),
+    schema: createSchema(
+      z.enum(Environment),
+      z.enum(Environment).default(Environment.DEVELOPMENT),
+    ),
     example: "development",
   },
   PROJECT_ROOT: {

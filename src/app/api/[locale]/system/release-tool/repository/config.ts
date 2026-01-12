@@ -7,7 +7,11 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
@@ -23,7 +27,10 @@ export interface IConfigLoader {
   /**
    * Load release configuration from file
    */
-  load(logger: EndpointLogger, configPath?: string): Promise<ResponseType<ReleaseConfig>>;
+  load(
+    logger: EndpointLogger,
+    configPath?: string,
+  ): Promise<ResponseType<ReleaseConfig>>;
 
   /**
    * Get the default config path

@@ -1,4 +1,9 @@
-import type { Countries, CountryInfo, CountryLanguage, Languages } from "./config";
+import type {
+  Countries,
+  CountryInfo,
+  CountryLanguage,
+  Languages,
+} from "./config";
 import { availableCountries } from "./config";
 
 // ================================================================================
@@ -25,7 +30,10 @@ export type LanguageGroupMap = {
 let instance: LanguageMapper | null = null;
 class LanguageMapper {
   private _uniqueLanguages:
-    | [langCode: Languages, langInfo: { name: string; countries: CountryInfo[] }][]
+    | [
+        langCode: Languages,
+        langInfo: { name: string; countries: CountryInfo[] },
+      ][]
     | null = null;
   private _languageGroupMap: LanguageGroupMap | null = null;
 
@@ -169,7 +177,9 @@ export const hasMultipleCountries = (language: Languages): boolean => {
 /**
  * Convenience function to get the primary country for a language
  */
-export const getPrimaryCountryForLanguage = (language: Languages): CountryInfo | null => {
+export const getPrimaryCountryForLanguage = (
+  language: Languages,
+): CountryInfo | null => {
   return getLanguageMapper().getPrimaryCountryForLanguage(language);
 };
 

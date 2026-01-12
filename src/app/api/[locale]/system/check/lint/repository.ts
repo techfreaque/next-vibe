@@ -22,7 +22,11 @@ import {
 } from "../config/shared";
 import type { CheckConfig } from "../config/types";
 import { getSystemResources } from "../config/utils";
-import type { LintIssue, LintRequestOutput, LintResponseOutput } from "./definition";
+import type {
+  LintIssue,
+  LintRequestOutput,
+  LintResponseOutput,
+} from "./definition";
 
 /**
  * Worker task for parallel processing
@@ -120,7 +124,9 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
 
       // Check if ESLint is enabled in config
       if (!(checkConfig.eslint?.enabled ?? true)) {
-        logger.info("ESLint is disabled in check.config.ts (eslint.enabled: false)");
+        logger.info(
+          "ESLint is disabled in check.config.ts (eslint.enabled: false)",
+        );
 
         return success({
           issues: {
@@ -176,7 +182,11 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
           `[ESLINT] Starting sequential execution (path: ${data.path || "./"}, fix: ${data.fix})`,
         );
 
-        const result = await this.executeSequential(data, enabledConfig, logger);
+        const result = await this.executeSequential(
+          data,
+          enabledConfig,
+          logger,
+        );
 
         logger.debug(
           `[ESLINT] Sequential execution completed (${result.issues.items.length} issues found)`,
@@ -225,7 +235,10 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       }
 
       // Distribute files across workers
-      const eslintConfigPath = resolve(process.cwd(), enabledConfig.eslint.configPath);
+      const eslintConfigPath = resolve(
+        process.cwd(),
+        enabledConfig.eslint.configPath,
+      );
       const workerTasks = this.distributeFiles(
         filesToLint,
         resources.maxWorkers,
@@ -233,13 +246,18 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         eslintConfigPath,
       );
 
-      logger.debug(`[ESLINT] Distributing work across ${workerTasks.length} workers`);
+      logger.debug(
+        `[ESLINT] Distributing work across ${workerTasks.length} workers`,
+      );
 
       // Pre-create all cache directories in parallel
       await this.createCacheDirectories(workerTasks, logger);
 
       // Execute workers in parallel
-      const workerResults = await this.executeWorkersInParallel(workerTasks, logger);
+      const workerResults = await this.executeWorkersInParallel(
+        workerTasks,
+        logger,
+      );
 
       // Merge results from all workers
       const mergedResult = this.mergeWorkerResults(workerResults, data, logger);
@@ -302,12 +320,21 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     await fs.mkdir(dirname(cacheDir), { recursive: true });
 
     // Handle multiple paths - support files, folders, or mixed
-    const targetPaths = data.path ? (Array.isArray(data.path) ? data.path : [data.path]) : ["./"];
+    const targetPaths = data.path
+      ? Array.isArray(data.path)
+        ? data.path
+        : [data.path]
+      : ["./"];
 
-    logger.debug(`[ESLINT] Running on ${targetPaths.length} path(s): ${targetPaths.join(", ")}`);
+    logger.debug(
+      `[ESLINT] Running on ${targetPaths.length} path(s): ${targetPaths.join(", ")}`,
+    );
 
     // Build ESLint command
-    const eslintConfigPath = resolve(process.cwd(), checkConfig.eslint.configPath);
+    const eslintConfigPath = resolve(
+      process.cwd(),
+      checkConfig.eslint.configPath,
+    );
     const args = [
       "eslint",
       "--format=json",
@@ -376,10 +403,16 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     });
 
     // Parse ESLint output
-    const result = await this.parseEslintOutputWithFixableDetection(stdout, data.fix, logger);
+    const result = await this.parseEslintOutputWithFixableDetection(
+      stdout,
+      data.fix,
+      logger,
+    );
 
     // Build response
-    const sortedIssues = data.skipSorting ? result.issues : sortIssuesByLocation(result.issues);
+    const sortedIssues = data.skipSorting
+      ? result.issues
+      : sortIssuesByLocation(result.issues);
 
     return this.buildResponse(sortedIssues, data);
   }
@@ -409,7 +442,10 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
   /**
    * Create global cache directory
    */
-  private async createCacheDirectories(tasks: WorkerTask[], logger: EndpointLogger): Promise<void> {
+  private async createCacheDirectories(
+    tasks: WorkerTask[],
+    logger: EndpointLogger,
+  ): Promise<void> {
     if (tasks.length === 0) {
       return;
     }
@@ -436,7 +472,9 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     const results: WorkerResult[] = [];
 
     // Execute all workers in parallel
-    const workerPromises = tasks.map((task) => this.executeWorker(task, logger));
+    const workerPromises = tasks.map((task) =>
+      this.executeWorker(task, logger),
+    );
 
     const workerResults = await Promise.allSettled(workerPromises);
 
@@ -453,7 +491,10 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
             {
               file: "worker-error",
               severity: "error" as const,
-              message: createWorkerFailedMessage(tasks[i].id, String(result.reason)),
+              message: createWorkerFailedMessage(
+                tasks[i].id,
+                String(result.reason),
+              ),
               type: "lint" as const,
             },
           ],
@@ -469,7 +510,10 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
   /**
    * Execute a single worker using Bun.spawn
    */
-  private async executeWorker(task: WorkerTask, logger: EndpointLogger): Promise<WorkerResult> {
+  private async executeWorker(
+    task: WorkerTask,
+    logger: EndpointLogger,
+  ): Promise<WorkerResult> {
     const startTime = Date.now();
 
     try {
@@ -524,7 +568,9 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     } catch (error) {
       const errorMessage = parseError(error).message;
 
-      logger.error(`[ESLINT:Worker${task.id}] Execution failed: ${errorMessage}`);
+      logger.error(
+        `[ESLINT:Worker${task.id}] Execution failed: ${errorMessage}`,
+      );
 
       return {
         id: task.id,
@@ -549,7 +595,10 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
   private buildFileStats(
     issues: LintIssue[],
   ): Map<string, { errors: number; warnings: number; total: number }> {
-    const fileStats = new Map<string, { errors: number; warnings: number; total: number }>();
+    const fileStats = new Map<
+      string,
+      { errors: number; warnings: number; total: number }
+    >();
 
     for (const issue of issues) {
       const stats = fileStats.get(issue.file) || {
@@ -589,10 +638,15 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
   /**
    * Build response with pagination and statistics
    */
-  private buildResponse(allIssues: LintIssue[], data: LintRequestOutput): LintResponseOutput {
+  private buildResponse(
+    allIssues: LintIssue[],
+    data: LintRequestOutput,
+  ): LintResponseOutput {
     const totalIssues = allIssues.length;
     const totalFiles = new Set(allIssues.map((issue) => issue.file)).size;
-    const totalErrors = allIssues.filter((issue) => issue.severity === "error").length;
+    const totalErrors = allIssues.filter(
+      (issue) => issue.severity === "error",
+    ).length;
 
     const fileStats = this.buildFileStats(allIssues);
     const allFiles = this.formatFileStats(fileStats);
@@ -605,7 +659,8 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     const limitedIssues = allIssues.slice(startIndex, endIndex);
 
     const displayedIssues = limitedIssues.length;
-    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file)).size;
+    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file))
+      .size;
 
     return {
       issues: {
@@ -644,7 +699,9 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     }
 
     // Sort issues by file, then by line number (unless skipSorting is true)
-    const issues = data.skipSorting ? allIssues : sortIssuesByLocation(allIssues);
+    const issues = data.skipSorting
+      ? allIssues
+      : sortIssuesByLocation(allIssues);
 
     logger.debug(
       `[ESLINT] Merged results from ${workerResults.length} workers (${issues.length} total issues)`,
@@ -664,7 +721,9 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     issues: LintIssue[];
     hasFixableIssues: boolean;
   }> {
-    logger.debug(`[ESLINT:Worker${task.id}] Executing command: bunx ${args.join(" ")}`);
+    logger.debug(
+      `[ESLINT:Worker${task.id}] Executing command: bunx ${args.join(" ")}`,
+    );
 
     // Use spawn for parallel execution
     const { spawn } = await import("node:child_process");

@@ -12,7 +12,9 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class BadgeWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.BADGE> {
+export class BadgeWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.BADGE
+> {
   readonly widgetType = WidgetType.BADGE;
 
   render(props: CLIWidgetProps<typeof WidgetType.BADGE, string>): string {

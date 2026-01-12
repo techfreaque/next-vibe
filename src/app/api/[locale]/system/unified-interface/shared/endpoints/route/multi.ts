@@ -21,7 +21,9 @@ import { endpointHandler } from "./single";
  * Base constraint for endpoint definitions
  * All endpoint objects must be a partial record of Methods to CreateApiEndpoint
  */
-export type EndpointDefinitionsConstraint = Partial<Record<Methods, CreateApiEndpointAny>>;
+export type EndpointDefinitionsConstraint = Partial<
+  Record<Methods, CreateApiEndpointAny>
+>;
 
 /**
  * Type-safe configuration that enforces handler types match endpoint types

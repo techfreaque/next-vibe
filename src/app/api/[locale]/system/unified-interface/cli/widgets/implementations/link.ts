@@ -12,7 +12,9 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class LinkWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.LINK> {
+export class LinkWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.LINK
+> {
   readonly widgetType = WidgetType.LINK;
 
   render(props: CLIWidgetProps<typeof WidgetType.LINK, string>): string {
@@ -35,7 +37,10 @@ export class LinkWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.LIN
     return this.renderLink(data, context);
   }
 
-  private renderLink(data: ProcessedLink, context: WidgetRenderContext): string {
+  private renderLink(
+    data: ProcessedLink,
+    context: WidgetRenderContext,
+  ): string {
     const { url, text } = data;
 
     // For CLI, we render links in a readable format

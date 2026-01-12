@@ -160,7 +160,8 @@ class PermissionsRegistry implements IPermissionsRegistry {
         if (!platformMarkers.includes(PlatformMarker.CLI_AUTH_BYPASS)) {
           return {
             allowed: false,
-            reason: "Endpoint requires authentication which is not available in CLI_PACKAGE mode",
+            reason:
+              "Endpoint requires authentication which is not available in CLI_PACKAGE mode",
             blockedByRole: PlatformMarker.CLI_AUTH_BYPASS,
           };
         }
@@ -226,7 +227,8 @@ class PermissionsRegistry implements IPermissionsRegistry {
     if (user.isPublic) {
       return {
         allowed: false,
-        reason: "Authentication required - endpoint does not allow public access",
+        reason:
+          "Authentication required - endpoint does not allow public access",
         userRoles: [],
         requiredRoles: permissionRoles,
       };
@@ -274,7 +276,10 @@ class PermissionsRegistry implements IPermissionsRegistry {
     });
 
     // 1. Check platform access first
-    const platformAccess = this.checkPlatformAccess(allowedRoles, platform as Platform);
+    const platformAccess = this.checkPlatformAccess(
+      allowedRoles,
+      platform as Platform,
+    );
     if (!platformAccess.allowed) {
       logger.warn("Platform access denied", {
         platform,
@@ -284,7 +289,8 @@ class PermissionsRegistry implements IPermissionsRegistry {
 
       return {
         success: false,
-        message: "app.api.system.unifiedInterface.shared.permissions.errors.platformAccessDenied",
+        message:
+          "app.api.system.unifiedInterface.shared.permissions.errors.platformAccessDenied",
         errorType: ErrorResponseTypes.FORBIDDEN,
         messageParams: {
           platform: String(platform),
@@ -308,7 +314,9 @@ class PermissionsRegistry implements IPermissionsRegistry {
       logger.warn("User role access denied", {
         userId: user.isPublic ? "public" : user.id,
         reason: roleAccess.reason,
-        userRoles: roleAccess.userRoles ? (roleAccess.userRoles as string[]).join(", ") : undefined,
+        userRoles: roleAccess.userRoles
+          ? (roleAccess.userRoles as string[]).join(", ")
+          : undefined,
         requiredRoles: roleAccess.requiredRoles
           ? (roleAccess.requiredRoles as string[]).join(", ")
           : undefined,
@@ -316,7 +324,8 @@ class PermissionsRegistry implements IPermissionsRegistry {
 
       return {
         success: false,
-        message: "app.api.system.unifiedInterface.shared.permissions.errors.insufficientRoles",
+        message:
+          "app.api.system.unifiedInterface.shared.permissions.errors.insufficientRoles",
         errorType: ErrorResponseTypes.FORBIDDEN,
         messageParams: {
           userRoles: (roleAccess.userRoles || []).join(", ") || "none",
@@ -342,7 +351,8 @@ class PermissionsRegistry implements IPermissionsRegistry {
     if (!endpoint.allowedRoles || !Array.isArray(endpoint.allowedRoles)) {
       return {
         success: false,
-        message: "app.api.system.unifiedInterface.shared.permissions.errors.definitionError",
+        message:
+          "app.api.system.unifiedInterface.shared.permissions.errors.definitionError",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: "Endpoint allowedRoles is not properly configured",
@@ -351,11 +361,15 @@ class PermissionsRegistry implements IPermissionsRegistry {
     }
 
     // 1. Check platform access first
-    const platformAccess = this.checkPlatformAccess(endpoint.allowedRoles, platform);
+    const platformAccess = this.checkPlatformAccess(
+      endpoint.allowedRoles,
+      platform,
+    );
     if (!platformAccess.allowed) {
       return {
         success: false,
-        message: "app.api.system.unifiedInterface.shared.permissions.errors.platformAccessDenied",
+        message:
+          "app.api.system.unifiedInterface.shared.permissions.errors.platformAccessDenied",
         errorType: ErrorResponseTypes.FORBIDDEN,
         messageParams: {
           platform: String(platform),
@@ -369,7 +383,8 @@ class PermissionsRegistry implements IPermissionsRegistry {
     if (!hasPermission) {
       return {
         success: false,
-        message: "app.api.system.unifiedInterface.shared.permissions.errors.insufficientRoles",
+        message:
+          "app.api.system.unifiedInterface.shared.permissions.errors.insufficientRoles",
         errorType: ErrorResponseTypes.FORBIDDEN,
         messageParams: {
           userId: user.isPublic ? "public" : user.id,
@@ -477,7 +492,12 @@ class PermissionsRegistry implements IPermissionsRegistry {
     platform: Platform = Platform.AI,
     logger: EndpointLogger,
   ): Record<string, number> {
-    const filtered = this.filterEndpointsByPermissions(endpoints, user, platform, logger);
+    const filtered = this.filterEndpointsByPermissions(
+      endpoints,
+      user,
+      platform,
+      logger,
+    );
     const counts: Record<string, number> = {};
 
     for (const endpoint of filtered) {
@@ -493,7 +513,9 @@ class PermissionsRegistry implements IPermissionsRegistry {
   /**
    * Get available endpoints count by role (PRIVATE - used internally)
    */
-  private getEndpointCountByRole(endpoints: CreateApiEndpointAny[]): Record<string, number> {
+  private getEndpointCountByRole(
+    endpoints: CreateApiEndpointAny[],
+  ): Record<string, number> {
     const counts: Record<string, number> = {};
 
     for (const endpoint of endpoints) {
@@ -517,7 +539,9 @@ class PermissionsRegistry implements IPermissionsRegistry {
   /**
    * Check if endpoint allows CLI auth bypass (PRIVATE - used internally)
    */
-  private allowsCliAuthBypass(platformMarkers: readonly (typeof PlatformMarkerValue)[]): boolean {
+  private allowsCliAuthBypass(
+    platformMarkers: readonly (typeof PlatformMarkerValue)[],
+  ): boolean {
     return platformMarkers.includes(PlatformMarker.CLI_AUTH_BYPASS);
   }
 

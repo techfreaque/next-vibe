@@ -62,7 +62,11 @@ export class DefinitionLoader implements IDefinitionLoader {
       }
 
       // Validate endpoint access using consolidated method
-      const accessValidation = permissionsRegistry.validateEndpointAccess(endpoint, user, platform);
+      const accessValidation = permissionsRegistry.validateEndpointAccess(
+        endpoint,
+        user,
+        platform,
+      );
 
       if (!accessValidation.success) {
         logger.debug(

@@ -64,13 +64,17 @@ export const translations: typeof enTranslations = {
     emptyConfig: "Pusta konfiguracja - brak zdefiniowanych kroków kompilacji",
   },
   warnings: {
-    outputIsDirectory: "Ścieżka wyjściowa powinna być plikiem, nie katalogiem: {{path}}",
+    outputIsDirectory:
+      "Ścieżka wyjściowa powinna być plikiem, nie katalogiem: {{path}}",
     sourceNotFound: "Nie znaleziono pliku źródłowego: {{path}}",
   },
   suggestions: {
-    checkFilePaths: "Sprawdź, czy wszystkie ścieżki plików są poprawne i pliki istnieją",
-    runFromProjectRoot: "Upewnij się, że uruchamiasz z głównego katalogu projektu",
-    checkPermissions: "Sprawdź uprawnienia do plików dla katalogów wejściowych i wyjściowych",
+    checkFilePaths:
+      "Sprawdź, czy wszystkie ścieżki plików są poprawne i pliki istnieją",
+    runFromProjectRoot:
+      "Upewnij się, że uruchamiasz z głównego katalogu projektu",
+    checkPermissions:
+      "Sprawdź uprawnienia do plików dla katalogów wejściowych i wyjściowych",
     checkDependencies: "Niektóre zależności mogą brakować - sprawdź importy",
     runInstall:
       "Spróbuj uruchomić 'bun install', aby upewnić się, że wszystkie zależności są dostępne",
@@ -126,17 +130,20 @@ export const translations: typeof enTranslations = {
     configWarnings: "Ostrzeżenia konfiguracji",
     tsEntrypointWithNode:
       "Punkt wejścia TypeScript z celem Node - rozważ użycie celu Bun dla lepszej kompatybilności",
-    watchModeStarted: "Tryb obserwacji uruchomiony - oczekiwanie na zmiany plików...",
+    watchModeStarted:
+      "Tryb obserwacji uruchomiony - oczekiwanie na zmiany plików...",
     watchModeRebuild: "Plik zmieniony: {{file}} - przebudowywanie...",
     watchModeReady: "Kompilacja zakończona - obserwowanie zmian...",
     watchModeError: "Błąd trybu obserwacji: {{error}}",
     watchModeStopped: "Tryb obserwacji zatrzymany",
     parallelCompiling: "Kompilowanie {{count}} plików równolegle...",
-    parallelComplete: "Kompilacja równoległa zakończona: {{count}} plików w {{duration}}ms",
+    parallelComplete:
+      "Kompilacja równoległa zakończona: {{count}} plików w {{duration}}ms",
     cacheHit: "Trafienie cache: {{file}} (pominięto)",
     cacheMiss: "Pudło cache: {{file}} (przebudowywanie)",
     cacheCleared: "Cache kompilacji wyczyszczony",
-    cacheStats: "Cache: {{hits}} trafień, {{misses}} pudel ({{hitRate}}% trafień)",
+    cacheStats:
+      "Cache: {{hits}} trafień, {{misses}} pudel ({{hitRate}}% trafień)",
     generatingReport: "Generowanie raportu kompilacji...",
     reportGenerated: "Raport kompilacji wygenerowany: {{path}}",
     progress: "[{{current}}/{{total}}] {{step}}",
@@ -150,21 +157,25 @@ export const translations: typeof enTranslations = {
       "Kompleksowe narzędzie do kompilacji obsługujące pakowanie CLI, kompilacje Vite, React/Tailwind i dystrybucję npm",
     form: {
       title: "Konfiguracja kompilacji",
-      description: "Skonfiguruj ustawienia kompilacji lub użyj pliku build.config.ts",
+      description:
+        "Skonfiguruj ustawienia kompilacji lub użyj pliku build.config.ts",
     },
     fields: {
       configPath: {
         title: "Ścieżka pliku konfiguracyjnego",
-        description: "Ścieżka do pliku konfiguracyjnego kompilacji (build.config.ts)",
+        description:
+          "Ścieżka do pliku konfiguracyjnego kompilacji (build.config.ts)",
         placeholder: "build.config.ts",
       },
       configObject: {
         title: "Opcje kompilacji",
-        description: "Wbudowana konfiguracja kompilacji (nadpisuje plik konfiguracyjny)",
+        description:
+          "Wbudowana konfiguracja kompilacji (nadpisuje plik konfiguracyjny)",
       },
       profile: {
         title: "Profil kompilacji",
-        description: "Rozwój (szybki, debug) lub Produkcja (zoptymalizowany, zminifikowany)",
+        description:
+          "Rozwój (szybki, debug) lub Produkcja (zoptymalizowany, zminifikowany)",
       },
       dryRun: {
         title: "Próba",
@@ -176,7 +187,8 @@ export const translations: typeof enTranslations = {
       },
       analyze: {
         title: "Analiza paczki",
-        description: "Analizuj rozmiary paczek i identyfikuj możliwości optymalizacji",
+        description:
+          "Analizuj rozmiary paczek i identyfikuj możliwości optymalizacji",
       },
       watch: {
         title: "Tryb obserwacji",
@@ -184,19 +196,23 @@ export const translations: typeof enTranslations = {
       },
       parallel: {
         title: "Kompilacja równoległa",
-        description: "Kompiluj wiele plików równolegle dla szybszych kompilacji",
+        description:
+          "Kompiluj wiele plików równolegle dla szybszych kompilacji",
       },
       cache: {
         title: "Cache kompilacji",
-        description: "Cachuj artefakty kompilacji, aby pomijać niezmienione pliki",
+        description:
+          "Cachuj artefakty kompilacji, aby pomijać niezmienione pliki",
       },
       report: {
         title: "Generuj raport",
-        description: "Generuj raport kompilacji JSON ze szczegółowymi metrykami",
+        description:
+          "Generuj raport kompilacji JSON ze szczegółowymi metrykami",
       },
       minify: {
         title: "Minifikuj",
-        description: "Minifikuj wyjściową paczkę (nadpisuje ustawienie profilu)",
+        description:
+          "Minifikuj wyjściową paczkę (nadpisuje ustawienie profilu)",
       },
       foldersToClean: {
         title: "Foldery do wyczyszczenia",
@@ -239,7 +255,8 @@ export const translations: typeof enTranslations = {
       },
       packageConfig: {
         title: "Konfiguracja pakietu",
-        description: "Ustawienia dla kompilacji bibliotek z deklaracjami TypeScript",
+        description:
+          "Ustawienia dla kompilacji bibliotek z deklaracjami TypeScript",
       },
       isPackage: {
         title: "Jest pakietem",
@@ -247,7 +264,8 @@ export const translations: typeof enTranslations = {
       },
       dtsInclude: {
         title: "DTS Include",
-        description: "Wzorce glob dla plików TypeScript do uwzględnienia w deklaracjach",
+        description:
+          "Wzorce glob dla plików TypeScript do uwzględnienia w deklaracjach",
         placeholder: "src/**/*.ts",
       },
       dtsEntryRoot: {
@@ -257,7 +275,8 @@ export const translations: typeof enTranslations = {
       },
       bunOptions: {
         title: "Opcje Bun",
-        description: "Opcje kompilacji specyficzne dla Bun dla kompilacji wykonywalnych",
+        description:
+          "Opcje kompilacji specyficzne dla Bun dla kompilacji wykonywalnych",
       },
       bunTarget: {
         title: "Docelowe środowisko",
@@ -278,7 +297,8 @@ export const translations: typeof enTranslations = {
       },
       define: {
         title: "Zdefiniuj stałe",
-        description: "Stałe czasu kompilacji jako JSON (np. process.env.NODE_ENV)",
+        description:
+          "Stałe czasu kompilacji jako JSON (np. process.env.NODE_ENV)",
         placeholder: '{"process.env.NODE_ENV": "\\"production\\""}',
       },
       splitting: {
@@ -354,7 +374,8 @@ export const translations: typeof enTranslations = {
       },
       viteAssetsInlineLimit: {
         title: "Limit wbudowania",
-        description: "Maksymalny rozmiar (bajty) do wbudowania zasobów jako base64",
+        description:
+          "Maksymalny rozmiar (bajty) do wbudowania zasobów jako base64",
         placeholder: "4096",
       },
       viteChunkSizeWarningLimit: {
@@ -501,7 +522,8 @@ export const translations: typeof enTranslations = {
       packageExports: {
         title: "Mapa eksportów",
         description: "Pole exports pakietu jako JSON",
-        placeholder: '{".": {"import": "./dist/index.mjs", "require": "./dist/index.cjs"}}',
+        placeholder:
+          '{".": {"import": "./dist/index.mjs", "require": "./dist/index.cjs"}}',
       },
       packageDependencies: {
         title: "Zależności",
@@ -633,10 +655,13 @@ export const translations: typeof enTranslations = {
   analysis: {
     criticalSize: "KRYTYCZNE: Rozmiar paczki ({{size}}) przekracza próg",
     largeBundle: "OSTRZEŻENIE: Wykryto dużą paczkę ({{size}})",
-    considerTreeShaking: "Rozważ włączenie tree-shaking, aby zmniejszyć rozmiar paczki",
+    considerTreeShaking:
+      "Rozważ włączenie tree-shaking, aby zmniejszyć rozmiar paczki",
     checkLargeDeps: "Sprawdź duże zależności, które można zastąpić",
-    largeSourcemaps: "Wykryto duże sourcemapy - rozważ wyłączenie ich w produkcji",
-    possibleDuplicates: "Wykryto możliwe zduplikowane zależności - rozważ deduplikację",
+    largeSourcemaps:
+      "Wykryto duże sourcemapy - rozważ wyłączenie ich w produkcji",
+    possibleDuplicates:
+      "Wykryto możliwe zduplikowane zależności - rozważ deduplikację",
     totalSize: "Całkowity rozmiar",
     largestFiles: "Największe pliki",
   },
