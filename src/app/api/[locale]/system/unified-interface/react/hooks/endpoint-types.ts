@@ -653,40 +653,54 @@ export interface FormDataPriority<T> {
   hasUnsavedChanges: boolean;
 }
 
+// ============================================================================
+// LOCAL STORAGE CALLBACKS
+// ============================================================================
+
 /**
  * Type-safe callbacks for localStorage mode
  * All callbacks must return ResponseType to maintain consistency with API mode
  */
 export interface LocalStorageCallbacks<T> {
   /** Callback for GET/read operations */
-  read?: GetEndpointTypes<T> extends never
-    ? undefined
-    : (params: {
-        urlPathParams?: GetEndpointTypes<T>["urlPathParams"];
-        requestData?: GetEndpointTypes<T>["request"];
-      }) => Promise<ResponseType<GetEndpointTypes<T>["response"]>>;
+  read?: T extends { GET: CreateApiEndpointAny }
+    ? (params: {
+        urlPathParams?: T["GET"]["types"]["UrlVariablesOutput"];
+        requestData?: T["GET"]["types"]["RequestOutput"];
+      }) => Promise<ResponseType<T["GET"]["types"]["ResponseOutput"]>>
+    : undefined;
 
   /** Callback for POST/create operations */
-  create?: PrimaryMutationTypes<T> extends never
-    ? undefined
-    : (params: {
-        requestData: PrimaryMutationTypes<T>["request"];
-        urlPathParams?: PrimaryMutationTypes<T>["urlPathParams"];
-      }) => Promise<ResponseType<PrimaryMutationTypes<T>["response"]>>;
+  create?: T extends { POST: CreateApiEndpointAny }
+    ? (params: {
+        requestData: T["POST"]["types"]["RequestOutput"];
+        urlPathParams?: T["POST"]["types"]["UrlVariablesOutput"];
+      }) => Promise<ResponseType<T["POST"]["types"]["ResponseOutput"]>>
+    : T extends { PUT: CreateApiEndpointAny }
+      ? (params: {
+          requestData: T["PUT"]["types"]["RequestOutput"];
+          urlPathParams?: T["PUT"]["types"]["UrlVariablesOutput"];
+        }) => Promise<ResponseType<T["PUT"]["types"]["ResponseOutput"]>>
+      : T extends { PATCH: CreateApiEndpointAny }
+        ? (params: {
+            requestData: T["PATCH"]["types"]["RequestOutput"];
+            urlPathParams?: T["PATCH"]["types"]["UrlVariablesOutput"];
+          }) => Promise<ResponseType<T["PATCH"]["types"]["ResponseOutput"]>>
+        : undefined;
 
   /** Callback for PATCH/update operations */
-  update?: PatchEndpointTypes<T> extends never
-    ? undefined
-    : (params: {
-        requestData: PatchEndpointTypes<T>["request"];
-        urlPathParams?: PatchEndpointTypes<T>["urlPathParams"];
-      }) => Promise<ResponseType<PatchEndpointTypes<T>["response"]>>;
+  update?: T extends { PATCH: CreateApiEndpointAny }
+    ? (params: {
+        requestData: T["PATCH"]["types"]["RequestOutput"];
+        urlPathParams?: T["PATCH"]["types"]["UrlVariablesOutput"];
+      }) => Promise<ResponseType<T["PATCH"]["types"]["ResponseOutput"]>>
+    : undefined;
 
   /** Callback for DELETE operations */
-  delete?: DeleteEndpointTypes<T> extends never
-    ? undefined
-    : (params: {
-        requestData?: DeleteEndpointTypes<T>["request"];
-        urlPathParams?: DeleteEndpointTypes<T>["urlPathParams"];
-      }) => Promise<ResponseType<DeleteEndpointTypes<T>["response"]>>;
+  delete?: T extends { DELETE: CreateApiEndpointAny }
+    ? (params: {
+        requestData?: T["DELETE"]["types"]["RequestOutput"];
+        urlPathParams?: T["DELETE"]["types"]["UrlVariablesOutput"];
+      }) => Promise<ResponseType<T["DELETE"]["types"]["ResponseOutput"]>>
+    : undefined;
 }

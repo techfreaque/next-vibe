@@ -100,9 +100,9 @@ const DEFAULT_CONFIG: RestrictedSyntaxPluginConfig = {
 
 const DEFAULT_MESSAGES: RestrictedSyntaxMessages = {
   unknownType:
-    "Usage of the 'unknown' type isn't allowed. Consider using the inferred types from the unified interface system based on definition.ts",
+    "Replace 'unknown' with existing typed interface. align with codebase types rather than converting or recreating.",
   objectType:
-    "Usage of the 'object' type isn't allowed. Consider using the inferred types from the unified interface system based on definition.ts",
+    "Replace 'object' with existing typed interface. align with codebase types rather than converting or recreating.",
   throwStatement:
     "Usage of 'throw' statements is not allowed. Use proper ResponseType<T> patterns instead.",
   jsxInObjectLiteral:

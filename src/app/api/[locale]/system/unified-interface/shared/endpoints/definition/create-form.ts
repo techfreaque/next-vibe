@@ -51,6 +51,58 @@ export interface FormMethodConfig<TScopedTranslationKey extends string> {
 /**
  * Examples configuration for form endpoints
  */
+// ============================================================================
+// CACHED TYPE HELPERS FOR METHOD-SPECIFIC SCHEMAS
+// ============================================================================
+
+/**
+ * Helper types to compute method-specific schemas once and reuse
+ * These avoid recomputing InferSchemaFromFieldForMethod + ExtractInput/Output
+ */
+type InferMethodRequestDataSchema<
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TMethod extends Methods,
+> = InferSchemaFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.RequestData>;
+
+type InferMethodResponseDataSchema<
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TMethod extends Methods,
+> = InferSchemaFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.ResponseData>;
+
+type InferMethodUrlParamsSchema<
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TMethod extends Methods,
+> = InferSchemaFromFieldForMethod<
+  TScopedTranslationKey,
+  TFields,
+  TMethod,
+  FieldUsage.RequestUrlParams
+>;
+
+/**
+ * Combined helper types that include both schema and extracted Input/Output
+ */
+type InferMethodRequestInput<
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TMethod extends Methods,
+> = ExtractInput<InferMethodRequestDataSchema<TScopedTranslationKey, TFields, TMethod>>;
+
+type InferMethodResponseOutput<
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TMethod extends Methods,
+> = ExtractOutput<InferMethodResponseDataSchema<TScopedTranslationKey, TFields, TMethod>>;
+
+type InferMethodUrlVariablesInput<
+  TScopedTranslationKey extends string,
+  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  TMethod extends Methods,
+> = ExtractInput<InferMethodUrlParamsSchema<TScopedTranslationKey, TFields, TMethod>>;
+
 /**
  * Cache schemas for a method to avoid repeated evaluation
  */
@@ -59,28 +111,14 @@ export interface CachedMethodSchemas<
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
   TMethod extends Methods,
 > {
-  requestData: InferSchemaFromFieldForMethod<
-    TScopedTranslationKey,
-    TFields,
-    TMethod,
-    FieldUsage.RequestData
-  >;
-  response: InferSchemaFromFieldForMethod<
-    TScopedTranslationKey,
-    TFields,
-    TMethod,
-    FieldUsage.ResponseData
-  >;
-  urlParams: InferSchemaFromFieldForMethod<
-    TScopedTranslationKey,
-    TFields,
-    TMethod,
-    FieldUsage.RequestUrlParams
-  >;
+  requestData: InferMethodRequestDataSchema<TScopedTranslationKey, TFields, TMethod>;
+  response: InferMethodResponseDataSchema<TScopedTranslationKey, TFields, TMethod>;
+  urlParams: InferMethodUrlParamsSchema<TScopedTranslationKey, TFields, TMethod>;
 }
 
 /**
  * Build examples structure from cached schemas
+ * Uses the cached schema types and extracts Input/Output as needed
  */
 export interface MethodExamples<
   TSchemas extends CachedMethodSchemas<string, UnifiedField<string, z.ZodTypeAny>, Methods>,
@@ -101,14 +139,9 @@ export interface MethodExamples<
 // oxlint-disable-next-line consistent-type-definitions
 export type FormExamples<
   TScopedTranslationKey extends string,
-  TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
+  out TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
   TExampleKey extends string,
   TMethods extends {
-    GET?: FormMethodConfig<TScopedTranslationKey>;
-    POST?: FormMethodConfig<TScopedTranslationKey>;
-    PATCH?: FormMethodConfig<TScopedTranslationKey>;
-    DELETE?: FormMethodConfig<TScopedTranslationKey>;
-  } = {
     GET?: FormMethodConfig<TScopedTranslationKey>;
     POST?: FormMethodConfig<TScopedTranslationKey>;
     PATCH?: FormMethodConfig<TScopedTranslationKey>;
@@ -117,220 +150,112 @@ export type FormExamples<
 > = {
   GET?: "GET" extends keyof TMethods
     ? {
-        requests?: ExtractInput<
-          InferSchemaFromFieldForMethod<
-            TScopedTranslationKey,
-            TFields,
-            Methods.GET,
-            FieldUsage.RequestData
-          >
+        requests?: InferMethodRequestInput<
+          TScopedTranslationKey,
+          TFields,
+          Methods.GET
         > extends never
           ? undefined
           : ExamplesList<
-              ExtractInput<
-                InferSchemaFromFieldForMethod<
-                  TScopedTranslationKey,
-                  TFields,
-                  Methods.GET,
-                  FieldUsage.RequestData
-                >
-              >,
+              InferMethodRequestInput<TScopedTranslationKey, TFields, Methods.GET>,
               TExampleKey
             >;
         responses: ExamplesList<
-          ExtractOutput<
-            InferSchemaFromFieldForMethod<
-              TScopedTranslationKey,
-              TFields,
-              Methods.GET,
-              FieldUsage.ResponseData
-            >
-          >,
+          InferMethodResponseOutput<TScopedTranslationKey, TFields, Methods.GET>,
           TExampleKey
         >;
-        urlPathParams?: ExtractInput<
-          InferSchemaFromFieldForMethod<
-            TScopedTranslationKey,
-            TFields,
-            Methods.GET,
-            FieldUsage.RequestUrlParams
-          >
+        urlPathParams?: InferMethodUrlVariablesInput<
+          TScopedTranslationKey,
+          TFields,
+          Methods.GET
         > extends never
           ? undefined
           : ExamplesList<
-              ExtractInput<
-                InferSchemaFromFieldForMethod<
-                  TScopedTranslationKey,
-                  TFields,
-                  Methods.GET,
-                  FieldUsage.RequestUrlParams
-                >
-              >,
+              InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, Methods.GET>,
               TExampleKey
             >;
       }
     : never;
   POST?: "POST" extends keyof TMethods
     ? {
-        requests?: ExtractInput<
-          InferSchemaFromFieldForMethod<
-            TScopedTranslationKey,
-            TFields,
-            Methods.POST,
-            FieldUsage.RequestData
-          >
+        requests?: InferMethodRequestInput<
+          TScopedTranslationKey,
+          TFields,
+          Methods.POST
         > extends never
           ? undefined
           : ExamplesList<
-              ExtractInput<
-                InferSchemaFromFieldForMethod<
-                  TScopedTranslationKey,
-                  TFields,
-                  Methods.POST,
-                  FieldUsage.RequestData
-                >
-              >,
+              InferMethodRequestInput<TScopedTranslationKey, TFields, Methods.POST>,
               TExampleKey
             >;
         responses: ExamplesList<
-          ExtractOutput<
-            InferSchemaFromFieldForMethod<
-              TScopedTranslationKey,
-              TFields,
-              Methods.POST,
-              FieldUsage.ResponseData
-            >
-          >,
+          InferMethodResponseOutput<TScopedTranslationKey, TFields, Methods.POST>,
           TExampleKey
         >;
-        urlPathParams?: ExtractInput<
-          InferSchemaFromFieldForMethod<
-            TScopedTranslationKey,
-            TFields,
-            Methods.POST,
-            FieldUsage.RequestUrlParams
-          >
+        urlPathParams?: InferMethodUrlVariablesInput<
+          TScopedTranslationKey,
+          TFields,
+          Methods.POST
         > extends never
           ? undefined
           : ExamplesList<
-              ExtractInput<
-                InferSchemaFromFieldForMethod<
-                  TScopedTranslationKey,
-                  TFields,
-                  Methods.POST,
-                  FieldUsage.RequestUrlParams
-                >
-              >,
+              InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, Methods.POST>,
               TExampleKey
             >;
       }
     : never;
   PATCH?: "PATCH" extends keyof TMethods
     ? {
-        requests?: ExtractInput<
-          InferSchemaFromFieldForMethod<
-            TScopedTranslationKey,
-            TFields,
-            Methods.PATCH,
-            FieldUsage.RequestData
-          >
+        requests?: InferMethodRequestInput<
+          TScopedTranslationKey,
+          TFields,
+          Methods.PATCH
         > extends never
           ? undefined
           : ExamplesList<
-              ExtractInput<
-                InferSchemaFromFieldForMethod<
-                  TScopedTranslationKey,
-                  TFields,
-                  Methods.PATCH,
-                  FieldUsage.RequestData
-                >
-              >,
+              InferMethodRequestInput<TScopedTranslationKey, TFields, Methods.PATCH>,
               TExampleKey
             >;
         responses: ExamplesList<
-          ExtractOutput<
-            InferSchemaFromFieldForMethod<
-              TScopedTranslationKey,
-              TFields,
-              Methods.PATCH,
-              FieldUsage.ResponseData
-            >
-          >,
+          InferMethodResponseOutput<TScopedTranslationKey, TFields, Methods.PATCH>,
           TExampleKey
         >;
-        urlPathParams?: ExtractInput<
-          InferSchemaFromFieldForMethod<
-            TScopedTranslationKey,
-            TFields,
-            Methods.PATCH,
-            FieldUsage.RequestUrlParams
-          >
+        urlPathParams?: InferMethodUrlVariablesInput<
+          TScopedTranslationKey,
+          TFields,
+          Methods.PATCH
         > extends never
           ? undefined
           : ExamplesList<
-              ExtractInput<
-                InferSchemaFromFieldForMethod<
-                  TScopedTranslationKey,
-                  TFields,
-                  Methods.PATCH,
-                  FieldUsage.RequestUrlParams
-                >
-              >,
+              InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, Methods.PATCH>,
               TExampleKey
             >;
       }
     : never;
   DELETE?: "DELETE" extends keyof TMethods
     ? {
-        requests?: ExtractInput<
-          InferSchemaFromFieldForMethod<
-            TScopedTranslationKey,
-            TFields,
-            Methods.DELETE,
-            FieldUsage.RequestData
-          >
+        requests?: InferMethodRequestInput<
+          TScopedTranslationKey,
+          TFields,
+          Methods.DELETE
         > extends never
           ? undefined
           : ExamplesList<
-              ExtractInput<
-                InferSchemaFromFieldForMethod<
-                  TScopedTranslationKey,
-                  TFields,
-                  Methods.DELETE,
-                  FieldUsage.RequestData
-                >
-              >,
+              InferMethodRequestInput<TScopedTranslationKey, TFields, Methods.DELETE>,
               TExampleKey
             >;
         responses: ExamplesList<
-          ExtractOutput<
-            InferSchemaFromFieldForMethod<
-              TScopedTranslationKey,
-              TFields,
-              Methods.DELETE,
-              FieldUsage.ResponseData
-            >
-          >,
+          InferMethodResponseOutput<TScopedTranslationKey, TFields, Methods.DELETE>,
           TExampleKey
         >;
-        urlPathParams?: ExtractInput<
-          InferSchemaFromFieldForMethod<
-            TScopedTranslationKey,
-            TFields,
-            Methods.DELETE,
-            FieldUsage.RequestUrlParams
-          >
+        urlPathParams?: InferMethodUrlVariablesInput<
+          TScopedTranslationKey,
+          TFields,
+          Methods.DELETE
         > extends never
           ? undefined
           : ExamplesList<
-              ExtractInput<
-                InferSchemaFromFieldForMethod<
-                  TScopedTranslationKey,
-                  TFields,
-                  Methods.DELETE,
-                  FieldUsage.RequestUrlParams
-                >
-              >,
+              InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, Methods.DELETE>,
               TExampleKey
             >;
       }
@@ -1095,90 +1020,31 @@ export function createFormEndpoint<
   const createMethodEndpoint = <TMethod extends Methods>(
     method: TMethod,
     methodConfig: FormMethodConfig<TScopedTranslationKey>,
-    requestSchema: InferSchemaFromFieldForMethod<
-      TScopedTranslationKey,
-      TFields,
-      TMethod,
-      FieldUsage.RequestData
-    >,
-    responseSchema: InferSchemaFromFieldForMethod<
-      TScopedTranslationKey,
-      TFields,
-      TMethod,
-      FieldUsage.ResponseData
-    >,
-    urlSchema: InferSchemaFromFieldForMethod<
-      TScopedTranslationKey,
-      TFields,
-      TMethod,
-      FieldUsage.RequestUrlParams
-    >,
-    examples: (ExtractInput<
-      InferSchemaFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.RequestData>
-    > extends undefined
+    requestSchema: InferMethodRequestDataSchema<TScopedTranslationKey, TFields, TMethod>,
+    responseSchema: InferMethodResponseDataSchema<TScopedTranslationKey, TFields, TMethod>,
+    urlSchema: InferMethodUrlParamsSchema<TScopedTranslationKey, TFields, TMethod>,
+    examples: (InferMethodRequestInput<TScopedTranslationKey, TFields, TMethod> extends undefined
       ? { requests?: undefined }
-      : ExtractInput<
-            InferSchemaFromFieldForMethod<
-              TScopedTranslationKey,
-              TFields,
-              TMethod,
-              FieldUsage.RequestData
-            >
-          > extends never
+      : InferMethodRequestInput<TScopedTranslationKey, TFields, TMethod> extends never
         ? { requests?: undefined }
         : {
             requests: ExamplesList<
-              ExtractInput<
-                InferSchemaFromFieldForMethod<
-                  TScopedTranslationKey,
-                  TFields,
-                  TMethod,
-                  FieldUsage.RequestData
-                >
-              >,
+              InferMethodRequestInput<TScopedTranslationKey, TFields, TMethod>,
               TExampleKey
             >;
           }) &
-      (ExtractInput<
-        InferSchemaFromFieldForMethod<
-          TScopedTranslationKey,
-          TFields,
-          TMethod,
-          FieldUsage.RequestUrlParams
-        >
-      > extends undefined
+      (InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, TMethod> extends undefined
         ? { urlPathParams?: undefined }
-        : ExtractInput<
-              InferSchemaFromFieldForMethod<
-                TScopedTranslationKey,
-                TFields,
-                TMethod,
-                FieldUsage.RequestUrlParams
-              >
-            > extends never
+        : InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, TMethod> extends never
           ? { urlPathParams?: undefined }
           : {
               urlPathParams: ExamplesList<
-                ExtractInput<
-                  InferSchemaFromFieldForMethod<
-                    TScopedTranslationKey,
-                    TFields,
-                    TMethod,
-                    FieldUsage.RequestUrlParams
-                  >
-                >,
+                InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, TMethod>,
                 TExampleKey
               >;
             }) & {
         responses: ExamplesList<
-          ExtractOutput<
-            InferSchemaFromFieldForMethod<
-              TScopedTranslationKey,
-              TFields,
-              TMethod,
-              FieldUsage.ResponseData
-            >
-          >,
+          InferMethodResponseOutput<TScopedTranslationKey, TFields, TMethod>,
           TExampleKey
         >;
       },

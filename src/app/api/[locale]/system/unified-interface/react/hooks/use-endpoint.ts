@@ -7,17 +7,21 @@ import type { UseFormReturn } from "react-hook-form";
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type {
+  DeleteRequest,
+  DeleteResponse,
+  DeleteUrlVariables,
+  PatchRequest,
+  PatchResponse,
+  PatchUrlVariables,
+  PrimaryMutationRequest,
+  PrimaryMutationResponse,
+  PrimaryMutationUrlVariables,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-helpers";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { useTranslation } from "@/i18n/core/client";
 
-import type {
-  DeleteEndpointTypes,
-  EndpointReturn,
-  FormAlertState,
-  PatchEndpointTypes,
-  PrimaryMutationTypes,
-  UseEndpointOptions,
-} from "./endpoint-types";
+import type { EndpointReturn, FormAlertState, UseEndpointOptions } from "./endpoint-types";
 import { useAvailableMethods, usePrimaryMutationMethod } from "./endpoint-utils";
 import type { ApiMutationOptions } from "./types";
 import { useEndpointCreate } from "./use-endpoint-create";
@@ -142,23 +146,19 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
 
   const createMutationOptions = useMemo(():
     | ApiMutationOptions<
-        PrimaryMutationTypes<T>["request"],
-        PrimaryMutationTypes<T>["response"],
-        PrimaryMutationTypes<T>["urlPathParams"]
+        PrimaryMutationRequest<T>,
+        PrimaryMutationResponse<T>,
+        PrimaryMutationUrlVariables<T>
       >
     | undefined => {
     return options.create?.mutationOptions;
   }, [options.create?.mutationOptions]);
 
-  const createInitialState = useMemo(():
-    | DeepPartial<PrimaryMutationTypes<T>["request"]>
-    | undefined => {
+  const createInitialState = useMemo((): DeepPartial<PrimaryMutationRequest<T>> | undefined => {
     return options.create?.initialState;
   }, [options.create?.initialState]);
 
-  const createAutoPrefillData = useMemo(():
-    | DeepPartial<PrimaryMutationTypes<T>["request"]>
-    | undefined => {
+  const createAutoPrefillData = useMemo((): DeepPartial<PrimaryMutationRequest<T>> | undefined => {
     return autoPrefillData ?? options.create?.autoPrefillData;
   }, [autoPrefillData, options.create?.autoPrefillData]);
 
@@ -204,20 +204,14 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
 
   // Merge delete options - only use hook-provided options (endpoint-level options not accessible due to dynamic endpoint selection)
   const deleteMutationOptions = useMemo(():
-    | ApiMutationOptions<
-        DeleteEndpointTypes<T>["request"],
-        DeleteEndpointTypes<T>["response"],
-        DeleteEndpointTypes<T>["urlPathParams"]
-      >
+    | ApiMutationOptions<DeleteRequest<T>, DeleteResponse<T>, DeleteUrlVariables<T>>
     | undefined => {
     return options.delete?.mutationOptions;
   }, [options.delete?.mutationOptions]);
 
   const deleteUrlPathParams = options.delete?.urlPathParams ?? options.urlPathParams;
 
-  const deleteAutoPrefillData = useMemo(():
-    | DeepPartial<DeleteEndpointTypes<T>["request"]>
-    | undefined => {
+  const deleteAutoPrefillData = useMemo((): DeepPartial<DeleteRequest<T>> | undefined => {
     return options.delete?.autoPrefillData;
   }, [options.delete?.autoPrefillData]);
 
@@ -345,24 +339,16 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   }, [options.update?.formOptions, options.formOptions, options.defaultValues]);
 
   const updateMutationOptions = useMemo(():
-    | ApiMutationOptions<
-        PatchEndpointTypes<T>["request"],
-        PatchEndpointTypes<T>["response"],
-        PatchEndpointTypes<T>["urlPathParams"]
-      >
+    | ApiMutationOptions<PatchRequest<T>, PatchResponse<T>, PatchUrlVariables<T>>
     | undefined => {
     return options.update?.mutationOptions;
   }, [options.update?.mutationOptions]);
 
-  const updateInitialState = useMemo(():
-    | DeepPartial<PatchEndpointTypes<T>["request"]>
-    | undefined => {
+  const updateInitialState = useMemo((): DeepPartial<PatchRequest<T>> | undefined => {
     return options.update?.initialState;
   }, [options.update?.initialState]);
 
-  const updateAutoPrefillData = useMemo(():
-    | DeepPartial<PatchEndpointTypes<T>["request"]>
-    | undefined => {
+  const updateAutoPrefillData = useMemo((): DeepPartial<PatchRequest<T>> | undefined => {
     return autoPrefillData ?? options.update?.autoPrefillData;
   }, [autoPrefillData, options.update?.autoPrefillData]);
 

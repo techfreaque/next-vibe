@@ -13,7 +13,6 @@
 
 import { z } from "zod";
 
-import type { ExtractEndpointTypes } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -233,8 +232,7 @@ const testResponseEndpoint = createEndpoint({
   },
 });
 
-// Extract the response type from GET method
-type TestResponseType = ExtractEndpointTypes<typeof testResponseEndpoint.GET>["response"];
+type TestResponseType = (typeof testResponseEndpoint.GET)["types"]["ResponseOutput"];
 
 // The response type should be: { userId: string; count: number }
 interface ExpectedResponseType {

@@ -54,7 +54,7 @@ const { GET } = createEndpoint({
     },
     { response: true },
     {
-      // Top action buttons container (widget object field - pure UI, no response data)
+      // Top action buttons container
       topActions: widgetObjectField(
         {
           type: WidgetType.CONTAINER,
@@ -72,6 +72,7 @@ const { GET } = createEndpoint({
             label: "app.api.agent.chat.characters.get.createButton.label" as const,
             icon: "plus",
             variant: "default",
+            className: "ml-auto",
           }),
         },
       ),

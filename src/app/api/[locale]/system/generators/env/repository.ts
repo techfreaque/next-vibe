@@ -282,7 +282,7 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       logger.info(
         formatGenerator(
           `Generated env files with ${formatCount(validServerModules.length, "server module")} and ${formatCount(validClientModules.length, "client module")} in ${formatDuration(duration)}`,
-          "\u2699\uFE0F",
+          "⚙️ ",
         ),
       );
 

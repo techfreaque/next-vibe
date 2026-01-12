@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 
@@ -128,12 +129,17 @@ export function WidgetRenderer<const TKey extends string>({
   submitButton,
   cancelButton,
 }: WidgetRendererProps<TKey>): JSX.Element {
+  // Merge className from field.ui with className prop
+  // field.ui.className is specified in the endpoint definition
+  // className prop comes from parent container/layout
+  const mergedClassName = cn(field.ui?.className, className);
+
   const baseProps = {
     field,
     fieldName,
     value: data,
     context,
-    className,
+    className: mergedClassName,
     style,
     form,
     onSubmit,

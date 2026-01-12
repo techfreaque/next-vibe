@@ -19,13 +19,7 @@ import type { z } from "zod";
 import type imapAccountsListDefinition from "@/app/api/[locale]/emails/imap-client/accounts/list/definition";
 import type imapAccountTestDefinition from "@/app/api/[locale]/emails/imap-client/accounts/test/definition";
 import type imapConfigDefinition from "@/app/api/[locale]/emails/imap-client/config/definition";
-import type {
-  DeleteEndpointTypes,
-  EndpointReturn,
-  ExtractEndpointTypes,
-  GetEndpointTypes,
-  PrimaryMutationTypes,
-} from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
+import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import {
   objectField,
   responseField,
@@ -37,6 +31,17 @@ import type {
   PrimitiveField,
   UnifiedField,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
+import type {
+  DeleteRequest,
+  DeleteResponse,
+  DeleteUrlVariables,
+  GetRequest,
+  GetResponse,
+  GetUrlVariables,
+  PrimaryMutationRequest,
+  PrimaryMutationResponse,
+  PrimaryMutationUrlVariables,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-helpers";
 import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   LayoutType,
@@ -157,9 +162,7 @@ type ImapStep4d_ResponseOutput = ImapStep4a_Types["ResponseOutput"];
 type ImapStep4d_IsNotNever = ImapStep4d_ResponseOutput extends never ? false : true;
 type ImapStep4d_Verify = Expect<Equal<ImapStep4d_IsNotNever, true>>;
 
-// Step 5: Extract the response type using ExtractEndpointTypes
-type ImapStep5_ExtractedTypes = ExtractEndpointTypes<typeof imapAccountsListDefinition.GET>;
-type ImapStep5_ResponseType = ImapStep5_ExtractedTypes["response"];
+type ImapStep5_ResponseType = (typeof imapAccountsListDefinition.GET)["types"]["ResponseOutput"];
 
 // Step 6: Verify extracted type has 'accounts' property
 type ImapStep6_HasAccounts = "accounts" extends keyof ImapStep5_ResponseType ? true : false;

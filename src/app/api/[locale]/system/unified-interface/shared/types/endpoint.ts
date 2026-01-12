@@ -595,6 +595,8 @@ export interface NavigateButtonConfig<
   icon?: IconKey;
   /** Button variant */
   variant?: "default" | "secondary" | "destructive" | "ghost" | "outline";
+  /** Optional CSS class name */
+  className?: string;
 }
 
 /**

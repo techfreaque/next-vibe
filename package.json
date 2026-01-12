@@ -310,6 +310,7 @@
     "ignore-loader": "^0.1.2",
     "jsdom": "27.3.0",
     "module-alias": "2.2.3",
+    "oxfmt": "^0.24.0",
     "oxlint": "1.33.0",
     "patch-package": "8.0.1",
     "postcss": "8",

@@ -127,6 +127,16 @@ export const DataCardsWidget = <const TKey extends string>({
 
   // Render a single card
   const renderCard = (card: (typeof cards)[number], index: number): JSX.Element => {
+    // Check if card click navigation is configured
+    const onCardClickMetadata = field.ui.metadata?.onCardClick;
+    const handleCardClick = (): void => {
+      if (onCardClickMetadata && context.navigation && isWidgetDataObject(card)) {
+        const params = onCardClickMetadata.extractParams(card as Record<string, WidgetData>);
+        context.logger.debug("DataCardsWidget: extracted params", { params });
+        context.navigation.push(onCardClickMetadata.targetEndpoint, params, false, undefined);
+      }
+    };
+
     return (
       <Div
         key={index}

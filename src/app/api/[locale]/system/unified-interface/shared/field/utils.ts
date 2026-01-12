@@ -9,6 +9,7 @@ import { z } from "zod";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { IconKey } from "../../react/icons";
 import type { EndpointLogger } from "../logger/endpoint";
 import type {
   ArrayField,
@@ -24,8 +25,12 @@ import type {
   UnifiedField,
   WidgetField,
 } from "../types/endpoint";
-import { FieldUsage, WidgetType } from "../types/enums";
-import type { NavigateButtonWidgetConfig, WidgetConfig } from "../widgets/configs";
+import { FieldUsage, type SpacingSize, WidgetType } from "../types/enums";
+import type {
+  NavigateButtonWidgetConfig,
+  SubmitButtonWidgetConfig,
+  WidgetConfig,
+} from "../widgets/configs";
 
 // ============================================================================
 // TYPE GUARDS
@@ -1861,6 +1866,7 @@ export function navigateButtonField<
     label: config.label,
     icon: config.icon,
     variant: config.variant,
+    className: config.className,
     // Store navigation config in metadata for widget access
     metadata: {
       targetEndpoint: config.targetEndpoint,
@@ -1955,7 +1961,10 @@ export function deleteButton<
  * ```
  */
 export function backButton<TKey extends string = TranslationKey>(
-  config?: Pick<NavigateButtonConfig<never, never, TKey>, "label" | "icon" | "variant">,
+  config?: Pick<
+    NavigateButtonConfig<never, never, TKey>,
+    "label" | "icon" | "variant" | "className"
+  >,
 ): WidgetField<{ response: true }, TKey, NavigateButtonWidgetConfig<null, undefined, TKey>> {
   return {
     type: "widget" as const,
@@ -1965,10 +1974,55 @@ export function backButton<TKey extends string = TranslationKey>(
       label: config?.label,
       icon: config?.icon ?? "arrow-left",
       variant: config?.variant,
+      className: config?.className,
       // targetEndpoint: null signals back navigation
       metadata: {
         targetEndpoint: null,
       },
+    },
+  };
+}
+
+/**
+ * Convenience helper for creating a submit button
+ * Renders a button that triggers form submission
+ *
+ * @template TKey - Translation key type
+ *
+ * @example
+ * ```typescript
+ * submitButton: submitButton({
+ *   label: "app.api.user.public.login.actions.submit",
+ *   loadingText: "app.api.user.public.login.actions.submitting",
+ *   icon: "save",
+ *   variant: "primary",
+ *   className: "ml-auto"
+ * })
+ * ```
+ */
+export function submitButton<TKey extends string = TranslationKey>(config: {
+  label?: TKey;
+  loadingText?: TKey;
+  icon?: IconKey;
+  variant?: "default" | "primary" | "secondary" | "destructive" | "ghost" | "outline" | "link";
+  size?: "default" | "sm" | "lg" | "icon";
+  iconSize?: "xs" | "sm" | "base" | "lg";
+  iconSpacing?: SpacingSize;
+  className?: string;
+}): WidgetField<{ request: "data" }, TKey, SubmitButtonWidgetConfig<TKey>> {
+  return {
+    type: "widget" as const,
+    usage: { request: "data" },
+    ui: {
+      type: WidgetType.SUBMIT_BUTTON,
+      text: config.label,
+      loadingText: config.loadingText,
+      icon: config.icon,
+      variant: config.variant ?? "default",
+      size: config.size ?? "default",
+      iconSize: config.iconSize,
+      iconSpacing: config.iconSpacing,
+      className: config.className,
     },
   };
 }
