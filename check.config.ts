@@ -46,7 +46,7 @@ const features = {
   pedantic: false, // Stricter/pedantic rules
   // Custom plugins
   i18n: true, // Check for untranslated strings
-  jsxCapitalization: true, // Enforce capitalized JSX components
+  jsxCapitalization: false, // Enforce capitalized JSX components
   restrictedSyntax: true, // No throw, unknown, object types
   // TypeScript
   tsgo: true, // Use tsgo instead of tsc for type checking
