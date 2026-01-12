@@ -1,6 +1,6 @@
 {
   "name": "@next-vibe/checker",
-  "version": "1.0.51",
+  "version": "1.0.52",
   "description": "TypeScript code quality checker with CLI and MCP support",
   "keywords": [
     "api",
