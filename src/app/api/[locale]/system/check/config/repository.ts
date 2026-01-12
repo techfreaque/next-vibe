@@ -66,6 +66,7 @@ export interface ConfigRepositoryInterface {
 
   createDefaultMcpConfig(
     logger: EndpointLogger,
+    path: string,
   ): Promise<{ success: boolean; mcpConfigPath: string; error?: string }>;
 }
 
@@ -611,10 +612,23 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       await fs.writeFile(configPath, templateContent, "utf8");
 
       // Also create .mcp.json
-      const mcpResult = await this.createDefaultMcpConfig(logger);
+      const mcpResult = await this.createDefaultMcpConfig(logger, ".mcp.json");
       if (!mcpResult.success) {
         logger.warn("Failed to create .mcp.json", {
           error: mcpResult.error,
+        });
+      }
+      const mcpCursorResult = await this.createDefaultMcpConfig(logger, ".cursor/mcp.json");
+      if (!mcpCursorResult.success) {
+        logger.warn("Failed to create .cursor/mcp.json", {
+          error: mcpCursorResult.error,
+        });
+      }
+
+      const mcpVscodeResult = await this.createDefaultMcpConfig(logger, ".vscode/mcp.json");
+      if (!mcpVscodeResult.success) {
+        logger.warn("Failed to create .vscode/mcp.json", {
+          error: mcpVscodeResult.error,
         });
       }
 
@@ -628,8 +642,9 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
   async createDefaultMcpConfig(
     logger: EndpointLogger,
+    path: string,
   ): Promise<{ success: boolean; mcpConfigPath: string; error?: string }> {
-    const mcpConfigPath = resolve(process.cwd(), ".mcp.json");
+    const mcpConfigPath = resolve(process.cwd(), path);
 
     try {
       const mcpConfig = {

@@ -182,13 +182,36 @@ export class ConfigCreateRepository {
 
       // Create MCP config if requested
       if (data.createMcpConfig) {
-        const mcpResult = await configRepository.createDefaultMcpConfig(logger);
-
+        const mcpResult = await configRepository.createDefaultMcpConfig(logger, ".mcp.json");
         if (mcpResult.success) {
           mcpConfigPath = mcpResult.mcpConfigPath;
         } else {
           logger.warn(t("app.api.system.check.config.create.warnings.mcpConfigFailed"), {
             error: mcpResult.error,
+          });
+        }
+
+        const mcpCursorResult = await configRepository.createDefaultMcpConfig(
+          logger,
+          ".cursor/mcp.json",
+        );
+        if (mcpCursorResult.success) {
+          mcpConfigPath = mcpCursorResult.mcpConfigPath;
+        } else {
+          logger.warn(t("app.api.system.check.config.create.warnings.mcpConfigFailed"), {
+            error: mcpCursorResult.error,
+          });
+        }
+
+        const mcpVscodeResult = await configRepository.createDefaultMcpConfig(
+          logger,
+          ".vscode/mcp.json",
+        );
+        if (mcpVscodeResult.success) {
+          mcpConfigPath = mcpVscodeResult.mcpConfigPath;
+        } else {
+          logger.warn(t("app.api.system.check.config.create.warnings.mcpConfigFailed"), {
+            error: mcpVscodeResult.error,
           });
         }
       }
