@@ -6,12 +6,14 @@ export const translations: typeof enTranslations = {
     description: "Übersetzungsdateien aus einer Sicherung wiederherstellen",
     container: {
       title: "Sicherung wiederherstellen",
-      description: "Übersetzungsdateien aus einer angegebenen Sicherung wiederherstellen",
+      description:
+        "Übersetzungsdateien aus einer angegebenen Sicherung wiederherstellen",
     },
     fields: {
       backupPath: {
         title: "Sicherungspfad",
-        description: "Pfad zum Sicherungsverzeichnis, aus dem wiederhergestellt werden soll",
+        description:
+          "Pfad zum Sicherungsverzeichnis, aus dem wiederhergestellt werden soll",
       },
       validateOnly: {
         title: "Nur validieren",
@@ -19,7 +21,8 @@ export const translations: typeof enTranslations = {
       },
       createBackupBeforeRestore: {
         title: "Sicherung vor Wiederherstellung erstellen",
-        description: "Sicherung des aktuellen Zustands vor der Wiederherstellung erstellen",
+        description:
+          "Sicherung des aktuellen Zustands vor der Wiederherstellung erstellen",
       },
     },
     messages: {

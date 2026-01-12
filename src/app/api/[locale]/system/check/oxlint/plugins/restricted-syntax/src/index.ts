@@ -17,8 +17,15 @@
  */
 
 import type { RestrictedSyntaxPluginConfig } from "../../../../config/types";
-import type { OxlintASTNode, OxlintComment, OxlintRuleContext } from "../../../types";
-import type { createPluginMessages, loadPluginConfig } from "../../shared/config-loader";
+import type {
+  OxlintASTNode,
+  OxlintComment,
+  OxlintRuleContext,
+} from "../../../types";
+import type {
+  createPluginMessages,
+  loadPluginConfig,
+} from "../../shared/config-loader";
 
 // ============================================================
 // Types
@@ -173,9 +180,11 @@ function loadConfigFallback(): RestrictedSyntaxPluginConfig {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment -- Plugin fallback requires dynamic loading
     const config = require(`${process.cwd()}/check.config.ts`);
     const checkConfig = config.default ?? config;
-    const exported = typeof checkConfig === "function" ? checkConfig() : checkConfig;
+    const exported =
+      typeof checkConfig === "function" ? checkConfig() : checkConfig;
 
-    const ruleConfig = exported?.oxlint?.rules?.["oxlint-plugin-restricted/restricted-syntax"];
+    const ruleConfig =
+      exported?.oxlint?.rules?.["oxlint-plugin-restricted/restricted-syntax"];
     if (Array.isArray(ruleConfig) && ruleConfig[1]) {
       return ruleConfig[1] as RestrictedSyntaxPluginConfig;
     }
@@ -205,7 +214,9 @@ function getMessages(): RestrictedSyntaxMessages {
  * Type guard to check if a node is a Property node
  */
 function isProperty(node: OxlintASTNode): node is Property {
-  return node.type === "Property" && typeof (node as Property).method === "boolean";
+  return (
+    node.type === "Property" && typeof (node as Property).method === "boolean"
+  );
 }
 
 /**
@@ -231,9 +242,13 @@ function isAllowedPath(context: RestrictedSyntaxRuleContext): boolean {
 /**
  * Check if the node has a disable comment
  */
-function hasDisableComment(context: RestrictedSyntaxRuleContext, node: OxlintASTNode): boolean {
+function hasDisableComment(
+  context: RestrictedSyntaxRuleContext,
+  node: OxlintASTNode,
+): boolean {
   // Try to get comments from context
-  const getComments = context.getCommentsBefore ?? context.sourceCode?.getCommentsBefore;
+  const getComments =
+    context.getCommentsBefore ?? context.sourceCode?.getCommentsBefore;
   if (typeof getComments !== "function") {
     // If comment API is not available, allow the node (fail open)
     return false;
@@ -254,7 +269,8 @@ function hasDisableComment(context: RestrictedSyntaxRuleContext, node: OxlintAST
       if (
         (commentText.includes("eslint-disable-next-line") ||
           commentText.includes("oxlint-disable-next-line")) &&
-        (commentText.includes("restricted-syntax") || commentText.includes("no-restricted-syntax"))
+        (commentText.includes("restricted-syntax") ||
+          commentText.includes("no-restricted-syntax"))
       ) {
         return true;
       }
@@ -277,7 +293,9 @@ function isObjectProperty(prop: OxlintASTNode): prop is Property {
 /**
  * Get the JSX allowed properties Set from rule options or config file
  */
-function getJsxAllowedProperties(context: RestrictedSyntaxRuleContext): Set<string> {
+function getJsxAllowedProperties(
+  context: RestrictedSyntaxRuleContext,
+): Set<string> {
   // First try rule options (primary - passed via oxlint config)
   const ruleOptions = context.options?.[0];
   if (ruleOptions?.jsxAllowedProperties) {
@@ -297,7 +315,10 @@ function getJsxAllowedProperties(context: RestrictedSyntaxRuleContext): Set<stri
 /**
  * Check if a property key is in the allowlist for JSX values
  */
-function isJSXAllowedKey(prop: OxlintASTNode, jsxAllowedProperties: Set<string>): boolean {
+function isJSXAllowedKey(
+  prop: OxlintASTNode,
+  jsxAllowedProperties: Set<string>,
+): boolean {
   const property = prop as Property;
   if (property.computed) {
     return false;
@@ -311,7 +332,10 @@ function isJSXAllowedKey(prop: OxlintASTNode, jsxAllowedProperties: Set<string>)
 
   if (key.type === "Identifier") {
     keyName = (key as Identifier).name;
-  } else if (key.type === "Literal" && typeof (key as Literal).value === "string") {
+  } else if (
+    key.type === "Literal" &&
+    typeof (key as Literal).value === "string"
+  ) {
     keyName = (key as Literal).value as string;
   }
 
@@ -362,7 +386,9 @@ const restrictedSyntaxRule = {
       },
     ],
   },
-  create(context: RestrictedSyntaxRuleContext): Record<string, (node: OxlintASTNode) => void> {
+  create(
+    context: RestrictedSyntaxRuleContext,
+  ): Record<string, (node: OxlintASTNode) => void> {
     // Check if file is in allowed path (applies to all rules)
     const isAllowed = isAllowedPath(context);
 

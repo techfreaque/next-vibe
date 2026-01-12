@@ -58,7 +58,11 @@ const getStatusConfig = (
   };
 };
 
-export function UsersTable({ locale, users, isLoading }: UsersTableProps): React.JSX.Element {
+export function UsersTable({
+  locale,
+  users,
+  isLoading,
+}: UsersTableProps): React.JSX.Element {
   const { t } = simpleT(locale);
 
   // Utility function for formatting dates
@@ -67,7 +71,10 @@ export function UsersTable({ locale, users, isLoading }: UsersTableProps): React
       if (!date) {
         return t("app.admin.users.formatting.fallbacks.never");
       }
-      const dateObj = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
+      const dateObj =
+        typeof date === "string" || typeof date === "number"
+          ? new Date(date)
+          : date;
       return dateObj.toLocaleDateString(locale);
     },
     [t, locale],
@@ -83,7 +90,9 @@ export function UsersTable({ locale, users, isLoading }: UsersTableProps): React
               <TableHead>{t("app.admin.users.table.email")}</TableHead>
               <TableHead>{t("app.admin.users.table.status")}</TableHead>
               <TableHead>{t("app.admin.users.table.created")}</TableHead>
-              <TableHead className="text-right">{t("app.admin.users.table.actions")}</TableHead>
+              <TableHead className="text-right">
+                {t("app.admin.users.table.actions")}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -140,10 +149,18 @@ export function UsersTable({ locale, users, isLoading }: UsersTableProps): React
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="min-w-[200px]">{t("app.admin.users.table.name")}</TableHead>
-            <TableHead className="min-w-[200px]">{t("app.admin.users.table.email")}</TableHead>
-            <TableHead className="min-w-[120px]">{t("app.admin.users.table.status")}</TableHead>
-            <TableHead className="min-w-[120px]">{t("app.admin.users.table.created")}</TableHead>
+            <TableHead className="min-w-[200px]">
+              {t("app.admin.users.table.name")}
+            </TableHead>
+            <TableHead className="min-w-[200px]">
+              {t("app.admin.users.table.email")}
+            </TableHead>
+            <TableHead className="min-w-[120px]">
+              {t("app.admin.users.table.status")}
+            </TableHead>
+            <TableHead className="min-w-[120px]">
+              {t("app.admin.users.table.created")}
+            </TableHead>
             <TableHead className="text-right min-w-[100px]">
               {t("app.admin.users.table.actions")}
             </TableHead>
@@ -164,7 +181,9 @@ export function UsersTable({ locale, users, isLoading }: UsersTableProps): React
                 </TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
-                  <Badge variant={statusConfig.variant}>{t(statusConfig.label)}</Badge>
+                  <Badge variant={statusConfig.variant}>
+                    {t(statusConfig.label)}
+                  </Badge>
                 </TableCell>
                 <TableCell>
                   <Div className="text-sm text-gray-500 dark:text-gray-400">

@@ -11,7 +11,9 @@ interface CronAdminPageProps {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-export default async function CronAdminPage({ params }: CronAdminPageProps): Promise<never> {
+export default async function CronAdminPage({
+  params,
+}: CronAdminPageProps): Promise<never> {
   const { locale } = await params;
 
   // Redirect to the stats page

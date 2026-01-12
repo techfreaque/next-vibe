@@ -93,7 +93,10 @@ export interface ValidationResult {
  * Validate that an env file exports the correct structure
  * Uses static analysis to avoid import side effects during generation
  */
-export function validateEnvFileExports(filePath: string, isClient: boolean): ValidationResult {
+export function validateEnvFileExports(
+  filePath: string,
+  isClient: boolean,
+): ValidationResult {
   const errors: EnvValidationError[] = [];
 
   try {
@@ -135,7 +138,8 @@ export function validateEnvFileExports(filePath: string, isClient: boolean): Val
 
     const envModule: EnvModuleInfo = {
       moduleName,
-      envExampleEntries: envExampleEntries.length > 0 ? envExampleEntries : undefined,
+      envExampleEntries:
+        envExampleEntries.length > 0 ? envExampleEntries : undefined,
     };
 
     return {
@@ -163,7 +167,9 @@ export function validateEnvFileExports(filePath: string, isClient: boolean): Val
 export function formatValidationErrors(errors: EnvValidationError[]): string {
   return errors
     .map((err) => {
-      const relativePath = err.filePath.replace(process.cwd(), "").replace(/^\//, "");
+      const relativePath = err.filePath
+        .replace(process.cwd(), "")
+        .replace(/^\//, "");
       let msg = `    • ${relativePath}`;
       msg += `\n      ${err.message}`;
 
@@ -173,8 +179,13 @@ export function formatValidationErrors(errors: EnvValidationError[]): string {
           msg += `\n      💡 ${err.details.hint}`;
         } else if ("error" in err.details) {
           msg += `\n      ⚠️  ${err.details.error}`;
-        } else if ("existingFile" in err.details && "duplicateFile" in err.details) {
-          const existing = err.details.existingFile.replace(process.cwd(), "").replace(/^\//, "");
+        } else if (
+          "existingFile" in err.details &&
+          "duplicateFile" in err.details
+        ) {
+          const existing = err.details.existingFile
+            .replace(process.cwd(), "")
+            .replace(/^\//, "");
           msg += `\n      ⚠️  Conflicts with: ${existing}`;
         }
       }

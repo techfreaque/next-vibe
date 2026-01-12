@@ -22,7 +22,9 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class LinkCardWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.LINK_CARD> {
+export class LinkCardWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.LINK_CARD
+> {
   readonly widgetType = WidgetType.LINK_CARD;
 
   /**
@@ -56,7 +58,10 @@ export class LinkCardWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
    * - Lines 3+: Description (wrapped, indented) if available
    * - Additional lines: Metadata key-value pairs (dimmed keys, indented) if available
    */
-  private renderLinkCard(data: ProcessedLinkCard, context: WidgetRenderContext): string {
+  private renderLinkCard(
+    data: ProcessedLinkCard,
+    context: WidgetRenderContext,
+  ): string {
     const { title, url, description, icon, metadata } = data;
     const indent = this.createIndent(context.depth, context);
     const result: string[] = [];
@@ -65,7 +70,11 @@ export class LinkCardWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     const iconPrefix = context.options.useEmojis && icon ? `${icon} ` : "";
 
     // Render title
-    const styledTitle = this.styleText(`${iconPrefix}${title}`, "bold", context);
+    const styledTitle = this.styleText(
+      `${iconPrefix}${title}`,
+      "bold",
+      context,
+    );
     result.push(`${indent}${styledTitle}`);
 
     // Render URL

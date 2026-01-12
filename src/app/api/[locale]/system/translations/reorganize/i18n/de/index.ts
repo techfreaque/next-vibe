@@ -4,7 +4,8 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
     title: "Übersetzungen reorganisieren",
-    description: "Übersetzungsdateien reorganisieren und ungenutzte Schlüssel entfernen",
+    description:
+      "Übersetzungsdateien reorganisieren und ungenutzte Schlüssel entfernen",
     form: {
       title: "Reorganisationsoptionen",
       description: "Übersetzungsreorganisationsparameter konfigurieren",
@@ -16,7 +17,8 @@ export const translations: typeof enTranslations = {
     fields: {
       removeUnused: {
         title: "Ungenutzte Schlüssel entfernen",
-        description: "Übersetzungsschlüssel entfernen, die im Code nicht verwendet werden",
+        description:
+          "Übersetzungsschlüssel entfernen, die im Code nicht verwendet werden",
       },
       dryRun: {
         title: "Probelauf",
@@ -28,11 +30,13 @@ export const translations: typeof enTranslations = {
       },
       regenerateStructure: {
         title: "Struktur regenerieren",
-        description: "Übersetzungsdateistruktur basierend auf Verwendung regenerieren",
+        description:
+          "Übersetzungsdateistruktur basierend auf Verwendung regenerieren",
       },
       regenerateKeys: {
         title: "Schlüssel regenerieren",
-        description: "Übersetzungsschlüssel basierend auf Dateipfaden regenerieren",
+        description:
+          "Übersetzungsschlüssel basierend auf Dateipfaden regenerieren",
       },
       success: {
         title: "Operation erfolgreich",

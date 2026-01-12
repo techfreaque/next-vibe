@@ -6,7 +6,8 @@ export const translations = {
   csv: {
     post: {
       title: "Import CSV Data",
-      description: "Import data from CSV files with intelligent processing and validation",
+      description:
+        "Import data from CSV files with intelligent processing and validation",
 
       form: {
         title: "CSV Import Configuration",
@@ -184,7 +185,8 @@ export const translations = {
           emptyFileName: "Please provide a name for this import",
           invalidDomain: "Please select a valid import domain",
           invalidBatchSize: "Batch size must be between 10 and 1000",
-          fileTooLarge: "File size exceeds 10MB limit. Consider using background processing.",
+          fileTooLarge:
+            "File size exceeds 10MB limit. Consider using background processing.",
         },
         unauthorized: {
           title: "Access Denied",
@@ -192,11 +194,13 @@ export const translations = {
         },
         fileTooLarge: {
           title: "File Too Large",
-          description: "The selected file exceeds the maximum size limit of 10MB",
+          description:
+            "The selected file exceeds the maximum size limit of 10MB",
         },
         server: {
           title: "Import Failed",
-          description: "An error occurred while processing your import. Please try again.",
+          description:
+            "An error occurred while processing your import. Please try again.",
         },
         network: {
           title: "Network Error",

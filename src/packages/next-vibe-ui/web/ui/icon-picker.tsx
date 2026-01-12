@@ -59,7 +59,9 @@ export function IconPicker({
     }
 
     const query = searchQuery.toLowerCase();
-    return categoryIcons.filter((iconKey) => iconKey.toLowerCase().includes(query));
+    return categoryIcons.filter((iconKey) =>
+      iconKey.toLowerCase().includes(query),
+    );
   }, [searchQuery, activeCategory]);
 
   // Button size classes
@@ -96,7 +98,9 @@ export function IconPicker({
         <Div className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col">
           {/* Header with search */}
           <Div className="flex flex-col gap-3 p-4 border-b bg-card shrink-0">
-            <Span className="font-semibold text-sm">{t("app.ui.iconPicker.title")}</Span>
+            <Span className="font-semibold text-sm">
+              {t("app.ui.iconPicker.title")}
+            </Span>
             <Input
               placeholder={t("app.ui.iconPicker.searchPlaceholder")}
               value={searchQuery}
@@ -112,11 +116,17 @@ export function IconPicker({
             className="flex flex-col flex-1 min-h-0"
           >
             <TabsList className="w-full h-auto flex-wrap justify-start gap-1 p-2 border-b rounded-none bg-muted/30 shrink-0">
-              {Object.entries(ICON_CATEGORIES).map(([categoryKey, category]) => (
-                <TabsTrigger key={categoryKey} value={categoryKey} className="text-xs px-2 py-1">
-                  {t(category.name)}
-                </TabsTrigger>
-              ))}
+              {Object.entries(ICON_CATEGORIES).map(
+                ([categoryKey, category]) => (
+                  <TabsTrigger
+                    key={categoryKey}
+                    value={categoryKey}
+                    className="text-xs px-2 py-1"
+                  >
+                    {t(category.name)}
+                  </TabsTrigger>
+                ),
+              )}
             </TabsList>
 
             {/* Icon grid */}

@@ -201,7 +201,10 @@ describe("extractSchemaDefaults", () => {
           .nullable()
           .optional(),
         sortingOptions: z.object({
-          sortBy: z.nativeEnum(LeadSortField).optional().default(LeadSortField.CREATED_AT),
+          sortBy: z
+            .nativeEnum(LeadSortField)
+            .optional()
+            .default(LeadSortField.CREATED_AT),
           sortOrder: z.enum(SortOrder).optional().default("desc"),
         }),
         paginationInfo: z.object({
@@ -264,16 +267,36 @@ describe("extractSchemaDefaults", () => {
     });
 
     it("returns empty values for primitives when forFormInit is true", () => {
-      const stringResult = extractSchemaDefaults<string>(z.string(), undefined, "", true);
+      const stringResult = extractSchemaDefaults<string>(
+        z.string(),
+        undefined,
+        "",
+        true,
+      );
       expect(stringResult).toBe("");
 
-      const numberResult = extractSchemaDefaults<number>(z.coerce.number(), undefined, "", true);
+      const numberResult = extractSchemaDefaults<number>(
+        z.coerce.number(),
+        undefined,
+        "",
+        true,
+      );
       expect(numberResult).toBe(0);
 
-      const booleanResult = extractSchemaDefaults<boolean>(z.boolean(), undefined, "", true);
+      const booleanResult = extractSchemaDefaults<boolean>(
+        z.boolean(),
+        undefined,
+        "",
+        true,
+      );
       expect(booleanResult).toBe(false);
 
-      const arrayResult = extractSchemaDefaults<string[]>(z.array(z.string()), undefined, "", true);
+      const arrayResult = extractSchemaDefaults<string[]>(
+        z.array(z.string()),
+        undefined,
+        "",
+        true,
+      );
       expect(arrayResult).toEqual([]);
     });
 

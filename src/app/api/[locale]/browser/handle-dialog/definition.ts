@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.handle-dialog.description",
   category: "app.api.browser.category",
   icon: "message-square",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.dialogAutomation"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.dialogAutomation",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -52,32 +55,43 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.browser.handle-dialog.form.fields.action.label",
-          description: "app.api.browser.handle-dialog.form.fields.action.description",
-          placeholder: "app.api.browser.handle-dialog.form.fields.action.placeholder",
+          description:
+            "app.api.browser.handle-dialog.form.fields.action.description",
+          placeholder:
+            "app.api.browser.handle-dialog.form.fields.action.placeholder",
           columns: 6,
           options: [
             {
-              label: "app.api.browser.handle-dialog.form.fields.action.options.accept" as const,
+              label:
+                "app.api.browser.handle-dialog.form.fields.action.options.accept" as const,
               value: "accept",
             },
             {
-              label: "app.api.browser.handle-dialog.form.fields.action.options.dismiss" as const,
+              label:
+                "app.api.browser.handle-dialog.form.fields.action.options.dismiss" as const,
               value: "dismiss",
             },
           ],
         },
-        z.enum(["accept", "dismiss"]).describe("Whether to dismiss or accept the dialog"),
+        z
+          .enum(["accept", "dismiss"])
+          .describe("Whether to dismiss or accept the dialog"),
       ),
       promptText: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.browser.handle-dialog.form.fields.promptText.label",
-          description: "app.api.browser.handle-dialog.form.fields.promptText.description",
-          placeholder: "app.api.browser.handle-dialog.form.fields.promptText.placeholder",
+          description:
+            "app.api.browser.handle-dialog.form.fields.promptText.description",
+          placeholder:
+            "app.api.browser.handle-dialog.form.fields.promptText.placeholder",
           columns: 6,
         },
-        z.string().optional().describe("Optional prompt text to enter into the dialog"),
+        z
+          .string()
+          .optional()
+          .describe("Optional prompt text to enter into the dialog"),
       ),
 
       // Response fields
@@ -136,7 +150,8 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.browser.handle-dialog.errors.validation.title",
-      description: "app.api.browser.handle-dialog.errors.validation.description",
+      description:
+        "app.api.browser.handle-dialog.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.browser.handle-dialog.errors.network.title",
@@ -144,7 +159,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.browser.handle-dialog.errors.unauthorized.title",
-      description: "app.api.browser.handle-dialog.errors.unauthorized.description",
+      description:
+        "app.api.browser.handle-dialog.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.browser.handle-dialog.errors.forbidden.title",
@@ -156,7 +172,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.browser.handle-dialog.errors.serverError.title",
-      description: "app.api.browser.handle-dialog.errors.serverError.description",
+      description:
+        "app.api.browser.handle-dialog.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.browser.handle-dialog.errors.unknown.title",
@@ -164,7 +181,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.handle-dialog.errors.unsavedChanges.title",
-      description: "app.api.browser.handle-dialog.errors.unsavedChanges.description",
+      description:
+        "app.api.browser.handle-dialog.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.handle-dialog.errors.conflict.title",

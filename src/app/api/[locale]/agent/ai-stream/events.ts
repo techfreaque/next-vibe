@@ -214,12 +214,16 @@ export const createStreamEvent = {
     data,
   }),
 
-  contentDelta: (data: ContentDeltaEventData): StreamEvent<StreamEventType.CONTENT_DELTA> => ({
+  contentDelta: (
+    data: ContentDeltaEventData,
+  ): StreamEvent<StreamEventType.CONTENT_DELTA> => ({
     type: StreamEventType.CONTENT_DELTA,
     data,
   }),
 
-  contentDone: (data: ContentDoneEventData): StreamEvent<StreamEventType.CONTENT_DONE> => ({
+  contentDone: (
+    data: ContentDoneEventData,
+  ): StreamEvent<StreamEventType.CONTENT_DONE> => ({
     type: StreamEventType.CONTENT_DONE,
     data,
   }),
@@ -231,22 +235,30 @@ export const createStreamEvent = {
     data,
   }),
 
-  reasoningDone: (data: ReasoningDoneEventData): StreamEvent<StreamEventType.REASONING_DONE> => ({
+  reasoningDone: (
+    data: ReasoningDoneEventData,
+  ): StreamEvent<StreamEventType.REASONING_DONE> => ({
     type: StreamEventType.REASONING_DONE,
     data,
   }),
 
-  toolCall: (data: ToolCallEventData): StreamEvent<StreamEventType.TOOL_CALL> => ({
+  toolCall: (
+    data: ToolCallEventData,
+  ): StreamEvent<StreamEventType.TOOL_CALL> => ({
     type: StreamEventType.TOOL_CALL,
     data,
   }),
 
-  toolWaiting: (data: ToolWaitingEventData): StreamEvent<StreamEventType.TOOL_WAITING> => ({
+  toolWaiting: (
+    data: ToolWaitingEventData,
+  ): StreamEvent<StreamEventType.TOOL_WAITING> => ({
     type: StreamEventType.TOOL_WAITING,
     data,
   }),
 
-  toolResult: (data: ToolResultEventData): StreamEvent<StreamEventType.TOOL_RESULT> => ({
+  toolResult: (
+    data: ToolResultEventData,
+  ): StreamEvent<StreamEventType.TOOL_RESULT> => ({
     type: StreamEventType.TOOL_RESULT,
     data,
   }),
@@ -264,12 +276,16 @@ export const createStreamEvent = {
     data,
   }),
 
-  audioChunk: (data: AudioChunkEventData): StreamEvent<StreamEventType.AUDIO_CHUNK> => ({
+  audioChunk: (
+    data: AudioChunkEventData,
+  ): StreamEvent<StreamEventType.AUDIO_CHUNK> => ({
     type: StreamEventType.AUDIO_CHUNK,
     data,
   }),
 
-  filesUploaded: (data: FilesUploadedEventData): StreamEvent<StreamEventType.FILES_UPLOADED> => ({
+  filesUploaded: (
+    data: FilesUploadedEventData,
+  ): StreamEvent<StreamEventType.FILES_UPLOADED> => ({
     type: StreamEventType.FILES_UPLOADED,
     data,
   }),
@@ -280,7 +296,9 @@ export const createStreamEvent = {
  * Uses SSE protocol constants for consistency
  * Handles error serialization for events with error fields
  */
-export function formatSSEEvent<T extends StreamEventType>(event: StreamEvent<T>): string {
+export function formatSSEEvent<T extends StreamEventType>(
+  event: StreamEvent<T>,
+): string {
   let dataToSerialize = event.data;
 
   // Handle TOOL_RESULT events with error field - serialize all errors
@@ -340,7 +358,9 @@ export function parseSSEEvent(eventString: string): StreamEvent | null {
     }
 
     // Validate event type
-    if (!Object.values(StreamEventType).includes(eventType as StreamEventType)) {
+    if (
+      !Object.values(StreamEventType).includes(eventType as StreamEventType)
+    ) {
       return null;
     }
 
@@ -361,9 +381,14 @@ export function parseSSEEvent(eventString: string): StreamEvent | null {
       }
 
       // Deserialize error inside toolCall object
-      if (toolResultData.toolCall?.error && typeof toolResultData.toolCall.error === "string") {
+      if (
+        toolResultData.toolCall?.error &&
+        typeof toolResultData.toolCall.error === "string"
+      ) {
         try {
-          const parsedError = JSON.parse(toolResultData.toolCall.error) as ErrorResponseType;
+          const parsedError = JSON.parse(
+            toolResultData.toolCall.error,
+          ) as ErrorResponseType;
           updates.toolCall = {
             ...toolResultData.toolCall,
             error: parsedError,

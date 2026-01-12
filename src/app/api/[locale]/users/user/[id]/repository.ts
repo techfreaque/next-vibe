@@ -7,7 +7,11 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -54,7 +58,10 @@ export class UserByIdRepository {
 
       logger.debug("User found successfully", { userId: foundUser.id });
 
-      const userRolesResponse = await UserRolesRepository.findByUserId(foundUser.id, logger);
+      const userRolesResponse = await UserRolesRepository.findByUserId(
+        foundUser.id,
+        logger,
+      );
 
       // Default to empty array if roles fetch fails
       const userRoles = userRolesResponse.success ? userRolesResponse.data : [];
@@ -174,7 +181,10 @@ export class UserByIdRepository {
 
       logger.debug("User updated successfully", { userId: urlPathParams.id });
 
-      const userRolesResponse = await UserRolesRepository.findByUserId(updatedUser.id, logger);
+      const userRolesResponse = await UserRolesRepository.findByUserId(
+        updatedUser.id,
+        logger,
+      );
 
       // Default to empty array if roles fetch fails
       const userRoles = userRolesResponse.success ? userRolesResponse.data : [];

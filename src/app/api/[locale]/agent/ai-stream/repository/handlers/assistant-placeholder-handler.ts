@@ -55,12 +55,15 @@ export class AssistantPlaceholderHandler {
     const newDepth = depth;
     // depth stays the same - ASSISTANT message is at the same depth
 
-    logger.info("[AI Stream] Creating placeholder ASSISTANT message for tool-call parent chain", {
-      messageId,
-      reason: "Tool call without preceding text/reasoning",
-      parentId,
-      depth: newDepth,
-    });
+    logger.info(
+      "[AI Stream] Creating placeholder ASSISTANT message for tool-call parent chain",
+      {
+        messageId,
+        reason: "Tool call without preceding text/reasoning",
+        parentId,
+        depth: newDepth,
+      },
+    );
 
     // Create the ASSISTANT message in the database immediately so TOOL messages can reference it as parent_id
     if (!isIncognito) {
@@ -77,10 +80,13 @@ export class AssistantPlaceholderHandler {
         logger,
       });
 
-      logger.info("[AI Stream] Created placeholder ASSISTANT message in database", {
-        messageId,
-        threadId,
-      });
+      logger.info(
+        "[AI Stream] Created placeholder ASSISTANT message in database",
+        {
+          messageId,
+          threadId,
+        },
+      );
     }
 
     // CRITICAL FIX: Emit MESSAGE_CREATED event for placeholder ASSISTANT messages
@@ -99,11 +105,14 @@ export class AssistantPlaceholderHandler {
     });
     controller.enqueue(encoder.encode(formatSSEEvent(placeholderMessageEvent)));
 
-    logger.info("[AI Stream] MESSAGE_CREATED event sent for placeholder ASSISTANT", {
-      messageId,
-      parentId,
-      depth,
-    });
+    logger.info(
+      "[AI Stream] MESSAGE_CREATED event sent for placeholder ASSISTANT",
+      {
+        messageId,
+        parentId,
+        depth,
+      },
+    );
 
     return {
       messageId,

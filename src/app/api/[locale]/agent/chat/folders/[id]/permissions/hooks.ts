@@ -46,4 +46,6 @@ export function useFolderPermissions(
   );
 }
 
-export type FolderPermissionsEndpointReturn = EndpointReturn<typeof definitions>;
+export type FolderPermissionsEndpointReturn = EndpointReturn<
+  typeof definitions
+>;

@@ -5,7 +5,12 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "next-vibe-ui/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX, ReactNode } from "react";
 
@@ -119,7 +124,10 @@ function NavButton({
       {icon && <Span className="mr-2">{icon}</Span>}
       {title && t(title)}
       {badge && (
-        <Badge variant={badgeVariant || "secondary"} className="ml-2 h-5 px-1.5 text-xs">
+        <Badge
+          variant={badgeVariant || "secondary"}
+          className="ml-2 h-5 px-1.5 text-xs"
+        >
           {t(badge, badgeTranslationPayload)}
         </Badge>
       )}

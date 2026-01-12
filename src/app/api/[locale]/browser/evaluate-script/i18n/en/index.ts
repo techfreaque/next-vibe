@@ -1,6 +1,7 @@
 export const translations = {
   title: "Evaluate Script",
-  description: "Evaluate a JavaScript function inside the currently selected page",
+  description:
+    "Evaluate a JavaScript function inside the currently selected page",
   form: {
     label: "Evaluate Script",
     description: "Execute JavaScript in the browser page",
@@ -12,7 +13,8 @@ export const translations = {
       },
       args: {
         label: "Arguments",
-        description: "Optional list of arguments (element UIDs) to pass to the function",
+        description:
+          "Optional list of arguments (element UIDs) to pass to the function",
         placeholder: '[{"uid": "element-uid"}]',
         uid: {
           label: "Element UID",

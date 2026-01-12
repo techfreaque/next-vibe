@@ -18,7 +18,9 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class SectionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.SECTION> {
+export class SectionWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.SECTION
+> {
   readonly widgetType = WidgetType.SECTION;
 
   render(props: CLIWidgetProps<typeof WidgetType.SECTION, string>): string {
@@ -73,7 +75,11 @@ export class SectionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.
    * Render a simple field when no metadata is available.
    * Uses centralized renderValue helper for consistent formatting.
    */
-  private renderSimpleField(key: string, value: WidgetData, context: WidgetRenderContext): string {
+  private renderSimpleField(
+    key: string,
+    value: WidgetData,
+    context: WidgetRenderContext,
+  ): string {
     if (value === null || value === undefined) {
       return "";
     }
@@ -83,7 +89,9 @@ export class SectionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.
       if (value.length === 0) {
         return "";
       }
-      return value.map((item) => `  ${this.renderValue(item, context)}`).join("\n");
+      return value
+        .map((item) => `  ${this.renderValue(item, context)}`)
+        .join("\n");
     }
 
     // Use centralized renderValue for consistent formatting

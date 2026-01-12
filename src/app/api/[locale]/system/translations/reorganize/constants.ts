@@ -21,12 +21,17 @@ export const INDEX_FILE = `${INDEX_FILE_WITHOUT_EXTENSION}.ts`;
 /**
  * Main translations directory path
  */
-export const TRANSLATIONS_DIR = path.resolve(path.join(process.cwd(), "src", I18N_PATH));
+export const TRANSLATIONS_DIR = path.resolve(
+  path.join(process.cwd(), "src", I18N_PATH),
+);
 
 /**
  * Backup directory for translation files
  */
-export const BACKUP_DIR = path.resolve(process.cwd(), ".tmp/translations-backup");
+export const BACKUP_DIR = path.resolve(
+  process.cwd(),
+  ".tmp/translations-backup",
+);
 
 /**
  * Source directory for scanning files
@@ -38,7 +43,14 @@ export const SRC_DIR = path.resolve(process.cwd(), "src");
 /**
  * Directories to ignore when scanning for translation usage
  */
-export const IGNORED_DIRS = ["node_modules", ".next", "dist", "build", ".tmp", I18N_PATH];
+export const IGNORED_DIRS = [
+  "node_modules",
+  ".next",
+  "dist",
+  "build",
+  ".tmp",
+  I18N_PATH,
+];
 
 /**
  * Files to ignore when scanning for translation usage

@@ -17,7 +17,9 @@ export interface PasswordStrengthResult {
  * Calculate password strength score and level
  * Based on length, uppercase, numbers, and special characters
  */
-export function calculatePasswordStrength(password: string | undefined): PasswordStrengthResult {
+export function calculatePasswordStrength(
+  password: string | undefined,
+): PasswordStrengthResult {
   if (!password) {
     return {
       strength: 0,

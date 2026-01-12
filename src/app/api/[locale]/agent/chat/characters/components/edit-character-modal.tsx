@@ -49,7 +49,9 @@ export function EditCharacterModal({
         </Button>
         <Div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5" />
-          <Span className="font-medium">{t("app.chat.editCharacter.title")}</Span>
+          <Span className="font-medium">
+            {t("app.chat.editCharacter.title")}
+          </Span>
         </Div>
       </Div>
 

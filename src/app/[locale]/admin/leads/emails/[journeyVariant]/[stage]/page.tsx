@@ -19,7 +19,10 @@ import type {
   EmailCampaignStageValues,
   EmailJourneyVariantValues,
 } from "@/app/api/[locale]/leads/enum";
-import { EmailCampaignStage, EmailJourneyVariant } from "@/app/api/[locale]/leads/enum";
+import {
+  EmailCampaignStage,
+  EmailJourneyVariant,
+} from "@/app/api/[locale]/leads/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -53,12 +56,16 @@ export default async function EmailPreviewPage({
   }
 
   // Generate email preview server-side
-  const emailPreview = await emailService.generatePreview(journeyVariant, stage, {
-    t,
-    locale,
-    companyName: t("config.appName"),
-    companyEmail: contactClientRepository.getSupportEmail(locale),
-  });
+  const emailPreview = await emailService.generatePreview(
+    journeyVariant,
+    stage,
+    {
+      t,
+      locale,
+      companyName: t("config.appName"),
+      companyEmail: contactClientRepository.getSupportEmail(locale),
+    },
+  );
 
   if (!emailPreview) {
     notFound();
@@ -71,7 +78,8 @@ export default async function EmailPreviewPage({
   const allJourneys = emailService.getAvailableJourneys();
   const currentJourneyStages = emailService.getAvailableStages(journeyVariant);
   const currentStageIndex = currentJourneyStages.indexOf(stage);
-  const previousStage = currentStageIndex > 0 ? currentJourneyStages[currentStageIndex - 1] : null;
+  const previousStage =
+    currentStageIndex > 0 ? currentJourneyStages[currentStageIndex - 1] : null;
   const nextStage =
     currentStageIndex < currentJourneyStages.length - 1
       ? currentJourneyStages[currentStageIndex + 1]
@@ -85,7 +93,11 @@ export default async function EmailPreviewPage({
           <Div className="flex items-center justify-between">
             <Div className="flex items-center flex flex-row gap-4">
               <Link href={`/${locale}/admin/leads/emails`}>
-                <Button variant="ghost" size="sm" className="flex items-center flex flex-row gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center flex flex-row gap-2"
+                >
                   <ArrowLeft className="h-4 w-4" />
                   <Span>{t("app.admin.common.actions.back")}</Span>
                 </Button>
@@ -96,7 +108,9 @@ export default async function EmailPreviewPage({
                 </H1>
                 <P className="text-gray-600 dark:text-gray-400">
                   {journeyInfo.name} -{" "}
-                  {stage.replaceAll("_", " ").replaceAll(/\b\w/g, (l) => l.toUpperCase())}
+                  {stage
+                    .replaceAll("_", " ")
+                    .replaceAll(/\b\w/g, (l) => l.toUpperCase())}
                 </P>
               </Div>
             </Div>
@@ -116,7 +130,9 @@ export default async function EmailPreviewPage({
           <Div className="flex items-center justify-between">
             <Div className="flex items-center flex flex-row gap-2">
               {previousStage ? (
-                <Link href={`/${locale}/admin/leads/emails/${journeyVariant}/${previousStage}`}>
+                <Link
+                  href={`/${locale}/admin/leads/emails/${journeyVariant}/${previousStage}`}
+                >
                   <Button
                     variant="outline"
                     size="sm"
@@ -151,14 +167,18 @@ export default async function EmailPreviewPage({
 
             <Div className="flex items-center flex flex-row gap-2">
               {nextStage ? (
-                <Link href={`/${locale}/admin/leads/emails/${journeyVariant}/${nextStage}`}>
+                <Link
+                  href={`/${locale}/admin/leads/emails/${journeyVariant}/${nextStage}`}
+                >
                   <Button
                     variant="outline"
                     size="sm"
                     className="flex items-center flex flex-row gap-1"
                   >
                     <Span>
-                      {nextStage.replaceAll("_", " ").replaceAll(/\b\w/g, (l) => l.toUpperCase())}
+                      {nextStage
+                        .replaceAll("_", " ")
+                        .replaceAll(/\b\w/g, (l) => l.toUpperCase())}
                     </Span>
                     <ChevronRight className="h-4 w-4" />
                   </Button>

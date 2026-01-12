@@ -62,7 +62,12 @@ export function NumberInput({
         className: cn("flex-row items-center gap-3", className),
       })}
     >
-      <Button variant="outline" size="sm" onClick={handleDecrement} disabled={isDecrementDisabled}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleDecrement}
+        disabled={isDecrementDisabled}
+      >
         <Minus size={16} />
       </Button>
       <Input<"number">
@@ -73,7 +78,12 @@ export function NumberInput({
         editable={!disabled}
         className="text-center w-20"
       />
-      <Button variant="outline" size="sm" onClick={handleIncrement} disabled={isIncrementDisabled}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleIncrement}
+        disabled={isIncrementDisabled}
+      >
         <Plus size={16} />
       </Button>
     </StyledView>

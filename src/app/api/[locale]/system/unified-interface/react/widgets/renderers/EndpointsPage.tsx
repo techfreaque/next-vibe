@@ -124,7 +124,11 @@ export function EndpointsPage<
     : !!(endpoint.POST ?? endpoint.PUT ?? endpoint.PATCH) && !endpoint.GET;
   const isDeleteEndpoint = forcedEndpoint
     ? forceMethod === "DELETE"
-    : !!endpoint.DELETE && !endpoint.GET && !endpoint.POST && !endpoint.PUT && !endpoint.PATCH;
+    : !!endpoint.DELETE &&
+      !endpoint.GET &&
+      !endpoint.POST &&
+      !endpoint.PUT &&
+      !endpoint.PATCH;
 
   // Get the active endpoint definition for rendering response data
   // Priority: Forced method > GET (for response rendering) > POST/PUT/PATCH (for form) > DELETE
@@ -166,9 +170,15 @@ export function EndpointsPage<
           });
 
           // Navigate to GET endpoint with ID from response
-          if (responseData && typeof responseData === "object" && "id" in responseData) {
+          if (
+            responseData &&
+            typeof responseData === "object" &&
+            "id" in responseData
+          ) {
             const id = String(responseData.id);
-            navigation.replace(targetGetEndpoint, { urlPathParams: { id } as never });
+            navigation.replace(targetGetEndpoint, {
+              urlPathParams: { id } as never,
+            });
           }
 
           return existingResult;
@@ -177,7 +187,12 @@ export function EndpointsPage<
     }
 
     return existingMutationOptions;
-  }, [isMutationEndpoint, endpoint.GET, endpointOptions?.create?.mutationOptions, navigation]);
+  }, [
+    isMutationEndpoint,
+    endpoint.GET,
+    endpointOptions?.create?.mutationOptions,
+    navigation,
+  ]);
 
   // Merge navigation-aware mutation options into endpoint options
   const finalEndpointOptions = useMemo(() => {
@@ -205,13 +220,20 @@ export function EndpointsPage<
   if (isGetEndpoint && endpointState.read) {
     const read = endpointState.read;
     response = read.response;
-    responseData = read.response?.success === true ? read.response.data : undefined;
+    responseData =
+      read.response?.success === true ? read.response.data : undefined;
     isLoading = read.isLoading;
-  } else if (isMutationEndpoint && (endpointState.create || endpointState.update)) {
+  } else if (
+    isMutationEndpoint &&
+    (endpointState.create || endpointState.update)
+  ) {
     const operation = endpointState.update ?? endpointState.create;
     if (operation) {
       response = operation.response;
-      responseData = operation.response?.success === true ? operation.response.data : undefined;
+      responseData =
+        operation.response?.success === true
+          ? operation.response.data
+          : undefined;
       isLoading = operation.isSubmitting;
     }
 
@@ -219,7 +241,8 @@ export function EndpointsPage<
     // The mutation response data is for showing success/error, not for prefilling the form
     if (endpointState.read) {
       const readResponse = endpointState.read.response;
-      const readData = readResponse?.success === true ? readResponse.data : undefined;
+      const readData =
+        readResponse?.success === true ? readResponse.data : undefined;
       console.log("EndpointsPage PATCH/PUT with GET prefill", {
         hasRead: true,
         isLoading: endpointState.read.isLoading,
@@ -240,7 +263,8 @@ export function EndpointsPage<
   } else if (isDeleteEndpoint && endpointState.delete) {
     const deleteOp = endpointState.delete;
     response = deleteOp.response;
-    responseData = deleteOp.response?.success === true ? deleteOp.response.data : undefined;
+    responseData =
+      deleteOp.response?.success === true ? deleteOp.response.data : undefined;
     isLoading = deleteOp.isSubmitting;
   }
 
@@ -287,7 +311,8 @@ export function EndpointsPage<
   };
 
   // Base layer is visible when stack is empty (only applies to non-stacked instances)
-  const isBaseVisible = _disableNavigationStack || navigation.stack.length === 0;
+  const isBaseVisible =
+    _disableNavigationStack || navigation.stack.length === 0;
 
   return (
     <>
@@ -324,27 +349,32 @@ export function EndpointsPage<
                 user={user}
               />
             )}
-            {isMutationEndpoint && (endpointState.create || endpointState.update) && (
-              <EndpointRenderer
-                endpoint={activeEndpoint}
-                form={endpointState.update?.form ?? endpointState.create?.form}
-                onSubmit={(): void => {
-                  if (endpointState.update) {
-                    void endpointState.update.submit(endpointState.update.form.getValues());
-                  } else {
-                    void endpointState.create?.onSubmit();
+            {isMutationEndpoint &&
+              (endpointState.create || endpointState.update) && (
+                <EndpointRenderer
+                  endpoint={activeEndpoint}
+                  form={
+                    endpointState.update?.form ?? endpointState.create?.form
                   }
-                }}
-                locale={locale}
-                isSubmitting={endpointState.update?.isSubmitting ?? isLoading}
-                data={responseData}
-                submitButton={submitButton}
-                response={response}
-                endpointMutations={endpointMutations}
-                logger={logger}
-                user={user}
-              />
-            )}
+                  onSubmit={(): void => {
+                    if (endpointState.update) {
+                      void endpointState.update.submit(
+                        endpointState.update.form.getValues(),
+                      );
+                    } else {
+                      void endpointState.create?.onSubmit();
+                    }
+                  }}
+                  locale={locale}
+                  isSubmitting={endpointState.update?.isSubmitting ?? isLoading}
+                  data={responseData}
+                  submitButton={submitButton}
+                  response={response}
+                  endpointMutations={endpointMutations}
+                  logger={logger}
+                  user={user}
+                />
+              )}
             {isDeleteEndpoint && endpointState.delete && (
               <EndpointRenderer
                 endpoint={activeEndpoint}

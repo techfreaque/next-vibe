@@ -19,11 +19,13 @@ export const translations = {
   journeyInfo: {
     resultsFocused: {
       name: "Results-Focused Journey",
-      description: "Professional approach emphasizing measurable outcomes and practical results",
+      description:
+        "Professional approach emphasizing measurable outcomes and practical results",
     },
     personalResults: {
       name: "Personal Results Journey",
-      description: "Balanced approach combining personal connection with results-driven content",
+      description:
+        "Balanced approach combining personal connection with results-driven content",
     },
     personalApproach: {
       name: "Personal Approach Journey",

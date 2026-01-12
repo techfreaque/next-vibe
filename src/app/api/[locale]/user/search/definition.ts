@@ -51,7 +51,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.user.search.groups.searchCriteria.title" as const,
-          description: "app.api.user.search.groups.searchCriteria.description" as const,
+          description:
+            "app.api.user.search.groups.searchCriteria.description" as const,
           layoutType: LayoutType.VERTICAL,
         },
         { request: "data" },
@@ -61,15 +62,18 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.user.search.fields.search.label" as const,
-              description: "app.api.user.search.fields.search.description" as const,
-              placeholder: "app.api.user.search.fields.search.placeholder" as const,
+              description:
+                "app.api.user.search.fields.search.description" as const,
+              placeholder:
+                "app.api.user.search.fields.search.placeholder" as const,
               columns: 12,
               helpText: "app.api.user.search.fields.search.help" as const,
             },
             z
               .string()
               .min(2, {
-                message: "app.api.user.search.fields.search.validation.minLength",
+                message:
+                  "app.api.user.search.fields.search.validation.minLength",
               })
               .optional(),
           ),
@@ -81,7 +85,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.user.search.groups.filters.title" as const,
-          description: "app.api.user.search.groups.filters.description" as const,
+          description:
+            "app.api.user.search.groups.filters.description" as const,
           layoutType: LayoutType.VERTICAL,
         },
         { request: "data" },
@@ -91,8 +96,10 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
               label: "app.api.user.search.fields.roles.label" as const,
-              description: "app.api.user.search.fields.roles.description" as const,
-              placeholder: "app.api.user.search.fields.roles.placeholder" as const,
+              description:
+                "app.api.user.search.fields.roles.description" as const,
+              placeholder:
+                "app.api.user.search.fields.roles.placeholder" as const,
               options: UserRoleOptions,
               columns: 12,
               helpText: "app.api.user.search.fields.roles.help" as const,
@@ -105,8 +112,10 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.user.search.fields.status.label" as const,
-              description: "app.api.user.search.fields.status.description" as const,
-              placeholder: "app.api.user.search.fields.status.placeholder" as const,
+              description:
+                "app.api.user.search.fields.status.description" as const,
+              placeholder:
+                "app.api.user.search.fields.status.placeholder" as const,
               options: UserSearchStatusOptions,
               columns: 12,
               helpText: "app.api.user.search.fields.status.help" as const,
@@ -121,7 +130,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.user.search.groups.pagination.title" as const,
-          description: "app.api.user.search.groups.pagination.description" as const,
+          description:
+            "app.api.user.search.groups.pagination.description" as const,
           layoutType: LayoutType.VERTICAL,
         },
         { request: "data" },
@@ -131,7 +141,8 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
               label: "app.api.user.search.fields.limit.label" as const,
-              description: "app.api.user.search.fields.limit.description" as const,
+              description:
+                "app.api.user.search.fields.limit.description" as const,
               columns: 6,
               helpText: "app.api.user.search.fields.limit.help" as const,
             },
@@ -143,7 +154,8 @@ const { GET } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
               label: "app.api.user.search.fields.offset.label" as const,
-              description: "app.api.user.search.fields.offset.description" as const,
+              description:
+                "app.api.user.search.fields.offset.description" as const,
               columns: 6,
               helpText: "app.api.user.search.fields.offset.help" as const,
             },
@@ -180,7 +192,8 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.user.search.response.searchInfo.title" as const,
-              description: "app.api.user.search.response.searchInfo.description" as const,
+              description:
+                "app.api.user.search.response.searchInfo.description" as const,
               layoutType: LayoutType.GRID,
               columns: 12,
             },
@@ -189,28 +202,32 @@ const { GET } = createEndpoint({
               searchTerm: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.user.search.response.searchInfo.searchTerm" as const,
+                  content:
+                    "app.api.user.search.response.searchInfo.searchTerm" as const,
                 },
                 z.string().optional().describe("The search term used"),
               ),
               appliedFilters: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.user.search.response.searchInfo.appliedFilters" as const,
+                  content:
+                    "app.api.user.search.response.searchInfo.appliedFilters" as const,
                 },
                 z.array(z.string()).describe("Active search filters"),
               ),
               searchTime: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.user.search.response.searchInfo.searchTime" as const,
+                  content:
+                    "app.api.user.search.response.searchInfo.searchTime" as const,
                 },
                 z.string().describe("How long the search took"),
               ),
               totalResults: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.user.search.response.searchInfo.totalResults" as const,
+                  content:
+                    "app.api.user.search.response.searchInfo.totalResults" as const,
                 },
                 z.coerce.number().describe("Total number of results found"),
               ),
@@ -256,7 +273,8 @@ const { GET } = createEndpoint({
                 leadId: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.user.search.response.users.leadId" as const,
+                    content:
+                      "app.api.user.search.response.users.leadId" as const,
                   },
                   z.uuid().nullable(),
                 ),
@@ -270,21 +288,24 @@ const { GET } = createEndpoint({
                 privateName: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.user.search.response.users.privateName" as const,
+                    content:
+                      "app.api.user.search.response.users.privateName" as const,
                   },
                   z.string(),
                 ),
                 publicName: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.user.search.response.users.publicName" as const,
+                    content:
+                      "app.api.user.search.response.users.publicName" as const,
                   },
                   z.string(),
                 ),
                 email: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.user.search.response.users.email" as const,
+                    content:
+                      "app.api.user.search.response.users.email" as const,
                   },
                   z.email(),
                 ),
@@ -331,7 +352,8 @@ const { GET } = createEndpoint({
                       id: responseField(
                         {
                           type: WidgetType.TEXT,
-                          content: "app.api.user.search.response.users.userRoles.id" as const,
+                          content:
+                            "app.api.user.search.response.users.userRoles.id" as const,
                         },
                         z.string(),
                       ),
@@ -348,14 +370,16 @@ const { GET } = createEndpoint({
                 createdAt: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.user.search.response.users.createdAt" as const,
+                    content:
+                      "app.api.user.search.response.users.createdAt" as const,
                   },
                   z.string(),
                 ),
                 updatedAt: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.user.search.response.users.updatedAt" as const,
+                    content:
+                      "app.api.user.search.response.users.updatedAt" as const,
                   },
                   z.string(),
                 ),
@@ -366,7 +390,8 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.user.search.response.pagination.title" as const,
-              description: "app.api.user.search.response.pagination.description" as const,
+              description:
+                "app.api.user.search.response.pagination.description" as const,
               layoutType: LayoutType.GRID,
               columns: 12,
             },
@@ -375,28 +400,32 @@ const { GET } = createEndpoint({
               currentPage: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.user.search.response.pagination.currentPage" as const,
+                  content:
+                    "app.api.user.search.response.pagination.currentPage" as const,
                 },
                 z.coerce.number().describe("Current page number (1-based)"),
               ),
               totalPages: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.user.search.response.pagination.totalPages" as const,
+                  content:
+                    "app.api.user.search.response.pagination.totalPages" as const,
                 },
                 z.coerce.number().describe("Total number of pages"),
               ),
               itemsPerPage: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.user.search.response.pagination.itemsPerPage" as const,
+                  content:
+                    "app.api.user.search.response.pagination.itemsPerPage" as const,
                 },
                 z.coerce.number().describe("Number of items per page"),
               ),
               totalItems: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.user.search.response.pagination.totalItems" as const,
+                  content:
+                    "app.api.user.search.response.pagination.totalItems" as const,
                 },
                 z.coerce.number().describe("Total number of items"),
               ),
@@ -429,7 +458,8 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.user.search.errors.unauthorized.title" as const,
-      description: "app.api.user.search.errors.unauthorized.description" as const,
+      description:
+        "app.api.user.search.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.user.search.errors.forbidden.title" as const,
@@ -453,7 +483,8 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.user.search.errors.unsavedChanges.title" as const,
-      description: "app.api.user.search.errors.unsavedChanges.description" as const,
+      description:
+        "app.api.user.search.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.user.search.errors.conflict.title" as const,

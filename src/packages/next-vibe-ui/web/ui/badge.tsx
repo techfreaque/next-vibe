@@ -9,13 +9,15 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
+        default:
+          "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
         secondary:
           "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive:
           "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80 shadow-sm",
         outline: "text-foreground",
-        notification: "border-transparent bg-red-500 text-white shadow hover:bg-red-600",
+        notification:
+          "border-transparent bg-red-500 text-white shadow hover:bg-red-600",
       },
     },
     defaultVariants: {
@@ -46,7 +48,12 @@ export type BadgeProps = {
   children?: React.ReactNode;
 } & StyleType;
 
-function Badge({ className, style, variant, children }: BadgeProps): React.JSX.Element {
+function Badge({
+  className,
+  style,
+  variant,
+  children,
+}: BadgeProps): React.JSX.Element {
   return (
     <div className={cn(badgeVariants({ variant }), className)} style={style}>
       {children}

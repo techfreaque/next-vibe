@@ -24,6 +24,8 @@ export function usePulseExecute(
 /**
  * Hook for fetching pulse health status
  */
-export function usePulseStatus(logger: EndpointLogger): EndpointReturn<typeof pulseStatusEndpoint> {
+export function usePulseStatus(
+  logger: EndpointLogger,
+): EndpointReturn<typeof pulseStatusEndpoint> {
   return useEndpoint(pulseStatusEndpoint, {}, logger);
 }

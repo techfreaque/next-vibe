@@ -5,7 +5,10 @@
  */
 
 import type { WidgetData } from "../types";
-import { isWidgetDataNullish, isWidgetDataNumber } from "../utils/field-type-guards";
+import {
+  isWidgetDataNullish,
+  isWidgetDataNumber,
+} from "../utils/field-type-guards";
 
 /**
  * Stat format types from UI config
@@ -15,7 +18,13 @@ export type StatFormat = "number" | "percentage" | "currency" | "compact";
 /**
  * Stat variant types from UI config
  */
-export type StatVariant = "default" | "success" | "warning" | "danger" | "info" | "muted";
+export type StatVariant =
+  | "default"
+  | "success"
+  | "warning"
+  | "danger"
+  | "info"
+  | "muted";
 
 /**
  * Stat trend types from UI config
@@ -126,7 +135,10 @@ export function getStatVariantColor(
 /**
  * Get trend indicator symbol for CLI rendering
  */
-export function getTrendIndicator(trend: StatTrend, useEmojis: boolean): string {
+export function getTrendIndicator(
+  trend: StatTrend,
+  useEmojis: boolean,
+): string {
   if (!useEmojis) {
     switch (trend) {
       case "up":

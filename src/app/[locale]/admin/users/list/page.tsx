@@ -23,7 +23,9 @@ export default async function UsersListPage({
     <Div className="flex flex-col gap-6">
       {/* Page Description */}
       <Div>
-        <P className="text-gray-600 dark:text-gray-400">{t("app.admin.users.list.description")}</P>
+        <P className="text-gray-600 dark:text-gray-400">
+          {t("app.admin.users.list.description")}
+        </P>
       </Div>
 
       {/* Client Component handles all interactions */}

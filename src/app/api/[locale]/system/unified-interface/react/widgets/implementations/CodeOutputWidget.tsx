@@ -44,11 +44,18 @@ export function CodeOutputWidget<const TKey extends string>({
   const languageLabelSizeClass = getTextSizeClassName(languageLabelSize);
   const codePaddingClass = getSpacingClassName("padding", codePadding);
   const codeTextSizeClass = getTextSizeClassName(codeTextSize);
-  const lineNumberSpacingClass = getSpacingClassName("padding", lineNumberSpacing);
+  const lineNumberSpacingClass = getSpacingClassName(
+    "padding",
+    lineNumberSpacing,
+  );
 
   // Line number width mapping
   const lineNumberWidthClass =
-    lineNumberWidth === "sm" ? "w-8" : lineNumberWidth === "lg" ? "w-16" : "w-12";
+    lineNumberWidth === "sm"
+      ? "w-8"
+      : lineNumberWidth === "lg"
+        ? "w-16"
+        : "w-12";
 
   // Border radius mapping
   const borderRadiusClass =
@@ -66,7 +73,13 @@ export function CodeOutputWidget<const TKey extends string>({
 
   if (!data) {
     return (
-      <Div className={cn("italic text-muted-foreground", emptyPaddingClass || "p-4", className)}>
+      <Div
+        className={cn(
+          "italic text-muted-foreground",
+          emptyPaddingClass || "p-4",
+          className,
+        )}
+      >
         —
       </Div>
     );
@@ -115,7 +128,10 @@ export function CodeOutputWidget<const TKey extends string>({
             return (
               <Div
                 key={index}
-                className={cn("flex", highlighted && "bg-yellow-200/20 dark:bg-yellow-500/10")}
+                className={cn(
+                  "flex",
+                  highlighted && "bg-yellow-200/20 dark:bg-yellow-500/10",
+                )}
               >
                 {showLineNumbers && (
                   <Span

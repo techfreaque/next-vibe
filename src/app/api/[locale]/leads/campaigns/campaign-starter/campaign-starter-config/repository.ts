@@ -5,7 +5,11 @@
 
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { Environment } from "next-vibe/shared/utils/env-util";
 
@@ -74,7 +78,8 @@ export class CampaignStarterConfigRepository {
     // The database constraint ensures this, but TypeScript doesn't know that
     const priorityValue = cronTask.priority;
     const priority =
-      priorityValue && CampaignStarterConfigRepository.isValidPriority(priorityValue)
+      priorityValue &&
+      CampaignStarterConfigRepository.isValidPriority(priorityValue)
         ? priorityValue
         : defaults.priority;
 
@@ -96,7 +101,8 @@ export class CampaignStarterConfigRepository {
     dbConfig: CampaignStarterConfig,
   ): Promise<CampaignStarterConfigWithCronType> {
     // Get cron task settings
-    const cronTask = await CampaignStarterConfigRepository.getCronTaskSettings();
+    const cronTask =
+      await CampaignStarterConfigRepository.getCronTaskSettings();
 
     return {
       // Campaign-specific settings
@@ -119,7 +125,9 @@ export class CampaignStarterConfigRepository {
   /**
    * Save cron task settings for campaign starter
    */
-  private static async saveCronTaskSettings(cronSettings: CronSettings): Promise<void> {
+  private static async saveCronTaskSettings(
+    cronSettings: CronSettings,
+  ): Promise<void> {
     const [existingCronTask] = await db
       .select()
       .from(cronTasks)
@@ -146,7 +154,10 @@ export class CampaignStarterConfigRepository {
 
     if (existingCronTask) {
       // Update existing cron task
-      await db.update(cronTasks).set(cronData).where(eq(cronTasks.name, "campaign-starter"));
+      await db
+        .update(cronTasks)
+        .set(cronData)
+        .where(eq(cronTasks.name, "campaign-starter"));
     } else {
       // Create new cron task
       await db.insert(cronTasks).values(cronData);
@@ -182,7 +193,8 @@ export class CampaignStarterConfigRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<CampaignStarterConfigWithCronType>> {
     try {
-      const environment = CampaignStarterConfigRepository.getCurrentEnvironment();
+      const environment =
+        CampaignStarterConfigRepository.getCurrentEnvironment();
 
       logger.info("Fetching campaign starter config", {
         environment,
@@ -197,7 +209,10 @@ export class CampaignStarterConfigRepository {
         .limit(1);
 
       if (existingConfig) {
-        const config = await CampaignStarterConfigRepository.formatConfigResponse(existingConfig);
+        const config =
+          await CampaignStarterConfigRepository.formatConfigResponse(
+            existingConfig,
+          );
         logger.debug("Found existing config in database", { environment });
         return success(config);
       }
@@ -226,7 +241,8 @@ export class CampaignStarterConfigRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<CampaignStarterConfigWithCronType>> {
     try {
-      const environment = CampaignStarterConfigRepository.getCurrentEnvironment();
+      const environment =
+        CampaignStarterConfigRepository.getCurrentEnvironment();
 
       logger.info("Updating campaign starter config", {
         environment,
@@ -237,7 +253,10 @@ export class CampaignStarterConfigRepository {
       });
 
       // Save campaign settings
-      const dbConfig = CampaignStarterConfigRepository.formatConfigForDb(data, environment);
+      const dbConfig = CampaignStarterConfigRepository.formatConfigForDb(
+        data,
+        environment,
+      );
 
       // Check if config already exists
       const [existingConfig] = await db
@@ -296,7 +315,8 @@ export class CampaignStarterConfigRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<CampaignStarterConfigWithCronType>> {
     try {
-      const environment = CampaignStarterConfigRepository.getCurrentEnvironment();
+      const environment =
+        CampaignStarterConfigRepository.getCurrentEnvironment();
 
       logger.info("Ensuring config exists", {
         environment,
@@ -312,7 +332,10 @@ export class CampaignStarterConfigRepository {
         .limit(1);
 
       if (existingConfig) {
-        const config = await CampaignStarterConfigRepository.formatConfigResponse(existingConfig);
+        const config =
+          await CampaignStarterConfigRepository.formatConfigResponse(
+            existingConfig,
+          );
         return success(config);
       }
 

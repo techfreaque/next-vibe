@@ -4,7 +4,8 @@ export const translations: typeof enTranslations = {
   search: {
     get: {
       title: "Search Messages",
-      description: "Search messages within a specific thread using full-text search",
+      description:
+        "Search messages within a specific thread using full-text search",
       container: {
         title: "Message Search",
         description: "Search for messages in this thread",
@@ -74,11 +75,13 @@ export const translations: typeof enTranslations = {
         },
         forbidden: {
           title: "Forbidden",
-          description: "You don't have permission to search messages in this thread",
+          description:
+            "You don't have permission to search messages in this thread",
         },
         notFound: {
           title: "Thread Not Found",
-          description: "The specified thread does not exist or you don't have access to it",
+          description:
+            "The specified thread does not exist or you don't have access to it",
         },
         serverError: {
           title: "Server Error",

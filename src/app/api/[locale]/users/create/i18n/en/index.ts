@@ -238,13 +238,15 @@ export const translations = {
         phone: "Phone",
         nextSteps: "Next Steps",
         loginButton: "Login to Your Account",
-        support: "If you have any questions, our support team is here to help. Contact us anytime!",
+        support:
+          "If you have any questions, our support team is here to help. Contact us anytime!",
       },
       admin: {
         newUser: "New User Created",
         preview: "A new user {{firstName}} {{lastName}} has been created",
         subject: "New User Account Created - {{firstName}} {{lastName}}",
-        notification: "A new user account has been created in the system. Here are the details:",
+        notification:
+          "A new user account has been created in the system. Here are the details:",
         userDetails: "User Details",
         viewUser: "View User Profile",
       },
@@ -274,7 +276,8 @@ export const translations = {
         "Welcome {{firstName}}! Your account has been successfully created. Visit us at {{appUrl}}",
     },
     verification: {
-      message: "{{firstName}}, your verification code is: {{code}}. Enter code within 10 minutes.",
+      message:
+        "{{firstName}}, your verification code is: {{code}}. Enter code within 10 minutes.",
     },
     errors: {
       welcome_failed: {

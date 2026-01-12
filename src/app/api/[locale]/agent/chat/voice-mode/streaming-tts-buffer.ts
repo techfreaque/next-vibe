@@ -208,6 +208,8 @@ export class StreamingTTSBuffer {
 /**
  * Create a streaming TTS buffer
  */
-export function createStreamingTTSBuffer(onChunkReady: OnTTSChunkReady): StreamingTTSBuffer {
+export function createStreamingTTSBuffer(
+  onChunkReady: OnTTSChunkReady,
+): StreamingTTSBuffer {
   return new StreamingTTSBuffer(onChunkReady);
 }

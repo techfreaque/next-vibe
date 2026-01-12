@@ -51,11 +51,13 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description: "Sie müssen angemeldet sein, um auf diese Ressource zuzugreifen",
+        description:
+          "Sie müssen angemeldet sein, um auf diese Ressource zuzugreifen",
       },
       forbidden: {
         title: "Verboten",
-        description: "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
+        description:
+          "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
       },
       notFound: {
         title: "Charakter nicht gefunden",
@@ -116,7 +118,8 @@ export const translations: typeof enTranslations = {
     },
     systemPrompt: {
       label: "System-Prompt",
-      description: "Der System-Prompt, der das Verhalten der Charakter definiert",
+      description:
+        "Der System-Prompt, der das Verhalten der Charakter definiert",
     },
     category: {
       label: "Kategorie",
@@ -128,11 +131,13 @@ export const translations: typeof enTranslations = {
     },
     source: {
       label: "Quelle",
-      description: "Die Quelle dieses Charakters (integriert, benutzerdefiniert oder Community)",
+      description:
+        "Die Quelle dieses Charakters (integriert, benutzerdefiniert oder Community)",
     },
     ownershipType: {
       label: "Eigentümertyp",
-      description: "Wer besitzt diesen Charakter (System, Benutzer oder öffentlich)",
+      description:
+        "Wer besitzt diesen Charakter (System, Benutzer oder öffentlich)",
     },
     voice: {
       label: "Stimme",
@@ -161,19 +166,23 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description: "Sie müssen angemeldet sein, um Charakters zu aktualisieren",
+        description:
+          "Sie müssen angemeldet sein, um Charakters zu aktualisieren",
       },
       forbidden: {
         title: "Verboten",
-        description: "Sie haben keine Berechtigung, diese Charakter zu aktualisieren",
+        description:
+          "Sie haben keine Berechtigung, diese Charakter zu aktualisieren",
       },
       notFound: {
         title: "Charakter nicht gefunden",
-        description: "Die Charakter, die Sie aktualisieren möchten, existiert nicht",
+        description:
+          "Die Charakter, die Sie aktualisieren möchten, existiert nicht",
       },
       server: {
         title: "Serverfehler",
-        description: "Beim Aktualisieren der Charakter ist ein Fehler aufgetreten",
+        description:
+          "Beim Aktualisieren der Charakter ist ein Fehler aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -190,7 +199,8 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Charakter aktualisiert",
-      description: "Ihre benutzerdefinierte Charakter wurde erfolgreich aktualisiert",
+      description:
+        "Ihre benutzerdefinierte Charakter wurde erfolgreich aktualisiert",
     },
   },
   delete: {
@@ -219,7 +229,8 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Verboten",
-        description: "Sie haben keine Berechtigung, diesen Charakter zu löschen",
+        description:
+          "Sie haben keine Berechtigung, diesen Charakter zu löschen",
       },
       notFound: {
         title: "Charakter nicht gefunden",
@@ -231,7 +242,8 @@ export const translations: typeof enTranslations = {
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description: "Ein unerwarteter Fehler beim Löschen des Charakters ist aufgetreten",
+        description:
+          "Ein unerwarteter Fehler beim Löschen des Charakters ist aufgetreten",
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",

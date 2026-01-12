@@ -1,7 +1,11 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "next-vibe-ui/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "next-vibe-ui/ui/collapsible";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
@@ -40,13 +44,20 @@ interface SidebarFooterProps {
   logger: EndpointLogger;
 }
 
-export function SidebarFooter({ locale, credits, user, logger }: SidebarFooterProps): JSX.Element {
+export function SidebarFooter({
+  locale,
+  credits,
+  user,
+  logger,
+}: SidebarFooterProps): JSX.Element {
   const { t } = simpleT(locale);
   const [isExpanded, setIsExpanded] = useBottomSheetExpanded();
 
   // Tour state - expand when tour needs the footer elements visible
   const tourIsActive = useTourState((state) => state.isActive);
-  const tourBottomSheetExpanded = useTourState((state) => state.bottomSheetExpanded);
+  const tourBottomSheetExpanded = useTourState(
+    (state) => state.bottomSheetExpanded,
+  );
 
   // Expand collapsible when tour requests it
   useEffect(() => {
@@ -66,7 +77,9 @@ export function SidebarFooter({ locale, credits, user, logger }: SidebarFooterPr
           <Button
             variant="ghost"
             className="w-full min-h-11 px-3 flex flex-row items-center justify-between hover:bg-accent/50 rounded-none border-b border-border/50 transition-all duration-150"
-            aria-label={isExpanded ? "Collapse account section" : "Expand account section"}
+            aria-label={
+              isExpanded ? "Collapse account section" : "Expand account section"
+            }
             suppressHydrationWarning
           >
             <Span className="flex flex-row items-center gap-2 min-w-0 flex-1">
@@ -74,7 +87,10 @@ export function SidebarFooter({ locale, credits, user, logger }: SidebarFooterPr
               {credits && (
                 <>
                   <Coins className="h-4 w-4 text-blue-500 shrink-0" />
-                  <Span className="text-sm font-medium truncate" suppressHydrationWarning>
+                  <Span
+                    className="text-sm font-medium truncate"
+                    suppressHydrationWarning
+                  >
                     {credits.total === 1
                       ? t("app.chat.credits.credit", { count: 1 })
                       : t("app.chat.credits.credits", {
@@ -180,7 +196,9 @@ export function SidebarFooter({ locale, credits, user, logger }: SidebarFooterPr
                 </Button>
               </Link>
               {/* Logout */}
-              {isLoggedIn && <UserMenu user={user} locale={locale} logger={logger} />}
+              {isLoggedIn && (
+                <UserMenu user={user} locale={locale} logger={logger} />
+              )}
             </Div>
           </Div>
         </CollapsibleContent>

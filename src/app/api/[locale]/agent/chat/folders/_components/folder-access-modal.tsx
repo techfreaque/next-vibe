@@ -97,7 +97,9 @@ export function FolderAccessModal({
         </DialogHeader>
 
         <Div className="py-4">
-          <P className="text-sm text-muted-foreground leading-relaxed">{explanation}</P>
+          <P className="text-sm text-muted-foreground leading-relaxed">
+            {explanation}
+          </P>
         </Div>
 
         <DialogFooter className="flex-col sm:flex-row gap-2">
@@ -115,7 +117,9 @@ export function FolderAccessModal({
               </Button>
             </Link>
             <Link href={signupUrl} className="flex-1 sm:flex-none">
-              <Button className="w-full">{t("app.chat.folders.accessModal.signupButton")}</Button>
+              <Button className="w-full">
+                {t("app.chat.folders.accessModal.signupButton")}
+              </Button>
             </Link>
           </Div>
         </DialogFooter>

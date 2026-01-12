@@ -29,7 +29,12 @@ const { POST } = createEndpoint({
   category: "app.api.system.guard.category",
   tags: ["app.api.system.guard.destroy.tag"],
   icon: "shield",
-  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["guard:destroy", "guard-destroy", "guard:remove"],
 
   fields: objectField(
@@ -48,8 +53,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.system.guard.destroy.fields.projectPath.title",
-          description: "app.api.system.guard.destroy.fields.projectPath.description",
-          placeholder: "app.api.system.guard.destroy.fields.projectPath.placeholder",
+          description:
+            "app.api.system.guard.destroy.fields.projectPath.description",
+          placeholder:
+            "app.api.system.guard.destroy.fields.projectPath.placeholder",
           columns: 8,
         },
         z.string().optional(),
@@ -60,8 +67,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.system.guard.destroy.fields.guardId.title",
-          description: "app.api.system.guard.destroy.fields.guardId.description",
-          placeholder: "app.api.system.guard.destroy.fields.guardId.placeholder",
+          description:
+            "app.api.system.guard.destroy.fields.guardId.description",
+          placeholder:
+            "app.api.system.guard.destroy.fields.guardId.placeholder",
           columns: 4,
         },
         z.string().optional(),
@@ -83,7 +92,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.guard.destroy.fields.cleanupFiles.title",
-          description: "app.api.system.guard.destroy.fields.cleanupFiles.description",
+          description:
+            "app.api.system.guard.destroy.fields.cleanupFiles.description",
           columns: 4,
         },
         z.boolean().optional().default(true),
@@ -149,7 +159,8 @@ const { POST } = createEndpoint({
             projectPath: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.system.guard.destroy.fields.projectPath.title",
+                content:
+                  "app.api.system.guard.destroy.fields.projectPath.title",
                 fieldType: FieldDataType.TEXT,
               },
               z.string(),
@@ -165,7 +176,8 @@ const { POST } = createEndpoint({
             filesRemoved: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.system.guard.destroy.fields.filesRemoved.title",
+                content:
+                  "app.api.system.guard.destroy.fields.filesRemoved.title",
                 fieldType: FieldDataType.BOOLEAN,
               },
               z.boolean(),
@@ -173,7 +185,8 @@ const { POST } = createEndpoint({
             userRemoved: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.system.guard.destroy.fields.userRemoved.title",
+                content:
+                  "app.api.system.guard.destroy.fields.userRemoved.title",
                 fieldType: FieldDataType.BOOLEAN,
               },
               z.boolean(),
@@ -212,11 +225,13 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.guard.destroy.errors.unauthorized.title",
-      description: "app.api.system.guard.destroy.errors.unauthorized.description",
+      description:
+        "app.api.system.guard.destroy.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.guard.destroy.errors.unauthorized.title",
-      description: "app.api.system.guard.destroy.errors.unauthorized.description",
+      description:
+        "app.api.system.guard.destroy.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.guard.destroy.errors.notFound.title",
@@ -292,7 +307,8 @@ const { POST } = createEndpoint({
       },
       force: {
         success: true,
-        output: "💥 Force destroyed guard for project 'my-project' (was running)",
+        output:
+          "💥 Force destroyed guard for project 'my-project' (was running)",
         destroyedGuards: [
           {
             guardId: "guard_my_project_abc123",

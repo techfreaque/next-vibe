@@ -79,12 +79,16 @@ export function getCodeOutputConfig<const TKey extends string>(
       ? formatValue
       : "generic";
 
-  const showSummary = typeof config.showSummary === "boolean" ? config.showSummary : true;
+  const showSummary =
+    typeof config.showSummary === "boolean" ? config.showSummary : true;
 
-  const colorSchemeValue = "colorScheme" in config ? config.colorScheme : undefined;
+  const colorSchemeValue =
+    "colorScheme" in config ? config.colorScheme : undefined;
   const colorScheme =
     typeof colorSchemeValue === "string" &&
-    (colorSchemeValue === "auto" || colorSchemeValue === "light" || colorSchemeValue === "dark")
+    (colorSchemeValue === "auto" ||
+      colorSchemeValue === "light" ||
+      colorSchemeValue === "dark")
       ? colorSchemeValue
       : "auto";
 
@@ -113,7 +117,9 @@ export function getCodeOutputConfig<const TKey extends string>(
   }
 
   const groupBy =
-    "groupBy" in config && typeof config.groupBy === "string" ? config.groupBy : undefined;
+    "groupBy" in config && typeof config.groupBy === "string"
+      ? config.groupBy
+      : undefined;
 
   const summaryTemplate =
     "summaryTemplate" in config && typeof config.summaryTemplate === "string"
@@ -163,7 +169,9 @@ export function groupCodeOutputData(
 /**
  * Count items by severity
  */
-export function countCodeOutputBySeverity(data: CodeOutputItem[]): Record<string, number> {
+export function countCodeOutputBySeverity(
+  data: CodeOutputItem[],
+): Record<string, number> {
   const counts = { error: 0, warning: 0, info: 0, success: 0 };
 
   for (const item of data) {
@@ -216,7 +224,9 @@ export function buildTableData(data: CodeOutputItem[]): {
  * Extract and validate code output data from WidgetData
  * Handles both string (simple code) and object (full config) formats
  */
-export function extractCodeOutputData(value: WidgetData): ProcessedCodeOutput | null {
+export function extractCodeOutputData(
+  value: WidgetData,
+): ProcessedCodeOutput | null {
   // Handle string value directly (simple code string)
   if (typeof value === "string") {
     return {
@@ -229,9 +239,12 @@ export function extractCodeOutputData(value: WidgetData): ProcessedCodeOutput | 
 
   // Handle object value with code properties
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const code = "code" in value && typeof value.code === "string" ? value.code : "";
+    const code =
+      "code" in value && typeof value.code === "string" ? value.code : "";
     const language =
-      "language" in value && typeof value.language === "string" ? value.language : "text";
+      "language" in value && typeof value.language === "string"
+        ? value.language
+        : "text";
     const showLineNumbers =
       "showLineNumbers" in value && typeof value.showLineNumbers === "boolean"
         ? value.showLineNumbers
@@ -239,7 +252,9 @@ export function extractCodeOutputData(value: WidgetData): ProcessedCodeOutput | 
 
     // Extract and validate highlightLines array
     const rawHighlightLines =
-      "highlightLines" in value && Array.isArray(value.highlightLines) ? value.highlightLines : [];
+      "highlightLines" in value && Array.isArray(value.highlightLines)
+        ? value.highlightLines
+        : [];
     const highlightLines = rawHighlightLines.filter(
       (item): item is number => typeof item === "number",
     );
@@ -270,6 +285,9 @@ export function splitCodeIntoLines(code: string): string[] {
 /**
  * Check if a line should be highlighted
  */
-export function isLineHighlighted(lineNumber: number, highlightLines: number[]): boolean {
+export function isLineHighlighted(
+  lineNumber: number,
+  highlightLines: number[],
+): boolean {
   return highlightLines.includes(lineNumber);
 }

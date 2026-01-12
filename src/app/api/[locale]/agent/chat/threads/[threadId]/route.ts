@@ -14,12 +14,22 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined,
     handler: ({ urlPathParams, user, locale, logger }) =>
-      ThreadByIdRepository.getThreadById(urlPathParams.threadId, user, locale, logger),
+      ThreadByIdRepository.getThreadById(
+        urlPathParams.threadId,
+        user,
+        locale,
+        logger,
+      ),
   },
   [Methods.PATCH]: {
     email: undefined,
     handler: ({ data, urlPathParams, user, logger }) =>
-      ThreadByIdRepository.updateThread(data, urlPathParams.threadId, user, logger),
+      ThreadByIdRepository.updateThread(
+        data,
+        urlPathParams.threadId,
+        user,
+        logger,
+      ),
   },
   [Methods.DELETE]: {
     email: undefined,

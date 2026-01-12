@@ -17,7 +17,11 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { parseError } from "../../../../shared/utils";
-import { chatMessages, type ToolCall, type ToolCallResult } from "../../../chat/db";
+import {
+  chatMessages,
+  type ToolCall,
+  type ToolCallResult,
+} from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import {
   createErrorMessage,
@@ -110,10 +114,13 @@ export class ToolResultHandler {
     } = params;
 
     if (!pendingToolMessage) {
-      logger.error("[AI Stream] Tool result received but no pending message found", {
-        toolCallId: part.toolCallId,
-        toolName: part.toolName,
-      });
+      logger.error(
+        "[AI Stream] Tool result received but no pending message found",
+        {
+          toolCallId: part.toolCallId,
+          toolName: part.toolName,
+        },
+      );
       return null;
     }
 
@@ -131,10 +138,13 @@ export class ToolResultHandler {
     // The tool result will be processed in the next stream after confirmation
     try {
       if (controller.desiredSize === null) {
-        logger.info("[AI Stream] Controller closed - skipping tool result processing", {
-          toolCallId: part.toolCallId,
-          toolName: part.toolName,
-        });
+        logger.info(
+          "[AI Stream] Controller closed - skipping tool result processing",
+          {
+            toolCallId: part.toolCallId,
+            toolName: part.toolName,
+          },
+        );
         return null;
       }
     } catch (e) {
@@ -169,7 +179,8 @@ export class ToolResultHandler {
             : JSON.stringify(output);
 
       toolError = fail({
-        message: "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+        message:
+          "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
         errorType: ErrorResponseTypes.UNKNOWN_ERROR,
         messageParams: { error: errorMessage },
       });
@@ -178,10 +189,14 @@ export class ToolResultHandler {
     // Clean output by removing undefined values (they break validation)
     // Check for both undefined and null to avoid "Cannot convert null to object" error
     const cleanedOutput =
-      output !== null && output !== undefined ? JSON.parse(JSON.stringify(output)) : undefined;
+      output !== null && output !== undefined
+        ? JSON.parse(JSON.stringify(output))
+        : undefined;
 
     // Validate and type the output using type guard
-    const validatedOutput: ToolCallResult | undefined = isValidToolResult(cleanedOutput)
+    const validatedOutput: ToolCallResult | undefined = isValidToolResult(
+      cleanedOutput,
+    )
       ? cleanedOutput
       : undefined;
 
@@ -208,13 +223,19 @@ export class ToolResultHandler {
     try {
       controller.enqueue(encoder.encode(formatSSEEvent(toolMessageEvent)));
     } catch (e) {
-      if (e instanceof TypeError && e.message.includes("Controller is already closed")) {
+      if (
+        e instanceof TypeError &&
+        e.message.includes("Controller is already closed")
+      ) {
         logger.info("[AI Stream] Controller closed - skipping message event", {
           toolCallId: part.toolCallId,
         });
         return null;
       }
-      logger.error("[AI Stream] Failed to enqueue tool message event", parseError(e));
+      logger.error(
+        "[AI Stream] Failed to enqueue tool message event",
+        parseError(e),
+      );
       return null;
     }
 
@@ -281,12 +302,15 @@ export class ToolResultHandler {
         .returning({ id: chatMessages.id });
 
       if (updateResult.length === 0) {
-        logger.error("[AI Stream] CRITICAL: Tool message update failed - message not found in DB", {
-          messageId: toolMessageId,
-          toolCallId: part.toolCallId,
-          toolName: part.toolName,
-          threadId,
-        });
+        logger.error(
+          "[AI Stream] CRITICAL: Tool message update failed - message not found in DB",
+          {
+            messageId: toolMessageId,
+            toolCallId: part.toolCallId,
+            toolName: part.toolName,
+            threadId,
+          },
+        );
         // Fallback: create message if update failed
         await createToolMessage({
           messageId: toolMessageId,
@@ -345,14 +369,23 @@ export class ToolResultHandler {
       try {
         controller.enqueue(encoder.encode(formatSSEEvent(toolResultEvent)));
       } catch (e) {
-        if (e instanceof TypeError && e.message.includes("Controller is already closed")) {
-          logger.info("[AI Stream] Controller closed - skipping tool result event", {
-            toolCallId: part.toolCallId,
-            toolName: part.toolName,
-          });
+        if (
+          e instanceof TypeError &&
+          e.message.includes("Controller is already closed")
+        ) {
+          logger.info(
+            "[AI Stream] Controller closed - skipping tool result event",
+            {
+              toolCallId: part.toolCallId,
+              toolName: part.toolName,
+            },
+          );
           return null;
         }
-        logger.error("[AI Stream] Failed to enqueue tool result event", parseError(e));
+        logger.error(
+          "[AI Stream] Failed to enqueue tool result event",
+          parseError(e),
+        );
         return null;
       }
     }

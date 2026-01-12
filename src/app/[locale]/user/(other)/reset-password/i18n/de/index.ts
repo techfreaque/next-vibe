@@ -18,7 +18,8 @@ export const translations: typeof enTranslations = {
   auth: {
     resetPassword: {
       title: "Passwort zurücksetzen",
-      subtitle: "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Reset-Link",
+      subtitle:
+        "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Reset-Link",
       sendResetLink: "Reset-Link senden",
       backToLogin: "Zurück zur Anmeldung",
       emailSent: "E-Mail gesendet!",
@@ -36,7 +37,8 @@ export const translations: typeof enTranslations = {
       confirmPasswordLabel: "Passwort bestätigen",
       confirmPasswordPlaceholder: "Bestätigen Sie Ihr neues Passwort",
       errors: {
-        loadingError: "Fehler beim Laden des Formulars zum Zurücksetzen des Passworts",
+        loadingError:
+          "Fehler beim Laden des Formulars zum Zurücksetzen des Passworts",
       },
     },
   },

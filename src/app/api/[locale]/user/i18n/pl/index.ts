@@ -61,13 +61,15 @@ export const translations: typeof enTranslations = {
     id_lookup_failed: "Nie udało się znaleźć użytkownika po ID",
     email_lookup_failed: "Nie udało się znaleźć użytkownika po e-mailu",
     email_check_failed: "Sprawdzenie e-maila nie powiodło się",
-    email_duplicate_check_failed: "Sprawdzenie duplikatu e-maila nie powiodło się",
+    email_duplicate_check_failed:
+      "Sprawdzenie duplikatu e-maila nie powiodło się",
     search_failed: "Wyszukiwanie użytkowników nie powiodło się",
     email_already_in_use: "Adres e-mail jest już używany",
     creation_failed: "Nie udało się utworzyć użytkownika",
     no_data_returned: "Brak danych zwróconych z bazy danych",
     password_hashing_failed: "Hashowanie hasła nie powiodło się",
-    not_implemented_on_native: "Ta funkcja nie jest zaimplementowana w React Native",
+    not_implemented_on_native:
+      "Ta funkcja nie jest zaimplementowana w React Native",
     count_failed: "Nie udało się pobrać liczby użytkowników: {{error}}",
   },
   notifications: {

@@ -61,7 +61,10 @@ export function AudioWaveform({
 
       if (fullHistory.length <= barCount) {
         // Not enough samples yet, pad with zeros
-        return [...fullHistory, ...Array(barCount - fullHistory.length).fill(0)];
+        return [
+          ...fullHistory,
+          ...Array(barCount - fullHistory.length).fill(0),
+        ];
       }
 
       // Downsample: divide history into barCount chunks and take the max peak in each
@@ -118,7 +121,10 @@ export function AudioWaveform({
   });
 
   return (
-    <View {...styleProps} style={[styles.container, styleProps.style, { height }]}>
+    <View
+      {...styleProps}
+      style={[styles.container, styleProps.style, { height }]}
+    >
       {animatedValues.map((animatedValue, i) => (
         <Animated.View
           key={i}

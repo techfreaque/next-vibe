@@ -103,7 +103,8 @@ class CliEntryPoint {
       });
       return {
         success: false,
-        error: "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+        error:
+          "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
         errorParams: {
           error: parseError(error).message,
         },

@@ -23,7 +23,10 @@ export default function ErrorPage({
   reset: () => void;
 }): ReactElement {
   // In non-production environments, throw the error to let Next.js handle it with its awesome error page
-  if (envClient.NODE_ENV !== Environment.PRODUCTION || envClient.NEXT_PUBLIC_DEBUG_PRODUCTION) {
+  if (
+    envClient.NODE_ENV !== Environment.PRODUCTION ||
+    envClient.NEXT_PUBLIC_DEBUG_PRODUCTION
+  ) {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
     throw error;
   }

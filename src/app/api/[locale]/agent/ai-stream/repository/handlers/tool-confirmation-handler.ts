@@ -38,7 +38,14 @@ export class ToolConfirmationHandler {
     logger: EndpointLogger;
     user: JwtPayloadType;
   }): Promise<ResponseType<{ threadId: string; toolMessageId: string }>> {
-    const { toolConfirmation, messageHistory, isIncognito, locale, logger, user } = params;
+    const {
+      toolConfirmation,
+      messageHistory,
+      isIncognito,
+      locale,
+      logger,
+      user,
+    } = params;
 
     logger.debug("[Tool Confirmation] handleToolConfirmationInSetup called", {
       messageId: toolConfirmation.messageId,
@@ -50,9 +57,9 @@ export class ToolConfirmationHandler {
     let toolMessage: ChatMessage | undefined;
 
     if (isIncognito && messageHistory) {
-      toolMessage = messageHistory.find((msg) => msg.id === toolConfirmation.messageId) as
-        | ChatMessage
-        | undefined;
+      toolMessage = messageHistory.find(
+        (msg) => msg.id === toolConfirmation.messageId,
+      ) as ChatMessage | undefined;
     } else if (!isIncognito) {
       const [dbMessage] = await db
         .select()
@@ -68,7 +75,8 @@ export class ToolConfirmationHandler {
         isIncognito,
       });
       return fail({
-        message: "app.api.agent.chat.aiStream.post.toolConfirmation.errors.messageNotFound",
+        message:
+          "app.api.agent.chat.aiStream.post.toolConfirmation.errors.messageNotFound",
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -77,7 +85,8 @@ export class ToolConfirmationHandler {
     if (!toolCall) {
       logger.error("[Tool Confirmation] ToolCall metadata missing");
       return fail({
-        message: "app.api.agent.chat.aiStream.post.toolConfirmation.errors.toolCallMissing",
+        message:
+          "app.api.agent.chat.aiStream.post.toolConfirmation.errors.toolCallMissing",
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -86,7 +95,10 @@ export class ToolConfirmationHandler {
       // Execute tool with updated args
       const finalArgs = toolConfirmation.updatedArgs
         ? {
-            ...(toolCall.args as Record<string, string | number | boolean | null>),
+            ...(toolCall.args as Record<
+              string,
+              string | number | boolean | null
+            >),
             ...toolConfirmation.updatedArgs,
           }
         : toolCall.args;
@@ -108,7 +120,8 @@ export class ToolConfirmationHandler {
       });
 
       const toolEntry = Object.entries(toolsResult.tools ?? {}).find(
-        ([name]) => name === toolCall.toolName || name.endsWith(`/${toolCall.toolName}`),
+        ([name]) =>
+          name === toolCall.toolName || name.endsWith(`/${toolCall.toolName}`),
       );
 
       if (!toolEntry) {
@@ -116,7 +129,8 @@ export class ToolConfirmationHandler {
           toolName: toolCall.toolName,
         });
         return fail({
-          message: "app.api.agent.chat.aiStream.post.toolConfirmation.errors.toolNotFound",
+          message:
+            "app.api.agent.chat.aiStream.post.toolConfirmation.errors.toolNotFound",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -129,7 +143,10 @@ export class ToolConfirmationHandler {
       const [, tool] = toolEntry as [
         string,
         {
-          execute?: (args: ToolCallResult, options: ToolExecuteOptions) => Promise<ToolCallResult>;
+          execute?: (
+            args: ToolCallResult,
+            options: ToolExecuteOptions,
+          ) => Promise<ToolCallResult>;
         },
       ];
       let toolResult: ToolCallResult | undefined;
@@ -157,7 +174,8 @@ export class ToolConfirmationHandler {
             toolName: toolCall.toolName,
           });
           toolError = fail({
-            message: "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+            message:
+              "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
             errorType: ErrorResponseTypes.UNKNOWN_ERROR,
             messageParams: { error: "Tool does not have execute method" },
           });
@@ -169,7 +187,8 @@ export class ToolConfirmationHandler {
           errorStack: error instanceof Error ? error.stack : undefined,
         });
         toolError = fail({
-          message: "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+          message:
+            "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
           errorType: ErrorResponseTypes.UNKNOWN_ERROR,
           messageParams: {
             error: error instanceof Error ? error.message : String(error),
@@ -190,7 +209,9 @@ export class ToolConfirmationHandler {
       // Update tool message with result - persistence differs by mode
       if (isIncognito && messageHistory) {
         // Incognito: update messageHistory array (client will save to localStorage)
-        const msgIndex = messageHistory.findIndex((msg) => msg.id === toolConfirmation.messageId);
+        const msgIndex = messageHistory.findIndex(
+          (msg) => msg.id === toolConfirmation.messageId,
+        );
         if (msgIndex >= 0) {
           messageHistory[msgIndex].metadata = { toolCall: updatedToolCall };
         }
@@ -217,7 +238,8 @@ export class ToolConfirmationHandler {
         isConfirmed: false,
         waitingForConfirmation: false,
         error: fail({
-          message: "app.api.agent.chat.aiStream.errors.userDeclinedTool" as const,
+          message:
+            "app.api.agent.chat.aiStream.errors.userDeclinedTool" as const,
           errorType: ErrorResponseTypes.FORBIDDEN,
         }),
       };
@@ -225,7 +247,9 @@ export class ToolConfirmationHandler {
       // Update tool message with rejection - persistence differs by mode
       if (isIncognito && messageHistory) {
         // Incognito: update messageHistory array (client will save to localStorage)
-        const msgIndex = messageHistory.findIndex((msg) => msg.id === toolConfirmation.messageId);
+        const msgIndex = messageHistory.findIndex(
+          (msg) => msg.id === toolConfirmation.messageId,
+        );
         if (msgIndex >= 0) {
           messageHistory[msgIndex].metadata = { toolCall: rejectedToolCall };
         }

@@ -41,7 +41,8 @@ export class FileAttachmentHandler {
     const { attachments, threadId, userMessageId, userId, logger } = params;
 
     const { getStorageAdapter } = await import("../../../chat/storage");
-    const { isAllowedFileType } = await import("../../../chat/incognito/file-utils");
+    const { isAllowedFileType } =
+      await import("../../../chat/incognito/file-utils");
     const storage = getStorageAdapter();
 
     logger.debug("[File Processing] Uploading file attachments to storage", {

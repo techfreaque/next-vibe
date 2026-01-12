@@ -36,7 +36,8 @@ export const translations: typeof enTranslations = {
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist bei SQL-Ausführung aufgetreten",
+        description:
+          "Ein unbekannter Fehler ist bei SQL-Ausführung aufgetreten",
       },
       network: {
         title: "Netzwerkfehler",

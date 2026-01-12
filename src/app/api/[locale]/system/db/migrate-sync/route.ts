@@ -11,6 +11,7 @@ import { databaseMigrateSyncRepository as repository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, locale, logger }) => repository.syncMigrations(data, locale, logger),
+    handler: ({ data, locale, logger }) =>
+      repository.syncMigrations(data, locale, logger),
   },
 });

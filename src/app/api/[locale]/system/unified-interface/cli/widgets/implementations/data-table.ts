@@ -40,7 +40,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_TABLE> {
+export class DataTableWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.DATA_TABLE
+> {
   readonly widgetType = WidgetType.DATA_TABLE;
 
   /**
@@ -163,7 +165,9 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     const indent = this.createIndent(context.depth, context);
 
     // Filter data to only TableRow objects
-    const typedData: TableRow[] = data.filter((item): item is TableRow => isWidgetDataObject(item));
+    const typedData: TableRow[] = data.filter((item): item is TableRow =>
+      isWidgetDataObject(item),
+    );
 
     // Calculate column widths
     const columnWidths = this.calculateColumnWidths(typedData, config, context);
@@ -175,7 +179,9 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     const separator = this.renderTableSeparator(columnWidths);
 
     // Render rows
-    const rows = typedData.map((row) => this.renderTableRow(row, config, columnWidths, context));
+    const rows = typedData.map((row) =>
+      this.renderTableRow(row, config, columnWidths, context),
+    );
 
     const result = [header, separator, ...rows];
 
@@ -187,7 +193,8 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     config: TableRenderConfig<TKey>,
     context: WidgetRenderContext,
   ): number[] {
-    const maxWidth = context.options.maxWidth - context.depth * context.options.indentSize;
+    const maxWidth =
+      context.options.maxWidth - context.depth * context.options.indentSize;
     const availableWidth = maxWidth - (config.columns.length - 1) * 3; // Account for separators
 
     return config.columns.map((col) => {
@@ -202,7 +209,9 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
       const maxContentWidth = Math.max(
         ...data.slice(0, 10).map((row) => {
           const value = row[col.key];
-          const formatted = col.formatter ? col.formatter(value) : formatCellValue(value);
+          const formatted = col.formatter
+            ? col.formatter(value)
+            : formatCellValue(value);
           return formatted.length;
         }),
       );
@@ -229,7 +238,9 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
 
   private renderTableSeparator(columnWidths: number[]): string {
     /* eslint-disable i18next/no-literal-string */
-    const separators = columnWidths.map((width) => this.createSeparator(width, "─"));
+    const separators = columnWidths.map((width) =>
+      this.createSeparator(width, "─"),
+    );
     return separators.join("─┼─");
     /* eslint-enable i18next/no-literal-string */
   }
@@ -257,7 +268,10 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     return cells.join(" │ ");
   }
 
-  private renderTableAutoColumns(data: WidgetData[], context: WidgetRenderContext): string {
+  private renderTableAutoColumns(
+    data: WidgetData[],
+    context: WidgetRenderContext,
+  ): string {
     const t = context.t;
 
     if (data.length === 0) {
@@ -279,16 +293,18 @@ export class DataTableWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     }
 
     const firstRowObj = firstRow as TableRow;
-    const columns: TableColumn<string>[] = Object.keys(firstRowObj).map((key) => ({
-      key,
-      label: key,
-      type: this.detectFieldType(firstRowObj[key]),
-      align: "left" as const,
-      formatter: this.getColumnFormatter(
-        this.detectFieldType(firstRowObj[key]),
-        context.options.locale,
-      ),
-    }));
+    const columns: TableColumn<string>[] = Object.keys(firstRowObj).map(
+      (key) => ({
+        key,
+        label: key,
+        type: this.detectFieldType(firstRowObj[key]),
+        align: "left" as const,
+        formatter: this.getColumnFormatter(
+          this.detectFieldType(firstRowObj[key]),
+          context.options.locale,
+        ),
+      }),
+    );
 
     const config = {
       columns,

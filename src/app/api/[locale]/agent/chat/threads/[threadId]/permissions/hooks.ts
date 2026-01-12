@@ -46,4 +46,6 @@ export function useThreadPermissions(
   );
 }
 
-export type ThreadPermissionsEndpointReturn = EndpointReturn<typeof definitions>;
+export type ThreadPermissionsEndpointReturn = EndpointReturn<
+  typeof definitions
+>;

@@ -95,7 +95,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konfliktfehler",
-        description: "Benutzer können aufgrund von Konflikten nicht aufgelistet werden",
+        description:
+          "Benutzer können aufgrund von Konflikten nicht aufgelistet werden",
       },
       network: {
         title: "Netzwerkfehler",
@@ -200,7 +201,8 @@ export const translations: typeof enTranslations = {
     },
     internal: {
       title: "Interner Fehler",
-      description: "Ein interner Fehler ist beim Auflisten der Benutzer aufgetreten",
+      description:
+        "Ein interner Fehler ist beim Auflisten der Benutzer aufgetreten",
     },
   },
   post: {

@@ -26,7 +26,10 @@ export function isDefaultFolder(folderId: string): folderId is DefaultFolderId {
  * For default folders, use the icon from DEFAULT_FOLDER_CONFIGS
  * For custom folders, use the stored icon or fallback to "folder"
  */
-export function getFolderIcon(folderId: string, customIcon?: IconKey | null): IconKey {
+export function getFolderIcon(
+  folderId: string,
+  customIcon?: IconKey | null,
+): IconKey {
   if (isDefaultFolder(folderId)) {
     return DEFAULT_FOLDER_CONFIGS[folderId].icon;
   }
@@ -38,7 +41,10 @@ export function getFolderIcon(folderId: string, customIcon?: IconKey | null): Ic
  * For default folders, use the color from DEFAULT_FOLDER_CONFIGS
  * For custom folders, return the custom color or null
  */
-export function getFolderColor(folderId: string, customColor?: string | null): string | null {
+export function getFolderColor(
+  folderId: string,
+  customColor?: string | null,
+): string | null {
   if (isDefaultFolder(folderId)) {
     return DEFAULT_FOLDER_CONFIGS[folderId].color;
   }
@@ -50,7 +56,10 @@ export function getFolderColor(folderId: string, customColor?: string | null): s
  * For default folders, always use the translation key from DEFAULT_FOLDER_CONFIGS
  * For custom folders, use the stored name
  */
-export function getFolderDisplayName(folder: ChatFolder, locale: CountryLanguage): string {
+export function getFolderDisplayName(
+  folder: ChatFolder,
+  locale: CountryLanguage,
+): string {
   const { t } = simpleT(locale);
 
   // For default folders, always use the translation key from config
@@ -146,7 +155,9 @@ export function getAllChildFolderIds(
   folders: Record<string, ChatFolder>,
 ): string[] {
   const children: string[] = [];
-  const directChildren = Object.values(folders).filter((f) => f.parentId === folderId);
+  const directChildren = Object.values(folders).filter(
+    (f) => f.parentId === folderId,
+  );
 
   for (const child of directChildren) {
     children.push(child.id);

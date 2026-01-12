@@ -53,38 +53,58 @@ interface JobPosition {
   applicationDeadline: string;
 }
 
-export default async function CareersPage({ params }: Props): Promise<JSX.Element> {
+export default async function CareersPage({
+  params,
+}: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
   const openPositions: readonly JobPosition[] = [
     {
       id: "socialMediaManager",
-      title: t("app.story._components.home.careers.jobs.socialMediaManager.title"),
-      description: t("app.story._components.home.careers.jobs.socialMediaManager.shortDescription"),
+      title: t(
+        "app.story._components.home.careers.jobs.socialMediaManager.title",
+      ),
+      description: t(
+        "app.story._components.home.careers.jobs.socialMediaManager.shortDescription",
+      ),
       type: "Full-time",
-      location: t("app.story._components.home.careers.jobs.socialMediaManager.location"),
-      department: t("app.story._components.home.careers.jobs.socialMediaManager.department"),
+      location: t(
+        "app.story._components.home.careers.jobs.socialMediaManager.location",
+      ),
+      department: t(
+        "app.story._components.home.careers.jobs.socialMediaManager.department",
+      ),
 
       // current date - 2.5 weeks
-      postedDate: new Date(Date.now() - 2.5 * 7 * 24 * 60 * 60 * 1000).toLocaleDateString(locale),
+      postedDate: new Date(
+        Date.now() - 2.5 * 7 * 24 * 60 * 60 * 1000,
+      ).toLocaleDateString(locale),
       // current date + 1 month
-      applicationDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(
-        locale,
-      ),
+      applicationDeadline: new Date(
+        Date.now() + 30 * 24 * 60 * 60 * 1000,
+      ).toLocaleDateString(locale),
     },
     {
       id: "contentCreator",
       title: t("app.story._components.home.careers.jobs.contentCreator.title"),
-      description: t("app.story._components.home.careers.jobs.contentCreator.shortDescription"),
-      type: "Full-time",
-      location: t("app.story._components.home.careers.jobs.contentCreator.location"),
-      department: t("app.story._components.home.careers.jobs.contentCreator.department"),
-      // current date - 2.5 weeks
-      postedDate: new Date(Date.now() - 2.5 * 7 * 24 * 60 * 60 * 1000).toLocaleDateString(locale),
-      // current date + 1 month
-      applicationDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(
-        locale,
+      description: t(
+        "app.story._components.home.careers.jobs.contentCreator.shortDescription",
       ),
+      type: "Full-time",
+      location: t(
+        "app.story._components.home.careers.jobs.contentCreator.location",
+      ),
+      department: t(
+        "app.story._components.home.careers.jobs.contentCreator.department",
+      ),
+      // current date - 2.5 weeks
+      postedDate: new Date(
+        Date.now() - 2.5 * 7 * 24 * 60 * 60 * 1000,
+      ).toLocaleDateString(locale),
+      // current date + 1 month
+      applicationDeadline: new Date(
+        Date.now() + 30 * 24 * 60 * 60 * 1000,
+      ).toLocaleDateString(locale),
     },
   ];
 
@@ -110,7 +130,9 @@ export default async function CareersPage({ params }: Props): Promise<JSX.Elemen
               <H2 className="text-3xl font-bold mb-2">
                 {t("app.story._components.home.careers.joinTeam")}
               </H2>
-              <P className="text-lg max-w-lg">{t("app.story._components.home.careers.subtitle")}</P>
+              <P className="text-lg max-w-lg">
+                {t("app.story._components.home.careers.subtitle")}
+              </P>
             </Div>
           </Div>
 
@@ -132,15 +154,21 @@ export default async function CareersPage({ params }: Props): Promise<JSX.Elemen
               </Div>
               <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("app.story._components.home.careers.benefits.meaningfulTitle")}
+                  {t(
+                    "app.story._components.home.careers.benefits.meaningfulTitle",
+                  )}
                 </H3>
                 <P className="text-gray-700 dark:text-gray-300">
-                  {t("app.story._components.home.careers.benefits.meaningfulDesc")}
+                  {t(
+                    "app.story._components.home.careers.benefits.meaningfulDesc",
+                  )}
                 </P>
               </Div>
               <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("app.story._components.home.careers.benefits.balanceTitle")}
+                  {t(
+                    "app.story._components.home.careers.benefits.balanceTitle",
+                  )}
                 </H3>
                 <P className="text-gray-700 dark:text-gray-300">
                   {t("app.story._components.home.careers.benefits.balanceDesc")}
@@ -148,18 +176,26 @@ export default async function CareersPage({ params }: Props): Promise<JSX.Elemen
               </Div>
               <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("app.story._components.home.careers.benefits.compensationTitle")}
+                  {t(
+                    "app.story._components.home.careers.benefits.compensationTitle",
+                  )}
                 </H3>
                 <P className="text-gray-700 dark:text-gray-300">
-                  {t("app.story._components.home.careers.benefits.compensationDesc")}
+                  {t(
+                    "app.story._components.home.careers.benefits.compensationDesc",
+                  )}
                 </P>
               </Div>
               <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <H3 className="font-semibold text-lg mb-2 text-blue-600 dark:text-blue-400">
-                  {t("app.story._components.home.careers.benefits.innovationTitle")}
+                  {t(
+                    "app.story._components.home.careers.benefits.innovationTitle",
+                  )}
                 </H3>
                 <P className="text-gray-700 dark:text-gray-300">
-                  {t("app.story._components.home.careers.benefits.innovationDesc")}
+                  {t(
+                    "app.story._components.home.careers.benefits.innovationDesc",
+                  )}
                 </P>
               </Div>
               <Div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
@@ -184,37 +220,61 @@ export default async function CareersPage({ params }: Props): Promise<JSX.Elemen
                   className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6"
                 >
                   <H3 className="text-xl font-bold mb-2">{position.title}</H3>
-                  <P className="text-gray-700 dark:text-gray-300 mb-4">{position.description}</P>
+                  <P className="text-gray-700 dark:text-gray-300 mb-4">
+                    {position.description}
+                  </P>
                   <Div className="flex flex-col gap-2 mb-4">
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t("app.story._components.home.careers.jobDetail.department")}:
+                        {t(
+                          "app.story._components.home.careers.jobDetail.department",
+                        )}
+                        :
                       </Span>
-                      <Span className="text-sm font-medium">{position.department}</Span>
+                      <Span className="text-sm font-medium">
+                        {position.department}
+                      </Span>
                     </Div>
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t("app.story._components.home.careers.jobDetail.employmentType")}:
+                        {t(
+                          "app.story._components.home.careers.jobDetail.employmentType",
+                        )}
+                        :
                       </Span>
-                      <Span className="text-sm font-medium">{position.type}</Span>
+                      <Span className="text-sm font-medium">
+                        {position.type}
+                      </Span>
                     </Div>
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t("app.story._components.home.careers.jobDetail.location")}:
+                        {t(
+                          "app.story._components.home.careers.jobDetail.location",
+                        )}
+                        :
                       </Span>
-                      <Span className="text-sm font-medium">{position.location}</Span>
+                      <Span className="text-sm font-medium">
+                        {position.location}
+                      </Span>
                     </Div>
                     <Div className="flex items-center justify-between">
                       <Span className="text-sm text-gray-500 dark:text-gray-400">
-                        {t("app.story._components.home.careers.jobDetail.applicationDeadline")}:
+                        {t(
+                          "app.story._components.home.careers.jobDetail.applicationDeadline",
+                        )}
+                        :
                       </Span>
-                      <Span className="text-sm font-medium">{position.applicationDeadline}</Span>
+                      <Span className="text-sm font-medium">
+                        {position.applicationDeadline}
+                      </Span>
                     </Div>
                   </Div>
                   <Div className="flex flex-row gap-3">
                     <Button className="flex-1" asChild>
                       <Link href={`/${locale}/story/careers/${position.id}`}>
-                        {t("app.story._components.home.careers.jobDetail.moreDetails")}
+                        {t(
+                          "app.story._components.home.careers.jobDetail.moreDetails",
+                        )}
                       </Link>
                     </Button>
                     <Button variant="outline" className="flex-1" asChild>

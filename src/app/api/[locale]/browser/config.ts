@@ -52,9 +52,12 @@ export function getChromeMCPConfig(): ChromeMCPConfig {
 
   // Override executable path if specified
   if (process.env.CHROME_EXECUTABLE_PATH) {
-    const executableArgIndex = config.args.findIndex((arg) => arg.startsWith("--executablePath"));
+    const executableArgIndex = config.args.findIndex((arg) =>
+      arg.startsWith("--executablePath"),
+    );
     if (executableArgIndex !== -1) {
-      config.args[executableArgIndex] = `--executablePath=${process.env.CHROME_EXECUTABLE_PATH}`;
+      config.args[executableArgIndex] =
+        `--executablePath=${process.env.CHROME_EXECUTABLE_PATH}`;
     }
   }
 

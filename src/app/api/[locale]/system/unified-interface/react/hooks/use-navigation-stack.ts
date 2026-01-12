@@ -2,7 +2,10 @@
 
 import { create } from "zustand";
 
-import type { CreateApiEndpointAny, NavigationStackEntry } from "../../shared/types/endpoint";
+import type {
+  CreateApiEndpointAny,
+  NavigationStackEntry,
+} from "../../shared/types/endpoint";
 
 /**
  * Navigation stack store interface
@@ -78,7 +81,12 @@ export const useNavigationStore = create<NavigationStackStore>((set) => ({
     // before rendering the PATCH/PUT form if prefillFromGet is true
     if (prefillFromGet) {
       // eslint-disable-next-line no-console
-      console.log("Navigation: Prefill from GET requested for:", endpoint, "using:", getEndpoint);
+      console.log(
+        "Navigation: Prefill from GET requested for:",
+        endpoint,
+        "using:",
+        getEndpoint,
+      );
     }
   },
 

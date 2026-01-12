@@ -78,7 +78,9 @@ export function TabsWidget<const TKey extends string>({
 
   // Get classes from helper functions (no hardcoding!)
   const iconSizeClass = getTextSizeClassName(iconSize);
-  const preBorderRadiusClass = getBorderRadiusClassName(preBorderRadius || "lg");
+  const preBorderRadiusClass = getBorderRadiusClassName(
+    preBorderRadius || "lg",
+  );
 
   // Extract data using shared logic
   const data = extractTabsData(value);
@@ -86,7 +88,11 @@ export function TabsWidget<const TKey extends string>({
   if (!data || !data.tabs || data.tabs.length === 0) {
     return (
       <Div
-        className={cn("text-center text-muted-foreground", emptyPaddingClass || "py-8", className)}
+        className={cn(
+          "text-center text-muted-foreground",
+          emptyPaddingClass || "py-8",
+          className,
+        )}
       >
         {context.t("system.ui.widgets.tabs.empty")}
       </Div>
@@ -119,10 +125,16 @@ export function TabsWidget<const TKey extends string>({
       </TabsList>
 
       {tabs.map((tab) => (
-        <TabsContent key={tab.id} value={tab.id} className={contentMarginClass || "mt-4"}>
+        <TabsContent
+          key={tab.id}
+          value={tab.id}
+          className={contentMarginClass || "mt-4"}
+        >
           {tab.content !== null && tab.content !== undefined ? (
             typeof tab.content === "string" ? (
-              <Div className={contentTextSizeClass || "text-sm"}>{tab.content}</Div>
+              <Div className={contentTextSizeClass || "text-sm"}>
+                {tab.content}
+              </Div>
             ) : (
               <Div className={contentTextSizeClass || "text-sm"}>
                 <Pre

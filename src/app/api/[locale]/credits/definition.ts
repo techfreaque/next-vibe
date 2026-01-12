@@ -109,7 +109,8 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.chat.credits.get.errors.validation.title",
-      description: "app.api.agent.chat.credits.get.errors.validation.description",
+      description:
+        "app.api.agent.chat.credits.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.chat.credits.get.errors.network.title",
@@ -117,11 +118,13 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.agent.chat.credits.get.errors.unauthorized.title",
-      description: "app.api.agent.chat.credits.get.errors.unauthorized.description",
+      description:
+        "app.api.agent.chat.credits.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.credits.get.errors.forbidden.title",
-      description: "app.api.agent.chat.credits.get.errors.forbidden.description",
+      description:
+        "app.api.agent.chat.credits.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.credits.get.errors.notFound.title",
@@ -137,7 +140,8 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.agent.chat.credits.get.errors.unsavedChanges.title",
-      description: "app.api.agent.chat.credits.get.errors.unsavedChanges.description",
+      description:
+        "app.api.agent.chat.credits.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.credits.get.errors.conflict.title",

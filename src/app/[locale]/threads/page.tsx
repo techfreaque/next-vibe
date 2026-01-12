@@ -13,7 +13,9 @@ interface ThreadsRootPageProps {
   }>;
 }
 
-export default async function ThreadsRootPage({ params }: ThreadsRootPageProps): Promise<never> {
+export default async function ThreadsRootPage({
+  params,
+}: ThreadsRootPageProps): Promise<never> {
   const { locale } = await params;
 
   // Redirect to private folder by default

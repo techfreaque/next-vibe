@@ -20,10 +20,12 @@ export const translations: typeof enTranslations = {
     delete_failed: "Fehler beim Löschen des Cron-Tasks",
     not_found: "Cron-Task nicht gefunden",
     execution_create_failed: "Fehler beim Erstellen der Cron-Task-Ausführung",
-    execution_update_failed: "Fehler beim Aktualisieren der Cron-Task-Ausführung",
+    execution_update_failed:
+      "Fehler beim Aktualisieren der Cron-Task-Ausführung",
     execution_not_found: "Cron-Task-Ausführung nicht gefunden",
     executions_fetch_failed: "Fehler beim Abrufen der Cron-Task-Ausführungen",
-    recent_executions_fetch_failed: "Fehler beim Abrufen der letzten Cron-Ausführungen",
+    recent_executions_fetch_failed:
+      "Fehler beim Abrufen der letzten Cron-Ausführungen",
     schedules_fetch_failed: "Fehler beim Abrufen der Cron-Task-Zeitpläne",
     schedule_update_failed: "Fehler beim Aktualisieren des Cron-Task-Zeitplans",
     schedule_not_found: "Cron-Task-Zeitplan nicht gefunden",

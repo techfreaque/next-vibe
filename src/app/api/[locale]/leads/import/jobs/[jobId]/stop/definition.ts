@@ -49,7 +49,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.leads.import.jobs.jobId.stop.post.jobId.label",
-          description: "app.api.leads.import.jobs.jobId.stop.post.jobId.description",
+          description:
+            "app.api.leads.import.jobs.jobId.stop.post.jobId.description",
           columns: 12,
         },
         z.uuid(),
@@ -60,7 +61,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.leads.import.jobs.jobId.stop.post.response.title",
-          description: "app.api.leads.import.jobs.jobId.stop.post.response.description",
+          description:
+            "app.api.leads.import.jobs.jobId.stop.post.response.description",
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -68,14 +70,16 @@ const { POST } = createEndpoint({
           success: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.leads.import.jobs.jobId.stop.post.response.success.content",
+              content:
+                "app.api.leads.import.jobs.jobId.stop.post.response.success.content",
             },
             z.boolean(),
           ),
           message: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.leads.import.jobs.jobId.stop.post.response.message.content",
+              content:
+                "app.api.leads.import.jobs.jobId.stop.post.response.message.content",
             },
             z.string(),
           ),
@@ -86,46 +90,59 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.import.jobs.jobId.stop.post.errors.validation.title",
-      description: "app.api.leads.import.jobs.jobId.stop.post.errors.validation.description",
+      title:
+        "app.api.leads.import.jobs.jobId.stop.post.errors.validation.title",
+      description:
+        "app.api.leads.import.jobs.jobId.stop.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.import.jobs.jobId.stop.post.errors.unauthorized.title",
-      description: "app.api.leads.import.jobs.jobId.stop.post.errors.unauthorized.description",
+      title:
+        "app.api.leads.import.jobs.jobId.stop.post.errors.unauthorized.title",
+      description:
+        "app.api.leads.import.jobs.jobId.stop.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.leads.import.jobs.jobId.stop.post.errors.forbidden.title",
-      description: "app.api.leads.import.jobs.jobId.stop.post.errors.forbidden.description",
+      description:
+        "app.api.leads.import.jobs.jobId.stop.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.leads.import.jobs.jobId.stop.post.errors.notFound.title",
-      description: "app.api.leads.import.jobs.jobId.stop.post.errors.notFound.description",
+      description:
+        "app.api.leads.import.jobs.jobId.stop.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.leads.import.jobs.jobId.stop.post.errors.server.title",
-      description: "app.api.leads.import.jobs.jobId.stop.post.errors.server.description",
+      description:
+        "app.api.leads.import.jobs.jobId.stop.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.leads.import.jobs.jobId.stop.post.errors.unknown.title",
-      description: "app.api.leads.import.jobs.jobId.stop.post.errors.unknown.description",
+      description:
+        "app.api.leads.import.jobs.jobId.stop.post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.leads.import.jobs.jobId.stop.post.errors.network.title",
-      description: "app.api.leads.import.jobs.jobId.stop.post.errors.network.description",
+      description:
+        "app.api.leads.import.jobs.jobId.stop.post.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.import.jobs.jobId.stop.post.errors.unsavedChanges.title",
-      description: "app.api.leads.import.jobs.jobId.stop.post.errors.unsavedChanges.description",
+      title:
+        "app.api.leads.import.jobs.jobId.stop.post.errors.unsavedChanges.title",
+      description:
+        "app.api.leads.import.jobs.jobId.stop.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.leads.import.jobs.jobId.stop.post.errors.conflict.title",
-      description: "app.api.leads.import.jobs.jobId.stop.post.errors.conflict.description",
+      description:
+        "app.api.leads.import.jobs.jobId.stop.post.errors.conflict.description",
     },
   },
 
   successTypes: {
     title: "app.api.leads.import.jobs.jobId.stop.post.success.title",
-    description: "app.api.leads.import.jobs.jobId.stop.post.success.description",
+    description:
+      "app.api.leads.import.jobs.jobId.stop.post.success.description",
   },
 
   examples: {

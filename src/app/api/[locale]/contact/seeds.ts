@@ -59,7 +59,8 @@ export async function dev(logger: EndpointLogger): Promise<void> {
         name: "Mike Customer",
         email: "mike@customer.com",
         subject: "Feature Request",
-        message: "I love your service! Would it be possible to add a dark mode option?",
+        message:
+          "I love your service! Would it be possible to add a dark mode option?",
         status: ContactStatus.RESOLVED,
       }),
     ];
@@ -67,7 +68,11 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     // Create contact submissions
     for (const contact of contactSubmissions) {
       try {
-        const result = await ContactRepository.create(contact, defaultLocale, logger);
+        const result = await ContactRepository.create(
+          contact,
+          defaultLocale,
+          logger,
+        );
         if (result.success) {
           logger.debug("app.api.contact.seeds.dev.submission.created", {
             email: contact.email,
@@ -78,9 +83,13 @@ export async function dev(logger: EndpointLogger): Promise<void> {
           });
         }
       } catch (error) {
-        logger.error("app.api.contact.seeds.dev.submission.error", parseError(error), {
-          email: contact.email,
-        });
+        logger.error(
+          "app.api.contact.seeds.dev.submission.error",
+          parseError(error),
+          {
+            email: contact.email,
+          },
+        );
       }
     }
 
@@ -106,7 +115,11 @@ export async function test(logger: EndpointLogger): Promise<void> {
       status: ContactStatus.NEW,
     });
 
-    const result = await ContactRepository.create(testContact, defaultLocale, logger);
+    const result = await ContactRepository.create(
+      testContact,
+      defaultLocale,
+      logger,
+    );
     if (result.success) {
       logger.debug("app.api.contact.seeds.test.submission.created");
     } else {

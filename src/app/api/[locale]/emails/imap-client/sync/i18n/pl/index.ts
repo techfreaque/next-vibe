@@ -14,7 +14,8 @@ export const translations: typeof enTranslations = {
   },
   force: {
     label: "Wymuś synchronizację",
-    description: "Wymuś synchronizację nawet jeśli niedawno była przeprowadzona",
+    description:
+      "Wymuś synchronizację nawet jeśli niedawno była przeprowadzona",
   },
   dryRun: {
     label: "Test uruchomienia",

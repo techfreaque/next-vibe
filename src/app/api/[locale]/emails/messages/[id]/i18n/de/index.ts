@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   description: "Eine einzelne E-Mail anhand ihrer eindeutigen Kennung abrufen",
   container: {
     title: "E-Mail-Details",
-    description: "Detaillierte Informationen über eine bestimmte E-Mail anzeigen",
+    description:
+      "Detaillierte Informationen über eine bestimmte E-Mail anzeigen",
   },
   fields: {
     id: {
@@ -48,7 +49,8 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description: "Sie müssen authentifiziert sein, um E-Mail-Details einzusehen",
+        description:
+          "Sie müssen authentifiziert sein, um E-Mail-Details einzusehen",
       },
       not_found: {
         title: "E-Mail nicht gefunden",
@@ -60,7 +62,8 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Ein interner Serverfehler ist beim Abrufen der E-Mail aufgetreten",
+        description:
+          "Ein interner Serverfehler ist beim Abrufen der E-Mail aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -75,7 +78,8 @@ export const translations: typeof enTranslations = {
     },
     unauthorized: {
       title: "Nicht autorisiert",
-      description: "Sie müssen authentifiziert sein, um E-Mail-Details einzusehen",
+      description:
+        "Sie müssen authentifiziert sein, um E-Mail-Details einzusehen",
     },
     notFound: {
       title: "E-Mail nicht gefunden",
@@ -87,11 +91,13 @@ export const translations: typeof enTranslations = {
     },
     server: {
       title: "Serverfehler",
-      description: "Ein interner Serverfehler ist beim Abrufen der E-Mail aufgetreten",
+      description:
+        "Ein interner Serverfehler ist beim Abrufen der E-Mail aufgetreten",
     },
     conflict: {
       title: "Konfliktfehler",
-      description: "Ein Konflikt ist beim Verarbeiten der E-Mail-Anfrage aufgetreten",
+      description:
+        "Ein Konflikt ist beim Verarbeiten der E-Mail-Anfrage aufgetreten",
     },
     network: {
       title: "Netzwerkfehler",

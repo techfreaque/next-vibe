@@ -50,7 +50,10 @@ interface ResponseFieldsRendererProps {
  * Transform data for specific widget types
  * Some widgets expect specific data structures
  */
-function transformDataForWidget(widgetType: WidgetType, value: ToolCallResult): ToolCallResult {
+function transformDataForWidget(
+  widgetType: WidgetType,
+  value: ToolCallResult,
+): ToolCallResult {
   // LINK_LIST expects { items: [...] } format
   if (widgetType === WidgetType.LINK_LIST && Array.isArray(value)) {
     return {
@@ -116,11 +119,13 @@ function renderResponseField<const TKey extends string>(
   return (
     <Div key={fieldKey} className="flex flex-col gap-1">
       {/* Field Label (if provided) */}
-      {"label" in field.ui && field.ui.label && typeof field.ui.label === "string" && (
-        <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
-          {field.ui.label}
-        </Span>
-      )}
+      {"label" in field.ui &&
+        field.ui.label &&
+        typeof field.ui.label === "string" && (
+          <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
+            {field.ui.label}
+          </Span>
+        )}
 
       {/* Widget Renderer */}
       <Div className="pl-0">
@@ -140,7 +145,10 @@ function renderResponseField<const TKey extends string>(
  * Fallback renderer for when no widget metadata is available
  * Shows JSON dump with warning
  */
-function renderFallback(result: ToolCallResult, locale: CountryLanguage): JSX.Element {
+function renderFallback(
+  result: ToolCallResult,
+  locale: CountryLanguage,
+): JSX.Element {
   const { t } = simpleT(locale);
 
   return (
@@ -176,21 +184,31 @@ export function ResponseFieldsRenderer({
   if (!result) {
     return (
       <Div className="text-sm text-muted-foreground italic py-2">
-        {t("app.api.system.unifiedInterface.react.widgets.toolCall.messages.noResult")}
+        {t(
+          "app.api.system.unifiedInterface.react.widgets.toolCall.messages.noResult",
+        )}
       </Div>
     );
   }
 
-  const responseFields: Array<{ key: string; field: UnifiedField<string> }> = [];
+  const responseFields: Array<{ key: string; field: UnifiedField<string> }> =
+    [];
   if (
     definition?.fields &&
     typeof definition.fields === "object" &&
     "children" in definition.fields
   ) {
-    const children = definition.fields.children as Record<string, UnifiedField<string>>;
+    const children = definition.fields.children as Record<
+      string,
+      UnifiedField<string>
+    >;
 
     for (const [fieldKey, fieldDef] of Object.entries(children)) {
-      if ("usage" in fieldDef && typeof fieldDef.usage === "object" && fieldDef.usage !== null) {
+      if (
+        "usage" in fieldDef &&
+        typeof fieldDef.usage === "object" &&
+        fieldDef.usage !== null
+      ) {
         const usage = fieldDef.usage;
         let hasResponse = false;
         if ("response" in usage) {

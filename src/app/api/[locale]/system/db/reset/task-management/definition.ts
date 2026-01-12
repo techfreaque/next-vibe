@@ -25,26 +25,31 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 /**
  * Task Operation Types
  */
-export const { enum: TaskOperationType, options: TaskOperationTypeOptions } = createEnumOptions({
-  RUN_SAFETY_CHECK: "app.api.system.db.reset.taskManagement.operations.runSafetyCheck",
-  START_AUTO_RESET: "app.api.system.db.reset.taskManagement.operations.startAutoReset",
-  START_BACKUP_VERIFICATION:
-    "app.api.system.db.reset.taskManagement.operations.startBackupVerification",
-  STOP_AUTO_RESET: "app.api.system.db.reset.taskManagement.operations.stopAutoReset",
-  STOP_BACKUP_VERIFICATION:
-    "app.api.system.db.reset.taskManagement.operations.stopBackupVerification",
-  GET_STATUS: "app.api.system.db.reset.taskManagement.operations.getStatus",
-  LIST_TASKS: "app.api.system.db.reset.taskManagement.operations.listTasks",
-} as const);
+export const { enum: TaskOperationType, options: TaskOperationTypeOptions } =
+  createEnumOptions({
+    RUN_SAFETY_CHECK:
+      "app.api.system.db.reset.taskManagement.operations.runSafetyCheck",
+    START_AUTO_RESET:
+      "app.api.system.db.reset.taskManagement.operations.startAutoReset",
+    START_BACKUP_VERIFICATION:
+      "app.api.system.db.reset.taskManagement.operations.startBackupVerification",
+    STOP_AUTO_RESET:
+      "app.api.system.db.reset.taskManagement.operations.stopAutoReset",
+    STOP_BACKUP_VERIFICATION:
+      "app.api.system.db.reset.taskManagement.operations.stopBackupVerification",
+    GET_STATUS: "app.api.system.db.reset.taskManagement.operations.getStatus",
+    LIST_TASKS: "app.api.system.db.reset.taskManagement.operations.listTasks",
+  } as const);
 
 /**
  * Task Priority Types
  */
-export const { enum: TaskPriority, options: TaskPriorityOptions } = createEnumOptions({
-  LOW: "app.api.system.db.reset.taskManagement.priority.low",
-  MEDIUM: "app.api.system.db.reset.taskManagement.priority.medium",
-  HIGH: "app.api.system.db.reset.taskManagement.priority.high",
-} as const);
+export const { enum: TaskPriority, options: TaskPriorityOptions } =
+  createEnumOptions({
+    LOW: "app.api.system.db.reset.taskManagement.priority.low",
+    MEDIUM: "app.api.system.db.reset.taskManagement.priority.medium",
+    HIGH: "app.api.system.db.reset.taskManagement.priority.high",
+  } as const);
 
 /**
  * Database Reset Task Management Endpoint Definition
@@ -58,7 +63,12 @@ const { POST } = createEndpoint({
     "app.api.system.db.reset.taskManagement.tags.management",
   ],
   icon: "rotate-ccw",
-  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["reset-tasks", "db-reset-tasks"],
   method: Methods.POST,
   path: ["system", "db", "reset", "task-management"],
@@ -151,7 +161,8 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.system.db.reset.taskManagement.container.title",
-      description: "app.api.system.db.reset.taskManagement.container.description",
+      description:
+        "app.api.system.db.reset.taskManagement.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -162,9 +173,12 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
-          label: "app.api.system.db.reset.taskManagement.fields.operation.label",
-          description: "app.api.system.db.reset.taskManagement.fields.operation.description",
-          placeholder: "app.api.system.db.reset.taskManagement.fields.operation.placeholder",
+          label:
+            "app.api.system.db.reset.taskManagement.fields.operation.label",
+          description:
+            "app.api.system.db.reset.taskManagement.fields.operation.description",
+          placeholder:
+            "app.api.system.db.reset.taskManagement.fields.operation.placeholder",
           options: TaskOperationTypeOptions,
           columns: 12,
         },
@@ -175,15 +189,26 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.JSON,
           label: "app.api.system.db.reset.taskManagement.fields.options.label",
-          description: "app.api.system.db.reset.taskManagement.fields.options.description",
-          placeholder: "app.api.system.db.reset.taskManagement.fields.options.placeholder",
+          description:
+            "app.api.system.db.reset.taskManagement.fields.options.description",
+          placeholder:
+            "app.api.system.db.reset.taskManagement.fields.options.placeholder",
           columns: 12,
         },
         z
           .object({
-            force: z.boolean().optional().describe("Force operation even with warnings"),
-            environment: z.string().optional().describe("Target environment for operation"),
-            timeout: z.number().optional().describe("Operation timeout in milliseconds"),
+            force: z
+              .boolean()
+              .optional()
+              .describe("Force operation even with warnings"),
+            environment: z
+              .string()
+              .optional()
+              .describe("Target environment for operation"),
+            timeout: z
+              .number()
+              .optional()
+              .describe("Operation timeout in milliseconds"),
           })
           .optional(),
       ),
@@ -192,42 +217,48 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.db.reset.taskManagement.response.success.label",
+          content:
+            "app.api.system.db.reset.taskManagement.response.success.label",
         },
         z.boolean().describe("Whether the task operation was successful"),
       ),
       taskName: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.db.reset.taskManagement.response.taskName.label",
+          content:
+            "app.api.system.db.reset.taskManagement.response.taskName.label",
         },
         z.string().describe("Name of the task that was operated on"),
       ),
       status: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.db.reset.taskManagement.response.status.label",
+          content:
+            "app.api.system.db.reset.taskManagement.response.status.label",
         },
         z.string().describe("Current status of the task"),
       ),
       output: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.db.reset.taskManagement.response.output.label",
+          content:
+            "app.api.system.db.reset.taskManagement.response.output.label",
         },
         z.string().optional().describe("Task execution output"),
       ),
       error: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.db.reset.taskManagement.response.error.label",
+          content:
+            "app.api.system.db.reset.taskManagement.response.error.label",
         },
         z.string().optional().describe("Error message if task failed"),
       ),
       result: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.db.reset.taskManagement.response.result.label",
+          content:
+            "app.api.system.db.reset.taskManagement.response.result.label",
         },
         z
           .object({
@@ -245,39 +276,49 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.db.reset.taskManagement.errors.validation.title",
-      description: "app.api.system.db.reset.taskManagement.errors.validation.description",
+      description:
+        "app.api.system.db.reset.taskManagement.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.db.reset.taskManagement.errors.unauthorized.title",
-      description: "app.api.system.db.reset.taskManagement.errors.unauthorized.description",
+      description:
+        "app.api.system.db.reset.taskManagement.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.db.reset.taskManagement.errors.forbidden.title",
-      description: "app.api.system.db.reset.taskManagement.errors.forbidden.description",
+      description:
+        "app.api.system.db.reset.taskManagement.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.db.reset.taskManagement.errors.internal.title",
-      description: "app.api.system.db.reset.taskManagement.errors.internal.description",
+      description:
+        "app.api.system.db.reset.taskManagement.errors.internal.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.db.reset.taskManagement.errors.conflict.title",
-      description: "app.api.system.db.reset.taskManagement.errors.conflict.description",
+      description:
+        "app.api.system.db.reset.taskManagement.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.db.reset.taskManagement.errors.networkError.title",
-      description: "app.api.system.db.reset.taskManagement.errors.networkError.description",
+      description:
+        "app.api.system.db.reset.taskManagement.errors.networkError.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.db.reset.taskManagement.errors.notFound.title",
-      description: "app.api.system.db.reset.taskManagement.errors.notFound.description",
+      description:
+        "app.api.system.db.reset.taskManagement.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.db.reset.taskManagement.errors.unknownError.title",
-      description: "app.api.system.db.reset.taskManagement.errors.unknownError.description",
+      description:
+        "app.api.system.db.reset.taskManagement.errors.unknownError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.db.reset.taskManagement.errors.unsavedChanges.title",
-      description: "app.api.system.db.reset.taskManagement.errors.unsavedChanges.description",
+      title:
+        "app.api.system.db.reset.taskManagement.errors.unsavedChanges.title",
+      description:
+        "app.api.system.db.reset.taskManagement.errors.unsavedChanges.description",
     },
   },
 
@@ -294,7 +335,8 @@ const { POST } = createEndpoint({
 export type ResetTaskManagementRequestInput = typeof POST.types.RequestInput;
 export type ResetTaskManagementRequestOutput = typeof POST.types.RequestOutput;
 export type ResetTaskManagementResponseInput = typeof POST.types.ResponseInput;
-export type ResetTaskManagementResponseOutput = typeof POST.types.ResponseOutput;
+export type ResetTaskManagementResponseOutput =
+  typeof POST.types.ResponseOutput;
 
 const endpoints = { POST };
 export default endpoints;

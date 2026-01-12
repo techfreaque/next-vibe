@@ -24,7 +24,9 @@ function isValidEmail(email: string): boolean {
   return emailRegex.test(decodeURIComponent(email));
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { locale, email } = await params;
   const { t } = simpleT(locale);
 
@@ -52,7 +54,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function NewsletterWithEmail({ params }: PageProps): Promise<JSX.Element> {
+export default async function NewsletterWithEmail({
+  params,
+}: PageProps): Promise<JSX.Element> {
   const { locale, email } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
   const authUser = await AuthRepository.getAuthMinimalUser(
@@ -75,5 +79,7 @@ export default async function NewsletterWithEmail({ params }: PageProps): Promis
     notFound();
   }
 
-  return <NewsletterPage locale={locale} prefilledEmail={decodedEmail} user={user} />;
+  return (
+    <NewsletterPage locale={locale} prefilledEmail={decodedEmail} user={user} />
+  );
 }

@@ -3,7 +3,8 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   post: {
     title: "Czat strumieniowy AI",
-    description: "Strumieniuj odpowiedzi czatu wspierane przez AI używając OpenAI GPT-4o",
+    description:
+      "Strumieniuj odpowiedzi czatu wspierane przez AI używając OpenAI GPT-4o",
     form: {
       title: "Konfiguracja czatu AI",
       description: "Skonfiguruj parametry czatu AI i wiadomości",
@@ -115,7 +116,8 @@ export const translations: typeof enTranslations = {
     },
     enableSearch: {
       label: "Włącz wyszukiwanie internetowe",
-      description: "Zezwól AI na przeszukiwanie sieci w poszukiwaniu aktualnych informacji",
+      description:
+        "Zezwól AI na przeszukiwanie sieci w poszukiwaniu aktualnych informacji",
     },
     tools: {
       label: "Narzędzia AI",
@@ -126,7 +128,8 @@ export const translations: typeof enTranslations = {
       },
       requiresConfirmation: {
         label: "Wymaga potwierdzenia",
-        description: "Czy to narzędzie wymaga potwierdzenia użytkownika przed wykonaniem",
+        description:
+          "Czy to narzędzie wymaga potwierdzenia użytkownika przed wykonaniem",
       },
     },
     resumeToken: {
@@ -177,7 +180,8 @@ export const translations: typeof enTranslations = {
       },
       updatedArgs: {
         label: "Zaktualizowane argumenty",
-        description: "Opcjonalne zaktualizowane argumenty dla wywołania narzędzia",
+        description:
+          "Opcjonalne zaktualizowane argumenty dla wywołania narzędzia",
       },
       errors: {
         messageNotFound: "Wiadomość narzędzia nie została znaleziona",
@@ -224,7 +228,8 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Istnieją niezapisane zmiany, które należy najpierw zapisać",
+        description:
+          "Istnieją niezapisane zmiany, które należy najpierw zapisać",
       },
       conflict: {
         title: "Konflikt",
@@ -263,7 +268,8 @@ export const translations: typeof enTranslations = {
     errors: {
       invalidJson: "Nieprawidłowy JSON w treści żądania",
       invalidRequestData: "Nieprawidłowe dane żądania",
-      uncensoredApiKeyMissing: "Klucz API Uncensored.ai nie został skonfigurowany",
+      uncensoredApiKeyMissing:
+        "Klucz API Uncensored.ai nie został skonfigurowany",
       openrouterApiKeyMissing: "Klucz API OpenRouter nie został skonfigurowany",
       streamCreationFailed: "Nie udało się utworzyć strumienia",
       unknownError: "Wystąpił błąd",
@@ -271,7 +277,8 @@ export const translations: typeof enTranslations = {
       authenticationRequired:
         "Zaloguj się, aby korzystać z trwałych folderów. Użyj trybu incognito dla anonimowych czatów.",
       noIdentifier: "Nie podano identyfikatora użytkownika lub leada",
-      insufficientCredits: "Niewystarczająca liczba kredytów do wykonania żądania",
+      insufficientCredits:
+        "Niewystarczająca liczba kredytów do wykonania żądania",
       noResponseBody: "Nie otrzymano treści odpowiedzi ze strumienia",
     },
   },

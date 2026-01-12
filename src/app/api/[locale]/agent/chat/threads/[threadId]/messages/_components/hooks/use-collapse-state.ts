@@ -69,7 +69,9 @@ interface UseCollapseStateReturn {
  */
 export function useCollapseState(): UseCollapseStateReturn {
   // Map of user overrides: key -> collapsed state
-  const [userOverrides, setUserOverrides] = useState<Map<string, boolean>>(new Map());
+  const [userOverrides, setUserOverrides] = useState<Map<string, boolean>>(
+    new Map(),
+  );
 
   const isCollapsed = useCallback(
     (key: CollapseKey, autoCollapsed: boolean): boolean => {
@@ -87,14 +89,17 @@ export function useCollapseState(): UseCollapseStateReturn {
     [userOverrides],
   );
 
-  const toggleCollapse = useCallback((key: CollapseKey, currentState: boolean): void => {
-    const serialized = serializeKey(key);
-    setUserOverrides((prev) => {
-      const next = new Map(prev);
-      next.set(serialized, !currentState);
-      return next;
-    });
-  }, []);
+  const toggleCollapse = useCallback(
+    (key: CollapseKey, currentState: boolean): void => {
+      const serialized = serializeKey(key);
+      setUserOverrides((prev) => {
+        const next = new Map(prev);
+        next.set(serialized, !currentState);
+        return next;
+      });
+    },
+    [],
+  );
 
   const hasUserOverride = useCallback(
     (key: CollapseKey): boolean => {
@@ -142,7 +147,10 @@ export function useCollapseState(): UseCollapseStateReturn {
  * @param isStreaming - Whether the thinking section is still streaming
  * @returns true if should be collapsed, false if should be expanded
  */
-export function shouldThinkingBeCollapsed(hasContentAfter: boolean, isStreaming: boolean): boolean {
+export function shouldThinkingBeCollapsed(
+  hasContentAfter: boolean,
+  isStreaming: boolean,
+): boolean {
   // While streaming: keep expanded so user can see progress
   if (isStreaming) {
     return false;
@@ -161,7 +169,10 @@ export function shouldThinkingBeCollapsed(hasContentAfter: boolean, isStreaming:
  * @param isExecuting - Whether the tool is still executing
  * @returns true if should be collapsed, false if should be expanded
  */
-export function shouldToolBeCollapsed(hasContentAfter: boolean, isExecuting: boolean): boolean {
+export function shouldToolBeCollapsed(
+  hasContentAfter: boolean,
+  isExecuting: boolean,
+): boolean {
   // While executing: keep expanded so user can see progress
   if (isExecuting) {
     return false;

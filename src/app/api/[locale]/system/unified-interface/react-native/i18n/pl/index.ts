@@ -12,7 +12,8 @@ export const translations: typeof enTranslations = {
   generate: {
     post: {
       title: "Generuj indeksy Expo",
-      description: "Generuj wrappery kompatybilności Expo Router dla stron Next.js",
+      description:
+        "Generuj wrappery kompatybilności Expo Router dla stron Next.js",
       response: {
         fields: {
           success: "Sukces",

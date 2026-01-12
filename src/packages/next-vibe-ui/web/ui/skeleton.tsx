@@ -7,7 +7,12 @@ export interface SkeletonProps {
 }
 
 function Skeleton({ className, ...props }: SkeletonProps): JSX.Element {
-  return <div className={cn("animate-pulse rounded-md bg-primary/10", className)} {...props} />;
+  return (
+    <div
+      className={cn("animate-pulse rounded-md bg-primary/10", className)}
+      {...props}
+    />
+  );
 }
 
 export { Skeleton };

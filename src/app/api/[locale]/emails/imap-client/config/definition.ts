@@ -129,7 +129,8 @@ const { GET } = createEndpoint({
       connectionTimeout: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.connectionTimeout",
+          content:
+            "app.api.emails.imapClient.config.response.connectionTimeout",
         },
         z.coerce.number().int().min(1),
       ),
@@ -186,7 +187,8 @@ const { GET } = createEndpoint({
       concurrentAccounts: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.concurrentAccounts",
+          content:
+            "app.api.emails.imapClient.config.response.concurrentAccounts",
         },
         z.coerce.number().int().min(1),
       ),
@@ -244,7 +246,8 @@ const { GET } = createEndpoint({
       circuitBreakerThreshold: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
+          content:
+            "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
         },
         z.coerce.number().int().min(1),
       ),
@@ -252,7 +255,8 @@ const { GET } = createEndpoint({
       circuitBreakerTimeout: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
+          content:
+            "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
         },
         z.coerce.number().int().min(1),
       ),
@@ -261,7 +265,8 @@ const { GET } = createEndpoint({
       healthCheckInterval: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.imapClient.config.response.healthCheckInterval",
+          content:
+            "app.api.emails.imapClient.config.response.healthCheckInterval",
         },
         z.coerce.number().int().min(1),
       ),
@@ -295,40 +300,51 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.emails.imapClient.config.update.errors.validation.title" as const,
-      description: "app.api.emails.imapClient.config.update.errors.validation.description" as const,
+      title:
+        "app.api.emails.imapClient.config.update.errors.validation.title" as const,
+      description:
+        "app.api.emails.imapClient.config.update.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.emails.imapClient.config.errors.unauthorized.title" as const,
-      description: "app.api.emails.imapClient.config.errors.unauthorized.description" as const,
+      title:
+        "app.api.emails.imapClient.config.errors.unauthorized.title" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
   },
   successTypes: {
@@ -434,8 +450,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.imapClient.config.serverEnabled.label",
-          description: "app.api.emails.imapClient.config.serverEnabled.description",
-          placeholder: "app.api.emails.imapClient.accounts.create.host.placeholder",
+          description:
+            "app.api.emails.imapClient.config.serverEnabled.description",
+          placeholder:
+            "app.api.emails.imapClient.accounts.create.host.placeholder",
           columns: 6,
         },
         z.string().min(1),
@@ -447,8 +465,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.emails.imapClient.config.maxConnections.label",
-          description: "app.api.emails.imapClient.config.maxConnections.description",
-          placeholder: "app.api.emails.imapClient.accounts.create.port.placeholder",
+          description:
+            "app.api.emails.imapClient.config.maxConnections.description",
+          placeholder:
+            "app.api.emails.imapClient.accounts.create.port.placeholder",
           columns: 6,
         },
         z.coerce.number().int().min(1).max(65535),
@@ -460,8 +480,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.imapClient.accounts.create.username.label",
-          description: "app.api.emails.imapClient.accounts.create.username.description",
-          placeholder: "app.api.emails.imapClient.accounts.create.username.placeholder",
+          description:
+            "app.api.emails.imapClient.accounts.create.username.description",
+          placeholder:
+            "app.api.emails.imapClient.accounts.create.username.placeholder",
           columns: 6,
         },
         z.string().min(1),
@@ -473,8 +495,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.PASSWORD,
           label: "app.api.emails.imapClient.accounts.create.password.label",
-          description: "app.api.emails.imapClient.accounts.create.password.description",
-          placeholder: "app.api.emails.imapClient.accounts.create.password.placeholder",
+          description:
+            "app.api.emails.imapClient.accounts.create.password.description",
+          placeholder:
+            "app.api.emails.imapClient.accounts.create.password.placeholder",
           columns: 6,
         },
         z.string().min(1),
@@ -486,7 +510,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.emails.imapClient.accounts.create.secure.label",
-          description: "app.api.emails.imapClient.accounts.create.secure.description",
+          description:
+            "app.api.emails.imapClient.accounts.create.secure.description",
           columns: 6,
         },
         z.boolean(),
@@ -498,7 +523,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.emails.imapClient.accounts.create.keepAlive.label",
-          description: "app.api.emails.imapClient.accounts.create.keepAlive.description",
+          description:
+            "app.api.emails.imapClient.accounts.create.keepAlive.description",
           columns: 6,
         },
         z.boolean(),
@@ -510,7 +536,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.imapClient.config.loggingLevel.label",
-          description: "app.api.emails.imapClient.config.loggingLevel.description",
+          description:
+            "app.api.emails.imapClient.config.loggingLevel.description",
           options: ImapLoggingLevelOptions,
           columns: 6,
         },
@@ -523,7 +550,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.emails.imapClient.config.serverEnabled.label",
-          description: "app.api.emails.imapClient.config.serverEnabled.description",
+          description:
+            "app.api.emails.imapClient.config.serverEnabled.description",
           columns: 6,
         },
         z.boolean(),
@@ -534,7 +562,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.emails.imapClient.config.response.maxConnections",
-          description: "app.api.emails.imapClient.config.maxConnections.description",
+          description:
+            "app.api.emails.imapClient.config.maxConnections.description",
           columns: 6,
         },
         z.coerce.number().int().min(1),
@@ -545,7 +574,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.emails.imapClient.config.response.connectionTimeout",
-          description: "app.api.emails.imapClient.config.connectionTimeout.description",
+          description:
+            "app.api.emails.imapClient.config.connectionTimeout.description",
           columns: 6,
         },
         z.coerce.number().int().min(1),
@@ -556,7 +586,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.emails.imapClient.config.response.poolIdleTimeout",
-          description: "app.api.emails.imapClient.config.serverEnabled.description",
+          description:
+            "app.api.emails.imapClient.config.serverEnabled.description",
           columns: 6,
         },
         z.coerce.number().int().min(1),
@@ -567,7 +598,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.emails.imapClient.config.response.keepAlive",
-          description: "app.api.emails.imapClient.config.serverEnabled.description",
+          description:
+            "app.api.emails.imapClient.config.serverEnabled.description",
           columns: 6,
         },
         z.boolean(),
@@ -579,7 +611,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.emails.imapClient.config.syncEnabled.label",
-          description: "app.api.emails.imapClient.config.syncEnabled.description",
+          description:
+            "app.api.emails.imapClient.config.syncEnabled.description",
           columns: 6,
         },
         z.boolean(),
@@ -590,7 +623,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.emails.imapClient.config.syncInterval.label",
-          description: "app.api.emails.imapClient.config.syncInterval.description",
+          description:
+            "app.api.emails.imapClient.config.syncInterval.description",
           columns: 6,
         },
         z.coerce.number().int().min(1),
@@ -635,7 +669,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.emails.imapClient.config.response.cacheEnabled",
-          description: "app.api.emails.imapClient.config.serverEnabled.description",
+          description:
+            "app.api.emails.imapClient.config.serverEnabled.description",
           columns: 6,
         },
         z.boolean(),
@@ -701,8 +736,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
-          description: "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
+          label:
+            "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
+          description:
+            "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
           columns: 6,
         },
         z.coerce.number().int().min(1),
@@ -712,8 +749,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
-          description: "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
+          label:
+            "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
+          description:
+            "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
           columns: 6,
         },
         z.coerce.number().int().min(1),
@@ -724,8 +763,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.emails.imapClient.config.response.healthCheckInterval",
-          description: "app.api.emails.imapClient.config.syncInterval.description",
+          label:
+            "app.api.emails.imapClient.config.response.healthCheckInterval",
+          description:
+            "app.api.emails.imapClient.config.syncInterval.description",
           columns: 6,
         },
         z.coerce.number().int().min(1),
@@ -736,7 +777,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.emails.imapClient.config.response.metricsEnabled",
-          description: "app.api.emails.imapClient.config.serverEnabled.description",
+          description:
+            "app.api.emails.imapClient.config.serverEnabled.description",
           columns: 6,
         },
         z.boolean(),
@@ -778,45 +820,57 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.emails.imapClient.config.update.errors.validation.title" as const,
-      description: "app.api.emails.imapClient.config.update.errors.validation.description" as const,
+      title:
+        "app.api.emails.imapClient.config.update.errors.validation.title" as const,
+      description:
+        "app.api.emails.imapClient.config.update.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.emails.imapClient.config.errors.unauthorized.title" as const,
-      description: "app.api.emails.imapClient.config.errors.unauthorized.description" as const,
+      title:
+        "app.api.emails.imapClient.config.errors.unauthorized.title" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description: "app.api.emails.imapClient.config.errors.internal.description" as const,
+      description:
+        "app.api.emails.imapClient.config.errors.internal.description" as const,
     },
   },
   successTypes: {
     title: "app.api.emails.imapClient.config.update.success.title" as const,
-    description: "app.api.emails.imapClient.config.update.success.description" as const,
+    description:
+      "app.api.emails.imapClient.config.update.success.description" as const,
   },
 
   examples: {

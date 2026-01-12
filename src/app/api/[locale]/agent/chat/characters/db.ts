@@ -14,7 +14,10 @@ import { users } from "@/app/api/[locale]/user/db";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { CharacterModelSelection } from "./create/definition";
-import type { CharacterCategoryValue, CharacterOwnershipTypeValue } from "./enum";
+import type {
+  CharacterCategoryValue,
+  CharacterOwnershipTypeValue,
+} from "./enum";
 
 /**
  * Custom Characters Table
@@ -40,13 +43,20 @@ export const customCharacters = pgTable("custom_characters", {
   category: text("category").$type<typeof CharacterCategoryValue>().notNull(),
 
   voice: text("voice").$type<typeof TtsVoiceValue>(),
-  suggestedPrompts: jsonb("suggested_prompts").$type<string[]>().default([]).notNull(),
+  suggestedPrompts: jsonb("suggested_prompts")
+    .$type<string[]>()
+    .default([])
+    .notNull(),
 
   // Model selection (discriminated union from API)
-  modelSelection: jsonb("model_selection").$type<CharacterModelSelection>().notNull(),
+  modelSelection: jsonb("model_selection")
+    .$type<CharacterModelSelection>()
+    .notNull(),
 
   // Ownership type (determines visibility: USER=private, PUBLIC=shared, SYSTEM=built-in)
-  ownershipType: text("ownership_type").$type<typeof CharacterOwnershipTypeValue>().notNull(),
+  ownershipType: text("ownership_type")
+    .$type<typeof CharacterOwnershipTypeValue>()
+    .notNull(),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -56,12 +66,15 @@ export const customCharacters = pgTable("custom_characters", {
 /**
  * Relations
  */
-export const customCharactersRelations = relations(customCharacters, ({ one }) => ({
-  user: one(users, {
-    fields: [customCharacters.userId],
-    references: [users.id],
+export const customCharactersRelations = relations(
+  customCharacters,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [customCharacters.userId],
+      references: [users.id],
+    }),
   }),
-}));
+);
 
 /**
  * Schema for selecting custom characters

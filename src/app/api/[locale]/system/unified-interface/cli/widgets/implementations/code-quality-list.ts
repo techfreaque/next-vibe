@@ -39,7 +39,9 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
 > {
   readonly widgetType = WidgetType.CODE_QUALITY_LIST;
 
-  render(props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_LIST, string>): string {
+  render(
+    props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_LIST, string>,
+  ): string {
     const { field, value, context } = props;
     const t = context.t;
 
@@ -63,17 +65,25 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
     // Add truncation notice if data is truncated
     if (isWidgetDataObject(value) && isWidgetDataObject(value.summary)) {
       const summary = value.summary;
-      const totalIssues = isWidgetDataNumber(summary.totalIssues) ? summary.totalIssues : 0;
+      const totalIssues = isWidgetDataNumber(summary.totalIssues)
+        ? summary.totalIssues
+        : 0;
       const displayedIssues = isWidgetDataNumber(summary.displayedIssues)
         ? summary.displayedIssues
         : 0;
-      const totalFiles = isWidgetDataNumber(summary.totalFiles) ? summary.totalFiles : 0;
+      const totalFiles = isWidgetDataNumber(summary.totalFiles)
+        ? summary.totalFiles
+        : 0;
       const displayedFiles = isWidgetDataNumber(summary.displayedFiles)
         ? summary.displayedFiles
         : 0;
-      const totalErrors = isWidgetDataNumber(summary.totalErrors) ? summary.totalErrors : 0;
+      const totalErrors = isWidgetDataNumber(summary.totalErrors)
+        ? summary.totalErrors
+        : 0;
 
-      const displayedErrors = data.items.filter((item) => item.severity === "error").length;
+      const displayedErrors = data.items.filter(
+        (item) => item.severity === "error",
+      ).length;
 
       if (displayedIssues < totalIssues || displayedFiles < totalFiles) {
         const hiddenIssues = totalIssues - displayedIssues;
@@ -180,13 +190,18 @@ export class CodeQualityListWidgetRenderer extends BaseWidgetRenderer<
   /**
    * Render a single code quality issue
    */
-  private renderIssue(item: CodeQualityItem, context: WidgetRenderContext): string {
+  private renderIssue(
+    item: CodeQualityItem,
+    context: WidgetRenderContext,
+  ): string {
     const parts: string[] = [];
 
     // OSC 8 Approach 2: vscode://file/ protocol with absolute path
     if (item.line !== undefined || item.column !== undefined) {
       // Convert to absolute path
-      const absolutePath = item.file.startsWith("/") ? item.file : `${process.cwd()}/${item.file}`;
+      const absolutePath = item.file.startsWith("/")
+        ? item.file
+        : `${process.cwd()}/${item.file}`;
 
       // Build URL with vscode://file/ protocol and line/column
       let vscodeUrl = `vscode://file${absolutePath}:${item.line || 1}:${item.column || 1}`;

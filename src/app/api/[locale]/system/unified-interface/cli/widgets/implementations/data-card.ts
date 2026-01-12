@@ -14,7 +14,9 @@ import { extractDataCardData } from "@/app/api/[locale]/system/unified-interface
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class DataCardWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_CARD> {
+export class DataCardWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.DATA_CARD
+> {
   readonly widgetType = WidgetType.DATA_CARD;
 
   /**
@@ -54,7 +56,9 @@ export class DataCardWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     for (const field of data.fields) {
       const label = this.styleText(`${field.label}:`, "bold", context);
       const fieldValue =
-        field.value !== null && field.value !== undefined ? String(field.value) : "—";
+        field.value !== null && field.value !== undefined
+          ? String(field.value)
+          : "—";
       lines.push(`${indent}  ${label} ${fieldValue}`);
     }
 

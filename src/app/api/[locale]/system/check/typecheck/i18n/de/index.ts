@@ -3,7 +3,8 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   // Main endpoint properties
   title: "TypeScript-Typprüfung",
-  description: "TypeScript-Typprüfung für angegebene Dateien oder Verzeichnisse ausführen",
+  description:
+    "TypeScript-Typprüfung für angegebene Dateien oder Verzeichnisse ausführen",
   category: "Systemprüfungen",
   tag: "typprüfung",
 
@@ -28,7 +29,8 @@ export const translations: typeof enTranslations = {
   // Container
   container: {
     title: "TypeScript-Typprüfung Konfiguration",
-    description: "Parameter für die Ausführung der TypeScript-Typprüfung konfigurieren",
+    description:
+      "Parameter für die Ausführung der TypeScript-Typprüfung konfigurieren",
   },
 
   // Request fields
@@ -41,11 +43,13 @@ export const translations: typeof enTranslations = {
     },
     verbose: {
       label: "Ausführlich",
-      description: "Detaillierte Ausgabe mit zusätzlichen Informationen aktivieren",
+      description:
+        "Detaillierte Ausgabe mit zusätzlichen Informationen aktivieren",
     },
     disableFilter: {
       label: "Filter deaktivieren",
-      description: "Filterung deaktivieren und alle TypeScript-Probleme anzeigen",
+      description:
+        "Filterung deaktivieren und alle TypeScript-Probleme anzeigen",
     },
     createConfig: {
       label: "Konfiguration erstellen",
@@ -100,11 +104,13 @@ export const translations: typeof enTranslations = {
     },
     internal: {
       title: "Interner Fehler",
-      description: "Ein interner Serverfehler ist während der Typprüfung aufgetreten",
+      description:
+        "Ein interner Serverfehler ist während der Typprüfung aufgetreten",
     },
     unauthorized: {
       title: "Nicht autorisiert",
-      description: "Authentifizierung erforderlich für den Zugriff auf diesen Endpunkt",
+      description:
+        "Authentifizierung erforderlich für den Zugriff auf diesen Endpunkt",
     },
     forbidden: {
       title: "Verboten",
@@ -124,7 +130,8 @@ export const translations: typeof enTranslations = {
     },
     unsaved: {
       title: "Ungespeicherte Änderungen",
-      description: "Es gibt ungespeicherte Änderungen, die behandelt werden müssen",
+      description:
+        "Es gibt ungespeicherte Änderungen, die behandelt werden müssen",
     },
     conflict: {
       title: "Konflikt",

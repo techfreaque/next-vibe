@@ -47,7 +47,8 @@ async function getPlanIcon(
                   width: "48px",
                   height: "48px",
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)",
+                  background:
+                    "linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)",
                   textAlign: "center",
                   verticalAlign: "middle",
                 }}
@@ -390,7 +391,9 @@ export async function EmailPricingSection({
   const bottomRowPlans = allPlansWithRenderedFeatures.slice(2, 4);
 
   // Helper function to render a single plan card as table
-  const renderPlanCard = (plan: (typeof allPlansWithRenderedFeatures)[0]): JSX.Element => (
+  const renderPlanCard = (
+    plan: (typeof allPlansWithRenderedFeatures)[0],
+  ): JSX.Element => (
     <table
       style={{
         width: "100%",
@@ -436,7 +439,9 @@ export async function EmailPricingSection({
         <tr>
           <td
             style={{
-              padding: plan.highlighted ? "16px 16px 12px 16px" : "12px 16px 12px 16px",
+              padding: plan.highlighted
+                ? "16px 16px 12px 16px"
+                : "12px 16px 12px 16px",
               textAlign: "center",
             }}
           >
@@ -467,7 +472,11 @@ export async function EmailPricingSection({
                         display: "inline",
                       }}
                     >
-                      {formatCurrencyNoDecimals(plan.price, plan.currency, locale)}
+                      {formatCurrencyNoDecimals(
+                        plan.price,
+                        plan.currency,
+                        locale,
+                      )}
                       {
                         <span
                           style={{
@@ -536,7 +545,9 @@ export async function EmailPricingSection({
               <tbody>
                 {plan.renderedFeatures.map((feature, idx) => (
                   <tr key={`feature-${idx}`}>
-                    <td style={{ padding: "4px 0", verticalAlign: "top" }}>{feature}</td>
+                    <td style={{ padding: "4px 0", verticalAlign: "top" }}>
+                      {feature}
+                    </td>
                   </tr>
                 ))}
               </tbody>

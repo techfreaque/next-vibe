@@ -24,7 +24,9 @@ import definitions from "../definition";
  * - subject: Email subject line
  * - templateVersion: Version of the template
  */
-export function useEmailPreviewRender(logger: EndpointLogger): EmailPreviewRenderEndpointReturn {
+export function useEmailPreviewRender(
+  logger: EndpointLogger,
+): EmailPreviewRenderEndpointReturn {
   return useEndpoint(
     definitions,
     {
@@ -37,4 +39,6 @@ export function useEmailPreviewRender(logger: EndpointLogger): EmailPreviewRende
   );
 }
 
-export type EmailPreviewRenderEndpointReturn = EndpointReturn<typeof definitions>;
+export type EmailPreviewRenderEndpointReturn = EndpointReturn<
+  typeof definitions
+>;

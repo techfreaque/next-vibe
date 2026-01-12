@@ -9,7 +9,10 @@
 import type { JSX, ReactNode } from "react";
 import React, { createContext, useContext, useMemo } from "react";
 
-import { useChat, type UseChatReturn } from "@/app/api/[locale]/agent/chat/hooks/hooks";
+import {
+  useChat,
+  type UseChatReturn,
+} from "@/app/api/[locale]/agent/chat/hooks/hooks";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -71,7 +74,10 @@ export function ChatProvider({
 }: ChatProviderProps): JSX.Element {
   // Create logger once - memoize to prevent infinite re-renders
   // The timestamp is only used for logging context, not for identity
-  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
 
   // Get chat hook with URL-derived navigation state
   const chat = useChat(

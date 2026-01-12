@@ -16,7 +16,10 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -53,14 +56,15 @@ export type InferUrlVariablesOutput<T> = T extends CreateApiEndpointAny
  * Combined parameters for endpoint calls
  * Merges request data and URL parameters into a single object
  */
-export type EndpointParams<TEndpoint> = (InferRequestOutput<TEndpoint> extends undefined
-  ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    {}
-  : { data: InferRequestOutput<TEndpoint> }) &
-  (InferUrlVariablesOutput<TEndpoint> extends undefined
+export type EndpointParams<TEndpoint> =
+  (InferRequestOutput<TEndpoint> extends undefined
     ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
       {}
-    : { urlPathParams: InferUrlVariablesOutput<TEndpoint> });
+    : { data: InferRequestOutput<TEndpoint> }) &
+    (InferUrlVariablesOutput<TEndpoint> extends undefined
+      ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+        {}
+      : { urlPathParams: InferUrlVariablesOutput<TEndpoint> });
 
 /**
  * Construct URL path from endpoint definition and parameters
@@ -85,12 +89,15 @@ function constructUrl<TEndpoint extends CreateApiEndpointAny>(
         const paramName = segment.slice(1, -1);
 
         // Get value from urlPathParams
-        const urlPathParams = "urlPathParams" in params ? params.urlPathParams : {};
-        const paramValue = urlPathParams[paramName as keyof typeof urlPathParams];
+        const urlPathParams =
+          "urlPathParams" in params ? params.urlPathParams : {};
+        const paramValue =
+          urlPathParams[paramName as keyof typeof urlPathParams];
 
         if (paramValue === undefined) {
           return fail({
-            message: "app.api.system.unifiedInterface.reactNative.errors.missingUrlParam",
+            message:
+              "app.api.system.unifiedInterface.reactNative.errors.missingUrlParam",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { paramName, endpoint: endpoint.title },
           });
@@ -105,7 +112,8 @@ function constructUrl<TEndpoint extends CreateApiEndpointAny>(
     return { success: true, data: urlPath };
   } catch (error) {
     return fail({
-      message: "app.api.system.unifiedInterface.reactNative.errors.urlConstructionFailed",
+      message:
+        "app.api.system.unifiedInterface.reactNative.errors.urlConstructionFailed",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         error: String(error),
@@ -161,7 +169,8 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
       } catch (validationError) {
         logger.error("Request validation failed", parseError(validationError));
         return fail({
-          message: "app.api.system.unifiedInterface.reactNative.errors.validationFailed",
+          message:
+            "app.api.system.unifiedInterface.reactNative.errors.validationFailed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             error: String(validationError),
@@ -248,7 +257,8 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
       jsonResponse = JSON.parse(responseText);
     } catch (parseError) {
       logger.error("Failed to parse response as JSON", {
-        error: parseError instanceof Error ? parseError.message : String(parseError),
+        error:
+          parseError instanceof Error ? parseError.message : String(parseError),
         responseText: responseText.slice(0, 500),
         contentType: fetchResponse.headers.get("content-type"),
       });
@@ -261,7 +271,8 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
         responseText.includes("<html")
       ) {
         return fail({
-          message: "app.api.system.unifiedInterface.reactNative.errors.htmlResponseReceived",
+          message:
+            "app.api.system.unifiedInterface.reactNative.errors.htmlResponseReceived",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             url: fetchUrl,
@@ -292,7 +303,8 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
   } catch (error) {
     logger.error("Native endpoint call failed", parseError(error));
     return fail({
-      message: "app.api.system.unifiedInterface.reactNative.errors.networkError",
+      message:
+        "app.api.system.unifiedInterface.reactNative.errors.networkError",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         error: String(error),

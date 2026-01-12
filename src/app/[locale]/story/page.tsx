@@ -32,7 +32,9 @@ interface HomePageProps {
 /**
  * Generate metadata for the homepage with translations
  */
-export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: HomePageProps): Promise<Metadata> {
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "",
@@ -67,7 +69,9 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
   });
 }
 
-export default async function HomePage({ params }: HomePageProps): Promise<JSX.Element> {
+export default async function HomePage({
+  params,
+}: HomePageProps): Promise<JSX.Element> {
   const { locale } = await params;
 
   // Create logger for server-side operations
@@ -94,20 +98,31 @@ export default async function HomePage({ params }: HomePageProps): Promise<JSX.E
   // For authenticated users, fetch subscription data
   let subscription: SubscriptionGetResponseOutput | null = null;
 
-  if (isAuthenticated && userResponse.data && "id" in userResponse.data && userResponse.data.id) {
+  if (
+    isAuthenticated &&
+    userResponse.data &&
+    "id" in userResponse.data &&
+    userResponse.data.id
+  ) {
     const subscriptionResponse = await SubscriptionRepository.getSubscription(
       userResponse.data.id,
       logger,
       locale,
     );
-    subscription = subscriptionResponse?.success ? subscriptionResponse.data : null;
+    subscription = subscriptionResponse?.success
+      ? subscriptionResponse.data
+      : null;
   }
 
   // Fetch stats for hero section (cached for 24h)
-  const activeUserCountResponse = await UserRepository.getActiveUserCount(logger);
-  const totalConversationsResponse = await ThreadsRepository.getTotalConversationsCount(logger);
+  const activeUserCountResponse =
+    await UserRepository.getActiveUserCount(logger);
+  const totalConversationsResponse =
+    await ThreadsRepository.getTotalConversationsCount(logger);
 
-  const activeUserCount = activeUserCountResponse.success ? activeUserCountResponse.data : 0;
+  const activeUserCount = activeUserCountResponse.success
+    ? activeUserCountResponse.data
+    : 0;
   const totalConversations = totalConversationsResponse.success
     ? totalConversationsResponse.data
     : 0;

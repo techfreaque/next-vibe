@@ -193,7 +193,8 @@ export const {
   UNFLAGGED: "app.api.emails.enums.imapMessageStatusFilter.unflagged",
   DRAFT: "app.api.emails.enums.imapMessageStatusFilter.draft",
   DELETED: "app.api.emails.enums.imapMessageStatusFilter.deleted",
-  HAS_ATTACHMENTS: "app.api.emails.enums.imapMessageStatusFilter.hasAttachments",
+  HAS_ATTACHMENTS:
+    "app.api.emails.enums.imapMessageStatusFilter.hasAttachments",
   NO_ATTACHMENTS: "app.api.emails.enums.imapMessageStatusFilter.noAttachments",
 });
 

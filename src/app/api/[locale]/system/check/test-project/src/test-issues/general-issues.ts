@@ -43,7 +43,9 @@ export function templateInString(): string {
 }
 
 // no-unsafe-optional-chaining - Unsafe optional chaining
-export function unsafeOptionalChaining(obj: { a?: { b: number } } | null): number {
+export function unsafeOptionalChaining(
+  obj: { a?: { b: number } } | null,
+): number {
   return 1 + obj?.a?.b;
 }
 

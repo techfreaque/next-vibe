@@ -12,7 +12,10 @@ import type {
   ImportJobsListResponseType,
   LeadsImportResponseOutput,
 } from "../leads/import/definition";
-import type { CsvImportConfig, DomainImportRepository } from "../leads/import/repository";
+import type {
+  CsvImportConfig,
+  DomainImportRepository,
+} from "../leads/import/repository";
 
 /**
  * Domain-specific Record Interface

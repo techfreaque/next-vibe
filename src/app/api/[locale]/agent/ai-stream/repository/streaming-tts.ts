@@ -260,7 +260,9 @@ export class StreamingTTSHandler {
    */
   private async generateTTS(text: string): Promise<string | null> {
     if (!agentEnv.EDEN_AI_API_KEY) {
-      this.logger.error("[Streaming TTS] Eden AI API key not configured - TTS disabled");
+      this.logger.error(
+        "[Streaming TTS] Eden AI API key not configured - TTS disabled",
+      );
       return null;
     }
 
@@ -274,20 +276,23 @@ export class StreamingTTSHandler {
     });
 
     try {
-      const response = await fetch("https://api.edenai.run/v2/audio/text_to_speech", {
-        method: "POST",
-        headers: {
-          // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "https://api.edenai.run/v2/audio/text_to_speech",
+        {
+          method: "POST",
+          headers: {
+            // eslint-disable-next-line i18next/no-literal-string
+            Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            providers: "openai",
+            text,
+            language: language.toLowerCase(),
+            option: voiceOption,
+          }),
         },
-        body: JSON.stringify({
-          providers: "openai",
-          text,
-          language: language.toLowerCase(),
-          option: voiceOption,
-        }),
-      });
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -331,18 +336,25 @@ export class StreamingTTSHandler {
       // Fetch the audio file and convert to base64
       const audioResponse = await fetch(audioResourceUrl);
       if (!audioResponse.ok) {
-        this.logger.error("[Streaming TTS] Failed to fetch audio file from URL", {
-          status: audioResponse.status,
-          statusText: audioResponse.statusText,
-          url: audioResourceUrl.substring(0, 100),
-        });
+        this.logger.error(
+          "[Streaming TTS] Failed to fetch audio file from URL",
+          {
+            status: audioResponse.status,
+            statusText: audioResponse.statusText,
+            url: audioResourceUrl.substring(0, 100),
+          },
+        );
         return null;
       }
 
       const audioBuffer = await audioResponse.arrayBuffer();
-      let contentType = audioResponse.headers.get("content-type") || "audio/mpeg";
+      let contentType =
+        audioResponse.headers.get("content-type") || "audio/mpeg";
 
-      if (contentType === "binary/octet-stream" || contentType === "application/octet-stream") {
+      if (
+        contentType === "binary/octet-stream" ||
+        contentType === "application/octet-stream"
+      ) {
         contentType = "audio/mpeg";
       }
 
@@ -377,7 +389,9 @@ export class StreamingTTSHandler {
     });
 
     if (!this.isEnabled || !this.messageId) {
-      this.logger.info("[Streaming TTS] flush() skipped - not enabled or no messageId");
+      this.logger.info(
+        "[Streaming TTS] flush() skipped - not enabled or no messageId",
+      );
       return;
     }
 

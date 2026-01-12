@@ -3,7 +3,11 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { ChevronDown, ChevronRight, CornerDownRight } from "next-vibe-ui/ui/icons";
+import {
+  ChevronDown,
+  ChevronRight,
+  CornerDownRight,
+} from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useState } from "react";
@@ -93,13 +97,18 @@ export function ThreadedMessage({
   const isTouch = useTouchDevice();
 
   // Check if this message is currently streaming
-  const streamingMessage = useAIStreamStore((state) => state.streamingMessages[message.id]);
+  const streamingMessage = useAIStreamStore(
+    (state) => state.streamingMessages[message.id],
+  );
   const isMessageStreaming = streamingMessage?.isStreaming ?? false;
 
   // TTS support for assistant messages
   // Process entire message group (primary + continuations) for sequential playback
   const allMessagesInGroup = React.useMemo(
-    () => (messageGroup ? [messageGroup.primary, ...messageGroup.continuations] : [message]),
+    () =>
+      messageGroup
+        ? [messageGroup.primary, ...messageGroup.continuations]
+        : [message],
     [messageGroup, message],
   );
 
@@ -107,7 +116,9 @@ export function ThreadedMessage({
   const [ttsText, setTtsText] = React.useState<string>("");
 
   React.useEffect(() => {
-    void processMessageGroupForTTS(allMessagesInGroup, locale, logger).then(setTtsText);
+    void processMessageGroupForTTS(allMessagesInGroup, locale, logger).then(
+      setTtsText,
+    );
   }, [allMessagesInGroup, locale, logger]);
 
   const {
@@ -201,25 +212,37 @@ export function ThreadedMessage({
           )}
 
           {/* Message content */}
-          <Div id={`thread-msg-${message.id}`} className="group/message relative">
+          <Div
+            id={`thread-msg-${message.id}`}
+            className="group/message relative"
+          >
             {/* Collapsed state indicator */}
             {isCollapsed && hasReplies && (
               <Div className="absolute -bottom-2 left-0 right-0 h-8 flex items-center justify-center">
                 <Div className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs text-blue-400 font-medium flex items-center gap-2">
                   <ChevronRight className="h-3 w-3" />
                   <Span>
-                    {replies.length} hidden {replies.length === 1 ? "reply" : "replies"}
+                    {replies.length} hidden{" "}
+                    {replies.length === 1 ? "reply" : "replies"}
                   </Span>
                 </Div>
               </Div>
             )}
 
             {isEditing ? (
-              <Div className={cn(message.role === "user" ? "flex justify-end" : "")}>
+              <Div
+                className={cn(
+                  message.role === "user" ? "flex justify-end" : "",
+                )}
+              >
                 <MessageEditor
                   message={message}
                   onBranch={(id, content) =>
-                    messageActions.handleBranchEdit(id, content, onBranchMessage)
+                    messageActions.handleBranchEdit(
+                      id,
+                      content,
+                      onBranchMessage,
+                    )
                   }
                   onCancel={messageActions.cancelAction}
                   onModelChange={onModelChange}
@@ -237,21 +260,32 @@ export function ThreadedMessage({
                   onModelChange={
                     onModelChange ||
                     ((model: ModelId): void => {
-                      logger.debug("ThreadedMessage", "Model selection changed (no handler)", {
-                        model,
-                      });
+                      logger.debug(
+                        "ThreadedMessage",
+                        "Model selection changed (no handler)",
+                        {
+                          model,
+                        },
+                      );
                     })
                   }
                   onCharacterChange={
                     onCharacterChange ||
                     ((character: string): void => {
-                      logger.debug("ThreadedMessage", "Character selection changed (no handler)", {
-                        character,
-                      });
+                      logger.debug(
+                        "ThreadedMessage",
+                        "Character selection changed (no handler)",
+                        {
+                          character,
+                        },
+                      );
                     })
                   }
                   onConfirm={(): Promise<void> =>
-                    messageActions.handleConfirmRetry(message.id, onRetryMessage)
+                    messageActions.handleConfirmRetry(
+                      message.id,
+                      onRetryMessage,
+                    )
                   }
                   onCancel={messageActions.cancelAction}
                   confirmLabelKey="app.chat.threadedView.retryModal.confirmLabel"
@@ -313,17 +347,25 @@ export function ThreadedMessage({
                 onModelChange={
                   onModelChange ||
                   ((model: ModelId): void => {
-                    logger.debug("ThreadedMessage", "Model selection changed (no handler)", {
-                      model,
-                    });
+                    logger.debug(
+                      "ThreadedMessage",
+                      "Model selection changed (no handler)",
+                      {
+                        model,
+                      },
+                    );
                   })
                 }
                 onCharacterChange={
                   onCharacterChange ||
                   ((character: string): void => {
-                    logger.debug("ThreadedMessage", "Character selection changed (no handler)", {
-                      character,
-                    });
+                    logger.debug(
+                      "ThreadedMessage",
+                      "Character selection changed (no handler)",
+                      {
+                        character,
+                      },
+                    );
                   })
                 }
                 showInput={true}
@@ -331,7 +373,10 @@ export function ThreadedMessage({
                 onInputChange={messageActions.setAnswerContent}
                 inputPlaceholderKey="app.chat.threadedView.answerModal.inputPlaceholder"
                 onConfirm={(): Promise<void> =>
-                  messageActions.handleConfirmAnswer(message.id, onAnswerAsModel)
+                  messageActions.handleConfirmAnswer(
+                    message.id,
+                    onAnswerAsModel,
+                  )
                 }
                 onCancel={messageActions.cancelAction}
                 confirmLabelKey="app.chat.threadedView.answerModal.confirmLabel"
@@ -343,46 +388,51 @@ export function ThreadedMessage({
           )}
 
           {/* Nested replies */}
-          {hasReplies && !isCollapsed && (depth < maxDepth || showDeepReplies) && (
-            <Div className="mt-2 flex flex-col gap-2">
-              {replies.map((reply) => (
-                <ErrorBoundary key={reply.id} locale={locale}>
-                  <ThreadedMessage
-                    message={reply}
-                    messageGroup={messageToGroupMap.get(reply.id)}
-                    replies={getDirectReplies(allMessages, reply.id)}
-                    allMessages={allMessages}
-                    messageToGroupMap={messageToGroupMap}
-                    depth={depth + 1}
-                    locale={locale}
-                    logger={logger}
-                    collapseState={collapseState}
-                    maxDepth={maxDepth}
-                    currentUserId={currentUserId}
-                  />
-                </ErrorBoundary>
-              ))}
-            </Div>
-          )}
+          {hasReplies &&
+            !isCollapsed &&
+            (depth < maxDepth || showDeepReplies) && (
+              <Div className="mt-2 flex flex-col gap-2">
+                {replies.map((reply) => (
+                  <ErrorBoundary key={reply.id} locale={locale}>
+                    <ThreadedMessage
+                      message={reply}
+                      messageGroup={messageToGroupMap.get(reply.id)}
+                      replies={getDirectReplies(allMessages, reply.id)}
+                      allMessages={allMessages}
+                      messageToGroupMap={messageToGroupMap}
+                      depth={depth + 1}
+                      locale={locale}
+                      logger={logger}
+                      collapseState={collapseState}
+                      maxDepth={maxDepth}
+                      currentUserId={currentUserId}
+                    />
+                  </ErrorBoundary>
+                ))}
+              </Div>
+            )}
 
           {/* "Continue thread" button for deeply nested conversations */}
-          {hasReplies && !isCollapsed && depth >= maxDepth && !showDeepReplies && (
-            <Button
-              variant="ghost"
-              size="unset"
-              onClick={(): void => setShowDeepReplies(true)}
-              className="mt-3 text-sm text-blue-500 hover:text-blue-600 cursor-pointer hover:underline transition-all flex items-center gap-1"
-            >
-              <CornerDownRight className="h-3.5 w-3.5" />
-              {t("app.chat.threadedView.continueThread", {
-                count: replies.length,
-                replyText:
-                  replies.length === 1
-                    ? t("app.chat.threadedView.reply")
-                    : t("app.chat.threadedView.replies"),
-              })}
-            </Button>
-          )}
+          {hasReplies &&
+            !isCollapsed &&
+            depth >= maxDepth &&
+            !showDeepReplies && (
+              <Button
+                variant="ghost"
+                size="unset"
+                onClick={(): void => setShowDeepReplies(true)}
+                className="mt-3 text-sm text-blue-500 hover:text-blue-600 cursor-pointer hover:underline transition-all flex items-center gap-1"
+              >
+                <CornerDownRight className="h-3.5 w-3.5" />
+                {t("app.chat.threadedView.continueThread", {
+                  count: replies.length,
+                  replyText:
+                    replies.length === 1
+                      ? t("app.chat.threadedView.reply")
+                      : t("app.chat.threadedView.replies"),
+                })}
+              </Button>
+            )}
         </Div>
       </Div>
 
@@ -390,7 +440,9 @@ export function ThreadedMessage({
       {hoveredUserId && userCardPosition && (
         <UserProfileCard
           userId={hoveredUserId}
-          userName={message.authorName || t("app.chat.threadedView.userFallback")}
+          userName={
+            message.authorName || t("app.chat.threadedView.userFallback")
+          }
           messages={allMessages}
           position={userCardPosition}
           locale={locale}

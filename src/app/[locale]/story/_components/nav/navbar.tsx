@@ -55,7 +55,10 @@ export function Navbar({
         </Div>
 
         {/* Desktop Navigation */}
-        <Div role="navigation" className="hidden md:flex items-center gap-1 xl:gap-4">
+        <Div
+          role="navigation"
+          className="hidden md:flex items-center gap-1 xl:gap-4"
+        >
           <TooltipProvider>
             {navigationItems.map((item) => {
               return item.children ? (
@@ -78,7 +81,8 @@ export function Navbar({
                       const isDisabled = childItem.disabled;
                       const disabledReason = childItem.disabledReason;
                       const badge = childItem.badge;
-                      const badgeTranslationPayload = childItem.badgeTranslationPayload;
+                      const badgeTranslationPayload =
+                        childItem.badgeTranslationPayload;
                       const badgeVariant = childItem.badgeVariant;
 
                       if (isDisabled && disabledReason) {
@@ -103,7 +107,8 @@ export function Navbar({
                                             : "bg-secondary text-secondary-foreground",
                                       )}
                                     >
-                                      {typeof badge === "string" && badge.includes(".")
+                                      {typeof badge === "string" &&
+                                      badge.includes(".")
                                         ? t(badge, badgeTranslationPayload)
                                         : badge}
                                     </Span>
@@ -143,7 +148,8 @@ export function Navbar({
                                           : "bg-secondary text-secondary-foreground",
                                     )}
                                   >
-                                    {typeof badge === "string" && badge.includes(".")
+                                    {typeof badge === "string" &&
+                                    badge.includes(".")
                                       ? t(badge)
                                       : badge}
                                   </Span>
@@ -190,7 +196,11 @@ export function Navbar({
 
           {/* Auth buttons display logic */}
           {user ? (
-            <UserMenu user={user} locale={locale} hasSubscription={hasSubscription} />
+            <UserMenu
+              user={user}
+              locale={locale}
+              hasSubscription={hasSubscription}
+            />
           ) : (
             <>
               {/* Mobile auth button (showing signup) */}

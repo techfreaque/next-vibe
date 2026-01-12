@@ -48,7 +48,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Błąd konfliktu",
-        description: "Pobieranie wiadomości jest w konflikcie z istniejącymi danymi",
+        description:
+          "Pobieranie wiadomości jest w konflikcie z istniejącymi danymi",
       },
       network: {
         title: "Błąd sieci",
@@ -56,7 +57,8 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Istnieją niezapisane zmiany, które muszą zostać najpierw zapisane",
+        description:
+          "Istnieją niezapisane zmiany, które muszą zostać najpierw zapisane",
       },
     },
     success: {
@@ -68,7 +70,8 @@ export const translations: typeof enTranslations = {
   // PATCH endpoint translations
   patch: {
     title: "Aktualizuj wiadomość IMAP",
-    description: "Aktualizuj właściwości wiadomości IMAP (status przeczytania, flagi, itp.)",
+    description:
+      "Aktualizuj właściwości wiadomości IMAP (status przeczytania, flagi, itp.)",
     container: {
       title: "Aktualizuj wiadomość",
       description: "Zmodyfikuj właściwości wiadomości IMAP",
@@ -122,7 +125,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Błąd konfliktu",
-        description: "Aktualizacja wiadomości jest w konflikcie z istniejącymi danymi",
+        description:
+          "Aktualizacja wiadomości jest w konflikcie z istniejącymi danymi",
       },
       network: {
         title: "Błąd sieci",
@@ -130,7 +134,8 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Niezapisane zmiany",
-        description: "Istnieją niezapisane zmiany, które muszą zostać najpierw zapisane",
+        description:
+          "Istnieją niezapisane zmiany, które muszą zostać najpierw zapisane",
       },
     },
     success: {

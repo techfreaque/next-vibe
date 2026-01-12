@@ -20,7 +20,11 @@ export interface IBundleAnalyzer {
   /**
    * Analyze bundle sizes and generate optimization suggestions
    */
-  analyze(outputDir: string, output: string[], t: TFunction): Promise<BundleAnalysis>;
+  analyze(
+    outputDir: string,
+    output: string[],
+    t: TFunction,
+  ): Promise<BundleAnalysis>;
 
   /**
    * Get all files recursively from a directory
@@ -43,7 +47,11 @@ export interface IBundleAnalyzer {
 // ============================================================================
 
 export class BundleAnalyzer implements IBundleAnalyzer {
-  async analyze(outputDir: string, output: string[], t: TFunction): Promise<BundleAnalysis> {
+  async analyze(
+    outputDir: string,
+    output: string[],
+    t: TFunction,
+  ): Promise<BundleAnalysis> {
     const dirPath = resolve(ROOT_DIR, outputDir);
     const analysis: BundleAnalysis = {
       totalSize: 0,
@@ -66,7 +74,8 @@ export class BundleAnalyzer implements IBundleAnalyzer {
       .map((f) => ({
         name: f.path,
         size: f.size,
-        percentage: analysis.totalSize > 0 ? (f.size / analysis.totalSize) * 100 : 0,
+        percentage:
+          analysis.totalSize > 0 ? (f.size / analysis.totalSize) * 100 : 0,
       }));
 
     // Generate suggestions based on analysis
@@ -76,8 +85,12 @@ export class BundleAnalyzer implements IBundleAnalyzer {
           size: outputFormatter.formatBytes(analysis.totalSize),
         }),
       );
-      analysis.suggestions.push(t("app.api.system.builder.analysis.considerTreeShaking"));
-      analysis.suggestions.push(t("app.api.system.builder.analysis.checkLargeDeps"));
+      analysis.suggestions.push(
+        t("app.api.system.builder.analysis.considerTreeShaking"),
+      );
+      analysis.suggestions.push(
+        t("app.api.system.builder.analysis.checkLargeDeps"),
+      );
     } else if (analysis.totalSize > SIZE_THRESHOLDS.WARNING) {
       analysis.warnings.push(
         t("app.api.system.builder.analysis.largeBundle", {
@@ -87,27 +100,37 @@ export class BundleAnalyzer implements IBundleAnalyzer {
     }
 
     // Check for common issues
-    const jsFiles = allFiles.filter((f) => f.path.endsWith(".js") || f.path.endsWith(".mjs"));
+    const jsFiles = allFiles.filter(
+      (f) => f.path.endsWith(".js") || f.path.endsWith(".mjs"),
+    );
     const mapFiles = allFiles.filter((f) => f.path.endsWith(".map"));
 
     if (mapFiles.length > 0) {
       const mapSize = mapFiles.reduce((sum, f) => sum + f.size, 0);
       if (mapSize > analysis.totalSize * 0.5) {
-        analysis.suggestions.push(t("app.api.system.builder.analysis.largeSourcemaps"));
+        analysis.suggestions.push(
+          t("app.api.system.builder.analysis.largeSourcemaps"),
+        );
       }
     }
 
     // Check for duplicate-looking files
     const baseNames = jsFiles.map((f) => basename(f.path, extname(f.path)));
-    const duplicates = baseNames.filter((name, idx) => baseNames.indexOf(name) !== idx);
+    const duplicates = baseNames.filter(
+      (name, idx) => baseNames.indexOf(name) !== idx,
+    );
     if (duplicates.length > 0) {
-      analysis.suggestions.push(t("app.api.system.builder.analysis.possibleDuplicates"));
+      analysis.suggestions.push(
+        t("app.api.system.builder.analysis.possibleDuplicates"),
+      );
     }
 
     // Output analysis
     if (analysis.files.length > 0) {
       output.push(
-        outputFormatter.formatSection(t("app.api.system.builder.messages.bundleAnalysis")),
+        outputFormatter.formatSection(
+          t("app.api.system.builder.messages.bundleAnalysis"),
+        ),
       );
       output.push(
         outputFormatter.formatItem(
@@ -115,7 +138,11 @@ export class BundleAnalyzer implements IBundleAnalyzer {
           outputFormatter.formatBytes(analysis.totalSize),
         ),
       );
-      output.push(outputFormatter.formatStep(t("app.api.system.builder.analysis.largestFiles")));
+      output.push(
+        outputFormatter.formatStep(
+          t("app.api.system.builder.analysis.largestFiles"),
+        ),
+      );
       for (const file of analysis.files) {
         output.push(
           outputFormatter.formatItem(

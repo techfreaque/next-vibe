@@ -8,12 +8,15 @@ export const translations = {
     previewText:
       "Your password has been reset successfully. You can now log in and continue chatting with 38 AI models.",
     greeting: "Hello,",
-    confirmationMessage: "Your {{appName}} password has been successfully reset.",
+    confirmationMessage:
+      "Your {{appName}} password has been successfully reset.",
     successMessage:
       "Your password reset is complete! You can now log in to your account with your new password and continue exploring uncensored AI conversations.",
-    loginInstructions: "You can now log in with your new password and access all 38 AI models.",
+    loginInstructions:
+      "You can now log in with your new password and access all 38 AI models.",
     loginButton: "Log In to {{appName}}",
-    securityInfo: "This password change was completed from {{ipAddress}} on {{resetTime}}.",
+    securityInfo:
+      "This password change was completed from {{ipAddress}} on {{resetTime}}.",
     securityWarning:
       "If you did not make this change, your account may be compromised. Please contact our support team immediately.",
     securityTip:
@@ -87,7 +90,8 @@ export const translations = {
       label: "Message",
       description: "Response message",
     },
-    securityTip: "Consider enabling two-factor authentication for better security",
+    securityTip:
+      "Consider enabling two-factor authentication for better security",
     nextSteps: [
       "Log in with your new password",
       "Update saved passwords in your browser",

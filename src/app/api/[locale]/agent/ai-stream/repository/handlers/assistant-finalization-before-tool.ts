@@ -53,9 +53,12 @@ export class AssistantFinalizationBeforeTool {
 
       newIsInReasoningBlock = false;
 
-      logger.info("[AI Stream] ⏱️ Reasoning interrupted by tool call → </think>", {
-        messageId: currentAssistantMessageId,
-      });
+      logger.info(
+        "[AI Stream] ⏱️ Reasoning interrupted by tool call → </think>",
+        {
+          messageId: currentAssistantMessageId,
+        },
+      );
     }
 
     // Update ASSISTANT message in database with accumulated content

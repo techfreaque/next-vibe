@@ -146,14 +146,17 @@ export const translations = {
         step1Number: "1.",
         step1: "Our team will review your business profile and goals",
         step2Number: "2.",
-        step2: "You'll receive a personalized consultation proposal within 24 hours",
+        step2:
+          "You'll receive a personalized consultation proposal within 24 hours",
         step3Number: "3.",
-        step3: "We'll schedule a call to discuss your specific needs and objectives",
+        step3:
+          "We'll schedule a call to discuss your specific needs and objectives",
       },
       cta: {
         getStarted: "Schedule Your Consultation",
       },
-      support: "Have questions? Reply to this email or contact us at {{supportEmail}}",
+      support:
+        "Have questions? Reply to this email or contact us at {{supportEmail}}",
       error: {
         noEmail: "Cannot send welcome email - no email address provided",
       },

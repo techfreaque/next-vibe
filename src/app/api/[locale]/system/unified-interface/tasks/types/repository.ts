@@ -6,17 +6,34 @@
 
 import "server-only";
 
-import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { JwtPayloadType, JwtPrivatePayloadType } from "../../../../user/auth/types";
-import type { CronTaskPriority, TaskCategory, TaskCategoryValue } from "../enum";
-import type { TaskTypesRequestOutput, TaskTypesResponseOutput } from "./definition";
+import type {
+  JwtPayloadType,
+  JwtPrivatePayloadType,
+} from "../../../../user/auth/types";
+import type {
+  CronTaskPriority,
+  TaskCategory,
+  TaskCategoryValue,
+} from "../enum";
+import type {
+  TaskTypesRequestOutput,
+  TaskTypesResponseOutput,
+} from "./definition";
 
 /**
  * Task Configuration
@@ -80,7 +97,10 @@ export interface TaskDocumentation {
  * Cron Task Definition
  * Enhanced to support both string and function-based schedules as per spec.md
  */
-export interface CronTaskDefinition<TConfig = TaskConfig, TResult = TaskResult> {
+export interface CronTaskDefinition<
+  TConfig = TaskConfig,
+  TResult = TaskResult,
+> {
   name: string;
   description: string;
   version?: string;
@@ -104,7 +124,10 @@ export interface CronTaskDefinition<TConfig = TaskConfig, TResult = TaskResult> 
  * Side Task Definition
  * Enhanced to match spec.md requirements
  */
-export interface SideTaskDefinition<TConfig = TaskConfig, TResult = TaskResult> {
+export interface SideTaskDefinition<
+  TConfig = TaskConfig,
+  TResult = TaskResult,
+> {
   name: string;
   description: string;
   version?: string;
@@ -124,13 +147,15 @@ export interface SideTaskDefinition<TConfig = TaskConfig, TResult = TaskResult> 
 /**
  * Task Execution Functions
  */
-export type CronTaskExecuteFunction<TConfig = TaskConfig, TResult = TaskResult> = (
-  context: TaskExecutionContext<TConfig>,
-) => Promise<ResponseType<TResult>>;
+export type CronTaskExecuteFunction<
+  TConfig = TaskConfig,
+  TResult = TaskResult,
+> = (context: TaskExecutionContext<TConfig>) => Promise<ResponseType<TResult>>;
 
-export type SideTaskExecuteFunction<TConfig = TaskConfig, TResult = TaskResult> = (
-  context: TaskExecutionContext<TConfig>,
-) => Promise<ResponseType<TResult>>;
+export type SideTaskExecuteFunction<
+  TConfig = TaskConfig,
+  TResult = TaskResult,
+> = (context: TaskExecutionContext<TConfig>) => Promise<ResponseType<TResult>>;
 
 export type TaskValidateFunction<TConfig = TaskConfig> = (
   config: TConfig,
@@ -243,7 +268,10 @@ export interface TaskRegistry {
   sideTasks: SideTask[];
   taskRunners: TaskRunner[];
   allTasks: Task[];
-  tasksByCategory: Record<(typeof TaskCategory)[keyof typeof TaskCategory], Task[]>;
+  tasksByCategory: Record<
+    (typeof TaskCategory)[keyof typeof TaskCategory],
+    Task[]
+  >;
   tasksByName: Record<string, Task>;
   taskRunner: TaskRunnerManager; // Single unified task runner instance
 }
@@ -267,8 +295,13 @@ export interface TaskRunnerManager {
   description: string;
 
   // Task execution with overlap prevention
-  executeCronTask: (task: CronTask) => Promise<ResponseType<{ status: string; message: string }>>;
-  startSideTask: (task: SideTask, signal: AbortSignal) => Promise<ResponseType<void>>;
+  executeCronTask: (
+    task: CronTask,
+  ) => Promise<ResponseType<{ status: string; message: string }>>;
+  startSideTask: (
+    task: SideTask,
+    signal: AbortSignal,
+  ) => Promise<ResponseType<void>>;
   stopSideTask: (taskName: string) => void;
 
   // Task state management
@@ -445,7 +478,8 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
         error: parsedError.message,
       });
       return fail({
-        message: "app.api.system.unifiedInterface.tasks.types.get.errors.internal.title",
+        message:
+          "app.api.system.unifiedInterface.tasks.types.get.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,
@@ -476,7 +510,8 @@ export class TaskTypesRepositoryImpl implements TaskTypesRepository {
         error: parsedError.message,
       });
       return fail({
-        message: "app.api.system.unifiedInterface.tasks.types.get.errors.internal.title",
+        message:
+          "app.api.system.unifiedInterface.tasks.types.get.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -529,7 +564,8 @@ export interface TaskStatus { /* ... */ }`;
           // Handle unsupported format with proper error response
           logger.error("Unsupported export format", { format });
           return fail({
-            message: "app.api.system.unifiedInterface.tasks.types.get.errors.validation.title",
+            message:
+              "app.api.system.unifiedInterface.tasks.types.get.errors.validation.title",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { format },
           });
@@ -544,7 +580,8 @@ export interface TaskStatus { /* ... */ }`;
         error: parsedError.message,
       });
       return fail({
-        message: "app.api.system.unifiedInterface.tasks.types.get.errors.internal.title",
+        message:
+          "app.api.system.unifiedInterface.tasks.types.get.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message, format },
       });

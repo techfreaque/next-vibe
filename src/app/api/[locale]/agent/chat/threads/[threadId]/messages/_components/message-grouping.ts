@@ -21,7 +21,9 @@ export interface MessageGroup {
  * The first message in each group is the primary (shows header)
  * Subsequent messages are continuations (no header)
  */
-export function groupMessagesBySequence(messages: ChatMessage[]): MessageGroup[] {
+export function groupMessagesBySequence(
+  messages: ChatMessage[],
+): MessageGroup[] {
   const groups: MessageGroup[] = [];
   const sequenceMap = new Map<string, MessageGroup>();
 
@@ -71,7 +73,9 @@ export function hasContentAfterToolCalls(group: MessageGroup): boolean {
     return true;
   }
 
-  return group.continuations.some((msg) => (msg.content ?? "").trim().length > 0);
+  return group.continuations.some(
+    (msg) => (msg.content ?? "").trim().length > 0,
+  );
 }
 
 /**

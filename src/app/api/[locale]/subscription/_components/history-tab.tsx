@@ -15,7 +15,11 @@ interface HistoryTabProps {
   user: JwtPayloadType;
 }
 
-export function HistoryTab({ locale, initialData, user }: HistoryTabProps): JSX.Element {
+export function HistoryTab({
+  locale,
+  initialData,
+  user,
+}: HistoryTabProps): JSX.Element {
   return (
     <MotionDiv
       initial={{ opacity: 0, y: 20 }}

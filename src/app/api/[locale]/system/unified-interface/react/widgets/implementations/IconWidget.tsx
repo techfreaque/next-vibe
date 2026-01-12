@@ -28,11 +28,19 @@ export function IconWidget<const TKey extends string>({
   field,
   className,
 }: ReactWidgetProps<typeof WidgetType.ICON, TKey>): JSX.Element {
-  const { containerSize, iconSize, borderRadius, noHover, justifyContent = "center" } = field.ui;
+  const {
+    containerSize,
+    iconSize,
+    borderRadius,
+    noHover,
+    justifyContent = "center",
+  } = field.ui;
 
   // Get classes from config (no hardcoding!)
   const iconSizeClass = getIconSizeClassName(iconSize);
-  const containerSizeClass = containerSize ? getContainerSizeClassName(containerSize) : "";
+  const containerSizeClass = containerSize
+    ? getContainerSizeClassName(containerSize)
+    : "";
   const borderRadiusClass = getBorderRadiusClassName(borderRadius);
 
   // JIT-safe justify-content classes mapping
@@ -58,7 +66,12 @@ export function IconWidget<const TKey extends string>({
 
   // If no containerSize, render icon without wrapper
   if (!containerSize) {
-    return <Icon icon={value} className={cn(iconSizeClass || "h-5 w-5", className)} />;
+    return (
+      <Icon
+        icon={value}
+        className={cn(iconSizeClass || "h-5 w-5", className)}
+      />
+    );
   }
 
   return (

@@ -146,7 +146,9 @@ export async function updateMemory(params: {
   const [updated] = await db
     .update(memories)
     .set(updateData)
-    .where(and(eq(memories.memoryNumber, memoryNumber), eq(memories.userId, userId)))
+    .where(
+      and(eq(memories.memoryNumber, memoryNumber), eq(memories.userId, userId)),
+    )
     .returning();
 
   if (!updated) {
@@ -172,7 +174,9 @@ export async function deleteMemory(params: {
 
   const result = await db
     .delete(memories)
-    .where(and(eq(memories.memoryNumber, memoryNumber), eq(memories.userId, userId)))
+    .where(
+      and(eq(memories.memoryNumber, memoryNumber), eq(memories.userId, userId)),
+    )
     .returning();
 
   if (result.length === 0) {
@@ -216,7 +220,9 @@ export async function generateMemorySummary(params: {
  * Get next memory number for a user
  * Each user's memories start at 0 and increment
  */
-async function getNextMemoryNumber(params: { userId: string }): Promise<number> {
+async function getNextMemoryNumber(params: {
+  userId: string;
+}): Promise<number> {
   const { userId } = params;
 
   const [result] = await db
@@ -268,7 +274,10 @@ async function checkAndSummarizeIfNeeded(params: {
   const memoriesList = await getMemoriesList({ userId, logger });
 
   // Calculate total size
-  const totalSize = memoriesList.reduce((sum, memory) => sum + memory.content.length, 0);
+  const totalSize = memoriesList.reduce(
+    (sum, memory) => sum + memory.content.length,
+    0,
+  );
 
   logger.info("Memory size check", {
     userId,
@@ -297,7 +306,10 @@ async function checkAndSummarizeIfNeeded(params: {
 /**
  * Get memory statistics
  */
-export async function getMemoryStats(params: { userId: string; logger: EndpointLogger }): Promise<{
+export async function getMemoryStats(params: {
+  userId: string;
+  logger: EndpointLogger;
+}): Promise<{
   count: number;
   totalSize: number;
   oldestMemory: Date | null;
@@ -307,18 +319,29 @@ export async function getMemoryStats(params: { userId: string; logger: EndpointL
 
   const memoriesList = await getMemoriesList({ userId, logger });
 
-  const totalSize = memoriesList.reduce((sum, memory) => sum + memory.content.length, 0);
+  const totalSize = memoriesList.reduce(
+    (sum, memory) => sum + memory.content.length,
+    0,
+  );
 
   const stats = {
     count: memoriesList.length,
     totalSize,
     oldestMemory:
       memoriesList.length > 0
-        ? new Date(Math.min(...memoriesList.map((m) => m.createdAt?.getTime() ?? Date.now())))
+        ? new Date(
+            Math.min(
+              ...memoriesList.map((m) => m.createdAt?.getTime() ?? Date.now()),
+            ),
+          )
         : null,
     newestMemory:
       memoriesList.length > 0
-        ? new Date(Math.max(...memoriesList.map((m) => m.createdAt?.getTime() ?? Date.now())))
+        ? new Date(
+            Math.max(
+              ...memoriesList.map((m) => m.createdAt?.getTime() ?? Date.now()),
+            ),
+          )
         : null,
   };
 

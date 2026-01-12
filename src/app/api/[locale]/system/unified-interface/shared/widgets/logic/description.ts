@@ -5,7 +5,10 @@
  */
 
 import type { WidgetData } from "../types";
-import { isWidgetDataNullish, isWidgetDataString } from "../utils/field-type-guards";
+import {
+  isWidgetDataNullish,
+  isWidgetDataString,
+} from "../utils/field-type-guards";
 
 /**
  * Processed description data structure

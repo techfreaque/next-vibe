@@ -32,7 +32,12 @@ const { POST } = createEndpoint({
   category: "app.api.system.db.category",
   tags: ["app.api.system.db.reset.tag"],
   icon: "rotate-ccw",
-  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["reset", "db:reset"],
   method: Methods.POST,
   path: ["system", "db", "reset"],
@@ -247,7 +252,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.db.reset.fields.skipMigrations.title",
-          description: "app.api.system.db.reset.fields.skipMigrations.description",
+          description:
+            "app.api.system.db.reset.fields.skipMigrations.description",
           columns: 6,
         },
         z.boolean().default(false),
@@ -315,7 +321,8 @@ const { POST } = createEndpoint({
             details: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.system.db.reset.fields.operations.details.title",
+                content:
+                  "app.api.system.db.reset.fields.operations.details.title",
                 fieldType: FieldDataType.TEXT,
               },
               z.string(),
@@ -323,7 +330,8 @@ const { POST } = createEndpoint({
             count: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.system.db.reset.fields.operations.count.title",
+                content:
+                  "app.api.system.db.reset.fields.operations.count.title",
                 fieldType: FieldDataType.NUMBER,
               },
               z.coerce.number(),
@@ -390,7 +398,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.db.reset.post.errors.unauthorized.title",
-      description: "app.api.system.db.reset.post.errors.unauthorized.description",
+      description:
+        "app.api.system.db.reset.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.db.reset.post.errors.server.title",

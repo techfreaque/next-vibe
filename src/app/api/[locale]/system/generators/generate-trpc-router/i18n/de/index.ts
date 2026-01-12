@@ -17,8 +17,10 @@ export const translations: typeof enTranslations = {
     exportConstTrpc: "export const trpc",
     routerNotFound:
       "tRPC-Router-Datei nicht gefunden. Führen Sie 'vibe generate-trpc' aus, um sie zu erstellen.",
-    routeHasDefinitionNoHandler: "Route hat Definition, verwendet aber nicht enhancedApiHandler",
-    routeHasHandlerNoTrpc: "Route verwendet enhancedApiHandler, aber tRPC-Export fehlt",
+    routeHasDefinitionNoHandler:
+      "Route hat Definition, verwendet aber nicht enhancedApiHandler",
+    routeHasHandlerNoTrpc:
+      "Route verwendet enhancedApiHandler, aber tRPC-Export fehlt",
     routeMissingNextExports:
       "Route fehlt Next.js-Exporte (benötigt für React Native-Unterstützung)",
     apiHandlerOld: "apiHandler(",

@@ -48,7 +48,8 @@ export const translations: typeof enTranslations = {
     empty: {
       title: "Keine Benutzer gefunden",
       message: "Keine Benutzer entsprechen Ihren Suchkriterien",
-      description: "Versuchen Sie, Ihre Filter anzupassen oder einen neuen Benutzer zu erstellen",
+      description:
+        "Versuchen Sie, Ihre Filter anzupassen oder einen neuen Benutzer zu erstellen",
     },
     pagination: {
       showing: "Zeige {from} bis {to} von {total} Benutzern",

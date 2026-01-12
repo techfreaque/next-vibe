@@ -70,7 +70,10 @@ const { GET } = createEndpoint({
   title: "app.api.leads.search.get.title" as const,
   description: "app.api.leads.search.get.description" as const,
   category: "app.api.leads.category" as const,
-  tags: ["app.api.leads.tags.leads" as const, "app.api.leads.tags.search" as const],
+  tags: [
+    "app.api.leads.tags.leads" as const,
+    "app.api.leads.tags.search" as const,
+  ],
 
   fields: objectField(
     {
@@ -134,7 +137,8 @@ const { GET } = createEndpoint({
             responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.leads.search.get.response.leads.item" as const,
+                content:
+                  "app.api.leads.search.get.response.leads.item" as const,
                 fieldType: FieldDataType.TEXT,
               },
               leadResponseSchema,
@@ -164,39 +168,48 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.leads.search.get.errors.unauthorized.title" as const,
-      description: "app.api.leads.search.get.errors.unauthorized.description" as const,
+      description:
+        "app.api.leads.search.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.leads.search.get.errors.validation.title" as const,
-      description: "app.api.leads.search.get.errors.validation.description" as const,
+      description:
+        "app.api.leads.search.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.leads.search.get.errors.server.title" as const,
-      description: "app.api.leads.search.get.errors.server.description" as const,
+      description:
+        "app.api.leads.search.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.leads.search.get.errors.unknown.title" as const,
-      description: "app.api.leads.search.get.errors.unknown.description" as const,
+      description:
+        "app.api.leads.search.get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.leads.search.get.errors.network.title" as const,
-      description: "app.api.leads.search.get.errors.network.description" as const,
+      description:
+        "app.api.leads.search.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.leads.search.get.errors.forbidden.title" as const,
-      description: "app.api.leads.search.get.errors.forbidden.description" as const,
+      description:
+        "app.api.leads.search.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.leads.search.get.errors.notFound.title" as const,
-      description: "app.api.leads.search.get.errors.notFound.description" as const,
+      description:
+        "app.api.leads.search.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.leads.search.get.errors.unsavedChanges.title" as const,
-      description: "app.api.leads.search.get.errors.unsavedChanges.description" as const,
+      description:
+        "app.api.leads.search.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.leads.search.get.errors.conflict.title" as const,
-      description: "app.api.leads.search.get.errors.conflict.description" as const,
+      description:
+        "app.api.leads.search.get.errors.conflict.description" as const,
     },
   },
 

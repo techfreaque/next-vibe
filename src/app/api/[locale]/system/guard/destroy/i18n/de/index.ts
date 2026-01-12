@@ -29,7 +29,8 @@ export const translations: typeof enTranslations = {
     },
     dryRun: {
       title: "Probelauf",
-      description: "Vorschau, was zerstört würde, ohne tatsächlich zu zerstören",
+      description:
+        "Vorschau, was zerstört würde, ohne tatsächlich zu zerstören",
     },
     success: {
       title: "Erfolg",

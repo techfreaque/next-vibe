@@ -32,7 +32,8 @@ export class FileUploadEventHandler {
     encoder: TextEncoder;
     logger: EndpointLogger;
   }): void {
-    const { fileUploadPromise, userMessageId, controller, encoder, logger } = params;
+    const { fileUploadPromise, userMessageId, controller, encoder, logger } =
+      params;
 
     // Handle file upload promise in background (server threads only)
     // When upload completes, emit FILES_UPLOADED event to update UI
@@ -40,10 +41,13 @@ export class FileUploadEventHandler {
       void fileUploadPromise
         .then((result) => {
           if (result.success && result.attachments) {
-            logger.info("[File Processing] File upload completed - emitting FILES_UPLOADED event", {
-              messageId: result.userMessageId,
-              attachmentCount: result.attachments.length,
-            });
+            logger.info(
+              "[File Processing] File upload completed - emitting FILES_UPLOADED event",
+              {
+                messageId: result.userMessageId,
+                attachmentCount: result.attachments.length,
+              },
+            );
 
             // Emit FILES_UPLOADED event to update UI with attachment metadata
             const filesUploadedEvent = createStreamEvent.filesUploaded({
@@ -52,22 +56,30 @@ export class FileUploadEventHandler {
             });
 
             try {
-              controller.enqueue(encoder.encode(formatSSEEvent(filesUploadedEvent)));
+              controller.enqueue(
+                encoder.encode(formatSSEEvent(filesUploadedEvent)),
+              );
               logger.info("[File Processing] FILES_UPLOADED event emitted", {
                 messageId: result.userMessageId,
                 attachmentCount: result.attachments.length,
               });
             } catch (error) {
-              logger.error("[File Processing] Failed to emit FILES_UPLOADED event", {
-                error: parseError(error),
-                messageId: result.userMessageId,
-              });
+              logger.error(
+                "[File Processing] Failed to emit FILES_UPLOADED event",
+                {
+                  error: parseError(error),
+                  messageId: result.userMessageId,
+                },
+              );
             }
           } else {
-            logger.warn("[File Processing] File upload failed - no event emitted", {
-              messageId: result.userMessageId,
-              success: result.success,
-            });
+            logger.warn(
+              "[File Processing] File upload failed - no event emitted",
+              {
+                messageId: result.userMessageId,
+                success: result.success,
+              },
+            );
           }
           return undefined;
         })

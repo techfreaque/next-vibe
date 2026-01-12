@@ -12,7 +12,11 @@ import { simpleT } from "@/i18n/core/shared";
  * TranscribingIndicator - Loading animation for speech-to-text transcription
  * Shows a microphone icon with animated sound waves
  */
-export function TranscribingIndicator({ locale }: { locale: CountryLanguage }): JSX.Element {
+export function TranscribingIndicator({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): JSX.Element {
   const { t } = simpleT(locale);
   return (
     <Div className="flex items-center gap-3 py-1">

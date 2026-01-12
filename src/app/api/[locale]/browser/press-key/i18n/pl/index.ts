@@ -9,7 +9,8 @@ export const translations: typeof enTranslations = {
     fields: {
       key: {
         label: "Klawisz",
-        description: "Klawisz lub kombinacja (np. Enter, Control+A, Control+Shift+R)",
+        description:
+          "Klawisz lub kombinacja (np. Enter, Control+A, Control+Shift+R)",
         placeholder: "Wprowadź klawisz lub kombinację",
       },
     },
@@ -31,7 +32,8 @@ export const translations: typeof enTranslations = {
     },
     unauthorized: {
       title: "Nieautoryzowany",
-      description: "Nie masz uprawnień do wykonywania operacji naciśnięcia klawisza",
+      description:
+        "Nie masz uprawnień do wykonywania operacji naciśnięcia klawisza",
     },
     forbidden: {
       title: "Zabronione",
@@ -43,11 +45,13 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description: "Wystąpił wewnętrzny błąd serwera podczas operacji naciśnięcia klawisza",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas operacji naciśnięcia klawisza",
     },
     unknown: {
       title: "Nieznany błąd",
-      description: "Wystąpił nieznany błąd podczas operacji naciśnięcia klawisza",
+      description:
+        "Wystąpił nieznany błąd podczas operacji naciśnięcia klawisza",
     },
     unsavedChanges: {
       title: "Niezapisane zmiany",

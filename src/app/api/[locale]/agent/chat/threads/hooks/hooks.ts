@@ -19,7 +19,9 @@ import definitions from "../definition";
  * - Filtering (status, folderId, isPinned, dateFrom, dateTo)
  * - Sorting (createdAt, updatedAt, title)
  */
-export function useThreadsList(logger: EndpointLogger): EndpointReturn<typeof definitions> {
+export function useThreadsList(
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {
@@ -39,7 +41,9 @@ export function useThreadsList(logger: EndpointLogger): EndpointReturn<typeof de
  * Provides form handling and mutation capabilities
  * Auto-refetches thread list on success
  */
-export function useCreateThread(logger: EndpointLogger): EndpointReturn<typeof definitions> {
+export function useCreateThread(
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

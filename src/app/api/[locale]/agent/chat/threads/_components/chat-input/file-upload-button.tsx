@@ -8,10 +8,23 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Paperclip, X } from "next-vibe-ui/ui/icons";
-import { Input, type InputChangeEvent, type InputRefObject } from "next-vibe-ui/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "next-vibe-ui/ui/popover";
+import {
+  Input,
+  type InputChangeEvent,
+  type InputRefObject,
+} from "next-vibe-ui/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "next-vibe-ui/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 import { useRef, useState } from "react";
 
@@ -112,11 +125,17 @@ export function FileUploadButton({
               </Div>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80 p-3" align="start" side="top" sideOffset={8}>
+          <PopoverContent
+            className="w-80 p-3"
+            align="start"
+            side="top"
+            sideOffset={8}
+          >
             <Div className="space-y-2">
               <Div className="flex items-center justify-between">
                 <Span className="text-sm font-semibold">
-                  {t("app.chat.input.attachments.attachedFiles")} ({attachments.length})
+                  {t("app.chat.input.attachments.attachedFiles")} (
+                  {attachments.length})
                 </Span>
                 <Button
                   type="button"
@@ -173,7 +192,9 @@ export function FileUploadButton({
                 <Paperclip className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>{t("app.chat.input.attachments.uploadFile")}</TooltipContent>
+            <TooltipContent>
+              {t("app.chat.input.attachments.uploadFile")}
+            </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       )}

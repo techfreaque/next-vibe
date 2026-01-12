@@ -46,7 +46,10 @@ export function useNewsletterStatus(params: {
   enabled?: boolean;
 }): EndpointReturn<typeof statusEndpoints> {
   const { locale } = useTranslation();
-  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
 
   return useEndpoint(
     statusEndpoints,
@@ -63,9 +66,14 @@ export function useNewsletterStatus(params: {
 /**
  * Hook for newsletter subscription
  */
-export function useNewsletterSubscription(): EndpointReturn<typeof subscribeEndpoints> {
+export function useNewsletterSubscription(): EndpointReturn<
+  typeof subscribeEndpoints
+> {
   const { locale } = useTranslation();
-  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
 
   return useEndpoint(
     subscribeEndpoints,
@@ -85,9 +93,14 @@ export function useNewsletterSubscription(): EndpointReturn<typeof subscribeEndp
 /**
  * Hook for newsletter unsubscription
  */
-export function useNewsletterUnsubscription(): EndpointReturn<typeof unsubscribeEndpoints> {
+export function useNewsletterUnsubscription(): EndpointReturn<
+  typeof unsubscribeEndpoints
+> {
   const { locale } = useTranslation();
-  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
 
   return useEndpoint(
     unsubscribeEndpoints,
@@ -136,7 +149,10 @@ export function useNewsletterManager(
   user: MeGetResponseOutput | undefined,
 ): NewsletterManagerResult {
   const { locale } = useTranslation();
-  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
 
   // Use typed custom state for newsletter-related state
   const [manualEmail, setManualEmail] = useCustomState(manualEmailKey, "");
@@ -176,7 +192,10 @@ export function useNewsletterManager(
       (subscriptionEndpoint.create?.isSubmitting ?? false) ||
       (unsubscribeEndpoint.create?.isSubmitting ?? false)
     );
-  }, [subscriptionEndpoint.create?.isSubmitting, unsubscribeEndpoint.create?.isSubmitting]);
+  }, [
+    subscriptionEndpoint.create?.isSubmitting,
+    unsubscribeEndpoint.create?.isSubmitting,
+  ]);
 
   // Check status when we have a valid email
   const statusEndpoint = useNewsletterStatus({
@@ -188,7 +207,8 @@ export function useNewsletterManager(
   });
 
   const isSubscribed =
-    statusEndpoint.read?.response?.success && statusEndpoint.read.response.data.subscribed
+    statusEndpoint.read?.response?.success &&
+    statusEndpoint.read.response.data.subscribed
       ? statusEndpoint.read.response.data.subscribed
       : false;
 
@@ -230,7 +250,8 @@ export function useNewsletterManager(
       if (showConfirmUnsubscribe) {
         return {
           type: "confirm",
-          message: "app.api.newsletter.subscription.unsubscribe.confirmQuestion",
+          message:
+            "app.api.newsletter.subscription.unsubscribe.confirmQuestion",
         };
       }
       // Show unsubscribe text when email is already subscribed
@@ -254,7 +275,9 @@ export function useNewsletterManager(
   const subscribe = useCallback(
     (emailParam?: string): void => {
       const emailToUse = emailParam || email;
-      const isEmailValid = emailParam ? isValidEmail(emailParam) : isCurrentEmailValid;
+      const isEmailValid = emailParam
+        ? isValidEmail(emailParam)
+        : isCurrentEmailValid;
 
       if (emailToUse && isEmailValid && subscriptionEndpoint.create) {
         // Reset unsubscribe endpoint
@@ -281,7 +304,9 @@ export function useNewsletterManager(
   const unsubscribe = useCallback(
     (emailParam?: string): void => {
       const emailToUse = emailParam || email;
-      const isEmailValid = emailParam ? isValidEmail(emailParam) : isCurrentEmailValid;
+      const isEmailValid = emailParam
+        ? isValidEmail(emailParam)
+        : isCurrentEmailValid;
 
       if (emailToUse && isEmailValid && unsubscribeEndpoint.create) {
         if (!showConfirmUnsubscribe) {
@@ -321,10 +346,16 @@ export function useNewsletterManager(
         setShowConfirmUnsubscribe(false);
 
         // Clear success/error messages when user starts typing
-        if (subscriptionEndpoint.create?.isSuccess || subscriptionEndpoint.create?.error) {
+        if (
+          subscriptionEndpoint.create?.isSuccess ||
+          subscriptionEndpoint.create?.error
+        ) {
           subscriptionEndpoint.create?.reset();
         }
-        if (unsubscribeEndpoint.create?.isSuccess || unsubscribeEndpoint.create?.error) {
+        if (
+          unsubscribeEndpoint.create?.isSuccess ||
+          unsubscribeEndpoint.create?.error
+        ) {
           unsubscribeEndpoint.create?.reset();
         }
       }
@@ -355,6 +386,10 @@ export function useNewsletterManager(
       subscriptionEndpoint.create?.reset();
       unsubscribeEndpoint.create?.reset();
       setShowConfirmUnsubscribe(false);
-    }, [subscriptionEndpoint.create, unsubscribeEndpoint.create, setShowConfirmUnsubscribe]),
+    }, [
+      subscriptionEndpoint.create,
+      unsubscribeEndpoint.create,
+      setShowConfirmUnsubscribe,
+    ]),
   };
 }

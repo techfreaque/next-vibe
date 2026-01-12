@@ -83,7 +83,9 @@ export function getLayoutClassName(config: LayoutConfig): string {
 
   switch (type) {
     case "grid": {
-      const gridColsClass = columns ? (gridColsMap[columns] ?? "grid-cols-1") : "grid-cols-1";
+      const gridColsClass = columns
+        ? (gridColsMap[columns] ?? "grid-cols-1")
+        : "grid-cols-1";
       return `grid ${gapClass} ${gridColsClass}`;
     }
     case "flex":
@@ -122,13 +124,16 @@ export function isExternalUrl(url: string): boolean {
  * Used by: MetricCardWidget
  */
 export function extractMetricUnit(value: WidgetData): string | undefined {
-  const isObject = typeof value === "object" && value !== null && !Array.isArray(value);
+  const isObject =
+    typeof value === "object" && value !== null && !Array.isArray(value);
 
   if (!isObject) {
     return undefined;
   }
 
-  return "unit" in value && typeof value.unit === "string" ? value.unit : undefined;
+  return "unit" in value && typeof value.unit === "string"
+    ? value.unit
+    : undefined;
 }
 
 /**
@@ -173,7 +178,10 @@ export interface ColumnConfig {
   format?: (value: WidgetData) => WidgetData;
 }
 
-export function extractColumnConfig(value: WidgetData, columnKey: string): ColumnConfig {
+export function extractColumnConfig(
+  value: WidgetData,
+  columnKey: string,
+): ColumnConfig {
   const defaultConfig: ColumnConfig = {
     align: "text-left",
     sortable: false,
@@ -190,7 +198,8 @@ export function extractColumnConfig(value: WidgetData, columnKey: string): Colum
   }
 
   const rawColumn = value.columns.find(
-    (c: WidgetData) => typeof c === "object" && c !== null && "key" in c && c.key === columnKey,
+    (c: WidgetData) =>
+      typeof c === "object" && c !== null && "key" in c && c.key === columnKey,
   );
 
   if (!rawColumn || typeof rawColumn !== "object" || rawColumn === null) {
@@ -203,7 +212,9 @@ export function extractColumnConfig(value: WidgetData, columnKey: string): Colum
       : "text-left";
 
   const sortable =
-    "sortable" in rawColumn && typeof rawColumn.sortable === "boolean" ? rawColumn.sortable : false;
+    "sortable" in rawColumn && typeof rawColumn.sortable === "boolean"
+      ? rawColumn.sortable
+      : false;
 
   const width =
     "width" in rawColumn &&
@@ -260,7 +271,9 @@ export function sortTableRows<T extends Record<string, WidgetData>>(
  * Get format class name for text display
  * Used by: TextWidget
  */
-export function getTextFormatClassName(format: "code" | "pre" | "normal" | undefined): string {
+export function getTextFormatClassName(
+  format: "code" | "pre" | "normal" | undefined,
+): string {
   switch (format) {
     case "code":
       return "font-mono text-sm bg-muted px-1 py-0.5 rounded";
@@ -309,7 +322,9 @@ export function getTextSizeClassName(
  * Used by: LinkWidget, IconWidget, and other icon-based widgets
  * IMPORTANT: FULL class strings for Tailwind purge!
  */
-export function getIconSizeClassName(size: "xs" | "sm" | "base" | "lg" | "xl" | undefined): string {
+export function getIconSizeClassName(
+  size: "xs" | "sm" | "base" | "lg" | "xl" | undefined,
+): string {
   if (size === "xs") {
     return "h-3 w-3";
   }
@@ -330,7 +345,9 @@ export function getIconSizeClassName(size: "xs" | "sm" | "base" | "lg" | "xl" | 
  * Used by: LinkCardWidget, and other thumbnail-based widgets
  * IMPORTANT: FULL class strings for Tailwind purge!
  */
-export function getThumbnailSizeClassName(size: "sm" | "base" | "lg" | undefined): string {
+export function getThumbnailSizeClassName(
+  size: "sm" | "base" | "lg" | undefined,
+): string {
   if (size === "sm") {
     return "w-12 h-12";
   }
@@ -492,7 +509,9 @@ export function getBorderRadiusClassName(
  * Get button size CSS class name from config
  * IMPORTANT: FULL class strings for Tailwind purge!
  */
-export function getButtonSizeClassName(size: "xs" | "sm" | "base" | "lg" | undefined): string {
+export function getButtonSizeClassName(
+  size: "xs" | "sm" | "base" | "lg" | undefined,
+): string {
   if (size === "xs") {
     return "h-6 w-6";
   }
@@ -509,7 +528,9 @@ export function getButtonSizeClassName(size: "xs" | "sm" | "base" | "lg" | undef
  * Get height CSS class name from config
  * IMPORTANT: FULL class strings for Tailwind purge!
  */
-export function getHeightClassName(size: "xs" | "sm" | "base" | "lg" | undefined): string {
+export function getHeightClassName(
+  size: "xs" | "sm" | "base" | "lg" | undefined,
+): string {
   if (size === "xs") {
     return "h-1";
   }

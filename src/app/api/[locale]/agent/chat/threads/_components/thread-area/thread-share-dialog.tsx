@@ -1,7 +1,12 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import type { JSX } from "react";
@@ -37,7 +42,9 @@ export function ThreadShareDialog({
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle>{t("app.chat.shareDialog.title")}</DialogTitle>
-          <Div className="text-sm text-muted-foreground mt-2">{threadTitle}</Div>
+          <Div className="text-sm text-muted-foreground mt-2">
+            {threadTitle}
+          </Div>
         </DialogHeader>
 
         <ScrollArea className="flex-1 -mx-6 px-6 overflow-y-auto">

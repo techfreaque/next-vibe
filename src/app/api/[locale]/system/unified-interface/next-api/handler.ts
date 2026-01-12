@@ -24,7 +24,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/next-api/response";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { type ApiHandlerOptions, createGenericHandler } from "../shared/endpoints/route/handler";
+import {
+  type ApiHandlerOptions,
+  createGenericHandler,
+} from "../shared/endpoints/route/handler";
 import { createEndpointLogger } from "../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint";
 import { Methods } from "../shared/types/enums";
@@ -39,9 +42,12 @@ import { Platform } from "../shared/types/platform";
  */
 export type NextHandlerReturnType<TResponseOutput, TUrlVariablesInput> = (
   request: NextRequest,
-  { params }: { params: Promise<TUrlVariablesInput & { locale: CountryLanguage }> },
+  {
+    params,
+  }: { params: Promise<TUrlVariablesInput & { locale: CountryLanguage }> },
 ) => Promise<
-  NextResponse<ResponseType<TResponseOutput> | Buffer | ReadableStream | Blob> | Response
+  | NextResponse<ResponseType<TResponseOutput> | Buffer | ReadableStream | Blob>
+  | Response
 >;
 
 /**
@@ -58,7 +64,10 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
     T["allowedRoles"],
     T
   >,
-): NextHandlerReturnType<T["types"]["ResponseOutput"], T["types"]["UrlVariablesOutput"]> {
+): NextHandlerReturnType<
+  T["types"]["ResponseOutput"],
+  T["types"]["UrlVariablesOutput"]
+> {
   const { endpoint } = options;
 
   // Create the shared generic handler (handles auth, permissions, validation, business logic, email)
@@ -69,7 +78,9 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
     {
       params,
     }: {
-      params: Promise<T["types"]["UrlVariablesOutput"] & { locale: CountryLanguage }>;
+      params: Promise<
+        T["types"]["UrlVariablesOutput"] & { locale: CountryLanguage }
+      >;
     },
   ) => {
     // Extract Next.js-specific data
@@ -122,7 +133,10 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
       }
 
       // Wrap validated success result in NextResponse
-      return wrapSuccessResponse(result.data as T["types"]["ResponseOutput"], 200);
+      return wrapSuccessResponse(
+        result.data as T["types"]["ResponseOutput"],
+        200,
+      );
     } catch (error) {
       // Handle ErrorResponseError - return the contained proper error response
       if (error instanceof ErrorResponseError) {

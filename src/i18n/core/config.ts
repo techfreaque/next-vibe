@@ -6,7 +6,8 @@ import { allTranslations, languageConfig, languageDefaults } from "../../i18n";
 // ----------------
 export type Countries = keyof typeof languageConfig.countries;
 export type Currencies = keyof typeof languageConfig.currencies;
-export type Languages = (typeof languageConfig.languages)[keyof typeof languageConfig.languages];
+export type Languages =
+  (typeof languageConfig.languages)[keyof typeof languageConfig.languages];
 export type CountryLanguage = `${Languages}-${Countries}`;
 
 export type TranslationSchema = typeof languageDefaults.translations;
@@ -153,7 +154,9 @@ export function convertLanguageFilter(
 }
 
 // Create a proper enum-like object for CountryLanguageValues that works with z.enum()
-export const CountryLanguageValues = Object.values(languageConfig.languages).reduce(
+export const CountryLanguageValues = Object.values(
+  languageConfig.languages,
+).reduce(
   (acc, language) => {
     Object.keys(languageConfig.countries).forEach((country) => {
       const key: CountryLanguage = `${language as Languages}-${String(country) as Countries}`;
@@ -169,7 +172,8 @@ export const currencyByCountry = languageConfig.mappings.currencyByCountry;
 export const translations = allTranslations;
 export const defaultLocaleConfig = languageDefaults;
 export const defaultLocale: CountryLanguage = `${languageDefaults.language}-${languageDefaults.country}`;
-export const globalCountryInfo: CountryInfo = languageConfig.countryInfo.GLOBAL as CountryInfo;
+export const globalCountryInfo: CountryInfo = languageConfig.countryInfo
+  .GLOBAL as CountryInfo;
 export const availableCountries: readonly CountryInfo[] = [
   languageConfig.countryInfo.DE as CountryInfo,
   languageConfig.countryInfo.PL as CountryInfo,

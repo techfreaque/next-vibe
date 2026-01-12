@@ -100,19 +100,25 @@ export const resultsFollowup2Email: EmailTemplateFunction = ({
           </div>
 
           <div style={{ paddingLeft: "20px" }}>
-            <div style={{ fontSize: "14px", color: "#374151", margin: "8px 0" }}>
+            <div
+              style={{ fontSize: "14px", color: "#374151", margin: "8px 0" }}
+            >
               •{" "}
               {t(
                 "app.api.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.competitorPoint1",
               )}
             </div>
-            <div style={{ fontSize: "14px", color: "#374151", margin: "8px 0" }}>
+            <div
+              style={{ fontSize: "14px", color: "#374151", margin: "8px 0" }}
+            >
               •{" "}
               {t(
                 "app.api.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.competitorPoint2",
               )}
             </div>
-            <div style={{ fontSize: "14px", color: "#374151", margin: "8px 0" }}>
+            <div
+              style={{ fontSize: "14px", color: "#374151", margin: "8px 0" }}
+            >
               •{" "}
               {t(
                 "app.api.leads.campaigns.emails.journeys.results.templates.resultsJourney.followup2.competitorPoint3",

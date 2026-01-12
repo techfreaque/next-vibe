@@ -10,14 +10,21 @@ import type { z } from "zod";
 
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
 
-import { contactClientEnv, contactClientEnvSchema } from "../../contact/env-client";
+import {
+  contactClientEnv,
+  contactClientEnvSchema,
+} from "../../contact/env-client";
 // Import client env modules
-import { paymentClientEnv, paymentClientEnvSchema } from "../../payment/env-client";
+import {
+  paymentClientEnv,
+  paymentClientEnvSchema,
+} from "../../payment/env-client";
 
 // Platform detection (will be set at runtime)
 const isServer = typeof window === "undefined";
 const isReactNative = false;
-const isBrowser = !isServer && typeof window !== "undefined" && !!window.document;
+const isBrowser =
+  !isServer && typeof window !== "undefined" && !!window.document;
 
 const platform = {
   isServer,
@@ -35,7 +42,9 @@ export const envClientModules = {
 export { platform };
 
 // Combined client schema
-export const envClientSchema = paymentClientEnvSchema.merge(contactClientEnvSchema);
+export const envClientSchema = paymentClientEnvSchema.merge(
+  contactClientEnvSchema,
+);
 
 export type EnvClient = z.infer<typeof envClientSchema>;
 
@@ -43,7 +52,11 @@ export type EnvClient = z.infer<typeof envClientSchema>;
  * Validate all client environment variables
  */
 export function validateAllClientEnv(): EnvClient {
-  return validateEnv({ ...process.env, platform }, envClientSchema, envValidationLogger);
+  return validateEnv(
+    { ...process.env, platform },
+    envClientSchema,
+    envValidationLogger,
+  );
 }
 
 /**

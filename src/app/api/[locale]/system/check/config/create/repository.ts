@@ -10,7 +10,11 @@ import { resolve } from "node:path";
 
 import { confirm } from "@inquirer/prompts";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -20,7 +24,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { configRepository } from "../repository";
-import type { ConfigCreateRequestOutput, ConfigCreateResponseOutput } from "./definition";
+import type {
+  ConfigCreateRequestOutput,
+  ConfigCreateResponseOutput,
+} from "./definition";
 
 export class ConfigCreateRepository {
   static async execute(
@@ -58,63 +65,86 @@ export class ConfigCreateRepository {
         // oxlint-disable-next-line no-console
         console.log(`\n${"═".repeat(60)}`);
         // oxlint-disable-next-line no-console
-        console.log(`  🔧 ${t("app.api.system.check.config.create.interactive.welcome")}`);
+        console.log(
+          `  🔧 ${t("app.api.system.check.config.create.interactive.welcome")}`,
+        );
         // oxlint-disable-next-line no-console
         console.log("═".repeat(60));
         // oxlint-disable-next-line no-console
-        console.log(`  ${t("app.api.system.check.config.create.interactive.description")}`);
+        console.log(
+          `  ${t("app.api.system.check.config.create.interactive.description")}`,
+        );
         // oxlint-disable-next-line no-console
         console.log(`${"═".repeat(60)}\n`);
 
         // Ask each question step by step
         data.createMcpConfig = await confirm({
-          message: t("app.api.system.check.config.create.interactive.createMcpConfig"),
+          message: t(
+            "app.api.system.check.config.create.interactive.createMcpConfig",
+          ),
           default: data.createMcpConfig,
         });
 
         data.updateVscodeSettings = await confirm({
-          message: t("app.api.system.check.config.create.interactive.updateVscodeSettings"),
+          message: t(
+            "app.api.system.check.config.create.interactive.updateVscodeSettings",
+          ),
           default: data.updateVscodeSettings,
         });
 
         data.enableReactRules = await confirm({
-          message: t("app.api.system.check.config.create.interactive.enableReactRules"),
+          message: t(
+            "app.api.system.check.config.create.interactive.enableReactRules",
+          ),
           default: data.enableReactRules,
         });
 
         data.enableNextjsRules = await confirm({
-          message: t("app.api.system.check.config.create.interactive.enableNextjsRules"),
+          message: t(
+            "app.api.system.check.config.create.interactive.enableNextjsRules",
+          ),
           default: data.enableNextjsRules,
         });
 
         data.enableI18nRules = await confirm({
-          message: t("app.api.system.check.config.create.interactive.enableI18nRules"),
+          message: t(
+            "app.api.system.check.config.create.interactive.enableI18nRules",
+          ),
           default: data.enableI18nRules,
         });
 
         data.jsxCapitalization = await confirm({
-          message: t("app.api.system.check.config.create.interactive.jsxCapitalization"),
+          message: t(
+            "app.api.system.check.config.create.interactive.jsxCapitalization",
+          ),
           default: data.jsxCapitalization,
         });
 
         data.enablePedanticRules = await confirm({
-          message: t("app.api.system.check.config.create.interactive.enablePedanticRules"),
+          message: t(
+            "app.api.system.check.config.create.interactive.enablePedanticRules",
+          ),
           default: data.enablePedanticRules,
         });
 
         data.enableRestrictedSyntax = await confirm({
-          message: t("app.api.system.check.config.create.interactive.enableRestrictedSyntax"),
+          message: t(
+            "app.api.system.check.config.create.interactive.enableRestrictedSyntax",
+          ),
           default: data.enableRestrictedSyntax,
         });
 
         data.updatePackageJson = await confirm({
-          message: t("app.api.system.check.config.create.interactive.updatePackageJson"),
+          message: t(
+            "app.api.system.check.config.create.interactive.updatePackageJson",
+          ),
           default: data.updatePackageJson,
         });
       }
 
       // Create check.config.ts with user-selected options
-      const configResult = await configRepository.createDefaultCheckConfig(logger);
+      const configResult =
+        await configRepository.createDefaultCheckConfig(logger);
 
       if (!configResult.success) {
         return fail({
@@ -131,7 +161,10 @@ export class ConfigCreateRepository {
 
       // Apply feature flags based on user input
       if (data.enableReactRules !== undefined) {
-        configContent = configContent.replace(/react: true,/g, `react: ${data.enableReactRules},`);
+        configContent = configContent.replace(
+          /react: true,/g,
+          `react: ${data.enableReactRules},`,
+        );
         configContent = configContent.replace(
           /reactCompiler: true,/g,
           `reactCompiler: ${data.enableReactRules},`,
@@ -150,7 +183,10 @@ export class ConfigCreateRepository {
       }
 
       if (data.enableI18nRules !== undefined) {
-        configContent = configContent.replace(/i18n: true,/g, `i18n: ${data.enableI18nRules},`);
+        configContent = configContent.replace(
+          /i18n: true,/g,
+          `i18n: ${data.enableI18nRules},`,
+        );
       }
 
       if (data.jsxCapitalization !== undefined) {
@@ -182,13 +218,19 @@ export class ConfigCreateRepository {
 
       // Create MCP config if requested
       if (data.createMcpConfig) {
-        const mcpResult = await configRepository.createDefaultMcpConfig(logger, ".mcp.json");
+        const mcpResult = await configRepository.createDefaultMcpConfig(
+          logger,
+          ".mcp.json",
+        );
         if (mcpResult.success) {
           mcpConfigPath = mcpResult.mcpConfigPath;
         } else {
-          logger.warn(t("app.api.system.check.config.create.warnings.mcpConfigFailed"), {
-            error: mcpResult.error,
-          });
+          logger.warn(
+            t("app.api.system.check.config.create.warnings.mcpConfigFailed"),
+            {
+              error: mcpResult.error,
+            },
+          );
         }
 
         const mcpCursorResult = await configRepository.createDefaultMcpConfig(
@@ -198,9 +240,12 @@ export class ConfigCreateRepository {
         if (mcpCursorResult.success) {
           mcpConfigPath = mcpCursorResult.mcpConfigPath;
         } else {
-          logger.warn(t("app.api.system.check.config.create.warnings.mcpConfigFailed"), {
-            error: mcpCursorResult.error,
-          });
+          logger.warn(
+            t("app.api.system.check.config.create.warnings.mcpConfigFailed"),
+            {
+              error: mcpCursorResult.error,
+            },
+          );
         }
 
         const mcpVscodeResult = await configRepository.createDefaultMcpConfig(
@@ -210,16 +255,20 @@ export class ConfigCreateRepository {
         if (mcpVscodeResult.success) {
           mcpConfigPath = mcpVscodeResult.mcpConfigPath;
         } else {
-          logger.warn(t("app.api.system.check.config.create.warnings.mcpConfigFailed"), {
-            error: mcpVscodeResult.error,
-          });
+          logger.warn(
+            t("app.api.system.check.config.create.warnings.mcpConfigFailed"),
+            {
+              error: mcpVscodeResult.error,
+            },
+          );
         }
       }
 
       // Update VSCode settings if requested
       if (data.updateVscodeSettings) {
         // Load the created config to get settings
-        const configReadResult = await configRepository.ensureConfigReady(logger);
+        const configReadResult =
+          await configRepository.ensureConfigReady(logger);
         if (configReadResult.ready) {
           const vscodeResult = await configRepository.generateVSCodeSettings(
             logger,
@@ -229,9 +278,12 @@ export class ConfigCreateRepository {
           if (vscodeResult.success) {
             vscodeSettingsPath = vscodeResult.settingsPath;
           } else {
-            logger.warn(t("app.api.system.check.config.create.warnings.vscodeFailed"), {
-              error: vscodeResult.error,
-            });
+            logger.warn(
+              t("app.api.system.check.config.create.warnings.vscodeFailed"),
+              {
+                error: vscodeResult.error,
+              },
+            );
           }
         }
       }
@@ -253,12 +305,21 @@ export class ConfigCreateRepository {
             writeFileSync(pkgPath, `${JSON.stringify(packageJson, null, 2)}\n`);
             packageJsonPath = pkgPath;
           } catch (error) {
-            logger.warn(t("app.api.system.check.config.create.warnings.packageJsonFailed"), {
-              error: parseError(error).message,
-            });
+            logger.warn(
+              t(
+                "app.api.system.check.config.create.warnings.packageJsonFailed",
+              ),
+              {
+                error: parseError(error).message,
+              },
+            );
           }
         } else {
-          logger.warn(t("app.api.system.check.config.create.warnings.packageJsonNotFound"));
+          logger.warn(
+            t(
+              "app.api.system.check.config.create.warnings.packageJsonNotFound",
+            ),
+          );
         }
       }
 
@@ -281,7 +342,10 @@ export class ConfigCreateRepository {
         message: messages.join("\n"),
       });
     } catch (error) {
-      logger.error(t("app.api.system.check.config.create.errors.unexpected"), parseError(error));
+      logger.error(
+        t("app.api.system.check.config.create.errors.unexpected"),
+        parseError(error),
+      );
       return fail({
         message: "app.api.system.check.config.create.errors.unexpected",
         messageParams: { error: parseError(error).message },

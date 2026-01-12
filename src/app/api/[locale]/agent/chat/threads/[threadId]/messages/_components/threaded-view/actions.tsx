@@ -106,11 +106,15 @@ export function ThreadedMessageActions({
             onClick={() => onVoteMessage(message.id, userVote === "up" ? 0 : 1)}
             className={cn(
               "flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 transition-all",
-              userVote === "up" ? "text-blue-400" : "text-muted-foreground hover:text-blue-400",
+              userVote === "up"
+                ? "text-blue-400"
+                : "text-muted-foreground hover:text-blue-400",
             )}
             title={t("app.chat.threadedView.actions.upvote")}
           >
-            <ArrowBigUp className={cn("h-4 w-4", userVote === "up" && "fill-current")} />
+            <ArrowBigUp
+              className={cn("h-4 w-4", userVote === "up" && "fill-current")}
+            />
           </Button>
           {voteScore !== 0 && (
             <Span
@@ -126,14 +130,20 @@ export function ThreadedMessageActions({
           <Button
             variant="ghost"
             size="unset"
-            onClick={() => onVoteMessage(message.id, userVote === "down" ? 0 : -1)}
+            onClick={() =>
+              onVoteMessage(message.id, userVote === "down" ? 0 : -1)
+            }
             className={cn(
               "flex items-center gap-1 px-2 py-1 rounded hover:bg-red-500/10 transition-all",
-              userVote === "down" ? "text-red-400" : "text-muted-foreground hover:text-red-400",
+              userVote === "down"
+                ? "text-red-400"
+                : "text-muted-foreground hover:text-red-400",
             )}
             title={t("app.chat.threadedView.actions.downvote")}
           >
-            <ArrowBigDown className={cn("h-4 w-4", userVote === "down" && "fill-current")} />
+            <ArrowBigDown
+              className={cn("h-4 w-4", userVote === "down" && "fill-current")}
+            />
           </Button>
         </Div>
       )}
@@ -144,7 +154,11 @@ export function ThreadedMessageActions({
           variant="ghost"
           size="unset"
           onClick={
-            isTTSLoading ? cancelLoading : isPlaying ? stopAudio : (): void => void playAudio()
+            isTTSLoading
+              ? cancelLoading
+              : isPlaying
+                ? stopAudio
+                : (): void => void playAudio()
           }
           className={cn(
             "flex items-center gap-1 px-2 py-1 rounded transition-all",
@@ -254,7 +268,9 @@ export function ThreadedMessageActions({
             behavior: "smooth",
             block: "center",
           });
-          void navigator.clipboard.writeText(`${window.location.href}#thread-msg-${message.id}`);
+          void navigator.clipboard.writeText(
+            `${window.location.href}#thread-msg-${message.id}`,
+          );
         }}
         className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
         title={t("app.chat.threadedView.actions.copyPermalink")}
@@ -282,7 +298,9 @@ export function ThreadedMessageActions({
           variant="ghost"
           size="unset"
           onClick={(): void => {
-            const element = document.getElementById(`thread-msg-${message.parentId}`);
+            const element = document.getElementById(
+              `thread-msg-${message.parentId}`,
+            );
             element?.scrollIntoView({
               behavior: "smooth",
               block: "center",

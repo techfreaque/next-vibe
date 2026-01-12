@@ -53,7 +53,11 @@ function Sheet({ children, ...props }: SheetRootProps): React.JSX.Element {
 }
 Sheet.displayName = DialogPrimitive.Root.displayName;
 
-function SheetTrigger({ children, asChild, ...props }: SheetTriggerProps): React.JSX.Element {
+function SheetTrigger({
+  children,
+  asChild,
+  ...props
+}: SheetTriggerProps): React.JSX.Element {
   return (
     <DialogPrimitive.Trigger asChild={asChild} {...props}>
       {children}
@@ -62,7 +66,11 @@ function SheetTrigger({ children, asChild, ...props }: SheetTriggerProps): React
 }
 SheetTrigger.displayName = DialogPrimitive.Trigger.displayName;
 
-function SheetClose({ children, asChild, ...props }: SheetCloseProps): React.JSX.Element {
+function SheetClose({
+  children,
+  asChild,
+  ...props
+}: SheetCloseProps): React.JSX.Element {
   return (
     <DialogPrimitive.Close asChild={asChild} {...props}>
       {children}
@@ -97,7 +105,10 @@ function SheetOverlay({
       <StyledView
         {...applyStyleType({
           nativeStyle,
-          className: cn("bg-black/80 flex justify-center items-center p-2", className),
+          className: cn(
+            "bg-black/80 flex justify-center items-center p-2",
+            className,
+          ),
         })}
       >
         {renderChildren()}
@@ -208,7 +219,10 @@ function SheetFooter({
     <View
       {...applyStyleType({
         nativeStyle,
-        className: cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className),
+        className: cn(
+          "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+          className,
+        ),
       })}
       {...props}
     >
@@ -218,7 +232,12 @@ function SheetFooter({
 }
 SheetFooter.displayName = "SheetFooter";
 
-function SheetTitle({ className, style, children, ...props }: SheetTitleProps): React.JSX.Element {
+function SheetTitle({
+  className,
+  style,
+  children,
+  ...props
+}: SheetTitleProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <DialogPrimitive.Title

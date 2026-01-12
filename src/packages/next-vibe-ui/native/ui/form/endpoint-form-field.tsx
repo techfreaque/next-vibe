@@ -9,7 +9,12 @@ import { cn } from "next-vibe/shared/utils";
 import { safeGetRequiredFields } from "next-vibe/shared/utils/zod-required-fields";
 import { AlertCircle, Calendar } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
-import type { ControllerRenderProps, FieldPath, FieldValues, Path } from "react-hook-form";
+import type {
+  ControllerRenderProps,
+  FieldPath,
+  FieldValues,
+  Path,
+} from "react-hook-form";
 import { View } from "react-native";
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
@@ -43,13 +48,30 @@ import { Label } from "../label";
 import { PhoneField } from "../phone-field";
 import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 import { RadioGroup, RadioGroupItem } from "../radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../select";
 import { Span } from "../span";
 import { Switch } from "../switch";
 import { TagsField } from "../tags-field";
 import { Textarea } from "../textarea";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../tooltip";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "./form";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../tooltip";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./form";
 
 // Re-export types for module compatibility with web version
 export type { EndpointFormFieldProps, FormFieldError };
@@ -125,7 +147,10 @@ function getFieldStyleClassName(
         baseContainerClassName,
         "p-4 rounded-lg border border-red-200/60 dark:border-red-800/60 bg-red-50/60 dark:bg-red-950/30",
       ),
-      labelClassName: cn(baseLabelClassName, "text-red-600 dark:text-red-400 font-semibold"),
+      labelClassName: cn(
+        baseLabelClassName,
+        "text-red-600 dark:text-red-400 font-semibold",
+      ),
       inputClassName: cn(
         baseInputClassName,
         "border-red-300 dark:border-red-600 focus-visible:border-red-500 focus-visible:ring-red-500/20",
@@ -172,7 +197,10 @@ function getFieldStyleClassName(
 
       const colors = successVariants[completedColor];
       return {
-        containerClassName: cn(baseContainerClassName, colors.containerClassName),
+        containerClassName: cn(
+          baseContainerClassName,
+          colors.containerClassName,
+        ),
         labelClassName: cn(baseLabelClassName, colors.labelClassName),
         inputClassName: cn(baseInputClassName, colors.inputClassName),
         errorClassName: cn(
@@ -356,7 +384,9 @@ function renderFieldInput<
 
     case "select": {
       // Find the selected option to get the proper label
-      const selectedOption = config.options.find((opt) => opt.value === field.value);
+      const selectedOption = config.options.find(
+        (opt) => opt.value === field.value,
+      );
       const selectedValue = selectedOption
         ? {
             value: String(selectedOption.value),
@@ -375,7 +405,9 @@ function renderFieldInput<
           disabled={disabled || config.disabled}
         >
           <SelectTrigger className={inputClassName}>
-            <SelectValue placeholder={config.placeholder ? t(config.placeholder) : ""} />
+            <SelectValue
+              placeholder={config.placeholder ? t(config.placeholder) : ""}
+            />
           </SelectTrigger>
           <SelectContent>
             {config.options.map((option, index) => (
@@ -420,7 +452,9 @@ function renderFieldInput<
           value={String(field.value || "")}
           className={cn(
             "flex py-2",
-            config.orientation === "horizontal" ? "flex-row gap-6" : "flex-col gap-3",
+            config.orientation === "horizontal"
+              ? "flex-row gap-6"
+              : "flex-col gap-3",
           )}
         >
           {config.options.map((option) => (
@@ -577,7 +611,9 @@ function renderFieldInput<
     }
 
     case "multiselect": {
-      const multiselectValue: string[] = Array.isArray(field.value) ? field.value : [];
+      const multiselectValue: string[] = Array.isArray(field.value)
+        ? field.value
+        : [];
 
       return (
         <Div className="space-y-2">
@@ -590,7 +626,10 @@ function renderFieldInput<
               multiselectValue.length <= config.maxSelections;
 
             return (
-              <Div key={option.value} className="flex flex-row items-center space-x-2">
+              <Div
+                key={option.value}
+                className="flex flex-row items-center space-x-2"
+              >
                 <Checkbox
                   checked={isSelected}
                   disabled={isDisabled || (!isSelected && !canSelect)}
@@ -641,7 +680,9 @@ function renderFieldInput<
           onBlur={field.onBlur}
           disabled={disabled || false}
           className={inputClassName}
-          placeholder={globalT("packages.nextVibeUi.web.common.unknownFieldType")}
+          placeholder={globalT(
+            "packages.nextVibeUi.web.common.unknownFieldType",
+          )}
         />
       );
     }
@@ -672,7 +713,11 @@ export function EndpointFormField<
   style?: React.CSSProperties;
 }): JSX.Element {
   // Extract from endpoint
-  const { fields: endpointFields, scopedTranslation, requestSchema: schema } = endpoint;
+  const {
+    fields: endpointFields,
+    scopedTranslation,
+    requestSchema: schema,
+  } = endpoint;
   const { scopedT } = scopedTranslation;
 
   const { t } = scopedT(locale);
@@ -680,7 +725,9 @@ export function EndpointFormField<
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Auto-infer config from endpoint fields if not provided
-  const config = providedConfig || (endpointFields ? getFieldConfig(endpointFields, name) : null);
+  const config =
+    providedConfig ||
+    (endpointFields ? getFieldConfig(endpointFields, name) : null);
 
   if (!config) {
     // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Developer mistake - missing required prop
@@ -702,7 +749,11 @@ export function EndpointFormField<
       control={control}
       name={name}
       render={({ field, fieldState }) => {
-        const validationState = getFieldValidationState(field.value, fieldState.error, isRequired);
+        const validationState = getFieldValidationState(
+          field.value,
+          fieldState.error,
+          isRequired,
+        );
 
         const styleClassName = getFieldStyleClassName(validationState, theme);
 
@@ -710,9 +761,18 @@ export function EndpointFormField<
         // FormItem uses className for styling via NativeWind (either style OR className, not both)
         void nativeStyle; // Acknowledge nativeStyle is intentionally unused for FormItem
         return (
-          <FormItem className={cn(styleClassName.containerClassName, className)}>
+          <FormItem
+            className={cn(styleClassName.containerClassName, className)}
+          >
             <FormLabel className={styleClassName.labelClassName}>
-              {renderLabel(config, isRequired, theme, styleClassName.labelClassName, t, globalT)}
+              {renderLabel(
+                config,
+                isRequired,
+                theme,
+                styleClassName.labelClassName,
+                t,
+                globalT,
+              )}
             </FormLabel>
 
             <FormControl>

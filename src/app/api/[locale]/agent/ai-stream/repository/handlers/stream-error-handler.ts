@@ -5,7 +5,10 @@
 import type { ReadableStreamDefaultController } from "node:stream/web";
 
 import type { JSONValue } from "ai";
-import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 

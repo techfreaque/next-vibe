@@ -89,7 +89,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt",
-        description: "Bei der Verarbeitung Ihrer Anfrage ist ein Konflikt aufgetreten",
+        description:
+          "Bei der Verarbeitung Ihrer Anfrage ist ein Konflikt aufgetreten",
       },
     },
     success: {
@@ -128,7 +129,8 @@ export const translations: typeof enTranslations = {
     },
     parentId: {
       label: "Übergeordneter Ordner",
-      description: "Ordner zu einem anderen übergeordneten Ordner verschieben (null für Wurzel)",
+      description:
+        "Ordner zu einem anderen übergeordneten Ordner verschieben (null für Wurzel)",
     },
     expanded: {
       label: "Erweitert",
@@ -210,7 +212,8 @@ export const translations: typeof enTranslations = {
       validation: {
         title: "Validierungsfehler",
         description: "Die angegebenen Daten sind ungültig",
-        circularReference: "Ordner kann nicht als eigener übergeordneter Ordner festgelegt werden",
+        circularReference:
+          "Ordner kann nicht als eigener übergeordneter Ordner festgelegt werden",
       },
       unauthorized: {
         title: "Nicht autorisiert",
@@ -218,7 +221,8 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Verboten",
-        description: "Sie haben keine Berechtigung, diesen Ordner zu aktualisieren",
+        description:
+          "Sie haben keine Berechtigung, diesen Ordner zu aktualisieren",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -226,7 +230,8 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Serverfehler",
-        description: "Beim Aktualisieren des Ordners ist ein Fehler aufgetreten",
+        description:
+          "Beim Aktualisieren des Ordners ist ein Fehler aufgetreten",
       },
       network: {
         title: "Netzwerkfehler",

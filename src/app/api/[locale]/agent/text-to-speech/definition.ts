@@ -29,13 +29,22 @@ import { DEFAULT_TTS_VOICE, TtsVoiceOptions } from "./enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["agent", "text-to-speech"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC, UserRole.AI_TOOL_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.CUSTOMER,
+    UserRole.PUBLIC,
+    UserRole.AI_TOOL_OFF,
+  ],
 
   title: "app.api.agent.textToSpeech.post.title",
   description: "app.api.agent.textToSpeech.post.description",
   icon: "volume-2",
   category: "app.api.agent.category",
-  tags: ["app.api.agent.tags.speech", "app.api.agent.tags.tts", "app.api.agent.tags.ai"],
+  tags: [
+    "app.api.agent.tags.speech",
+    "app.api.agent.tags.tts",
+    "app.api.agent.tags.ai",
+  ],
 
   fields: objectField(
     {
@@ -84,39 +93,48 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.textToSpeech.post.errors.validation_failed.title",
-      description: "app.api.agent.textToSpeech.post.errors.validation_failed.description",
+      description:
+        "app.api.agent.textToSpeech.post.errors.validation_failed.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.textToSpeech.post.errors.network_error.title",
-      description: "app.api.agent.textToSpeech.post.errors.network_error.description",
+      description:
+        "app.api.agent.textToSpeech.post.errors.network_error.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.agent.textToSpeech.post.errors.unauthorized.title",
-      description: "app.api.agent.textToSpeech.post.errors.unauthorized.description",
+      description:
+        "app.api.agent.textToSpeech.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.textToSpeech.post.errors.forbidden.title",
-      description: "app.api.agent.textToSpeech.post.errors.forbidden.description",
+      description:
+        "app.api.agent.textToSpeech.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.textToSpeech.post.errors.not_found.title",
-      description: "app.api.agent.textToSpeech.post.errors.not_found.description",
+      description:
+        "app.api.agent.textToSpeech.post.errors.not_found.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.textToSpeech.post.errors.server_error.title",
-      description: "app.api.agent.textToSpeech.post.errors.server_error.description",
+      description:
+        "app.api.agent.textToSpeech.post.errors.server_error.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.agent.textToSpeech.post.errors.unknown_error.title",
-      description: "app.api.agent.textToSpeech.post.errors.unknown_error.description",
+      description:
+        "app.api.agent.textToSpeech.post.errors.unknown_error.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.agent.textToSpeech.post.errors.unsaved_changes.title",
-      description: "app.api.agent.textToSpeech.post.errors.unsaved_changes.description",
+      description:
+        "app.api.agent.textToSpeech.post.errors.unsaved_changes.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.textToSpeech.post.errors.conflict.title",
-      description: "app.api.agent.textToSpeech.post.errors.conflict.description",
+      description:
+        "app.api.agent.textToSpeech.post.errors.conflict.description",
     },
   },
 

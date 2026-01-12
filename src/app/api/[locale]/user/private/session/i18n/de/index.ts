@@ -9,9 +9,11 @@ export const translations: typeof enTranslations = {
   errors: {
     session_not_found: "Sitzung nicht gefunden",
     session_lookup_failed: "Sitzungssuche fehlgeschlagen",
-    expired_sessions_delete_failed: "Löschen abgelaufener Sitzungen fehlgeschlagen",
+    expired_sessions_delete_failed:
+      "Löschen abgelaufener Sitzungen fehlgeschlagen",
     session_creation_failed: "Sitzungserstellung fehlgeschlagen",
-    session_creation_database_error: "Datenbankfehler beim Erstellen der Sitzung",
+    session_creation_database_error:
+      "Datenbankfehler beim Erstellen der Sitzung",
     user_sessions_delete_failed: "Löschen der Benutzersitzungen fehlgeschlagen",
     expired: "Sitzung ist abgelaufen",
   },

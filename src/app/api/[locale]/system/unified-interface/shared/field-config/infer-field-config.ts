@@ -6,7 +6,10 @@
  */
 
 import { FieldDataType, WidgetType } from "../types/enums";
-import { type EndpointFieldStructure, getFieldStructureByPath } from "./endpoint-field-types";
+import {
+  type EndpointFieldStructure,
+  getFieldStructureByPath,
+} from "./endpoint-field-types";
 import type { FieldConfig } from "./field-config-types";
 
 /**

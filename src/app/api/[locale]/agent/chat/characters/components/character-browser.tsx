@@ -61,7 +61,10 @@ export function CharacterListItem({
 
   const allModels = useMemo(() => Object.values(modelOptions), []);
   const bestModel = useMemo(() => {
-    return CharactersRepositoryClient.resolveModelForSelection(character.modelSelection, allModels);
+    return CharactersRepositoryClient.resolveModelForSelection(
+      character.modelSelection,
+      allModels,
+    );
   }, [allModels, character]);
 
   return (
@@ -107,7 +110,9 @@ export function CharacterListItem({
           disabled={isAdded}
         >
           <Plus className="h-3.5 w-3.5 mr-1" />
-          {isAdded ? t("app.api.agent.chat.selector.added") : t("app.api.agent.chat.selector.add")}
+          {isAdded
+            ? t("app.api.agent.chat.selector.added")
+            : t("app.api.agent.chat.selector.add")}
         </Button>
       </Div>
 
@@ -130,7 +135,10 @@ export function CharacterListItem({
               <Span className="truncate">{bestModel.name}</Span>
               <Span className="text-muted-foreground/40">•</Span>
               <Span className="shrink-0">
-                {CharactersRepositoryClient.formatCreditCost(bestModel.creditCost, t)}
+                {CharactersRepositoryClient.formatCreditCost(
+                  bestModel.creditCost,
+                  t,
+                )}
               </Span>
             </>
           )}
@@ -266,7 +274,8 @@ export function CharacterBrowserCore({
     const query = searchQuery.toLowerCase();
     return [...DEFAULT_CHARACTERS].filter(
       (p) =>
-        t(p.name).toLowerCase().includes(query) || t(p.description).toLowerCase().includes(query),
+        t(p.name).toLowerCase().includes(query) ||
+        t(p.description).toLowerCase().includes(query),
     );
   }, [searchQuery, t]);
 
@@ -332,7 +341,9 @@ export function CharacterBrowserCore({
           const needsSeparatorBefore =
             item.category === CharacterCategory.ROLEPLAY ||
             (item.category === CharacterCategory.CONTROVERSIAL &&
-              !categoriesWithCharacters.some((c) => c.category === CharacterCategory.ROLEPLAY));
+              !categoriesWithCharacters.some(
+                (c) => c.category === CharacterCategory.ROLEPLAY,
+              ));
 
           return (
             <Div key={item.category} className="flex flex-col gap-5">
@@ -406,7 +417,9 @@ export function CharacterBrowser({
               className="h-9 gap-1.5 shrink-0"
             >
               <Plus className="h-4 w-4" />
-              <Span className="hidden sm:inline">{t("app.chat.selector.createCustom")}</Span>
+              <Span className="hidden sm:inline">
+                {t("app.chat.selector.createCustom")}
+              </Span>
             </Button>
           )}
         </Div>

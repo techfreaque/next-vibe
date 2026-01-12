@@ -97,7 +97,9 @@ export class ReleaseExecutor {
     options: ReleaseOrchestrationOptions,
     t: TFunction,
   ): string {
-    const baseCommand = t("app.api.system.launchpad.releaseExecutor.baseCommand");
+    const baseCommand = t(
+      "app.api.system.launchpad.releaseExecutor.baseCommand",
+    );
     const flags: string[] = [];
 
     if (options.ciMode) {
@@ -127,10 +129,14 @@ export class ReleaseExecutor {
       const existingState = this.stateManager.loadState(this.logger);
       if (existingState) {
         state = existingState;
-        this.logger.info(t("app.api.system.launchpad.releaseExecutor.state.continuing"));
+        this.logger.info(
+          t("app.api.system.launchpad.releaseExecutor.state.continuing"),
+        );
         this.logger.info(this.stateManager.getStateSummary(state));
       } else {
-        this.logger.info(t("app.api.system.launchpad.releaseExecutor.state.noState"));
+        this.logger.info(
+          t("app.api.system.launchpad.releaseExecutor.state.noState"),
+        );
         state = this.stateManager.initializeState(targets, this.logger);
       }
     } else {
@@ -144,7 +150,9 @@ export class ReleaseExecutor {
     const failedTargets = this.stateManager.getFailedTargets(state);
 
     if (remainingTargets.length === 0 && failedTargets.length === 0) {
-      this.logger.info(t("app.api.system.launchpad.releaseExecutor.state.allCompleted"));
+      this.logger.info(
+        t("app.api.system.launchpad.releaseExecutor.state.allCompleted"),
+      );
       this.stateManager.clearState(this.logger);
       return;
     }
@@ -155,9 +163,12 @@ export class ReleaseExecutor {
         {
           type: "confirm",
           name: "retryFailed",
-          message: t("app.api.system.launchpad.releaseExecutor.prompts.retryFailed", {
-            count: failedTargets.length,
-          }),
+          message: t(
+            "app.api.system.launchpad.releaseExecutor.prompts.retryFailed",
+            {
+              count: failedTargets.length,
+            },
+          ),
           default: true,
         },
       ])) as { retryFailed: boolean };
@@ -174,33 +185,45 @@ export class ReleaseExecutor {
       const target = targetsToProcess[i];
       this.stateManager.updateCurrentIndex(state, i, this.logger);
 
-      this.logger.info(`\n📦 Processing ${i + 1}/${targetsToProcess.length}: ${target.directory}`);
+      this.logger.info(
+        `\n📦 Processing ${i + 1}/${targetsToProcess.length}: ${target.directory}`,
+      );
 
       // Handle skip option
       if (options.allowSkip && !options.ciMode) {
-        const response: TargetActionResponse = await inquirer.prompt<TargetActionResponse>([
-          {
-            type: "list",
-            name: "action",
-            message: t("app.api.system.launchpad.releaseExecutor.prompts.targetAction", {
-              directory: target.directory,
-            }),
-            choices: [
-              {
-                name: t("app.api.system.launchpad.releaseExecutor.prompts.processTarget"),
-                value: "process",
-              },
-              {
-                name: t("app.api.system.launchpad.releaseExecutor.prompts.skipTarget"),
-                value: "skip",
-              },
-              {
-                name: t("app.api.system.launchpad.releaseExecutor.prompts.abortOperation"),
-                value: "abort",
-              },
-            ],
-          },
-        ]);
+        const response: TargetActionResponse =
+          await inquirer.prompt<TargetActionResponse>([
+            {
+              type: "list",
+              name: "action",
+              message: t(
+                "app.api.system.launchpad.releaseExecutor.prompts.targetAction",
+                {
+                  directory: target.directory,
+                },
+              ),
+              choices: [
+                {
+                  name: t(
+                    "app.api.system.launchpad.releaseExecutor.prompts.processTarget",
+                  ),
+                  value: "process",
+                },
+                {
+                  name: t(
+                    "app.api.system.launchpad.releaseExecutor.prompts.skipTarget",
+                  ),
+                  value: "skip",
+                },
+                {
+                  name: t(
+                    "app.api.system.launchpad.releaseExecutor.prompts.abortOperation",
+                  ),
+                  value: "abort",
+                },
+              ],
+            },
+          ]);
         const { action } = response;
 
         if (action === "skip") {
@@ -214,7 +237,9 @@ export class ReleaseExecutor {
         }
 
         if (action === "abort") {
-          this.logger.info(t("app.api.system.launchpad.releaseExecutor.actions.aborted"));
+          this.logger.info(
+            t("app.api.system.launchpad.releaseExecutor.actions.aborted"),
+          );
           return;
         }
       }
@@ -233,19 +258,25 @@ export class ReleaseExecutor {
               {
                 type: "confirm",
                 name: "continue",
-                message: t("app.api.system.launchpad.releaseExecutor.prompts.continueAfterFailure"),
+                message: t(
+                  "app.api.system.launchpad.releaseExecutor.prompts.continueAfterFailure",
+                ),
                 default: true,
               },
             ]);
           const continueAfterFailure = failureResponse.continue;
 
           if (!continueAfterFailure) {
-            this.logger.info(t("app.api.system.launchpad.releaseExecutor.actions.stopped"));
+            this.logger.info(
+              t("app.api.system.launchpad.releaseExecutor.actions.stopped"),
+            );
             return;
           }
         } else {
           // In CI mode, continue processing other targets
-          this.logger.info(t("app.api.system.launchpad.releaseExecutor.actions.continuing"));
+          this.logger.info(
+            t("app.api.system.launchpad.releaseExecutor.actions.continuing"),
+          );
         }
       }
     }
@@ -253,11 +284,15 @@ export class ReleaseExecutor {
     // Final summary
     const finalState = this.stateManager.loadState(this.logger);
     if (finalState) {
-      this.logger.info(`\n📊 ${t("app.api.system.launchpad.releaseExecutor.summary.title")}`);
+      this.logger.info(
+        `\n📊 ${t("app.api.system.launchpad.releaseExecutor.summary.title")}`,
+      );
       this.logger.info(this.stateManager.getStateSummary(finalState));
 
       if (finalState.failed.length === 0) {
-        this.logger.info(t("app.api.system.launchpad.releaseExecutor.summary.allSuccess"));
+        this.logger.info(
+          t("app.api.system.launchpad.releaseExecutor.summary.allSuccess"),
+        );
         this.stateManager.clearState(this.logger);
       } else {
         this.logger.info(
@@ -273,7 +308,9 @@ export class ReleaseExecutor {
    * Execute force update for all targets
    */
   executeForceUpdateAll(targets: ReleaseTarget[], t: TFunction): void {
-    this.logger.info(`🔄 ${t("app.api.system.launchpad.releaseExecutor.forceUpdate.starting")}`);
+    this.logger.info(
+      `🔄 ${t("app.api.system.launchpad.releaseExecutor.forceUpdate.starting")}`,
+    );
 
     for (const target of targets) {
       const fullPath = join(this.rootDir, target.directory);
@@ -283,11 +320,14 @@ export class ReleaseExecutor {
 
       try {
         // Use release tool with force update
-        execSync(t("app.api.system.launchpad.releaseExecutor.forceUpdateCommand"), {
-          cwd: fullPath,
-          stdio: "inherit",
-          env: { ...process.env },
-        });
+        execSync(
+          t("app.api.system.launchpad.releaseExecutor.forceUpdateCommand"),
+          {
+            cwd: fullPath,
+            stdio: "inherit",
+            env: { ...process.env },
+          },
+        );
 
         this.logger.info(
           `✅ ${t("app.api.system.launchpad.releaseExecutor.forceUpdate.updated", { directory: target.directory })}`,
@@ -301,7 +341,9 @@ export class ReleaseExecutor {
       }
     }
 
-    this.logger.info(t("app.api.system.launchpad.releaseExecutor.forceUpdate.completed"));
+    this.logger.info(
+      t("app.api.system.launchpad.releaseExecutor.forceUpdate.completed"),
+    );
   }
 
   /**
@@ -333,7 +375,9 @@ export class ReleaseExecutor {
    * Execute weekly update - updates all packages, creates branch, runs Snyk, creates PR
    */
   async executeWeeklyUpdate(branchName: string, t: TFunction): Promise<void> {
-    this.logger.info(`📅 ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.starting")}`);
+    this.logger.info(
+      `📅 ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.starting")}`,
+    );
     this.logger.info(
       t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.targetBranch", {
         branchName,
@@ -385,7 +429,9 @@ export class ReleaseExecutor {
       this.commitWeeklyUpdate();
 
       // 6. Push branch
-      this.logger.info(`📤 ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.pushing")}`);
+      this.logger.info(
+        `📤 ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.pushing")}`,
+      );
       execSync(
         t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.gitPush", {
           branchName,
@@ -397,10 +443,14 @@ export class ReleaseExecutor {
       );
 
       // 7. Create or update PR
-      this.logger.info(t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.creatingPR"));
+      this.logger.info(
+        t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.creatingPR"),
+      );
       await this.createOrUpdatePR(branchName);
 
-      this.logger.info(t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.completed"));
+      this.logger.info(
+        t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.completed"),
+      );
     } catch (error) {
       this.logger.error(
         `❌ ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.failed")}:`,
@@ -421,15 +471,20 @@ export class ReleaseExecutor {
     const snykOrgKey = process.env.SNYK_ORG_KEY;
 
     if (!snykToken || !snykOrgKey) {
-      this.logger.info(`⚠️  ${t("app.api.system.launchpad.releaseExecutor.snyk.noCredentials")}`);
+      this.logger.info(
+        `⚠️  ${t("app.api.system.launchpad.releaseExecutor.snyk.noCredentials")}`,
+      );
       return;
     }
 
     // Find all package.json files
-    const packageFiles = execSync(t("app.api.system.launchpad.releaseExecutor.git.findCommand"), {
-      cwd: this.rootDir,
-      encoding: "utf8",
-    })
+    const packageFiles = execSync(
+      t("app.api.system.launchpad.releaseExecutor.git.findCommand"),
+      {
+        cwd: this.rootDir,
+        encoding: "utf8",
+      },
+    )
       .trim()
       .split("\n")
       .filter(Boolean);
@@ -439,7 +494,9 @@ export class ReleaseExecutor {
 
       try {
         // Get package name
-        const packageJson = JSON.parse(readFileSync(join(packageDir, "package.json"), "utf8")) as {
+        const packageJson = JSON.parse(
+          readFileSync(join(packageDir, "package.json"), "utf8"),
+        ) as {
           name?: string;
         };
         const packageName = packageJson.name || "unknown";
@@ -498,7 +555,9 @@ This is an automated update. Please review changes before merging.`;
     const { t } = simpleT("en-GLOBAL");
     const githubToken = process.env.GITHUB_TOKEN;
     if (!githubToken) {
-      this.logger.info(`⚠️  ${t("app.api.system.launchpad.releaseExecutor.github.noToken")}`);
+      this.logger.info(
+        `⚠️  ${t("app.api.system.launchpad.releaseExecutor.github.noToken")}`,
+      );
       return;
     }
 
@@ -531,10 +590,18 @@ Check the [Snyk dashboard](https://app.snyk.io) for security vulnerabilities bef
       // Try to create PR using GitHub API via curl
       const repoInfo = this.getRepoInfo();
       if (repoInfo) {
-        await this.createPRWithAPI(repoInfo, branchName, title, body, githubToken);
+        await this.createPRWithAPI(
+          repoInfo,
+          branchName,
+          title,
+          body,
+          githubToken,
+        );
       }
     } catch (error) {
-      this.logger.info(`⚠️  ${t("app.api.system.launchpad.releaseExecutor.github.prFailed")}`);
+      this.logger.info(
+        `⚠️  ${t("app.api.system.launchpad.releaseExecutor.github.prFailed")}`,
+      );
       this.logger.error(
         t("app.api.system.launchpad.releaseExecutor.github.prError"),
         parseError(error),
@@ -590,7 +657,9 @@ Check the [Snyk dashboard](https://app.snyk.io) for security vulnerabilities bef
 
       curl.on("close", (code: number | null) => {
         if (code === 0) {
-          this.logger.info(`✅ ${t("app.api.system.launchpad.releaseExecutor.github.prSuccess")}`);
+          this.logger.info(
+            `✅ ${t("app.api.system.launchpad.releaseExecutor.github.prSuccess")}`,
+          );
           resolve();
         } else {
           reject(new Error(`curl exited with code ${code}`));

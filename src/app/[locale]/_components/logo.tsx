@@ -41,7 +41,10 @@ export function Logo({
           fetchPriority="high"
           src={`${platform.isReactNative ? envClient.NEXT_PUBLIC_APP_URL : ""}/images/unbottled-icon-white.png`}
           alt={t("config.appName")}
-          className={cn("hidden dark:block h-full w-auto object-contain", className)}
+          className={cn(
+            "hidden dark:block h-full w-auto object-contain",
+            className,
+          )}
           width={32}
           height={32}
           priority
@@ -50,7 +53,10 @@ export function Logo({
           fetchPriority="high"
           src={`${platform.isReactNative ? envClient.NEXT_PUBLIC_APP_URL : ""}/images/unbottled-icon.png`}
           alt={t("config.appName")}
-          className={cn("hidden light:block h-full w-auto object-contain", className)}
+          className={cn(
+            "hidden light:block h-full w-auto object-contain",
+            className,
+          )}
           width={32}
           height={32}
           priority

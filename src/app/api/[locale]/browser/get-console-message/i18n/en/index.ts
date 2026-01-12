@@ -7,7 +7,8 @@ export const translations = {
     fields: {
       msgid: {
         label: "Message ID",
-        description: "The msgid of a console message from the listed console messages",
+        description:
+          "The msgid of a console message from the listed console messages",
         placeholder: "Enter message ID",
       },
     },
@@ -25,7 +26,8 @@ export const translations = {
     },
     network: {
       title: "Network Error",
-      description: "A network error occurred while retrieving the console message",
+      description:
+        "A network error occurred while retrieving the console message",
     },
     unauthorized: {
       title: "Unauthorized",
@@ -41,11 +43,13 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred while retrieving the console message",
+      description:
+        "An internal server error occurred while retrieving the console message",
     },
     unknown: {
       title: "Unknown Error",
-      description: "An unknown error occurred while retrieving the console message",
+      description:
+        "An unknown error occurred while retrieving the console message",
     },
     unsavedChanges: {
       title: "Unsaved Changes",

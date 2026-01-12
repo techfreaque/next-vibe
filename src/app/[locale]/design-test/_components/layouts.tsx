@@ -15,7 +15,11 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe-ui/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "next-vibe-ui/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "next-vibe-ui/ui/collapsible";
 import { Div } from "next-vibe-ui/ui/div";
 import { Section } from "next-vibe-ui/ui/section";
 import { Separator } from "next-vibe-ui/ui/separator";

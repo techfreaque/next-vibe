@@ -19,7 +19,9 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class StatWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.STAT> {
+export class StatWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.STAT
+> {
   readonly widgetType = WidgetType.STAT;
 
   /**
@@ -44,7 +46,13 @@ export class StatWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.STA
   render(props: CLIWidgetProps<typeof WidgetType.STAT, string>): string {
     const { field, value, context } = props;
     const indent = this.createIndent(context.depth, context);
-    const { label: labelKey, format, variant = "default", trend, trendValue } = field.ui;
+    const {
+      label: labelKey,
+      format,
+      variant = "default",
+      trend,
+      trendValue,
+    } = field.ui;
 
     // Translate label from UI config
     const label = labelKey ? context.t(labelKey) : "—";
@@ -63,15 +71,21 @@ export class StatWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.STA
     // Apply variant color styling
     const color = getStatVariantColor(variant);
     const styledValue =
-      color !== "default" ? this.styleText(formattedValue, color, context) : formattedValue;
+      color !== "default"
+        ? this.styleText(formattedValue, color, context)
+        : formattedValue;
 
     // Build result with label and value
-    const parts: string[] = [this.styleText(label, "dim", context), styledValue];
+    const parts: string[] = [
+      this.styleText(label, "dim", context),
+      styledValue,
+    ];
 
     // Add trend indicator if configured
     if (trend && trendValue !== undefined) {
       const indicator = getTrendIndicator(trend, context.options.useEmojis);
-      const trendColor = trend === "up" ? "green" : trend === "down" ? "red" : "dim";
+      const trendColor =
+        trend === "up" ? "green" : trend === "down" ? "red" : "dim";
       const trendText = `${indicator} ${trendValue > 0 ? "+" : ""}${trendValue}%`;
       const styledTrend = this.styleText(trendText, trendColor, context);
       parts.push(styledTrend);

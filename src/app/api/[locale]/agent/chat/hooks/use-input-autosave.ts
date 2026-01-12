@@ -39,7 +39,10 @@ export function getDraftKey(
 /**
  * Load a draft from localStorage
  */
-export async function loadDraft(storageKey: string, logger: EndpointLogger): Promise<string> {
+export async function loadDraft(
+  storageKey: string,
+  logger: EndpointLogger,
+): Promise<string> {
   try {
     const savedDraft = await storage.getItem(storageKey);
     if (savedDraft) {
@@ -95,7 +98,10 @@ export async function saveDraft(
 /**
  * Clear a draft from localStorage
  */
-export async function clearDraft(storageKey: string, logger: EndpointLogger): Promise<void> {
+export async function clearDraft(
+  storageKey: string,
+  logger: EndpointLogger,
+): Promise<void> {
   try {
     await storage.removeItem(storageKey);
     await clearDraftAttachments(storageKey, logger);

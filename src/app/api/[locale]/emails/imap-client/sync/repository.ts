@@ -7,7 +7,11 @@ import "server-only";
 
 import { eq, inArray } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -57,7 +61,10 @@ export class ImapSyncRepository {
         }
       } else {
         // Sync all enabled accounts
-        accountsToSync = await db.select().from(imapAccounts).where(eq(imapAccounts.enabled, true));
+        accountsToSync = await db
+          .select()
+          .from(imapAccounts)
+          .where(eq(imapAccounts.enabled, true));
       }
 
       if (accountsToSync.length === 0) {
@@ -102,15 +109,24 @@ export class ImapSyncRepository {
             })
             .where(eq(imapAccounts.id, account.id));
 
-          const syncResult = await imapSyncRepository.syncAccount({ account }, logger);
+          const syncResult = await imapSyncRepository.syncAccount(
+            { account },
+            logger,
+          );
 
           if (syncResult.success) {
-            results.accountsProcessed += syncResult.data.result.results.accountsProcessed;
-            results.foldersProcessed += syncResult.data.result.results.foldersProcessed;
-            results.messagesProcessed += syncResult.data.result.results.messagesProcessed;
-            results.messagesAdded += syncResult.data.result.results.messagesAdded;
-            results.messagesUpdated += syncResult.data.result.results.messagesUpdated;
-            results.messagesDeleted += syncResult.data.result.results.messagesDeleted;
+            results.accountsProcessed +=
+              syncResult.data.result.results.accountsProcessed;
+            results.foldersProcessed +=
+              syncResult.data.result.results.foldersProcessed;
+            results.messagesProcessed +=
+              syncResult.data.result.results.messagesProcessed;
+            results.messagesAdded +=
+              syncResult.data.result.results.messagesAdded;
+            results.messagesUpdated +=
+              syncResult.data.result.results.messagesUpdated;
+            results.messagesDeleted +=
+              syncResult.data.result.results.messagesDeleted;
 
             // Convert error objects to simple error format
             // Note: errors might be in different format, handle gracefully

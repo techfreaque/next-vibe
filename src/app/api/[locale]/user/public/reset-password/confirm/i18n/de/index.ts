@@ -10,13 +10,15 @@ export const translations: typeof enTranslations = {
     previewText:
       "Ihr Passwort wurde erfolgreich zurückgesetzt. Sie können sich jetzt anmelden und mit 38 KI-Modellen chatten.",
     greeting: "Hallo,",
-    confirmationMessage: "Ihr {{appName}}-Passwort wurde erfolgreich zurückgesetzt.",
+    confirmationMessage:
+      "Ihr {{appName}}-Passwort wurde erfolgreich zurückgesetzt.",
     successMessage:
       "Ihr Passwort-Reset ist abgeschlossen! Sie können sich jetzt mit Ihrem neuen Passwort in Ihr Konto einloggen und weiter unzensierte KI-Gespräche führen.",
     loginInstructions:
       "Sie können sich jetzt mit Ihrem neuen Passwort anmelden und auf alle 38 KI-Modelle zugreifen.",
     loginButton: "Bei {{appName}} anmelden",
-    securityInfo: "Diese Passwortänderung wurde von {{ipAddress}} am {{resetTime}} abgeschlossen.",
+    securityInfo:
+      "Diese Passwortänderung wurde von {{ipAddress}} am {{resetTime}} abgeschlossen.",
     securityWarning:
       "Wenn Sie diese Änderung nicht vorgenommen haben, könnte Ihr Konto kompromittiert sein. Bitte kontaktieren Sie sofort unser Support-Team.",
     securityTip:
@@ -30,7 +32,8 @@ export const translations: typeof enTranslations = {
     bestPractice3: "Teilen Sie Ihr Passwort niemals mit anderen",
     bestPractice4: "Aktualisieren Sie Ihr Passwort regelmäßig",
     signoff: "Bleiben Sie sicher,\nDas {{appName}} Team",
-    footer: "Dies ist eine automatische Sicherheitsbenachrichtigung von {{appName}}",
+    footer:
+      "Dies ist eine automatische Sicherheitsbenachrichtigung von {{appName}}",
   },
   groups: {
     verification: {
@@ -102,7 +105,8 @@ export const translations: typeof enTranslations = {
     title: "Fehler beim Zurücksetzen des Passworts",
     validation: {
       title: "Validierungsfehler",
-      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description:
+        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
       passwordsDoNotMatch: "Passwörter stimmen nicht überein",
     },
     unauthorized: {
@@ -135,7 +139,8 @@ export const translations: typeof enTranslations = {
     },
     conflict: {
       title: "Konflikt",
-      description: "Beim Verarbeiten Ihrer Anfrage ist ein Konflikt aufgetreten",
+      description:
+        "Beim Verarbeiten Ihrer Anfrage ist ein Konflikt aufgetreten",
     },
   },
   success: {

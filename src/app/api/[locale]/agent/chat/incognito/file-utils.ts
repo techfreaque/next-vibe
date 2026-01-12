@@ -39,7 +39,9 @@ const ALLOWED_MIME_TYPES = [
  * Validate file type
  */
 export function isAllowedFileType(mimeType: string): boolean {
-  return ALLOWED_MIME_TYPES.includes(mimeType as (typeof ALLOWED_MIME_TYPES)[number]);
+  return ALLOWED_MIME_TYPES.includes(
+    mimeType as (typeof ALLOWED_MIME_TYPES)[number],
+  );
 }
 
 /**
@@ -106,7 +108,11 @@ export function base64ToBlobUrl(base64: string, mimeType: string): string {
 /**
  * Convert base64 string to File object
  */
-export function base64ToFile(base64: string, filename: string, mimeType: string): File {
+export function base64ToFile(
+  base64: string,
+  filename: string,
+  mimeType: string,
+): File {
   const byteString = atob(base64);
   const arrayBuffer = new ArrayBuffer(byteString.length);
   const uint8Array = new Uint8Array(arrayBuffer);
@@ -122,7 +128,9 @@ export function base64ToFile(base64: string, filename: string, mimeType: string)
 /**
  * Convert incognito attachments back to File objects
  */
-export function convertIncognitoAttachmentsToFiles(attachments: IncognitoAttachment[]): File[] {
+export function convertIncognitoAttachmentsToFiles(
+  attachments: IncognitoAttachment[],
+): File[] {
   return attachments
     .filter((att) => att.data)
     .map((att) => base64ToFile(att.data, att.filename, att.mimeType));

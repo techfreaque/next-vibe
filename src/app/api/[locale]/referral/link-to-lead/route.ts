@@ -9,7 +9,11 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: async ({ data, user, logger }) => {
-      return await ReferralRepository.linkReferralToLead(user.leadId, data.referralCode, logger);
+      return await ReferralRepository.linkReferralToLead(
+        user.leadId,
+        data.referralCode,
+        logger,
+      );
     },
   },
 });

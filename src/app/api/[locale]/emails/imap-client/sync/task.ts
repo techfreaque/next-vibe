@@ -7,7 +7,11 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 
@@ -79,7 +83,10 @@ async function executeImapSync(
 
   try {
     // Use the repository to execute the IMAP sync task
-    const syncResult = await imapSyncTaskRepository.executeImapSync({ config }, logger);
+    const syncResult = await imapSyncTaskRepository.executeImapSync(
+      { config },
+      logger,
+    );
 
     if (syncResult.success && syncResult.data) {
       logger.info("tasks.imap_sync.completed", syncResult.data.result.summary);
@@ -94,7 +101,10 @@ async function executeImapSync(
     });
   } catch (error) {
     logger.error("tasks.imap_sync.failed", {
-      error: error instanceof Error ? error.message : "tasks.imap_sync.unknown_error",
+      error:
+        error instanceof Error
+          ? error.message
+          : "tasks.imap_sync.unknown_error",
     });
 
     return fail({

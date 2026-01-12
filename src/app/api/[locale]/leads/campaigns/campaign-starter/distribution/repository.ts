@@ -7,7 +7,11 @@ import "server-only";
 
 import { and, eq, gte, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -35,18 +39,23 @@ export class DistributionRepository {
     try {
       const { config, cronSchedule } = data;
 
-      const totalEnabledHours = config.enabledHours.end - config.enabledHours.start + 1;
+      const totalEnabledHours =
+        config.enabledHours.end - config.enabledHours.start + 1;
       const enabledDaysPerWeek = config.enabledDays.length;
 
       // Get cron frequency from schedule
-      const cronFrequencyMinutes = getCronFrequencyMinutes(cronSchedule, logger);
+      const cronFrequencyMinutes = getCronFrequencyMinutes(
+        cronSchedule,
+        logger,
+      );
 
       // Calculate runs per day for the current enabled days
       const totalEnabledMinutesPerDay = totalEnabledHours * 60;
       const runsPerDay = totalEnabledMinutesPerDay / cronFrequencyMinutes;
 
       // Calculate total runs per week
-      const totalEnabledMinutesPerWeek = totalEnabledMinutesPerDay * enabledDaysPerWeek;
+      const totalEnabledMinutesPerWeek =
+        totalEnabledMinutesPerDay * enabledDaysPerWeek;
       const runsPerWeek = totalEnabledMinutesPerWeek / cronFrequencyMinutes;
 
       const result: DistributionCalculationOutputType = {
@@ -62,7 +71,8 @@ export class DistributionRepository {
     } catch (error) {
       logger.error("Distribution calculation failed", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.campaigns.common.error.server.title" as const,
+        message:
+          "app.api.leads.leadsErrors.campaigns.common.error.server.title" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -73,7 +83,13 @@ export class DistributionRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<LocaleProcessingInfoOutputType>> {
     try {
-      const { locale: targetLocale, weeklyQuota, config, distribution, now } = data;
+      const {
+        locale: targetLocale,
+        weeklyQuota,
+        config,
+        distribution,
+        now,
+      } = data;
 
       const currentHour = now.getUTCHours();
 
@@ -90,17 +106,26 @@ export class DistributionRepository {
         (config.enabledHours.end - config.enabledHours.start + 1) * 60;
 
       // Calculate target leads processed by this time
-      const progressThroughDay = Math.min(1, minutesIntoEnabledPeriod / totalEnabledMinutesInDay);
-      const targetLeadsProcessedByNow = Math.floor(dailyQuota * progressThroughDay);
-
-      // Count how many leads we've already processed today for this locale
-      const processedCount = await DistributionRepository.getProcessedLeadsToday(
-        targetLocale as CountryLanguage,
-        now,
+      const progressThroughDay = Math.min(
+        1,
+        minutesIntoEnabledPeriod / totalEnabledMinutesInDay,
+      );
+      const targetLeadsProcessedByNow = Math.floor(
+        dailyQuota * progressThroughDay,
       );
 
+      // Count how many leads we've already processed today for this locale
+      const processedCount =
+        await DistributionRepository.getProcessedLeadsToday(
+          targetLocale as CountryLanguage,
+          now,
+        );
+
       // Calculate how many more leads we need to process to catch up
-      let rawLeadsPerRun = Math.max(0, targetLeadsProcessedByNow - processedCount);
+      let rawLeadsPerRun = Math.max(
+        0,
+        targetLeadsProcessedByNow - processedCount,
+      );
 
       // For development: if we haven't processed any leads yet and it's early in the day,
       // process at least 1 lead to get things started
@@ -131,7 +156,8 @@ export class DistributionRepository {
     } catch (error) {
       logger.error("Locale quota calculation failed", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.campaigns.common.error.server.title" as const,
+        message:
+          "app.api.leads.leadsErrors.campaigns.common.error.server.title" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -140,7 +166,10 @@ export class DistributionRepository {
   /**
    * Count how many leads were already processed today for a locale
    */
-  private static async getProcessedLeadsToday(locale: CountryLanguage, now: Date): Promise<number> {
+  private static async getProcessedLeadsToday(
+    locale: CountryLanguage,
+    now: Date,
+  ): Promise<number> {
     const startOfDay = new Date(now);
     startOfDay.setUTCHours(0, 0, 0, 0);
     const languageCode = getLanguageFromLocale(locale);
@@ -149,7 +178,12 @@ export class DistributionRepository {
     const alreadyProcessedToday = await db
       .select({ count: sql<number>`count(*)` })
       .from(leads)
-      .where(and(eq(leads.language, languageCode), gte(leads.campaignStartedAt, startOfDay)));
+      .where(
+        and(
+          eq(leads.language, languageCode),
+          gte(leads.campaignStartedAt, startOfDay),
+        ),
+      );
 
     return Number(alreadyProcessedToday[0]?.count || 0);
   }

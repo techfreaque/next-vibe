@@ -91,12 +91,15 @@ export class ToolCallHandler {
       currentParentId = newParentId;
       // currentDepth stays the same - ASSISTANT message is at the same depth
 
-      logger.info("[AI Stream] Creating placeholder ASSISTANT message for tool-call parent chain", {
-        messageId: currentAssistantMessageId,
-        reason: "Tool call without preceding text/reasoning",
-        parentId: params.currentParentId,
-        depth: newDepth,
-      });
+      logger.info(
+        "[AI Stream] Creating placeholder ASSISTANT message for tool-call parent chain",
+        {
+          messageId: currentAssistantMessageId,
+          reason: "Tool call without preceding text/reasoning",
+          parentId: params.currentParentId,
+          depth: newDepth,
+        },
+      );
 
       // CRITICAL FIX: Create the ASSISTANT message in the database immediately
       // This prevents foreign key errors when TOOL messages try to reference it as parent_id
@@ -114,10 +117,13 @@ export class ToolCallHandler {
           logger,
         });
 
-        logger.info("[AI Stream] Created placeholder ASSISTANT message in database", {
-          messageId: currentAssistantMessageId,
-          threadId,
-        });
+        logger.info(
+          "[AI Stream] Created placeholder ASSISTANT message in database",
+          {
+            messageId: currentAssistantMessageId,
+            threadId,
+          },
+        );
       }
 
       // CRITICAL FIX: Emit MESSAGE_CREATED event for placeholder ASSISTANT messages
@@ -134,13 +140,18 @@ export class ToolCallHandler {
         model,
         character,
       });
-      controller.enqueue(encoder.encode(formatSSEEvent(placeholderMessageEvent)));
+      controller.enqueue(
+        encoder.encode(formatSSEEvent(placeholderMessageEvent)),
+      );
 
-      logger.info("[AI Stream] MESSAGE_CREATED event sent for placeholder ASSISTANT", {
-        messageId: currentAssistantMessageId,
-        parentId: params.currentParentId,
-        depth: currentDepth,
-      });
+      logger.info(
+        "[AI Stream] MESSAGE_CREATED event sent for placeholder ASSISTANT",
+        {
+          messageId: currentAssistantMessageId,
+          parentId: params.currentParentId,
+          depth: currentDepth,
+        },
+      );
     }
 
     let newAssistantContent = currentAssistantContent;
@@ -162,9 +173,12 @@ export class ToolCallHandler {
 
         _newIsInReasoningBlock = false;
 
-        logger.info("[AI Stream] ⏱️ Reasoning interrupted by tool call → </think>", {
-          messageId: currentAssistantMessageId,
-        });
+        logger.info(
+          "[AI Stream] ⏱️ Reasoning interrupted by tool call → </think>",
+          {
+            messageId: currentAssistantMessageId,
+          },
+        );
       }
 
       // Update ASSISTANT message in database with accumulated content

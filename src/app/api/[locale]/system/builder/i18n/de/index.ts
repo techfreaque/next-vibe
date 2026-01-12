@@ -64,14 +64,19 @@ export const translations: typeof enTranslations = {
     emptyConfig: "Leere Konfiguration - keine Build-Schritte definiert",
   },
   warnings: {
-    outputIsDirectory: "Ausgabepfad sollte eine Datei sein, kein Verzeichnis: {{path}}",
+    outputIsDirectory:
+      "Ausgabepfad sollte eine Datei sein, kein Verzeichnis: {{path}}",
     sourceNotFound: "Quelldatei nicht gefunden: {{path}}",
   },
   suggestions: {
-    checkFilePaths: "Überprüfen Sie, ob alle Dateipfade korrekt sind und die Dateien existieren",
-    runFromProjectRoot: "Stellen Sie sicher, dass Sie vom Projektstammverzeichnis aus ausführen",
-    checkPermissions: "Überprüfen Sie die Dateiberechtigungen für Ein- und Ausgabeverzeichnisse",
-    checkDependencies: "Einige Abhängigkeiten könnten fehlen - überprüfen Sie die Imports",
+    checkFilePaths:
+      "Überprüfen Sie, ob alle Dateipfade korrekt sind und die Dateien existieren",
+    runFromProjectRoot:
+      "Stellen Sie sicher, dass Sie vom Projektstammverzeichnis aus ausführen",
+    checkPermissions:
+      "Überprüfen Sie die Dateiberechtigungen für Ein- und Ausgabeverzeichnisse",
+    checkDependencies:
+      "Einige Abhängigkeiten könnten fehlen - überprüfen Sie die Imports",
     runInstall:
       "Versuchen Sie 'bun install' auszuführen, um sicherzustellen, dass alle Abhängigkeiten verfügbar sind",
     increaseMemory:
@@ -82,7 +87,8 @@ export const translations: typeof enTranslations = {
     increaseTimeout: "Erhöhen Sie den Timeout-Wert für die Build-Operation",
     checkNetworkConnection: "Überprüfen Sie Ihre Netzwerkverbindung",
     checkDiskSpace: "Überprüfen Sie den verfügbaren Speicherplatz",
-    cleanBuildCache: "Versuchen Sie, den Build-Cache und temporäre Dateien zu löschen",
+    cleanBuildCache:
+      "Versuchen Sie, den Build-Cache und temporäre Dateien zu löschen",
   },
   messages: {
     buildStart: "Build wird gestartet...",
@@ -132,11 +138,13 @@ export const translations: typeof enTranslations = {
     watchModeError: "Watch-Modus-Fehler: {{error}}",
     watchModeStopped: "Watch-Modus gestoppt",
     parallelCompiling: "Kompiliere {{count}} Dateien parallel...",
-    parallelComplete: "Parallele Kompilierung abgeschlossen: {{count}} Dateien in {{duration}}ms",
+    parallelComplete:
+      "Parallele Kompilierung abgeschlossen: {{count}} Dateien in {{duration}}ms",
     cacheHit: "Cache-Treffer: {{file}} (übersprungen)",
     cacheMiss: "Cache-Fehler: {{file}} (baue neu)",
     cacheCleared: "Build-Cache geleert",
-    cacheStats: "Cache: {{hits}} Treffer, {{misses}} Fehlschläge ({{hitRate}}% Trefferrate)",
+    cacheStats:
+      "Cache: {{hits}} Treffer, {{misses}} Fehlschläge ({{hitRate}}% Trefferrate)",
     generatingReport: "Generiere Build-Bericht...",
     reportGenerated: "Build-Bericht generiert: {{path}}",
     progress: "[{{current}}/{{total}}] {{step}}",
@@ -150,7 +158,8 @@ export const translations: typeof enTranslations = {
       "Umfassendes Build-Tool für CLI-Bundling, Vite-Builds, React/Tailwind und npm-Distribution",
     form: {
       title: "Build-Konfiguration",
-      description: "Build-Einstellungen konfigurieren oder build.config.ts Datei verwenden",
+      description:
+        "Build-Einstellungen konfigurieren oder build.config.ts Datei verwenden",
     },
     fields: {
       configPath: {
@@ -160,11 +169,13 @@ export const translations: typeof enTranslations = {
       },
       configObject: {
         title: "Build-Optionen",
-        description: "Inline-Build-Konfiguration (überschreibt Konfigurationsdatei)",
+        description:
+          "Inline-Build-Konfiguration (überschreibt Konfigurationsdatei)",
       },
       profile: {
         title: "Build-Profil",
-        description: "Entwicklung (schnell, Debug) oder Produktion (optimiert, minifiziert)",
+        description:
+          "Entwicklung (schnell, Debug) oder Produktion (optimiert, minifiziert)",
       },
       dryRun: {
         title: "Testlauf",
@@ -172,11 +183,13 @@ export const translations: typeof enTranslations = {
       },
       verbose: {
         title: "Ausführliche Ausgabe",
-        description: "Detaillierte Build-Informationen und Fortschritt anzeigen",
+        description:
+          "Detaillierte Build-Informationen und Fortschritt anzeigen",
       },
       analyze: {
         title: "Bundle-Analyse",
-        description: "Bundle-Größen analysieren und Optimierungsmöglichkeiten identifizieren",
+        description:
+          "Bundle-Größen analysieren und Optimierungsmöglichkeiten identifizieren",
       },
       watch: {
         title: "Watch-Modus",
@@ -184,11 +197,13 @@ export const translations: typeof enTranslations = {
       },
       parallel: {
         title: "Paralleler Build",
-        description: "Mehrere Dateien parallel kompilieren für schnellere Builds",
+        description:
+          "Mehrere Dateien parallel kompilieren für schnellere Builds",
       },
       cache: {
         title: "Build-Cache",
-        description: "Build-Artefakte cachen, um unveränderte Dateien zu überspringen",
+        description:
+          "Build-Artefakte cachen, um unveränderte Dateien zu überspringen",
       },
       report: {
         title: "Bericht generieren",
@@ -196,16 +211,19 @@ export const translations: typeof enTranslations = {
       },
       minify: {
         title: "Minifizieren",
-        description: "Ausgabe-Bundle minifizieren (überschreibt Profileinstellung)",
+        description:
+          "Ausgabe-Bundle minifizieren (überschreibt Profileinstellung)",
       },
       foldersToClean: {
         title: "Zu bereinigende Ordner",
-        description: "Ordner, die vor dem Build gelöscht werden (z.B. dist, build)",
+        description:
+          "Ordner, die vor dem Build gelöscht werden (z.B. dist, build)",
         placeholder: "dist, build, .cache",
       },
       filesToCompile: {
         title: "Zu kompilierende Dateien",
-        description: "Liste der Dateien, die mit Vite oder Bun kompiliert werden",
+        description:
+          "Liste der Dateien, die mit Vite oder Bun kompiliert werden",
       },
       fileToCompile: {
         title: "Dateikonfiguration",
@@ -226,7 +244,8 @@ export const translations: typeof enTranslations = {
       },
       modulesToExternalize: {
         title: "Externe Module",
-        description: "Module, die vom Bundle ausgeschlossen werden (z.B. react, lodash)",
+        description:
+          "Module, die vom Bundle ausgeschlossen werden (z.B. react, lodash)",
         placeholder: "react, react-dom, lodash",
       },
       inlineCss: {
@@ -239,7 +258,8 @@ export const translations: typeof enTranslations = {
       },
       packageConfig: {
         title: "Paket-Konfiguration",
-        description: "Einstellungen für Library-Builds mit TypeScript-Deklarationen",
+        description:
+          "Einstellungen für Library-Builds mit TypeScript-Deklarationen",
       },
       isPackage: {
         title: "Ist Paket",
@@ -278,7 +298,8 @@ export const translations: typeof enTranslations = {
       },
       define: {
         title: "Konstanten definieren",
-        description: "Compile-Zeit-Konstanten als JSON (z.B. process.env.NODE_ENV)",
+        description:
+          "Compile-Zeit-Konstanten als JSON (z.B. process.env.NODE_ENV)",
         placeholder: '{"process.env.NODE_ENV": "\\"production\\""}',
       },
       splitting: {
@@ -295,7 +316,8 @@ export const translations: typeof enTranslations = {
       },
       banner: {
         title: "Banner",
-        description: "Text, der der Ausgabe vorangestellt wird (z.B. Shebang-Zeile)",
+        description:
+          "Text, der der Ausgabe vorangestellt wird (z.B. Shebang-Zeile)",
         placeholder: "#!/usr/bin/env node",
       },
       footer: {
@@ -354,7 +376,8 @@ export const translations: typeof enTranslations = {
       },
       viteAssetsInlineLimit: {
         title: "Inline-Limit",
-        description: "Maximale Größe (Bytes) zum Inline-Einbetten von Assets als Base64",
+        description:
+          "Maximale Größe (Bytes) zum Inline-Einbetten von Assets als Base64",
         placeholder: "4096",
       },
       viteChunkSizeWarningLimit: {
@@ -439,7 +462,8 @@ export const translations: typeof enTranslations = {
       },
       filesOrFoldersToCopy: {
         title: "Zu kopierende Dateien",
-        description: "Dateien oder Ordner, die nach der Kompilierung kopiert werden",
+        description:
+          "Dateien oder Ordner, die nach der Kompilierung kopiert werden",
       },
       copyConfig: {
         title: "Kopier-Konfiguration",
@@ -501,7 +525,8 @@ export const translations: typeof enTranslations = {
       packageExports: {
         title: "Exports-Map",
         description: "Paket-Exports-Feld als JSON",
-        placeholder: '{".": {"import": "./dist/index.mjs", "require": "./dist/index.cjs"}}',
+        placeholder:
+          '{".": {"import": "./dist/index.mjs", "require": "./dist/index.cjs"}}',
       },
       packageDependencies: {
         title: "Abhängigkeiten",
@@ -515,7 +540,8 @@ export const translations: typeof enTranslations = {
       },
       packageFiles: {
         title: "Enthaltene Dateien",
-        description: "Dateien, die im veröffentlichten Paket enthalten sein sollen",
+        description:
+          "Dateien, die im veröffentlichten Paket enthalten sein sollen",
         placeholder: "dist, README.md, LICENSE",
       },
       packageKeywords: {
@@ -585,7 +611,8 @@ export const translations: typeof enTranslations = {
       },
       network: {
         title: "Netzwerkfehler",
-        description: "Ein Netzwerkfehler ist während des Build-Prozesses aufgetreten",
+        description:
+          "Ein Netzwerkfehler ist während des Build-Prozesses aufgetreten",
       },
       unauthorized: {
         title: "Nicht autorisiert",
@@ -601,7 +628,8 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nicht gefunden",
-        description: "Die angegebene Datei oder Konfiguration wurde nicht gefunden",
+        description:
+          "Die angegebene Datei oder Konfiguration wurde nicht gefunden",
       },
       unknown: {
         title: "Unbekannter Fehler",
@@ -609,7 +637,8 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Ungespeicherte Änderungen",
-        description: "Es gibt ungespeicherte Änderungen, die den Build beeinflussen könnten",
+        description:
+          "Es gibt ungespeicherte Änderungen, die den Build beeinflussen könnten",
       },
       conflict: {
         title: "Build-Konflikt",
@@ -631,14 +660,17 @@ export const translations: typeof enTranslations = {
     production: "Produktion",
   },
   analysis: {
-    criticalSize: "KRITISCH: Bundle-Größe ({{size}}) überschreitet Schwellenwert",
+    criticalSize:
+      "KRITISCH: Bundle-Größe ({{size}}) überschreitet Schwellenwert",
     largeBundle: "WARNUNG: Großes Bundle erkannt ({{size}})",
     considerTreeShaking:
       "Erwägen Sie Tree-Shaking zu aktivieren, um die Bundle-Größe zu reduzieren",
-    checkLargeDeps: "Prüfen Sie große Abhängigkeiten, die ersetzt werden könnten",
+    checkLargeDeps:
+      "Prüfen Sie große Abhängigkeiten, die ersetzt werden könnten",
     largeSourcemaps:
       "Große Sourcemaps erkannt - erwägen Sie, diese in der Produktion zu deaktivieren",
-    possibleDuplicates: "Mögliche doppelte Abhängigkeiten erkannt - erwägen Sie Deduplizierung",
+    possibleDuplicates:
+      "Mögliche doppelte Abhängigkeiten erkannt - erwägen Sie Deduplizierung",
     totalSize: "Gesamtgröße",
     largestFiles: "Größte Dateien",
   },

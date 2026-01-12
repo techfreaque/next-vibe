@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
     error: {
       invalid_phone_format:
         "Nieprawidłowy format numeru telefonu. Proszę podać prawidłowy numer telefonu.",
-      delivery_failed: "Nie udało się dostarczyć SMS-a do {{phoneNumber}}: {{error}}",
+      delivery_failed:
+        "Nie udało się dostarczyć SMS-a do {{phoneNumber}}: {{error}}",
       unexpected_error: "Wystąpił nieoczekiwany błąd podczas wysyłania SMS-a",
       all_failed: "Wszystkie wiadomości SMS nie powiodły się",
       partial_failure:

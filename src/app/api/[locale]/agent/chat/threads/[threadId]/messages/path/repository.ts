@@ -2,7 +2,11 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -50,7 +54,12 @@ export const pathRepository = {
       const [thread] = await db
         .select()
         .from(chatThreads)
-        .where(and(eq(chatThreads.id, urlPathParams.threadId), eq(chatThreads.userId, userId)))
+        .where(
+          and(
+            eq(chatThreads.id, urlPathParams.threadId),
+            eq(chatThreads.userId, userId),
+          ),
+        )
         .limit(1);
 
       if (!thread) {
@@ -121,7 +130,10 @@ export const pathRepository = {
 
         // Use branch index if provided, otherwise use first child (index 0)
         const branchIndex = branchIndices[currentId] ?? 0;
-        const validIndex = Math.min(Math.max(0, branchIndex), children.length - 1);
+        const validIndex = Math.min(
+          Math.max(0, branchIndex),
+          children.length - 1,
+        );
 
         currentId = children[validIndex];
       }
@@ -150,7 +162,8 @@ export const pathRepository = {
     } catch (error) {
       logger.error("Failed to get conversation path", parseError(error));
       return fail({
-        message: "app.api.agent.chat.threads.threadId.messages.path.get.errors.getFailed.title",
+        message:
+          "app.api.agent.chat.threads.threadId.messages.path.get.errors.getFailed.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

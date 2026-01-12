@@ -47,7 +47,9 @@ const getStatusBadge = (
       </Badge>
     );
   }
-  return <Badge variant="outline">{t("app.admin.emails.imap.messages.read")}</Badge>;
+  return (
+    <Badge variant="outline">{t("app.admin.emails.imap.messages.read")}</Badge>
+  );
 };
 
 const formatDate = (
@@ -98,7 +100,9 @@ export function ImapMessagesTable({
   if (messages.length === 0) {
     return (
       <Div className="text-center py-8">
-        <P className="text-muted-foreground">{t("app.admin.emails.imap.messages.noMessages")}</P>
+        <P className="text-muted-foreground">
+          {t("app.admin.emails.imap.messages.noMessages")}
+        </P>
       </Div>
     );
   }
@@ -107,14 +111,22 @@ export function ImapMessagesTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-12">{t("app.admin.emails.imap.common.status")}</TableHead>
+          <TableHead className="w-12">
+            {t("app.admin.emails.imap.common.status")}
+          </TableHead>
           <TableHead>{t("app.admin.emails.imap.messages.subject")}</TableHead>
           <TableHead>{t("app.admin.emails.imap.messages.sender")}</TableHead>
           <TableHead>{t("app.admin.emails.imap.messages.recipient")}</TableHead>
           <TableHead>{t("app.admin.emails.imap.messages.sentAt")}</TableHead>
-          <TableHead className="w-12">{t("app.admin.emails.imap.messages.attachments")}</TableHead>
-          <TableHead className="w-12">{t("app.admin.emails.imap.messages.flagged")}</TableHead>
-          <TableHead className="w-32">{t("app.admin.emails.imap.common.actions")}</TableHead>
+          <TableHead className="w-12">
+            {t("app.admin.emails.imap.messages.attachments")}
+          </TableHead>
+          <TableHead className="w-12">
+            {t("app.admin.emails.imap.messages.flagged")}
+          </TableHead>
+          <TableHead className="w-32">
+            {t("app.admin.emails.imap.common.actions")}
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -124,21 +136,32 @@ export function ImapMessagesTable({
             className={message.isRead ? "" : "bg-blue-50 dark:bg-blue-950/20"}
           >
             <TableCell>
-              <Div className="flex items-center flex flex-row gap-2">{getStatusIcon(message)}</Div>
+              <Div className="flex items-center flex flex-row gap-2">
+                {getStatusIcon(message)}
+              </Div>
             </TableCell>
             <TableCell>
               <Div className="flex flex-col gap-1">
-                <Div className={`font-medium ${message.isRead ? "" : "font-bold"}`}>
-                  {truncateText(message.subject || t("app.admin.emails.imap.messages.noSubject"))}
+                <Div
+                  className={`font-medium ${message.isRead ? "" : "font-bold"}`}
+                >
+                  {truncateText(
+                    message.subject ||
+                      t("app.admin.emails.imap.messages.noSubject"),
+                  )}
                 </Div>
                 {getStatusBadge(message, t)}
               </Div>
             </TableCell>
             <TableCell>
               <Div className="flex flex-col gap-1">
-                <Div className="font-medium">{message.senderName || message.senderEmail}</Div>
+                <Div className="font-medium">
+                  {message.senderName || message.senderEmail}
+                </Div>
                 {message.senderName && (
-                  <Div className="text-sm text-muted-foreground">{message.senderEmail}</Div>
+                  <Div className="text-sm text-muted-foreground">
+                    {message.senderEmail}
+                  </Div>
                 )}
               </Div>
             </TableCell>
@@ -156,11 +179,17 @@ export function ImapMessagesTable({
               )}
             </TableCell>
             <TableCell>
-              {message.isFlagged && <Star className="h-4 w-4 text-yellow-500 fill-current" />}
+              {message.isFlagged && (
+                <Star className="h-4 w-4 text-yellow-500 fill-current" />
+              )}
             </TableCell>
             <TableCell>
               <Div className="flex items-center flex flex-row gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleViewMessage(message.id)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleViewMessage(message.id)}
+                >
                   <Eye className="h-4 w-4 mr-1" />
                   {t("app.admin.emails.imap.common.view")}
                 </Button>

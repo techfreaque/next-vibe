@@ -7,7 +7,10 @@ import React, { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 
 import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
-import type { TagOption, TagsFieldProps } from "@/packages/next-vibe-ui/web/ui/tags-field";
+import type {
+  TagOption,
+  TagsFieldProps,
+} from "@/packages/next-vibe-ui/web/ui/tags-field";
 
 import { useTranslation } from "../../../../i18n/core/client";
 import { Badge } from "./badge";
@@ -33,15 +36,22 @@ export function TagsField<TKey extends string>({
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Filter suggestions based on input and exclude already selected
-  const filteredSuggestions = suggestions.filter((suggestion: TagOption<TKey>) => {
-    const matchesInput = t(suggestion.label).toLowerCase().includes(inputValue.toLowerCase());
-    const notSelected = !value.includes(suggestion.value);
-    return matchesInput && notSelected;
-  });
+  const filteredSuggestions = suggestions.filter(
+    (suggestion: TagOption<TKey>) => {
+      const matchesInput = t(suggestion.label)
+        .toLowerCase()
+        .includes(inputValue.toLowerCase());
+      const notSelected = !value.includes(suggestion.value);
+      return matchesInput && notSelected;
+    },
+  );
 
   // Group suggestions by category
   const groupedSuggestions = filteredSuggestions.reduce(
-    (groups: Record<string, TagOption<TKey>[]>, suggestion: TagOption<TKey>) => {
+    (
+      groups: Record<string, TagOption<TKey>[]>,
+      suggestion: TagOption<TKey>,
+    ) => {
       const category = suggestion.category || "other";
       if (!groups[category]) {
         groups[category] = [];
@@ -105,7 +115,9 @@ export function TagsField<TKey extends string>({
   };
 
   const getTagLabel = (tagValue: string): string => {
-    const suggestion = suggestions.find((s: TagOption<TKey>) => s.value === tagValue);
+    const suggestion = suggestions.find(
+      (s: TagOption<TKey>) => s.value === tagValue,
+    );
     return suggestion ? t(suggestion.label) : tagValue;
   };
 
@@ -126,7 +138,11 @@ export function TagsField<TKey extends string>({
       >
         {/* Render selected tags */}
         {value.map((tag: string) => (
-          <Badge key={tag} variant="secondary" className="flex-row items-center gap-1 px-2 py-1">
+          <Badge
+            key={tag}
+            variant="secondary"
+            className="flex-row items-center gap-1 px-2 py-1"
+          >
             <UIText className="text-xs">{getTagLabel(tag)}</UIText>
             {!disabled && (
               <Pressable
@@ -141,7 +157,10 @@ export function TagsField<TKey extends string>({
 
         {/* Input field */}
         {canAddMore && !disabled && (
-          <Popover open={showSuggestions} onOpenChange={handleSuggestionsOpenChange}>
+          <Popover
+            open={showSuggestions}
+            onOpenChange={handleSuggestionsOpenChange}
+          >
             <PopoverTrigger>
               <View className="flex-1 min-w-[120px]">
                 <Input
@@ -159,27 +178,36 @@ export function TagsField<TKey extends string>({
             {suggestions.length > 0 && filteredSuggestions.length > 0 && (
               <PopoverContent className="w-80 p-0" align="start">
                 <ScrollView className="max-h-[200px]">
-                  {Object.entries(groupedSuggestions).map(([category, categorySuggestions]) => (
-                    <View key={category} className="p-2">
-                      {category !== "other" && (
-                        <UIText className="px-2 py-1 text-xs font-medium text-muted-foreground uppercase">
-                          {category}
-                        </UIText>
-                      )}
-                      <View className="gap-1">
-                        {categorySuggestions.map((suggestion: TagOption<TKey>) => (
-                          <Pressable
-                            key={suggestion.value}
-                            onPress={() => addTag(suggestion.value)}
-                            className="flex-row items-center w-full h-8 px-2 rounded-sm active:bg-accent"
-                          >
-                            <Plus size={14} className="mr-2 text-foreground" />
-                            <UIText className="text-base">{t(suggestion.label)}</UIText>
-                          </Pressable>
-                        ))}
+                  {Object.entries(groupedSuggestions).map(
+                    ([category, categorySuggestions]) => (
+                      <View key={category} className="p-2">
+                        {category !== "other" && (
+                          <UIText className="px-2 py-1 text-xs font-medium text-muted-foreground uppercase">
+                            {category}
+                          </UIText>
+                        )}
+                        <View className="gap-1">
+                          {categorySuggestions.map(
+                            (suggestion: TagOption<TKey>) => (
+                              <Pressable
+                                key={suggestion.value}
+                                onPress={() => addTag(suggestion.value)}
+                                className="flex-row items-center w-full h-8 px-2 rounded-sm active:bg-accent"
+                              >
+                                <Plus
+                                  size={14}
+                                  className="mr-2 text-foreground"
+                                />
+                                <UIText className="text-base">
+                                  {t(suggestion.label)}
+                                </UIText>
+                              </Pressable>
+                            ),
+                          )}
+                        </View>
                       </View>
-                    </View>
-                  ))}
+                    ),
+                  )}
 
                   {allowCustom &&
                     inputValue.trim() &&
@@ -193,9 +221,12 @@ export function TagsField<TKey extends string>({
                         >
                           <Plus size={14} className="mr-2 text-foreground" />
                           <UIText className="text-base">
-                            {globalT("packages.nextVibeUi.web.common.addCustomValue", {
-                              value: inputValue.trim(),
-                            })}
+                            {globalT(
+                              "packages.nextVibeUi.web.common.addCustomValue",
+                              {
+                                value: inputValue.trim(),
+                              },
+                            )}
                           </UIText>
                         </Pressable>
                       </View>

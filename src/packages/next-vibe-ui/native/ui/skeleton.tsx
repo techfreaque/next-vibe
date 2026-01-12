@@ -12,7 +12,11 @@ import type { SkeletonProps } from "@/packages/next-vibe-ui/web/ui/skeleton";
 
 const duration = 1000;
 
-function Skeleton({ className, children, ...props }: SkeletonProps): React.JSX.Element {
+function Skeleton({
+  className,
+  children,
+  ...props
+}: SkeletonProps): React.JSX.Element {
   const sv = useSharedValue(1);
 
   React.useEffect(() => {

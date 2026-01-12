@@ -28,7 +28,11 @@ export const { GET, PATCH, tools } = endpointsHandler({
         ...props.data,
         threadId: props.urlPathParams.threadId,
       };
-      return await updateThreadPermissions(props.user, dataWithId, props.logger);
+      return await updateThreadPermissions(
+        props.user,
+        dataWithId,
+        props.logger,
+      );
     },
   },
 });

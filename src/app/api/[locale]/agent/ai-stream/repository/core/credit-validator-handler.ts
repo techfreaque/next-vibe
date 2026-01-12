@@ -10,7 +10,10 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import { getModelCost, type ModelId } from "@/app/api/[locale]/agent/models/models";
+import {
+  getModelCost,
+  type ModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import { creditValidator } from "@/app/api/[locale]/credits/validator";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -39,9 +42,17 @@ export class CreditValidatorHandler {
     let effectiveLeadId = leadId;
 
     if (userId) {
-      validationResult = await creditValidator.validateUserCredits(userId, model, logger);
+      validationResult = await creditValidator.validateUserCredits(
+        userId,
+        model,
+        logger,
+      );
     } else if (leadId) {
-      validationResult = await creditValidator.validateLeadCredits(leadId, model, logger);
+      validationResult = await creditValidator.validateLeadCredits(
+        leadId,
+        model,
+        logger,
+      );
     } else if (ipAddress) {
       const leadByIpResult = await creditValidator.validateLeadByIp(
         ipAddress,
@@ -52,7 +63,8 @@ export class CreditValidatorHandler {
 
       if (!leadByIpResult.success) {
         return fail({
-          message: "app.api.agent.chat.aiStream.route.errors.creditValidationFailed",
+          message:
+            "app.api.agent.chat.aiStream.route.errors.creditValidationFailed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -72,7 +84,8 @@ export class CreditValidatorHandler {
 
     if (!validationResult.success) {
       return fail({
-        message: "app.api.agent.chat.aiStream.route.errors.creditValidationFailed",
+        message:
+          "app.api.agent.chat.aiStream.route.errors.creditValidationFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

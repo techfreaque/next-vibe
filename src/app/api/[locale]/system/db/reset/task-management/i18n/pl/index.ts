@@ -71,7 +71,8 @@ export const translations: typeof enTranslations = {
     },
     forbidden: {
       title: "Zabronione",
-      description: "Niewystarczające uprawnienia dla operacji zadań resetowania",
+      description:
+        "Niewystarczające uprawnienia dla operacji zadań resetowania",
     },
     internal: {
       title: "Błąd Zadania",
@@ -91,7 +92,8 @@ export const translations: typeof enTranslations = {
     },
     unknownError: {
       title: "Nieznany Błąd",
-      description: "Wystąpił nieznany błąd podczas operacji zadania resetowania",
+      description:
+        "Wystąpił nieznany błąd podczas operacji zadania resetowania",
     },
     unsavedChanges: {
       title: "Niezapisane Zmiany",
@@ -112,25 +114,35 @@ export const translations: typeof enTranslations = {
     description: "Operacja zadania resetowania zakończona pomyślnie",
   },
   messages: {
-    noUnauthorizedResetOperations: "Nie wykryto nieautoryzowanych operacji resetowania",
-    safetyCheckSkippedNotProduction: "Sprawdzenie bezpieczeństwa pominięte (nie w produkcji)",
-    safetyCheckFailed: "Sprawdzenie bezpieczeństwa resetowania bazy danych nie powiodło się",
-    autoResetSkippedNotDevelopment: "Automatyczny reset pominięty (nie w środowisku rozwojowym)",
-    operationOnlyAllowedInDevelopment: "Operacja dozwolona tylko w środowisku rozwojowym",
+    noUnauthorizedResetOperations:
+      "Nie wykryto nieautoryzowanych operacji resetowania",
+    safetyCheckSkippedNotProduction:
+      "Sprawdzenie bezpieczeństwa pominięte (nie w produkcji)",
+    safetyCheckFailed:
+      "Sprawdzenie bezpieczeństwa resetowania bazy danych nie powiodło się",
+    autoResetSkippedNotDevelopment:
+      "Automatyczny reset pominięty (nie w środowisku rozwojowym)",
+    operationOnlyAllowedInDevelopment:
+      "Operacja dozwolona tylko w środowisku rozwojowym",
     autoResetTaskNotFound: "Zadanie automatycznego resetowania nie znalezione",
     taskConfigurationMissing: "Brak konfiguracji zadania",
     autoResetStartedSuccessfully:
       "Zadanie automatycznego resetowania bazy danych rozpoczęte pomyślnie",
-    failedToStartAutoReset: "Nie udało się uruchomić automatycznego resetowania",
-    backupVerificationTaskNotFound: "Zadanie weryfikacji kopii zapasowej nie znalezione",
+    failedToStartAutoReset:
+      "Nie udało się uruchomić automatycznego resetowania",
+    backupVerificationTaskNotFound:
+      "Zadanie weryfikacji kopii zapasowej nie znalezione",
     backupVerificationStartedSuccessfully:
       "Weryfikacja kopii zapasowej bazy danych rozpoczęta pomyślnie",
-    failedToStartBackupVerification: "Nie udało się uruchomić weryfikacji kopii zapasowej",
-    autoResetStoppedSuccessfully: "Zadanie automatycznego resetowania zatrzymane pomyślnie",
+    failedToStartBackupVerification:
+      "Nie udało się uruchomić weryfikacji kopii zapasowej",
+    autoResetStoppedSuccessfully:
+      "Zadanie automatycznego resetowania zatrzymane pomyślnie",
     failedToStopAutoReset: "Nie udało się zatrzymać automatycznego resetowania",
     backupVerificationStoppedSuccessfully:
       "Zadanie weryfikacji kopii zapasowej zatrzymane pomyślnie",
-    failedToStopBackupVerification: "Nie udało się zatrzymać weryfikacji kopii zapasowej",
+    failedToStopBackupVerification:
+      "Nie udało się zatrzymać weryfikacji kopii zapasowej",
     taskNotFound: "Zadanie nie znalezione",
     taskDoesNotExist: "Zadanie '{taskName}' nie istnieje",
     taskStatusRetrieved: "Status zadania '{taskName}' pobrany",
@@ -140,15 +152,18 @@ export const translations: typeof enTranslations = {
   },
   tasks: {
     resetSafetyCheck: {
-      description: "Monitorowanie przypadkowych resetów bazy danych w produkcji",
+      description:
+        "Monitorowanie przypadkowych resetów bazy danych w produkcji",
       schedule: "0 */12 * * *",
     },
     devAutoReset: {
-      description: "Automatyczne resetowanie bazy danych rozwojowej zgodnie z harmonogramem",
+      description:
+        "Automatyczne resetowanie bazy danych rozwojowej zgodnie z harmonogramem",
       schedule: "0 6 * * 1",
     },
     backupVerification: {
-      description: "Weryfikacja kopii zapasowych bazy danych przed pozwoleniem na resety",
+      description:
+        "Weryfikacja kopii zapasowych bazy danych przed pozwoleniem na resety",
     },
   },
 };

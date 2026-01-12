@@ -27,7 +27,9 @@ interface UserCreateFormProps {
   locale: CountryLanguage;
 }
 
-export function UserCreateForm({ locale }: UserCreateFormProps): React.JSX.Element {
+export function UserCreateForm({
+  locale,
+}: UserCreateFormProps): React.JSX.Element {
   const router = useRouter();
   const { t } = simpleT(locale);
 
@@ -53,7 +55,11 @@ export function UserCreateForm({ locale }: UserCreateFormProps): React.JSX.Eleme
     <Div className="flex flex-col gap-6">
       {/* Action Buttons */}
       <Div className="flex items-center justify-between">
-        <Button variant="outline" onClick={handleBack} className="flex items-center flex-row gap-2">
+        <Button
+          variant="outline"
+          onClick={handleBack}
+          className="flex items-center flex-row gap-2"
+        >
           <ArrowLeft className="h-4 w-4" />
           <Span>{t("app.admin.users.form.buttons.back")}</Span>
         </Button>
@@ -67,7 +73,11 @@ export function UserCreateForm({ locale }: UserCreateFormProps): React.JSX.Eleme
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Form form={endpoint.create.form} onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <Form
+            form={endpoint.create.form}
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-6"
+          >
             <FormFieldGroup>
               <EndpointFormField
                 name="basicInfo.email"
@@ -162,7 +172,12 @@ export function UserCreateForm({ locale }: UserCreateFormProps): React.JSX.Eleme
 
             {/* Submit Button */}
             <Div className="flex justify-end flex-row gap-4">
-              <Button type="button" variant="outline" onClick={handleBack} disabled={isSaving}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleBack}
+                disabled={isSaving}
+              >
                 {t("app.admin.users.form.buttons.cancel")}
               </Button>
               <Button type="submit" disabled={isSaving}>

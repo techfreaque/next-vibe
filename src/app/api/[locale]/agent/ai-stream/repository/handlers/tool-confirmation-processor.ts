@@ -36,7 +36,14 @@ export class ToolConfirmationProcessor {
       }>
     >
   > {
-    const { toolConfirmations, messageHistory, isIncognito, locale, logger, user } = params;
+    const {
+      toolConfirmations,
+      messageHistory,
+      isIncognito,
+      locale,
+      logger,
+      user,
+    } = params;
 
     logger.debug("[Setup] Processing tool confirmations", {
       count: toolConfirmations.length,
@@ -51,14 +58,15 @@ export class ToolConfirmationProcessor {
 
     // Process all confirmations and collect results
     for (const toolConfirmation of toolConfirmations) {
-      const confirmResult = await ToolConfirmationHandler.handleToolConfirmation({
-        toolConfirmation,
-        messageHistory,
-        isIncognito,
-        locale,
-        logger,
-        user,
-      });
+      const confirmResult =
+        await ToolConfirmationHandler.handleToolConfirmation({
+          toolConfirmation,
+          messageHistory,
+          isIncognito,
+          locale,
+          logger,
+          user,
+        });
 
       if (!confirmResult.success) {
         return confirmResult;
@@ -78,9 +86,12 @@ export class ToolConfirmationProcessor {
       }
     }
 
-    logger.debug("[Setup] All tools executed - continuing with AI stream to process results", {
-      resultsCount: results.length,
-    });
+    logger.debug(
+      "[Setup] All tools executed - continuing with AI stream to process results",
+      {
+        resultsCount: results.length,
+      },
+    );
 
     return {
       success: true,

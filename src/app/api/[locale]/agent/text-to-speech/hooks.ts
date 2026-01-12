@@ -145,14 +145,20 @@ export function useTTSAudio({
 
   // Fetch audio for a specific chunk
   const fetchChunkAudio = useCallback(
-    (chunkIndex: number, chunkText: string): Promise<HTMLAudioElement | null> => {
+    (
+      chunkIndex: number,
+      chunkText: string,
+    ): Promise<HTMLAudioElement | null> => {
       if (!endpoint.create) {
         return Promise.resolve(null);
       }
 
-      logger.debug(`TTS: Fetching chunk ${chunkIndex + 1}/${chunksRef.current.length}`, {
-        chunkLength: chunkText.length,
-      });
+      logger.debug(
+        `TTS: Fetching chunk ${chunkIndex + 1}/${chunksRef.current.length}`,
+        {
+          chunkLength: chunkText.length,
+        },
+      );
 
       // Create new AbortController for this chunk
       abortControllerRef.current = new AbortController();
@@ -194,7 +200,8 @@ export function useTTSAudio({
               errorType: error.errorType,
               errorMessage: error.message,
             });
-            const errorMsg = error.message || t("app.chat.hooks.tts.failed-to-generate");
+            const errorMsg =
+              error.message || t("app.chat.hooks.tts.failed-to-generate");
             setError(errorMsg);
             onError?.(errorMsg);
             resolve(null);
@@ -225,7 +232,9 @@ export function useTTSAudio({
       return;
     }
 
-    logger.info(`TTS: Playing chunk ${nextIndex + 1}/${chunksRef.current.length}`);
+    logger.info(
+      `TTS: Playing chunk ${nextIndex + 1}/${chunksRef.current.length}`,
+    );
     setCurrentChunk(nextIndex + 1);
     setIsPlaying(true);
 
@@ -234,7 +243,9 @@ export function useTTSAudio({
       const duration = audio.duration;
 
       if (!duration || isNaN(duration)) {
-        logger.info(`TTS: Chunk ${nextIndex + 1} duration not available yet, will retry`);
+        logger.info(
+          `TTS: Chunk ${nextIndex + 1} duration not available yet, will retry`,
+        );
         return;
       }
 
@@ -254,45 +265,65 @@ export function useTTSAudio({
       logger.info(`TTS: Scheduling prefetch`, {
         nextFetchIndex: currentFetchingIndexRef.current,
         prefetchDelay: `${prefetchDelay}ms`,
-        willPrefetch: currentFetchingIndexRef.current < chunksRef.current.length,
+        willPrefetch:
+          currentFetchingIndexRef.current < chunksRef.current.length,
       });
 
       prefetchTimerRef.current = setTimeout(() => {
         const nextFetchIndex = currentFetchingIndexRef.current;
         if (nextFetchIndex < chunksRef.current.length) {
-          logger.info(`TTS: Prefetch timer fired, fetching chunk ${nextFetchIndex + 1}`);
-          void fetchChunkAudio(nextFetchIndex, chunksRef.current[nextFetchIndex]!).then(
-            (nextAudio) => {
-              if (nextAudio) {
-                logger.info(`TTS: Prefetched chunk ${nextFetchIndex + 1} successfully`, {
+          logger.info(
+            `TTS: Prefetch timer fired, fetching chunk ${nextFetchIndex + 1}`,
+          );
+          void fetchChunkAudio(
+            nextFetchIndex,
+            chunksRef.current[nextFetchIndex]!,
+          ).then((nextAudio) => {
+            if (nextAudio) {
+              logger.info(
+                `TTS: Prefetched chunk ${nextFetchIndex + 1} successfully`,
+                {
                   isProcessing: isProcessingRef.current,
                   currentPlayingIndex: currentPlayingIndexRef.current,
                   nextFetchIndex,
                   shouldAutoPlay:
-                    isProcessingRef.current && currentPlayingIndexRef.current === nextFetchIndex,
-                });
-                audioQueueRef.current[nextFetchIndex] = nextAudio;
-                currentFetchingIndexRef.current++;
+                    isProcessingRef.current &&
+                    currentPlayingIndexRef.current === nextFetchIndex,
+                },
+              );
+              audioQueueRef.current[nextFetchIndex] = nextAudio;
+              currentFetchingIndexRef.current++;
 
-                // If we're waiting for this chunk to play, start playing it now
-                // Check: we're still processing AND the current playing index matches this chunk
-                if (isProcessingRef.current && currentPlayingIndexRef.current === nextFetchIndex) {
-                  logger.info(`TTS: Auto-playing fetched chunk ${nextFetchIndex + 1}`);
-                  playNextChunk();
-                } else {
-                  logger.info(`TTS: NOT auto-playing chunk ${nextFetchIndex + 1}`, {
-                    reason: isProcessingRef.current ? "playing index mismatch" : "not processing",
+              // If we're waiting for this chunk to play, start playing it now
+              // Check: we're still processing AND the current playing index matches this chunk
+              if (
+                isProcessingRef.current &&
+                currentPlayingIndexRef.current === nextFetchIndex
+              ) {
+                logger.info(
+                  `TTS: Auto-playing fetched chunk ${nextFetchIndex + 1}`,
+                );
+                playNextChunk();
+              } else {
+                logger.info(
+                  `TTS: NOT auto-playing chunk ${nextFetchIndex + 1}`,
+                  {
+                    reason: isProcessingRef.current
+                      ? "playing index mismatch"
+                      : "not processing",
                     isProcessing: isProcessingRef.current,
                     currentPlayingIndex: currentPlayingIndexRef.current,
                     nextFetchIndex,
-                  });
-                }
-              } else {
-                logger.error(`TTS: Failed to prefetch chunk ${nextFetchIndex + 1}`);
+                  },
+                );
               }
-              return undefined;
-            },
-          );
+            } else {
+              logger.error(
+                `TTS: Failed to prefetch chunk ${nextFetchIndex + 1}`,
+              );
+            }
+            return undefined;
+          });
         } else {
           logger.info(`TTS: No more chunks to prefetch`);
         }
@@ -336,7 +367,8 @@ export function useTTSAudio({
       logger.info(`TTS: Checking for more chunks`, {
         currentPlayingIndex: currentPlayingIndexRef.current,
         totalChunks: chunksRef.current.length,
-        hasMoreChunks: currentPlayingIndexRef.current < chunksRef.current.length,
+        hasMoreChunks:
+          currentPlayingIndexRef.current < chunksRef.current.length,
       });
 
       if (currentPlayingIndexRef.current < chunksRef.current.length) {
@@ -374,7 +406,10 @@ export function useTTSAudio({
 
     const onAudioError = (): void => {
       const audioError = new Error(t("app.chat.hooks.tts.failed-to-play"));
-      logger.error(`TTS: Chunk ${nextIndex + 1} playback error`, parseError(audioError));
+      logger.error(
+        `TTS: Chunk ${nextIndex + 1} playback error`,
+        parseError(audioError),
+      );
 
       // Remove event listeners
       audio.removeEventListener("ended", onEnded);
@@ -499,7 +534,9 @@ export function useTTSAudio({
       }
 
       const errorMsg =
-        err instanceof Error ? err.message : t("app.chat.hooks.tts.failed-to-generate");
+        err instanceof Error
+          ? err.message
+          : t("app.chat.hooks.tts.failed-to-generate");
       logger.error("TTS: Exception during processing", parseError(err));
       setError(errorMsg);
       onError?.(errorMsg);

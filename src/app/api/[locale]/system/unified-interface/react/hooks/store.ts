@@ -1,6 +1,9 @@
 import type { QueryKey } from "@tanstack/react-query";
 import { QueryClient } from "@tanstack/react-query";
-import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
 import { z } from "zod";
 import { create } from "zustand";
 
@@ -60,9 +63,13 @@ export interface TypedCustomStateKey<T extends CustomStateValue> {
   readonly _type?: T; // Phantom type for TypeScript inference
 }
 
-export type TypedCustomStateSelector<T extends CustomStateValue> = (state: ApiStore) => T;
+export type TypedCustomStateSelector<T extends CustomStateValue> = (
+  state: ApiStore,
+) => T;
 
-export type TypedCustomStateSetter<T extends CustomStateValue> = (value: T) => void;
+export type TypedCustomStateSetter<T extends CustomStateValue> = (
+  value: T,
+) => void;
 
 export function createCustomStateKey<T extends CustomStateValue>(
   key: string,
@@ -130,7 +137,10 @@ export interface ApiStore {
     readonly method: Methods;
     readonly path: readonly string[];
   }) => string;
-  getFormId: (endpoint: { readonly method: Methods; readonly path: readonly string[] }) => string;
+  getFormId: (endpoint: {
+    readonly method: Methods;
+    readonly path: readonly string[];
+  }) => string;
 
   /**
    * Update cached endpoint data optimistically
@@ -321,7 +331,9 @@ export const useApiStore = create<ApiStore>((set, get) => ({
  * Helper to deserialize query params that were serialized when stored
  * This parses JSON strings back to objects for nested data structures
  */
-export function deserializeQueryParams<T>(params: FormQueryParams | undefined): T {
+export function deserializeQueryParams<T>(
+  params: FormQueryParams | undefined,
+): T {
   if (!params) {
     return {} as T;
   }
@@ -386,14 +398,20 @@ export const apiClient = {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Schema type cast requires 'unknown' for runtime type compatibility
     const requestSchema = endpoint.requestSchema as unknown as z.ZodTypeAny;
     const isUndefinedSchema =
-      requestSchema.safeParse(undefined).success && !requestSchema.safeParse({}).success;
+      requestSchema.safeParse(undefined).success &&
+      !requestSchema.safeParse({}).success;
 
     // Check if the endpoint expects an empty object for request data (GET endpoints with no params)
     const isEmptyObjectSchema =
-      requestSchema instanceof z.ZodObject && Object.keys(requestSchema.shape).length === 0;
+      requestSchema instanceof z.ZodObject &&
+      Object.keys(requestSchema.shape).length === 0;
 
     // If the schema expects undefined but we received an object, set requestData to undefined
-    if (isUndefinedSchema && typeof requestData === "object" && requestData !== null) {
+    if (
+      isUndefinedSchema &&
+      typeof requestData === "object" &&
+      requestData !== null
+    ) {
       logger.debug(
         "Converting object to undefined for endpoint with undefinedSchema",
         endpoint.path.join("/"),
@@ -499,7 +517,9 @@ export const apiClient = {
   /**
    * Get current query state from React Query cache
    */
-  getQueryState: <TResponse>(queryKey: QueryKey): QueryStoreType<TResponse> | undefined => {
+  getQueryState: <TResponse>(
+    queryKey: QueryKey,
+  ): QueryStoreType<TResponse> | undefined => {
     // Get data from React Query cache
     const data = queryClient.getQueryData<ResponseType<TResponse>>(queryKey);
 
@@ -562,6 +582,8 @@ export const apiClient = {
       | undefined,
     urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
   ): void => {
-    useApiStore.getState().updateEndpointData(endpoint, logger, updater, urlPathParams);
+    useApiStore
+      .getState()
+      .updateEndpointData(endpoint, logger, updater, urlPathParams);
   },
 };

@@ -264,8 +264,16 @@ function initializeEndpoints(): Record<string, ApiSection> {
   }
 
   const endpoints: Record<string, ApiSection> = {};
-  setNestedPath(endpoints, ["agent", "chat", "threads", "GET"], endpointDefinition_GET_0.GET);
-  setNestedPath(endpoints, ["agent", "chat", "threads", "POST"], endpointDefinition_POST_1.POST);
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "threads", "GET"],
+    endpointDefinition_GET_0.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "threads", "POST"],
+    endpointDefinition_POST_1.POST,
+  );
   setNestedPath(
     endpoints,
     ["agent", "chat", "threads", "search", "GET"],
@@ -308,27 +316,69 @@ function initializeEndpoints(): Record<string, ApiSection> {
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]", "vote", "POST"],
+    [
+      "agent",
+      "chat",
+      "threads",
+      "[threadId]",
+      "messages",
+      "[messageId]",
+      "vote",
+      "POST",
+    ],
     endpointDefinition_POST_10.POST,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]", "GET"],
+    [
+      "agent",
+      "chat",
+      "threads",
+      "[threadId]",
+      "messages",
+      "[messageId]",
+      "GET",
+    ],
     endpointDefinition_GET_11.GET,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]", "PATCH"],
+    [
+      "agent",
+      "chat",
+      "threads",
+      "[threadId]",
+      "messages",
+      "[messageId]",
+      "PATCH",
+    ],
     endpointDefinition_PATCH_12.PATCH,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]", "DELETE"],
+    [
+      "agent",
+      "chat",
+      "threads",
+      "[threadId]",
+      "messages",
+      "[messageId]",
+      "DELETE",
+    ],
     endpointDefinition_DELETE_13.DELETE,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]", "branch", "POST"],
+    [
+      "agent",
+      "chat",
+      "threads",
+      "[threadId]",
+      "messages",
+      "[messageId]",
+      "branch",
+      "POST",
+    ],
     endpointDefinition_POST_14.POST,
   );
   setNestedPath(
@@ -361,8 +411,16 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["agent", "chat", "threads", "[threadId]", "share-links", "DELETE"],
     endpointDefinition_DELETE_20.DELETE,
   );
-  setNestedPath(endpoints, ["agent", "chat", "memories", "GET"], endpointDefinition_GET_21.GET);
-  setNestedPath(endpoints, ["agent", "chat", "memories", "POST"], endpointDefinition_POST_22.POST);
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "memories", "GET"],
+    endpointDefinition_GET_21.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "memories", "POST"],
+    endpointDefinition_POST_22.POST,
+  );
   setNestedPath(
     endpoints,
     ["agent", "chat", "memories", "[id]", "PATCH"],
@@ -373,8 +431,16 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["agent", "chat", "memories", "[id]", "DELETE"],
     endpointDefinition_DELETE_24.DELETE,
   );
-  setNestedPath(endpoints, ["agent", "chat", "favorites", "GET"], endpointDefinition_GET_25.GET);
-  setNestedPath(endpoints, ["agent", "chat", "favorites", "POST"], endpointDefinition_POST_26.POST);
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "favorites", "GET"],
+    endpointDefinition_GET_25.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "favorites", "POST"],
+    endpointDefinition_POST_26.POST,
+  );
   setNestedPath(
     endpoints,
     ["agent", "chat", "favorites", "[id]", "GET"],
@@ -390,7 +456,11 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["agent", "chat", "favorites", "[id]", "DELETE"],
     endpointDefinition_DELETE_29.DELETE,
   );
-  setNestedPath(endpoints, ["agent", "chat", "characters", "GET"], endpointDefinition_GET_30.GET);
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "characters", "GET"],
+    endpointDefinition_GET_30.GET,
+  );
   setNestedPath(
     endpoints,
     ["agent", "chat", "characters", "[id]", "GET"],
@@ -411,8 +481,16 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["agent", "chat", "characters", "create", "POST"],
     endpointDefinition_POST_34.POST,
   );
-  setNestedPath(endpoints, ["agent", "chat", "folders", "GET"], endpointDefinition_GET_35.GET);
-  setNestedPath(endpoints, ["agent", "chat", "folders", "POST"], endpointDefinition_POST_36.POST);
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "folders", "GET"],
+    endpointDefinition_GET_35.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "folders", "POST"],
+    endpointDefinition_POST_36.POST,
+  );
   setNestedPath(
     endpoints,
     ["agent", "chat", "folders", "[id]", "GET"],
@@ -448,24 +526,76 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["agent", "chat", "files", "[threadId]", "[filename]", "GET"],
     endpointDefinition_GET_43.GET,
   );
-  setNestedPath(endpoints, ["agent", "fetch-url-content", "GET"], endpointDefinition_GET_44.GET);
-  setNestedPath(endpoints, ["agent", "brave-search", "GET"], endpointDefinition_GET_45.GET);
-  setNestedPath(endpoints, ["agent", "ai-stream", "POST"], endpointDefinition_POST_46.POST);
-  setNestedPath(endpoints, ["agent", "text-to-speech", "POST"], endpointDefinition_POST_47.POST);
+  setNestedPath(
+    endpoints,
+    ["agent", "fetch-url-content", "GET"],
+    endpointDefinition_GET_44.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["agent", "brave-search", "GET"],
+    endpointDefinition_GET_45.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["agent", "ai-stream", "POST"],
+    endpointDefinition_POST_46.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["agent", "text-to-speech", "POST"],
+    endpointDefinition_POST_47.POST,
+  );
   setNestedPath(
     endpoints,
     ["agent", "speech-to-text", "hotkey", "POST"],
     endpointDefinition_POST_48.POST,
   );
-  setNestedPath(endpoints, ["agent", "speech-to-text", "POST"], endpointDefinition_POST_49.POST);
-  setNestedPath(endpoints, ["system", "server", "dev", "POST"], endpointDefinition_POST_50.POST);
-  setNestedPath(endpoints, ["system", "server", "start", "POST"], endpointDefinition_POST_51.POST);
-  setNestedPath(endpoints, ["system", "server", "build", "POST"], endpointDefinition_POST_52.POST);
-  setNestedPath(endpoints, ["system", "server", "health", "GET"], endpointDefinition_GET_53.GET);
-  setNestedPath(endpoints, ["system", "guard", "start", "POST"], endpointDefinition_POST_54.POST);
-  setNestedPath(endpoints, ["system", "guard", "stop", "POST"], endpointDefinition_POST_55.POST);
-  setNestedPath(endpoints, ["system", "guard", "status", "POST"], endpointDefinition_POST_56.POST);
-  setNestedPath(endpoints, ["system", "guard", "destroy", "POST"], endpointDefinition_POST_57.POST);
+  setNestedPath(
+    endpoints,
+    ["agent", "speech-to-text", "POST"],
+    endpointDefinition_POST_49.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "server", "dev", "POST"],
+    endpointDefinition_POST_50.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "server", "start", "POST"],
+    endpointDefinition_POST_51.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "server", "build", "POST"],
+    endpointDefinition_POST_52.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "server", "health", "GET"],
+    endpointDefinition_GET_53.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "guard", "start", "POST"],
+    endpointDefinition_POST_54.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "guard", "stop", "POST"],
+    endpointDefinition_POST_55.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "guard", "status", "POST"],
+    endpointDefinition_POST_56.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "guard", "destroy", "POST"],
+    endpointDefinition_POST_57.POST,
+  );
   setNestedPath(
     endpoints,
     ["system", "translations", "reorganize", "POST"],
@@ -481,8 +611,16 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["system", "translations", "stats", "GET"],
     endpointDefinition_GET_60.GET,
   );
-  setNestedPath(endpoints, ["system", "help", "POST"], endpointDefinition_POST_61.POST);
-  setNestedPath(endpoints, ["system", "help", "list", "POST"], endpointDefinition_POST_62.POST);
+  setNestedPath(
+    endpoints,
+    ["system", "help", "POST"],
+    endpointDefinition_POST_61.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "help", "list", "POST"],
+    endpointDefinition_POST_62.POST,
+  );
   setNestedPath(
     endpoints,
     ["system", "help", "interactive", "POST"],
@@ -493,7 +631,11 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["system", "db", "schema-verify", "POST"],
     endpointDefinition_POST_64.POST,
   );
-  setNestedPath(endpoints, ["system", "db", "utils", "GET"], endpointDefinition_GET_65.GET);
+  setNestedPath(
+    endpoints,
+    ["system", "db", "utils", "GET"],
+    endpointDefinition_GET_65.GET,
+  );
   setNestedPath(
     endpoints,
     ["system", "db", "utils", "docker-operations", "POST"],
@@ -509,8 +651,16 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["system", "db", "migrate-prod", "POST"],
     endpointDefinition_POST_68.POST,
   );
-  setNestedPath(endpoints, ["system", "db", "seed", "POST"], endpointDefinition_POST_69.POST);
-  setNestedPath(endpoints, ["system", "db", "reset", "POST"], endpointDefinition_POST_70.POST);
+  setNestedPath(
+    endpoints,
+    ["system", "db", "seed", "POST"],
+    endpointDefinition_POST_69.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "db", "reset", "POST"],
+    endpointDefinition_POST_70.POST,
+  );
   setNestedPath(
     endpoints,
     ["system", "db", "reset", "task-management", "POST"],
@@ -521,15 +671,31 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["system", "db", "migrate-sync", "POST"],
     endpointDefinition_POST_72.POST,
   );
-  setNestedPath(endpoints, ["system", "db", "migrate", "POST"], endpointDefinition_POST_73.POST);
+  setNestedPath(
+    endpoints,
+    ["system", "db", "migrate", "POST"],
+    endpointDefinition_POST_73.POST,
+  );
   setNestedPath(
     endpoints,
     ["system", "db", "migrate", "task-management", "POST"],
     endpointDefinition_POST_74.POST,
   );
-  setNestedPath(endpoints, ["system", "db", "ping", "POST"], endpointDefinition_POST_75.POST);
-  setNestedPath(endpoints, ["system", "db", "sql", "POST"], endpointDefinition_POST_76.POST);
-  setNestedPath(endpoints, ["system", "db", "studio", "POST"], endpointDefinition_POST_77.POST);
+  setNestedPath(
+    endpoints,
+    ["system", "db", "ping", "POST"],
+    endpointDefinition_POST_75.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "db", "sql", "POST"],
+    endpointDefinition_POST_76.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "db", "studio", "POST"],
+    endpointDefinition_POST_77.POST,
+  );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "tasks", "cron", "tasks", "GET"],
@@ -655,15 +821,31 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["system", "check", "typecheck", "POST"],
     endpointDefinition_POST_102.POST,
   );
-  setNestedPath(endpoints, ["system", "check", "lint", "POST"], endpointDefinition_POST_103.POST);
+  setNestedPath(
+    endpoints,
+    ["system", "check", "lint", "POST"],
+    endpointDefinition_POST_103.POST,
+  );
   setNestedPath(
     endpoints,
     ["system", "check", "config", "create", "POST"],
     endpointDefinition_POST_104.POST,
   );
-  setNestedPath(endpoints, ["system", "check", "oxlint", "POST"], endpointDefinition_POST_105.POST);
-  setNestedPath(endpoints, ["system", "release-tool", "POST"], endpointDefinition_POST_106.POST);
-  setNestedPath(endpoints, ["system", "builder", "POST"], endpointDefinition_POST_107.POST);
+  setNestedPath(
+    endpoints,
+    ["system", "check", "oxlint", "POST"],
+    endpointDefinition_POST_105.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "release-tool", "POST"],
+    endpointDefinition_POST_106.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "builder", "POST"],
+    endpointDefinition_POST_107.POST,
+  );
   setNestedPath(
     endpoints,
     ["system", "generators", "generate-all", "POST"],
@@ -720,8 +902,16 @@ function initializeEndpoints(): Record<string, ApiSection> {
     endpointDefinition_POST_118.POST,
   );
   setNestedPath(endpoints, ["manifest", "GET"], endpointDefinition_GET_119.GET);
-  setNestedPath(endpoints, ["leads", "lead", "[id]", "GET"], endpointDefinition_GET_120.GET);
-  setNestedPath(endpoints, ["leads", "lead", "[id]", "PATCH"], endpointDefinition_PATCH_121.PATCH);
+  setNestedPath(
+    endpoints,
+    ["leads", "lead", "[id]", "GET"],
+    endpointDefinition_GET_120.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["leads", "lead", "[id]", "PATCH"],
+    endpointDefinition_PATCH_121.PATCH,
+  );
   setNestedPath(
     endpoints,
     ["leads", "tracking", "engagement", "POST"],
@@ -732,15 +922,31 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["leads", "tracking", "engagement", "GET"],
     endpointDefinition_GET_123.GET,
   );
-  setNestedPath(endpoints, ["leads", "search", "GET"], endpointDefinition_GET_124.GET);
   setNestedPath(
     endpoints,
-    ["leads", "campaigns", "campaign-starter", "campaign-starter-config", "GET"],
+    ["leads", "search", "GET"],
+    endpointDefinition_GET_124.GET,
+  );
+  setNestedPath(
+    endpoints,
+    [
+      "leads",
+      "campaigns",
+      "campaign-starter",
+      "campaign-starter-config",
+      "GET",
+    ],
     endpointDefinition_GET_125.GET,
   );
   setNestedPath(
     endpoints,
-    ["leads", "campaigns", "campaign-starter", "campaign-starter-config", "PUT"],
+    [
+      "leads",
+      "campaigns",
+      "campaign-starter",
+      "campaign-starter-config",
+      "PUT",
+    ],
     endpointDefinition_PUT_126.PUT,
   );
   setNestedPath(
@@ -748,8 +954,16 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["leads", "campaigns", "emails", "test-mail", "POST"],
     endpointDefinition_POST_127.POST,
   );
-  setNestedPath(endpoints, ["leads", "list", "GET"], endpointDefinition_GET_128.GET);
-  setNestedPath(endpoints, ["leads", "import", "POST"], endpointDefinition_POST_129.POST);
+  setNestedPath(
+    endpoints,
+    ["leads", "list", "GET"],
+    endpointDefinition_GET_128.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["leads", "import", "POST"],
+    endpointDefinition_POST_129.POST,
+  );
   setNestedPath(
     endpoints,
     ["leads", "import", "jobs", "[jobId]", "PATCH"],
@@ -770,30 +984,106 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["leads", "import", "jobs", "[jobId]", "retry", "POST"],
     endpointDefinition_POST_133.POST,
   );
-  setNestedPath(endpoints, ["leads", "import", "status", "GET"], endpointDefinition_GET_134.GET);
-  setNestedPath(endpoints, ["leads", "export", "GET"], endpointDefinition_GET_135.GET);
-  setNestedPath(endpoints, ["leads", "stats", "GET"], endpointDefinition_GET_136.GET);
-  setNestedPath(endpoints, ["leads", "create", "POST"], endpointDefinition_POST_137.POST);
-  setNestedPath(endpoints, ["leads", "batch", "PATCH"], endpointDefinition_PATCH_138.PATCH);
-  setNestedPath(endpoints, ["leads", "batch", "DELETE"], endpointDefinition_DELETE_139.DELETE);
-  setNestedPath(endpoints, ["referral", "earnings", "list", "GET"], endpointDefinition_GET_140.GET);
-  setNestedPath(endpoints, ["referral", "POST"], endpointDefinition_POST_141.POST);
-  setNestedPath(endpoints, ["referral", "link-to-lead", "POST"], endpointDefinition_POST_142.POST);
-  setNestedPath(endpoints, ["referral", "codes", "list", "GET"], endpointDefinition_GET_143.GET);
-  setNestedPath(endpoints, ["referral", "stats", "GET"], endpointDefinition_GET_144.GET);
-  setNestedPath(endpoints, ["users", "user", "[id]", "GET"], endpointDefinition_GET_145.GET);
-  setNestedPath(endpoints, ["users", "user", "[id]", "PUT"], endpointDefinition_PUT_146.PUT);
+  setNestedPath(
+    endpoints,
+    ["leads", "import", "status", "GET"],
+    endpointDefinition_GET_134.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["leads", "export", "GET"],
+    endpointDefinition_GET_135.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["leads", "stats", "GET"],
+    endpointDefinition_GET_136.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["leads", "create", "POST"],
+    endpointDefinition_POST_137.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["leads", "batch", "PATCH"],
+    endpointDefinition_PATCH_138.PATCH,
+  );
+  setNestedPath(
+    endpoints,
+    ["leads", "batch", "DELETE"],
+    endpointDefinition_DELETE_139.DELETE,
+  );
+  setNestedPath(
+    endpoints,
+    ["referral", "earnings", "list", "GET"],
+    endpointDefinition_GET_140.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["referral", "POST"],
+    endpointDefinition_POST_141.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["referral", "link-to-lead", "POST"],
+    endpointDefinition_POST_142.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["referral", "codes", "list", "GET"],
+    endpointDefinition_GET_143.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["referral", "stats", "GET"],
+    endpointDefinition_GET_144.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["users", "user", "[id]", "GET"],
+    endpointDefinition_GET_145.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["users", "user", "[id]", "PUT"],
+    endpointDefinition_PUT_146.PUT,
+  );
   setNestedPath(
     endpoints,
     ["users", "user", "[id]", "DELETE"],
     endpointDefinition_DELETE_147.DELETE,
   );
-  setNestedPath(endpoints, ["users", "list", "GET"], endpointDefinition_GET_148.GET);
-  setNestedPath(endpoints, ["users", "stats", "GET"], endpointDefinition_GET_149.GET);
-  setNestedPath(endpoints, ["users", "create", "POST"], endpointDefinition_POST_150.POST);
-  setNestedPath(endpoints, ["user", "private", "logout", "POST"], endpointDefinition_POST_151.POST);
-  setNestedPath(endpoints, ["user", "private", "me", "GET"], endpointDefinition_GET_152.GET);
-  setNestedPath(endpoints, ["user", "private", "me", "POST"], endpointDefinition_POST_153.POST);
+  setNestedPath(
+    endpoints,
+    ["users", "list", "GET"],
+    endpointDefinition_GET_148.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["users", "stats", "GET"],
+    endpointDefinition_GET_149.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["users", "create", "POST"],
+    endpointDefinition_POST_150.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["user", "private", "logout", "POST"],
+    endpointDefinition_POST_151.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["user", "private", "me", "GET"],
+    endpointDefinition_GET_152.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["user", "private", "me", "POST"],
+    endpointDefinition_POST_153.POST,
+  );
   setNestedPath(
     endpoints,
     ["user", "private", "me", "DELETE"],
@@ -814,13 +1104,21 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["user", "private", "me", "avatar", "DELETE"],
     endpointDefinition_DELETE_157.DELETE,
   );
-  setNestedPath(endpoints, ["user", "public", "login", "POST"], endpointDefinition_POST_158.POST);
+  setNestedPath(
+    endpoints,
+    ["user", "public", "login", "POST"],
+    endpointDefinition_POST_158.POST,
+  );
   setNestedPath(
     endpoints,
     ["user", "public", "login", "options", "GET"],
     endpointDefinition_GET_159.GET,
   );
-  setNestedPath(endpoints, ["user", "public", "signup", "POST"], endpointDefinition_POST_160.POST);
+  setNestedPath(
+    endpoints,
+    ["user", "public", "signup", "POST"],
+    endpointDefinition_POST_160.POST,
+  );
   setNestedPath(
     endpoints,
     ["user", "public", "reset-password", "validate", "GET"],
@@ -836,16 +1134,52 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["user", "public", "reset-password", "confirm", "POST"],
     endpointDefinition_POST_163.POST,
   );
-  setNestedPath(endpoints, ["user", "search", "GET"], endpointDefinition_GET_164.GET);
-  setNestedPath(endpoints, ["user", "auth", "check", "GET"], endpointDefinition_GET_165.GET);
-  setNestedPath(endpoints, ["subscription", "GET"], endpointDefinition_GET_166.GET);
-  setNestedPath(endpoints, ["subscription", "POST"], endpointDefinition_POST_167.POST);
-  setNestedPath(endpoints, ["subscription", "PUT"], endpointDefinition_PUT_168.PUT);
-  setNestedPath(endpoints, ["subscription", "DELETE"], endpointDefinition_DELETE_169.DELETE);
+  setNestedPath(
+    endpoints,
+    ["user", "search", "GET"],
+    endpointDefinition_GET_164.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["user", "auth", "check", "GET"],
+    endpointDefinition_GET_165.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["subscription", "GET"],
+    endpointDefinition_GET_166.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["subscription", "POST"],
+    endpointDefinition_POST_167.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["subscription", "PUT"],
+    endpointDefinition_PUT_168.PUT,
+  );
+  setNestedPath(
+    endpoints,
+    ["subscription", "DELETE"],
+    endpointDefinition_DELETE_169.DELETE,
+  );
   setNestedPath(endpoints, ["payment", "GET"], endpointDefinition_GET_170.GET);
-  setNestedPath(endpoints, ["payment", "POST"], endpointDefinition_POST_171.POST);
-  setNestedPath(endpoints, ["payment", "portal", "POST"], endpointDefinition_POST_172.POST);
-  setNestedPath(endpoints, ["payment", "invoice", "POST"], endpointDefinition_POST_173.POST);
+  setNestedPath(
+    endpoints,
+    ["payment", "POST"],
+    endpointDefinition_POST_171.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["payment", "portal", "POST"],
+    endpointDefinition_POST_172.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["payment", "invoice", "POST"],
+    endpointDefinition_POST_173.POST,
+  );
   setNestedPath(
     endpoints,
     ["payment", "providers", "stripe", "cli", "POST"],
@@ -856,12 +1190,32 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["payment", "providers", "nowpayments", "cli", "POST"],
     endpointDefinition_POST_175.POST,
   );
-  setNestedPath(endpoints, ["payment", "checkout", "POST"], endpointDefinition_POST_176.POST);
-  setNestedPath(endpoints, ["payment", "refund", "POST"], endpointDefinition_POST_177.POST);
+  setNestedPath(
+    endpoints,
+    ["payment", "checkout", "POST"],
+    endpointDefinition_POST_176.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["payment", "refund", "POST"],
+    endpointDefinition_POST_177.POST,
+  );
   setNestedPath(endpoints, ["credits", "GET"], endpointDefinition_GET_178.GET);
-  setNestedPath(endpoints, ["credits", "history", "GET"], endpointDefinition_GET_179.GET);
-  setNestedPath(endpoints, ["credits", "purchase", "POST"], endpointDefinition_POST_180.POST);
-  setNestedPath(endpoints, ["contact", "POST"], endpointDefinition_POST_181.POST);
+  setNestedPath(
+    endpoints,
+    ["credits", "history", "GET"],
+    endpointDefinition_GET_179.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["credits", "purchase", "POST"],
+    endpointDefinition_POST_180.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["contact", "POST"],
+    endpointDefinition_POST_181.POST,
+  );
   setNestedPath(
     endpoints,
     ["emails", "smtp-client", "list", "GET"],
@@ -882,10 +1236,26 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["emails", "smtp-client", "create", "POST"],
     endpointDefinition_POST_185.POST,
   );
-  setNestedPath(endpoints, ["emails", "send", "POST"], endpointDefinition_POST_186.POST);
-  setNestedPath(endpoints, ["emails", "messages", "[id]", "GET"], endpointDefinition_GET_187.GET);
-  setNestedPath(endpoints, ["emails", "messages", "list", "GET"], endpointDefinition_GET_188.GET);
-  setNestedPath(endpoints, ["emails", "messages", "stats", "GET"], endpointDefinition_GET_189.GET);
+  setNestedPath(
+    endpoints,
+    ["emails", "send", "POST"],
+    endpointDefinition_POST_186.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["emails", "messages", "[id]", "GET"],
+    endpointDefinition_GET_187.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["emails", "messages", "list", "GET"],
+    endpointDefinition_GET_188.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["emails", "messages", "stats", "GET"],
+    endpointDefinition_GET_189.GET,
+  );
   setNestedPath(
     endpoints,
     ["emails", "imap-client", "messages", "[id]", "GET"],
@@ -976,11 +1346,27 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["emails", "preview", "render", "POST"],
     endpointDefinition_POST_207.POST,
   );
-  setNestedPath(endpoints, ["import", "POST"], endpointDefinition_POST_208.POST);
+  setNestedPath(
+    endpoints,
+    ["import", "POST"],
+    endpointDefinition_POST_208.POST,
+  );
   setNestedPath(endpoints, ["import", "GET"], endpointDefinition_GET_209.GET);
-  setNestedPath(endpoints, ["newsletter", "unsubscribe", "POST"], endpointDefinition_POST_210.POST);
-  setNestedPath(endpoints, ["newsletter", "subscribe", "POST"], endpointDefinition_POST_211.POST);
-  setNestedPath(endpoints, ["newsletter", "status", "GET"], endpointDefinition_GET_212.GET);
+  setNestedPath(
+    endpoints,
+    ["newsletter", "unsubscribe", "POST"],
+    endpointDefinition_POST_210.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["newsletter", "subscribe", "POST"],
+    endpointDefinition_POST_211.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["newsletter", "status", "GET"],
+    endpointDefinition_GET_212.GET,
+  );
   setNestedPath(
     endpoints,
     ["browser", "performance-analyze-insight", "POST"],
@@ -991,26 +1377,86 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["browser", "get-console-message", "POST"],
     endpointDefinition_POST_214.POST,
   );
-  setNestedPath(endpoints, ["browser", "new-page", "POST"], endpointDefinition_POST_215.POST);
-  setNestedPath(endpoints, ["browser", "take-snapshot", "POST"], endpointDefinition_POST_216.POST);
-  setNestedPath(endpoints, ["browser", "drag", "POST"], endpointDefinition_POST_217.POST);
-  setNestedPath(endpoints, ["browser", "POST"], endpointDefinition_POST_218.POST);
+  setNestedPath(
+    endpoints,
+    ["browser", "new-page", "POST"],
+    endpointDefinition_POST_215.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "take-snapshot", "POST"],
+    endpointDefinition_POST_216.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "drag", "POST"],
+    endpointDefinition_POST_217.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "POST"],
+    endpointDefinition_POST_218.POST,
+  );
   setNestedPath(
     endpoints,
     ["browser", "get-network-request", "POST"],
     endpointDefinition_POST_219.POST,
   );
-  setNestedPath(endpoints, ["browser", "list-pages", "POST"], endpointDefinition_POST_220.POST);
-  setNestedPath(endpoints, ["browser", "close-page", "POST"], endpointDefinition_POST_221.POST);
-  setNestedPath(endpoints, ["browser", "resize-page", "POST"], endpointDefinition_POST_222.POST);
-  setNestedPath(endpoints, ["browser", "fill", "POST"], endpointDefinition_POST_223.POST);
-  setNestedPath(endpoints, ["browser", "hover", "POST"], endpointDefinition_POST_224.POST);
-  setNestedPath(endpoints, ["browser", "upload-file", "POST"], endpointDefinition_POST_225.POST);
-  setNestedPath(endpoints, ["browser", "handle-dialog", "POST"], endpointDefinition_POST_226.POST);
-  setNestedPath(endpoints, ["browser", "select-page", "POST"], endpointDefinition_POST_227.POST);
-  setNestedPath(endpoints, ["browser", "navigate-page", "POST"], endpointDefinition_POST_228.POST);
-  setNestedPath(endpoints, ["browser", "press-key", "POST"], endpointDefinition_POST_229.POST);
-  setNestedPath(endpoints, ["browser", "fill-form", "POST"], endpointDefinition_POST_230.POST);
+  setNestedPath(
+    endpoints,
+    ["browser", "list-pages", "POST"],
+    endpointDefinition_POST_220.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "close-page", "POST"],
+    endpointDefinition_POST_221.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "resize-page", "POST"],
+    endpointDefinition_POST_222.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "fill", "POST"],
+    endpointDefinition_POST_223.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "hover", "POST"],
+    endpointDefinition_POST_224.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "upload-file", "POST"],
+    endpointDefinition_POST_225.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "handle-dialog", "POST"],
+    endpointDefinition_POST_226.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "select-page", "POST"],
+    endpointDefinition_POST_227.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "navigate-page", "POST"],
+    endpointDefinition_POST_228.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "press-key", "POST"],
+    endpointDefinition_POST_229.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "fill-form", "POST"],
+    endpointDefinition_POST_230.POST,
+  );
   setNestedPath(
     endpoints,
     ["browser", "performance-stop-trace", "POST"],
@@ -1021,7 +1467,11 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["browser", "performance-start-trace", "POST"],
     endpointDefinition_POST_232.POST,
   );
-  setNestedPath(endpoints, ["browser", "emulate", "POST"], endpointDefinition_POST_233.POST);
+  setNestedPath(
+    endpoints,
+    ["browser", "emulate", "POST"],
+    endpointDefinition_POST_233.POST,
+  );
   setNestedPath(
     endpoints,
     ["browser", "take-screenshot", "POST"],
@@ -1042,8 +1492,16 @@ function initializeEndpoints(): Record<string, ApiSection> {
     ["browser", "list-console-messages", "POST"],
     endpointDefinition_POST_237.POST,
   );
-  setNestedPath(endpoints, ["browser", "wait-for", "POST"], endpointDefinition_POST_238.POST);
-  setNestedPath(endpoints, ["browser", "click", "POST"], endpointDefinition_POST_239.POST);
+  setNestedPath(
+    endpoints,
+    ["browser", "wait-for", "POST"],
+    endpointDefinition_POST_238.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["browser", "click", "POST"],
+    endpointDefinition_POST_239.POST,
+  );
 
   endpointsInstance = endpoints;
   return endpoints;

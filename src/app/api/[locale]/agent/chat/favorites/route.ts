@@ -18,6 +18,7 @@ export const { GET, POST, tools } = endpointsHandler({
   },
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger }) => ChatFavoritesRepository.createFavorite(data, user, logger),
+    handler: ({ data, user, logger }) =>
+      ChatFavoritesRepository.createFavorite(data, user, logger),
   },
 });

@@ -24,7 +24,11 @@ import type {
   PrimitiveField,
   UnifiedField,
 } from "../../types/endpoint";
-import type { EndpointErrorTypes, FieldUsage, Methods } from "../../types/enums";
+import type {
+  EndpointErrorTypes,
+  FieldUsage,
+  Methods,
+} from "../../types/enums";
 import type { WidgetConfig } from "../../widgets/configs";
 
 // ============================================================================
@@ -36,7 +40,9 @@ type Test1_1_LiteralString = "default" extends string ? "PASS" : "FAIL";
 const test1_1: Test1_1_LiteralString = "PASS";
 
 // Test 1.2: Can a union literal extend string?
-type Test1_2_UnionLiteral = "default" | "failed" extends string ? "PASS" : "FAIL";
+type Test1_2_UnionLiteral = "default" | "failed" extends string
+  ? "PASS"
+  : "FAIL";
 const test1_2: Test1_2_UnionLiteral = "PASS";
 
 // Test 1.3: Can a specific Methods enum extend Methods?
@@ -102,7 +108,12 @@ type Test3_1_LiteralCreate = CreateApiEndpoint<
   string,
   ObjectField<
     {
-      jobId: PrimitiveField<z.ZodUUID, { request: "urlPathParams" }, string, WidgetConfig<string>>;
+      jobId: PrimitiveField<
+        z.ZodUUID,
+        { request: "urlPathParams" },
+        string,
+        WidgetConfig<string>
+      >;
     },
     { request: "urlPathParams"; response: true },
     string,
@@ -111,14 +122,21 @@ type Test3_1_LiteralCreate = CreateApiEndpoint<
 >;
 
 // Test 3.2: Can it be assigned to CreateApiEndpointAny?
-type Test3_2_Result = Test3_1_LiteralCreate extends CreateApiEndpointAny ? "PASS" : "FAIL";
+type Test3_2_Result = Test3_1_LiteralCreate extends CreateApiEndpointAny
+  ? "PASS"
+  : "FAIL";
 const test3_2: Test3_2_Result = "PASS"; // Fixed! CreateApiEndpoint now extends CreateApiEndpointAny
 
 // Test 3.3: Does the ObjectField extend UnifiedField?
 type Test3_3_ObjectFieldExtendsUnified =
   ObjectField<
     {
-      jobId: PrimitiveField<z.ZodUUID, { request: "urlPathParams" }, string, WidgetConfig<string>>;
+      jobId: PrimitiveField<
+        z.ZodUUID,
+        { request: "urlPathParams" },
+        string,
+        WidgetConfig<string>
+      >;
     },
     { request: "urlPathParams"; response: true },
     string,
@@ -158,14 +176,22 @@ const test3_4: Test3_4_FullCheck = "PASS"; // We WANT this to pass
 // Let's test if this property type is compatible
 type TestObjectField = ObjectField<
   {
-    jobId: PrimitiveField<z.ZodUUID, { request: "urlPathParams" }, string, WidgetConfig<string>>;
+    jobId: PrimitiveField<
+      z.ZodUUID,
+      { request: "urlPathParams" },
+      string,
+      WidgetConfig<string>
+    >;
   },
   { request: "urlPathParams"; response: true },
   string,
   WidgetConfig<string>
 >;
 type Test3_5_SchemaCompat = {
-  readonly requestSchema: InferSchemaFromField<TestObjectField, FieldUsage.RequestData>;
+  readonly requestSchema: InferSchemaFromField<
+    TestObjectField,
+    FieldUsage.RequestData
+  >;
 } extends {
   readonly requestSchema: InferSchemaFromField<
     UnifiedField<string, z.ZodTypeAny>,
@@ -212,7 +238,8 @@ type Test3_7_ApiEndpointBase =
 const test3_7: Test3_7_ApiEndpointBase = "PASS"; // We WANT ApiEndpoint with ObjectField to extend ApiEndpoint with UnifiedField
 
 // Test 3.8: Direct test - does ObjectField with WidgetConfig<string> extend UnifiedField<string>?
-type Test3_8_Direct = TestObjectField extends UnifiedField<string, z.ZodTypeAny> ? "PASS" : "FAIL";
+type Test3_8_Direct =
+  TestObjectField extends UnifiedField<string, z.ZodTypeAny> ? "PASS" : "FAIL";
 const test3_8: Test3_8_Direct = "PASS"; // We WANT ObjectField to extend UnifiedField
 
 // Test 3.9: Test if WidgetConfig<string> is the issue
@@ -252,23 +279,32 @@ type Test3_10_SimpleObject =
 const test3_10: Test3_10_SimpleObject = "PASS"; // We WANT simple ObjectField to work in ApiEndpoint
 
 // Test 3.11: Test a minimal interface with just the fields property
-interface MinimalEndpoint<out TFields extends UnifiedField<string, z.ZodTypeAny>> {
+interface MinimalEndpoint<
+  out TFields extends UnifiedField<string, z.ZodTypeAny>,
+> {
   readonly fields: TFields;
 }
 type Test3_11_Minimal =
-  MinimalEndpoint<TestObjectField> extends MinimalEndpoint<UnifiedField<string, z.ZodTypeAny>>
+  MinimalEndpoint<TestObjectField> extends MinimalEndpoint<
+    UnifiedField<string, z.ZodTypeAny>
+  >
     ? "PASS"
     : "FAIL";
 const test3_11: Test3_11_Minimal = "PASS"; // We WANT minimal interface to work
 
 // Test 3.12: Test with a conditional type property (like exampleRequest in ApiEndpoint)
-interface ConditionalEndpoint<out TFields extends UnifiedField<string, z.ZodTypeAny>> {
+interface ConditionalEndpoint<
+  out TFields extends UnifiedField<string, z.ZodTypeAny>,
+> {
   readonly fields: TFields;
   readonly example: ExtractInput<
     InferSchemaFromField<TFields, FieldUsage.RequestData>
   > extends never
     ? undefined
-    : Record<string, ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>>;
+    : Record<
+        string,
+        ExtractInput<InferSchemaFromField<TFields, FieldUsage.RequestData>>
+      >;
 }
 type Test3_12_Conditional =
   ConditionalEndpoint<TestObjectField> extends ConditionalEndpoint<
@@ -280,7 +316,9 @@ const test3_12: Test3_12_Conditional = "PASS"; // Conditional properties work!
 
 // Test 3.13: Check what's actually different in ApiEndpoint that causes the failure
 // ApiEndpoint has many properties. Let me add them one by one.
-interface TestEndpointV1<out TFields extends UnifiedField<string, z.ZodTypeAny>> {
+interface TestEndpointV1<
+  out TFields extends UnifiedField<string, z.ZodTypeAny>,
+> {
   readonly fields: TFields;
 }
 interface TestEndpointV2<
@@ -364,7 +402,9 @@ type Test3_17_WithExamples =
 const test3_17: Test3_17_WithExamples = "PASS"; // We WANT the examples property structure to work
 
 // Test 3.18: Test the ACTUAL ExamplesList mapped type
-type Test3_18_MappedType = { [K in "default"]: number } extends { [K in string]: number }
+type Test3_18_MappedType = { [K in "default"]: number } extends {
+  [K in string]: number;
+}
   ? "PASS"
   : "FAIL";
 const test3_18: Test3_18_MappedType = "PASS"; // We WANT specific mapped type to extend generic
@@ -386,10 +426,10 @@ interface TestConditionalExamples<
       };
 }
 type Test3_19_ConditionalExamples =
-  TestConditionalExamples<"default", TestObjectField> extends TestConditionalExamples<
-    string,
-    UnifiedField<string, z.ZodTypeAny>
-  >
+  TestConditionalExamples<
+    "default",
+    TestObjectField
+  > extends TestConditionalExamples<string, UnifiedField<string, z.ZodTypeAny>>
     ? "PASS"
     : "FAIL";
 const test3_19: Test3_19_ConditionalExamples = "PASS"; // We WANT the conditional examples structure to work
@@ -458,7 +498,9 @@ interface TestWithFunctionParam<out TKey extends string> {
   };
 }
 type Test3_23_FunctionParam =
-  TestWithFunctionParam<"specific"> extends TestWithFunctionParam<string> ? "PASS" : "FAIL";
+  TestWithFunctionParam<"specific"> extends TestWithFunctionParam<string>
+    ? "PASS"
+    : "FAIL";
 const test3_23: Test3_23_FunctionParam = "PASS"; // With 'out' annotation, TypeScript trusts the variance declaration
 
 // Test 3.24: Test if NoInfer breaks variance
@@ -511,7 +553,9 @@ interface ApiEndpointWithOptions<
     ? EndpointReadOptions<
         ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestData>>,
         ExtractOutput<InferSchemaFromField<TFields, FieldUsage.ResponseData>>,
-        ExtractOutput<InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>>
+        ExtractOutput<
+          InferSchemaFromField<TFields, FieldUsage.RequestUrlParams>
+        >
       >
     : never;
 }
@@ -538,7 +582,12 @@ interface ApiEndpointWithErrorTypes<
   TUserRoleValue extends readonly UserRoleValue[],
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<string, z.ZodTypeAny>,
-> extends ApiEndpointWithOptions<TExampleKey, TMethod, TUserRoleValue, TFields> {
+> extends ApiEndpointWithOptions<
+  TExampleKey,
+  TMethod,
+  TUserRoleValue,
+  TFields
+> {
   readonly errorTypes: Record<
     EndpointErrorTypes,
     {
@@ -577,7 +626,9 @@ type MappedRecord<TKey extends string, T> = {
 // Test 3.28a: Does mapped type key preserve variance?
 type Test3_28a_Specific = MappedRecord<"default", string>;
 type Test3_28a_Generic = MappedRecord<string, string>;
-type Test3_28a_Result = Test3_28a_Specific extends Test3_28a_Generic ? "PASS" : "FAIL";
+type Test3_28a_Result = Test3_28a_Specific extends Test3_28a_Generic
+  ? "PASS"
+  : "FAIL";
 const test3_28a: Test3_28a_Result = "PASS"; // We WANT this to pass
 
 // Test 3.28b: Interface with out variance annotation and mapped type property
@@ -585,7 +636,9 @@ interface TestMappedVariance<TKey extends string> {
   readonly mapped: MappedRecord<TKey, string>;
 }
 type Test3_28b_Result =
-  TestMappedVariance<"default"> extends TestMappedVariance<string> ? "PASS" : "FAIL";
+  TestMappedVariance<"default"> extends TestMappedVariance<string>
+    ? "PASS"
+    : "FAIL";
 const test3_28b: Test3_28b_Result = "PASS"; // TypeScript infers covariance for readonly properties
 
 // Test 3.28c: Can we use index signature instead of mapped type?
@@ -594,7 +647,10 @@ type IndexSignatureRecord<TKey extends string, T> = {
   readonly [K in TKey]: T;
 };
 type Test3_28c_Result =
-  IndexSignatureRecord<"default", string> extends IndexSignatureRecord<string, string>
+  IndexSignatureRecord<"default", string> extends IndexSignatureRecord<
+    string,
+    string
+  >
     ? "PASS"
     : "FAIL";
 const test3_28c: Test3_28c_Result = "PASS"; // We WANT this to pass
@@ -604,7 +660,9 @@ interface TestRecordVariance<TKey extends string> {
   readonly mapped: Record<TKey, string>;
 }
 type Test3_28d_Result =
-  TestRecordVariance<"default"> extends TestRecordVariance<string> ? "PASS" : "FAIL";
+  TestRecordVariance<"default"> extends TestRecordVariance<string>
+    ? "PASS"
+    : "FAIL";
 const test3_28d: Test3_28d_Result = "PASS"; // TypeScript infers covariance for readonly properties
 
 // Test 3.28e: Verify mapped type works correctly (index signatures can't use generics)
@@ -647,7 +705,9 @@ type Test3_29_Specific = CreateApiEndpoint<
   "app.api.someScope.title",
   SimpleObjectField
 >;
-type Test3_29_Result = Test3_29_Specific extends CreateApiEndpointAny ? "PASS" : "FAIL";
+type Test3_29_Result = Test3_29_Specific extends CreateApiEndpointAny
+  ? "PASS"
+  : "FAIL";
 const test3_29: Test3_29_Result = "PASS"; // We WANT CreateApiEndpoint to satisfy CreateApiEndpointAny!
 
 // Test 3.30: Test if function parameter causes contravariance issue
@@ -657,7 +717,9 @@ interface TestFunctionParam<out TKey extends string> {
   };
 }
 type Test3_30_Result =
-  TestFunctionParam<"default"> extends TestFunctionParam<string> ? "PASS" : "FAIL";
+  TestFunctionParam<"default"> extends TestFunctionParam<string>
+    ? "PASS"
+    : "FAIL";
 const test3_30: Test3_30_Result = "PASS"; // We WANT this but it will FAIL due to contravariance
 // Force type check: if it's "FAIL", this will error
 type Test3_30_Check = Test3_30_Result extends "PASS" ? true : false;
@@ -678,7 +740,9 @@ type Test3_31_GenericApi = ApiEndpoint<
   string,
   UnifiedField<string, z.ZodTypeAny>
 >;
-type Test3_31_Result = Test3_31_SpecificApi extends Test3_31_GenericApi ? "PASS" : "FAIL";
+type Test3_31_Result = Test3_31_SpecificApi extends Test3_31_GenericApi
+  ? "PASS"
+  : "FAIL";
 const test3_31: Test3_31_Result = "PASS"; // We WANT ApiEndpoint to work
 
 // ============================================================================
@@ -693,7 +757,9 @@ type Test4_1_GenericExample = CreateApiEndpoint<
   string,
   UnifiedField<string, z.ZodTypeAny>
 >;
-type Test4_1_Result = Test4_1_GenericExample extends CreateApiEndpointAny ? "PASS" : "FAIL";
+type Test4_1_Result = Test4_1_GenericExample extends CreateApiEndpointAny
+  ? "PASS"
+  : "FAIL";
 const test4_1: Test4_1_Result = "PASS"; // Passes with variance!
 
 // Test 4.2: Test with generic TMethod but specific other params
@@ -704,7 +770,9 @@ type Test4_2_GenericMethod = CreateApiEndpoint<
   string,
   UnifiedField<string, z.ZodTypeAny>
 >;
-type Test4_2_Result = Test4_2_GenericMethod extends CreateApiEndpointAny ? "PASS" : "FAIL";
+type Test4_2_Result = Test4_2_GenericMethod extends CreateApiEndpointAny
+  ? "PASS"
+  : "FAIL";
 const test4_2: Test4_2_Result = "PASS"; // Passes with variance!
 
 // Test 4.3: Test with generic TUserRoleValue but specific other params
@@ -715,7 +783,9 @@ type Test4_3_GenericRoles = CreateApiEndpoint<
   string,
   UnifiedField<string, z.ZodTypeAny>
 >;
-type Test4_3_Result = Test4_3_GenericRoles extends CreateApiEndpointAny ? "PASS" : "FAIL";
+type Test4_3_Result = Test4_3_GenericRoles extends CreateApiEndpointAny
+  ? "PASS"
+  : "FAIL";
 const test4_3: Test4_3_Result = "PASS"; // Should pass!
 
 // Test 4.4: Tuple of UserRoleValue extends readonly UserRoleValue[]
@@ -726,7 +796,9 @@ type Test4_4_OnlyRoleIssue = CreateApiEndpoint<
   string,
   UnifiedField<string, z.ZodTypeAny>
 >;
-type Test4_4_Result = Test4_4_OnlyRoleIssue extends CreateApiEndpointAny ? "PASS" : "FAIL";
+type Test4_4_Result = Test4_4_OnlyRoleIssue extends CreateApiEndpointAny
+  ? "PASS"
+  : "FAIL";
 const test4_4: Test4_4_Result = "PASS"; // Passes with variance!
 
 // ============================================================================
@@ -749,7 +821,9 @@ type Test5_2_WithTuple = Test5_2_Container<
   readonly ["app.api.user.userRoles.enums.userRole.admin"]
 >;
 type Test5_2_Result =
-  Test5_2_WithTuple extends Test5_2_Container<readonly UserRoleValue[]> ? "PASS" : "FAIL";
+  Test5_2_WithTuple extends Test5_2_Container<readonly UserRoleValue[]>
+    ? "PASS"
+    : "FAIL";
 const test5_2: Test5_2_Result = "PASS"; // Passes - TypeScript infers covariance when property is not modified
 
 // Test 5.3: With 'out' variance annotation
@@ -760,7 +834,9 @@ type Test5_3_WithTuple = Test5_3_ContainerOut<
   readonly ["app.api.user.userRoles.enums.userRole.admin"]
 >;
 type Test5_3_Result =
-  Test5_3_WithTuple extends Test5_3_ContainerOut<readonly UserRoleValue[]> ? "PASS" : "FAIL";
+  Test5_3_WithTuple extends Test5_3_ContainerOut<readonly UserRoleValue[]>
+    ? "PASS"
+    : "FAIL";
 const test5_3: Test5_3_Result = "PASS"; // With 'out', it works!
 
 // ============================================================================
@@ -799,7 +875,9 @@ type Test7_1_CreateWithOut = CreateApiEndpoint<
   string,
   UnifiedField<string, z.ZodTypeAny>
 >;
-type Test7_1_Result = Test7_1_CreateWithOut extends CreateApiEndpointAny ? "PASS" : "FAIL";
+type Test7_1_Result = Test7_1_CreateWithOut extends CreateApiEndpointAny
+  ? "PASS"
+  : "FAIL";
 const test7_1: Test7_1_Result = "PASS"; // Passes with interface extends + variance!
 
 // Test 7.2: Check if the issue is in the intersection (&)
@@ -817,13 +895,16 @@ interface Test8_1_Base<out T extends readonly UserRoleValue[]> {
 interface Test8_1_Extra {
   readonly extra: string;
 }
-type Test8_1_Intersection<T extends readonly UserRoleValue[]> = Test8_1_Base<T> & Test8_1_Extra;
+type Test8_1_Intersection<T extends readonly UserRoleValue[]> =
+  Test8_1_Base<T> & Test8_1_Extra;
 
 type Test8_1_WithTuple = Test8_1_Intersection<
   readonly ["app.api.user.userRoles.enums.userRole.admin"]
 >;
 type Test8_1_Result =
-  Test8_1_WithTuple extends Test8_1_Intersection<readonly UserRoleValue[]> ? "PASS" : "FAIL";
+  Test8_1_WithTuple extends Test8_1_Intersection<readonly UserRoleValue[]>
+    ? "PASS"
+    : "FAIL";
 const test8_1: Test8_1_Result = "PASS"; // Intersection preserves variance from base interface!
 
 // Test 8.2: Key insight - interface extends + 'out' variance annotations solve the issue

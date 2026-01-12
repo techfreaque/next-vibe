@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.press-key.description",
   category: "app.api.browser.category",
   icon: "keyboard",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.inputAutomation"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.inputAutomation",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -147,7 +150,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.press-key.errors.unsavedChanges.title",
-      description: "app.api.browser.press-key.errors.unsavedChanges.description",
+      description:
+        "app.api.browser.press-key.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.press-key.errors.conflict.title",

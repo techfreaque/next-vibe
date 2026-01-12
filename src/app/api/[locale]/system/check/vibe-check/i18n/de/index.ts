@@ -144,7 +144,8 @@ export const translations: typeof enTranslations = {
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description: "Ein unbekannter Fehler ist während des Vibe Check aufgetreten",
+      description:
+        "Ein unbekannter Fehler ist während des Vibe Check aufgetreten",
     },
     unsaved: {
       title: "Ungespeicherte Änderungen",

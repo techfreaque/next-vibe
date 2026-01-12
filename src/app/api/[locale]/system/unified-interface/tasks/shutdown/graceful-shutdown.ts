@@ -97,24 +97,33 @@ export class GracefulShutdownManager {
 
     // Set a timeout to force exit if shutdown takes too long
     const forceExitTimeout = setTimeout(() => {
-      logger.error(`⏰ Shutdown timeout reached (${this.shutdownTimeout}ms), forcing exit`);
+      logger.error(
+        `⏰ Shutdown timeout reached (${this.shutdownTimeout}ms), forcing exit`,
+      );
       process.exit(1);
     }, this.shutdownTimeout);
 
     try {
       // Execute all shutdown handlers
-      logger.info(`🔄 Running ${this.shutdownHandlers.length} shutdown handlers...`);
+      logger.info(
+        `🔄 Running ${this.shutdownHandlers.length} shutdown handlers...`,
+      );
 
-      const shutdownPromises = this.shutdownHandlers.map(async (handler, index) => {
-        try {
-          logger.info(`🔄 Running shutdown handler ${index + 1}...`);
-          await handler();
-          logger.info(`✅ Shutdown handler ${index + 1} completed`);
-        } catch (error) {
-          const parsedError = parseError(error);
-          logger.error(`❌ Shutdown handler ${index + 1} failed:`, parsedError.message);
-        }
-      });
+      const shutdownPromises = this.shutdownHandlers.map(
+        async (handler, index) => {
+          try {
+            logger.info(`🔄 Running shutdown handler ${index + 1}...`);
+            await handler();
+            logger.info(`✅ Shutdown handler ${index + 1} completed`);
+          } catch (error) {
+            const parsedError = parseError(error);
+            logger.error(
+              `❌ Shutdown handler ${index + 1} failed:`,
+              parsedError.message,
+            );
+          }
+        },
+      );
 
       // Wait for all handlers to complete
       await Promise.all(shutdownPromises);

@@ -3,8 +3,14 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { type CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
-import { type CreditBalance, CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { ProductIds, productsRepository } from "@/app/api/[locale]/products/repository-client";
+import {
+  type CreditBalance,
+  CreditRepository,
+} from "@/app/api/[locale]/credits/repository";
+import {
+  ProductIds,
+  productsRepository,
+} from "@/app/api/[locale]/products/repository-client";
 import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -25,7 +31,9 @@ interface HistoryPageProps {
 /**
  * Generate metadata for the history page
  */
-export async function generateMetadata({ params }: HistoryPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: HistoryPageProps): Promise<Metadata> {
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "subscription/history",
@@ -38,7 +46,9 @@ export async function generateMetadata({ params }: HistoryPageProps): Promise<Me
   });
 }
 
-export default async function HistoryPage({ params }: HistoryPageProps): Promise<JSX.Element> {
+export default async function HistoryPage({
+  params,
+}: HistoryPageProps): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 
@@ -97,7 +107,9 @@ export default async function HistoryPage({ params }: HistoryPageProps): Promise
       logger,
       locale,
     );
-    subscription = subscriptionResponse.success ? subscriptionResponse.data : null;
+    subscription = subscriptionResponse.success
+      ? subscriptionResponse.data
+      : null;
   }
 
   // Get pricing

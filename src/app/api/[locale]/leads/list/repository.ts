@@ -4,12 +4,18 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { LeadsRepository } from "../repository";
-import type { LeadListGetRequestTypeOutput, LeadListGetResponseTypeOutput } from "./definition";
+import type {
+  LeadListGetRequestTypeOutput,
+  LeadListGetResponseTypeOutput,
+} from "./definition";
 
 /**
  * Repository interface for leads list operations

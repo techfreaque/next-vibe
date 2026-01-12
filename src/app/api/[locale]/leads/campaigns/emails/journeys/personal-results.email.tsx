@@ -12,7 +12,11 @@ import { HumanEmailLayout } from "@/app/api/[locale]/emails/smtp-client/componen
 import { HumanText } from "@/app/api/[locale]/emails/smtp-client/components/human_text.email";
 
 import { EmailCampaignStage } from "../../../enum";
-import type { EmailRenderContext, EmailTemplateFunction, JourneyTemplateMap } from "../types";
+import type {
+  EmailRenderContext,
+  EmailTemplateFunction,
+  JourneyTemplateMap,
+} from "../types";
 import { EmailPricingSection } from "./components/pricing-section.email";
 
 /**
@@ -66,7 +70,9 @@ export const personalPracticalInitialEmail: EmailTemplateFunction = async ({
       </HumanText>
 
       {/* Visual Pricing Section */}
-      <Section style={{ margin: "24px 0" }}>{await EmailPricingSection({ t, locale })}</Section>
+      <Section style={{ margin: "24px 0" }}>
+        {await EmailPricingSection({ t, locale })}
+      </Section>
 
       {/* Bridge to CTA */}
       <HumanText variant="body">

@@ -26,7 +26,10 @@ export const translations = {
     expiresAt: "Token Expires At",
     nextSteps: {
       item: "Next Steps After Validation",
-      steps: ["Proceed to set your new password", "Choose a strong, unique password"],
+      steps: [
+        "Proceed to set your new password",
+        "Choose a strong, unique password",
+      ],
     },
   },
   errors: {

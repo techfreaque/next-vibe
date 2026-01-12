@@ -6,7 +6,8 @@ export const translations: typeof enTranslations = {
   errors: {
     server: {
       title: "Błąd serwera",
-      description: "Wystąpił błąd podczas przetwarzania żądania startera kampanii",
+      description:
+        "Wystąpił błąd podczas przetwarzania żądania startera kampanii",
     },
   },
 };

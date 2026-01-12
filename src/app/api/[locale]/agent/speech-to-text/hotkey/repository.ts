@@ -8,7 +8,11 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { SpeechToTextRepository } from "@/app/api/[locale]/agent/speech-to-text/repository";
@@ -19,7 +23,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CreditRepository } from "../../../credits/repository";
 import { createAdapters } from "./adapters/factory";
-import type { SttHotkeyPostRequestOutput, SttHotkeyPostResponseOutput } from "./definition";
+import type {
+  SttHotkeyPostRequestOutput,
+  SttHotkeyPostResponseOutput,
+} from "./definition";
 import { HotkeyAction, RecordingStatus } from "./enum";
 import { createSession, type SpeechHotkeySession } from "./session";
 import { checkPlatformDependencies, platformDetector } from "./utils/platform";
@@ -66,7 +73,8 @@ export class SttHotkeyRepository {
           missing: deps.missing.join(", "),
         });
         return fail({
-          message: "app.api.agent.speechToText.hotkey.post.errors.dependenciesMissing",
+          message:
+            "app.api.agent.speechToText.hotkey.post.errors.dependenciesMissing",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             missing: deps.missing.join(", "),
@@ -80,7 +88,12 @@ export class SttHotkeyRepository {
       let session = sessions.get(sessionKey);
 
       if (!session) {
-        session = await SttHotkeyRepository.createNewSession(data, user, locale, logger);
+        session = await SttHotkeyRepository.createNewSession(
+          data,
+          user,
+          locale,
+          logger,
+        );
         sessions.set(sessionKey, session);
       }
 
@@ -101,14 +114,18 @@ export class SttHotkeyRepository {
         default:
           // No action provided - should not happen from CLI daemon mode
           return fail({
-            message: "app.api.agent.speechToText.hotkey.post.errors.invalidAction",
+            message:
+              "app.api.agent.speechToText.hotkey.post.errors.invalidAction",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { action: "none" },
           });
       }
     } catch (error) {
       // Enhanced error logging to debug the "unknown error" issue
-      const errorDetails: Record<string, string | number | boolean | null | undefined> = {
+      const errorDetails: Record<
+        string,
+        string | number | boolean | null | undefined
+      > = {
         action: data.action || "none",
         errorType: typeof error,
         errorName: error instanceof Error ? error.name : "unknown",
@@ -164,7 +181,12 @@ export class SttHotkeyRepository {
       });
 
       // Call existing STT repository
-      const result = await SpeechToTextRepository.transcribeAudio(audioFile, user, locale, logger);
+      const result = await SpeechToTextRepository.transcribeAudio(
+        audioFile,
+        user,
+        locale,
+        logger,
+      );
 
       if (!result.success) {
         // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- STT error
@@ -197,7 +219,8 @@ export class SttHotkeyRepository {
     if (session.isRecording) {
       logger.warn("Recording already in progress");
       return fail({
-        message: "app.api.agent.speechToText.hotkey.post.errors.alreadyRecording",
+        message:
+          "app.api.agent.speechToText.hotkey.post.errors.alreadyRecording",
         errorType: ErrorResponseTypes.CONFLICT,
       });
     }
@@ -246,7 +269,12 @@ export class SttHotkeyRepository {
     });
 
     // Deduct credits AFTER successful completion based on recording duration
-    await CreditRepository.deductCreditsForFeature(user, cost, "stt-hotkey", logger);
+    await CreditRepository.deductCreditsForFeature(
+      user,
+      cost,
+      "stt-hotkey",
+      logger,
+    );
 
     return success({
       response: {

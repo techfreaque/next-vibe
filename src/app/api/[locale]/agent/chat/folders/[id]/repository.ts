@@ -268,7 +268,8 @@ export class FolderRepository {
       // Check if user can delete this folder
       if (!(await canDeleteFolder(user, existingFolder, logger, foldersMap))) {
         return fail({
-          message: "app.api.agent.chat.folders.id.delete.errors.forbidden.title",
+          message:
+            "app.api.agent.chat.folders.id.delete.errors.forbidden.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -292,4 +293,7 @@ export class FolderRepository {
 }
 
 // Type for native repository type checking
-export type FolderRepositoryType = Pick<typeof FolderRepository, keyof typeof FolderRepository>;
+export type FolderRepositoryType = Pick<
+  typeof FolderRepository,
+  keyof typeof FolderRepository
+>;

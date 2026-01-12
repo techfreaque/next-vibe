@@ -90,7 +90,11 @@ export function AccordionWidget<const TKey extends string>({
   if (!data || !data.items || data.items.length === 0) {
     return (
       <Div
-        className={cn("text-center text-muted-foreground", emptyPaddingClass || "py-8", className)}
+        className={cn(
+          "text-center text-muted-foreground",
+          emptyPaddingClass || "py-8",
+          className,
+        )}
       >
         {context.t("system.ui.widgets.accordion.empty")}
       </Div>
@@ -100,7 +104,9 @@ export function AccordionWidget<const TKey extends string>({
   const { items } = data;
 
   // Get default open items
-  const defaultValue = items.filter((item) => item.expanded).map((item) => item.id || item.title);
+  const defaultValue = items
+    .filter((item) => item.expanded)
+    .map((item) => item.id || item.title);
 
   return (
     <Accordion
@@ -138,14 +144,25 @@ export function AccordionWidget<const TKey extends string>({
                 item.disabled && "opacity-50 cursor-not-allowed",
               )}
             >
-              <Div className={cn("flex items-center", titleGapClass || "gap-2")}>
-                {itemIcon && <Span className={iconSizeClass || "text-lg"}>{itemIcon}</Span>}
+              <Div
+                className={cn("flex items-center", titleGapClass || "gap-2")}
+              >
+                {itemIcon && (
+                  <Span className={iconSizeClass || "text-lg"}>{itemIcon}</Span>
+                )}
                 <Span className="font-medium">{item.title}</Span>
               </Div>
             </AccordionTrigger>
-            <AccordionContent className={cn(variant === "separated" && contentPaddingClass)}>
+            <AccordionContent
+              className={cn(variant === "separated" && contentPaddingClass)}
+            >
               {typeof item.content === "string" ? (
-                <Div className={cn("text-muted-foreground", contentTextSizeClass || "text-sm")}>
+                <Div
+                  className={cn(
+                    "text-muted-foreground",
+                    contentTextSizeClass || "text-sm",
+                  )}
+                >
                   {item.content}
                 </Div>
               ) : (

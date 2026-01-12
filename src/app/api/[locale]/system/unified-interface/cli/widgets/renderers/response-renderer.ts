@@ -24,7 +24,11 @@ import type { EndpointLogger } from "../../../shared/logger/endpoint";
 import type { WidgetData } from "../../../shared/widgets/types";
 import type { WidgetRegistry } from "../core/registry";
 import { defaultWidgetRegistry } from "../core/registry";
-import type { CLIRenderingOptions, DataFormatter, WidgetRenderContext } from "../core/types";
+import type {
+  CLIRenderingOptions,
+  DataFormatter,
+  WidgetRenderContext,
+} from "../core/types";
 
 /**
  * Data record type for response rendering
@@ -39,7 +43,10 @@ export class ModularCLIResponseRenderer {
   private options: CLIRenderingOptions;
   private formatter: DataFormatter;
 
-  constructor(options: Partial<CLIRenderingOptions> = {}, widgetRegistry?: WidgetRegistry) {
+  constructor(
+    options: Partial<CLIRenderingOptions> = {},
+    widgetRegistry?: WidgetRegistry,
+  ) {
     this.widgetRegistry = widgetRegistry || defaultWidgetRegistry;
     this.options = {
       useColors: true,
@@ -214,7 +221,8 @@ export class ModularCLIResponseRenderer {
     if (typeof value === "string") {
       return this.formatter.formatText(value, {
         maxLength:
-          field.ui.type === WidgetType.TEXT && typeof field.ui.maxLength === "number"
+          field.ui.type === WidgetType.TEXT &&
+          typeof field.ui.maxLength === "number"
             ? field.ui.maxLength
             : undefined,
       });
@@ -371,12 +379,17 @@ class DefaultDataFormatter implements DataFormatter {
     return "";
   }
 
-  formatArray(value: WidgetData[], options?: { separator?: string; maxItems?: number }): string {
+  formatArray(
+    value: WidgetData[],
+    options?: { separator?: string; maxItems?: number },
+  ): string {
     const separator = options?.separator ?? ", ";
     const maxItems = options?.maxItems ?? 10;
 
     const items = value.slice(0, maxItems);
-    const formatted = items.map((item) => this.safeItemToString(item)).join(separator);
+    const formatted = items
+      .map((item) => this.safeItemToString(item))
+      .join(separator);
 
     if (value.length > maxItems) {
       // eslint-disable-next-line i18next/no-literal-string

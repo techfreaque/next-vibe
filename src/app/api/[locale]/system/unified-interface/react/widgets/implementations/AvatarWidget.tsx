@@ -46,7 +46,13 @@ export function AvatarWidget<const TKey extends string>({
   context,
   className,
 }: ReactWidgetProps<typeof WidgetType.AVATAR, TKey>): JSX.Element {
-  const { src: configSrc, alt: altKey, fallback: configFallback, size, fallbackSize } = field.ui;
+  const {
+    src: configSrc,
+    alt: altKey,
+    fallback: configFallback,
+    size,
+    fallbackSize,
+  } = field.ui;
 
   // Get classes from config (no hardcoding!)
   const fallbackSizeClass = getTextSizeClassName(fallbackSize);
@@ -74,7 +80,9 @@ export function AvatarWidget<const TKey extends string>({
   return (
     <Avatar className={cn(avatarSizeClass, className)}>
       {src && <AvatarImage src={src} alt={alt} />}
-      <AvatarFallback className={cn("font-medium", fallbackSizeClass || "text-sm")}>
+      <AvatarFallback
+        className={cn("font-medium", fallbackSizeClass || "text-sm")}
+      >
         {fallback}
       </AvatarFallback>
     </Avatar>

@@ -8,7 +8,11 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -75,7 +79,8 @@ export class CreditPurchaseRepository {
       const user = userResult.data;
 
       // Check if user has an active subscription before allowing credit pack purchase
-      const { SubscriptionRepository } = await import("../../subscription/repository");
+      const { SubscriptionRepository } =
+        await import("../../subscription/repository");
       const subscriptionResult = await SubscriptionRepository.getSubscription(
         userId,
         logger,
@@ -83,11 +88,15 @@ export class CreditPurchaseRepository {
       );
 
       if (!subscriptionResult.success) {
-        logger.warn("Credit pack purchase attempted without active subscription", {
-          userId,
-        });
+        logger.warn(
+          "Credit pack purchase attempted without active subscription",
+          {
+            userId,
+          },
+        );
         return fail({
-          message: "app.api.credits.purchase.post.errors.noActiveSubscription.title",
+          message:
+            "app.api.credits.purchase.post.errors.noActiveSubscription.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
           cause: subscriptionResult,
         });
@@ -95,18 +104,25 @@ export class CreditPurchaseRepository {
 
       const subscription = subscriptionResult.data;
       if (subscription.status !== SubscriptionStatus.ACTIVE) {
-        logger.warn("Credit pack purchase attempted with inactive subscription", {
-          userId,
-          subscriptionStatus: subscription.status,
-        });
+        logger.warn(
+          "Credit pack purchase attempted with inactive subscription",
+          {
+            userId,
+            subscriptionStatus: subscription.status,
+          },
+        );
         return fail({
-          message: "app.api.credits.purchase.post.errors.noActiveSubscription.title",
+          message:
+            "app.api.credits.purchase.post.errors.noActiveSubscription.title",
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
       // Get payment provider from request data or default to stripe
-      const providerKey = data.provider === PaymentProvider.NOWPAYMENTS ? "nowpayments" : "stripe";
+      const providerKey =
+        data.provider === PaymentProvider.NOWPAYMENTS
+          ? "nowpayments"
+          : "stripe";
       const provider = getPaymentProvider(providerKey);
 
       logger.debug("Using payment provider", {
@@ -137,8 +153,13 @@ export class CreditPurchaseRepository {
       const country = getCountryFromLocale(locale);
 
       // Get product and calculate totals based on quantity
-      const { productsRepository } = await import("../../products/repository-client");
-      const product = productsRepository.getProduct(ProductIds.CREDIT_PACK, locale, "one_time");
+      const { productsRepository } =
+        await import("../../products/repository-client");
+      const product = productsRepository.getProduct(
+        ProductIds.CREDIT_PACK,
+        locale,
+        "one_time",
+      );
       const totalAmount = product.price * data.quantity;
       const totalCredits = product.credits * data.quantity;
 

@@ -30,7 +30,8 @@ export const translations: typeof enTranslations = {
     },
     load: {
       error: {
-        noncritical: "Błąd podczas ładowania danych śledzenia leadu (niekrytyczny)",
+        noncritical:
+          "Błąd podczas ładowania danych śledzenia leadu (niekrytyczny)",
       },
     },
     stored: "Dane śledzenia leadu zapisane",

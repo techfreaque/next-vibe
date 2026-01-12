@@ -59,7 +59,9 @@ export function TagsField<TKey extends string>({
 
   // Filter suggestions based on input and exclude already selected
   const filteredSuggestions = suggestions.filter((suggestion) => {
-    const matchesInput = t(suggestion.label).toLowerCase().includes(inputValue.toLowerCase());
+    const matchesInput = t(suggestion.label)
+      .toLowerCase()
+      .includes(inputValue.toLowerCase());
     const notSelected = !value.includes(suggestion.value);
     return matchesInput && notSelected;
   });
@@ -150,7 +152,11 @@ export function TagsField<TKey extends string>({
       >
         {/* Render selected tags */}
         {value.map((tag) => (
-          <Badge key={tag} variant="secondary" className="flex items-center gap-1 px-2 py-1">
+          <Badge
+            key={tag}
+            variant="secondary"
+            className="flex items-center gap-1 px-2 py-1"
+          >
             <span className="text-xs">{getTagLabel(tag)}</span>
             {!disabled && (
               <Button
@@ -176,7 +182,9 @@ export function TagsField<TKey extends string>({
                   onKeyDown={handleKeyDown}
                   onFocus={handleInputFocus}
                   onBlur={handleInputBlur}
-                  placeholder={value.length === 0 && placeholder ? t(placeholder) : ""}
+                  placeholder={
+                    value.length === 0 && placeholder ? t(placeholder) : ""
+                  }
                   className="border-0 p-0 h-6 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent w-full"
                 />
               </div>
@@ -185,33 +193,37 @@ export function TagsField<TKey extends string>({
             {suggestions.length > 0 && (
               <PopoverContent className="w-80 p-0" align="start">
                 <div className="max-h-[200px] overflow-y-auto">
-                  {Object.entries(groupedSuggestions).map(([category, categorySuggestions]) => (
-                    <div key={category} className="p-2">
-                      {category !== "other" && (
-                        <div className="px-2 py-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                          {category}
+                  {Object.entries(groupedSuggestions).map(
+                    ([category, categorySuggestions]) => (
+                      <div key={category} className="p-2">
+                        {category !== "other" && (
+                          <div className="px-2 py-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                            {category}
+                          </div>
+                        )}
+                        <div className="space-y-1">
+                          {categorySuggestions.map((suggestion) => (
+                            <Button
+                              key={suggestion.value}
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start h-8 px-2"
+                              onClick={() => addTag(suggestion.value)}
+                            >
+                              <Plus className="h-3 w-3 mr-2" />
+                              {t(suggestion.label)}
+                            </Button>
+                          ))}
                         </div>
-                      )}
-                      <div className="space-y-1">
-                        {categorySuggestions.map((suggestion) => (
-                          <Button
-                            key={suggestion.value}
-                            variant="ghost"
-                            size="sm"
-                            className="w-full justify-start h-8 px-2"
-                            onClick={() => addTag(suggestion.value)}
-                          >
-                            <Plus className="h-3 w-3 mr-2" />
-                            {t(suggestion.label)}
-                          </Button>
-                        ))}
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
 
                   {allowCustom &&
                     inputValue.trim() &&
-                    !filteredSuggestions.some((s) => s.value === inputValue.trim()) && (
+                    !filteredSuggestions.some(
+                      (s) => s.value === inputValue.trim(),
+                    ) && (
                       <div className="p-2 border-t">
                         <Button
                           variant="ghost"
@@ -220,9 +232,12 @@ export function TagsField<TKey extends string>({
                           onClick={() => addTag(inputValue)}
                         >
                           <Plus className="h-3 w-3 mr-2" />
-                          {globalT("packages.nextVibeUi.web.common.addCustomValue", {
-                            value: inputValue.trim(),
-                          })}
+                          {globalT(
+                            "packages.nextVibeUi.web.common.addCustomValue",
+                            {
+                              value: inputValue.trim(),
+                            },
+                          )}
                         </Button>
                       </div>
                     )}
@@ -241,7 +256,9 @@ export function TagsField<TKey extends string>({
       </div>
 
       {/* Hidden input for form submission */}
-      {name && <input type="hidden" name={name} value={JSON.stringify(value)} />}
+      {name && (
+        <input type="hidden" name={name} value={JSON.stringify(value)} />
+      )}
     </div>
   );
 }

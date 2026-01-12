@@ -44,7 +44,10 @@ export function chunkTextForTTS(text: string): string[] {
     SENTENCE_ENDINGS.lastIndex = 0;
 
     while ((match = SENTENCE_ENDINGS.exec(paragraph)) !== null) {
-      const sentence = paragraph.slice(lastIndex, match.index + match[0].length);
+      const sentence = paragraph.slice(
+        lastIndex,
+        match.index + match[0].length,
+      );
       sentences.push(sentence);
       lastIndex = match.index + match[0].length;
     }
@@ -90,7 +93,9 @@ export function chunkTextForTTS(text: string): string[] {
       }
 
       // Check if adding this sentence would exceed max size
-      const potentialChunk = currentChunk ? `${currentChunk} ${trimmedSentence}` : trimmedSentence;
+      const potentialChunk = currentChunk
+        ? `${currentChunk} ${trimmedSentence}`
+        : trimmedSentence;
 
       if (potentialChunk.length > MAX_CHUNK_SIZE) {
         // Save current chunk and start new one

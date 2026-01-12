@@ -6,11 +6,18 @@ import "server-only";
 
 import { and, eq, gte, ilike, lte, or, type SQL, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { userLeadLinks } from "@/app/api/[locale]/leads/db";
-import { paymentRefunds, paymentTransactions } from "@/app/api/[locale]/payment/db";
+import {
+  paymentRefunds,
+  paymentTransactions,
+} from "@/app/api/[locale]/payment/db";
 import { PaymentStatus } from "@/app/api/[locale]/payment/enum";
 import {
   DateRangePreset,
@@ -29,7 +36,10 @@ import {
   UserRoleFilter,
   UserStatusFilter,
 } from "../enum";
-import type { UserStatsRequestOutput, UserStatsResponseOutput } from "./definition";
+import type {
+  UserStatsRequestOutput,
+  UserStatsResponseOutput,
+} from "./definition";
 
 export interface UsersStatsRepository {
   getUserStats(
@@ -39,7 +49,9 @@ export interface UsersStatsRepository {
 }
 
 class UsersStatsRepositoryImpl implements UsersStatsRepository {
-  private getDateTruncFormat(timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod]): string {
+  private getDateTruncFormat(
+    timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod],
+  ): string {
     switch (timePeriod) {
       case TimePeriod.DAY:
         return "day";
@@ -87,7 +99,9 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
     const startOfYear = new Date(date.getFullYear(), 0, 1);
     const diff = date.getTime() - startOfYear.getTime();
     const oneWeek = 7 * 24 * 60 * 60 * 1000;
-    return Math.ceil((diff + startOfYear.getDay() * 24 * 60 * 60 * 1000) / oneWeek);
+    return Math.ceil(
+      (diff + startOfYear.getDay() * 24 * 60 * 60 * 1000) / oneWeek,
+    );
   }
 
   async getUserStats(
@@ -105,11 +119,15 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         search: basicFilters?.search,
         status: basicFilters?.status ?? UserStatusFilter.ALL,
         role: basicFilters?.role ?? UserRoleFilter.ALL,
-        subscriptionStatus: subscriptionFilters?.subscriptionStatus ?? SubscriptionStatusFilter.ALL,
-        paymentMethod: subscriptionFilters?.paymentMethod ?? PaymentMethodFilter.ALL,
+        subscriptionStatus:
+          subscriptionFilters?.subscriptionStatus ??
+          SubscriptionStatusFilter.ALL,
+        paymentMethod:
+          subscriptionFilters?.paymentMethod ?? PaymentMethodFilter.ALL,
         country: locationFilters?.country,
         language: locationFilters?.language,
-        dateRangePreset: timePeriodOptions?.dateRangePreset ?? DateRangePreset.LAST_30_DAYS,
+        dateRangePreset:
+          timePeriodOptions?.dateRangePreset ?? DateRangePreset.LAST_30_DAYS,
       };
 
       logger.debug("Fetching user statistics", query);
@@ -170,9 +188,16 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         whereConditions.push(ilike(users.locale, `${query.language}-%`));
       }
 
-      if (query.subscriptionStatus && query.subscriptionStatus !== SubscriptionStatusFilter.ALL) {
-        if (query.subscriptionStatus === SubscriptionStatusFilter.NO_SUBSCRIPTION) {
-          whereConditions.push(sql`${users.id} NOT IN (SELECT user_id FROM subscriptions)`);
+      if (
+        query.subscriptionStatus &&
+        query.subscriptionStatus !== SubscriptionStatusFilter.ALL
+      ) {
+        if (
+          query.subscriptionStatus === SubscriptionStatusFilter.NO_SUBSCRIPTION
+        ) {
+          whereConditions.push(
+            sql`${users.id} NOT IN (SELECT user_id FROM subscriptions)`,
+          );
         } else {
           whereConditions.push(
             sql`${users.id} IN (SELECT user_id FROM subscriptions WHERE status = ${query.subscriptionStatus})`,
@@ -180,9 +205,14 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         }
       }
 
-      if (query.paymentMethod && query.paymentMethod !== PaymentMethodFilter.ALL) {
+      if (
+        query.paymentMethod &&
+        query.paymentMethod !== PaymentMethodFilter.ALL
+      ) {
         if (query.paymentMethod === PaymentMethodFilter.NO_PAYMENT_METHOD) {
-          whereConditions.push(sql`${users.id} NOT IN (SELECT user_id FROM payment_methods)`);
+          whereConditions.push(
+            sql`${users.id} NOT IN (SELECT user_id FROM payment_methods)`,
+          );
         } else if (query.paymentMethod === PaymentMethodFilter.CRYPTO) {
           whereConditions.push(
             sql`${users.id} IN (SELECT user_id FROM payment_transactions WHERE provider = 'NOWPAYMENTS')`,
@@ -194,10 +224,15 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         }
       }
 
-      const whereClause = whereConditions.length > 0 ? and(...whereConditions) : undefined;
+      const whereClause =
+        whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
       const timePeriod = timePeriodOptions?.timePeriod ?? TimePeriod.DAY;
-      const response = await this.buildResponse(whereClause, dateRange, timePeriod);
+      const response = await this.buildResponse(
+        whereClause,
+        dateRange,
+        timePeriod,
+      );
       return success(response);
     } catch (error) {
       logger.error("Error fetching user statistics", parseError(error));
@@ -254,9 +289,11 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
       );
 
     const activeSubscriptions = subscriptionCounts?.activeSubscriptions ?? 0;
-    const canceledSubscriptions = subscriptionCounts?.canceledSubscriptions ?? 0;
+    const canceledSubscriptions =
+      subscriptionCounts?.canceledSubscriptions ?? 0;
     const expiredSubscriptions = subscriptionCounts?.expiredSubscriptions ?? 0;
-    const totalWithSubscription = subscriptionCounts?.totalWithSubscription ?? 0;
+    const totalWithSubscription =
+      subscriptionCounts?.totalWithSubscription ?? 0;
     const noSubscription = totalUsers - totalWithSubscription;
 
     // Payment stats - filter by transaction createdAt
@@ -291,7 +328,8 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
     const refundCount = refundCounts?.refundCount ?? 0;
     const averageOrderValue =
       transactionCount > 0 ? Math.round(totalRevenue / transactionCount) : 0;
-    const refundRate = transactionCount > 0 ? refundCount / transactionCount : 0;
+    const refundRate =
+      transactionCount > 0 ? refundCount / transactionCount : 0;
 
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -318,7 +356,12 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         count: sql<number>`count(*)::int`,
       })
       .from(users)
-      .where(and(gte(users.createdAt, dateRange.from), lte(users.createdAt, dateRange.to)))
+      .where(
+        and(
+          gte(users.createdAt, dateRange.from),
+          lte(users.createdAt, dateRange.to),
+        ),
+      )
       .groupBy(sql`date_trunc(${dateTruncFormat}, ${users.createdAt})`)
       .orderBy(sql`date_trunc(${dateTruncFormat}, ${users.createdAt})`);
 
@@ -378,13 +421,16 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
 
     const verificationRate =
       totalUsers > 0 ? (basicCounts?.emailVerifiedUsers ?? 0) / totalUsers : 0;
-    const leadAssociationRate = totalUsers > 0 ? usersWithLeadId / totalUsers : 0;
+    const leadAssociationRate =
+      totalUsers > 0 ? usersWithLeadId / totalUsers : 0;
     const growthRate =
       (timeBased?.usersCreatedLastMonth ?? 0) > 0
-        ? ((timeBased?.usersCreatedThisMonth ?? 0) - (timeBased?.usersCreatedLastMonth ?? 0)) /
+        ? ((timeBased?.usersCreatedThisMonth ?? 0) -
+            (timeBased?.usersCreatedLastMonth ?? 0)) /
           (timeBased?.usersCreatedLastMonth ?? 1)
         : 0;
-    const retentionRate = totalUsers > 0 ? (basicCounts?.activeUsers ?? 0) / totalUsers : 0;
+    const retentionRate =
+      totalUsers > 0 ? (basicCounts?.activeUsers ?? 0) / totalUsers : 0;
 
     return {
       overviewStats: {
@@ -407,22 +453,26 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
           {
             x: "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
             y: activeSubscriptions,
-            label: "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
+            label:
+              "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
           },
           {
             x: "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
             y: canceledSubscriptions,
-            label: "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
+            label:
+              "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
           },
           {
             x: "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
             y: expiredSubscriptions,
-            label: "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
+            label:
+              "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
           },
           {
             x: "app.api.users.stats.response.subscriptionStats.noSubscription.label",
             y: noSubscription,
-            label: "app.api.users.stats.response.subscriptionStats.noSubscription.label",
+            label:
+              "app.api.users.stats.response.subscriptionStats.noSubscription.label",
           },
         ],
       },

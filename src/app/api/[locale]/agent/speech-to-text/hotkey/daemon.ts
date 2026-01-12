@@ -199,10 +199,14 @@ export async function startHotkeyDaemon(
             await onToggle();
           } catch (error) {
             // Enhanced error logging
-            const errorDetails: Record<string, string | number | boolean | null | undefined> = {
+            const errorDetails: Record<
+              string,
+              string | number | boolean | null | undefined
+            > = {
               errorType: typeof error,
               errorName: error instanceof Error ? error.name : "unknown",
-              errorMessage: error instanceof Error ? error.message : String(error),
+              errorMessage:
+                error instanceof Error ? error.message : String(error),
               errorStack: error instanceof Error ? error.stack : undefined,
             };
 

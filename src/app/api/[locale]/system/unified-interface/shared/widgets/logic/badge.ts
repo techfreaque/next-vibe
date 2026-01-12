@@ -16,7 +16,12 @@ import {
  * Semantic variants from UI config
  * Used in BadgeWidgetConfig
  */
-export type SemanticVariant = "default" | "success" | "warning" | "error" | "info";
+export type SemanticVariant =
+  | "default"
+  | "success"
+  | "warning"
+  | "error"
+  | "info";
 
 /**
  * Badge variants for component rendering
@@ -53,7 +58,9 @@ export interface BadgeEnumOption {
  * Maps semantic widget variants to Badge component variants
  * Used to convert UI config variant to component variant
  */
-export function mapSemanticVariantToBadgeVariant(variant: SemanticVariant): BadgeVariant {
+export function mapSemanticVariantToBadgeVariant(
+  variant: SemanticVariant,
+): BadgeVariant {
   switch (variant) {
     case "error":
       return "destructive";
@@ -113,12 +120,16 @@ export function extractBadgeData(
 
   // Handle object value with badge properties
   if (isWidgetDataObject(value)) {
-    const text = "text" in value && typeof value.text === "string" ? value.text : "";
+    const text =
+      "text" in value && typeof value.text === "string" ? value.text : "";
     const variant =
       "variant" in value && typeof value.variant === "string"
         ? (value.variant as BadgeVariant)
         : "default";
-    const icon = "icon" in value && typeof value.icon === "string" ? value.icon : undefined;
+    const icon =
+      "icon" in value && typeof value.icon === "string"
+        ? value.icon
+        : undefined;
 
     if (!text) {
       return null;
@@ -165,7 +176,9 @@ export function findEnumLabel(
 /**
  * Get color for badge variant (used in CLI rendering)
  */
-export function getBadgeColor(variant: BadgeVariant): "blue" | "dim" | "green" | "yellow" | "red" {
+export function getBadgeColor(
+  variant: BadgeVariant,
+): "blue" | "dim" | "green" | "yellow" | "red" {
   switch (variant) {
     case "primary":
       return "blue";

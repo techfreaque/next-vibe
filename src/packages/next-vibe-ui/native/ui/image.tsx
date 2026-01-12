@@ -38,7 +38,11 @@ export function Image({
   return (
     <RNImage
       source={{ uri }}
-      style={[width !== undefined && { width }, height !== undefined && { height }, nativeStyle]}
+      style={[
+        width !== undefined && { width },
+        height !== undefined && { height },
+        nativeStyle,
+      ]}
       accessibilityLabel={alt}
       accessible={!!alt}
       onLoad={onLoad}

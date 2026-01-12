@@ -9,7 +9,8 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Lista wątków czatu",
-    description: "Pobierz stronicowaną listę wątków czatu z opcjami filtrowania",
+    description:
+      "Pobierz stronicowaną listę wątków czatu z opcjami filtrowania",
     container: {
       title: "Lista wątków",
       description: "Przeglądaj i filtruj wątki czatu",
@@ -34,7 +35,8 @@ export const translations: typeof enTranslations = {
     },
     rootFolderId: {
       label: "Folder główny",
-      description: "Filtruj według folderu głównego (private, shared, public, incognito)",
+      description:
+        "Filtruj według folderu głównego (private, shared, public, incognito)",
     },
     subFolderId: {
       label: "Podfolder",
@@ -266,7 +268,8 @@ export const translations: typeof enTranslations = {
       forbidden: {
         title: "Zabronione",
         description: "Nie masz uprawnień do tworzenia wątków",
-        incognitoNotAllowed: "Wątki incognito nie mogą być tworzone na serwerze",
+        incognitoNotAllowed:
+          "Wątki incognito nie mogą być tworzone na serwerze",
       },
       notFound: {
         title: "Nie znaleziono",

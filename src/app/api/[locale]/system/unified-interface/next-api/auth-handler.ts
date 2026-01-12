@@ -2,7 +2,11 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { Environment, parseError } from "next-vibe/shared/utils";
 
 import {
@@ -13,7 +17,10 @@ import {
 import { env } from "@/config/env";
 
 import type { EndpointLogger } from "../shared/logger/endpoint";
-import { type AuthContext, BaseAuthHandler } from "../shared/server-only/auth/base-auth-handler";
+import {
+  type AuthContext,
+  BaseAuthHandler,
+} from "../shared/server-only/auth/base-auth-handler";
 
 /**
  * Web Authentication Handler

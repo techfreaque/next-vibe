@@ -28,7 +28,12 @@ interface LeadEditFormProps {
   user: JwtPayloadType;
 }
 
-export function LeadEditForm({ lead, locale, leadId, user }: LeadEditFormProps): JSX.Element {
+export function LeadEditForm({
+  lead,
+  locale,
+  leadId,
+  user,
+}: LeadEditFormProps): JSX.Element {
   const router = useRouter();
   const { t } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -55,7 +60,8 @@ export function LeadEditForm({ lead, locale, leadId, user }: LeadEditFormProps):
       <Card>
         <CardHeader>
           <CardTitle>
-            {t("app.admin.common.actions.edit")} - {lead.lead.basicInfo.businessName}
+            {t("app.admin.common.actions.edit")} -{" "}
+            {lead.lead.basicInfo.businessName}
           </CardTitle>
         </CardHeader>
         <CardContent>

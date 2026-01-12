@@ -78,7 +78,10 @@ export const SubscriptionStatusDB = [
   SubscriptionStatus.PAUSED,
 ] as const;
 
-export const BillingIntervalDB = [BillingInterval.MONTHLY, BillingInterval.YEARLY] as const;
+export const BillingIntervalDB = [
+  BillingInterval.MONTHLY,
+  BillingInterval.YEARLY,
+] as const;
 
 export const CancellationReasonDB = [
   CancellationReason.TOO_EXPENSIVE,

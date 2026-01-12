@@ -6,7 +6,11 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -15,7 +19,12 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { ManifestResponseOutput } from "./definition";
-import { IconPurpose, WebAppCategory, WebAppDisplayMode, WebAppOrientation } from "./enum";
+import {
+  IconPurpose,
+  WebAppCategory,
+  WebAppDisplayMode,
+  WebAppOrientation,
+} from "./enum";
 
 // Constants for manifest values (non-translatable)
 const MANIFEST_CONSTANTS = {
@@ -23,7 +32,11 @@ const MANIFEST_CONSTANTS = {
   BACKGROUND_COLOR: "#ffffff",
   THEME_COLOR: "#0EA5E9",
   ORIENTATION: WebAppOrientation.PORTRAIT_PRIMARY,
-  CATEGORIES: [WebAppCategory.SOCIAL, WebAppCategory.PRODUCTIVITY, WebAppCategory.BUSINESS],
+  CATEGORIES: [
+    WebAppCategory.SOCIAL,
+    WebAppCategory.PRODUCTIVITY,
+    WebAppCategory.BUSINESS,
+  ],
   ICON_SIZES: {
     SMALL: "192x192",
     LARGE: "512x512",
@@ -77,7 +90,9 @@ export class ManifestRepository {
         orientation: t(MANIFEST_CONSTANTS.ORIENTATION),
         scope: `/${locale}/`,
         lang: manifestLang,
-        categories: MANIFEST_CONSTANTS.CATEGORIES.map((category) => t(category)),
+        categories: MANIFEST_CONSTANTS.CATEGORIES.map((category) =>
+          t(category),
+        ),
         icons: [
           {
             src: "/images/placeholder-logo.png",

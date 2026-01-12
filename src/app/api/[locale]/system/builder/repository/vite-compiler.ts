@@ -7,7 +7,11 @@ import { existsSync, mkdirSync, statSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import type { OutputOptions, RollupOptions } from "rollup";
 import type { BuildOptions, InlineConfig, PluginOption } from "vite";
 import { build as viteBuild } from "vite";
@@ -90,7 +94,8 @@ export class ViteCompiler implements IViteCompiler {
     if (dryRun) {
       // Simulate output files for dry run
       if (fileConfig.packageConfig?.isPackage) {
-        const outputFileName = basename(fileConfig.output).split(".")[0] || "index";
+        const outputFileName =
+          basename(fileConfig.output).split(".")[0] || "index";
         compiledFiles.push(
           `${dirname(fileConfig.output)}/${outputFileName}.mjs`,
           `${dirname(fileConfig.output)}/${outputFileName}.cjs`,
@@ -121,7 +126,8 @@ export class ViteCompiler implements IViteCompiler {
 
     // Track built files
     if (fileConfig.packageConfig?.isPackage) {
-      const outputFileName = basename(fileConfig.output).split(".")[0] || "index";
+      const outputFileName =
+        basename(fileConfig.output).split(".")[0] || "index";
       compiledFiles.push(
         `${dirname(fileConfig.output)}/${outputFileName}.mjs`,
         `${dirname(fileConfig.output)}/${outputFileName}.cjs`,
@@ -133,7 +139,9 @@ export class ViteCompiler implements IViteCompiler {
     filesBuilt.push(...compiledFiles);
 
     if (verbose) {
-      output.push(outputFormatter.formatVerbose(`Compiled: ${compiledFiles.join(", ")}`));
+      output.push(
+        outputFormatter.formatVerbose(`Compiled: ${compiledFiles.join(", ")}`),
+      );
     }
 
     logger.info("File compiled", {
@@ -160,7 +168,8 @@ export class ViteCompiler implements IViteCompiler {
     const buildOpts = (viteOpts.build || {}) as BuildOptions & {
       rollupOptions?: RollupOptions & { output?: OutputOptions };
     };
-    const { rollupOptions: rollupOpts = {}, ...buildOptionsOverride } = buildOpts;
+    const { rollupOptions: rollupOpts = {}, ...buildOptionsOverride } =
+      buildOpts;
     const { output: outputOverride, ...rollupOptionsOverride } = rollupOpts;
 
     // Collect other vite options (excluding plugins and build which we handled separately)
@@ -186,12 +195,15 @@ export class ViteCompiler implements IViteCompiler {
     // Use string variables to prevent Turbopack static analysis of CLI-only packages
     if (fileConfig.type === "react-tailwind") {
       const tailwindPkg = "@tailwindcss/vite";
-      const tailwindcss = (await import(/* webpackIgnore: true */ tailwindPkg)).default;
+      const tailwindcss = (await import(/* webpackIgnore: true */ tailwindPkg))
+        .default;
       plugins.push(tailwindcss() as PluginOption);
 
       if (fileConfig.inlineCss !== false) {
         const cssPkg = "vite-plugin-css-injected-by-js";
-        const cssInjectedByJsPlugin = (await import(/* webpackIgnore: true */ cssPkg)).default;
+        const cssInjectedByJsPlugin = (
+          await import(/* webpackIgnore: true */ cssPkg)
+        ).default;
         plugins.push(cssInjectedByJsPlugin() as PluginOption);
       }
     }
@@ -214,12 +226,14 @@ export class ViteCompiler implements IViteCompiler {
         }) as PluginOption,
       );
 
-      const outputFileName = basename(fileConfig.output).split(".")[0] || "index";
+      const outputFileName =
+        basename(fileConfig.output).split(".")[0] || "index";
 
       buildOptions.lib = {
         entry: inputFilePath,
         formats: ["es", "cjs"],
-        fileName: (format): string => `${outputFileName}.${format === "es" ? "mjs" : "cjs"}`,
+        fileName: (format): string =>
+          `${outputFileName}.${format === "es" ? "mjs" : "cjs"}`,
       };
       outputOptions.exports = "auto";
 

@@ -6,7 +6,11 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -15,7 +19,10 @@ import type { Countries, Languages } from "@/i18n/core/config";
 
 import { EmailServiceRepository } from "../email-service/repository";
 import { smsServiceRepository as smsService } from "../sms-service/repository";
-import type { EmailSendRequestOutput, EmailSendResponseOutput } from "./definition";
+import type {
+  EmailSendRequestOutput,
+  EmailSendResponseOutput,
+} from "./definition";
 
 // Define the proper type for locale to match standardized patterns
 type CountryLanguage = `${Lowercase<Languages>}-${Countries}`;
@@ -53,7 +60,8 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
       // Validate SMS notification requirements
       if (
         data.smsNotifications?.sendSmsNotification &&
-        (!data.smsNotifications.smsPhoneNumber || !data.smsNotifications.smsMessage)
+        (!data.smsNotifications.smsPhoneNumber ||
+          !data.smsNotifications.smsMessage)
       ) {
         return fail({
           message: "app.api.emails.send.errors.validation.title",
@@ -155,10 +163,13 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
               sentAt: smsResult.data.result.sentAt,
               provider: smsResult.data.result.provider,
             };
-            logger.info("Email send repository: SMS notification sent successfully", {
-              smsMessageId: smsResult.data.result.messageId,
-              emailMessageId: emailResult.data.result.messageId,
-            });
+            logger.info(
+              "Email send repository: SMS notification sent successfully",
+              {
+                smsMessageId: smsResult.data.result.messageId,
+                emailMessageId: emailResult.data.result.messageId,
+              },
+            );
           } else {
             response.response.smsResult = {
               success: false,
@@ -190,7 +201,10 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
       return success(response);
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error("Email send repository: Critical error in email send", parsedError);
+      logger.error(
+        "Email send repository: Critical error in email send",
+        parsedError,
+      );
       return fail({
         message: "app.api.emails.send.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

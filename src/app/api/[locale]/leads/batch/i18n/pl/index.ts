@@ -3,7 +3,8 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   patch: {
     title: "Aktualizacja wsadowa",
-    description: "Aktualizacja leadów wsadowo na podstawie kryteriów filtrowania",
+    description:
+      "Aktualizacja leadów wsadowo na podstawie kryteriów filtrowania",
     form: {
       title: "Konfiguracja aktualizacji wsadowej",
       description: "Skonfiguruj parametry aktualizacji wsadowej",
@@ -74,11 +75,13 @@ export const translations: typeof enTranslations = {
       },
       validation: {
         title: "Błąd walidacji",
-        description: "Nieprawidłowe parametry żądania dla aktualizacji wsadowej",
+        description:
+          "Nieprawidłowe parametry żądania dla aktualizacji wsadowej",
       },
       server: {
         title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera podczas aktualizacji wsadowej",
+        description:
+          "Wystąpił wewnętrzny błąd serwera podczas aktualizacji wsadowej",
       },
       unknown: {
         title: "Nieznany błąd",
@@ -158,7 +161,8 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera podczas usuwania wsadowego",
+        description:
+          "Wystąpił wewnętrzny błąd serwera podczas usuwania wsadowego",
       },
       unknown: {
         title: "Nieznany błąd",

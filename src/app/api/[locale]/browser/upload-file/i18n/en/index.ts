@@ -7,7 +7,8 @@ export const translations = {
     fields: {
       uid: {
         label: "Element UID",
-        description: "The uid of the file input element or an element that will open file chooser",
+        description:
+          "The uid of the file input element or an element that will open file chooser",
         placeholder: "Enter element uid",
       },
       filePath: {
@@ -46,7 +47,8 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred during the file upload operation",
+      description:
+        "An internal server error occurred during the file upload operation",
     },
     unknown: {
       title: "Unknown Error",

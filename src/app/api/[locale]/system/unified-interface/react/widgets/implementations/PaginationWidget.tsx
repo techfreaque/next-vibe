@@ -57,7 +57,11 @@ export function PaginationWidget<const TKey extends string>({
 
   // Select width mapping
   const selectWidthClass =
-    selectWidth === "sm" ? "w-[60px]" : selectWidth === "lg" ? "w-[80px]" : "w-[70px]";
+    selectWidth === "sm"
+      ? "w-[60px]"
+      : selectWidth === "lg"
+        ? "w-[80px]"
+        : "w-[70px]";
 
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return <Div className={className}>—</Div>;
@@ -114,18 +118,25 @@ export function PaginationWidget<const TKey extends string>({
         )}
       >
         <Span>
-          {t("app.api.system.unifiedInterface.react.widgets.pagination.showing", {
-            start: startItem,
-            end: endItem,
-            total,
-          })}
+          {t(
+            "app.api.system.unifiedInterface.react.widgets.pagination.showing",
+            {
+              start: startItem,
+              end: endItem,
+              total,
+            },
+          )}
         </Span>
       </Div>
 
       <Div className={cn("flex items-center", controlsGapClass || "gap-4")}>
         <Div className={cn("flex items-center", elementGapClass || "gap-2")}>
-          <Span className={cn("text-muted-foreground", textSizeClass || "text-sm")}>
-            {t("app.api.system.unifiedInterface.react.widgets.pagination.itemsPerPage")}
+          <Span
+            className={cn("text-muted-foreground", textSizeClass || "text-sm")}
+          >
+            {t(
+              "app.api.system.unifiedInterface.react.widgets.pagination.itemsPerPage",
+            )}
           </Span>
           <Select value={String(limit)} onValueChange={handleLimitChange}>
             <SelectTrigger className={selectWidthClass}>
@@ -151,10 +162,13 @@ export function PaginationWidget<const TKey extends string>({
           </Button>
 
           <Span className={cn("font-medium", textSizeClass || "text-sm")}>
-            {t("app.api.system.unifiedInterface.react.widgets.pagination.page", {
-              current: page,
-              total: totalPages,
-            })}
+            {t(
+              "app.api.system.unifiedInterface.react.widgets.pagination.page",
+              {
+                current: page,
+                total: totalPages,
+              },
+            )}
           </Span>
 
           <Button

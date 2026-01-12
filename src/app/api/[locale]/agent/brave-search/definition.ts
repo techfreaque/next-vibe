@@ -26,7 +26,12 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
  * Freshness options for search results
  * Values are API codes, mapped to readable display in options
  */
-const FRESHNESS_OPTIONS = ["past_day", "past_week", "past_month", "past_year"] as const;
+const FRESHNESS_OPTIONS = [
+  "past_day",
+  "past_week",
+  "past_month",
+  "past_year",
+] as const;
 
 /** Map readable values to Brave API codes */
 export const FRESHNESS_API_MAP: Record<string, string> = {
@@ -77,7 +82,8 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       linkable: true,
       title: "app.api.agent.chat.tools.braveSearch.get.form.title" as const,
-      description: "app.api.agent.chat.tools.braveSearch.get.form.description" as const,
+      description:
+        "app.api.agent.chat.tools.braveSearch.get.form.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -88,9 +94,12 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.tools.braveSearch.get.fields.query.title" as const,
-          description: "app.api.agent.chat.tools.braveSearch.get.fields.query.description" as const,
-          placeholder: "app.api.agent.chat.tools.braveSearch.get.fields.query.placeholder" as const,
+          label:
+            "app.api.agent.chat.tools.braveSearch.get.fields.query.title" as const,
+          description:
+            "app.api.agent.chat.tools.braveSearch.get.fields.query.description" as const,
+          placeholder:
+            "app.api.agent.chat.tools.braveSearch.get.fields.query.placeholder" as const,
           columns: 12,
         },
         z.string().min(1).max(400),
@@ -100,7 +109,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.agent.chat.tools.braveSearch.get.fields.maxResults.title" as const,
+          label:
+            "app.api.agent.chat.tools.braveSearch.get.fields.maxResults.title" as const,
           description:
             "app.api.agent.chat.tools.braveSearch.get.fields.maxResults.description" as const,
           columns: 4,
@@ -112,7 +122,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.agent.chat.tools.braveSearch.get.fields.includeNews.title" as const,
+          label:
+            "app.api.agent.chat.tools.braveSearch.get.fields.includeNews.title" as const,
           description:
             "app.api.agent.chat.tools.braveSearch.get.fields.includeNews.description" as const,
           columns: 4,
@@ -124,7 +135,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.agent.chat.tools.braveSearch.get.fields.freshness.title" as const,
+          label:
+            "app.api.agent.chat.tools.braveSearch.get.fields.freshness.title" as const,
           description:
             "app.api.agent.chat.tools.braveSearch.get.fields.freshness.description" as const,
           options: [
@@ -158,7 +170,8 @@ const { GET } = createEndpoint({
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.tools.braveSearch.get.response.message.title" as const,
+          content:
+            "app.api.agent.chat.tools.braveSearch.get.response.message.title" as const,
           columns: 12,
         },
         z.string(),
@@ -182,7 +195,8 @@ const { GET } = createEndpoint({
             title: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.agent.chat.tools.braveSearch.get.response.results.title" as const,
+                content:
+                  "app.api.agent.chat.tools.braveSearch.get.response.results.title" as const,
               },
               z.string(),
             ),
@@ -228,49 +242,66 @@ const { GET } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.chat.tools.braveSearch.get.errors.validation.title" as const,
+      title:
+        "app.api.agent.chat.tools.braveSearch.get.errors.validation.title" as const,
       description:
         "app.api.agent.chat.tools.braveSearch.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.agent.chat.threads.search.get.errors.unsavedChanges.title" as const,
+      title:
+        "app.api.agent.chat.threads.search.get.errors.unsavedChanges.title" as const,
       description:
         "app.api.agent.chat.threads.search.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.braveSearch.get.errors.internal.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
     title: "app.api.agent.chat.tools.braveSearch.get.success.title" as const,
-    description: "app.api.agent.chat.tools.braveSearch.get.success.description" as const,
+    description:
+      "app.api.agent.chat.tools.braveSearch.get.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -298,7 +329,8 @@ const { GET } = createEndpoint({
           {
             title: "Breaking: GPT-5 Announced",
             url: "https://example.com/gpt5",
-            snippet: "OpenAI announces the next generation of language models...",
+            snippet:
+              "OpenAI announces the next generation of language models...",
             age: "2 hours ago",
             source: "TechNews",
           },
@@ -341,5 +373,7 @@ export type BraveSearchGetRequestInput = typeof GET.types.RequestInput;
 export type BraveSearchGetRequestOutput = typeof GET.types.RequestOutput;
 export type BraveSearchGetResponseInput = typeof GET.types.ResponseInput;
 export type BraveSearchGetResponseOutput = typeof GET.types.ResponseOutput;
-export type BraveSearchGetUrlVariablesInput = typeof GET.types.UrlVariablesInput;
-export type BraveSearchGetUrlVariablesOutput = typeof GET.types.UrlVariablesOutput;
+export type BraveSearchGetUrlVariablesInput =
+  typeof GET.types.UrlVariablesInput;
+export type BraveSearchGetUrlVariablesOutput =
+  typeof GET.types.UrlVariablesOutput;

@@ -5,7 +5,11 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { ApiProvider, getModelById, type ModelId } from "@/app/api/[locale]/agent/models/models";
+import {
+  ApiProvider,
+  getModelById,
+  type ModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { createFreedomGPT } from "../../providers/freedomgpt";

@@ -78,7 +78,9 @@ export function RecordingModal({
             <Span
               className={cn(
                 "text-base font-medium",
-                isPaused ? "text-yellow-600 dark:text-yellow-400" : "text-destructive",
+                isPaused
+                  ? "text-yellow-600 dark:text-yellow-400"
+                  : "text-destructive",
               )}
             >
               {isPaused
@@ -88,7 +90,11 @@ export function RecordingModal({
           </Div>
 
           {/* Waveform visualization */}
-          <AudioWaveform stream={stream} isPaused={isPaused} className="h-12 w-full max-w-xs" />
+          <AudioWaveform
+            stream={stream}
+            isPaused={isPaused}
+            className="h-12 w-full max-w-xs"
+          />
 
           {/* Action buttons */}
           <Div className="flex items-center gap-2 flex-wrap justify-center">

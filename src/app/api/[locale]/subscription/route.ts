@@ -14,19 +14,33 @@ export const { GET, POST, PUT, DELETE, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined,
     handler: async ({ user, logger, locale }) => {
-      return await SubscriptionRepository.getSubscription(user.id, logger, locale);
+      return await SubscriptionRepository.getSubscription(
+        user.id,
+        logger,
+        locale,
+      );
     },
   },
   [Methods.POST]: {
     email: undefined, // Email integration to be implemented when needed
     handler: async ({ data, user, locale, logger }) => {
-      return await SubscriptionRepository.createSubscription(data, user.id, locale, logger);
+      return await SubscriptionRepository.createSubscription(
+        data,
+        user.id,
+        locale,
+        logger,
+      );
     },
   },
   [Methods.PUT]: {
     email: undefined, // Email integration to be implemented when needed
     handler: async ({ data, user, locale, logger }) => {
-      return await SubscriptionRepository.updateSubscription(data, user.id, locale, logger);
+      return await SubscriptionRepository.updateSubscription(
+        data,
+        user.id,
+        locale,
+        logger,
+      );
     },
   },
   [Methods.DELETE]: {
@@ -39,7 +53,12 @@ export const { GET, POST, PUT, DELETE, tools } = endpointsHandler({
       });
 
       // Delegate to repository for business logic and data access
-      return await SubscriptionRepository.cancelSubscription(data, user.id, logger, locale);
+      return await SubscriptionRepository.cancelSubscription(
+        data,
+        user.id,
+        logger,
+        locale,
+      );
     },
   },
 });

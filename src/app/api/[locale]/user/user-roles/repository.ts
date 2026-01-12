@@ -7,7 +7,11 @@ import "server-only";
 
 import { and, eq, inArray } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -18,7 +22,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { NewUserRole, UserRole } from "../db";
 import { insertUserRoleSchema, userRoles } from "../db";
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- UserRoleDB is used in typeof expressions
-import { type UserPermissionRoleValue, type UserRole as UserRoleEnum, UserRoleDB } from "./enum";
+import {
+  type UserPermissionRoleValue,
+  type UserRole as UserRoleEnum,
+  UserRoleDB,
+} from "./enum";
 
 /**
  * User Roles Repository
@@ -48,7 +56,10 @@ export class UserRolesRepository {
         return success([]);
       }
 
-      const results = await db.select().from(userRoles).where(eq(userRoles.userId, userId));
+      const results = await db
+        .select()
+        .from(userRoles)
+        .where(eq(userRoles.userId, userId));
 
       return success(results);
     } catch (error) {
@@ -60,7 +71,10 @@ export class UserRolesRepository {
       }
 
       // Check if this is a database connection error
-      if (parsedError.message.includes("ECONNREFUSED") || parsedError.message.includes("connect")) {
+      if (
+        parsedError.message.includes("ECONNREFUSED") ||
+        parsedError.message.includes("connect")
+      ) {
         return fail({
           message: "app.api.user.userRoles.errors.find_failed",
           errorType: ErrorResponseTypes.DATABASE_ERROR,
@@ -198,7 +212,10 @@ export class UserRolesRepository {
 
       return success(results[0]);
     } catch (error) {
-      logger.error("Error finding user role by user ID and role", parseError(error));
+      logger.error(
+        "Error finding user role by user ID and role",
+        parseError(error),
+      );
       return fail({
         message: "app.api.user.userRoles.errors.lookup_failed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
@@ -212,7 +229,10 @@ export class UserRolesRepository {
    * @param data - The user role data
    * @returns Created user role or error response
    */
-  static async addRole(data: NewUserRole, logger: EndpointLogger): Promise<ResponseType<UserRole>> {
+  static async addRole(
+    data: NewUserRole,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<UserRole>> {
     try {
       logger.debug("Adding role to user", {
         userId: data.userId,
@@ -238,7 +258,10 @@ export class UserRolesRepository {
 
       // Create the role
       const validatedData = insertUserRoleSchema.parse(roleData);
-      const results = await db.insert(userRoles).values(validatedData).returning();
+      const results = await db
+        .insert(userRoles)
+        .values(validatedData)
+        .returning();
 
       if (results.length === 0) {
         return fail({
@@ -336,7 +359,10 @@ export class UserRolesRepository {
    * @param userId - The user ID
    * @returns Success or error response
    */
-  static async deleteByUserId(userId: DbId, logger: EndpointLogger): Promise<ResponseType<void>> {
+  static async deleteByUserId(
+    userId: DbId,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
     try {
       logger.debug("Deleting user roles by user ID", { userId });
 
@@ -365,7 +391,10 @@ export class UserRolesRepository {
     try {
       logger.debug("Getting user permission roles", { userId });
 
-      const rolesResult = await UserRolesRepository.findByUserId(userId, logger);
+      const rolesResult = await UserRolesRepository.findByUserId(
+        userId,
+        logger,
+      );
 
       if (!rolesResult.success || !rolesResult.data) {
         return fail({
@@ -377,7 +406,9 @@ export class UserRolesRepository {
 
       // Database only contains permission roles (platform markers are never stored)
       // Safe to cast as UserPermissionRoleValue since UserRoleDB only contains permission roles
-      const roleValues = rolesResult.data.map((r) => r.role as typeof UserPermissionRoleValue);
+      const roleValues = rolesResult.data.map(
+        (r) => r.role as typeof UserPermissionRoleValue,
+      );
       return success(roleValues);
     } catch (error) {
       logger.error("Error getting user permission roles", parseError(error));

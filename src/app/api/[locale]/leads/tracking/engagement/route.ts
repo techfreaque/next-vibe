@@ -29,7 +29,12 @@ export const { GET, POST, tools } = endpointsHandler({
   },
   [Methods.GET]: {
     handler: async ({ data, user, locale, logger }) => {
-      return await LeadTrackingRepository.handleClickTracking(data, user, locale, logger);
+      return await LeadTrackingRepository.handleClickTracking(
+        data,
+        user,
+        locale,
+        logger,
+      );
     },
   },
 });

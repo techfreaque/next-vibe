@@ -20,7 +20,8 @@ export const translations = {
     },
     network: {
       title: "Network Error",
-      description: "A network error occurred while stopping the performance trace",
+      description:
+        "A network error occurred while stopping the performance trace",
     },
     unauthorized: {
       title: "Unauthorized",
@@ -36,11 +37,13 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred while stopping the performance trace",
+      description:
+        "An internal server error occurred while stopping the performance trace",
     },
     unknown: {
       title: "Unknown Error",
-      description: "An unknown error occurred while stopping the performance trace",
+      description:
+        "An unknown error occurred while stopping the performance trace",
     },
     unsavedChanges: {
       title: "Unsaved Changes",

@@ -6,7 +6,12 @@
 import "server-only";
 
 import { Platform, type PlatformType } from "../enum";
-import type { Recorder, RecorderFactoryOptions, Typer, TyperFactoryOptions } from "../types";
+import type {
+  Recorder,
+  RecorderFactoryOptions,
+  Typer,
+  TyperFactoryOptions,
+} from "../types";
 import { platformDetector } from "../utils/platform";
 import { createLinuxWaylandRecorder } from "./recorder/linux-wayland";
 import { createLinuxX11Recorder } from "./recorder/linux-x11";

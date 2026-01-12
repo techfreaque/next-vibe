@@ -9,7 +9,12 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { smsEnv } from "../env";
-import type { SendSmsParams, SmsProvider, SmsResult, SmsResultMetadata } from "../utils";
+import type {
+  SendSmsParams,
+  SmsProvider,
+  SmsResult,
+  SmsResultMetadata,
+} from "../utils";
 import { SmsProviders } from "../utils";
 
 // Re-export enum from separate file to avoid circular dependency
@@ -95,7 +100,9 @@ export function getAwsSnsProvider(): SmsProvider {
           .toISOString()
           .replaceAll(/[:-]|\.\d{3}/g, "")
           .slice(0, 8);
-        const amzDate = new Date().toISOString().replaceAll(/[:-]|\.\d{3}/g, "");
+        const amzDate = new Date()
+          .toISOString()
+          .replaceAll(/[:-]|\.\d{3}/g, "");
 
         // Create the canonical request
         const method = "POST";
@@ -181,7 +188,8 @@ export function getAwsSnsProvider(): SmsProvider {
           `x-amz-date:${amzDate}`,
         ].join("\n")}\n`;
 
-        const signedHeaders = "content-type;host;x-amz-content-sha256;x-amz-date";
+        const signedHeaders =
+          "content-type;host;x-amz-content-sha256;x-amz-date";
 
         const canonicalRequest = [
           method,
@@ -210,11 +218,17 @@ export function getAwsSnsProvider(): SmsProvider {
           serviceName: string,
         ): Buffer => {
           // eslint-disable-next-line i18next/no-literal-string
-          const kDate = createHmac("sha256", `AWS4${key}`).update(dateStamp).digest();
+          const kDate = createHmac("sha256", `AWS4${key}`)
+            .update(dateStamp)
+            .digest();
           // eslint-disable-next-line i18next/no-literal-string
-          const kRegion = createHmac("sha256", kDate).update(regionName).digest();
+          const kRegion = createHmac("sha256", kDate)
+            .update(regionName)
+            .digest();
           // eslint-disable-next-line i18next/no-literal-string
-          const kService = createHmac("sha256", kRegion).update(serviceName).digest();
+          const kService = createHmac("sha256", kRegion)
+            .update(serviceName)
+            .digest();
           // eslint-disable-next-line i18next/no-literal-string
           const kSigning = createHmac("sha256", kService)
             // eslint-disable-next-line i18next/no-literal-string
@@ -223,9 +237,16 @@ export function getAwsSnsProvider(): SmsProvider {
           return kSigning;
         };
 
-        const signatureKey = getSignatureKey(secretAccessKey, dateStamp, region, service);
+        const signatureKey = getSignatureKey(
+          secretAccessKey,
+          dateStamp,
+          region,
+          service,
+        );
         // eslint-disable-next-line i18next/no-literal-string
-        const signature = createHmac("sha256", signatureKey).update(stringToSign).digest("hex");
+        const signature = createHmac("sha256", signatureKey)
+          .update(stringToSign)
+          .digest("hex");
 
         // eslint-disable-next-line i18next/no-literal-string
         const authorizationHeader = `${algorithm} Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
@@ -263,12 +284,16 @@ export function getAwsSnsProvider(): SmsProvider {
 
         // Parse XML response with proper error handling
         const responseText = await response.text();
-        const messageIdMatch = responseText.match(/<MessageId>(.*?)<\/MessageId>/);
+        const messageIdMatch = responseText.match(
+          /<MessageId>(.*?)<\/MessageId>/,
+        );
         const timestamp = Date.now().toString();
         const fallbackId = AWS_SNS_CONSTANTS.MESSAGE_ID_PREFIX + timestamp;
         const messageId = messageIdMatch?.[1] ?? fallbackId;
 
-        const requestIdMatch = responseText.match(/<RequestId>(.*?)<\/RequestId>/);
+        const requestIdMatch = responseText.match(
+          /<RequestId>(.*?)<\/RequestId>/,
+        );
 
         // Create metadata object using conditional properties to handle exactOptionalPropertyTypes
         const metadata: SmsResultMetadata = {

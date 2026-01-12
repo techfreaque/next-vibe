@@ -9,7 +9,9 @@ interface SubscriptionPageProps {
 /**
  * Main subscription page - redirects to overview tab
  */
-export default async function SubscriptionPage({ params }: SubscriptionPageProps): Promise<never> {
+export default async function SubscriptionPage({
+  params,
+}: SubscriptionPageProps): Promise<never> {
   const { locale } = await params;
   redirect(`/${locale}/subscription/overview`);
 }

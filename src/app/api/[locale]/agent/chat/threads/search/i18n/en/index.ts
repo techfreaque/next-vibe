@@ -14,7 +14,8 @@ export const translations = {
       },
       query: {
         label: "Search Query",
-        description: "Enter search terms. Supports phrases in quotes, AND/OR operators",
+        description:
+          "Enter search terms. Supports phrases in quotes, AND/OR operators",
         placeholder: "Search threads...",
       },
       sections: {

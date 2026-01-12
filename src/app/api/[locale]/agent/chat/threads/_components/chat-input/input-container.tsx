@@ -43,7 +43,13 @@ export function ChatInputContainer({
           : "absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
       }
     >
-      <Div style={platform.isReactNative ? { paddingBottom: insets.bottom || 16 } : undefined}>
+      <Div
+        style={
+          platform.isReactNative
+            ? { paddingBottom: insets.bottom || 16 }
+            : undefined
+        }
+      >
         <Div
           className={
             platform.isReactNative

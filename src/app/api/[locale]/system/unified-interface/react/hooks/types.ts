@@ -1,5 +1,12 @@
-import type { DefaultError, QueryKey, UseQueryOptions } from "@tanstack/react-query";
-import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
+import type {
+  DefaultError,
+  QueryKey,
+  UseQueryOptions,
+} from "@tanstack/react-query";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
 import type { FieldValues, UseFormProps, UseFormReturn } from "react-hook-form";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -66,7 +73,11 @@ export type InferEnhancedMutationResult<T> = T extends CreateApiEndpointAny
         UrlVariablesOutput: infer TUrlVariablesOutput;
       };
     }
-    ? EnhancedMutationResult<TResponseOutput, TRequestOutput, TUrlVariablesOutput>
+    ? EnhancedMutationResult<
+        TResponseOutput,
+        TRequestOutput,
+        TUrlVariablesOutput
+      >
     : never
   : never;
 
@@ -107,7 +118,11 @@ export interface ApiQueryReturn<TResponse> {
 /**
  * Type for the API query options
  */
-export interface ApiQueryOptions<TRequest, TResponse, TUrlVariables> extends Omit<
+export interface ApiQueryOptions<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+> extends Omit<
   UseQueryOptions<TResponse, DefaultError, TResponse, QueryKey>,
   "queryFn" | "initialData" | "queryKey"
 > {
@@ -151,16 +166,19 @@ export interface ApiMutationOptions<TRequest, TResponse, TUrlVariables> {
   invalidateQueries?: string[]; // List of queries to invalidate after mutation
 }
 
-export type ApiInferMutationOptions<TEndpoint extends CreateApiEndpointAny> = ApiMutationOptions<
-  TEndpoint["types"]["RequestOutput"],
-  TEndpoint["types"]["ResponseOutput"],
-  TEndpoint["types"]["UrlVariablesOutput"]
->;
+export type ApiInferMutationOptions<TEndpoint extends CreateApiEndpointAny> =
+  ApiMutationOptions<
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"]
+  >;
 
 /**
  * Type for the API query form options
  */
-export interface ApiQueryFormOptions<TRequest> extends ApiFormOptions<TRequest> {
+export interface ApiQueryFormOptions<
+  TRequest,
+> extends ApiFormOptions<TRequest> {
   autoSubmit?: boolean; // Whether to automatically submit the form when values change
   debounceMs?: number; // Debounce time in ms for auto-submission
 }

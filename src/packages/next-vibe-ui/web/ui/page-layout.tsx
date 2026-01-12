@@ -11,7 +11,11 @@ export type PageLayoutProps = {
  * Web: Simple div wrapper (no safe area needed)
  * Native: SafeAreaView with optional scrolling
  */
-export function PageLayout({ children, className, style }: PageLayoutProps): React.JSX.Element {
+export function PageLayout({
+  children,
+  className,
+  style,
+}: PageLayoutProps): React.JSX.Element {
   return (
     <div className={className} style={style}>
       {children}

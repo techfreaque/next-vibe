@@ -55,17 +55,25 @@ export function HistoryPageClient({
       if (payment === "success") {
         setAlertType("success");
         if (type === "subscription") {
-          setAlertMessage(t("app.subscription.subscription.payment.success.subscription"));
+          setAlertMessage(
+            t("app.subscription.subscription.payment.success.subscription"),
+          );
         } else if (type === "credits") {
-          setAlertMessage(t("app.subscription.subscription.payment.success.credits"));
+          setAlertMessage(
+            t("app.subscription.subscription.payment.success.credits"),
+          );
         }
         setShowAlert(true);
       } else if (payment === "canceled") {
         setAlertType("error");
         if (type === "subscription") {
-          setAlertMessage(t("app.subscription.subscription.payment.canceled.subscription"));
+          setAlertMessage(
+            t("app.subscription.subscription.payment.canceled.subscription"),
+          );
         } else if (type === "credits") {
-          setAlertMessage(t("app.subscription.subscription.payment.canceled.credits"));
+          setAlertMessage(
+            t("app.subscription.subscription.payment.canceled.credits"),
+          );
         }
         setShowAlert(true);
       }
@@ -113,7 +121,10 @@ export function HistoryPageClient({
 
       {/* Subscription Status Card */}
       {initialSubscription && (
-        <SubscriptionStatusCard locale={locale} initialSubscription={initialSubscription} />
+        <SubscriptionStatusCard
+          locale={locale}
+          initialSubscription={initialSubscription}
+        />
       )}
 
       {/* Tabs Navigation */}

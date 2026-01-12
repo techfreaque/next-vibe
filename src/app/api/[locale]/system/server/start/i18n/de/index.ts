@@ -101,12 +101,14 @@ export const translations: typeof enTranslations = {
         failedTaskRunner: "Task-Runner konnte nicht gestartet werden",
         taskRunnerSkipped:
           "Produktions-Task-Runner übersprungen (--skip-task-runner Flag verwendet)",
-        skipNextStart: "Next.js-Start wird übersprungen (wird von package.json behandelt)",
+        skipNextStart:
+          "Next.js-Start wird übersprungen (wird von package.json behandelt)",
         serverWillStart: "Produktionsserver wird von package.json gestartet",
         serverAvailable: "Server wird verfügbar sein unter http://localhost:",
         startupPrepared: "✅ Produktionsserver-Start erfolgreich vorbereitet",
         failedStart: "❌ Produktionsserver-Start fehlgeschlagen:",
-        gracefulShutdown: "Graceful Shutdown für Produktions-Task-Runner angefordert",
+        gracefulShutdown:
+          "Graceful Shutdown für Produktions-Task-Runner angefordert",
       },
     },
   },

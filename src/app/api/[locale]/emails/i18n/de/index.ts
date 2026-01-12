@@ -502,7 +502,8 @@ export const translations: typeof enTranslations = {
         update: {
           meta: {
             name: "Lead-Massenaktualisierungs-E-Mail",
-            description: "E-Mail, die bei Massenaktualisierung von Leads gesendet wird",
+            description:
+              "E-Mail, die bei Massenaktualisierung von Leads gesendet wird",
           },
           preview: {
             totalMatched: "Gesamt gefunden",
@@ -510,9 +511,11 @@ export const translations: typeof enTranslations = {
             totalProcessed: "Gesamt verarbeitet",
             totalProcessed_description: "Anzahl der verarbeiteten Leads",
             totalUpdated: "Gesamt aktualisiert",
-            totalUpdated_description: "Anzahl der erfolgreich aktualisierten Leads",
+            totalUpdated_description:
+              "Anzahl der erfolgreich aktualisierten Leads",
             errorsCount: "Fehleranzahl",
-            errorsCount_description: "Anzahl der Fehler während der Verarbeitung",
+            errorsCount_description:
+              "Anzahl der Fehler während der Verarbeitung",
             dryRun: "Testlauf",
             dryRun_description: "Nur Vorschau ohne tatsächliche Änderungen",
             userId: "Benutzer-ID",
@@ -555,7 +558,8 @@ export const translations: typeof enTranslations = {
           message: "Nachricht",
           message_description: "Nachrichteninhalt",
           isForCompany: "Für Firmenkonto",
-          isForCompany_description: "Ob diese E-Mail an das Firmenteam gesendet wird",
+          isForCompany_description:
+            "Ob diese E-Mail an das Firmenteam gesendet wird",
           userId: "Benutzer-ID",
           userId_description: "ID des zugeordneten Benutzers (optional)",
           leadId: "Lead-ID",

@@ -72,10 +72,16 @@ export interface PageRouterParams extends Record<string, string | string[]> {
  * Type for any Next.js page component (handles various signatures)
  * Using a single flexible signature to avoid intersection type issues
  */
-export type AnyNextComponent = AnyNextSyncPageComponent | AnyNextAsyncPageComponent;
-export type AnyNextSyncPageComponent = (props: SyncLayoutRouterProps) => JSX.Element | never;
+export type AnyNextComponent =
+  | AnyNextSyncPageComponent
+  | AnyNextAsyncPageComponent;
+export type AnyNextSyncPageComponent = (
+  props: SyncLayoutRouterProps,
+) => JSX.Element | never;
 
-export type AnyNextAsyncPageComponent = (props: AsyncLayoutRouterProps) => Promise<JSX.Element>;
+export type AnyNextAsyncPageComponent = (
+  props: AsyncLayoutRouterProps,
+) => Promise<JSX.Element>;
 
 /**
  * Creates a wrapper for Next.js page components with lazy loading and error boundaries
@@ -152,7 +158,9 @@ export function createPageWrapperWithImport(
               err instanceof Error
                 ? err
                 : new Error(
-                    t("app.api.system.unifiedInterface.reactNative.errors.failedToLoadPage"),
+                    t(
+                      "app.api.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+                    ),
                   ),
             );
           }
@@ -177,9 +185,13 @@ export function createPageWrapperWithImport(
           }}
         >
           <Span style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-            {t("app.api.system.unifiedInterface.reactNative.errors.failedToLoadPage")}
+            {t(
+              "app.api.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+            )}
           </Span>
-          <Span style={{ fontSize: 14, color: "#666", textAlign: "center" }}>{error.message}</Span>
+          <Span style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
+            {error.message}
+          </Span>
         </View>
       );
     }
@@ -216,7 +228,9 @@ export function createPageWrapperWithImport(
  * @param PageComponent - The Next.js page component to wrap
  * @returns A synchronous Expo Router compatible component
  */
-export function createPageWrapper(PageComponent: AnyNextComponent): () => React.ReactElement {
+export function createPageWrapper(
+  PageComponent: AnyNextComponent,
+): () => React.ReactElement {
   return function PageWrapper(): React.ReactElement {
     const params = useLocalSearchParams<PageRouterParams>();
     const [content, setContent] = useState<JSX.Element | null>(null);
@@ -265,7 +279,9 @@ export function createPageWrapper(PageComponent: AnyNextComponent): () => React.
                 err instanceof Error
                   ? err
                   : new Error(
-                      t("app.api.system.unifiedInterface.reactNative.errors.failedToLoadPage"),
+                      t(
+                        "app.api.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+                      ),
                     ),
               );
             }
@@ -290,9 +306,13 @@ export function createPageWrapper(PageComponent: AnyNextComponent): () => React.
           }}
         >
           <Span style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-            {t("app.api.system.unifiedInterface.reactNative.errors.failedToLoadPage")}
+            {t(
+              "app.api.system.unifiedInterface.reactNative.errors.failedToLoadPage",
+            )}
           </Span>
-          <Span style={{ fontSize: 14, color: "#666", textAlign: "center" }}>{error.message}</Span>
+          <Span style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
+            {error.message}
+          </Span>
         </View>
       );
     }
@@ -334,7 +354,9 @@ export function createPageWrapper(PageComponent: AnyNextComponent): () => React.
  * @param LayoutComponent - The Next.js layout component to wrap
  * @returns A synchronous Expo Router compatible component
  */
-export function createLayoutWrapper(LayoutComponent: AnyNextComponent): () => React.ReactElement {
+export function createLayoutWrapper(
+  LayoutComponent: AnyNextComponent,
+): () => React.ReactElement {
   return function LayoutWrapper(): React.ReactElement {
     const params = useLocalSearchParams<PageRouterParams>();
     const [content, setContent] = useState<React.ReactElement | null>(null);
@@ -353,7 +375,11 @@ export function createLayoutWrapper(LayoutComponent: AnyNextComponent): () => Re
       queueMicrotask(() => {
         void (async (): Promise<void> => {
           try {
-            const result = await renderedComponent(LayoutComponent, params, slotElement);
+            const result = await renderedComponent(
+              LayoutComponent,
+              params,
+              slotElement,
+            );
             if (!cancelled) {
               setContent(result);
             }
@@ -416,7 +442,11 @@ export function createLayoutWrapperWithImport(
             const layoutModule = await importFn();
             const LayoutComponent = layoutModule.default;
 
-            const result = await renderedComponent(LayoutComponent, params, slotElement);
+            const result = await renderedComponent(
+              LayoutComponent,
+              params,
+              slotElement,
+            );
 
             if (!cancelled) {
               setContent(result);

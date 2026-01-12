@@ -33,10 +33,15 @@ export function useScrollPosition(delay = 10): ScrollPosition {
     const currentY = window.scrollY;
     const currentX = window.scrollX;
     const direction =
-      currentY > scrollPosition.y ? "down" : currentY < scrollPosition.y ? "up" : "none";
+      currentY > scrollPosition.y
+        ? "down"
+        : currentY < scrollPosition.y
+          ? "up"
+          : "none";
 
     const isAtTop = currentY <= 0;
-    const isAtBottom = Math.ceil(window.innerHeight + currentY) >= document.body.offsetHeight;
+    const isAtBottom =
+      Math.ceil(window.innerHeight + currentY) >= document.body.offsetHeight;
 
     setScrollPosition({
       x: currentX,

@@ -10,9 +10,17 @@ import { AlertCircle, Calendar } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import { safeGetRequiredFields } from "next-vibe/shared/utils/zod-required-fields";
 import type { JSX } from "react";
-import type { Control, ControllerRenderProps, FieldPath, FieldValues } from "react-hook-form";
+import type {
+  Control,
+  ControllerRenderProps,
+  FieldPath,
+  FieldValues,
+} from "react-hook-form";
 
-import { getIconComponent, type IconKey } from "@/app/api/[locale]/agent/chat/model-access/icons";
+import {
+  getIconComponent,
+  type IconKey,
+} from "@/app/api/[locale]/agent/chat/model-access/icons";
 import type {
   FieldConfig,
   FieldStyleClassName,
@@ -25,7 +33,11 @@ import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-int
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { simpleT } from "@/i18n/core/shared";
-import type { TFunction, TParams, TranslationKey } from "@/i18n/core/static-types";
+import type {
+  TFunction,
+  TParams,
+  TranslationKey,
+} from "@/i18n/core/static-types";
 
 import { AutocompleteField } from "../autocomplete-field";
 import { Badge } from "../badge";
@@ -41,13 +53,30 @@ import { NumberInput } from "../number-input";
 import { PhoneField } from "../phone-field";
 import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 import { RadioGroup, RadioGroupItem } from "../radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../select";
 import { Span } from "../span";
 import { Switch } from "../switch";
 import { TagsField } from "../tags-field";
 import { Textarea } from "../textarea";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../tooltip";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "./form";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../tooltip";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./form";
 
 // Default theme for required fields
 const DEFAULT_THEME: RequiredFieldTheme = {
@@ -123,7 +152,10 @@ function getFieldStyleClassName(
         baseContainerClassName,
         "p-4 rounded-lg border border-red-200/60 dark:border-red-800/60 bg-red-50/60 dark:bg-red-950/30",
       ),
-      labelClassName: cn(baseLabelClassName, "text-red-600 dark:text-red-400 font-semibold"),
+      labelClassName: cn(
+        baseLabelClassName,
+        "text-red-600 dark:text-red-400 font-semibold",
+      ),
       inputClassName: cn(
         baseInputClassName,
         "border-red-300 dark:border-red-600 focus-visible:border-red-500 focus-visible:ring-red-500/20",
@@ -170,7 +202,10 @@ function getFieldStyleClassName(
 
       const colors = successVariants[completedColor];
       return {
-        containerClassName: cn(baseContainerClassName, colors.containerClassName),
+        containerClassName: cn(
+          baseContainerClassName,
+          colors.containerClassName,
+        ),
         labelClassName: cn(baseLabelClassName, colors.labelClassName),
         inputClassName: cn(baseInputClassName, colors.inputClassName),
         errorClassName: cn(
@@ -252,7 +287,11 @@ function renderPrefillDisplay<TKey extends string>(
   prefillDisplay: PrefillDisplayConfig<TKey>,
   t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType,
 ): JSX.Element {
-  const displayLabel = prefillDisplay.labelKey ? t(prefillDisplay.labelKey) : label ? t(label) : "";
+  const displayLabel = prefillDisplay.labelKey
+    ? t(prefillDisplay.labelKey)
+    : label
+      ? t(label)
+      : "";
 
   switch (prefillDisplay.variant) {
     case "card":
@@ -360,18 +399,26 @@ function renderFieldInput<
           key={`${field.name}-${String(field.value) || "empty"}`}
           onValueChange={(value) => field.onChange(value)}
           value={
-            field.value !== undefined && field.value !== null ? String(field.value) : undefined
+            field.value !== undefined && field.value !== null
+              ? String(field.value)
+              : undefined
           }
           disabled={disabled || config.disabled}
         >
           <SelectTrigger className={cn(inputClassName, "h-10")}>
-            <SelectValue placeholder={config.placeholder ? t(config.placeholder) : undefined} />
+            <SelectValue
+              placeholder={
+                config.placeholder ? t(config.placeholder) : undefined
+              }
+            />
           </SelectTrigger>
           <SelectContent>
             {config.options
               .filter(
                 (option) =>
-                  option.value !== undefined && option.value !== null && option.value !== "",
+                  option.value !== undefined &&
+                  option.value !== null &&
+                  option.value !== "",
               )
               .map((option, index) => (
                 <SelectItem
@@ -400,7 +447,11 @@ function renderFieldInput<
             htmlFor={field.name}
             className="text-sm font-normal cursor-pointer leading-relaxed"
           >
-            {config.checkboxLabel ? t(config.checkboxLabel) : config.label ? t(config.label) : null}
+            {config.checkboxLabel
+              ? t(config.checkboxLabel)
+              : config.label
+                ? t(config.label)
+                : null}
           </Label>
         </div>
       );
@@ -413,7 +464,9 @@ function renderFieldInput<
           disabled={disabled || config.disabled}
           className={cn(
             "flex py-2",
-            config.orientation === "horizontal" ? "flex-row gap-6" : "flex-col gap-3",
+            config.orientation === "horizontal"
+              ? "flex-row gap-6"
+              : "flex-col gap-3",
           )}
         >
           {config.options.map((option) => (
@@ -571,7 +624,9 @@ function renderFieldInput<
     }
 
     case "multiselect": {
-      const multiselectValue: string[] = Array.isArray(field.value) ? field.value : [];
+      const multiselectValue: string[] = Array.isArray(field.value)
+        ? field.value
+        : [];
 
       return (
         <MultiSelect
@@ -627,7 +682,12 @@ function renderFieldInput<
                 )}
               >
                 {Icon && (
-                  <Icon className={cn("h-4 w-4", isSelected && "text-primary-foreground")} />
+                  <Icon
+                    className={cn(
+                      "h-4 w-4",
+                      isSelected && "text-primary-foreground",
+                    )}
+                  />
                 )}
                 <Span className="text-xs font-medium">{t(option.label)}</Span>
               </Button>
@@ -647,7 +707,9 @@ function renderFieldInput<
           onBlur={field.onBlur}
           disabled={disabled || false}
           className={cn(inputClassName, "h-10")}
-          placeholder={globalT("packages.nextVibeUi.web.common.unknownFieldType")}
+          placeholder={globalT(
+            "packages.nextVibeUi.web.common.unknownFieldType",
+          )}
         />
       );
     }
@@ -699,7 +761,11 @@ export function EndpointFormField<
   locale,
 }: EndpointFormFieldProps<TKey, TFieldValues, TName, TEndpoint>): JSX.Element {
   // Extract from endpoint
-  const { fields: endpointFields, scopedTranslation, requestSchema: schema } = endpoint;
+  const {
+    fields: endpointFields,
+    scopedTranslation,
+    requestSchema: schema,
+  } = endpoint;
   const { scopedT } = scopedTranslation;
 
   // Use scoped translation from endpoint.scopedTranslation.scopedT
@@ -707,7 +773,9 @@ export function EndpointFormField<
   const { t: globalT } = simpleT(locale); // For hardcoded framework keys
 
   // Auto-infer config from endpoint fields if not provided
-  const config = providedConfig || (endpointFields ? getFieldConfig(endpointFields, name) : null);
+  const config =
+    providedConfig ||
+    (endpointFields ? getFieldConfig(endpointFields, name) : null);
 
   if (!config) {
     // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Developer mistake - missing required prop
@@ -729,35 +797,52 @@ export function EndpointFormField<
       control={control}
       name={name}
       render={({ field, fieldState }) => {
-        const validationState = getFieldValidationState(field.value, fieldState.error, isRequired);
+        const validationState = getFieldValidationState(
+          field.value,
+          fieldState.error,
+          isRequired,
+        );
 
         const styleClassName = getFieldStyleClassName(validationState, theme);
         const { style } = theme;
 
         // For checkbox/switch, skip the top label since they have inline labels
-        const skipTopLabel = config.type === "checkbox" || config.type === "switch";
+        const skipTopLabel =
+          config.type === "checkbox" || config.type === "switch";
 
         return (
-          <FormItem className={cn(styleClassName.containerClassName, className)}>
+          <FormItem
+            className={cn(styleClassName.containerClassName, className)}
+          >
             {!skipTopLabel && (
               <div className="flex flex-row items-start gap-2">
                 <FormLabel
-                  className={cn(styleClassName.labelClassName, "flex items-center gap-1.5")}
+                  className={cn(
+                    styleClassName.labelClassName,
+                    "flex items-center gap-1.5",
+                  )}
                 >
                   <span>{config.label && t(config.label)}</span>
                   {config.label && style === "asterisk" && isRequired && (
-                    <span className="text-blue-600 dark:text-blue-400 font-bold">*</span>
+                    <span className="text-blue-600 dark:text-blue-400 font-bold">
+                      *
+                    </span>
                   )}
                   {config.description && (
                     <TooltipProvider delayDuration={300}>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button type="button" className="cursor-help inline-flex">
+                          <button
+                            type="button"
+                            className="cursor-help inline-flex"
+                          >
                             <Info className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent className="max-w-[250px]">
-                          <span className="text-sm">{t(config.description)}</span>
+                          <span className="text-sm">
+                            {t(config.description)}
+                          </span>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -780,7 +865,12 @@ export function EndpointFormField<
                   // 1. prefillDisplay is configured
                   // 2. Field has a value
                   // 3. Field is NOT dirty (value hasn't changed from initial/prefilled)
-                  renderPrefillDisplay(String(field.value), config.label, config.prefillDisplay, t)
+                  renderPrefillDisplay(
+                    String(field.value),
+                    config.label,
+                    config.prefillDisplay,
+                    t,
+                  )
                 : // Render normal form input
                   renderFieldInput(
                     config,

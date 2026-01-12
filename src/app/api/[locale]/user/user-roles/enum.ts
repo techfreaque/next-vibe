@@ -43,9 +43,14 @@ export const UserRole = {
   ...PlatformMarker,
 } as const;
 
-export type UserRoleValue = typeof UserPermissionRoleValue | typeof PlatformMarkerValue;
+export type UserRoleValue =
+  | typeof UserPermissionRoleValue
+  | typeof PlatformMarkerValue;
 
-export const UserRoleOptions = [...UserPermissionRoleOptions, ...PlatformMarkerOptions];
+export const UserRoleOptions = [
+  ...UserPermissionRoleOptions,
+  ...PlatformMarkerOptions,
+];
 
 /**
  * Type guards and filters
@@ -54,14 +59,18 @@ export const UserRoleOptions = [...UserPermissionRoleOptions, ...PlatformMarkerO
 /**
  * Check if a role is a user permission role (can be assigned to users)
  */
-export function isUserPermissionRole(role: UserRoleValue): role is typeof UserPermissionRoleValue {
+export function isUserPermissionRole(
+  role: UserRoleValue,
+): role is typeof UserPermissionRoleValue {
   return !isPlatformMarker(role);
 }
 
 /**
  * Check if a role is a platform access marker (config-only, never assigned to users)
  */
-export function isPlatformMarker(role: UserRoleValue): role is typeof PlatformMarkerValue {
+export function isPlatformMarker(
+  role: UserRoleValue,
+): role is typeof PlatformMarkerValue {
   return (
     role === PlatformMarker.CLI_OFF ||
     role === PlatformMarker.WEB_OFF ||

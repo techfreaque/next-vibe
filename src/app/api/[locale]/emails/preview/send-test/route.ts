@@ -12,6 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definition,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) => emailPreviewSendTestRepository.sendTest(data, logger),
+    handler: ({ data, logger }) =>
+      emailPreviewSendTestRepository.sendTest(data, logger),
   },
 });

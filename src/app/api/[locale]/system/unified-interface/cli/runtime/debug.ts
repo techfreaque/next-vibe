@@ -127,9 +127,12 @@ export class ResourceCleanupRegistry {
           cleanupError instanceof Error
             ? { message: cleanupError.message, stack: cleanupError.stack }
             : { message: String(cleanupError) };
-        logger.warn("app.api.system.unifiedInterface.cli.vibe.utils.debug.cleanupFunctionFailed", {
-          cleanupError: error,
-        });
+        logger.warn(
+          "app.api.system.unifiedInterface.cli.vibe.utils.debug.cleanupFunctionFailed",
+          {
+            cleanupError: error,
+          },
+        );
       }
     }
 
@@ -185,8 +188,14 @@ export class CliPerformanceMonitor {
     const initOverhead = Math.max(0, (t.initEnd || 0) - (t.initStart || 0));
     const parseOverhead = Math.max(0, (t.parseEnd || 0) - (t.parseStart || 0));
     const routeExecution = t.routeEnd - t.routeStart;
-    const renderOverhead = Math.max(0, (t.renderEnd || 0) - (t.renderStart || 0));
-    const preRouteOverhead = Math.max(0, t.routeStart - (t.tsStart || t.binaryStart));
+    const renderOverhead = Math.max(
+      0,
+      (t.renderEnd || 0) - (t.renderStart || 0),
+    );
+    const preRouteOverhead = Math.max(
+      0,
+      t.routeStart - (t.tsStart || t.binaryStart),
+    );
     const postRouteOverhead = Math.max(0, t.end - t.routeEnd);
 
     return {
@@ -256,7 +265,9 @@ export class ResourceMonitor {
     // Any handle that's not in the safe list is potentially problematic
     return handles.some((handle) => {
       const handleType = handle.type;
-      return !SAFE_HANDLE_TYPES.includes(handleType as (typeof SAFE_HANDLE_TYPES)[number]);
+      return !SAFE_HANDLE_TYPES.includes(
+        handleType as (typeof SAFE_HANDLE_TYPES)[number],
+      );
     });
   }
 
@@ -493,10 +504,15 @@ export class CliResourceManager {
       if (breakdown) {
         if (verbose) {
           const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
-          logger.info("app.api.system.unifiedInterface.cli.vibe.utils.debug.executionTime", {
-            totalSeconds,
-          });
-          logger.info("app.api.system.unifiedInterface.cli.vibe.utils.debug.performanceBreakdown");
+          logger.info(
+            "app.api.system.unifiedInterface.cli.vibe.utils.debug.executionTime",
+            {
+              totalSeconds,
+            },
+          );
+          logger.info(
+            "app.api.system.unifiedInterface.cli.vibe.utils.debug.performanceBreakdown",
+          );
           logger.info(formatPerformanceBreakdown(breakdown));
         }
         if (mcpSilentMode) {
@@ -526,13 +542,21 @@ export class CliResourceManager {
         const requests = this.resourceMonitor.getActiveRequestsCount();
 
         if (handles.length > 0 || requests > 0) {
-          logger.info("app.api.system.unifiedInterface.cli.vibe.utils.debug.remainingResources");
-          logger.info("app.api.system.unifiedInterface.cli.vibe.utils.debug.activeHandles", {
-            handles: formatActiveHandles(handles),
-          });
-          logger.info("app.api.system.unifiedInterface.cli.vibe.utils.debug.activeRequests", {
-            requests: requests.toString(),
-          });
+          logger.info(
+            "app.api.system.unifiedInterface.cli.vibe.utils.debug.remainingResources",
+          );
+          logger.info(
+            "app.api.system.unifiedInterface.cli.vibe.utils.debug.activeHandles",
+            {
+              handles: formatActiveHandles(handles),
+            },
+          );
+          logger.info(
+            "app.api.system.unifiedInterface.cli.vibe.utils.debug.activeRequests",
+            {
+              requests: requests.toString(),
+            },
+          );
         }
       }
 
@@ -559,16 +583,24 @@ export class CliResourceManager {
         cleanupError instanceof Error
           ? { message: cleanupError.message, stack: cleanupError.stack }
           : { message: String(cleanupError) };
-      logger.warn("app.api.system.unifiedInterface.cli.vibe.utils.debug.cleanupError", {
-        cleanupError: error,
-      });
+      logger.warn(
+        "app.api.system.unifiedInterface.cli.vibe.utils.debug.cleanupError",
+        {
+          cleanupError: error,
+        },
+      );
       process.exit(1);
     }
   }
 
   exit(result: RouteExecutionResult): void {
     // Exit with error code if the result indicates failure
-    if (!result.success || result.cause || result.error || result.isErrorResponse) {
+    if (
+      !result.success ||
+      result.cause ||
+      result.error ||
+      result.isErrorResponse
+    ) {
       process.exit(1);
     } else {
       process.exit(0);

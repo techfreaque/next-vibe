@@ -2,7 +2,14 @@ import type { Metadata } from "next";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft, Award, Globe, Handshake, Heart, Lightbulb } from "next-vibe-ui/ui/icons";
+import {
+  ArrowLeft,
+  Award,
+  Globe,
+  Handshake,
+  Heart,
+  Lightbulb,
+} from "next-vibe-ui/ui/icons";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
@@ -21,7 +28,9 @@ interface Props {
 /**
  * Generate metadata for the About Us page with translations
  */
-export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "about-us",
@@ -72,7 +81,9 @@ function ValueCard({
   );
 }
 
-export default async function AboutUsPage({ params }: Props): Promise<JSX.Element> {
+export default async function AboutUsPage({
+  params,
+}: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 
@@ -80,22 +91,30 @@ export default async function AboutUsPage({ params }: Props): Promise<JSX.Elemen
   const values = [
     {
       title: t("app.story._components.home.aboutUs.values.excellence.title"),
-      description: t("app.story._components.home.aboutUs.values.excellence.description"),
+      description: t(
+        "app.story._components.home.aboutUs.values.excellence.description",
+      ),
       icon: <Award className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
     {
       title: t("app.story._components.home.aboutUs.values.innovation.title"),
-      description: t("app.story._components.home.aboutUs.values.innovation.description"),
+      description: t(
+        "app.story._components.home.aboutUs.values.innovation.description",
+      ),
       icon: <Lightbulb className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
     {
       title: t("app.story._components.home.aboutUs.values.integrity.title"),
-      description: t("app.story._components.home.aboutUs.values.integrity.description"),
+      description: t(
+        "app.story._components.home.aboutUs.values.integrity.description",
+      ),
       icon: <Heart className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
     {
       title: t("app.story._components.home.aboutUs.values.collaboration.title"),
-      description: t("app.story._components.home.aboutUs.values.collaboration.description"),
+      description: t(
+        "app.story._components.home.aboutUs.values.collaboration.description",
+      ),
       icon: <Handshake className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
     },
   ];
@@ -163,9 +182,12 @@ export default async function AboutUsPage({ params }: Props): Promise<JSX.Elemen
               </CardHeader>
               <CardContent>
                 <P className="text-muted-foreground leading-relaxed">
-                  {t("app.story._components.home.aboutUs.mission.vision.description", {
-                    appName: t("config.appName"),
-                  })}
+                  {t(
+                    "app.story._components.home.aboutUs.mission.vision.description",
+                    {
+                      appName: t("config.appName"),
+                    },
+                  )}
                 </P>
               </CardContent>
             </Card>
@@ -176,12 +198,16 @@ export default async function AboutUsPage({ params }: Props): Promise<JSX.Elemen
                   <Globe className="h-7 w-7 text-green-600 dark:text-green-400" />
                 </Div>
                 <CardTitle className="text-xl">
-                  {t("app.story._components.home.aboutUs.mission.approach.title")}
+                  {t(
+                    "app.story._components.home.aboutUs.mission.approach.title",
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <P className="text-muted-foreground leading-relaxed">
-                  {t("app.story._components.home.aboutUs.mission.approach.description")}
+                  {t(
+                    "app.story._components.home.aboutUs.mission.approach.description",
+                  )}
                 </P>
               </CardContent>
             </Card>
@@ -192,12 +218,16 @@ export default async function AboutUsPage({ params }: Props): Promise<JSX.Elemen
                   <Handshake className="h-7 w-7 text-purple-600 dark:text-purple-400" />
                 </Div>
                 <CardTitle className="text-xl">
-                  {t("app.story._components.home.aboutUs.mission.commitment.title")}
+                  {t(
+                    "app.story._components.home.aboutUs.mission.commitment.title",
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <P className="text-muted-foreground leading-relaxed">
-                  {t("app.story._components.home.aboutUs.mission.commitment.description")}
+                  {t(
+                    "app.story._components.home.aboutUs.mission.commitment.description",
+                  )}
                 </P>
               </CardContent>
             </Card>

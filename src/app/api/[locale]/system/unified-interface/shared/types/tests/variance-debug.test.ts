@@ -5,7 +5,12 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { CreateApiEndpoint } from "../../endpoints/definition/create";
 import type { WidgetConfig } from "../../widgets/configs";
-import type { CreateApiEndpointAny, ObjectField, PrimitiveField, UnifiedField } from "../endpoint";
+import type {
+  CreateApiEndpointAny,
+  ObjectField,
+  PrimitiveField,
+  UnifiedField,
+} from "../endpoint";
 import type { FieldUsageConfig } from "../endpoint";
 import type { Methods } from "../enums";
 
@@ -17,10 +22,20 @@ type TestEndpoint = CreateApiEndpoint<
   string,
   ObjectField<
     {
-      jobId: PrimitiveField<z.ZodUUID, FieldUsageConfig, string, WidgetConfig<string>>;
+      jobId: PrimitiveField<
+        z.ZodUUID,
+        FieldUsageConfig,
+        string,
+        WidgetConfig<string>
+      >;
       result: ObjectField<
         {
-          success: PrimitiveField<z.ZodBoolean, FieldUsageConfig, string, WidgetConfig<string>>;
+          success: PrimitiveField<
+            z.ZodBoolean,
+            FieldUsageConfig,
+            string,
+            WidgetConfig<string>
+          >;
         },
         FieldUsageConfig,
         string,

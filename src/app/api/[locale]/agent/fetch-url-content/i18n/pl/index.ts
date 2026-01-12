@@ -6,12 +6,14 @@ export const translations = {
       "Pobierz i wyodrębnij zawartość z dowolnego adresu URL, konwertując ją na czytelny format markdown. Użyj tego, gdy potrzebujesz przeczytać lub przeanalizować zawartość strony internetowej.",
     form: {
       title: "Parametry Pobierania URL",
-      description: "Skonfiguruj adres URL, z którego ma zostać pobrana zawartość",
+      description:
+        "Skonfiguruj adres URL, z którego ma zostać pobrana zawartość",
     },
     fields: {
       url: {
         title: "URL",
-        description: "Pełny adres URL do pobrania (musi zawierać http:// lub https://)",
+        description:
+          "Pełny adres URL do pobrania (musi zawierać http:// lub https://)",
         placeholder: "https://przyklad.pl",
       },
     },

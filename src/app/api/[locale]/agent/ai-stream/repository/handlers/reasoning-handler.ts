@@ -152,8 +152,13 @@ export class ReasoningHandler {
     encoder: TextEncoder;
     logger: EndpointLogger;
   }): string {
-    const { currentAssistantMessageId, currentAssistantContent, controller, encoder, logger } =
-      params;
+    const {
+      currentAssistantMessageId,
+      currentAssistantContent,
+      controller,
+      encoder,
+      logger,
+    } = params;
 
     if (currentAssistantMessageId) {
       const thinkCloseTag = "</think>";
@@ -258,10 +263,13 @@ export class ReasoningHandler {
         logger,
       });
       if (!result.success) {
-        logger.warn("Failed to persist ASSISTANT message (reasoning) - continuing stream", {
-          messageId,
-          error: result.message,
-        });
+        logger.warn(
+          "Failed to persist ASSISTANT message (reasoning) - continuing stream",
+          {
+            messageId,
+            error: result.message,
+          },
+        );
       }
     }
 

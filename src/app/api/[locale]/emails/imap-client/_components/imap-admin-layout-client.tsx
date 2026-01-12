@@ -9,7 +9,13 @@ import { cn } from "next-vibe/shared/utils";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { BarChart3, Mail, RefreshCw, Settings, Users } from "next-vibe-ui/ui/icons";
+import {
+  BarChart3,
+  Mail,
+  RefreshCw,
+  Settings,
+  Users,
+} from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { Nav } from "next-vibe-ui/ui/nav";
 import { Span } from "next-vibe-ui/ui/span";
@@ -84,7 +90,9 @@ export function ImapAdminLayoutClient({
     },
   ];
 
-  const currentSubSection = subNavigationItems.find((item) => item.pattern.test(pathname));
+  const currentSubSection = subNavigationItems.find((item) =>
+    item.pattern.test(pathname),
+  );
 
   return (
     <Div className="flex flex-col gap-6">
@@ -103,7 +111,10 @@ export function ImapAdminLayoutClient({
 
             {/* Sub Navigation Tabs */}
             <Div className="border-b border-gray-200 dark:border-gray-700">
-              <Nav className="flex flex-row gap-8" aria-label={t("app.admin.emails.imap.title")}>
+              <Nav
+                className="flex flex-row gap-8"
+                aria-label={t("app.admin.emails.imap.title")}
+              >
                 {subNavigationItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = currentSubSection?.key === item.key;

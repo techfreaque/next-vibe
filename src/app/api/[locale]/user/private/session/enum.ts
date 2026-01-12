@@ -8,5 +8,6 @@ export const {
   options: SessionErrorReasonOptions,
   Value: SessionErrorReasonValue,
 } = createEnumOptions({
-  NO_TOKEN_IN_COOKIES: "app.api.user.private.session.enums.sessionErrorReason.noTokenInCookies",
+  NO_TOKEN_IN_COOKIES:
+    "app.api.user.private.session.enums.sessionErrorReason.noTokenInCookies",
 });

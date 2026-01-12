@@ -37,8 +37,13 @@ const StyledView = styledNative(View);
 const StyledText = styledNative(Text);
 const StyledPressable = styledNative(Pressable);
 
-function ContextMenu({ children, ...props }: ContextMenuRootProps): React.JSX.Element {
-  return <ContextMenuPrimitive.Root {...props}>{children}</ContextMenuPrimitive.Root>;
+function ContextMenu({
+  children,
+  ...props
+}: ContextMenuRootProps): React.JSX.Element {
+  return (
+    <ContextMenuPrimitive.Root {...props}>{children}</ContextMenuPrimitive.Root>
+  );
 }
 ContextMenu.displayName = ContextMenuPrimitive.Root.displayName;
 
@@ -65,18 +70,27 @@ function ContextMenuTrigger({
 }
 ContextMenuTrigger.displayName = ContextMenuPrimitive.Trigger.displayName;
 
-function ContextMenuGroup({ children }: ContextMenuGroupProps): React.JSX.Element {
+function ContextMenuGroup({
+  children,
+}: ContextMenuGroupProps): React.JSX.Element {
   return <ContextMenuPrimitive.Group>{children}</ContextMenuPrimitive.Group>;
 }
 ContextMenuGroup.displayName = ContextMenuPrimitive.Group.displayName;
 
-function ContextMenuPortal({ children }: ContextMenuPortalProps): React.JSX.Element {
+function ContextMenuPortal({
+  children,
+}: ContextMenuPortalProps): React.JSX.Element {
   return <ContextMenuPrimitive.Portal>{children}</ContextMenuPrimitive.Portal>;
 }
 ContextMenuPortal.displayName = "ContextMenuPortal";
 
-function ContextMenuSub({ children, ...props }: ContextMenuSubProps): React.JSX.Element {
-  return <ContextMenuPrimitive.Sub {...props}>{children}</ContextMenuPrimitive.Sub>;
+function ContextMenuSub({
+  children,
+  ...props
+}: ContextMenuSubProps): React.JSX.Element {
+  return (
+    <ContextMenuPrimitive.Sub {...props}>{children}</ContextMenuPrimitive.Sub>
+  );
 }
 ContextMenuSub.displayName = ContextMenuPrimitive.Sub.displayName;
 
@@ -110,7 +124,10 @@ function ContextMenuSubTrigger({
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <TextClassContext.Provider
-      value={cn("select-none text-sm text-lg text-primary", open && "text-accent-foreground")}
+      value={cn(
+        "select-none text-sm text-lg text-primary",
+        open && "text-accent-foreground",
+      )}
     >
       <ContextMenuPrimitive.SubTrigger asChild {...props}>
         <StyledPressable
@@ -148,7 +165,9 @@ function ContextMenuSubContent({
           nativeStyle,
           className: cn(
             "z-50 min-w-32 overflow-hidden rounded-md border border-border mt-1 bg-popover p-1 shadow-md shadow-foreground/5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-            open ? "animate-in fade-in-0 zoom-in-95" : "animate-out fade-out-0 zoom-out",
+            open
+              ? "animate-in fade-in-0 zoom-in-95"
+              : "animate-out fade-out-0 zoom-out",
             className,
           ),
         })}
@@ -182,7 +201,9 @@ function ContextMenuContent({
               nativeStyle,
               className: cn(
                 "z-50 min-w-32 overflow-hidden rounded-md border border-border bg-popover p-1 shadow-md shadow-foreground/5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-                open ? "animate-in fade-in-0 zoom-in-95" : "animate-out fade-out-0 zoom-out-95",
+                open
+                  ? "animate-in fade-in-0 zoom-in-95"
+                  : "animate-out fade-out-0 zoom-out-95",
                 className,
               ),
             })}
@@ -209,7 +230,9 @@ function ContextMenuItem({
   if (asChild) {
     return (
       <TextClassContext.Provider value={TEXT_CLASS_ITEM}>
-        <ContextMenuPrimitive.Item asChild>{children}</ContextMenuPrimitive.Item>
+        <ContextMenuPrimitive.Item asChild>
+          {children}
+        </ContextMenuPrimitive.Item>
       </TextClassContext.Provider>
     );
   }
@@ -275,7 +298,8 @@ function ContextMenuCheckboxItem({
     </ContextMenuPrimitive.CheckboxItem>
   );
 }
-ContextMenuCheckboxItem.displayName = ContextMenuPrimitive.CheckboxItem.displayName;
+ContextMenuCheckboxItem.displayName =
+  ContextMenuPrimitive.CheckboxItem.displayName;
 
 function ContextMenuRadioItem({
   className,
@@ -364,7 +388,10 @@ function ContextMenuShortcut({
 }: ContextMenuShortcutProps): React.JSX.Element {
   return (
     <Span
-      className={cn("ml-auto text-xs tracking-widest text-muted-foreground", className)}
+      className={cn(
+        "ml-auto text-xs tracking-widest text-muted-foreground",
+        className,
+      )}
       {...props}
     >
       {children}

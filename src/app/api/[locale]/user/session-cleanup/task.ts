@@ -39,7 +39,10 @@ export async function executeTask(
   const defaultConfig = sessionCleanupRepository.getDefaultConfig();
 
   // Validate configuration before execution
-  const validationResult = await sessionCleanupRepository.validateConfig(defaultConfig, logger);
+  const validationResult = await sessionCleanupRepository.validateConfig(
+    defaultConfig,
+    logger,
+  );
 
   if (!validationResult.success) {
     logger.error("Session cleanup configuration validation failed");
@@ -50,7 +53,10 @@ export async function executeTask(
     });
   }
 
-  return await sessionCleanupRepository.executeSessionCleanup(defaultConfig, logger);
+  return await sessionCleanupRepository.executeSessionCleanup(
+    defaultConfig,
+    logger,
+  );
 }
 
 /**

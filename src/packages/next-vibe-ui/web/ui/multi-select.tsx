@@ -86,10 +86,17 @@ export function MultiSelect(props: MultiSelectProps): React.JSX.Element {
         >
           <div className="flex gap-1 flex-wrap">
             {value.length === 0 ? (
-              <span>{placeholder || t("packages.nextVibeUi.web.ui.multiSelect.placeholder")}</span>
+              <span>
+                {placeholder ||
+                  t("packages.nextVibeUi.web.ui.multiSelect.placeholder")}
+              </span>
             ) : (
               selectedOptions.map((option) => (
-                <Badge key={option.value} variant="secondary" className="mr-1 mb-1">
+                <Badge
+                  key={option.value}
+                  variant="secondary"
+                  className="mr-1 mb-1"
+                >
                   {option.label}
                   <span
                     role="button" // eslint-disable-line jsx-a11y/prefer-tag-over-role
@@ -122,17 +129,22 @@ export function MultiSelect(props: MultiSelectProps): React.JSX.Element {
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="start">
         <Command shouldFilter={false} id="multi-select-list">
-          {searchable && <CommandInput placeholder="Search..." className="h-9" />}
+          {searchable && (
+            <CommandInput placeholder="Search..." className="h-9" />
+          )}
           <CommandList className="max-h-[300px]">
             <CommandEmpty>
-              {emptyMessage || t("packages.nextVibeUi.web.ui.multiSelect.noResultsFound")}
+              {emptyMessage ||
+                t("packages.nextVibeUi.web.ui.multiSelect.noResultsFound")}
             </CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
                 const isSelected = value.includes(option.value);
                 const isDisabled =
                   option.disabled ||
-                  (!isSelected && maxSelections !== undefined && value.length >= maxSelections);
+                  (!isSelected &&
+                    maxSelections !== undefined &&
+                    value.length >= maxSelections);
 
                 return (
                   <CommandItem
@@ -144,7 +156,9 @@ export function MultiSelect(props: MultiSelectProps): React.JSX.Element {
                       }
                     }}
                     disabled={isDisabled}
-                    className={cn(isDisabled && "opacity-50 cursor-not-allowed")}
+                    className={cn(
+                      isDisabled && "opacity-50 cursor-not-allowed",
+                    )}
                   >
                     <div
                       className={cn(

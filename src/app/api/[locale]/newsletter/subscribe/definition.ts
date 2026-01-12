@@ -52,7 +52,8 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.newsletter.subscribe.post.form.title" as const,
-      description: "app.api.newsletter.subscribe.post.form.description" as const,
+      description:
+        "app.api.newsletter.subscribe.post.form.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -64,8 +65,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.EMAIL,
           label: "app.api.newsletter.subscribe.email.label" as const,
-          description: "app.api.newsletter.subscribe.email.description" as const,
-          placeholder: "app.api.newsletter.subscribe.email.placeholder" as const,
+          description:
+            "app.api.newsletter.subscribe.email.description" as const,
+          placeholder:
+            "app.api.newsletter.subscribe.email.placeholder" as const,
           helpText: "app.api.newsletter.subscribe.email.helpText" as const,
           columns: 12,
         },
@@ -88,9 +91,12 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.MULTISELECT,
           label: "app.api.newsletter.subscribe.preferences.label" as const,
-          description: "app.api.newsletter.subscribe.preferences.description" as const,
-          placeholder: "app.api.newsletter.subscribe.preferences.placeholder" as const,
-          helpText: "app.api.newsletter.subscribe.preferences.helpText" as const,
+          description:
+            "app.api.newsletter.subscribe.preferences.description" as const,
+          placeholder:
+            "app.api.newsletter.subscribe.preferences.placeholder" as const,
+          helpText:
+            "app.api.newsletter.subscribe.preferences.helpText" as const,
           options: NewsletterPreferenceOptions,
           columns: 12,
         },
@@ -123,7 +129,8 @@ const { POST } = createEndpoint({
       subscriptionId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.newsletter.subscribe.response.subscriptionId" as const,
+          content:
+            "app.api.newsletter.subscribe.response.subscriptionId" as const,
         },
         z.string(),
       ),
@@ -138,53 +145,69 @@ const { POST } = createEndpoint({
   ),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.newsletter.subscribe.post.errors.validation.title" as const,
-      description: "app.api.newsletter.subscribe.post.errors.validation.description" as const,
+      title:
+        "app.api.newsletter.subscribe.post.errors.validation.title" as const,
+      description:
+        "app.api.newsletter.subscribe.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.newsletter.subscribe.post.errors.internal.title" as const,
-      description: "app.api.newsletter.subscribe.post.errors.internal.description" as const,
+      description:
+        "app.api.newsletter.subscribe.post.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.newsletter.subscribe.post.errors.unauthorized.title" as const,
-      description: "app.api.newsletter.subscribe.post.errors.unauthorized.description" as const,
+      title:
+        "app.api.newsletter.subscribe.post.errors.unauthorized.title" as const,
+      description:
+        "app.api.newsletter.subscribe.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.newsletter.subscribe.post.errors.forbidden.title" as const,
-      description: "app.api.newsletter.subscribe.post.errors.forbidden.description" as const,
+      title:
+        "app.api.newsletter.subscribe.post.errors.forbidden.title" as const,
+      description:
+        "app.api.newsletter.subscribe.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.newsletter.subscribe.post.errors.internal.title" as const,
-      description: "app.api.newsletter.subscribe.post.errors.internal.description" as const,
+      description:
+        "app.api.newsletter.subscribe.post.errors.internal.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.newsletter.subscribe.post.errors.internal.title" as const,
-      description: "app.api.newsletter.subscribe.post.errors.internal.description" as const,
+      description:
+        "app.api.newsletter.subscribe.post.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.newsletter.subscribe.post.errors.internal.title" as const,
-      description: "app.api.newsletter.subscribe.post.errors.internal.description" as const,
+      description:
+        "app.api.newsletter.subscribe.post.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.newsletter.subscribe.post.errors.internal.title" as const,
-      description: "app.api.newsletter.subscribe.post.errors.internal.description" as const,
+      description:
+        "app.api.newsletter.subscribe.post.errors.internal.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.newsletter.subscribe.post.errors.conflict.title" as const,
-      description: "app.api.newsletter.subscribe.post.errors.conflict.description" as const,
+      description:
+        "app.api.newsletter.subscribe.post.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
     title: "app.api.newsletter.subscribe.post.success.title" as const,
-    description: "app.api.newsletter.subscribe.post.success.description" as const,
+    description:
+      "app.api.newsletter.subscribe.post.success.description" as const,
   },
   examples: {
     requests: {
       default: {
         email: "user@example.com",
         name: "John Doe",
-        preferences: [NewsletterPreference.MARKETING, NewsletterPreference.PRODUCT_NEWS],
+        preferences: [
+          NewsletterPreference.MARKETING,
+          NewsletterPreference.PRODUCT_NEWS,
+        ],
       },
       minimal: {
         email: "user@example.com",

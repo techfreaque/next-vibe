@@ -6,10 +6,16 @@
 import { storage } from "next-vibe-ui/lib/storage";
 import { create } from "zustand";
 
-import { defaultModel, type ModelId as ModelIdType } from "@/app/api/[locale]/agent/models/models";
+import {
+  defaultModel,
+  type ModelId as ModelIdType,
+} from "@/app/api/[locale]/agent/models/models";
 
 import { aliasToPathMap } from "../../../system/generated/endpoint";
-import { DEFAULT_TTS_VOICE, type TtsVoiceValue } from "../../text-to-speech/enum";
+import {
+  DEFAULT_TTS_VOICE,
+  type TtsVoiceValue,
+} from "../../text-to-speech/enum";
 import { DEFAULT_TOOL_CONFIRMATION_IDS, DEFAULT_TOOL_IDS } from "../constants";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { ViewMode, type ViewModeValue } from "../enum";
@@ -81,7 +87,11 @@ interface ChatState {
   // Branch actions
   getBranchIndices: (threadId: string) => Record<string, number>;
   setBranchIndices: (threadId: string, indices: Record<string, number>) => void;
-  updateBranchIndex: (threadId: string, parentMessageId: string, branchIndex: number) => void;
+  updateBranchIndex: (
+    threadId: string,
+    parentMessageId: string,
+    branchIndex: number,
+  ) => void;
 
   // Settings actions
   hydrateSettings: () => Promise<void>;
@@ -113,7 +123,9 @@ const getDefaultSettings = (): ChatSettings => ({
   viewMode: ViewMode.LINEAR,
   enabledTools: DEFAULT_TOOL_IDS.map((id) => ({
     id,
-    requiresConfirmation: DEFAULT_TOOL_CONFIRMATION_IDS.some((confirmId) => confirmId === id),
+    requiresConfirmation: DEFAULT_TOOL_CONFIRMATION_IDS.some(
+      (confirmId) => confirmId === id,
+    ),
   })),
 });
 
@@ -133,7 +145,9 @@ const loadSettings = async (): Promise<ChatSettings> => {
       // Validate enabled tools against aliasToPathMap
       let enabledTools = parsed.enabledTools || defaults.enabledTools;
       if (Array.isArray(enabledTools)) {
-        const validTools = enabledTools.filter((tool) => tool.id in aliasToPathMap);
+        const validTools = enabledTools.filter(
+          (tool) => tool.id in aliasToPathMap,
+        );
         if (validTools.length !== enabledTools.length) {
           enabledTools = validTools;
           // Save cleaned settings
@@ -341,7 +355,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
     return state.branchIndices[threadId] || {};
   },
 
-  setBranchIndices: (threadId: string, indices: Record<string, number>): void => {
+  setBranchIndices: (
+    threadId: string,
+    indices: Record<string, number>,
+  ): void => {
     set((state) => ({
       branchIndices: {
         ...state.branchIndices,
@@ -350,7 +367,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }));
   },
 
-  updateBranchIndex: (threadId: string, parentMessageId: string, branchIndex: number): void => {
+  updateBranchIndex: (
+    threadId: string,
+    parentMessageId: string,
+    branchIndex: number,
+  ): void => {
     set((state) => {
       const currentIndices = state.branchIndices[threadId] || {};
       return {

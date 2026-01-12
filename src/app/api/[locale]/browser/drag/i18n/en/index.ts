@@ -53,7 +53,8 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred during the drag operation",
+      description:
+        "An internal server error occurred during the drag operation",
     },
     unknown: {
       title: "Unknown Error",

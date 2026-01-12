@@ -27,7 +27,13 @@ export type TextEmphasis = "bold" | "italic" | "underline";
 /**
  * Text variant types from UI config (for styling)
  */
-export type TextVariant = "default" | "error" | "info" | "success" | "warning" | "muted";
+export type TextVariant =
+  | "default"
+  | "error"
+  | "info"
+  | "success"
+  | "warning"
+  | "muted";
 
 /**
  * Processed text data structure
@@ -90,10 +96,16 @@ export function extractTextData(
 
   // Handle object value with text properties
   if (isWidgetDataObject(value)) {
-    const text = "text" in value && typeof value.text === "string" ? value.text : "";
+    const text =
+      "text" in value && typeof value.text === "string" ? value.text : "";
     const truncate =
-      "truncate" in value && typeof value.truncate === "number" ? value.truncate : undefined;
-    const format = "format" in value && typeof value.format === "string" ? value.format : "plain";
+      "truncate" in value && typeof value.truncate === "number"
+        ? value.truncate
+        : undefined;
+    const format =
+      "format" in value && typeof value.format === "string"
+        ? value.format
+        : "plain";
 
     if (!text) {
       return null;
@@ -106,7 +118,10 @@ export function extractTextData(
       text: finalText,
       truncate,
       format:
-        format === "code" || format === "pre" || format === "plain" || format === "link"
+        format === "code" ||
+        format === "pre" ||
+        format === "plain" ||
+        format === "link"
           ? (format as TextFormat)
           : "plain",
     };
@@ -142,8 +157,12 @@ export function formatDateValue(
   }
 
   try {
-    const dateValue = typeof value === "string" || value instanceof Date ? value : String(value);
-    const date = typeof dateValue === "string" ? new Date(dateValue) : dateValue;
+    const dateValue =
+      typeof value === "string" || value instanceof Date
+        ? value
+        : String(value);
+    const date =
+      typeof dateValue === "string" ? new Date(dateValue) : dateValue;
 
     if (isNaN(date.getTime())) {
       return String(value);

@@ -1,7 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
 import { useCallback, useState } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
 
@@ -52,11 +55,15 @@ export function useLocalStorageRead<T>(
   type RequestType = GetEndpointTypes<T>["request"];
   type ResponseDataType = GetEndpointTypes<T>["response"];
 
-  const [response, setResponse] = useState<ResponseType<ResponseDataType> | undefined>(undefined);
+  const [response, setResponse] = useState<
+    ResponseType<ResponseDataType> | undefined
+  >(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<RequestType>({
-    resolver: endpoint?.requestSchema ? zodResolver(endpoint.requestSchema) : undefined,
+    resolver: endpoint?.requestSchema
+      ? zodResolver(endpoint.requestSchema)
+      : undefined,
     defaultValues: (options.initialState ?? {}) as RequestType,
   });
 
@@ -122,12 +129,17 @@ export function useLocalStorageCreate<T>(
   endpoint: CreateApiEndpointAny | null,
   callback:
     | ((params: {
-        requestData: PrimaryMutationTypes<T>["request"] | PatchEndpointTypes<T>["request"];
+        requestData:
+          | PrimaryMutationTypes<T>["request"]
+          | PatchEndpointTypes<T>["request"];
         urlPathParams?:
           | PrimaryMutationTypes<T>["urlPathParams"]
           | PatchEndpointTypes<T>["urlPathParams"];
       }) => Promise<
-        ResponseType<PrimaryMutationTypes<T>["response"] | PatchEndpointTypes<T>["response"]>
+        ResponseType<
+          | PrimaryMutationTypes<T>["response"]
+          | PatchEndpointTypes<T>["response"]
+        >
       >)
     | undefined,
   options: {
@@ -142,9 +154,13 @@ export function useLocalStorageCreate<T>(
     >;
   } = {},
 ): {
-  form: UseFormReturn<PrimaryMutationTypes<T>["request"] | PatchEndpointTypes<T>["request"]>;
+  form: UseFormReturn<
+    PrimaryMutationTypes<T>["request"] | PatchEndpointTypes<T>["request"]
+  >;
   response:
-    | ResponseType<PrimaryMutationTypes<T>["response"] | PatchEndpointTypes<T>["response"]>
+    | ResponseType<
+        PrimaryMutationTypes<T>["response"] | PatchEndpointTypes<T>["response"]
+      >
     | undefined;
   isSubmitSuccessful: boolean;
   submitError: ErrorResponseType | null;
@@ -156,15 +172,25 @@ export function useLocalStorageCreate<T>(
   clearSavedForm: () => void;
   setErrorType: () => void;
 } | null {
-  type RequestType = PrimaryMutationTypes<T>["request"] | PatchEndpointTypes<T>["request"];
-  type ResponseDataType = PrimaryMutationTypes<T>["response"] | PatchEndpointTypes<T>["response"];
+  type RequestType =
+    | PrimaryMutationTypes<T>["request"]
+    | PatchEndpointTypes<T>["request"];
+  type ResponseDataType =
+    | PrimaryMutationTypes<T>["response"]
+    | PatchEndpointTypes<T>["response"];
 
-  const [response, setResponse] = useState<ResponseType<ResponseDataType> | undefined>(undefined);
+  const [response, setResponse] = useState<
+    ResponseType<ResponseDataType> | undefined
+  >(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<RequestType>({
-    resolver: endpoint?.requestSchema ? zodResolver(endpoint.requestSchema) : undefined,
-    defaultValues: (options.autoPrefillData ?? options.defaultValues ?? {}) as RequestType,
+    resolver: endpoint?.requestSchema
+      ? zodResolver(endpoint.requestSchema)
+      : undefined,
+    defaultValues: (options.autoPrefillData ??
+      options.defaultValues ??
+      {}) as RequestType,
   });
 
   const submitForm = useCallback(
@@ -249,12 +275,16 @@ export function useLocalStorageDelete<T>(
   type RequestType = DeleteEndpointTypes<T>["request"];
   type ResponseDataType = DeleteEndpointTypes<T>["response"];
 
-  const [response, setResponse] = useState<ResponseType<ResponseDataType> | undefined>(undefined);
+  const [response, setResponse] = useState<
+    ResponseType<ResponseDataType> | undefined
+  >(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Create form instance for localStorage mode (similar to API mode)
   const form = useForm<RequestType>({
-    resolver: endpoint ? (zodResolver(endpoint.requestSchema) as never) : undefined,
+    resolver: endpoint
+      ? (zodResolver(endpoint.requestSchema) as never)
+      : undefined,
     defaultValues: {} as RequestType,
   });
 

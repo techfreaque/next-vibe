@@ -197,7 +197,8 @@ export const translations = {
           },
           suggestedPrompts: {
             label: "Suggested Prompts (optional)",
-            description: "Add up to 4 example prompts to help users get started",
+            description:
+              "Add up to 4 example prompts to help users get started",
             placeholder: "Example prompt {{number}}",
           },
         },
@@ -241,7 +242,8 @@ export const translations = {
   dialogs: {
     searchAndCreate: "Search & Create",
     deleteChat: 'Delete chat "{{title}}"?',
-    deleteFolderConfirm: 'Delete folder "{{name}}" and move {{count}} chat(s) to General?',
+    deleteFolderConfirm:
+      'Delete folder "{{name}}" and move {{count}} chat(s) to General?',
   },
   views: {
     linearView: "Linear view (ChatGPT style)",
@@ -256,7 +258,8 @@ export const translations = {
     failed: "Failed to capture screenshot",
     failedWithMessage: "Failed to capture screenshot: {{message}}",
     tryAgain: "Failed to capture screenshot. Please try again.",
-    noMessages: "Could not find chat messages area. Please ensure you have messages in the chat.",
+    noMessages:
+      "Could not find chat messages area. Please ensure you have messages in the chat.",
     quotaExceeded: "Storage quota exceeded. Screenshot is too large.",
     canvasError: "Failed to convert screenshot to image format.",
   },
@@ -312,22 +315,28 @@ export const translations = {
   },
   models: {
     descriptions: {
-      uncensoredLmV11: "Uncensored AI model for creative and unrestricted conversations",
+      uncensoredLmV11:
+        "Uncensored AI model for creative and unrestricted conversations",
       freedomgptLiberty:
         "FreedomGPT Liberty - Uncensored AI model focused on free expression and creative content",
       gabAiArya:
         "Gab AI Arya - Uncensored conversational AI model with free expression and creative capabilities",
-      gemini3Pro: "Google Gemini 3 Pro - Advanced multimodal AI model with large context window",
+      gemini3Pro:
+        "Google Gemini 3 Pro - Advanced multimodal AI model with large context window",
       deepseekV32:
         "DeepSeek V3.2 - High-performance reasoning model with advanced coding capabilities",
       gpt52Pro:
         "GPT-5.2 Pro - Advanced OpenAI model with enhanced reasoning and coding capabilities",
-      gpt52: "GPT-5.2 - High-performance OpenAI model for complex tasks and analysis",
-      gpt52_chat: "GPT-5.2 Chat - Optimized OpenAI model for conversational interactions",
+      gpt52:
+        "GPT-5.2 - High-performance OpenAI model for complex tasks and analysis",
+      gpt52_chat:
+        "GPT-5.2 Chat - Optimized OpenAI model for conversational interactions",
       dolphin3_0_r1_mistral_24b:
         "Dolphin 3.0 R1 Mistral 24B - Uncensored large language model based on Mistral",
-      dolphinLlama3_70B: "Dolphin Llama 3 70B - Uncensored large language model based on Llama 3",
-      veniceUncensored: "Venice Uncensored - Uncensored AI model for unrestricted conversations",
+      dolphinLlama3_70B:
+        "Dolphin Llama 3 70B - Uncensored large language model based on Llama 3",
+      veniceUncensored:
+        "Venice Uncensored - Uncensored AI model for unrestricted conversations",
     },
   },
   modelUtilities: {

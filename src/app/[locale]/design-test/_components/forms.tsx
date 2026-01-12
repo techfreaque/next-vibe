@@ -4,7 +4,11 @@ import { Calendar } from "next-vibe-ui/ui/calendar";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
 import { Input } from "next-vibe-ui/ui/input";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "next-vibe-ui/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "next-vibe-ui/ui/input-otp";
 import { Label } from "next-vibe-ui/ui/label";
 import { RadioGroup, RadioGroupItem } from "next-vibe-ui/ui/radio-group";
 import { Section } from "next-vibe-ui/ui/section";
@@ -93,7 +97,12 @@ export function FormsPreview(): JSX.Element {
 
           <Div className="space-y-2">
             <Label>Slider</Label>
-            <Slider defaultValue={[50]} max={100} step={1} className="w-[60%]" />
+            <Slider
+              defaultValue={[50]}
+              max={100}
+              step={1}
+              className="w-[60%]"
+            />
           </Div>
 
           <Div className="space-y-2">

@@ -4,7 +4,8 @@ export const translations: typeof enTranslations = {
   tag: "Lista Wiadomości",
   get: {
     title: "Lista wiadomości IMAP",
-    description: "Pobierz podzieloną na strony listę wiadomości IMAP z filtrowaniem i sortowaniem",
+    description:
+      "Pobierz podzieloną na strony listę wiadomości IMAP z filtrowaniem i sortowaniem",
     container: {
       title: "Zapytanie wiadomości",
       description: "Skonfiguruj parametry listowania wiadomości",
@@ -90,11 +91,13 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt",
-        description: "Żądanie listy wiadomości jest w konflikcie z istniejącymi danymi",
+        description:
+          "Żądanie listy wiadomości jest w konflikcie z istniejącymi danymi",
       },
       server: {
         title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera podczas listowania wiadomości",
+        description:
+          "Wystąpił wewnętrzny błąd serwera podczas listowania wiadomości",
       },
       network: {
         title: "Błąd sieci",

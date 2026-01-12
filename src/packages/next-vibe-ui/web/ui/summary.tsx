@@ -7,7 +7,12 @@ export type SummaryProps = {
   id?: string;
 } & StyleType;
 
-export function Summary({ className, style, children, id }: SummaryProps): JSX.Element {
+export function Summary({
+  className,
+  style,
+  children,
+  id,
+}: SummaryProps): JSX.Element {
   return (
     <summary className={className} style={style} id={id}>
       {children}

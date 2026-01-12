@@ -363,7 +363,8 @@ export const translations: typeof enTranslations = {
         failed: "Nie udało się zaktualizować konfiguracji",
       },
       reset: {
-        success: "Konfiguracja została pomyślnie zresetowana do wartości domyślnych",
+        success:
+          "Konfiguracja została pomyślnie zresetowana do wartości domyślnych",
         failed: "Nie udało się zresetować konfiguracji",
       },
       export: {

@@ -57,7 +57,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt ponowienia",
-        description: "Nie można ponowić zadania, które jest obecnie przetwarzane",
+        description:
+          "Nie można ponowić zadania, które jest obecnie przetwarzane",
       },
     },
     success: {

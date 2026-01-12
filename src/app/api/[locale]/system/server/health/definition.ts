@@ -51,7 +51,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.health.get.fields.detailed.title",
-          description: "app.api.system.server.health.get.fields.detailed.description",
+          description:
+            "app.api.system.server.health.get.fields.detailed.description",
         },
         z.boolean().default(false),
       ),
@@ -60,8 +61,10 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.health.get.fields.includeDatabase.title",
-          description: "app.api.system.server.health.get.fields.includeDatabase.description",
+          label:
+            "app.api.system.server.health.get.fields.includeDatabase.title",
+          description:
+            "app.api.system.server.health.get.fields.includeDatabase.description",
         },
         z.boolean().default(true),
       ),
@@ -71,7 +74,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.health.get.fields.includeTasks.title",
-          description: "app.api.system.server.health.get.fields.includeTasks.description",
+          description:
+            "app.api.system.server.health.get.fields.includeTasks.description",
         },
         z.boolean().default(true),
       ),
@@ -81,7 +85,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.health.get.fields.includeSystem.title",
-          description: "app.api.system.server.health.get.fields.includeSystem.description",
+          description:
+            "app.api.system.server.health.get.fields.includeSystem.description",
         },
         z.boolean().default(false),
       ),
@@ -115,7 +120,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.system.server.health.get.response.environment.title",
-          description: "app.api.system.server.health.get.response.environment.description",
+          description:
+            "app.api.system.server.health.get.response.environment.description",
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -124,21 +130,24 @@ const { GET } = createEndpoint({
           name: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.server.health.get.response.environment.name.title",
+              content:
+                "app.api.system.server.health.get.response.environment.name.title",
             },
             z.string(),
           ),
           nodeEnv: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.server.health.get.response.environment.nodeEnv.title",
+              content:
+                "app.api.system.server.health.get.response.environment.nodeEnv.title",
             },
             z.string(),
           ),
           platform: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.server.health.get.response.environment.platform.title",
+              content:
+                "app.api.system.server.health.get.response.environment.platform.title",
             },
             z.string(),
           ),
@@ -159,7 +168,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.system.server.health.get.response.database.title",
-          description: "app.api.system.server.health.get.response.database.description",
+          description:
+            "app.api.system.server.health.get.response.database.description",
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -168,21 +178,24 @@ const { GET } = createEndpoint({
           status: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.server.health.get.response.database.status.title",
+              content:
+                "app.api.system.server.health.get.response.database.status.title",
             },
             z.enum(["connected", "disconnected", "error", "unknown"]),
           ),
           responseTime: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.server.health.get.response.database.responseTime.title",
+              content:
+                "app.api.system.server.health.get.response.database.responseTime.title",
             },
             z.coerce.number().optional(),
           ),
           error: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.server.health.get.response.database.error.title",
+              content:
+                "app.api.system.server.health.get.response.database.error.title",
             },
             z.string().optional(),
           ),
@@ -193,7 +206,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.system.server.health.get.response.tasks.title",
-          description: "app.api.system.server.health.get.response.tasks.description",
+          description:
+            "app.api.system.server.health.get.response.tasks.description",
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -202,35 +216,40 @@ const { GET } = createEndpoint({
           runnerStatus: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.server.health.get.response.tasks.runnerStatus.title",
+              content:
+                "app.api.system.server.health.get.response.tasks.runnerStatus.title",
             },
             z.enum(["running", "stopped", "error", "unknown"]),
           ),
           activeTasks: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.server.health.get.response.tasks.activeTasks.title",
+              content:
+                "app.api.system.server.health.get.response.tasks.activeTasks.title",
             },
             z.coerce.number(),
           ),
           totalTasks: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.server.health.get.response.tasks.totalTasks.title",
+              content:
+                "app.api.system.server.health.get.response.tasks.totalTasks.title",
             },
             z.coerce.number(),
           ),
           errors: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.server.health.get.response.tasks.errors.title",
+              content:
+                "app.api.system.server.health.get.response.tasks.errors.title",
             },
             z.coerce.number(),
           ),
           lastError: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.server.health.get.response.tasks.lastError.title",
+              content:
+                "app.api.system.server.health.get.response.tasks.lastError.title",
             },
             z.string().optional(),
           ),
@@ -241,7 +260,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.system.server.health.get.response.system.title",
-          description: "app.api.system.server.health.get.response.system.description",
+          description:
+            "app.api.system.server.health.get.response.system.description",
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -250,8 +270,10 @@ const { GET } = createEndpoint({
           memory: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.system.server.health.get.response.system.memory.title",
-              description: "app.api.system.server.health.get.response.system.memory.description",
+              title:
+                "app.api.system.server.health.get.response.system.memory.title",
+              description:
+                "app.api.system.server.health.get.response.system.memory.description",
               layoutType: LayoutType.GRID,
               columns: 12,
             },
@@ -260,14 +282,16 @@ const { GET } = createEndpoint({
               used: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.server.health.get.response.system.memory.used.title",
+                  content:
+                    "app.api.system.server.health.get.response.system.memory.used.title",
                 },
                 z.coerce.number(),
               ),
               total: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.server.health.get.response.system.memory.total.title",
+                  content:
+                    "app.api.system.server.health.get.response.system.memory.total.title",
                 },
                 z.coerce.number(),
               ),
@@ -284,8 +308,10 @@ const { GET } = createEndpoint({
           cpu: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.system.server.health.get.response.system.cpu.title",
-              description: "app.api.system.server.health.get.response.system.cpu.description",
+              title:
+                "app.api.system.server.health.get.response.system.cpu.title",
+              description:
+                "app.api.system.server.health.get.response.system.cpu.description",
               layoutType: LayoutType.GRID,
               columns: 12,
             },
@@ -294,14 +320,16 @@ const { GET } = createEndpoint({
               usage: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.server.health.get.response.system.cpu.usage.title",
+                  content:
+                    "app.api.system.server.health.get.response.system.cpu.usage.title",
                 },
                 z.coerce.number(),
               ),
               loadAverage: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.server.health.get.response.system.cpu.loadAverage.title",
+                  content:
+                    "app.api.system.server.health.get.response.system.cpu.loadAverage.title",
                 },
                 z.array(z.coerce.number()),
               ),
@@ -310,8 +338,10 @@ const { GET } = createEndpoint({
           disk: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.system.server.health.get.response.system.disk.title",
-              description: "app.api.system.server.health.get.response.system.disk.description",
+              title:
+                "app.api.system.server.health.get.response.system.disk.title",
+              description:
+                "app.api.system.server.health.get.response.system.disk.description",
               layoutType: LayoutType.GRID,
               columns: 12,
             },
@@ -320,21 +350,24 @@ const { GET } = createEndpoint({
               available: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.server.health.get.response.system.disk.available.title",
+                  content:
+                    "app.api.system.server.health.get.response.system.disk.available.title",
                 },
                 z.coerce.number(),
               ),
               total: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.server.health.get.response.system.disk.total.title",
+                  content:
+                    "app.api.system.server.health.get.response.system.disk.total.title",
                 },
                 z.coerce.number(),
               ),
               percentage: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.server.health.get.response.system.disk.percentage.title",
+                  content:
+                    "app.api.system.server.health.get.response.system.disk.percentage.title",
                 },
                 z.coerce.number(),
               ),
@@ -347,7 +380,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.system.server.health.get.response.checks.title",
-          description: "app.api.system.server.health.get.response.checks.description",
+          description:
+            "app.api.system.server.health.get.response.checks.description",
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -362,28 +396,32 @@ const { GET } = createEndpoint({
             name: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.system.server.health.get.response.checks.item.name.title",
+                content:
+                  "app.api.system.server.health.get.response.checks.item.name.title",
               },
               z.string(),
             ),
             status: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.system.server.health.get.response.checks.item.status.title",
+                content:
+                  "app.api.system.server.health.get.response.checks.item.status.title",
               },
               z.enum(["pass", "fail", "warn"]),
             ),
             message: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.system.server.health.get.response.checks.item.message.title",
+                content:
+                  "app.api.system.server.health.get.response.checks.item.message.title",
               },
               z.string().optional(),
             ),
             duration: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.system.server.health.get.response.checks.item.duration.title",
+                content:
+                  "app.api.system.server.health.get.response.checks.item.duration.title",
               },
               z.coerce.number().optional(),
             ),
@@ -400,35 +438,43 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.server.health.get.errors.validation.title",
-      description: "app.api.system.server.health.get.errors.validation.description",
+      description:
+        "app.api.system.server.health.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.server.health.get.errors.unauthorized.title",
-      description: "app.api.system.server.health.get.errors.unauthorized.description",
+      description:
+        "app.api.system.server.health.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.server.health.get.errors.forbidden.title",
-      description: "app.api.system.server.health.get.errors.forbidden.description",
+      description:
+        "app.api.system.server.health.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.server.health.get.errors.notFound.title",
-      description: "app.api.system.server.health.get.errors.notFound.description",
+      description:
+        "app.api.system.server.health.get.errors.notFound.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.server.health.get.errors.network.title",
-      description: "app.api.system.server.health.get.errors.network.description",
+      description:
+        "app.api.system.server.health.get.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.server.health.get.errors.unknown.title",
-      description: "app.api.system.server.health.get.errors.unknown.description",
+      description:
+        "app.api.system.server.health.get.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.server.health.get.errors.conflict.title",
-      description: "app.api.system.server.health.get.errors.conflict.description",
+      description:
+        "app.api.system.server.health.get.errors.conflict.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.server.health.get.errors.unsavedChanges.title",
-      description: "app.api.system.server.health.get.errors.unsavedChanges.description",
+      description:
+        "app.api.system.server.health.get.errors.unsavedChanges.description",
     },
   },
 

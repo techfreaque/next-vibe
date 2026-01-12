@@ -7,7 +7,11 @@
 // CLI output messages don't need internationalization
 
 import type { ResponseType as ApiResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -89,7 +93,10 @@ class TestRepositoryImpl implements TestRepositoryInterface {
       const duration = Date.now() - startTime;
       const parsedError = parseError(error);
 
-      logger.error("system.check.testing.test.execute.error", parseError(error));
+      logger.error(
+        "system.check.testing.test.execute.error",
+        parseError(error),
+      );
 
       return fail({
         message: "app.api.system.check.testing.test.errors.internal.title",

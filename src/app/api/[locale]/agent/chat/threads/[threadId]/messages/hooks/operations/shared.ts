@@ -57,10 +57,23 @@ export async function createAndSendUserMessage(
   params: CreateMessageParams,
   deps: MessageOperationDeps,
 ): Promise<void> {
-  const { logger, aiStream, currentRootFolderId, currentSubFolderId, settings, deductCredits } =
-    deps;
+  const {
+    logger,
+    aiStream,
+    currentRootFolderId,
+    currentSubFolderId,
+    settings,
+    deductCredits,
+  } = deps;
 
-  const { content, parentMessageId, threadId, audioInput, attachments, operation } = params;
+  const {
+    content,
+    parentMessageId,
+    threadId,
+    audioInput,
+    attachments,
+    operation,
+  } = params;
 
   logger.debug(`${operation} operation`, {
     hasAudioInput: !!audioInput,
@@ -74,25 +87,34 @@ export async function createAndSendUserMessage(
   try {
     // For tool confirmations, we don't create a new user message
     // We're just confirming existing tool calls
-    const hasToolConfirmations = params.toolConfirmations && params.toolConfirmations.length > 0;
+    const hasToolConfirmations =
+      params.toolConfirmations && params.toolConfirmations.length > 0;
     const newMessageId = hasToolConfirmations ? null : crypto.randomUUID();
 
     // Load thread messages
     let threadMessages: ChatMessage[];
     if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-      const { getMessagesForThread } = await import("../../../../../incognito/storage");
+      const { getMessagesForThread } =
+        await import("../../../../../incognito/storage");
       threadMessages = await getMessagesForThread(threadId);
     } else {
       threadMessages = chatStore.getThreadMessages(threadId);
     }
 
-    const parentDepth = threadMessages.find((msg) => msg.id === parentMessageId)?.depth ?? -1;
+    const parentDepth =
+      threadMessages.find((msg) => msg.id === parentMessageId)?.depth ?? -1;
 
     // Build message history (incognito only - server fetches from DB)
     // Use provided messageHistory if available (e.g., from send operation)
     let messageHistory: ChatMessage[] | null = params.messageHistory ?? null;
-    if (!messageHistory && currentRootFolderId === DefaultFolderId.INCOGNITO && parentMessageId) {
-      const parentIndex = threadMessages.findIndex((msg) => msg.id === parentMessageId);
+    if (
+      !messageHistory &&
+      currentRootFolderId === DefaultFolderId.INCOGNITO &&
+      parentMessageId
+    ) {
+      const parentIndex = threadMessages.findIndex(
+        (msg) => msg.id === parentMessageId,
+      );
       if (parentIndex !== -1) {
         messageHistory = threadMessages.slice(0, parentIndex + 1);
       }
@@ -113,7 +135,10 @@ export async function createAndSendUserMessage(
 
         logger.debug(`${operation} will process attachments via API`, {
           attachmentCount: attachments.length,
-          mode: currentRootFolderId === DefaultFolderId.INCOGNITO ? "incognito" : "server",
+          mode:
+            currentRootFolderId === DefaultFolderId.INCOGNITO
+              ? "incognito"
+              : "server",
         });
       }
 
@@ -126,7 +151,10 @@ export async function createAndSendUserMessage(
         parentId: parentMessageId,
         depth: parentDepth + 1,
         sequenceId: null,
-        authorId: currentRootFolderId === DefaultFolderId.INCOGNITO ? "incognito" : null,
+        authorId:
+          currentRootFolderId === DefaultFolderId.INCOGNITO
+            ? "incognito"
+            : null,
         authorName: null,
         authorAvatar: null,
         authorColor: null,
@@ -153,12 +181,14 @@ export async function createAndSendUserMessage(
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
         // If there are attachments, use saveMessageWithAttachments to convert files to base64
         if (attachments && attachments.length > 0) {
-          const { saveMessageWithAttachments } = await import("../../../../../incognito/storage");
+          const { saveMessageWithAttachments } =
+            await import("../../../../../incognito/storage");
           const { convertFilesToIncognitoAttachments } =
             await import("../../../../../incognito/file-utils");
 
           // Convert files to base64 attachments
-          const incognitoAttachments = await convertFilesToIncognitoAttachments(attachments);
+          const incognitoAttachments =
+            await convertFilesToIncognitoAttachments(attachments);
 
           // Save to localStorage
           await saveMessageWithAttachments(createdUserMessage, attachments);
@@ -170,7 +200,8 @@ export async function createAndSendUserMessage(
             },
           });
         } else {
-          const { saveMessage } = await import("../../../../../incognito/storage");
+          const { saveMessage } =
+            await import("../../../../../incognito/storage");
           await saveMessage(createdUserMessage);
         }
       }
@@ -182,8 +213,12 @@ export async function createAndSendUserMessage(
 
     // Voice mode settings
     const voiceModeSettings = useVoiceModeStore.getState().settings;
-    const callModeKey = getCallModeKey(settings.selectedModel, settings.selectedCharacter);
-    const isCallModeEnabled = voiceModeSettings.callModeByConfig?.[callModeKey] ?? false;
+    const callModeKey = getCallModeKey(
+      settings.selectedModel,
+      settings.selectedCharacter,
+    );
+    const isCallModeEnabled =
+      voiceModeSettings.callModeByConfig?.[callModeKey] ?? false;
 
     const effectiveVoiceMode = isCallModeEnabled
       ? {
@@ -219,7 +254,10 @@ export async function createAndSendUserMessage(
         audioInput: audioInput ?? { file: null },
       },
       {
-        onContentDone: createCreditUpdateCallback(settings.selectedModel, deductCredits),
+        onContentDone: createCreditUpdateCallback(
+          settings.selectedModel,
+          deductCredits,
+        ),
       },
     );
   } catch (error) {

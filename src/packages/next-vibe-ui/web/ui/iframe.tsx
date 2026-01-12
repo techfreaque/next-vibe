@@ -17,7 +17,11 @@ export type IframeProps = {
 
 export function Iframe(props: IframeProps): React.JSX.Element {
   // Ensure title and sandbox are provided for accessibility and security
-  const { title = "", sandbox = "allow-scripts allow-same-origin", ...restProps } = props;
+  const {
+    title = "",
+    sandbox = "allow-scripts allow-same-origin",
+    ...restProps
+  } = props;
 
   return <iframe title={title} sandbox={sandbox} {...restProps} />;
 }

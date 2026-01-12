@@ -195,6 +195,7 @@ export const translations: typeof enTranslations = {
     standardSecurity: "Standardowe wymagania bezpieczeństwa",
     tryPasswordFirst: "Wypróbuj najpierw logowanie hasłem",
     useSocialLogin: "Użyj logowania społecznościowego",
-    socialLoginFaster: "Logowanie społecznościowe jest szybsze dla nowych użytkowników",
+    socialLoginFaster:
+      "Logowanie społecznościowe jest szybsze dla nowych użytkowników",
   },
 };

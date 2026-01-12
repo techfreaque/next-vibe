@@ -9,7 +9,11 @@ import { and, eq, ne, or } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "@/app/api/[locale]/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -28,7 +32,10 @@ import type {
   CharacterCreateResponseOutput,
 } from "./create/definition";
 import { customCharacters } from "./db";
-import type { CharacterListItem, CharacterListResponseOutput } from "./definition";
+import type {
+  CharacterListItem,
+  CharacterListResponseOutput,
+} from "./definition";
 import type { CharacterCategoryDB } from "./enum";
 import { type CharacterCategoryValue, CharacterOwnershipType } from "./enum";
 import { CATEGORY_CONFIG } from "./enum";
@@ -48,7 +55,9 @@ export class CharactersRepository {
     userId?: string,
   ): Promise<CharacterGetResponseOutput | null> {
     // Check default characters first (these already have source field)
-    const defaultCharacter = DEFAULT_CHARACTERS.find((p) => p.id === characterId);
+    const defaultCharacter = DEFAULT_CHARACTERS.find(
+      (p) => p.id === characterId,
+    );
     if (defaultCharacter) {
       return {
         ...defaultCharacter,
@@ -69,7 +78,10 @@ export class CharactersRepository {
           userId
             ? or(
                 eq(customCharacters.userId, userId),
-                eq(customCharacters.ownershipType, CharacterOwnershipType.PUBLIC),
+                eq(
+                  customCharacters.ownershipType,
+                  CharacterOwnershipType.PUBLIC,
+                ),
               )
             : eq(customCharacters.ownershipType, CharacterOwnershipType.PUBLIC),
         ),
@@ -123,7 +135,10 @@ export class CharactersRepository {
               eq(customCharacters.userId, userId),
               // PUBLIC characters from other users
               and(
-                eq(customCharacters.ownershipType, CharacterOwnershipType.PUBLIC),
+                eq(
+                  customCharacters.ownershipType,
+                  CharacterOwnershipType.PUBLIC,
+                ),
                 ne(customCharacters.userId, userId),
               ),
             ),
@@ -140,7 +155,10 @@ export class CharactersRepository {
         );
 
         // Combine all characters
-        const allCharacters = [...defaultCharactersCards, ...customCharactersCards];
+        const allCharacters = [
+          ...defaultCharactersCards,
+          ...customCharactersCards,
+        ];
 
         // Group characters by category into sections
         const sections = this.groupCharactersIntoSections(allCharacters);
@@ -178,7 +196,10 @@ export class CharactersRepository {
     characters: CharacterListItem[],
   ): CharacterListResponseOutput["sections"] {
     // Group characters by category
-    const groupedByCategory = new Map<typeof CharacterCategoryValue, CharacterListItem[]>();
+    const groupedByCategory = new Map<
+      typeof CharacterCategoryValue,
+      CharacterListItem[]
+    >();
 
     for (const char of characters) {
       const existing = groupedByCategory.get(char.category) || [];
@@ -221,7 +242,9 @@ export class CharactersRepository {
       logger.debug("Getting character by ID", { characterId, userId });
 
       // Check default characters first
-      const defaultCharacter = DEFAULT_CHARACTERS.find((p) => p.id === characterId);
+      const defaultCharacter = DEFAULT_CHARACTERS.find(
+        (p) => p.id === characterId,
+      );
       if (defaultCharacter) {
         const characterData: CharacterGetResponseOutput = {
           id: defaultCharacter.id,
@@ -252,9 +275,15 @@ export class CharactersRepository {
             userId
               ? or(
                   eq(customCharacters.userId, userId),
-                  eq(customCharacters.ownershipType, CharacterOwnershipType.PUBLIC),
+                  eq(
+                    customCharacters.ownershipType,
+                    CharacterOwnershipType.PUBLIC,
+                  ),
                 )
-              : eq(customCharacters.ownershipType, CharacterOwnershipType.PUBLIC),
+              : eq(
+                  customCharacters.ownershipType,
+                  CharacterOwnershipType.PUBLIC,
+                ),
           ),
         )
         .limit(1);
@@ -302,7 +331,8 @@ export class CharactersRepository {
 
       if (!userId) {
         return fail({
-          message: "app.api.agent.chat.characters.post.errors.unauthorized.title",
+          message:
+            "app.api.agent.chat.characters.post.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -351,7 +381,8 @@ export class CharactersRepository {
 
       if (!userId) {
         return fail({
-          message: "app.api.agent.chat.characters.id.patch.errors.unauthorized.title",
+          message:
+            "app.api.agent.chat.characters.id.patch.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -368,12 +399,18 @@ export class CharactersRepository {
           ...updateValues,
           updatedAt: new Date(),
         })
-        .where(and(eq(customCharacters.id, characterId), eq(customCharacters.userId, userId)))
+        .where(
+          and(
+            eq(customCharacters.id, characterId),
+            eq(customCharacters.userId, userId),
+          ),
+        )
         .returning();
 
       if (!updated) {
         return fail({
-          message: "app.api.agent.chat.characters.id.patch.errors.notFound.title",
+          message:
+            "app.api.agent.chat.characters.id.patch.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -390,7 +427,8 @@ export class CharactersRepository {
         category: updated.category,
         tagline: updated.tagline,
         ownershipType:
-          updated.ownershipType === "app.api.agent.chat.characters.enums.ownershipType.system"
+          updated.ownershipType ===
+          "app.api.agent.chat.characters.enums.ownershipType.system"
             ? "app.api.agent.chat.characters.enums.ownershipType.user"
             : updated.ownershipType,
         voice: updated.voice || DEFAULT_TTS_VOICE,
@@ -420,7 +458,8 @@ export class CharactersRepository {
 
       if (!userId) {
         return fail({
-          message: "app.api.agent.chat.characters.id.delete.errors.unauthorized.title",
+          message:
+            "app.api.agent.chat.characters.id.delete.errors.unauthorized.title",
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -429,12 +468,18 @@ export class CharactersRepository {
 
       const result = await db
         .delete(customCharacters)
-        .where(and(eq(customCharacters.id, characterId), eq(customCharacters.userId, userId)))
+        .where(
+          and(
+            eq(customCharacters.id, characterId),
+            eq(customCharacters.userId, userId),
+          ),
+        )
         .returning();
 
       if (result.length === 0) {
         return fail({
-          message: "app.api.agent.chat.characters.id.delete.errors.notFound.title",
+          message:
+            "app.api.agent.chat.characters.id.delete.errors.notFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -502,7 +547,8 @@ export class CharactersRepository {
     tagline: string;
     modelSelection: CharacterGetResponseOutput["modelSelection"];
   }): CharacterListItem {
-    const displayFields = CharactersRepository.computeCharacterDisplayFields(char);
+    const displayFields =
+      CharactersRepository.computeCharacterDisplayFields(char);
     return {
       id: char.id,
       category: char.category as (typeof CharacterCategoryDB)[number],

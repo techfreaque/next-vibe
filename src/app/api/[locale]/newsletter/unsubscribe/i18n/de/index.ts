@@ -7,13 +7,15 @@ export const translations: typeof enTranslations = {
   },
   email: {
     label: "E-Mail-Adresse",
-    description: "Die E-Mail-Adresse, die vom Newsletter abgemeldet werden soll",
+    description:
+      "Die E-Mail-Adresse, die vom Newsletter abgemeldet werden soll",
     placeholder: "benutzer@beispiel.de",
     unsubscribe: {
       title: "Vom Newsletter abmelden",
       preview: "Sie haben sich erfolgreich von unserem Newsletter abgemeldet",
       greeting: "Hallo",
-      confirmation: "Wir haben {{email}} erfolgreich von unserem Newsletter abgemeldet",
+      confirmation:
+        "Wir haben {{email}} erfolgreich von unserem Newsletter abgemeldet",
       resubscribe_info:
         "Falls Sie Ihre Meinung ändern, können Sie sich jederzeit auf unserer Website wieder anmelden",
       resubscribe_button: "Wieder anmelden",
@@ -37,7 +39,8 @@ export const translations: typeof enTranslations = {
   errors: {
     internal: {
       title: "Interner Fehler",
-      description: "Beim Verarbeiten Ihrer Abmeldeanfrage ist ein Fehler aufgetreten",
+      description:
+        "Beim Verarbeiten Ihrer Abmeldeanfrage ist ein Fehler aufgetreten",
     },
   },
   post: {
@@ -45,7 +48,8 @@ export const translations: typeof enTranslations = {
     description: "Vom Newsletter abmelden",
     form: {
       title: "Vom Newsletter abmelden",
-      description: "Geben Sie Ihre E-Mail-Adresse ein, um sich vom Newsletter abzumelden",
+      description:
+        "Geben Sie Ihre E-Mail-Adresse ein, um sich vom Newsletter abzumelden",
     },
     response: {
       title: "Abmeldeantwort",
@@ -62,7 +66,8 @@ export const translations: typeof enTranslations = {
       },
       internal: {
         title: "Interner Fehler",
-        description: "Beim Verarbeiten Ihrer Abmeldeanfrage ist ein Fehler aufgetreten",
+        description:
+          "Beim Verarbeiten Ihrer Abmeldeanfrage ist ein Fehler aufgetreten",
       },
       forbidden: {
         title: "Verboten",
@@ -84,7 +89,8 @@ export const translations: typeof enTranslations = {
         "Sie haben sich erfolgreich vom {{appName}} Newsletter abgemeldet. Falls dies ein Fehler war, besuchen Sie bitte unsere Website, um sich erneut anzumelden.",
     },
     admin_notification: {
-      message: "Newsletter-Abmeldung: {{email}} hat sich vom Newsletter abgemeldet.",
+      message:
+        "Newsletter-Abmeldung: {{email}} hat sich vom Newsletter abgemeldet.",
     },
     errors: {
       confirmation_failed: {

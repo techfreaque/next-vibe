@@ -7,7 +7,10 @@ import type { JSX } from "react";
 
 import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { getModelById, type ModelId } from "@/app/api/[locale]/agent/models/models";
+import {
+  getModelById,
+  type ModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -62,7 +65,9 @@ export function MessageAuthorInfo({
   } else {
     // No author info - show "Anonymous" for public/shared, "User" for private/incognito
     displayName =
-      rootFolderId === "private" || rootFolderId === "shared" || rootFolderId === "public"
+      rootFolderId === "private" ||
+      rootFolderId === "shared" ||
+      rootFolderId === "public"
         ? t("app.chat.messages.anonymous")
         : t("app.chat.messages.user");
   }

@@ -7,7 +7,11 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -37,11 +41,26 @@ const SYSTEM_USER: JwtPayloadType = {
 
 // Define task execution types inline
 interface TaskLogger {
-  info: (message: string, meta?: Record<string, string | number | boolean>) => void;
-  warn: (message: string, meta?: Record<string, string | number | boolean>) => void;
-  error: (message: string, meta?: Record<string, string | number | boolean>) => void;
-  debug: (message: string, meta?: Record<string, string | number | boolean>) => void;
-  vibe: (message: string, meta?: Record<string, string | number | boolean>) => void;
+  info: (
+    message: string,
+    meta?: Record<string, string | number | boolean>,
+  ) => void;
+  warn: (
+    message: string,
+    meta?: Record<string, string | number | boolean>,
+  ) => void;
+  error: (
+    message: string,
+    meta?: Record<string, string | number | boolean>,
+  ) => void;
+  debug: (
+    message: string,
+    meta?: Record<string, string | number | boolean>,
+  ) => void;
+  vibe: (
+    message: string,
+    meta?: Record<string, string | number | boolean>,
+  ) => void;
   isDebugEnabled: boolean;
 }
 
@@ -72,7 +91,8 @@ interface CronTaskDefinition extends CronSettings {
 export const taskDefinition: CronTaskDefinition = {
   // Task metadata
   name: "lead-campaign-starter",
-  description: "Start campaigns for new leads by transitioning them to PENDING status",
+  description:
+    "Start campaigns for new leads by transitioning them to PENDING status",
 
   // Scheduling and execution configuration - environment-specific
   ...getDefaultCronSettings(),
@@ -92,15 +112,17 @@ export async function execute(
 
   try {
     // Ensure config exists in database and get current config
-    const configResult = await CampaignStarterConfigRepository.ensureConfigExists(
-      SYSTEM_USER,
-      "en-GLOBAL",
-      logger,
-    );
+    const configResult =
+      await CampaignStarterConfigRepository.ensureConfigExists(
+        SYSTEM_USER,
+        "en-GLOBAL",
+        logger,
+      );
 
     if (!configResult.success || !configResult.data) {
       return fail({
-        message: "app.api.leads.leadsErrors.campaigns.common.error.server.title",
+        message:
+          "app.api.leads.leadsErrors.campaigns.common.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: "Failed to load configuration" },
       });
@@ -123,7 +145,10 @@ export async function execute(
       });
     }
 
-    if (currentHour < config.enabledHours.start || currentHour > config.enabledHours.end) {
+    if (
+      currentHour < config.enabledHours.start ||
+      currentHour > config.enabledHours.end
+    ) {
       return success({
         leadsProcessed: 0,
         leadsStarted: 0,
@@ -150,7 +175,9 @@ export async function execute(
     // const distribution = { runsPerWeek: 168, runsPerDay: 24 }; // Temporary placeholder - unused for now
 
     // Process each configured locale
-    for (const [localeKey, weeklyQuota] of Object.entries(config.leadsPerWeek)) {
+    for (const [localeKey, weeklyQuota] of Object.entries(
+      config.leadsPerWeek,
+    )) {
       const locale = localeKey as CountryLanguage;
       const weeklyQuotaNum = typeof weeklyQuota === "number" ? weeklyQuota : 0;
 
@@ -215,7 +242,9 @@ export async function execute(
 /**
  * Campaign Starter Task Validation Function
  */
-export function validate(context: CronTaskExecutionContext): ResponseType<boolean> {
+export function validate(
+  context: CronTaskExecutionContext,
+): ResponseType<boolean> {
   const { config, logger } = context;
 
   try {
@@ -281,7 +310,9 @@ export function validate(context: CronTaskExecutionContext): ResponseType<boolea
 /**
  * Campaign Starter Task Rollback Function
  */
-export function rollback(context: CronTaskExecutionContext): ResponseType<boolean> {
+export function rollback(
+  context: CronTaskExecutionContext,
+): ResponseType<boolean> {
   const { logger } = context;
 
   // Campaign starter changes are tracked in database and don't need rollback

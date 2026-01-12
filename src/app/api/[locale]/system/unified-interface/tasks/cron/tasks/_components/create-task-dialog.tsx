@@ -72,7 +72,9 @@ export function CreateTaskDialog({
             <Plus className="h-5 w-5 mr-2" />
             {t("app.admin.cron.createTask.title")}
           </DialogTitle>
-          <DialogDescription>{t("app.admin.cron.createTask.description")}</DialogDescription>
+          <DialogDescription>
+            {t("app.admin.cron.createTask.description")}
+          </DialogDescription>
         </DialogHeader>
 
         <Card>
@@ -84,7 +86,9 @@ export function CreateTaskDialog({
             >
               <FormFieldGroup
                 title={"app.admin.cron.createTask.form.taskName" as const}
-                description={"app.admin.cron.createTask.form.taskNameDescription" as const}
+                description={
+                  "app.admin.cron.createTask.form.taskNameDescription" as const
+                }
               >
                 {/* Task Name and Priority */}
                 <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -127,7 +131,9 @@ export function CreateTaskDialog({
 
               <FormFieldGroup
                 title={"app.admin.cron.createTask.form.schedule" as const}
-                description={"app.admin.cron.createTask.form.scheduleDescription" as const}
+                description={
+                  "app.admin.cron.createTask.form.scheduleDescription" as const
+                }
               >
                 {/* Schedule and Timezone */}
                 <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -153,7 +159,9 @@ export function CreateTaskDialog({
 
               <FormFieldGroup
                 title={"app.admin.cron.createTask.form.enabled" as const}
-                description={"app.admin.cron.createTask.form.enabledDescription" as const}
+                description={
+                  "app.admin.cron.createTask.form.enabledDescription" as const
+                }
               >
                 {/* Timeout and Retries */}
                 <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -212,7 +220,12 @@ export function CreateTaskDialog({
         </Card>
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleClose}
+            disabled={isSubmitting}
+          >
             {t("app.admin.cron.createTask.form.cancel")}
           </Button>
           <Button type="submit" disabled={isSubmitting} onClick={handleSubmit}>
@@ -239,7 +252,10 @@ interface SchedulePreviewProps {
   locale: CountryLanguage;
 }
 
-function SchedulePreview({ schedule, locale }: SchedulePreviewProps): React.JSX.Element | null {
+function SchedulePreview({
+  schedule,
+  locale,
+}: SchedulePreviewProps): React.JSX.Element | null {
   const { t } = simpleT(locale);
   const timezone = getDefaultTimezone(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -249,7 +265,12 @@ function SchedulePreview({ schedule, locale }: SchedulePreviewProps): React.JSX.
   }
 
   try {
-    const humanReadable = formatCronSchedule(schedule, timezone, locale, logger);
+    const humanReadable = formatCronSchedule(
+      schedule,
+      timezone,
+      locale,
+      logger,
+    );
 
     // Don't show preview if it's the same as the input (parsing failed)
     if (humanReadable === schedule) {

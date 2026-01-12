@@ -36,7 +36,9 @@ export type HoverCardContentProps = {
   alignOffset?: number;
   avoidCollisions?: boolean;
   collisionBoundary?: Element | Element[] | null;
-  collisionPadding?: number | Partial<Record<"top" | "right" | "bottom" | "left", number>>;
+  collisionPadding?:
+    | number
+    | Partial<Record<"top" | "right" | "bottom" | "left", number>>;
   arrowPadding?: number;
   sticky?: "partial" | "always";
   hideWhenDetached?: boolean;
@@ -44,8 +46,13 @@ export type HoverCardContentProps = {
   onPointerDownOutside?: (event: Event) => void;
 } & StyleType;
 
-export function HoverCard({ children, ...props }: HoverCardRootProps): React.JSX.Element {
-  return <HoverCardPrimitive.Root {...props}>{children}</HoverCardPrimitive.Root>;
+export function HoverCard({
+  children,
+  ...props
+}: HoverCardRootProps): React.JSX.Element {
+  return (
+    <HoverCardPrimitive.Root {...props}>{children}</HoverCardPrimitive.Root>
+  );
 }
 HoverCard.displayName = HoverCardPrimitive.Root.displayName;
 

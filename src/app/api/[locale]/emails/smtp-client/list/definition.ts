@@ -62,7 +62,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.smtpClient.list.fields.campaignType.label",
-          description: "app.api.emails.smtpClient.list.fields.campaignType.description",
+          description:
+            "app.api.emails.smtpClient.list.fields.campaignType.description",
           columns: 3,
           options: CampaignTypeFilterOptions,
         },
@@ -74,7 +75,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.smtpClient.list.fields.status.label",
-          description: "app.api.emails.smtpClient.list.fields.status.description",
+          description:
+            "app.api.emails.smtpClient.list.fields.status.description",
           columns: 3,
           options: SmtpAccountStatusFilterOptions,
         },
@@ -86,7 +88,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.smtpClient.list.fields.healthStatus.label",
-          description: "app.api.emails.smtpClient.list.fields.healthStatus.description",
+          description:
+            "app.api.emails.smtpClient.list.fields.healthStatus.description",
           columns: 3,
           options: SmtpHealthStatusFilterOptions,
         },
@@ -98,8 +101,10 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.smtpClient.list.fields.search.label",
-          description: "app.api.emails.smtpClient.list.fields.search.description",
-          placeholder: "app.api.emails.smtpClient.list.fields.search.placeholder",
+          description:
+            "app.api.emails.smtpClient.list.fields.search.description",
+          placeholder:
+            "app.api.emails.smtpClient.list.fields.search.placeholder",
           columns: 3,
         },
         z.string().optional(),
@@ -110,7 +115,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.smtpClient.list.fields.sortBy.label",
-          description: "app.api.emails.smtpClient.list.fields.sortBy.description",
+          description:
+            "app.api.emails.smtpClient.list.fields.sortBy.description",
           columns: 3,
           options: SmtpAccountSortFieldOptions,
         },
@@ -122,7 +128,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.smtpClient.list.fields.sortOrder.label",
-          description: "app.api.emails.smtpClient.list.fields.sortOrder.description",
+          description:
+            "app.api.emails.smtpClient.list.fields.sortOrder.description",
           columns: 3,
           options: SortOrderOptions,
         },
@@ -145,7 +152,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.emails.smtpClient.list.fields.limit.label",
-          description: "app.api.emails.smtpClient.list.fields.limit.description",
+          description:
+            "app.api.emails.smtpClient.list.fields.limit.description",
           columns: 3,
         },
         z.coerce.number().int().min(1).max(100).default(10),
@@ -161,7 +169,8 @@ const { GET } = createEndpoint({
           {
             type: WidgetType.CONTAINER,
             title: "app.api.emails.smtpClient.list.response.account.title",
-            description: "app.api.emails.smtpClient.list.response.account.description",
+            description:
+              "app.api.emails.smtpClient.list.response.account.description",
             layoutType: LayoutType.GRID,
             columns: 12,
           },
@@ -198,28 +207,32 @@ const { GET } = createEndpoint({
             priority: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.emails.smtpClient.list.response.account.priority",
+                content:
+                  "app.api.emails.smtpClient.list.response.account.priority",
               },
               z.coerce.number().int(),
             ),
             totalEmailsSent: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.emails.smtpClient.list.response.account.totalEmailsSent",
+                content:
+                  "app.api.emails.smtpClient.list.response.account.totalEmailsSent",
               },
               z.coerce.number().int(),
             ),
             lastUsedAt: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.emails.smtpClient.list.response.account.lastUsedAt",
+                content:
+                  "app.api.emails.smtpClient.list.response.account.lastUsedAt",
               },
               dateSchema.nullable(),
             ),
             createdAt: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.emails.smtpClient.list.response.account.createdAt",
+                content:
+                  "app.api.emails.smtpClient.list.response.account.createdAt",
               },
               z.string().datetime(),
             ),
@@ -231,7 +244,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.emails.smtpClient.list.response.pagination.title",
-          description: "app.api.emails.smtpClient.list.response.pagination.description",
+          description:
+            "app.api.emails.smtpClient.list.response.pagination.description",
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -240,28 +254,32 @@ const { GET } = createEndpoint({
           page: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.emails.smtpClient.list.response.pagination.page",
+              content:
+                "app.api.emails.smtpClient.list.response.pagination.page",
             },
             z.coerce.number().int(),
           ),
           limit: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.emails.smtpClient.list.response.pagination.limit",
+              content:
+                "app.api.emails.smtpClient.list.response.pagination.limit",
             },
             z.coerce.number().int(),
           ),
           total: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.emails.smtpClient.list.response.pagination.total",
+              content:
+                "app.api.emails.smtpClient.list.response.pagination.total",
             },
             z.coerce.number().int(),
           ),
           totalPages: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.emails.smtpClient.list.response.pagination.totalPages",
+              content:
+                "app.api.emails.smtpClient.list.response.pagination.totalPages",
             },
             z.coerce.number().int(),
           ),
@@ -274,15 +292,18 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.emails.smtpClient.list.errors.validation.title",
-      description: "app.api.emails.smtpClient.list.errors.validation.description",
+      description:
+        "app.api.emails.smtpClient.list.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.emails.smtpClient.list.errors.unauthorized.title",
-      description: "app.api.emails.smtpClient.list.errors.unauthorized.description",
+      description:
+        "app.api.emails.smtpClient.list.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.emails.smtpClient.list.errors.forbidden.title",
-      description: "app.api.emails.smtpClient.list.errors.forbidden.description",
+      description:
+        "app.api.emails.smtpClient.list.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.emails.smtpClient.list.errors.notFound.title",
@@ -298,11 +319,13 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.emails.smtpClient.list.errors.networkError.title",
-      description: "app.api.emails.smtpClient.list.errors.networkError.description",
+      description:
+        "app.api.emails.smtpClient.list.errors.networkError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.emails.smtpClient.list.errors.unsavedChanges.title",
-      description: "app.api.emails.smtpClient.list.errors.unsavedChanges.description",
+      description:
+        "app.api.emails.smtpClient.list.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.smtpClient.list.errors.unknown.title",

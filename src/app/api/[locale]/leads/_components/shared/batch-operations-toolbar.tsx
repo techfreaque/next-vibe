@@ -66,9 +66,9 @@ export function BatchOperationsToolbar({
   const { t } = simpleT(locale);
   const [selectedAction, setSelectedAction] = React.useState<string>("");
   const [selectedValue, setSelectedValue] = React.useState<string>("");
-  const [operationScope, setOperationScope] = React.useState<typeof BatchOperationScopeValues>(
-    BatchOperationScope.ALL_PAGES,
-  );
+  const [operationScope, setOperationScope] = React.useState<
+    typeof BatchOperationScopeValues
+  >(BatchOperationScope.ALL_PAGES);
 
   // Reset state when resetTrigger changes
   React.useEffect(() => {
@@ -104,7 +104,8 @@ export function BatchOperationsToolbar({
     if (selectedAction === "status") {
       updates.status = selectedValue as typeof LeadStatusValues;
     } else if (selectedAction === "currentCampaignStage") {
-      updates.currentCampaignStage = selectedValue as typeof EmailCampaignStageValues;
+      updates.currentCampaignStage =
+        selectedValue as typeof EmailCampaignStageValues;
     } else if (selectedAction === "source") {
       updates.source = selectedValue as typeof LeadSourceValues;
     } else if (selectedAction === "notes") {
@@ -181,9 +182,17 @@ export function BatchOperationsToolbar({
 
           {/* Batch actions */}
           <Div className="flex items-center gap-2">
-            <Select value={selectedAction} onValueChange={setSelectedAction} disabled={isLoading}>
+            <Select
+              value={selectedAction}
+              onValueChange={setSelectedAction}
+              disabled={isLoading}
+            >
               <SelectTrigger className="w-40">
-                <SelectValue placeholder={t("app.admin.leads.leads.admin.batch.select_action")} />
+                <SelectValue
+                  placeholder={t(
+                    "app.admin.leads.leads.admin.batch.select_action",
+                  )}
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="status">
@@ -202,9 +211,17 @@ export function BatchOperationsToolbar({
             </Select>
 
             {selectedAction && selectedAction !== "delete" && (
-              <Select value={selectedValue} onValueChange={setSelectedValue} disabled={isLoading}>
+              <Select
+                value={selectedValue}
+                onValueChange={setSelectedValue}
+                disabled={isLoading}
+              >
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder={t("app.admin.leads.leads.admin.batch.select_value")} />
+                  <SelectValue
+                    placeholder={t(
+                      "app.admin.leads.leads.admin.batch.select_value",
+                    )}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {getActionOptions().map((option) => (
@@ -219,7 +236,9 @@ export function BatchOperationsToolbar({
             <Button
               onClick={handleApplyAction}
               disabled={
-                !selectedAction || (selectedAction !== "delete" && !selectedValue) || isLoading
+                !selectedAction ||
+                (selectedAction !== "delete" && !selectedValue) ||
+                isLoading
               }
               size="sm"
               variant={selectedAction === "delete" ? "destructive" : "default"}

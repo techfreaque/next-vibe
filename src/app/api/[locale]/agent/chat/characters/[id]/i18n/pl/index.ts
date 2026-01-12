@@ -128,11 +128,13 @@ export const translations: typeof enTranslations = {
     },
     source: {
       label: "Źródło",
-      description: "Źródło tej postaciy (wbudowane, niestandardowe lub społecznościowe)",
+      description:
+        "Źródło tej postaciy (wbudowane, niestandardowe lub społecznościowe)",
     },
     ownershipType: {
       label: "Typ własności",
-      description: "Kto jest właścicielem tej postaciy (system, użytkownik lub publiczny)",
+      description:
+        "Kto jest właścicielem tej postaciy (system, użytkownik lub publiczny)",
     },
     voice: {
       label: "Głos",
@@ -190,7 +192,8 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Postać zaktualizowana",
-      description: "Twoja niestandardowa postać została pomyślnie zaktualizowana",
+      description:
+        "Twoja niestandardowa postać została pomyślnie zaktualizowana",
     },
   },
   delete: {

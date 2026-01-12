@@ -140,7 +140,8 @@ export const translations = {
 
   createCharacter: {
     title: "Create Custom Character",
-    description: "Design your own AI character with custom characterlity, expertise, and behavior.",
+    description:
+      "Design your own AI character with custom characterlity, expertise, and behavior.",
     icon: "Icon",
     name: "Name",
     namePlaceholder: "e.g. Code Reviewer",
@@ -171,7 +172,8 @@ export const translations = {
 
   editCharacter: {
     title: "Edit as Custom Character",
-    description: "Create a custom character based on this character. You can modify any settings.",
+    description:
+      "Create a custom character based on this character. You can modify any settings.",
     loginRequired:
       "Please log in to create and edit custom characters. Custom characters are saved to your account.",
     name: "Name",
@@ -263,8 +265,10 @@ export const translations = {
   input: {
     placeholder: "Type your message...",
     noPermission: "You don't have permission to post messages",
-    noPostPermission: "You don't have permission to post messages in this thread",
-    noCreateThreadPermission: "You don't have permission to create threads in this folder",
+    noPostPermission:
+      "You don't have permission to post messages in this thread",
+    noCreateThreadPermission:
+      "You don't have permission to create threads in this folder",
     noCreateThreadPermissionInRootFolder:
       "You don't have permission to create threads in this folder. Please sign in or select a subfolder.",
     keyboardShortcuts: {
@@ -473,7 +477,8 @@ export const translations = {
     all: "All",
     noFavorites: "No favorites yet. Star some to add them here.",
     noModels: "No models available",
-    filteredByCharacter: "Showing {{compatible}} of {{total}} models (filtered by character)",
+    filteredByCharacter:
+      "Showing {{compatible}} of {{total}} models (filtered by character)",
     selectCharacter: "Select Character",
     allCharacters: "All",
   },
@@ -557,7 +562,8 @@ export const translations = {
     manualSelect: "Pick manually...",
     best: "BEST",
     noMatchingModels: "No models match your filters",
-    noModelsWarning: "No models match these filters. Adjust your settings to continue.",
+    noModelsWarning:
+      "No models match these filters. Adjust your settings to continue.",
     allModelsCount: "{{count}} models available",
     filteredModelsCount: "{{count}} matching models",
     showAllModels: "Show all",
@@ -640,7 +646,8 @@ export const translations = {
     // Character switch modal
     characterSwitchModal: {
       title: "Switch Character",
-      description: "Switch to a different character without losing your settings",
+      description:
+        "Switch to a different character without losing your settings",
       searchPlaceholder: "Search characters...",
       noResults: "No characters found",
       keepSettings: "Keep current model settings",
@@ -680,11 +687,13 @@ export const translations = {
     // Screen 3: Specialists - add to team
     specialists: {
       title: "Add specialists for specific tasks",
-      subtitle: "Each expert is optimized for their specialty. Add as many as you like.",
+      subtitle:
+        "Each expert is optimized for their specialty. Add as many as you like.",
       chosen: "{{name}} is ready",
       add: "Add",
       added: "Added",
-      switchTip: "Switch between your team members anytime. You can customize or add more later.",
+      switchTip:
+        "Switch between your team members anytime. You can customize or add more later.",
       start: "Start Chatting",
       browseAll: "Browse All Characters",
     },
@@ -757,7 +766,8 @@ export const translations = {
   dialogs: {
     searchAndCreate: "Search & Create",
     deleteChat: 'Delete chat "{{title}}"?',
-    deleteFolderConfirm: 'Delete folder "{{name}}" and move {{count}} chat(s) to General?',
+    deleteFolderConfirm:
+      'Delete folder "{{name}}" and move {{count}} chat(s) to General?',
   },
   newFolder: {
     title: "Create New Folder",
@@ -779,7 +789,8 @@ export const translations = {
     privateDescription:
       "Your private conversations are stored on our servers and synchronized across devices.",
     sharedDescription: "Conversations shared with others via links.",
-    publicDescription: "Public US First Amendment protected forum for people and AI.",
+    publicDescription:
+      "Public US First Amendment protected forum for people and AI.",
     incognitoDescription: "Conversations are only stored in your browser.",
     accessModal: {
       title: "Account Required",
@@ -795,7 +806,8 @@ export const translations = {
         "The Public Forum is a First Amendment protected space where people and AI engage in open dialogue. Share ideas, challenge perspectives, and participate in uncensored discussions.",
       incognitoExplanation:
         "Incognito mode keeps your conversations completely private and local. Your chats are stored only in your browser and never sent to our servers - not even tied to your account.",
-      requiresAccount: "To access {{folderName}}, you need to create an account or sign in.",
+      requiresAccount:
+        "To access {{folderName}}, you need to create an account or sign in.",
       loginButton: "Login",
       signupButton: "Sign Up",
       close: "Close",
@@ -819,7 +831,8 @@ export const translations = {
     failed: "Failed to capture screenshot",
     failedWithMessage: "Failed to capture screenshot: {{message}}",
     tryAgain: "Failed to capture screenshot. Please try again.",
-    noMessages: "Could not find chat messages area. Please ensure you have messages in the chat.",
+    noMessages:
+      "Could not find chat messages area. Please ensure you have messages in the chat.",
     quotaExceeded: "Storage quota exceeded. Screenshot is too large.",
     canvasError: "Failed to convert screenshot to image format.",
   },
@@ -1020,7 +1033,8 @@ export const translations = {
       errorLabel: "Error:",
       noArguments: "No arguments",
       noResult: "No result",
-      metadataNotAvailable: "Widget metadata not available. Showing raw result.",
+      metadataNotAvailable:
+        "Widget metadata not available. Showing raw result.",
     },
   },
   reasoning: {
@@ -1073,9 +1087,12 @@ export const translations = {
       gpt5Nano: "Latest nano model with excellent performance-to-cost ratio",
       gptOss120b: "Open-source GPT model with 120B parameters",
       geminiFlash25Pro: "Ultra-fast and efficient 14B model with large context",
-      geminiFlash25Flash: "Ultra-fast and efficient 14B model with large context",
-      geminiFlash25Lite: "Ultra-fast and efficient 14B model with large context",
-      mistralNemo: "European AI model with strong performance and privacy focus",
+      geminiFlash25Flash:
+        "Ultra-fast and efficient 14B model with large context",
+      geminiFlash25Lite:
+        "Ultra-fast and efficient 14B model with large context",
+      mistralNemo:
+        "European AI model with strong performance and privacy focus",
       kimiK2Free:
         "Kimi K2 Instruct is a large-scale Mixture-of-Experts (MoE) language model developed by Moonshot AI.",
       kimiK2:
@@ -1093,19 +1110,26 @@ export const translations = {
       grok4Fast:
         "Grok 4 Fast is xAI's latest multimodal model with SOTA cost-efficiency and a 2M token context window. It comes in two flavors: non-reasoning and reasoning.",
       glm46: "GLM 4.6 - efficient 7B parameter model with large context window",
-      glm45Air: "GLM 4.5 AIR - ultra-fast lightweight model with large context window",
-      glm45v: "GLM 4.5v - vision-capable multimodal model with large context window",
-      uncensoredLmV11: "Uncensored language model without content filtering - premium model",
+      glm45Air:
+        "GLM 4.5 AIR - ultra-fast lightweight model with large context window",
+      glm45v:
+        "GLM 4.5v - vision-capable multimodal model with large context window",
+      uncensoredLmV11:
+        "Uncensored language model without content filtering - premium model",
       freedomgptLiberty:
         "FreedomGPT Liberty - Uncensored AI model focused on free expression and creative content",
       gabAiArya:
         "Gab AI Arya - Uncensored conversational AI model with free expression and creative capabilities",
       gpt52Pro:
         "GPT 5.2 Pro - advanced reasoning model with enhanced capabilities for complex tasks",
-      gpt52: "GPT 5.2 - latest generation model with improved performance and efficiency",
-      gpt52_chat: "GPT 5.2 Chat - conversational variant optimized for dialogue and interactions",
-      veniceUncensored: "Venice Uncensored - Uncensored AI model for unrestricted conversations",
-      dolphinLlama3_70B: "Dolphin Llama 3 70B - Uncensored large language model based on Llama 3",
+      gpt52:
+        "GPT 5.2 - latest generation model with improved performance and efficiency",
+      gpt52_chat:
+        "GPT 5.2 Chat - conversational variant optimized for dialogue and interactions",
+      veniceUncensored:
+        "Venice Uncensored - Uncensored AI model for unrestricted conversations",
+      dolphinLlama3_70B:
+        "Dolphin Llama 3 70B - Uncensored large language model based on Llama 3",
       dolphin3_0_r1_mistral_24b:
         "Dolphin 3.0 R1 Mistral 24B - Uncensored large language model based on Mistral",
     },
@@ -1157,13 +1181,15 @@ export const translations = {
       network: "Network error. Please check your connection.",
       serviceNotAllowed: "Speech recognition service not allowed.",
       badGrammar: "Speech recognition error. Please try again.",
-      languageNotSupported: "This language is not supported for speech recognition.",
+      languageNotSupported:
+        "This language is not supported for speech recognition.",
       aborted: "Recording cancelled.",
       unknown: "Speech recognition error: {{errorCode}}",
       apiNotFound: "Speech recognition API not found",
       initializationFailed: "Failed to initialize speech recognition",
       microphoneAccessDenied: "Microphone access denied",
-      microphonePermissionDenied: "Microphone permission denied. Please allow microphone access.",
+      microphonePermissionDenied:
+        "Microphone permission denied. Please allow microphone access.",
       noMicrophoneFound: "No microphone found. Please connect a microphone.",
       microphoneInUse: "Microphone is already in use by another application.",
       startFailed: "Failed to start recording. Please try again.",
@@ -1186,9 +1212,11 @@ export const translations = {
   debugView: {
     systemPrompt: "System Prompt",
     systemPromptTitle: "System Prompt (Generated)",
-    systemPromptHint: "This is the system prompt for the entire conversation thread",
+    systemPromptHint:
+      "This is the system prompt for the entire conversation thread",
     systemMessage: "System Message",
-    systemMessageHint: "This is a system message injected into the conversation",
+    systemMessageHint:
+      "This is a system message injected into the conversation",
     copied: "Copied!",
     retryModal: {
       title: "Retry with Different Settings",
@@ -1206,14 +1234,17 @@ export const translations = {
   suggestedPrompts: {
     title: "How can I help you?",
     privateTitle: "Your Private AI Assistant",
-    privateDescription: "Conversations saved to your account and synced across all your devices.",
+    privateDescription:
+      "Conversations saved to your account and synced across all your devices.",
     sharedTitle: "Collaborate with AI",
-    sharedDescription: "Create conversations and share them with team members using secure links.",
+    sharedDescription:
+      "Create conversations and share them with team members using secure links.",
     publicTitle: "Join the Public AI Forum",
     publicDescription:
       "Public conversations visible to everyone. Share ideas and engage in open dialogue.",
     incognitoTitle: "Anonymous AI Chat",
-    incognitoDescription: "Stored only in your browser. Never saved to your account or synced.",
+    incognitoDescription:
+      "Stored only in your browser. Never saved to your account or synced.",
     more: "More",
     selectCharacter: "Select a Character",
     noPrompts: "No suggested prompts for this character",
@@ -1274,7 +1305,8 @@ export const translations = {
     },
   },
   folderList: {
-    confirmDelete: 'Delete folder "{{folderName}}" and move {{count}} chat(s) to General?',
+    confirmDelete:
+      'Delete folder "{{folderName}}" and move {{count}} chat(s) to General?',
     enterFolderName: "Enter folder name:",
     newChatInFolder: "New chat in folder",
     moveUp: "Move Up",
@@ -1502,7 +1534,8 @@ export const translations = {
       thu: "Thu",
       fri: "Fri",
       sat: "Sat",
-      format: "{{month}}/{{day}}/{{year}}({{dayName}}){{hours}}:{{mins}}:{{secs}}",
+      format:
+        "{{month}}/{{day}}/{{year}}({{dayName}}){{hours}}:{{mins}}:{{secs}}",
     },
     retryModal: {
       title: "Retry with Different Settings",
@@ -1601,7 +1634,8 @@ export const translations = {
     },
     characterSelectorSearch: {
       title: "Search Characters",
-      description: "Find the right style fast. Search by name, category, or description.",
+      description:
+        "Find the right style fast. Search by name, category, or description.",
     },
     characterSelectorGroup: {
       title: "Organized by Source & Category",
@@ -1681,12 +1715,14 @@ export const translations = {
     },
     chatInput: {
       title: "Type Your Message",
-      description: "Type in the text area and press Enter to send your message to the AI.",
+      description:
+        "Type in the text area and press Enter to send your message to the AI.",
       tip: "Press Shift+Enter for a new line without sending.",
     },
     voiceInput: {
       title: "Voice Recording",
-      description: "Click the microphone to start recording. When done, choose what to do:",
+      description:
+        "Click the microphone to start recording. When done, choose what to do:",
       options: {
         transcribe: "Transcribe to text - converts speech to editable text",
         sendAudio: "Send as voice - AI hears your actual voice",

@@ -19,7 +19,9 @@ import { userCreateRepository } from "./create/repository";
 /**
  * Helper function to create user management seed data
  */
-function createUserManagementSeed(config: UserCreateRequestOutput): UserCreateRequestOutput {
+function createUserManagementSeed(
+  config: UserCreateRequestOutput,
+): UserCreateRequestOutput {
   return config;
 }
 
@@ -30,7 +32,10 @@ export const priority = 20;
 /**
  * Development seed function for users management module
  */
-export async function dev(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
+export async function dev(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding users management data for development environment");
 
   try {
@@ -43,16 +48,21 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
     );
 
     if (!adminUserResponse.success || !adminUserResponse.data) {
-      logger.error("❌ Admin user not found, skipping users management seeding", {
-        error: adminUserResponse.message || "User not found",
-      });
+      logger.error(
+        "❌ Admin user not found, skipping users management seeding",
+        {
+          error: adminUserResponse.message || "User not found",
+        },
+      );
       return;
     }
 
     const adminUser = adminUserResponse.data;
 
     if (!adminUser.leadId) {
-      logger.debug("Admin user has no leadId, skipping users management seeding");
+      logger.debug(
+        "Admin user has no leadId, skipping users management seeding",
+      );
       return;
     }
 
@@ -126,7 +136,9 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
         );
 
         if (emailExistsResponse.success && emailExistsResponse.data) {
-          logger.debug(`User ${userData.basicInfo.email} already exists, skipping creation`);
+          logger.debug(
+            `User ${userData.basicInfo.email} already exists, skipping creation`,
+          );
           continue;
         }
         const { t } = simpleT(locale);
@@ -151,11 +163,16 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
           );
         }
       } catch (error) {
-        logger.error(`Error creating user ${userData.basicInfo.email}:`, parseError(error));
+        logger.error(
+          `Error creating user ${userData.basicInfo.email}:`,
+          parseError(error),
+        );
       }
     }
 
-    logger.debug(`✅ Created ${createdCount} sample users for development environment`);
+    logger.debug(
+      `✅ Created ${createdCount} sample users for development environment`,
+    );
   } catch (error) {
     logger.error("Error seeding users management data:", parseError(error));
   }
@@ -164,7 +181,10 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
 /**
  * Test seed function for users management module
  */
-export async function test(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
+export async function test(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding users management data for test environment");
 
   try {
@@ -177,16 +197,21 @@ export async function test(logger: EndpointLogger, locale: CountryLanguage): Pro
     );
 
     if (!adminUserResponse.success || !adminUserResponse.data) {
-      logger.error("❌ Admin user not found, skipping test users management seeding", {
-        error: adminUserResponse.message || "User not found",
-      });
+      logger.error(
+        "❌ Admin user not found, skipping test users management seeding",
+        {
+          error: adminUserResponse.message || "User not found",
+        },
+      );
       return;
     }
 
     const adminUser = adminUserResponse.data;
 
     if (!adminUser.leadId) {
-      logger.debug("Admin user has no leadId, skipping test users management seeding");
+      logger.debug(
+        "Admin user has no leadId, skipping test users management seeding",
+      );
       return;
     }
 
@@ -241,10 +266,15 @@ export async function test(logger: EndpointLogger, locale: CountryLanguage): Pro
         `✅ Created test management user: ${testUserData.basicInfo.email} (ID: ${createResponse.data.responseId})`,
       );
     } else {
-      logger.error(`Failed to create test management user: ${createResponse.message}`);
+      logger.error(
+        `Failed to create test management user: ${createResponse.message}`,
+      );
     }
   } catch (error) {
-    logger.error("Error seeding test users management data:", parseError(error));
+    logger.error(
+      "Error seeding test users management data:",
+      parseError(error),
+    );
   }
 }
 
@@ -261,6 +291,9 @@ export async function prod(logger: EndpointLogger): Promise<void> {
 
     logger.debug("✅ Users management system ready for production use");
   } catch (error) {
-    logger.error("Error seeding production users management data:", parseError(error));
+    logger.error(
+      "Error seeding production users management data:",
+      parseError(error),
+    );
   }
 }

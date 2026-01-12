@@ -44,7 +44,8 @@ export const translations: typeof enTranslations = {
         stubLabel: "DropdownItem (zaślepka)",
       },
       form: {
-        useFormFieldError: "useFormField powinno być używane wewnątrz <FormField>",
+        useFormFieldError:
+          "useFormField powinno być używane wewnątrz <FormField>",
         endpointFormField: {
           stubWarning: "Używanie zaślepki: EndpointFormField",
           stubLabel: "EndpointFormField (zaślepka)",

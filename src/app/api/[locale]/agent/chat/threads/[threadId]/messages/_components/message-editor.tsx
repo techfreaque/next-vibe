@@ -12,7 +12,12 @@ import { Form } from "next-vibe-ui/ui/form/form";
 import { GitBranch, Mic, Phone, X } from "next-vibe-ui/ui/icons";
 import { Kbd } from "next-vibe-ui/ui/kbd";
 import { Textarea } from "next-vibe-ui/ui/textarea";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "next-vibe-ui/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
@@ -92,7 +97,8 @@ export function MessageEditor({
   });
 
   // UI state
-  const showMicButton = !voice.isRecording && !voice.isProcessing && !editor.isLoading;
+  const showMicButton =
+    !voice.isRecording && !voice.isProcessing && !editor.isLoading;
   const showTextarea = !voice.isRecording && !voice.isProcessing;
 
   return (
@@ -233,7 +239,9 @@ export function MessageEditor({
                       <Mic className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>{t("app.chat.voiceMode.tapToRecord")}</TooltipContent>
+                  <TooltipContent>
+                    {t("app.chat.voiceMode.tapToRecord")}
+                  </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             )}

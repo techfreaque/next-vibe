@@ -8,7 +8,10 @@
 import { cn } from "next-vibe/shared/utils";
 import * as React from "react";
 
-import { Icon, type IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import {
+  Icon,
+  type IconKey,
+} from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { Span } from "./span";
@@ -107,19 +110,29 @@ export function RangeSlider({
           <div className="absolute inset-x-12 flex">
             {options.map((option, i) => {
               const isInRange = i >= minIndex && i <= maxIndex;
-              const position = optionsCount === 0 ? 50 : (i / optionsCount) * 100;
+              const position =
+                optionsCount === 0 ? 50 : (i / optionsCount) * 100;
 
               return (
                 <div
                   key={`option-${option.value}`}
                   className={cn(
                     "absolute flex flex-col items-center gap-2 transition-all duration-300 -translate-x-1/2",
-                    isInRange ? "opacity-100 scale-110 -translate-y-1" : "opacity-40 scale-95",
+                    isInRange
+                      ? "opacity-100 scale-110 -translate-y-1"
+                      : "opacity-40 scale-95",
                   )}
                   style={{ left: `${position}%` }}
                 >
-                  {option.icon && <Icon icon={option.icon} className="h-8 w-8 drop-shadow-lg" />}
-                  <Span className="text-xs font-semibold whitespace-nowrap">{t(option.label)}</Span>
+                  {option.icon && (
+                    <Icon
+                      icon={option.icon}
+                      className="h-8 w-8 drop-shadow-lg"
+                    />
+                  )}
+                  <Span className="text-xs font-semibold whitespace-nowrap">
+                    {t(option.label)}
+                  </Span>
                   {option.description && (
                     <Span className="text-[10px] text-muted-foreground whitespace-nowrap">
                       {t(option.description)}
@@ -149,7 +162,8 @@ export function RangeSlider({
           {
             // oxlint-disable-next-line no-unused-vars
             options.map((_option, i) => {
-              const position = optionsCount === 0 ? 50 : (i / optionsCount) * 100;
+              const position =
+                optionsCount === 0 ? 50 : (i / optionsCount) * 100;
               return (
                 <div
                   key={`tick-${i}`}

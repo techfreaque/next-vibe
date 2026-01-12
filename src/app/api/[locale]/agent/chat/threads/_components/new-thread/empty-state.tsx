@@ -21,7 +21,10 @@ interface ChatEmptyStateProps {
  * Empty state display for new threads.
  * Centered layout with folder-specific colors.
  */
-export function ChatEmptyState({ locale, inputHeight }: ChatEmptyStateProps): JSX.Element {
+export function ChatEmptyState({
+  locale,
+  inputHeight,
+}: ChatEmptyStateProps): JSX.Element {
   const { t } = simpleT(locale);
   const { currentRootFolderId: rootFolderId } = useChatContext();
 
@@ -29,8 +32,13 @@ export function ChatEmptyState({ locale, inputHeight }: ChatEmptyStateProps): JS
   const color = folderConfig?.color || "blue";
 
   // Map color names to Tailwind classes
-  const getColorClasses = (variant: "bg" | "border" | "text" | "hover-bg"): string => {
-    const colorMap: Record<string, Record<"bg" | "border" | "text" | "hover-bg", string>> = {
+  const getColorClasses = (
+    variant: "bg" | "border" | "text" | "hover-bg",
+  ): string => {
+    const colorMap: Record<
+      string,
+      Record<"bg" | "border" | "text" | "hover-bg", string>
+    > = {
       sky: {
         bg: "bg-sky-500/20",
         border: "border-sky-500/50",
@@ -97,7 +105,10 @@ export function ChatEmptyState({ locale, inputHeight }: ChatEmptyStateProps): JS
   };
 
   return (
-    <Div className="h-screen h-max-screen overflow-y-auto" id={DOM_IDS.MESSAGES_CONTAINER}>
+    <Div
+      className="h-screen h-max-screen overflow-y-auto"
+      id={DOM_IDS.MESSAGES_CONTAINER}
+    >
       <Div
         style={
           platform.isReactNative
@@ -113,13 +124,18 @@ export function ChatEmptyState({ locale, inputHeight }: ChatEmptyStateProps): JS
             className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 ${getColorClasses("bg")}`}
           >
             <Div className={`text-4xl ${getColorClasses("text")}`}>
-              <Icon icon={folderConfig?.icon || "message-circle"} className="h-10 w-10" />
+              <Icon
+                icon={folderConfig?.icon || "message-circle"}
+                className="h-10 w-10"
+              />
             </Div>
           </Div>
 
           {/* Title and description */}
           <H1 className="text-3xl font-bold mb-2 text-center">{getTitle()}</H1>
-          <P className="text-muted-foreground text-center mb-8">{getDescription()}</P>
+          <P className="text-muted-foreground text-center mb-8">
+            {getDescription()}
+          </P>
         </Div>
       </Div>
     </Div>

@@ -9,7 +9,8 @@ export const translations: typeof enTranslations = {
     fields: {
       uid: {
         label: "UID elementu",
-        description: "UID elementu wejścia pliku lub elementu, który otworzy wybór pliku",
+        description:
+          "UID elementu wejścia pliku lub elementu, który otworzy wybór pliku",
         placeholder: "Wprowadź UID elementu",
       },
       filePath: {
@@ -36,7 +37,8 @@ export const translations: typeof enTranslations = {
     },
     unauthorized: {
       title: "Nieautoryzowany",
-      description: "Nie masz uprawnień do wykonywania operacji przesyłania pliku",
+      description:
+        "Nie masz uprawnień do wykonywania operacji przesyłania pliku",
     },
     forbidden: {
       title: "Zabronione",
@@ -48,7 +50,8 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description: "Wystąpił wewnętrzny błąd serwera podczas operacji przesyłania pliku",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas operacji przesyłania pliku",
     },
     unknown: {
       title: "Nieznany błąd",

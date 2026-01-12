@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.get-console-message.description",
   category: "app.api.browser.category",
   icon: "terminal",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.debugging"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.debugging",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -52,13 +55,17 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.browser.get-console-message.form.fields.msgid.label",
-          description: "app.api.browser.get-console-message.form.fields.msgid.description",
-          placeholder: "app.api.browser.get-console-message.form.fields.msgid.placeholder",
+          description:
+            "app.api.browser.get-console-message.form.fields.msgid.description",
+          placeholder:
+            "app.api.browser.get-console-message.form.fields.msgid.placeholder",
           columns: 6,
         },
         z
           .number()
-          .describe("The msgid of a console message on the page from the listed console messages"),
+          .describe(
+            "The msgid of a console message on the page from the listed console messages",
+          ),
       ),
 
       // Response fields
@@ -67,7 +74,11 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.browser.get-console-message.response.success",
         },
-        z.boolean().describe("Whether the console message retrieval operation succeeded"),
+        z
+          .boolean()
+          .describe(
+            "Whether the console message retrieval operation succeeded",
+          ),
       ),
       result: responseField(
         {
@@ -128,39 +139,48 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.browser.get-console-message.errors.validation.title",
-      description: "app.api.browser.get-console-message.errors.validation.description",
+      description:
+        "app.api.browser.get-console-message.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.browser.get-console-message.errors.network.title",
-      description: "app.api.browser.get-console-message.errors.network.description",
+      description:
+        "app.api.browser.get-console-message.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.browser.get-console-message.errors.unauthorized.title",
-      description: "app.api.browser.get-console-message.errors.unauthorized.description",
+      description:
+        "app.api.browser.get-console-message.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.browser.get-console-message.errors.forbidden.title",
-      description: "app.api.browser.get-console-message.errors.forbidden.description",
+      description:
+        "app.api.browser.get-console-message.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.browser.get-console-message.errors.notFound.title",
-      description: "app.api.browser.get-console-message.errors.notFound.description",
+      description:
+        "app.api.browser.get-console-message.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.browser.get-console-message.errors.serverError.title",
-      description: "app.api.browser.get-console-message.errors.serverError.description",
+      description:
+        "app.api.browser.get-console-message.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.browser.get-console-message.errors.unknown.title",
-      description: "app.api.browser.get-console-message.errors.unknown.description",
+      description:
+        "app.api.browser.get-console-message.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.get-console-message.errors.unsavedChanges.title",
-      description: "app.api.browser.get-console-message.errors.unsavedChanges.description",
+      description:
+        "app.api.browser.get-console-message.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.get-console-message.errors.conflict.title",
-      description: "app.api.browser.get-console-message.errors.conflict.description",
+      description:
+        "app.api.browser.get-console-message.errors.conflict.description",
     },
   },
   successTypes: {

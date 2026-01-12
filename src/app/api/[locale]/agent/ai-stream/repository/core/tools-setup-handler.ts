@@ -2,7 +2,10 @@
  * ToolsSetupHandler - Handles AI streaming tools setup
  */
 
-import { getModelById, type ModelId } from "@/app/api/[locale]/agent/models/models";
+import {
+  getModelById,
+  type ModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import { getFullPath } from "@/app/api/[locale]/system/generated/endpoint";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
@@ -19,7 +22,10 @@ export class ToolsSetupHandler {
    */
   static async setupStreamingTools(params: {
     model: ModelId;
-    requestedTools: Array<{ toolId: string; requiresConfirmation: boolean }> | null | undefined;
+    requestedTools:
+      | Array<{ toolId: string; requiresConfirmation: boolean }>
+      | null
+      | undefined;
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
@@ -94,7 +100,9 @@ export class ToolsSetupHandler {
           const isConfirmedTool = confirmedToolNames.has(aiSdkToolName);
 
           toolsConfig.set(aiSdkToolName, {
-            requiresConfirmation: isConfirmedTool ? false : toolConfig.requiresConfirmation,
+            requiresConfirmation: isConfirmedTool
+              ? false
+              : toolConfig.requiresConfirmation,
           });
         }
       }

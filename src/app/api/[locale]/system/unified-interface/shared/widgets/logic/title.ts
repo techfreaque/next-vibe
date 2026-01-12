@@ -54,7 +54,8 @@ export function extractTitleData(
 
   // Handle object value with title properties
   if (isWidgetDataObject(value)) {
-    const text = "text" in value && typeof value.text === "string" ? value.text : "";
+    const text =
+      "text" in value && typeof value.text === "string" ? value.text : "";
 
     if (!text) {
       return null;

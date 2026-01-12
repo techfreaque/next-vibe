@@ -182,7 +182,8 @@ export const translations = {
       },
       server: {
         title: "Server Error",
-        description: "An internal server error occurred while sending the email",
+        description:
+          "An internal server error occurred while sending the email",
       },
       network: {
         title: "Network Error",

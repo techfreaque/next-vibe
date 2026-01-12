@@ -58,7 +58,9 @@ const engagementMetadataSchema = z
     source: z.string().optional(),
 
     // Custom tracking data
-    customData: z.record(z.string(), z.string().or(z.coerce.number()).or(z.boolean())).optional(),
+    customData: z
+      .record(z.string(), z.string().or(z.coerce.number()).or(z.boolean()))
+      .optional(),
   })
   .optional();
 
@@ -77,7 +79,12 @@ const { POST } = createEndpoint({
     "app.api.leads.tracking.engagement.tags.tracking" as const,
     "app.api.leads.tracking.engagement.tags.engagement" as const,
   ],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN, UserRole.AI_TOOL_OFF] as const,
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+  ] as const,
   aliases: ["record-engagement", "track-engagement"] as const,
 
   cli: {
@@ -88,7 +95,8 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.leads.tracking.engagement.post.form.title" as const,
-      description: "app.api.leads.tracking.engagement.post.form.description" as const,
+      description:
+        "app.api.leads.tracking.engagement.post.form.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -100,9 +108,12 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.leads.tracking.engagement.post.leadId.label" as const,
-          description: "app.api.leads.tracking.engagement.post.leadId.description" as const,
-          placeholder: "app.api.leads.tracking.engagement.post.leadId.placeholder" as const,
-          helpText: "app.api.leads.tracking.engagement.post.leadId.helpText" as const,
+          description:
+            "app.api.leads.tracking.engagement.post.leadId.description" as const,
+          placeholder:
+            "app.api.leads.tracking.engagement.post.leadId.placeholder" as const,
+          helpText:
+            "app.api.leads.tracking.engagement.post.leadId.helpText" as const,
           columns: 12,
         },
         z.uuid().nullable().optional(),
@@ -111,10 +122,14 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.tracking.engagement.post.engagementType.label" as const,
-          description: "app.api.leads.tracking.engagement.post.engagementType.description" as const,
-          placeholder: "app.api.leads.tracking.engagement.post.engagementType.placeholder" as const,
-          helpText: "app.api.leads.tracking.engagement.post.engagementType.helpText" as const,
+          label:
+            "app.api.leads.tracking.engagement.post.engagementType.label" as const,
+          description:
+            "app.api.leads.tracking.engagement.post.engagementType.description" as const,
+          placeholder:
+            "app.api.leads.tracking.engagement.post.engagementType.placeholder" as const,
+          helpText:
+            "app.api.leads.tracking.engagement.post.engagementType.helpText" as const,
           options: EngagementTypesOptions,
           columns: 6,
         },
@@ -124,10 +139,14 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
-          label: "app.api.leads.tracking.engagement.post.campaignId.label" as const,
-          description: "app.api.leads.tracking.engagement.post.campaignId.description" as const,
-          placeholder: "app.api.leads.tracking.engagement.post.campaignId.placeholder" as const,
-          helpText: "app.api.leads.tracking.engagement.post.campaignId.helpText" as const,
+          label:
+            "app.api.leads.tracking.engagement.post.campaignId.label" as const,
+          description:
+            "app.api.leads.tracking.engagement.post.campaignId.description" as const,
+          placeholder:
+            "app.api.leads.tracking.engagement.post.campaignId.placeholder" as const,
+          helpText:
+            "app.api.leads.tracking.engagement.post.campaignId.helpText" as const,
           columns: 6,
         },
         z.uuid().optional(),
@@ -136,10 +155,14 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.JSON,
-          label: "app.api.leads.tracking.engagement.post.metadata.label" as const,
-          description: "app.api.leads.tracking.engagement.post.metadata.description" as const,
-          placeholder: "app.api.leads.tracking.engagement.post.metadata.placeholder" as const,
-          helpText: "app.api.leads.tracking.engagement.post.metadata.helpText" as const,
+          label:
+            "app.api.leads.tracking.engagement.post.metadata.label" as const,
+          description:
+            "app.api.leads.tracking.engagement.post.metadata.description" as const,
+          placeholder:
+            "app.api.leads.tracking.engagement.post.metadata.placeholder" as const,
+          helpText:
+            "app.api.leads.tracking.engagement.post.metadata.helpText" as const,
           columns: 12,
         },
         engagementMetadataSchema,
@@ -149,9 +172,12 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.leads.tracking.engagement.post.userId.label" as const,
-          description: "app.api.leads.tracking.engagement.post.userId.description" as const,
-          placeholder: "app.api.leads.tracking.engagement.post.userId.placeholder" as const,
-          helpText: "app.api.leads.tracking.engagement.post.userId.helpText" as const,
+          description:
+            "app.api.leads.tracking.engagement.post.userId.description" as const,
+          placeholder:
+            "app.api.leads.tracking.engagement.post.userId.placeholder" as const,
+          helpText:
+            "app.api.leads.tracking.engagement.post.userId.helpText" as const,
           columns: 12,
         },
         z.uuid().optional(),
@@ -161,70 +187,82 @@ const { POST } = createEndpoint({
       id: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.post.response.id" as const,
+          content:
+            "app.api.leads.tracking.engagement.post.response.id" as const,
         },
         z.uuid(),
       ),
       responseLeadId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.post.response.leadId" as const,
+          content:
+            "app.api.leads.tracking.engagement.post.response.leadId" as const,
         },
         z.uuid(),
       ),
       responseEngagementType: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.post.response.engagementType" as const,
+          content:
+            "app.api.leads.tracking.engagement.post.response.engagementType" as const,
         },
         z.enum(EngagementTypes),
       ),
       responseCampaignId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.post.response.campaignId" as const,
+          content:
+            "app.api.leads.tracking.engagement.post.response.campaignId" as const,
         },
         z.uuid().optional(),
       ),
       responseMetadata: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.post.response.metadata" as const,
+          content:
+            "app.api.leads.tracking.engagement.post.response.metadata" as const,
         },
-        z.record(z.string(), z.string().or(z.coerce.number()).or(z.boolean())).optional(),
+        z
+          .record(z.string(), z.string().or(z.coerce.number()).or(z.boolean()))
+          .optional(),
       ),
       timestamp: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.post.response.timestamp" as const,
+          content:
+            "app.api.leads.tracking.engagement.post.response.timestamp" as const,
         },
         dateSchema,
       ),
       ipAddress: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.post.response.ipAddress" as const,
+          content:
+            "app.api.leads.tracking.engagement.post.response.ipAddress" as const,
         },
         z.string().optional(),
       ),
       userAgent: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.post.response.userAgent" as const,
+          content:
+            "app.api.leads.tracking.engagement.post.response.userAgent" as const,
         },
         z.string().optional(),
       ),
       createdAt: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.post.response.createdAt" as const,
+          content:
+            "app.api.leads.tracking.engagement.post.response.createdAt" as const,
         },
         dateSchema,
       ),
       leadCreated: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.post.response.leadCreated" as const,
+          content:
+            "app.api.leads.tracking.engagement.post.response.leadCreated" as const,
         },
         z.boolean().optional(),
       ),
@@ -241,40 +279,56 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.tracking.engagement.post.errors.validation.title" as const,
-      description: "app.api.leads.tracking.engagement.post.errors.validation.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.post.errors.validation.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.tracking.engagement.post.errors.unauthorized.title" as const,
+      title:
+        "app.api.leads.tracking.engagement.post.errors.unauthorized.title" as const,
       description:
         "app.api.leads.tracking.engagement.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.tracking.engagement.post.errors.forbidden.title" as const,
-      description: "app.api.leads.tracking.engagement.post.errors.forbidden.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.post.errors.forbidden.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.tracking.engagement.post.errors.notFound.title" as const,
-      description: "app.api.leads.tracking.engagement.post.errors.notFound.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.post.errors.notFound.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.tracking.engagement.post.errors.conflict.title" as const,
-      description: "app.api.leads.tracking.engagement.post.errors.conflict.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.post.errors.conflict.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.post.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.tracking.engagement.post.errors.server.title" as const,
-      description: "app.api.leads.tracking.engagement.post.errors.server.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.post.errors.server.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.tracking.engagement.post.errors.unknown.title" as const,
-      description: "app.api.leads.tracking.engagement.post.errors.unknown.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.post.errors.unknown.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.tracking.engagement.post.errors.network.title" as const,
-      description: "app.api.leads.tracking.engagement.post.errors.network.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.post.errors.network.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.tracking.engagement.post.errors.unsavedChanges.title" as const,
+      title:
+        "app.api.leads.tracking.engagement.post.errors.unsavedChanges.title" as const,
       description:
         "app.api.leads.tracking.engagement.post.errors.unsavedChanges.description" as const,
     },
@@ -282,7 +336,8 @@ const { POST } = createEndpoint({
 
   successTypes: {
     title: "app.api.leads.tracking.engagement.post.success.title" as const,
-    description: "app.api.leads.tracking.engagement.post.success.description" as const,
+    description:
+      "app.api.leads.tracking.engagement.post.success.description" as const,
   },
 
   examples: {
@@ -318,7 +373,8 @@ const { POST } = createEndpoint({
         },
         timestamp: "2023-01-01T12:00:00.000Z",
         ipAddress: "192.168.1.1",
-        userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        userAgent:
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         createdAt: "2023-01-01T12:00:00.000Z",
         leadCreated: false,
       },
@@ -332,7 +388,8 @@ const { POST } = createEndpoint({
         },
         timestamp: "2023-01-01T12:00:00.000Z",
         ipAddress: "192.168.1.1",
-        userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        userAgent:
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         createdAt: "2023-01-01T12:00:00.000Z",
         leadCreated: true,
       },
@@ -356,7 +413,12 @@ const { GET } = createEndpoint({
     "app.api.leads.tracking.engagement.tags.tracking" as const,
     "app.api.leads.tracking.engagement.tags.engagement" as const,
   ],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN, UserRole.AI_TOOL_OFF] as const,
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+  ] as const,
   aliases: ["track-click", "click-tracking"] as const,
 
   cli: {
@@ -367,7 +429,8 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.leads.tracking.engagement.get.form.title" as const,
-      description: "app.api.leads.tracking.engagement.get.form.description" as const,
+      description:
+        "app.api.leads.tracking.engagement.get.form.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -379,9 +442,12 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.leads.tracking.engagement.get.id.label" as const,
-          description: "app.api.leads.tracking.engagement.get.id.description" as const,
-          placeholder: "app.api.leads.tracking.engagement.get.id.placeholder" as const,
-          helpText: "app.api.leads.tracking.engagement.get.id.helpText" as const,
+          description:
+            "app.api.leads.tracking.engagement.get.id.description" as const,
+          placeholder:
+            "app.api.leads.tracking.engagement.get.id.placeholder" as const,
+          helpText:
+            "app.api.leads.tracking.engagement.get.id.helpText" as const,
           columns: 12,
         },
         z.uuid().optional(),
@@ -390,10 +456,14 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
-          label: "app.api.leads.tracking.engagement.post.campaignId.label" as const,
-          description: "app.api.leads.tracking.engagement.post.campaignId.description" as const,
-          placeholder: "app.api.leads.tracking.engagement.post.campaignId.placeholder" as const,
-          helpText: "app.api.leads.tracking.engagement.post.campaignId.helpText" as const,
+          label:
+            "app.api.leads.tracking.engagement.post.campaignId.label" as const,
+          description:
+            "app.api.leads.tracking.engagement.post.campaignId.description" as const,
+          placeholder:
+            "app.api.leads.tracking.engagement.post.campaignId.placeholder" as const,
+          helpText:
+            "app.api.leads.tracking.engagement.post.campaignId.helpText" as const,
           columns: 6,
         },
         z.uuid().optional(),
@@ -403,9 +473,12 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.leads.tracking.engagement.get.stage.label" as const,
-          description: "app.api.leads.tracking.engagement.get.stage.description" as const,
-          placeholder: "app.api.leads.tracking.engagement.get.stage.placeholder" as const,
-          helpText: "app.api.leads.tracking.engagement.get.stage.helpText" as const,
+          description:
+            "app.api.leads.tracking.engagement.get.stage.description" as const,
+          placeholder:
+            "app.api.leads.tracking.engagement.get.stage.placeholder" as const,
+          helpText:
+            "app.api.leads.tracking.engagement.get.stage.helpText" as const,
           options: EmailCampaignStageOptions,
           columns: 6,
         },
@@ -416,9 +489,12 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.leads.tracking.engagement.get.source.label" as const,
-          description: "app.api.leads.tracking.engagement.get.source.description" as const,
-          placeholder: "app.api.leads.tracking.engagement.get.source.placeholder" as const,
-          helpText: "app.api.leads.tracking.engagement.get.source.helpText" as const,
+          description:
+            "app.api.leads.tracking.engagement.get.source.description" as const,
+          placeholder:
+            "app.api.leads.tracking.engagement.get.source.placeholder" as const,
+          helpText:
+            "app.api.leads.tracking.engagement.get.source.helpText" as const,
           options: LeadSourceOptions,
           columns: 6,
         },
@@ -429,9 +505,12 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.leads.tracking.engagement.get.url.label" as const,
-          description: "app.api.leads.tracking.engagement.get.url.description" as const,
-          placeholder: "app.api.leads.tracking.engagement.get.url.placeholder" as const,
-          helpText: "app.api.leads.tracking.engagement.get.url.helpText" as const,
+          description:
+            "app.api.leads.tracking.engagement.get.url.description" as const,
+          placeholder:
+            "app.api.leads.tracking.engagement.get.url.placeholder" as const,
+          helpText:
+            "app.api.leads.tracking.engagement.get.url.helpText" as const,
           columns: 12,
         },
         z.string(),
@@ -441,9 +520,12 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.leads.tracking.engagement.get.ref.label" as const,
-          description: "app.api.leads.tracking.engagement.get.ref.description" as const,
-          placeholder: "app.api.leads.tracking.engagement.get.ref.placeholder" as const,
-          helpText: "app.api.leads.tracking.engagement.get.ref.helpText" as const,
+          description:
+            "app.api.leads.tracking.engagement.get.ref.description" as const,
+          placeholder:
+            "app.api.leads.tracking.engagement.get.ref.placeholder" as const,
+          helpText:
+            "app.api.leads.tracking.engagement.get.ref.helpText" as const,
           columns: 12,
         },
         z.string().optional(),
@@ -453,49 +535,56 @@ const { GET } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.get.response.success" as const,
+          content:
+            "app.api.leads.tracking.engagement.get.response.success" as const,
         },
         z.boolean(),
       ),
       redirectUrl: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.get.response.redirectUrl" as const,
+          content:
+            "app.api.leads.tracking.engagement.get.response.redirectUrl" as const,
         },
         z.string(),
       ),
       responseLeadId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.get.response.leadId" as const,
+          content:
+            "app.api.leads.tracking.engagement.get.response.leadId" as const,
         },
         z.string().optional(),
       ),
       responseCampaignId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.get.response.campaignId" as const,
+          content:
+            "app.api.leads.tracking.engagement.get.response.campaignId" as const,
         },
         z.uuid().optional(),
       ),
       engagementRecorded: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.get.response.engagementRecorded" as const,
+          content:
+            "app.api.leads.tracking.engagement.get.response.engagementRecorded" as const,
         },
         z.boolean(),
       ),
       leadStatusUpdated: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.get.response.leadStatusUpdated" as const,
+          content:
+            "app.api.leads.tracking.engagement.get.response.leadStatusUpdated" as const,
         },
         z.boolean(),
       ),
       isLoggedIn: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.tracking.engagement.get.response.isLoggedIn" as const,
+          content:
+            "app.api.leads.tracking.engagement.get.response.isLoggedIn" as const,
         },
         z.boolean(),
       ),
@@ -504,39 +593,56 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.tracking.engagement.get.errors.validation.title" as const,
-      description: "app.api.leads.tracking.engagement.get.errors.validation.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.get.errors.validation.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.tracking.engagement.get.errors.unauthorized.title" as const,
-      description: "app.api.leads.tracking.engagement.get.errors.unauthorized.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.get.errors.unauthorized.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.tracking.engagement.get.errors.forbidden.title" as const,
-      description: "app.api.leads.tracking.engagement.get.errors.forbidden.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.get.errors.forbidden.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.tracking.engagement.get.errors.notFound.title" as const,
-      description: "app.api.leads.tracking.engagement.get.errors.notFound.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.get.errors.notFound.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.tracking.engagement.get.errors.conflict.title" as const,
-      description: "app.api.leads.tracking.engagement.get.errors.conflict.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.get.errors.conflict.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.get.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.tracking.engagement.get.errors.server.title" as const,
-      description: "app.api.leads.tracking.engagement.get.errors.server.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.get.errors.server.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.tracking.engagement.get.errors.unknown.title" as const,
-      description: "app.api.leads.tracking.engagement.get.errors.unknown.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.get.errors.unknown.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.tracking.engagement.get.errors.network.title" as const,
-      description: "app.api.leads.tracking.engagement.get.errors.network.description" as const,
+      title:
+        "app.api.leads.tracking.engagement.get.errors.network.title" as const,
+      description:
+        "app.api.leads.tracking.engagement.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.tracking.engagement.get.errors.unsavedChanges.title" as const,
+      title:
+        "app.api.leads.tracking.engagement.get.errors.unsavedChanges.title" as const,
       description:
         "app.api.leads.tracking.engagement.get.errors.unsavedChanges.description" as const,
     },
@@ -544,7 +650,8 @@ const { GET } = createEndpoint({
 
   successTypes: {
     title: "app.api.leads.tracking.engagement.get.success.title" as const,
-    description: "app.api.leads.tracking.engagement.get.success.description" as const,
+    description:
+      "app.api.leads.tracking.engagement.get.success.description" as const,
   },
 
   examples: {
@@ -585,7 +692,9 @@ export type ClickTrackingResponseOutput = typeof GET.types.ResponseOutput;
 
 // Export metadata type for use in other files
 export type EngagementMetadataInput = z.infer<typeof engagementMetadataSchema>;
-export type EngagementMetadataOutput = z.output<typeof engagementMetadataSchema>;
+export type EngagementMetadataOutput = z.output<
+  typeof engagementMetadataSchema
+>;
 
 // Export combined endpoints for route handlers and hooks
 const engagementEndpoints = {

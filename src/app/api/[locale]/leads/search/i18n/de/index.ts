@@ -15,7 +15,8 @@ export const translations: typeof enTranslations = {
     },
     search: {
       label: "Suchanfrage",
-      description: "Suchbegriff um Leads nach E-Mail, Firmenname oder Notizen zu filtern",
+      description:
+        "Suchbegriff um Leads nach E-Mail, Firmenname oder Notizen zu filtern",
       placeholder: "Suchbegriff eingeben...",
     },
     limit: {

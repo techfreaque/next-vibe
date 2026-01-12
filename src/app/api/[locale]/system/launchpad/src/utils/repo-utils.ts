@@ -9,7 +9,11 @@ import { promisify } from "node:util";
 // eslint-disable-next-line eslint-plugin-import/no-named-as-default
 import simpleGit from "simple-git";
 
-import type { LaunchpadConfig, LaunchpadFolder, LaunchpadPackage } from "../types/types.js";
+import type {
+  LaunchpadConfig,
+  LaunchpadFolder,
+  LaunchpadPackage,
+} from "../types/types.js";
 
 const execAsync = promisify(exec);
 const git = simpleGit;
@@ -31,7 +35,9 @@ const prompt = (question: string): Promise<string> => {
 /**
  * Type guard to check if an object is a LaunchpadPackage
  */
-function isLaunchpadPackage(obj: LaunchpadPackage | LaunchpadFolder): obj is LaunchpadPackage {
+function isLaunchpadPackage(
+  obj: LaunchpadPackage | LaunchpadFolder,
+): obj is LaunchpadPackage {
   return "branch" in obj && "repoUrl" in obj;
 }
 
@@ -68,7 +74,9 @@ export function getAllRepos(config: LaunchpadConfig): {
 // Check if repository exists locally
 export function repoExists(repoPath: string[], rootDir?: string): boolean {
   const folderPath = path.join(rootDir || process.cwd(), ...repoPath);
-  return fs.existsSync(folderPath) && fs.existsSync(path.join(folderPath, ".git"));
+  return (
+    fs.existsSync(folderPath) && fs.existsSync(path.join(folderPath, ".git"))
+  );
 }
 
 // Clone a repository
@@ -79,7 +87,9 @@ export async function cloneRepo(
   rootDir: string,
 ): Promise<void> {
   // Ensure we use rootDir when determining the full path
-  const fullPath = path.isAbsolute(repoPath) ? repoPath : path.join(rootDir, repoPath);
+  const fullPath = path.isAbsolute(repoPath)
+    ? repoPath
+    : path.join(rootDir, repoPath);
 
   // Create parent directories if they don't exist
   const parentDir = path.dirname(fullPath);
@@ -133,7 +143,10 @@ export async function updateRepo(
 }
 
 // Update the root repository (the launchpad itself)
-export async function updateRootRepo(force = false, rootPath: string): Promise<void> {
+export async function updateRootRepo(
+  force = false,
+  rootPath: string,
+): Promise<void> {
   // Check for local changes
   const { stdout: statusOutput } = await execAsync("git status --porcelain", {
     cwd: rootPath,

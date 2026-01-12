@@ -32,7 +32,8 @@ export const translations = {
   },
   newsletter: {
     title: "Stay Updated",
-    description: "Subscribe to our newsletter for the latest updates and insights.",
+    description:
+      "Subscribe to our newsletter for the latest updates and insights.",
     emailPlaceholder: "Enter your email",
     subscribe: "Subscribe",
     subscription: {
@@ -54,7 +55,8 @@ export const translations = {
     },
     notFound: {
       title: "Page Not Found",
-      description: "The page you're looking for doesn't exist or has been moved.",
+      description:
+        "The page you're looking for doesn't exist or has been moved.",
       goBack: "Go Back",
       goHome: "Go to Homepage",
     },
@@ -72,27 +74,33 @@ export const translations = {
     aboutUs: {
       title: "About Us - {{appName}}",
       category: "About",
-      description: "Learn about {{appName}}'s mission to provide uncensored AI conversations",
+      description:
+        "Learn about {{appName}}'s mission to provide uncensored AI conversations",
       imageAlt: "About {{appName}}",
       keywords: "about {{appName}}, uncensored AI, AI mission, AI values",
       ogTitle: "About {{appName}} - Uncensored AI Platform",
-      ogDescription: "Discover our mission to democratize access to uncensored AI",
+      ogDescription:
+        "Discover our mission to democratize access to uncensored AI",
       twitterTitle: "About {{appName}}",
-      twitterDescription: "Learn about our mission for uncensored AI conversations",
+      twitterDescription:
+        "Learn about our mission for uncensored AI conversations",
     },
     privacyPolicy: {
       title: "Privacy Policy - {{appName}}",
       category: "Legal",
-      description: "Learn how {{appName}} protects your privacy and handles your data",
+      description:
+        "Learn how {{appName}} protects your privacy and handles your data",
       imageAlt: "Privacy Policy",
-      keywords: "privacy policy, data protection, user privacy, {{appName}} privacy",
+      keywords:
+        "privacy policy, data protection, user privacy, {{appName}} privacy",
     },
     termsOfService: {
       title: "Terms of Service - {{appName}}",
       category: "Legal",
       description: "Read the terms and conditions for using {{appName}}",
       imageAlt: "Terms of Service",
-      keywords: "terms of service, terms and conditions, user agreement, {{appName}} terms",
+      keywords:
+        "terms of service, terms and conditions, user agreement, {{appName}} terms",
     },
     imprint: {
       title: "Legal Notice - {{appName}}",
@@ -111,9 +119,11 @@ export const translations = {
     pricing: {
       title: "Pricing - {{appName}}",
       category: "Pricing",
-      description: "Affordable AI chat plans for everyone. Start free with 10 daily messages.",
+      description:
+        "Affordable AI chat plans for everyone. Start free with 10 daily messages.",
       imageAlt: "Pricing Plans",
-      keywords: "pricing, plans, subscription, AI chat pricing, {{appName}} pricing",
+      keywords:
+        "pricing, plans, subscription, AI chat pricing, {{appName}} pricing",
       ogTitle: "Pricing Plans - {{appName}}",
       ogDescription: "Simple, transparent pricing for uncensored AI chat",
       twitterTitle: "Pricing - {{appName}}",
@@ -188,7 +198,8 @@ export const translations = {
         description: "This page works on both web and mobile",
         unified: {
           title: "✅ Unified Components",
-          description: "Using next-vibe-ui components that work seamlessly across platforms",
+          description:
+            "Using next-vibe-ui components that work seamlessly across platforms",
         },
         types: {
           title: "✅ Type Safety",

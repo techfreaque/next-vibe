@@ -126,7 +126,8 @@ export const translations = {
     },
     source: {
       label: "Source",
-      description: "The source of this character (built-in, custom, or community)",
+      description:
+        "The source of this character (built-in, custom, or community)",
     },
     ownershipType: {
       label: "Ownership Type",
@@ -229,7 +230,8 @@ export const translations = {
       },
       unknown: {
         title: "Unknown Error",
-        description: "An unexpected error occurred while deleting the character",
+        description:
+          "An unexpected error occurred while deleting the character",
       },
       unsavedChanges: {
         title: "Unsaved Changes",

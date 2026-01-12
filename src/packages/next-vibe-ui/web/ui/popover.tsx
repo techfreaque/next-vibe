@@ -51,7 +51,10 @@ export type PopoverCloseProps = {
   asChild?: boolean;
 } & StyleType;
 
-export function Popover({ children, ...props }: PopoverRootProps): React.JSX.Element {
+export function Popover({
+  children,
+  ...props
+}: PopoverRootProps): React.JSX.Element {
   return <PopoverPrimitive.Root {...props}>{children}</PopoverPrimitive.Root>;
 }
 Popover.displayName = PopoverPrimitive.Root.displayName;
@@ -145,7 +148,11 @@ export function PopoverClose({
   asChild,
 }: PopoverCloseProps): React.JSX.Element {
   return (
-    <PopoverPrimitive.Close asChild={asChild} className={className} style={style}>
+    <PopoverPrimitive.Close
+      asChild={asChild}
+      className={className}
+      style={style}
+    >
       {children}
     </PopoverPrimitive.Close>
   );

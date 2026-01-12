@@ -89,7 +89,9 @@ export const DEVELOPMENT_CONFIG: EmailCampaignConfigType = {
  * Get configuration based on environment
  */
 export function getDefaultConfig(): EmailCampaignConfigType {
-  return env.NODE_ENV === Environment.PRODUCTION ? PRODUCTION_CONFIG : DEVELOPMENT_CONFIG;
+  return env.NODE_ENV === Environment.PRODUCTION
+    ? PRODUCTION_CONFIG
+    : DEVELOPMENT_CONFIG;
 }
 
 /**
@@ -107,49 +109,51 @@ export function getSchedule(): string {
  * Email Campaign Cron Task Definition
  * Production-ready configuration for automated email campaigns
  */
-export const taskDefinition: CronTaskDefinition<EmailCampaignConfigType, EmailCampaignResultType> =
-  {
-    // Task metadata
-    name: "lead-email-campaigns",
+export const taskDefinition: CronTaskDefinition<
+  EmailCampaignConfigType,
+  EmailCampaignResultType
+> = {
+  // Task metadata
+  name: "lead-email-campaigns",
+  description:
+    // eslint-disable-next-line i18next/no-literal-string
+    "Send automated email campaigns to leads based on their stage and timing",
+  version: "1.0.0",
+
+  // Scheduling configuration
+  schedule: getSchedule(),
+  enabled: true,
+
+  // Execution configuration
+  timeout: 600000, // 10 minutes
+  retries: 3,
+
+  // Task-specific configuration
+  defaultConfig: getDefaultConfig(),
+
+  // Validation schemas
+  configSchema: emailCampaignConfigSchema,
+  resultSchema: emailCampaignResultSchema,
+
+  // Task categories and metadata
+  category: "LEAD_MANAGEMENT",
+  tags: ["email", "marketing", "leads", "automation"],
+  dependencies: [],
+  monitoring: {
+    enabled: true,
+    alertOnFailure: true,
+    alertOnTimeout: true,
+    maxFailures: 3,
+  },
+
+  // Documentation
+  documentation: {
     description:
       // eslint-disable-next-line i18next/no-literal-string
-      "Send automated email campaigns to leads based on their stage and timing",
-    version: "1.0.0",
-
-    // Scheduling configuration
-    schedule: getSchedule(),
-    enabled: true,
-
-    // Execution configuration
-    timeout: 600000, // 10 minutes
-    retries: 3,
-
-    // Task-specific configuration
-    defaultConfig: getDefaultConfig(),
-
-    // Validation schemas
-    configSchema: emailCampaignConfigSchema,
-    resultSchema: emailCampaignResultSchema,
-
-    // Task categories and metadata
-    category: "LEAD_MANAGEMENT",
-    tags: ["email", "marketing", "leads", "automation"],
-    dependencies: [],
-    monitoring: {
-      enabled: true,
-      alertOnFailure: true,
-      alertOnTimeout: true,
-      maxFailures: 3,
-    },
-
-    // Documentation
-    documentation: {
-      description:
-        // eslint-disable-next-line i18next/no-literal-string
-        "Automates lead nurturing through staged email campaigns to improve lead conversion and engagement rates",
-      troubleshooting: [
-        // eslint-disable-next-line i18next/no-literal-string
-        "No rollback needed - emails are tracked in database",
-      ],
-    },
-  };
+      "Automates lead nurturing through staged email campaigns to improve lead conversion and engagement rates",
+    troubleshooting: [
+      // eslint-disable-next-line i18next/no-literal-string
+      "No rollback needed - emails are tracked in database",
+    ],
+  },
+};

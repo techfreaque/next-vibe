@@ -64,7 +64,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /**
  * Login Page Component
  */
-export default async function LoginPage({ params, searchParams }: Props): Promise<JSX.Element> {
+export default async function LoginPage({
+  params,
+  searchParams,
+}: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { callbackUrl } = await searchParams;
   const { t } = simpleT(locale);
@@ -94,12 +97,21 @@ export default async function LoginPage({ params, searchParams }: Props): Promis
   }
 
   // Get login options
-  const loginOptionsResponse = await LoginRepository.getLoginOptions(logger, locale);
+  const loginOptionsResponse = await LoginRepository.getLoginOptions(
+    logger,
+    locale,
+  );
   if (!loginOptionsResponse.success) {
-    return <Div>{t(loginOptionsResponse.message, loginOptionsResponse.messageParams)}</Div>;
+    return (
+      <Div>
+        {t(loginOptionsResponse.message, loginOptionsResponse.messageParams)}
+      </Div>
+    );
   }
   if (!verifiedUserResponse.success) {
-    return <Div>{t("app.user.other.login.errors.failedToLoadBrowserIdentity")}</Div>;
+    return (
+      <Div>{t("app.user.other.login.errors.failedToLoadBrowserIdentity")}</Div>
+    );
   }
 
   return (
@@ -111,7 +123,11 @@ export default async function LoginPage({ params, searchParams }: Props): Promis
         <ArrowLeft className="mr-2 h-4 w-4" />
         {t("app.user.common.backToHome")}
       </Link>
-      <LoginForm locale={locale} callbackUrl={callbackUrl} user={verifiedUserResponse.data} />
+      <LoginForm
+        locale={locale}
+        callbackUrl={callbackUrl}
+        user={verifiedUserResponse.data}
+      />
     </>
   );
 }

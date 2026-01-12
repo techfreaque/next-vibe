@@ -25,12 +25,14 @@ export const translations: typeof enTranslations = {
     skipDuplicates: {
       label: "Duplikate überspringen",
       description: "Leads mit doppelten E-Mail-Adressen überspringen",
-      helpText: "Aktivieren um existierende E-Mail-Adressen automatisch zu überspringen",
+      helpText:
+        "Aktivieren um existierende E-Mail-Adressen automatisch zu überspringen",
     },
     updateExisting: {
       label: "Existierende aktualisieren",
       description: "Existierende Leads mit neuen Daten aktualisieren",
-      helpText: "Aktivieren um existierende Leads zu aktualisieren statt zu überspringen",
+      helpText:
+        "Aktivieren um existierende Leads zu aktualisieren statt zu überspringen",
     },
     defaultCountry: {
       label: "Standard-Land",

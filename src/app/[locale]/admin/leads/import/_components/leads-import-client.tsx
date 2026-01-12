@@ -25,7 +25,10 @@ interface LeadsImportClientProps {
   user: JwtPayloadType;
 }
 
-export function LeadsImportClient({ locale, user }: LeadsImportClientProps): React.JSX.Element {
+export function LeadsImportClient({
+  locale,
+  user,
+}: LeadsImportClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 
@@ -86,7 +89,9 @@ export function LeadsImportClient({ locale, user }: LeadsImportClientProps): Rea
             locale={locale}
             user={user}
             data={
-              statusEndpoint.read.response?.success ? statusEndpoint.read.response.data : undefined
+              statusEndpoint.read.response?.success
+                ? statusEndpoint.read.response.data
+                : undefined
             }
             submitButtonText="app.admin.common.actions.reset"
             logger={logger}

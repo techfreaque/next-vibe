@@ -9,6 +9,8 @@ import loginEndpoints from "./definition";
  * Uses the simplified useEndpoint pattern for better type safety
  * @returns Login options and query state with full CRUD operations
  */
-export function useLoginOptions(logger: EndpointLogger): EndpointReturn<typeof loginEndpoints> {
+export function useLoginOptions(
+  logger: EndpointLogger,
+): EndpointReturn<typeof loginEndpoints> {
   return useEndpoint(loginEndpoints, {}, logger);
 }

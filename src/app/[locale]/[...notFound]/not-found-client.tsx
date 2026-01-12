@@ -9,7 +9,11 @@ import React from "react";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-export function NotFoundBackButton({ locale }: { locale: CountryLanguage }): JSX.Element {
+export function NotFoundBackButton({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): JSX.Element {
   const { t } = simpleT(locale);
   return (
     <Button variant="outline" asChild className="group">

@@ -35,7 +35,11 @@ import { NavigationPreview } from "./navigation";
 import { OverlaysPreview } from "./overlays";
 import { SpecialPreview } from "./special";
 
-export function DesignTestPageLayout({ locale }: { locale: CountryLanguage }): React.JSX.Element {
+export function DesignTestPageLayout({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): React.JSX.Element {
   const [collapsed, setCollapsed] = useState(true);
 
   return (
@@ -57,7 +61,9 @@ export function DesignTestPageLayout({ locale }: { locale: CountryLanguage }): R
               <Menu className="h-5 w-5" />
             </Button>
             <Div className="flex flex-row items-center bg-card backdrop-blur-sm shadow-sm rounded-md px-3 h-9">
-              <H4 className="font-semibold text-sm text-card-foreground">Vibe UI Components</H4>
+              <H4 className="font-semibold text-sm text-card-foreground">
+                Vibe UI Components
+              </H4>
             </Div>
           </>
         }
@@ -77,7 +83,9 @@ export function DesignTestPageLayout({ locale }: { locale: CountryLanguage }): R
                     size="sm"
                     onClick={() => {
                       if (!platform.isReactNative) {
-                        document.querySelector("#buttons")?.scrollIntoView({ behavior: "smooth" });
+                        document
+                          .querySelector("#buttons")
+                          ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
                   >
@@ -90,7 +98,9 @@ export function DesignTestPageLayout({ locale }: { locale: CountryLanguage }): R
                     size="sm"
                     onClick={() => {
                       if (!platform.isReactNative) {
-                        document.querySelector("#forms")?.scrollIntoView({ behavior: "smooth" });
+                        document
+                          .querySelector("#forms")
+                          ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
                   >
@@ -103,7 +113,9 @@ export function DesignTestPageLayout({ locale }: { locale: CountryLanguage }): R
                     size="sm"
                     onClick={() => {
                       if (!platform.isReactNative) {
-                        document.querySelector("#feedback")?.scrollIntoView({ behavior: "smooth" });
+                        document
+                          .querySelector("#feedback")
+                          ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
                   >
@@ -116,7 +128,9 @@ export function DesignTestPageLayout({ locale }: { locale: CountryLanguage }): R
                     size="sm"
                     onClick={() => {
                       if (!platform.isReactNative) {
-                        document.querySelector("#layouts")?.scrollIntoView({ behavior: "smooth" });
+                        document
+                          .querySelector("#layouts")
+                          ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
                   >
@@ -144,7 +158,9 @@ export function DesignTestPageLayout({ locale }: { locale: CountryLanguage }): R
                     size="sm"
                     onClick={() => {
                       if (!platform.isReactNative) {
-                        document.querySelector("#overlays")?.scrollIntoView({ behavior: "smooth" });
+                        document
+                          .querySelector("#overlays")
+                          ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
                   >
@@ -172,7 +188,9 @@ export function DesignTestPageLayout({ locale }: { locale: CountryLanguage }): R
                     size="sm"
                     onClick={() => {
                       if (!platform.isReactNative) {
-                        document.querySelector("#advanced")?.scrollIntoView({ behavior: "smooth" });
+                        document
+                          .querySelector("#advanced")
+                          ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
                   >
@@ -185,7 +203,9 @@ export function DesignTestPageLayout({ locale }: { locale: CountryLanguage }): R
                     size="sm"
                     onClick={() => {
                       if (!platform.isReactNative) {
-                        document.querySelector("#special")?.scrollIntoView({ behavior: "smooth" });
+                        document
+                          .querySelector("#special")
+                          ?.scrollIntoView({ behavior: "smooth" });
                       }
                     }}
                   >
@@ -196,7 +216,9 @@ export function DesignTestPageLayout({ locale }: { locale: CountryLanguage }): R
               </ScrollArea>
             </Div>
             <Div className="p-4 border-t border-border">
-              <P className="text-xs text-muted-foreground text-center">Vibe UI Library</P>
+              <P className="text-xs text-muted-foreground text-center">
+                Vibe UI Library
+              </P>
             </Div>
           </>
         }
@@ -207,7 +229,9 @@ export function DesignTestPageLayout({ locale }: { locale: CountryLanguage }): R
         <Container className="max-w-full mx-auto pt-15 pb-10 space-y-12 px-6">
           <Div className="space-y-2">
             <H1>Vibe UI Component Library</H1>
-            <Large className="text-muted-foreground">Demo of Vibe UI components</Large>
+            <Large className="text-muted-foreground">
+              Demo of Vibe UI components
+            </Large>
           </Div>
 
           <Separator />

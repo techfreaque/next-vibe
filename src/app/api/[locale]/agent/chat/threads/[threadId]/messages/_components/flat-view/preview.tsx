@@ -56,9 +56,16 @@ export function MessagePreview({
       >
         {/* Preview Header */}
         <Div className="flex items-center gap-2 mb-2 text-xs">
-          <Span className={cn("font-semibold", isUser ? "text-foreground" : "text-primary")}>
+          <Span
+            className={cn(
+              "font-semibold",
+              isUser ? "text-foreground" : "text-primary",
+            )}
+          >
             {isUser
-              ? rootFolderId === "private" || rootFolderId === "shared" || rootFolderId === "public"
+              ? rootFolderId === "private" ||
+                rootFolderId === "shared" ||
+                rootFolderId === "public"
                 ? t("app.chat.flatView.youLabel")
                 : t("app.chat.flatView.anonymous")
               : message.authorName || t("app.chat.flatView.assistantFallback")}
@@ -70,12 +77,16 @@ export function MessagePreview({
               borderColor: idColor,
             }}
           >
-            <Span className="px-1.5 py-0.5 rounded text-xs font-mono border">{shortId}</Span>
+            <Span className="px-1.5 py-0.5 rounded text-xs font-mono border">
+              {shortId}
+            </Span>
           </Span>
         </Div>
 
         {/* Preview Content */}
-        <Div className="text-sm text-foreground/90 line-clamp-4">{message.content}</Div>
+        <Div className="text-sm text-foreground/90 line-clamp-4">
+          {message.content}
+        </Div>
       </Div>
     </Div>
   );

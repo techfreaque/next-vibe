@@ -29,8 +29,15 @@ const isValidTab = (value: string): value is "country" | "language" => {
 };
 
 const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
-  const { countries, currentCountry, changeLocale, language, country, setLanguage, t } =
-    useTranslation();
+  const {
+    countries,
+    currentCountry,
+    changeLocale,
+    language,
+    country,
+    setLanguage,
+    t,
+  } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"country" | "language">("country");
   const [tabHover, setTabHover] = useState<"country" | "language" | null>(null);
@@ -60,7 +67,9 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
     [changeLocale],
   );
 
-  const currentLanguageFlag = countries.find((c) => c.language === language)?.flag;
+  const currentLanguageFlag = countries.find(
+    (c) => c.language === language,
+  )?.flag;
 
   // Get unique languages from countries using the singleton utility
   const uniqueLanguages = getUniqueLanguages();
@@ -82,7 +91,10 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
             {currentCountry.flag}
           </Span>
           <Span
-            className={cn(isNavBar ? "xl:flex hidden" : "flex", "items-center text-sm font-medium")}
+            className={cn(
+              isNavBar ? "xl:flex hidden" : "flex",
+              "items-center text-sm font-medium",
+            )}
           >
             {currentCountry.name}
           </Span>
@@ -135,10 +147,14 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
                     <Span className="text-lg mr-1">{countryItem.flag}</Span>
                     <Div className="flex flex-col items-start">
                       <Span className="font-medium">{countryItem.name}</Span>
-                      <Span className="text-xs text-muted-foreground">{countryItem.langName}</Span>
+                      <Span className="text-xs text-muted-foreground">
+                        {countryItem.langName}
+                      </Span>
                     </Div>
                   </Div>
-                  {country === countryItem.code && <Check className="h-4 w-4 text-primary" />}
+                  {country === countryItem.code && (
+                    <Check className="h-4 w-4 text-primary" />
+                  )}
                 </Button>
               ))}
             </Div>
@@ -167,7 +183,9 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar }) => {
                       <Span className="font-medium">{langInfo.name}</Span>
                     </Div>
                   </Div>
-                  {language === langCode && <Check className="h-4 w-4 text-primary" />}
+                  {language === langCode && (
+                    <Check className="h-4 w-4 text-primary" />
+                  )}
                 </Button>
               ))}
             </Div>

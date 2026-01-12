@@ -13,7 +13,12 @@ import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
 import { createTrackingContext } from "../../../../emails/smtp-client/components/tracking_context.email";
-import { EmailCampaignStage, EmailJourneyVariant, LeadSource, LeadStatus } from "../../../enum";
+import {
+  EmailCampaignStage,
+  EmailJourneyVariant,
+  LeadSource,
+  LeadStatus,
+} from "../../../enum";
 import type { LeadWithEmailType } from "../../../types";
 import { personalJourneyTemplates } from "../journeys/personal.email";
 import { personalPracticalJourneyTemplates } from "../journeys/personal-results.email";
@@ -298,7 +303,9 @@ export class EmailRendererService {
   /**
    * Get all available journey variants
    */
-  getAvailableJourneys(): Array<(typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]> {
+  getAvailableJourneys(): Array<
+    (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]
+  > {
     return Object.keys(JOURNEY_TEMPLATES) as Array<
       (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]
     >;
@@ -313,7 +320,9 @@ export class EmailRendererService {
   ): {
     name: string;
     description: string;
-    availableStages: Array<(typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]>;
+    availableStages: Array<
+      (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]
+    >;
   } {
     const journeyInfo = {
       [EmailJourneyVariant.PERSONAL_APPROACH]: {
@@ -361,18 +370,27 @@ export class EmailRendererService {
       companyEmail: string;
     },
   ): Promise<EmailTemplateResult | null> {
-    const [country, language] = context.locale.split("-") as [Countries, Languages];
+    const [country, language] = context.locale.split("-") as [
+      Countries,
+      Languages,
+    ];
     // Create mock lead data for preview
     const mockLead: LeadWithEmailType = {
-      id: context.t("app.api.leads.campaigns.emails.journeys.components.defaults.previewLeadId"),
-      email: context.t("app.api.leads.campaigns.emails.journeys.components.defaults.previewEmail"),
+      id: context.t(
+        "app.api.leads.campaigns.emails.journeys.components.defaults.previewLeadId",
+      ),
+      email: context.t(
+        "app.api.leads.campaigns.emails.journeys.components.defaults.previewEmail",
+      ),
       businessName: context.t(
         "app.api.leads.campaigns.emails.journeys.components.defaults.previewBusinessName",
       ),
       contactName: context.t(
         "app.api.leads.campaigns.emails.journeys.components.defaults.previewContactName",
       ),
-      phone: context.t("app.api.leads.campaigns.emails.journeys.components.defaults.previewPhone"),
+      phone: context.t(
+        "app.api.leads.campaigns.emails.journeys.components.defaults.previewPhone",
+      ),
       website: env.NEXT_PUBLIC_APP_URL,
       country: country,
       language: language,

@@ -40,7 +40,8 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.emails.imapClient.accounts.test.container.title",
-      description: "app.api.emails.imapClient.accounts.test.container.description",
+      description:
+        "app.api.emails.imapClient.accounts.test.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -52,8 +53,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.imapClient.accounts.test.accountId.label",
-          description: "app.api.emails.imapClient.accounts.test.accountId.description",
-          placeholder: "app.api.emails.imapClient.accounts.test.accountId.placeholder",
+          description:
+            "app.api.emails.imapClient.accounts.test.accountId.description",
+          placeholder:
+            "app.api.emails.imapClient.accounts.test.accountId.placeholder",
           columns: 12,
         },
         z.uuid(),
@@ -87,8 +90,10 @@ const { POST } = createEndpoint({
       details: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.emails.imapClient.accounts.test.response.details.title",
-          description: "app.api.emails.imapClient.accounts.test.response.details.description",
+          title:
+            "app.api.emails.imapClient.accounts.test.response.details.title",
+          description:
+            "app.api.emails.imapClient.accounts.test.response.details.description",
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -97,14 +102,16 @@ const { POST } = createEndpoint({
           host: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.emails.imapClient.accounts.test.response.details.host",
+              content:
+                "app.api.emails.imapClient.accounts.test.response.details.host",
             },
             z.string().optional(),
           ),
           port: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.emails.imapClient.accounts.test.response.details.port",
+              content:
+                "app.api.emails.imapClient.accounts.test.response.details.port",
             },
             z.coerce.number().optional(),
           ),
@@ -125,7 +132,8 @@ const { POST } = createEndpoint({
           responseTime: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.emails.imapClient.accounts.test.response.details.responseTime",
+              content:
+                "app.api.emails.imapClient.accounts.test.response.details.responseTime",
             },
             z.coerce.number().optional(),
           ),
@@ -145,39 +153,50 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.emails.imapClient.accounts.test.errors.validation.title",
-      description: "app.api.emails.imapClient.accounts.test.errors.validation.description",
+      description:
+        "app.api.emails.imapClient.accounts.test.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.emails.imapClient.accounts.test.errors.unauthorized.title",
-      description: "app.api.emails.imapClient.accounts.test.errors.unauthorized.description",
+      title:
+        "app.api.emails.imapClient.accounts.test.errors.unauthorized.title",
+      description:
+        "app.api.emails.imapClient.accounts.test.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.emails.imapClient.accounts.test.errors.server.title",
-      description: "app.api.emails.imapClient.accounts.test.errors.server.description",
+      description:
+        "app.api.emails.imapClient.accounts.test.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.imapClient.accounts.test.errors.unknown.title",
-      description: "app.api.emails.imapClient.accounts.test.errors.unknown.description",
+      description:
+        "app.api.emails.imapClient.accounts.test.errors.unknown.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.emails.imapClient.accounts.test.errors.forbidden.title",
-      description: "app.api.emails.imapClient.accounts.test.errors.forbidden.description",
+      description:
+        "app.api.emails.imapClient.accounts.test.errors.forbidden.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.emails.imapClient.accounts.test.errors.network.title",
-      description: "app.api.emails.imapClient.accounts.test.errors.network.description",
+      description:
+        "app.api.emails.imapClient.accounts.test.errors.network.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.emails.imapClient.accounts.test.errors.notFound.title",
-      description: "app.api.emails.imapClient.accounts.test.errors.notFound.description",
+      description:
+        "app.api.emails.imapClient.accounts.test.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.emails.imapClient.accounts.test.errors.conflict.title",
-      description: "app.api.emails.imapClient.accounts.test.errors.conflict.description",
+      description:
+        "app.api.emails.imapClient.accounts.test.errors.conflict.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.emails.imapClient.accounts.test.errors.unsavedChanges.title",
-      description: "app.api.emails.imapClient.accounts.test.errors.unsavedChanges.description",
+      title:
+        "app.api.emails.imapClient.accounts.test.errors.unsavedChanges.title",
+      description:
+        "app.api.emails.imapClient.accounts.test.errors.unsavedChanges.description",
     },
   },
 
@@ -214,7 +233,8 @@ const { POST } = createEndpoint({
 export type ImapAccountTestPostRequestInput = typeof POST.types.RequestInput;
 export type ImapAccountTestPostRequestOutput = typeof POST.types.RequestOutput;
 export type ImapAccountTestPostResponseInput = typeof POST.types.ResponseInput;
-export type ImapAccountTestPostResponseOutput = typeof POST.types.ResponseOutput;
+export type ImapAccountTestPostResponseOutput =
+  typeof POST.types.ResponseOutput;
 
 // Export individual endpoints
 

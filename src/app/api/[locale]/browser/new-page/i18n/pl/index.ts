@@ -14,7 +14,8 @@ export const translations: typeof enTranslations = {
       },
       timeout: {
         label: "Limit czasu",
-        description: "Maksymalny czas oczekiwania w milisekundach (0 dla domyślnego)",
+        description:
+          "Maksymalny czas oczekiwania w milisekundach (0 dla domyślnego)",
         placeholder: "Wprowadź limit czasu",
       },
     },
@@ -48,7 +49,8 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description: "Wystąpił wewnętrzny błąd serwera podczas tworzenia nowej strony",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas tworzenia nowej strony",
     },
     unknown: {
       title: "Nieznany błąd",

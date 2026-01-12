@@ -292,7 +292,9 @@ const _exhaustiveCheck: Record<string, never> = exhaustiveCheck;
 // This enforces that every library icon is mapped in the registry
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 type _RegistryCheck = {
-  [K in keyof typeof Icons]: K extends keyof typeof ICON_REGISTRY ? true : never;
+  [K in keyof typeof Icons]: K extends keyof typeof ICON_REGISTRY
+    ? true
+    : never;
 };
 
 /**
@@ -314,9 +316,13 @@ type AllRegistryIcons = keyof typeof ICON_REGISTRY;
 // Check: Every icon in registry must be in at least one category
 // This will produce a type error if any registry icon is not categorized
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-type _CategoryCoverageCheck = AllRegistryIcons extends CategorizedIcons ? true : never;
+type _CategoryCoverageCheck = AllRegistryIcons extends CategorizedIcons
+  ? true
+  : never;
 
 // Check: Every categorized icon must exist in registry
 // This will produce a type error if any category contains invalid icon keys
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-type _CategoryValidityCheck = CategorizedIcons extends AllRegistryIcons ? true : never;
+type _CategoryValidityCheck = CategorizedIcons extends AllRegistryIcons
+  ? true
+  : never;

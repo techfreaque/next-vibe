@@ -61,8 +61,12 @@ export function ModelCharacterSelectorModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const title = t(titleKey);
   const description = t(descriptionKey);
-  const finalConfirmLabel = confirmLabelKey ? t(confirmLabelKey) : t("app.chat.common.send");
-  const inputPlaceholder = inputPlaceholderKey ? t(inputPlaceholderKey) : t("app.chat.common.send");
+  const finalConfirmLabel = confirmLabelKey
+    ? t(confirmLabelKey)
+    : t("app.chat.common.send");
+  const inputPlaceholder = inputPlaceholderKey
+    ? t(inputPlaceholderKey)
+    : t("app.chat.common.send");
 
   const handleConfirm = async (): Promise<void> => {
     setIsSubmitting(true);
@@ -137,7 +141,9 @@ export function ModelCharacterSelectorModal({
               size="icon"
               variant="default"
               className="h-8 w-8 sm:h-9 sm:w-9 shrink-0"
-              title={isDisabled ? t("app.chat.common.sending") : finalConfirmLabel}
+              title={
+                isDisabled ? t("app.chat.common.sending") : finalConfirmLabel
+              }
             >
               <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>

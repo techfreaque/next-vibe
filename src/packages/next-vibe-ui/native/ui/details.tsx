@@ -13,9 +13,17 @@ import { convertCSSToViewStyle } from "../utils/style-converter";
 
 const StyledView = styled(View, { className: "style" });
 
-export function Details({ className, style, children, id, open }: DetailsProps): JSX.Element {
+export function Details({
+  className,
+  style,
+  children,
+  id,
+  open,
+}: DetailsProps): JSX.Element {
   const [isOpen, setIsOpen] = React.useState(open ?? false);
-  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
+  const nativeStyle: ViewStyle | undefined = style
+    ? convertCSSToViewStyle(style)
+    : undefined;
 
   // Update isOpen when open prop changes
   React.useEffect(() => {

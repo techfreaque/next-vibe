@@ -18,7 +18,8 @@ export const translations: typeof enTranslations = {
     },
     form: {
       title: "Operacje NOWPayments CLI",
-      description: "Konfiguruj i zarządzaj tunelem ngrok dla webhooków NOWPayments",
+      description:
+        "Konfiguruj i zarządzaj tunelem ngrok dla webhooków NOWPayments",
       fields: {
         operation: {
           label: "Operacja",

@@ -204,7 +204,9 @@ export function AutocompleteField<TKey extends string>({
             <CommandList className="max-h-[300px]">
               <CommandEmpty>
                 <div className="py-6 text-center text-sm">
-                  <p className="text-muted-foreground">{globalT("app.common.noOptionsFound")}</p>
+                  <p className="text-muted-foreground">
+                    {globalT("app.common.noOptionsFound")}
+                  </p>
                   {allowCustom && searchValue && (
                     <Button
                       variant="ghost"
@@ -220,46 +222,56 @@ export function AutocompleteField<TKey extends string>({
                 </div>
               </CommandEmpty>
 
-              {Object.entries(filteredGroups).map(([category, categoryOptions]) => (
-                <CommandGroup
-                  key={category}
-                  heading={
-                    category !== FormFieldCategory.OTHER.toString()
-                      ? globalT(
-                          CATEGORY_TRANSLATION_KEYS[category as FormFieldCategory] ||
-                            CATEGORY_TRANSLATION_KEYS[FormFieldCategory.OTHER],
-                        )
-                      : undefined
-                  }
-                >
-                  {categoryOptions.map((option) => (
+              {Object.entries(filteredGroups).map(
+                ([category, categoryOptions]) => (
+                  <CommandGroup
+                    key={category}
+                    heading={
+                      category !== FormFieldCategory.OTHER.toString()
+                        ? globalT(
+                            CATEGORY_TRANSLATION_KEYS[
+                              category as FormFieldCategory
+                            ] ||
+                              CATEGORY_TRANSLATION_KEYS[
+                                FormFieldCategory.OTHER
+                              ],
+                          )
+                        : undefined
+                    }
+                  >
+                    {categoryOptions.map((option) => (
+                      <CommandItem
+                        key={option.value}
+                        value={option.value}
+                        onSelect={() => handleSelect(option.value)}
+                        className="flex items-center justify-between"
+                      >
+                        <span>{t(option.label)}</span>
+                        {value === option.value && (
+                          <Check className="h-4 w-4" />
+                        )}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                ),
+              )}
+
+              {allowCustom &&
+                searchValue &&
+                Object.keys(filteredGroups).length === 0 && (
+                  <CommandGroup>
                     <CommandItem
-                      key={option.value}
-                      value={option.value}
-                      onSelect={() => handleSelect(option.value)}
+                      onSelect={() => handleCustomValue(searchValue)}
                       className="flex items-center justify-between"
                     >
-                      <span>{t(option.label)}</span>
-                      {value === option.value && <Check className="h-4 w-4" />}
+                      <span>
+                        {globalT("app.common.useCustomValue", {
+                          value: searchValue,
+                        })}
+                      </span>
                     </CommandItem>
-                  ))}
-                </CommandGroup>
-              ))}
-
-              {allowCustom && searchValue && Object.keys(filteredGroups).length === 0 && (
-                <CommandGroup>
-                  <CommandItem
-                    onSelect={() => handleCustomValue(searchValue)}
-                    className="flex items-center justify-between"
-                  >
-                    <span>
-                      {globalT("app.common.useCustomValue", {
-                        value: searchValue,
-                      })}
-                    </span>
-                  </CommandItem>
-                </CommandGroup>
-              )}
+                  </CommandGroup>
+                )}
             </CommandList>
           </Command>
         </PopoverContent>

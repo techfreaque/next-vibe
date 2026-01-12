@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.resize-page.description",
   category: "app.api.browser.category",
   icon: "maximize",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.viewportAutomation"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.viewportAutomation",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -52,8 +55,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.browser.resize-page.form.fields.width.label",
-          description: "app.api.browser.resize-page.form.fields.width.description",
-          placeholder: "app.api.browser.resize-page.form.fields.width.placeholder",
+          description:
+            "app.api.browser.resize-page.form.fields.width.description",
+          placeholder:
+            "app.api.browser.resize-page.form.fields.width.placeholder",
           columns: 6,
         },
         z.coerce.number().describe("Page width"),
@@ -63,8 +68,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.browser.resize-page.form.fields.height.label",
-          description: "app.api.browser.resize-page.form.fields.height.description",
-          placeholder: "app.api.browser.resize-page.form.fields.height.placeholder",
+          description:
+            "app.api.browser.resize-page.form.fields.height.description",
+          placeholder:
+            "app.api.browser.resize-page.form.fields.height.placeholder",
           columns: 6,
         },
         z.coerce.number().describe("Page height"),
@@ -136,7 +143,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.browser.resize-page.errors.unauthorized.title",
-      description: "app.api.browser.resize-page.errors.unauthorized.description",
+      description:
+        "app.api.browser.resize-page.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.browser.resize-page.errors.forbidden.title",
@@ -156,7 +164,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.resize-page.errors.unsavedChanges.title",
-      description: "app.api.browser.resize-page.errors.unsavedChanges.description",
+      description:
+        "app.api.browser.resize-page.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.resize-page.errors.conflict.title",

@@ -6,7 +6,8 @@ export const translations: typeof enTranslations = {
     "Ruft eine Netzwerk-Anfrage über eine optionale reqid ab, bei Weglassen wird die aktuell ausgewählte Anfrage im DevTools Network-Panel zurückgegeben",
   form: {
     label: "Netzwerk-Anfrage abrufen",
-    description: "Eine bestimmte Netzwerk-Anfrage oder die aktuell ausgewählte abrufen",
+    description:
+      "Eine bestimmte Netzwerk-Anfrage oder die aktuell ausgewählte abrufen",
     fields: {
       reqid: {
         label: "Anfrage-ID",
@@ -25,11 +26,13 @@ export const translations: typeof enTranslations = {
   errors: {
     validation: {
       title: "Validierungsfehler",
-      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description:
+        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
     },
     network: {
       title: "Netzwerkfehler",
-      description: "Ein Netzwerkfehler ist beim Abrufen der Netzwerk-Anfrage aufgetreten",
+      description:
+        "Ein Netzwerkfehler ist beim Abrufen der Netzwerk-Anfrage aufgetreten",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -45,19 +48,23 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Serverfehler",
-      description: "Ein interner Serverfehler ist beim Abrufen der Netzwerk-Anfrage aufgetreten",
+      description:
+        "Ein interner Serverfehler ist beim Abrufen der Netzwerk-Anfrage aufgetreten",
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description: "Ein unbekannter Fehler ist beim Abrufen der Netzwerk-Anfrage aufgetreten",
+      description:
+        "Ein unbekannter Fehler ist beim Abrufen der Netzwerk-Anfrage aufgetreten",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
+      description:
+        "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
     },
     conflict: {
       title: "Konflikt",
-      description: "Ein Konflikt ist beim Abrufen der Netzwerk-Anfrage aufgetreten",
+      description:
+        "Ein Konflikt ist beim Abrufen der Netzwerk-Anfrage aufgetreten",
     },
   },
   success: {

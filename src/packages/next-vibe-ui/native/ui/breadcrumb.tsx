@@ -27,13 +27,19 @@ import { convertCSSToViewStyle } from "../utils/style-converter";
 const StyledView = styled(View, { className: "style" });
 const StyledPressable = styledNative(Pressable);
 
-export function Breadcrumb({ className, style, children }: BreadcrumbProps): React.JSX.Element {
+export function Breadcrumb({
+  className,
+  style,
+  children,
+}: BreadcrumbProps): React.JSX.Element {
   const { t } = useTranslation();
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
     <StyledView
-      accessibilityLabel={t("packages.nextVibeUi.native.ui.breadcrumb.navigation")}
+      accessibilityLabel={t(
+        "packages.nextVibeUi.native.ui.breadcrumb.navigation",
+      )}
       {...applyStyleType({
         nativeStyle,
         className: cn(className),
@@ -119,7 +125,10 @@ export function BreadcrumbLink({
     }
   }, [onClick]);
 
-  const combinedClassName = cn("transition-colors active:text-foreground", className);
+  const combinedClassName = cn(
+    "transition-colors active:text-foreground",
+    className,
+  );
   const content =
     typeof children === "string" ? (
       <RNText className={cn("text-muted-foreground")}>{children}</RNText>
@@ -221,7 +230,9 @@ export function BreadcrumbEllipsis({
       accessibilityLabel={ariaLabel}
     >
       <RNText className={cn("text-muted-foreground")}>...</RNText>
-      <RNText className={cn("sr-only")}>{t("app.common.accessibility.srOnly.more")}</RNText>
+      <RNText className={cn("sr-only")}>
+        {t("app.common.accessibility.srOnly.more")}
+      </RNText>
     </StyledView>
   );
 }

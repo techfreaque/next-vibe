@@ -27,12 +27,21 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["agent", "speech-to-text"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC, UserRole.AI_TOOL_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.CUSTOMER,
+    UserRole.PUBLIC,
+    UserRole.AI_TOOL_OFF,
+  ],
   title: "app.api.agent.speechToText.post.title",
   description: "app.api.agent.speechToText.post.description",
   icon: "mic",
   category: "app.api.agent.category",
-  tags: ["app.api.agent.tags.speech", "app.api.agent.tags.transcription", "app.api.agent.tags.ai"],
+  tags: [
+    "app.api.agent.tags.speech",
+    "app.api.agent.tags.transcription",
+    "app.api.agent.tags.ai",
+  ],
 
   fields: objectField(
     {
@@ -66,15 +75,19 @@ const { POST } = createEndpoint({
             z
               .instanceof(File)
               .refine((file) => file.size <= 25 * 1024 * 1024, {
-                message: "app.api.agent.speechToText.post.audio.validation.maxSize",
+                message:
+                  "app.api.agent.speechToText.post.audio.validation.maxSize",
               })
               .refine(
                 (file) => {
                   const allowedTypes = ["audio/", "application/octet-stream"];
-                  return allowedTypes.some((type) => file.type.startsWith(type));
+                  return allowedTypes.some((type) =>
+                    file.type.startsWith(type),
+                  );
                 },
                 {
-                  message: "app.api.agent.speechToText.post.audio.validation.audioOnly",
+                  message:
+                    "app.api.agent.speechToText.post.audio.validation.audioOnly",
                 },
               ),
           ),
@@ -141,11 +154,13 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.agent.speechToText.post.errors.unauthorized.title",
-      description: "app.api.agent.speechToText.post.errors.unauthorized.description",
+      description:
+        "app.api.agent.speechToText.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.speechToText.post.errors.validation.title",
-      description: "app.api.agent.speechToText.post.errors.validation.description",
+      description:
+        "app.api.agent.speechToText.post.errors.validation.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.speechToText.post.errors.server.title",
@@ -157,7 +172,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.speechToText.post.errors.unauthorized.title",
-      description: "app.api.agent.speechToText.post.errors.unauthorized.description",
+      description:
+        "app.api.agent.speechToText.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.speechToText.post.errors.server.title",

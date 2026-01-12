@@ -34,7 +34,9 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.METRIC_CARD> {
+export class MetricWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.METRIC_CARD
+> {
   readonly widgetType = WidgetType.METRIC_CARD;
 
   /**
@@ -55,11 +57,10 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
 
     // Validate format against allowed values
     const validFormats = ["bytes", "currency", "number", "percentage"] as const;
-    const validatedFormat: "bytes" | "currency" | "number" | "percentage" = validFormats.includes(
-      format as (typeof validFormats)[number],
-    )
-      ? (format as (typeof validFormats)[number])
-      : "number";
+    const validatedFormat: "bytes" | "currency" | "number" | "percentage" =
+      validFormats.includes(format as (typeof validFormats)[number])
+        ? (format as (typeof validFormats)[number])
+        : "number";
 
     const config = {
       icon,
@@ -77,7 +78,8 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     if (data) {
       // Use extracted data for standard metric card
       const formattedValue = formatMetricValue(data.value);
-      const iconStr = context.options.useEmojis && data.icon ? `${data.icon} ` : "";
+      const iconStr =
+        context.options.useEmojis && data.icon ? `${data.icon} ` : "";
       return `${indent}${iconStr}${data.label}: ${formattedValue}`;
     }
 
@@ -117,7 +119,11 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     for (const [key, val] of Object.entries(value)) {
       if (isWidgetDataPrimitive(val) && val !== null && val !== undefined) {
         const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
-        const formattedValue = this.formatMetricValueLocal(val, config, context);
+        const formattedValue = this.formatMetricValueLocal(
+          val,
+          config,
+          context,
+        );
         const icon = this.getMetricIcon(config, val, context);
         lines.push(`${indent}${icon}${formattedKey}: ${formattedValue}`);
       }
@@ -202,7 +208,11 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     >,
     context: WidgetRenderContext,
   ): string {
-    if (!isWidgetDataPrimitive(value) || value === null || value === undefined) {
+    if (
+      !isWidgetDataPrimitive(value) ||
+      value === null ||
+      value === undefined
+    ) {
       return String(value);
     }
     if (!isWidgetDataNumber(value)) {
@@ -257,7 +267,11 @@ export class MetricWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.M
     value: WidgetData,
     context: WidgetRenderContext,
   ): string {
-    if (!isWidgetDataPrimitive(value) || value === null || value === undefined) {
+    if (
+      !isWidgetDataPrimitive(value) ||
+      value === null ||
+      value === undefined
+    ) {
       return "";
     }
     if (!context.options.useEmojis) {

@@ -39,7 +39,9 @@ export class WidgetErrorBoundary extends Component<
     };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<WidgetErrorBoundaryState> {
+  static getDerivedStateFromError(
+    error: Error,
+  ): Partial<WidgetErrorBoundaryState> {
     return {
       hasError: true,
       error,
@@ -76,16 +78,22 @@ export class WidgetErrorBoundary extends Component<
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>
-            {t("app.api.system.unifiedInterface.react.widgets.errorBoundary.title")}
+            {t(
+              "app.api.system.unifiedInterface.react.widgets.errorBoundary.title",
+            )}
           </AlertTitle>
           <AlertDescription>
             {this.state.error?.message ||
-              t("app.api.system.unifiedInterface.react.widgets.errorBoundary.defaultMessage")}
+              t(
+                "app.api.system.unifiedInterface.react.widgets.errorBoundary.defaultMessage",
+              )}
             {this.state.errorInfo && (
               <Accordion type="single" collapsible className="mt-2 text-xs">
                 <AccordionItem value="details">
                   <AccordionTrigger>
-                    {t("app.api.system.unifiedInterface.react.widgets.errorBoundary.errorDetails")}
+                    {t(
+                      "app.api.system.unifiedInterface.react.widgets.errorBoundary.errorDetails",
+                    )}
                   </AccordionTrigger>
                   <AccordionContent>
                     <Pre className="mt-2 overflow-auto p-2 bg-muted rounded">

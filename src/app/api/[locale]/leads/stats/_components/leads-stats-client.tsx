@@ -23,7 +23,10 @@ interface LeadsStatsClientProps {
   user: JwtPayloadType;
 }
 
-export function LeadsStatsClient({ locale, user }: LeadsStatsClientProps): JSX.Element {
+export function LeadsStatsClient({
+  locale,
+  user,
+}: LeadsStatsClientProps): JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
   const endpoint = useLeadsStatsEndpoint(logger);
@@ -50,7 +53,11 @@ export function LeadsStatsClient({ locale, user }: LeadsStatsClientProps): JSX.E
             onSubmit={handleSubmit}
             locale={locale}
             isSubmitting={endpoint.read.isLoading || false}
-            data={endpoint.read.response?.success ? endpoint.read.response.data : undefined}
+            data={
+              endpoint.read.response?.success
+                ? endpoint.read.response.data
+                : undefined
+            }
             submitButtonText="app.admin.common.actions.filter"
             logger={logger}
           />

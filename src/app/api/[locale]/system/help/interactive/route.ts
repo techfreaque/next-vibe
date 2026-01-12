@@ -5,7 +5,10 @@
 
 import "server-only";
 
-import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 
 import type { CliCompatiblePlatform } from "@/app/api/[locale]/system/unified-interface/cli/runtime/route-executor";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
@@ -22,7 +25,9 @@ const CLI_PLATFORMS: readonly Platform[] = [
   Platform.MCP,
 ];
 
-function isCliCompatiblePlatform(platform: Platform): platform is CliCompatiblePlatform {
+function isCliCompatiblePlatform(
+  platform: Platform,
+): platform is CliCompatiblePlatform {
   return CLI_PLATFORMS.includes(platform);
 }
 
@@ -37,7 +42,12 @@ export const { POST, tools } = endpointsHandler({
         });
       }
 
-      return interactiveRepository.startInteractiveMode(user, locale, logger, platform);
+      return interactiveRepository.startInteractiveMode(
+        user,
+        locale,
+        logger,
+        platform,
+      );
     },
   },
 });

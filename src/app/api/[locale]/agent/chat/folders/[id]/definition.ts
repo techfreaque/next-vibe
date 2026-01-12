@@ -43,7 +43,8 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.agent.chat.folders.id.get.container.title" as const,
-      description: "app.api.agent.chat.folders.id.get.container.description" as const,
+      description:
+        "app.api.agent.chat.folders.id.get.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
@@ -54,7 +55,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.agent.chat.folders.id.get.id.label" as const,
-          description: "app.api.agent.chat.folders.id.get.id.description" as const,
+          description:
+            "app.api.agent.chat.folders.id.get.id.description" as const,
         },
         z.uuid(),
       ),
@@ -64,7 +66,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.agent.chat.folders.id.get.response.title" as const,
-          description: "app.api.agent.chat.folders.id.get.response.description" as const,
+          description:
+            "app.api.agent.chat.folders.id.get.response.description" as const,
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -72,7 +75,8 @@ const { GET } = createEndpoint({
           folder: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.agent.chat.folders.id.get.response.folder.title" as const,
+              title:
+                "app.api.agent.chat.folders.id.get.response.folder.title" as const,
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -81,7 +85,8 @@ const { GET } = createEndpoint({
               id: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.agent.chat.folders.id.get.response.folder.id.content" as const,
+                  content:
+                    "app.api.agent.chat.folders.id.get.response.folder.id.content" as const,
                 },
                 z.uuid(),
               ),
@@ -246,39 +251,48 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.chat.folders.id.get.errors.validation.title",
-      description: "app.api.agent.chat.folders.id.get.errors.validation.description",
+      description:
+        "app.api.agent.chat.folders.id.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.agent.chat.folders.id.get.errors.unauthorized.title",
-      description: "app.api.agent.chat.folders.id.get.errors.unauthorized.description",
+      description:
+        "app.api.agent.chat.folders.id.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.folders.id.get.errors.forbidden.title",
-      description: "app.api.agent.chat.folders.id.get.errors.forbidden.description",
+      description:
+        "app.api.agent.chat.folders.id.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.folders.id.get.errors.notFound.title",
-      description: "app.api.agent.chat.folders.id.get.errors.notFound.description",
+      description:
+        "app.api.agent.chat.folders.id.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.folders.id.get.errors.server.title",
-      description: "app.api.agent.chat.folders.id.get.errors.server.description",
+      description:
+        "app.api.agent.chat.folders.id.get.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.chat.folders.id.get.errors.network.title",
-      description: "app.api.agent.chat.folders.id.get.errors.network.description",
+      description:
+        "app.api.agent.chat.folders.id.get.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.agent.chat.folders.id.get.errors.unknown.title",
-      description: "app.api.agent.chat.folders.id.get.errors.unknown.description",
+      description:
+        "app.api.agent.chat.folders.id.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.agent.chat.folders.id.get.errors.unsavedChanges.title",
-      description: "app.api.agent.chat.folders.id.get.errors.unsavedChanges.description",
+      description:
+        "app.api.agent.chat.folders.id.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.folders.id.get.errors.conflict.title",
-      description: "app.api.agent.chat.folders.id.get.errors.conflict.description",
+      description:
+        "app.api.agent.chat.folders.id.get.errors.conflict.description",
     },
   },
 
@@ -338,7 +352,8 @@ const { PATCH } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.agent.chat.folders.id.patch.container.title" as const,
-      description: "app.api.agent.chat.folders.id.patch.container.description" as const,
+      description:
+        "app.api.agent.chat.folders.id.patch.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { request: "data&urlPathParams", response: true },
@@ -349,7 +364,8 @@ const { PATCH } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.agent.chat.folders.id.patch.id.label" as const,
-          description: "app.api.agent.chat.folders.id.patch.id.description" as const,
+          description:
+            "app.api.agent.chat.folders.id.patch.id.description" as const,
         },
         z.uuid(),
       ),
@@ -358,8 +374,10 @@ const { PATCH } = createEndpoint({
       updates: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.agent.chat.folders.id.patch.sections.updates.title" as const,
-          description: "app.api.agent.chat.folders.id.patch.sections.updates.description" as const,
+          title:
+            "app.api.agent.chat.folders.id.patch.sections.updates.title" as const,
+          description:
+            "app.api.agent.chat.folders.id.patch.sections.updates.description" as const,
           layoutType: LayoutType.GRID,
           columns: 2,
         },
@@ -370,7 +388,8 @@ const { PATCH } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.agent.chat.folders.id.patch.name.label" as const,
-              description: "app.api.agent.chat.folders.id.patch.name.description" as const,
+              description:
+                "app.api.agent.chat.folders.id.patch.name.description" as const,
               columns: 12,
             },
             z.string().min(1).max(255).optional(),
@@ -380,7 +399,8 @@ const { PATCH } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.agent.chat.folders.id.patch.icon.label" as const,
-              description: "app.api.agent.chat.folders.id.patch.icon.description" as const,
+              description:
+                "app.api.agent.chat.folders.id.patch.icon.description" as const,
               columns: 6,
             },
             // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null | undefined
@@ -391,7 +411,8 @@ const { PATCH } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.agent.chat.folders.id.patch.color.label" as const,
-              description: "app.api.agent.chat.folders.id.patch.color.description" as const,
+              description:
+                "app.api.agent.chat.folders.id.patch.color.description" as const,
               columns: 6,
             },
             z.string().optional(),
@@ -400,8 +421,10 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.UUID,
-              label: "app.api.agent.chat.folders.id.patch.parentId.label" as const,
-              description: "app.api.agent.chat.folders.id.patch.parentId.description" as const,
+              label:
+                "app.api.agent.chat.folders.id.patch.parentId.label" as const,
+              description:
+                "app.api.agent.chat.folders.id.patch.parentId.description" as const,
               columns: 6,
             },
             z.uuid().nullable().optional(),
@@ -410,8 +433,10 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.agent.chat.folders.id.patch.expanded.label" as const,
-              description: "app.api.agent.chat.folders.id.patch.expanded.description" as const,
+              label:
+                "app.api.agent.chat.folders.id.patch.expanded.label" as const,
+              description:
+                "app.api.agent.chat.folders.id.patch.expanded.description" as const,
               columns: 6,
             },
             z.boolean().optional(),
@@ -420,8 +445,10 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
-              label: "app.api.agent.chat.folders.id.patch.sortOrder.label" as const,
-              description: "app.api.agent.chat.folders.id.patch.sortOrder.description" as const,
+              label:
+                "app.api.agent.chat.folders.id.patch.sortOrder.label" as const,
+              description:
+                "app.api.agent.chat.folders.id.patch.sortOrder.description" as const,
               columns: 6,
             },
             z.coerce.number().optional(),
@@ -430,8 +457,10 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.agent.chat.folders.id.patch.rolesView.label" as const,
-              description: "app.api.agent.chat.folders.id.patch.rolesView.description" as const,
+              label:
+                "app.api.agent.chat.folders.id.patch.rolesView.label" as const,
+              description:
+                "app.api.agent.chat.folders.id.patch.rolesView.description" as const,
               columns: 6,
               options: UserPermissionRoleOptions,
             },
@@ -441,8 +470,10 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.agent.chat.folders.id.patch.rolesManage.label" as const,
-              description: "app.api.agent.chat.folders.id.patch.rolesManage.description" as const,
+              label:
+                "app.api.agent.chat.folders.id.patch.rolesManage.label" as const,
+              description:
+                "app.api.agent.chat.folders.id.patch.rolesManage.description" as const,
               columns: 6,
               options: UserPermissionRoleOptions,
             },
@@ -452,7 +483,8 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.agent.chat.folders.id.patch.rolesCreateThread.label" as const,
+              label:
+                "app.api.agent.chat.folders.id.patch.rolesCreateThread.label" as const,
               description:
                 "app.api.agent.chat.folders.id.patch.rolesCreateThread.description" as const,
               columns: 6,
@@ -464,8 +496,10 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.agent.chat.folders.id.patch.rolesPost.label" as const,
-              description: "app.api.agent.chat.folders.id.patch.rolesPost.description" as const,
+              label:
+                "app.api.agent.chat.folders.id.patch.rolesPost.label" as const,
+              description:
+                "app.api.agent.chat.folders.id.patch.rolesPost.description" as const,
               columns: 6,
               options: UserPermissionRoleOptions,
             },
@@ -475,8 +509,10 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.agent.chat.folders.id.patch.rolesModerate.label" as const,
-              description: "app.api.agent.chat.folders.id.patch.rolesModerate.description" as const,
+              label:
+                "app.api.agent.chat.folders.id.patch.rolesModerate.label" as const,
+              description:
+                "app.api.agent.chat.folders.id.patch.rolesModerate.description" as const,
               columns: 6,
               options: UserPermissionRoleOptions,
             },
@@ -486,8 +522,10 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
-              label: "app.api.agent.chat.folders.id.patch.rolesAdmin.label" as const,
-              description: "app.api.agent.chat.folders.id.patch.rolesAdmin.description" as const,
+              label:
+                "app.api.agent.chat.folders.id.patch.rolesAdmin.label" as const,
+              description:
+                "app.api.agent.chat.folders.id.patch.rolesAdmin.description" as const,
               columns: 6,
               options: UserPermissionRoleOptions,
             },
@@ -501,7 +539,8 @@ const { PATCH } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.agent.chat.folders.id.patch.response.title" as const,
-          description: "app.api.agent.chat.folders.id.patch.response.description" as const,
+          description:
+            "app.api.agent.chat.folders.id.patch.response.description" as const,
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -509,7 +548,8 @@ const { PATCH } = createEndpoint({
           folder: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.agent.chat.folders.id.patch.response.folder.title" as const,
+              title:
+                "app.api.agent.chat.folders.id.patch.response.folder.title" as const,
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -684,39 +724,48 @@ const { PATCH } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.chat.folders.id.patch.errors.validation.title",
-      description: "app.api.agent.chat.folders.id.patch.errors.validation.description",
+      description:
+        "app.api.agent.chat.folders.id.patch.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.agent.chat.folders.id.patch.errors.unauthorized.title",
-      description: "app.api.agent.chat.folders.id.patch.errors.unauthorized.description",
+      description:
+        "app.api.agent.chat.folders.id.patch.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.folders.id.patch.errors.forbidden.title",
-      description: "app.api.agent.chat.folders.id.patch.errors.forbidden.description",
+      description:
+        "app.api.agent.chat.folders.id.patch.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.folders.id.patch.errors.notFound.title",
-      description: "app.api.agent.chat.folders.id.patch.errors.notFound.description",
+      description:
+        "app.api.agent.chat.folders.id.patch.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.folders.id.patch.errors.server.title",
-      description: "app.api.agent.chat.folders.id.patch.errors.server.description",
+      description:
+        "app.api.agent.chat.folders.id.patch.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.chat.folders.id.patch.errors.network.title",
-      description: "app.api.agent.chat.folders.id.patch.errors.network.description",
+      description:
+        "app.api.agent.chat.folders.id.patch.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.agent.chat.folders.id.patch.errors.unknown.title",
-      description: "app.api.agent.chat.folders.id.patch.errors.unknown.description",
+      description:
+        "app.api.agent.chat.folders.id.patch.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.agent.chat.folders.id.patch.errors.unsavedChanges.title",
-      description: "app.api.agent.chat.folders.id.patch.errors.unsavedChanges.description",
+      description:
+        "app.api.agent.chat.folders.id.patch.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.folders.id.patch.errors.conflict.title",
-      description: "app.api.agent.chat.folders.id.patch.errors.conflict.description",
+      description:
+        "app.api.agent.chat.folders.id.patch.errors.conflict.description",
     },
   },
 
@@ -784,7 +833,8 @@ const { DELETE } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.agent.chat.folders.id.delete.container.title" as const,
-      description: "app.api.agent.chat.folders.id.delete.container.description" as const,
+      description:
+        "app.api.agent.chat.folders.id.delete.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { request: "urlPathParams", response: true },
@@ -795,7 +845,8 @@ const { DELETE } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.agent.chat.folders.id.delete.id.label" as const,
-          description: "app.api.agent.chat.folders.id.delete.id.description" as const,
+          description:
+            "app.api.agent.chat.folders.id.delete.id.description" as const,
         },
         z.uuid(),
       ),
@@ -805,7 +856,8 @@ const { DELETE } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.agent.chat.folders.id.delete.response.title" as const,
-          description: "app.api.agent.chat.folders.id.delete.response.description" as const,
+          description:
+            "app.api.agent.chat.folders.id.delete.response.description" as const,
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -813,7 +865,8 @@ const { DELETE } = createEndpoint({
           success: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.agent.chat.folders.id.delete.response.success.content" as const,
+              content:
+                "app.api.agent.chat.folders.id.delete.response.success.content" as const,
             },
             z.boolean(),
           ),
@@ -833,39 +886,48 @@ const { DELETE } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.chat.folders.id.delete.errors.validation.title",
-      description: "app.api.agent.chat.folders.id.delete.errors.validation.description",
+      description:
+        "app.api.agent.chat.folders.id.delete.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.agent.chat.folders.id.delete.errors.unauthorized.title",
-      description: "app.api.agent.chat.folders.id.delete.errors.unauthorized.description",
+      description:
+        "app.api.agent.chat.folders.id.delete.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.folders.id.delete.errors.forbidden.title",
-      description: "app.api.agent.chat.folders.id.delete.errors.forbidden.description",
+      description:
+        "app.api.agent.chat.folders.id.delete.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.folders.id.delete.errors.notFound.title",
-      description: "app.api.agent.chat.folders.id.delete.errors.notFound.description",
+      description:
+        "app.api.agent.chat.folders.id.delete.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.folders.id.delete.errors.server.title",
-      description: "app.api.agent.chat.folders.id.delete.errors.server.description",
+      description:
+        "app.api.agent.chat.folders.id.delete.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.chat.folders.id.delete.errors.network.title",
-      description: "app.api.agent.chat.folders.id.delete.errors.network.description",
+      description:
+        "app.api.agent.chat.folders.id.delete.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.agent.chat.folders.id.delete.errors.unknown.title",
-      description: "app.api.agent.chat.folders.id.delete.errors.unknown.description",
+      description:
+        "app.api.agent.chat.folders.id.delete.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.agent.chat.folders.id.delete.errors.unsavedChanges.title",
-      description: "app.api.agent.chat.folders.id.delete.errors.unsavedChanges.description",
+      description:
+        "app.api.agent.chat.folders.id.delete.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.folders.id.delete.errors.conflict.title",
-      description: "app.api.agent.chat.folders.id.delete.errors.conflict.description",
+      description:
+        "app.api.agent.chat.folders.id.delete.errors.conflict.description",
     },
   },
 
@@ -901,13 +963,15 @@ export type FolderUpdateRequestInput = typeof PATCH.types.RequestInput;
 export type FolderUpdateRequestOutput = typeof PATCH.types.RequestOutput;
 export type FolderUpdateResponseInput = typeof PATCH.types.ResponseInput;
 export type FolderUpdateResponseOutput = typeof PATCH.types.ResponseOutput;
-export type FolderUpdateUrlParamsTypeOutput = typeof PATCH.types.UrlVariablesOutput;
+export type FolderUpdateUrlParamsTypeOutput =
+  typeof PATCH.types.UrlVariablesOutput;
 
 export type FolderDeleteRequestInput = typeof DELETE.types.RequestInput;
 export type FolderDeleteRequestOutput = typeof DELETE.types.RequestOutput;
 export type FolderDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type FolderDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
-export type FolderDeleteUrlParamsTypeOutput = typeof DELETE.types.UrlVariablesOutput;
+export type FolderDeleteUrlParamsTypeOutput =
+  typeof DELETE.types.UrlVariablesOutput;
 
 const definitions = { GET, PATCH, DELETE } as const;
 export default definitions;

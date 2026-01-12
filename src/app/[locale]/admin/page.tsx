@@ -28,7 +28,9 @@ export default async function AdminDashboardPage({
         <H1 className="text-3xl font-bold text-gray-900 dark:text-white">
           {t("app.admin.dashboard.title")}
         </H1>
-        <P className="mt-2 text-gray-600 dark:text-gray-400">{t("app.admin.dashboard.subtitle")}</P>
+        <P className="mt-2 text-gray-600 dark:text-gray-400">
+          {t("app.admin.dashboard.subtitle")}
+        </P>
       </Div>
     </Div>
   );

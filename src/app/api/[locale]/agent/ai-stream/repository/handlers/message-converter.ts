@@ -46,7 +46,8 @@ export class MessageConverter {
           message.metadata.attachments.length > 0
         ) {
           const contentParts: Array<
-            { type: "text"; text: string } | { type: "image"; image: string | URL }
+            | { type: "text"; text: string }
+            | { type: "image"; image: string | URL }
           > = [];
 
           // Add text content if present
@@ -71,11 +72,14 @@ export class MessageConverter {
                   base64Data = Buffer.from(buffer).toString("base64");
                 }
               } catch (error) {
-                logger.error("[MessageConverter] Failed to fetch attachment for AI context", {
-                  attachmentId: attachment.id,
-                  filename: attachment.filename,
-                  error: parseError(error),
-                });
+                logger.error(
+                  "[MessageConverter] Failed to fetch attachment for AI context",
+                  {
+                    attachmentId: attachment.id,
+                    filename: attachment.filename,
+                    error: parseError(error),
+                  },
+                );
               }
             }
 
@@ -93,7 +97,9 @@ export class MessageConverter {
               ) {
                 // Text files: Decode and add as text part
                 try {
-                  const decoded = Buffer.from(base64Data, "base64").toString("utf-8");
+                  const decoded = Buffer.from(base64Data, "base64").toString(
+                    "utf-8",
+                  );
                   contentParts.push({
                     type: "text",
                     text: `\n\n[File: ${attachment.filename}]\n${decoded}\n[End of file]`,
@@ -141,7 +147,9 @@ export class MessageConverter {
             const output = toolCall.error
               ? {
                   type: "error-text" as const,
-                  value: MessageConverter.translateErrorRecursive(toolCall.error),
+                  value: MessageConverter.translateErrorRecursive(
+                    toolCall.error,
+                  ),
                 }
               : { type: "json" as const, value: toolCall.result ?? null };
 
@@ -187,9 +195,14 @@ export class MessageConverter {
           }
         }
         // Skip TOOL messages without toolCall metadata
-        logger.error("[MessageConverter] TOOL message without toolCall metadata", {
-          messageId: MessageConverter.isChatMessage(message) ? message.id : "unknown",
-        });
+        logger.error(
+          "[MessageConverter] TOOL message without toolCall metadata",
+          {
+            messageId: MessageConverter.isChatMessage(message)
+              ? message.id
+              : "unknown",
+          },
+        );
         return null;
       case ChatMessageRole.ERROR: {
         // ERROR messages contain serialized MessageResponseType
@@ -208,10 +221,13 @@ export class MessageConverter {
             role: "assistant",
           };
         } catch (error) {
-          logger.error("[MessageConverter] Failed to deserialize error message", {
-            error: parseError(error),
-            content: message.content,
-          });
+          logger.error(
+            "[MessageConverter] Failed to deserialize error message",
+            {
+              error: parseError(error),
+              content: message.content,
+            },
+          );
           return {
             content: message.content,
             role: "assistant",
@@ -236,7 +252,11 @@ export class MessageConverter {
       const msg = messages[i];
 
       // Check if this is the start of a TOOL message sequence (multiple consecutive tool calls)
-      if (msg.role === ChatMessageRole.TOOL && "metadata" in msg && msg.metadata?.toolCall) {
+      if (
+        msg.role === ChatMessageRole.TOOL &&
+        "metadata" in msg &&
+        msg.metadata?.toolCall
+      ) {
         // Look ahead to find all consecutive TOOL messages
         const toolMessages: ChatMessage[] = [msg];
         let j = i + 1;
@@ -289,7 +309,9 @@ export class MessageConverter {
             const output = toolCall.error
               ? {
                   type: "error-text" as const,
-                  value: MessageConverter.translateErrorRecursive(toolCall.error),
+                  value: MessageConverter.translateErrorRecursive(
+                    toolCall.error,
+                  ),
                 }
               : { type: "json" as const, value: toolCall.result ?? null };
 
@@ -315,10 +337,13 @@ export class MessageConverter {
             role: "assistant",
             content: [{ type: "text", text: textContent }, ...toolCallContent],
           };
-          logger.debug("[MessageConverter] Merged tool calls into text assistant message", {
-            toolCount: toolMessages.length,
-            resultCount: toolResultMessages.length,
-          });
+          logger.debug(
+            "[MessageConverter] Merged tool calls into text assistant message",
+            {
+              toolCount: toolMessages.length,
+              resultCount: toolResultMessages.length,
+            },
+          );
         } else {
           // Create new assistant message with just tool calls
           // AI SDK format: assistant message with only tool-call content parts
@@ -326,10 +351,13 @@ export class MessageConverter {
             role: "assistant",
             content: toolCallContent,
           });
-          logger.debug("[MessageConverter] Created assistant message with tool calls", {
-            toolCount: toolMessages.length,
-            resultCount: toolResultMessages.length,
-          });
+          logger.debug(
+            "[MessageConverter] Created assistant message with tool calls",
+            {
+              toolCount: toolMessages.length,
+              resultCount: toolResultMessages.length,
+            },
+          );
         }
 
         // Add all TOOL result messages (one message per result)
@@ -343,7 +371,8 @@ export class MessageConverter {
       // Only for full ChatMessage objects (not simple { role, content } objects)
       if (
         MessageConverter.isChatMessage(msg) &&
-        (msg.role === ChatMessageRole.USER || msg.role === ChatMessageRole.ASSISTANT)
+        (msg.role === ChatMessageRole.USER ||
+          msg.role === ChatMessageRole.ASSISTANT)
       ) {
         const metadataContent = createMetadataSystemMessage(msg, rootFolderId);
         result.push({
@@ -375,7 +404,9 @@ export class MessageConverter {
     const mainMessage = t(error.message, error.messageParams);
 
     if (error.cause) {
-      const causeMessage = MessageConverter.translateErrorRecursive(error.cause);
+      const causeMessage = MessageConverter.translateErrorRecursive(
+        error.cause,
+      );
       return `${mainMessage}\n\nCause: ${causeMessage}`;
     }
 

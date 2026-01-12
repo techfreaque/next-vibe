@@ -29,7 +29,11 @@ export function useFavorites<T extends string>(
           const parsed = JSON.parse(stored) as T[];
           setFavoritesState(parsed);
         } catch (error) {
-          logger.error("Storage", `Failed to load favorites from ${storageKey}`, parseError(error));
+          logger.error(
+            "Storage",
+            `Failed to load favorites from ${storageKey}`,
+            parseError(error),
+          );
         }
       }
     }
@@ -45,7 +49,11 @@ export function useFavorites<T extends string>(
           try {
             await storage.setItem(storageKey, JSON.stringify(newFavorites));
           } catch (error) {
-            logger.error("Storage", `Failed to save favorites to ${storageKey}`, parseError(error));
+            logger.error(
+              "Storage",
+              `Failed to save favorites to ${storageKey}`,
+              parseError(error),
+            );
           }
         })();
       }

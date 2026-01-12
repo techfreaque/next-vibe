@@ -48,7 +48,9 @@ export function useToast(): {
         setToasts((prev) => prev.filter((t) => t.id !== id));
       },
       update: (newProps: Partial<Toast>): void => {
-        setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, ...newProps } : t)));
+        setToasts((prev) =>
+          prev.map((t) => (t.id === id ? { ...t, ...newProps } : t)),
+        );
       },
     };
   }, []);

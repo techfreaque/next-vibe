@@ -18,7 +18,10 @@ import definitions from "./definition";
  * - Fetches full favorite details including all configuration
  * - Returns complete favorite data for editing
  */
-export function useFavorite(favoriteId: string, logger: EndpointLogger): FavoriteEndpointReturn {
+export function useFavorite(
+  favoriteId: string,
+  logger: EndpointLogger,
+): FavoriteEndpointReturn {
   return useEndpoint(
     definitions,
     {

@@ -27,7 +27,10 @@ export default function TrackPage(): React.ReactElement {
   const ref = searchParams.get("ref") ?? undefined;
   const campaignId = searchParams.get("campaignId") ?? undefined;
 
-  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
 
   // Single API call - handles both tracking (with id) and ref-only cases server-side
   useApiQuery({
@@ -56,7 +59,9 @@ export default function TrackPage(): React.ReactElement {
     <Div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <Div className="text-center">
         <Div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
-        <P className="text-gray-600 dark:text-gray-400">{t("app.track.tracking.redirecting")}</P>
+        <P className="text-gray-600 dark:text-gray-400">
+          {t("app.track.tracking.redirecting")}
+        </P>
       </Div>
     </Div>
   );

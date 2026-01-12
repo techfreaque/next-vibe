@@ -13,7 +13,11 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     handler: async ({ user, locale, logger }) => {
-      return await CreditRepository.getCreditBalanceForUser(user, locale, logger);
+      return await CreditRepository.getCreditBalanceForUser(
+        user,
+        locale,
+        logger,
+      );
     },
   },
 });

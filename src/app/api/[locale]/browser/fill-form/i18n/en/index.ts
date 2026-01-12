@@ -65,7 +65,8 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred during the form fill operation",
+      description:
+        "An internal server error occurred during the form fill operation",
     },
     unknown: {
       title: "Unknown Error",

@@ -37,7 +37,8 @@ export const translations = {
       advancedSettings: "Advanced Settings",
       advancedSettingsDescription: "Configure timeouts, limits, and priority",
       selectionCriteria: "Selection Criteria",
-      selectionCriteriaDescription: "Configure automatic account selection rules",
+      selectionCriteriaDescription:
+        "Configure automatic account selection rules",
     },
     fields: {
       name: "Account Name",
@@ -85,11 +86,13 @@ export const translations = {
       failoverPriority: "Failover Priority",
       failoverPriorityPlaceholder: "0-100 (higher = used first in failover)",
       isExactMatch: "Exact Match Only",
-      isExactMatchDescription: "Only use this account for exact criteria matches",
+      isExactMatchDescription:
+        "Only use this account for exact criteria matches",
       isFailover: "Failover Account",
       isFailoverDescription: "Use this account when primary accounts fail",
       campaignTypes: "Campaign Types",
-      campaignTypesDescription: "Select which campaign types can use this account",
+      campaignTypesDescription:
+        "Select which campaign types can use this account",
       campaignTypesPlaceholder: "Configure campaign type restrictions",
       countries: "Countries",
       countriesDescription: "Select which countries can use this account",
@@ -99,10 +102,12 @@ export const translations = {
       languagesPlaceholder: "Configure language restrictions",
       // New multi-select fields
       emailJourneyVariants: "Email Journey Variants",
-      emailJourneyVariantsDescription: "Select which email journey variants can use this account",
+      emailJourneyVariantsDescription:
+        "Select which email journey variants can use this account",
       emailJourneyVariantsPlaceholder: "Select journey variants",
       emailCampaignStages: "Email Campaign Stages",
-      emailCampaignStagesDescription: "Select which campaign stages can use this account",
+      emailCampaignStagesDescription:
+        "Select which campaign stages can use this account",
       emailCampaignStagesPlaceholder: "Select campaign stages",
     },
     // Campaign type options
@@ -266,7 +271,8 @@ export const translations = {
       },
       unknown: {
         title: "Search Error",
-        description: "An unexpected error occurred while searching SMTP accounts.",
+        description:
+          "An unexpected error occurred while searching SMTP accounts.",
       },
     },
     success: {

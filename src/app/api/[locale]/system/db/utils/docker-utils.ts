@@ -18,7 +18,9 @@ const HIDDEN_DOCKER_LOG_PATTERNS = [
  * Check if a log line should be hidden
  */
 function shouldHideLogLine(line: string): boolean {
-  return HIDDEN_DOCKER_LOG_PATTERNS.some((pattern) => pattern.test(line.trim()));
+  return HIDDEN_DOCKER_LOG_PATTERNS.some((pattern) =>
+    pattern.test(line.trim()),
+  );
 }
 
 /**

@@ -198,7 +198,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt usuwania",
-        description: "Nie można usunąć zadania, które jest obecnie przetwarzane",
+        description:
+          "Nie można usunąć zadania, które jest obecnie przetwarzane",
       },
     },
     success: {

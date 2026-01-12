@@ -4,7 +4,11 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -70,7 +74,8 @@ export class BuildExecutor implements IBuildExecutor {
 
     // Extract config from configObject (new structure)
     const configObject = data.configObject;
-    const profile: BuildProfile = (configObject?.profile as BuildProfile) || "development";
+    const profile: BuildProfile =
+      (configObject?.profile as BuildProfile) || "development";
     const useParallel = configObject?.parallel !== false;
     const dryRun = configObject?.dryRun;
     const verbose = configObject?.verbose;
@@ -97,7 +102,9 @@ export class BuildExecutor implements IBuildExecutor {
         data.configPath,
         {
           foldersToClean: configObject?.foldersToClean,
-          filesToCompile: configObject?.filesToCompile as FileToCompile[] | undefined,
+          filesToCompile: configObject?.filesToCompile as
+            | FileToCompile[]
+            | undefined,
           filesOrFoldersToCopy: configObject?.filesOrFoldersToCopy ?? undefined,
           npmPackage: configObject?.npmPackage ?? undefined,
         },
@@ -115,9 +122,13 @@ export class BuildExecutor implements IBuildExecutor {
       }
 
       // Apply profile-specific settings
-      let buildConfig = profileService.applySettings(configResult.data, profile, {
-        minify,
-      });
+      let buildConfig = profileService.applySettings(
+        configResult.data,
+        profile,
+        {
+          minify,
+        },
+      );
 
       // Validate configuration
       const validation = configValidator.validate(buildConfig, t);
@@ -136,27 +147,40 @@ export class BuildExecutor implements IBuildExecutor {
 
       // Dry run notice
       if (dryRun) {
-        output.push(outputFormatter.formatWarning(t("app.api.system.builder.messages.dryRunMode")));
+        output.push(
+          outputFormatter.formatWarning(
+            t("app.api.system.builder.messages.dryRunMode"),
+          ),
+        );
       }
 
       // Execute pre-build hook
       if (buildConfig.hooks?.preBuild) {
         output.push(
-          outputFormatter.formatStep(t("app.api.system.builder.messages.runningPreBuild")),
+          outputFormatter.formatStep(
+            t("app.api.system.builder.messages.runningPreBuild"),
+          ),
         );
         await buildConfig.hooks.preBuild({
           config: buildConfig,
           profile,
           outputDir: buildConfig.foldersToClean?.[0] || "dist",
           logger,
-          addOutput: (msg) => output.push(outputFormatter.formatItem("hook", msg)),
+          addOutput: (msg) =>
+            output.push(outputFormatter.formatItem("hook", msg)),
         });
       }
 
       // Step 1: Clean folders
       if (buildConfig.foldersToClean?.length) {
         const stepStart = Date.now();
-        await folderCleaner.clean(buildConfig.foldersToClean, output, logger, t, dryRun);
+        await folderCleaner.clean(
+          buildConfig.foldersToClean,
+          output,
+          logger,
+          t,
+          dryRun,
+        );
         stepResults.push({
           step: "clean",
           success: true,
@@ -244,7 +268,9 @@ export class BuildExecutor implements IBuildExecutor {
         );
         if (analysis.suggestions.length > 0) {
           output.push(
-            outputFormatter.formatSection(t("app.api.system.builder.messages.optimizationTips")),
+            outputFormatter.formatSection(
+              t("app.api.system.builder.messages.optimizationTips"),
+            ),
           );
           for (const suggestion of analysis.suggestions) {
             output.push(outputFormatter.formatItem("💡", suggestion));
@@ -255,14 +281,17 @@ export class BuildExecutor implements IBuildExecutor {
       // Execute post-build hook
       if (buildConfig.hooks?.postBuild) {
         output.push(
-          outputFormatter.formatStep(t("app.api.system.builder.messages.runningPostBuild")),
+          outputFormatter.formatStep(
+            t("app.api.system.builder.messages.runningPostBuild"),
+          ),
         );
         await buildConfig.hooks.postBuild({
           config: buildConfig,
           profile,
           outputDir: buildConfig.foldersToClean?.[0] || "dist",
           logger,
-          addOutput: (msg) => output.push(outputFormatter.formatItem("hook", msg)),
+          addOutput: (msg) =>
+            output.push(outputFormatter.formatItem("hook", msg)),
         });
       }
 
@@ -279,7 +308,9 @@ export class BuildExecutor implements IBuildExecutor {
       );
 
       output.push(
-        outputFormatter.formatSuccess(t("app.api.system.builder.messages.buildComplete")),
+        outputFormatter.formatSuccess(
+          t("app.api.system.builder.messages.buildComplete"),
+        ),
       );
       logger.info("Build complete", {
         duration,
@@ -291,7 +322,11 @@ export class BuildExecutor implements IBuildExecutor {
       let reportPath: string | undefined;
       if (report && !dryRun) {
         const bundleAnalysisResult = analyze
-          ? await bundleAnalyzer.analyze(buildConfig.foldersToClean?.[0] || "dist", [], t)
+          ? await bundleAnalyzer.analyze(
+              buildConfig.foldersToClean?.[0] || "dist",
+              [],
+              t,
+            )
           : undefined;
 
         reportPath = await reportGenerator.generate(
@@ -316,14 +351,18 @@ export class BuildExecutor implements IBuildExecutor {
         filesCopied: filesCopied.length > 0 ? filesCopied : null,
         packageJson: packageJsonContent,
         profileUsed:
-          profile === "production" ? BuildProfileEnum.PRODUCTION : BuildProfileEnum.DEVELOPMENT,
+          profile === "production"
+            ? BuildProfileEnum.PRODUCTION
+            : BuildProfileEnum.DEVELOPMENT,
         reportPath,
         stepTimings:
           stepResults.length > 0
             ? stepResults.map((s) => ({
                 step: s.step,
                 duration: s.duration,
-                status: s.success ? StepStatusEnum.SUCCESS : StepStatusEnum.FAILED,
+                status: s.success
+                  ? StepStatusEnum.SUCCESS
+                  : StepStatusEnum.FAILED,
                 filesAffected: s.filesAffected?.length,
               }))
             : null,
@@ -342,7 +381,9 @@ export class BuildExecutor implements IBuildExecutor {
       );
       if (suggestions.length > 0) {
         output.push(
-          outputFormatter.formatSection(t("app.api.system.builder.messages.suggestions")),
+          outputFormatter.formatSection(
+            t("app.api.system.builder.messages.suggestions"),
+          ),
         );
         for (const suggestion of suggestions) {
           output.push(outputFormatter.formatItem("→", suggestion));
@@ -374,7 +415,11 @@ export class BuildExecutor implements IBuildExecutor {
     onFileCompiled?: (filePath: string, size: number) => void,
     parallel = true,
   ): Promise<ResponseType<string[]>> {
-    output.push(outputFormatter.formatSection(t("app.api.system.builder.messages.compilingFiles")));
+    output.push(
+      outputFormatter.formatSection(
+        t("app.api.system.builder.messages.compilingFiles"),
+      ),
+    );
     logger.info("Compiling files", {
       count: files.length,
       profile,

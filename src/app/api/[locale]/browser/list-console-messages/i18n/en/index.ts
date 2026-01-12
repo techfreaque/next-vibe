@@ -8,7 +8,8 @@ export const translations = {
     fields: {
       includePreservedMessages: {
         label: "Include Preserved Messages",
-        description: "Set to true to return the preserved messages over the last 3 navigations",
+        description:
+          "Set to true to return the preserved messages over the last 3 navigations",
         placeholder: "false",
       },
       pageIdx: {
@@ -18,7 +19,8 @@ export const translations = {
       },
       pageSize: {
         label: "Page Size",
-        description: "Maximum number of messages to return (omit to return all messages)",
+        description:
+          "Maximum number of messages to return (omit to return all messages)",
         placeholder: "Enter page size",
       },
       types: {
@@ -90,7 +92,8 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred while listing console messages",
+      description:
+        "An internal server error occurred while listing console messages",
     },
     unknown: {
       title: "Unknown Error",

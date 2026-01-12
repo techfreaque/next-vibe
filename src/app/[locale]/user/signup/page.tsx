@@ -63,7 +63,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * Signup Page Component
  * Fully definition-driven using EndpointsPage
  */
-export default async function SignUpPage({ params }: Props): Promise<JSX.Element> {
+export default async function SignUpPage({
+  params,
+}: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 

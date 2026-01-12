@@ -12,7 +12,8 @@ import { UserProfileRepository } from "./repository";
 export const { GET, POST, DELETE, tools } = endpointsHandler({
   endpoint: meEndpoints,
   [Methods.GET]: {
-    handler: ({ user, logger, locale }) => UserProfileRepository.getProfile(user, locale, logger),
+    handler: ({ user, logger, locale }) =>
+      UserProfileRepository.getProfile(user, locale, logger),
   },
   [Methods.POST]: {
     handler: ({ data, user, logger, locale }) =>

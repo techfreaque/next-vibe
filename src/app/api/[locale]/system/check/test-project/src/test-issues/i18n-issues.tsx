@@ -56,8 +56,20 @@ export function HardcodedVariables(): React.ReactElement {
 }
 
 // Literal strings in conditional rendering
-export function ConditionalStrings({ isError }: { isError: boolean }): React.ReactElement {
-  return <div>{isError ? <span>An error occurred</span> : <span>Operation successful</span>}</div>;
+export function ConditionalStrings({
+  isError,
+}: {
+  isError: boolean;
+}): React.ReactElement {
+  return (
+    <div>
+      {isError ? (
+        <span>An error occurred</span>
+      ) : (
+        <span>Operation successful</span>
+      )}
+    </div>
+  );
 }
 
 // Literal strings in array rendering
@@ -99,7 +111,11 @@ function CustomButton({ label }: { label: string }): React.ReactElement {
   return <button>{label}</button>;
 }
 
-function CustomInput({ errorMessage }: { errorMessage: string }): React.ReactElement {
+function CustomInput({
+  errorMessage,
+}: {
+  errorMessage: string;
+}): React.ReactElement {
   return (
     <div>
       <input />

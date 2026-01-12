@@ -22,7 +22,9 @@ interface TrackedPixelProps {
  * TrackedPixel Component
  * Invisible tracking pixel for email open tracking
  */
-export function TrackedPixel({ tracking }: TrackedPixelProps): JSX.Element | null {
+export function TrackedPixel({
+  tracking,
+}: TrackedPixelProps): JSX.Element | null {
   // Only render if tracking context is provided
   if (!tracking?.leadId && !tracking?.userId) {
     return null;
@@ -36,5 +38,13 @@ export function TrackedPixel({ tracking }: TrackedPixelProps): JSX.Element | nul
     tracking.locale,
   );
 
-  return <Img src={pixelUrl} width="1" height="1" style={{ display: "none" }} alt="" />;
+  return (
+    <Img
+      src={pixelUrl}
+      width="1"
+      height="1"
+      style={{ display: "none" }}
+      alt=""
+    />
+  );
 }

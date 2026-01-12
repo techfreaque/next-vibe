@@ -4,7 +4,11 @@
  */
 
 import { Button, Hr, Section } from "@react-email/components";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import type { ReactElement } from "react";
 import React from "react";
 import { z } from "zod";
@@ -34,7 +38,9 @@ const newsletterUnsubscribePropsSchema = z.object({
   email: z.string().email(),
 });
 
-type NewsletterUnsubscribeProps = z.infer<typeof newsletterUnsubscribePropsSchema>;
+type NewsletterUnsubscribeProps = z.infer<
+  typeof newsletterUnsubscribePropsSchema
+>;
 
 function NewsletterUnsubscribeEmail({
   props,
@@ -126,31 +132,35 @@ function NewsletterUnsubscribeEmail({
 }
 
 // Template Definition Export
-const newsletterUnsubscribeTemplate: EmailTemplateDefinition<NewsletterUnsubscribeProps> = {
-  meta: {
-    id: "newsletter-unsubscribe",
-    version: "1.0.0",
-    name: "app.api.emails.templates.newsletter.unsubscribe.meta.name",
-    description: "app.api.emails.templates.newsletter.unsubscribe.meta.description",
-    category: "newsletter",
-    path: "/newsletter/unsubscribe/email.tsx",
-    defaultSubject: (t) => t("app.api.newsletter.email.unsubscribe.subject"),
-    previewFields: {
-      email: {
-        type: "email",
-        label: "app.api.emails.templates.newsletter.unsubscribe.preview.email",
-        description: "app.api.emails.templates.newsletter.unsubscribe.preview.email.description",
-        defaultValue: "max@example.com",
-        required: true,
+const newsletterUnsubscribeTemplate: EmailTemplateDefinition<NewsletterUnsubscribeProps> =
+  {
+    meta: {
+      id: "newsletter-unsubscribe",
+      version: "1.0.0",
+      name: "app.api.emails.templates.newsletter.unsubscribe.meta.name",
+      description:
+        "app.api.emails.templates.newsletter.unsubscribe.meta.description",
+      category: "newsletter",
+      path: "/newsletter/unsubscribe/email.tsx",
+      defaultSubject: (t) => t("app.api.newsletter.email.unsubscribe.subject"),
+      previewFields: {
+        email: {
+          type: "email",
+          label:
+            "app.api.emails.templates.newsletter.unsubscribe.preview.email",
+          description:
+            "app.api.emails.templates.newsletter.unsubscribe.preview.email.description",
+          defaultValue: "max@example.com",
+          required: true,
+        },
       },
     },
-  },
-  schema: newsletterUnsubscribePropsSchema,
-  component: NewsletterUnsubscribeEmail,
-  exampleProps: {
-    email: "max@example.com",
-  },
-};
+    schema: newsletterUnsubscribePropsSchema,
+    component: NewsletterUnsubscribeEmail,
+    exampleProps: {
+      email: "max@example.com",
+    },
+  };
 
 export default newsletterUnsubscribeTemplate;
 
@@ -175,8 +185,12 @@ function AdminUnsubscribeNotificationEmailContent({
     <EmailTemplate
       t={t}
       locale={locale}
-      title={t("app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.title")}
-      previewText={t("app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.preview")}
+      title={t(
+        "app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.title",
+      )}
+      previewText={t(
+        "app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.preview",
+      )}
       recipientEmail={recipientEmail}
       tracking={tracking}
     >
@@ -188,7 +202,9 @@ function AdminUnsubscribeNotificationEmailContent({
           marginBottom: "16px",
         }}
       >
-        {t("app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.message")}
+        {t(
+          "app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.message",
+        )}
       </div>
 
       <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
@@ -202,7 +218,10 @@ function AdminUnsubscribeNotificationEmailContent({
         }}
       >
         <strong>
-          {t("app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.email")}:
+          {t(
+            "app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.email",
+          )}
+          :
         </strong>{" "}
         {requestData.email}
       </div>
@@ -216,7 +235,10 @@ function AdminUnsubscribeNotificationEmailContent({
         }}
       >
         <strong>
-          {t("app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.date")}:
+          {t(
+            "app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.date",
+          )}
+          :
         </strong>{" "}
         {new Date().toLocaleDateString()}
       </div>
@@ -236,7 +258,9 @@ function AdminUnsubscribeNotificationEmailContent({
             display: "inline-block",
           }}
         >
-          {t("app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.view_dashboard")}
+          {t(
+            "app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.view_dashboard",
+          )}
         </Button>
       </Section>
     </EmailTemplate>
@@ -294,7 +318,9 @@ export const renderAdminUnsubscribeNotificationMail: EmailFunctionType<
     return success({
       toEmail: contactClientRepository.getSupportEmail(locale),
       toName: t("config.appName"),
-      subject: t("app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.subject"),
+      subject: t(
+        "app.api.newsletter.email.unsubscribe.admin_unsubscribe_notification.subject",
+      ),
       jsx: AdminUnsubscribeNotificationEmailContent({
         requestData,
         t,

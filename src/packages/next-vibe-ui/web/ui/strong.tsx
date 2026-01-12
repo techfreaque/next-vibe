@@ -19,7 +19,11 @@ export type StrongProps = {
   onMouseLeave?: (event: StrongMouseEvent) => void;
 } & StyleType;
 
-function Strong({ className, children, ...props }: StrongProps): React.JSX.Element {
+function Strong({
+  className,
+  children,
+  ...props
+}: StrongProps): React.JSX.Element {
   return (
     <strong className={cn(className)} {...props}>
       {children}

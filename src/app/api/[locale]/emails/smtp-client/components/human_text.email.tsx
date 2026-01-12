@@ -46,6 +46,9 @@ export type TextStyle = keyof typeof TEXT_STYLES;
 /**
  * Human-style text component with natural spacing
  */
-export function HumanText({ children, variant = "body" }: HumanTextProps): React.JSX.Element {
+export function HumanText({
+  children,
+  variant = "body",
+}: HumanTextProps): React.JSX.Element {
   return <span style={TEXT_STYLES[variant]}>{children}</span>;
 }

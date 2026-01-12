@@ -12,7 +12,11 @@ import fs from "node:fs";
 import path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -20,7 +24,10 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { CliStripeRequestOutput, CliStripeResponseOutput } from "./definition";
+import type {
+  CliStripeRequestOutput,
+  CliStripeResponseOutput,
+} from "./definition";
 
 // ===== REPOSITORY INTERFACE =====
 
@@ -36,7 +43,10 @@ export interface CliStripeRepository {
   ): Promise<ResponseType<CliStripeResponseOutput>>;
 
   checkInstallation(logger: EndpointLogger): ResponseType<boolean>;
-  startListener(webhookUrl: string | undefined, logger: EndpointLogger): ResponseType<string>;
+  startListener(
+    webhookUrl: string | undefined,
+    logger: EndpointLogger,
+  ): ResponseType<string>;
   checkAuthentication(logger: EndpointLogger): ResponseType<boolean>;
 }
 
@@ -165,7 +175,10 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       logger.debug(`Stripe CLI installation status: ${installed}`);
       return success(installed);
     } catch (error) {
-      logger.error("Error checking Stripe CLI installation:", parseError(error));
+      logger.error(
+        "Error checking Stripe CLI installation:",
+        parseError(error),
+      );
       return fail({
         message: "app.api.stripe.errors.serverError.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -177,9 +190,14 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Start Stripe webhook listener
    */
-  startListener(webhookUrl: string | undefined, logger: EndpointLogger): ResponseType<string> {
+  startListener(
+    webhookUrl: string | undefined,
+    logger: EndpointLogger,
+  ): ResponseType<string> {
     try {
-      const url = webhookUrl || "http://localhost:3000/api/en-GLOBAL/v1/payment/webhook/stripe";
+      const url =
+        webhookUrl ||
+        "http://localhost:3000/api/en-GLOBAL/v1/payment/webhook/stripe";
       const result = this.startStripeListener(url, undefined, false, logger);
 
       if (result.success) {
@@ -318,7 +336,9 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       args.push("--skip-verify");
     }
 
-    logger.debug("🎧 Stripe webhook listener is running. Press Ctrl+C to stop.");
+    logger.debug(
+      "🎧 Stripe webhook listener is running. Press Ctrl+C to stop.",
+    );
 
     // Execute stripe listen and block forever
     // We need to capture output to extract webhook secret, but also display it
@@ -356,7 +376,10 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       });
 
       stripeProcess.on("error", (error: Error) => {
-        logger.error("Failed to start Stripe webhook listener:", parseError(error));
+        logger.error(
+          "Failed to start Stripe webhook listener:",
+          parseError(error),
+        );
         reject(error);
       });
     });
@@ -397,8 +420,12 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
         stdio: ["pipe", "pipe", "pipe"],
       });
 
-      stripeProcess.stdout?.on("data", (data) => this.handleStripeOutput(data as Buffer, logger));
-      stripeProcess.stderr?.on("data", (data) => this.handleStripeOutput(data as Buffer, logger));
+      stripeProcess.stdout?.on("data", (data) =>
+        this.handleStripeOutput(data as Buffer, logger),
+      );
+      stripeProcess.stderr?.on("data", (data) =>
+        this.handleStripeOutput(data as Buffer, logger),
+      );
 
       // Handle process exit
       stripeProcess.on("close", (code: number | null) => {
@@ -412,7 +439,10 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
 
       // Handle process errors
       stripeProcess.on("error", (error: Error) => {
-        logger.error("Failed to start Stripe webhook listener:", parseError(error));
+        logger.error(
+          "Failed to start Stripe webhook listener:",
+          parseError(error),
+        );
         this.activeListeners.delete(webhookUrl);
       });
 
@@ -421,7 +451,10 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
 
       return { success: true, process: stripeProcess };
     } catch (error) {
-      logger.error("Failed to start Stripe webhook listener:", parseError(error));
+      logger.error(
+        "Failed to start Stripe webhook listener:",
+        parseError(error),
+      );
       return { success: false };
     }
   }
@@ -429,7 +462,10 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Stop Stripe webhook listener
    */
-  private stopStripeListener(stripeProcess: ChildProcess, logger: EndpointLogger): void {
+  private stopStripeListener(
+    stripeProcess: ChildProcess,
+    logger: EndpointLogger,
+  ): void {
     logger.debug("🛑 Stopping Stripe webhook listener...");
     stripeProcess.kill("SIGTERM");
 
@@ -455,7 +491,9 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       execSync("stripe config --list", { stdio: "pipe" });
       return true;
     } catch {
-      logger.debug("Stripe CLI is not authenticated. Run 'stripe login' to authenticate.");
+      logger.debug(
+        "Stripe CLI is not authenticated. Run 'stripe login' to authenticate.",
+      );
       return false;
     }
   }
@@ -481,9 +519,13 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
           // Update the .env file automatically
           const updated = this.updateWebhookSecret(webhookSecret, logger);
           if (updated) {
-            logger.debug("✅ Updated STRIPE_WEBHOOK_SECRET in .env file automatically");
+            logger.debug(
+              "✅ Updated STRIPE_WEBHOOK_SECRET in .env file automatically",
+            );
           } else {
-            logger.debug("Add this to your .env file manually as STRIPE_WEBHOOK_SECRET");
+            logger.debug(
+              "Add this to your .env file manually as STRIPE_WEBHOOK_SECRET",
+            );
           }
         }
       }

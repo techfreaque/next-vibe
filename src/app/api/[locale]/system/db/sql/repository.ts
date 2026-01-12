@@ -4,7 +4,11 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -16,7 +20,10 @@ import type { SqlRequestOutput, SqlResponseOutput } from "./definition";
  * Execute SQL query Repository Interface
  */
 export interface SqlRepositoryInterface {
-  execute(data: SqlRequestOutput, logger: EndpointLogger): Promise<ResponseType<SqlResponseOutput>>;
+  execute(
+    data: SqlRequestOutput,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SqlResponseOutput>>;
 }
 
 /**
@@ -107,7 +114,10 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
   }> {
     // Add LIMIT for SELECT queries if not already present
     let finalQuery = query;
-    if (this.getQueryType(query) === "SELECT" && !query.toLowerCase().includes("limit")) {
+    if (
+      this.getQueryType(query) === "SELECT" &&
+      !query.toLowerCase().includes("limit")
+    ) {
       finalQuery = `${query} LIMIT ${limit}`;
     }
 

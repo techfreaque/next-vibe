@@ -235,7 +235,10 @@ export function useCreditPurchase(
           logger.error("app.api.credits.purchase.redirect.failed");
         }
       } catch (error) {
-        logger.error("app.api.credits.purchase.process.failed", parseError(error));
+        logger.error(
+          "app.api.credits.purchase.process.failed",
+          parseError(error),
+        );
         toast({
           title: t("app.common.error.title"),
           description: t("app.common.error.description"),

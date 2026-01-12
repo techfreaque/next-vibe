@@ -13,7 +13,8 @@ export const translations: typeof enTranslations = {
     endedOn: "Beendet am",
     cancellation: {
       title: "Abonnement zur Kündigung vorgemerkt",
-      description: "Ihr Abonnement endet am {{date}}. Sie behalten bis dahin den Zugriff.",
+      description:
+        "Ihr Abonnement endet am {{date}}. Sie behalten bis dahin den Zugriff.",
     },
     canceled: {
       title: "Abonnement gekündigt",
@@ -31,13 +32,15 @@ export const translations: typeof enTranslations = {
     },
     balance: {
       title: "Credit-Guthaben",
-      description: "Ihre verfügbaren Credits für KI-Gespräche mit {{modelCount}} Modellen",
+      description:
+        "Ihre verfügbaren Credits für KI-Gespräche mit {{modelCount}} Modellen",
       credit: "{{count}} Credit",
       credits: "{{count}} Credits",
       nextExpiration: "Nächster Ablauf",
       expiring: {
         title: "Abonnement-Credits",
-        description: "Aus monatlichem Abonnement ({{subCredits}} Credits/Monat)",
+        description:
+          "Aus monatlichem Abonnement ({{subCredits}} Credits/Monat)",
       },
       permanent: {
         title: "Permanente Credits",
@@ -125,7 +128,8 @@ export const translations: typeof enTranslations = {
           "{{subPrice}}/Monat - {{subCredits}} Credits pro Monat mit allen {{modelCount}} KI-Modellen",
         perMonth: "/Monat",
         perYear: "/Jahr",
-        yearlyEquivalent: "Nur {{monthlyPrice}}/Monat bei jährlicher Abrechnung",
+        yearlyEquivalent:
+          "Nur {{monthlyPrice}}/Monat bei jährlicher Abrechnung",
         features: {
           credits: "{{count}} Credits pro Monat",
           expiry: "Zugriff auf alle {{modelCount}} KI-Modelle",
@@ -136,7 +140,8 @@ export const translations: typeof enTranslations = {
       },
       pack: {
         title: "Credit-Pakete",
-        description: "Zusätzliche Credits für Power-User (erfordert aktives Abonnement)",
+        description:
+          "Zusätzliche Credits für Power-User (erfordert aktives Abonnement)",
         badge: "Für Power-User",
         perPack: "/Paket",
         quantity: "Menge",
@@ -194,7 +199,8 @@ export const translations: typeof enTranslations = {
         title: "Zahlung erfolgreich",
         subscription:
           "Ihr Abonnement wurde erfolgreich aktiviert! Ihre Credits sind in Kürze verfügbar.",
-        credits: "Ihr Credit-Paket-Kauf war erfolgreich! Ihre Credits sind in Kürze verfügbar.",
+        credits:
+          "Ihr Credit-Paket-Kauf war erfolgreich! Ihre Credits sind in Kürze verfügbar.",
       },
       canceled: {
         title: "Zahlung abgebrochen",

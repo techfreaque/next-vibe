@@ -101,7 +101,11 @@ export function ensureFullUrl(url: string, baseUrl: string): string {
   const telPrefix = "tel:";
   const anchorPrefix = "#";
 
-  if (url.startsWith(mailtoPrefix) || url.startsWith(telPrefix) || url.startsWith(anchorPrefix)) {
+  if (
+    url.startsWith(mailtoPrefix) ||
+    url.startsWith(telPrefix) ||
+    url.startsWith(anchorPrefix)
+  ) {
     return url;
   }
 

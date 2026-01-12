@@ -33,7 +33,10 @@ interface LeadsStatsFiltersProps {
   locale: CountryLanguage;
 }
 
-export function LeadsStatsFilters({ control, locale }: LeadsStatsFiltersProps): JSX.Element {
+export function LeadsStatsFilters({
+  control,
+  locale,
+}: LeadsStatsFiltersProps): JSX.Element {
   return (
     <Div className="flex flex-col gap-4">
       {/* Base time and chart filters */}

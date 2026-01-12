@@ -38,10 +38,12 @@ export const translations: typeof enTranslations = {
       defaultMessage: "Beim Rendern dieses Widgets ist ein Fehler aufgetreten",
     },
     formField: {
-      requiresContext: "Formularfeld erfordert Formularkontext und Feldkonfiguration",
+      requiresContext:
+        "Formularfeld erfordert Formularkontext und Feldkonfiguration",
     },
     filterPills: {
-      requiresContext: "Filter-Pills-Widget erfordert Formularkontext und Feldname",
+      requiresContext:
+        "Filter-Pills-Widget erfordert Formularkontext und Feldname",
     },
     toolCall: {
       status: {
@@ -61,8 +63,10 @@ export const translations: typeof enTranslations = {
         errorLabel: "Fehler:",
         noArguments: "Keine Argumente",
         noResult: "Kein Ergebnis",
-        metadataNotAvailable: "Widget-Metadaten nicht verfügbar. Zeige Rohdaten.",
-        confirmationRequired: "Parameter prüfen und bearbeiten, dann bestätigen.",
+        metadataNotAvailable:
+          "Widget-Metadaten nicht verfügbar. Zeige Rohdaten.",
+        confirmationRequired:
+          "Parameter prüfen und bearbeiten, dann bestätigen.",
       },
       actions: {
         confirm: "Bestätigen",

@@ -24,7 +24,10 @@ export interface HelpListDisplayProps {
   user: JwtPayloadType;
 }
 
-export function HelpListDisplay({ locale, user }: HelpListDisplayProps): JSX.Element {
+export function HelpListDisplay({
+  locale,
+  user,
+}: HelpListDisplayProps): JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 

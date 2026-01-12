@@ -5,11 +5,19 @@ import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import { View } from "react-native";
 
-import type { ToggleGroupItemProps, ToggleGroupRootProps } from "../../web/ui/toggle-group";
+import type {
+  ToggleGroupItemProps,
+  ToggleGroupRootProps,
+} from "../../web/ui/toggle-group";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 import { TextClassContext } from "./text";
-import { type ToggleSize, toggleTextVariants, type ToggleVariant, toggleVariants } from "./toggle";
+import {
+  type ToggleSize,
+  toggleTextVariants,
+  type ToggleVariant,
+  toggleVariants,
+} from "./toggle";
 
 // The styled() function has type inference issues with this primitive
 const StyledToggleGroupRoot = ToggleGroupPrimitive.Root;
@@ -37,7 +45,10 @@ export function ToggleGroup({
   style,
 }: ToggleGroupRootProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
-  const mergedClassName = cn("flex flex-row items-center justify-center gap-1", className);
+  const mergedClassName = cn(
+    "flex flex-row items-center justify-center gap-1",
+    className,
+  );
 
   const toggleType = type ?? "single";
   const toggleValue = value ?? "";
@@ -65,13 +76,16 @@ export function ToggleGroup({
   return (
     <ToggleGroupContext.Provider value={{ variant, size }}>
       {toggleType === "single" ? (
-        <StyledView {...applyStyleType({ nativeStyle, className: mergedClassName })}>
+        <StyledView
+          {...applyStyleType({ nativeStyle, className: mergedClassName })}
+        >
           <StyledToggleGroupRoot
             {...({
               type: "single",
               value: typeof toggleValue === "string" ? toggleValue : undefined,
               onValueChange: singleHandler,
-              defaultValue: typeof defaultValue === "string" ? defaultValue : undefined,
+              defaultValue:
+                typeof defaultValue === "string" ? defaultValue : undefined,
               disabled,
               rovingFocus,
               loop,
@@ -83,13 +97,19 @@ export function ToggleGroup({
           </StyledToggleGroupRoot>
         </StyledView>
       ) : (
-        <StyledView {...applyStyleType({ nativeStyle, className: mergedClassName })}>
+        <StyledView
+          {...applyStyleType({ nativeStyle, className: mergedClassName })}
+        >
           <StyledToggleGroupRoot
             {...({
               type: "multiple",
-              value: (Array.isArray(toggleValue) ? toggleValue : []) as string[],
+              value: (Array.isArray(toggleValue)
+                ? toggleValue
+                : []) as string[],
               onValueChange: multipleHandler,
-              defaultValue: (Array.isArray(defaultValue) ? defaultValue : []) as string[],
+              defaultValue: (Array.isArray(defaultValue)
+                ? defaultValue
+                : []) as string[],
               disabled,
               rovingFocus,
               loop,
@@ -151,7 +171,8 @@ export function ToggleGroupItem({
               size: context.size || size,
             }),
             disabled && "pointer-events-none opacity-50",
-            ToggleGroupPrimitive.utils.getIsSelected(groupValue, value) && "bg-accent",
+            ToggleGroupPrimitive.utils.getIsSelected(groupValue, value) &&
+              "bg-accent",
             className,
           ),
         })}

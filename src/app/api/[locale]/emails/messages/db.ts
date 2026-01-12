@@ -4,7 +4,16 @@
  */
 
 import { relations } from "drizzle-orm";
-import { boolean, index, integer, json, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  index,
+  integer,
+  json,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 import { ImapLoggingLevel } from "../imap-client/config/enum";
@@ -42,11 +51,15 @@ export const emails = pgTable(
     // Template versioning (for audit trail and compliance)
     templateId: text("template_id"), // Template ID (e.g., "leads-welcome")
     templateVersion: text("template_version"), // Semantic version (e.g., "1.2.3")
-    propsSnapshot: json("props_snapshot").$type<Record<string, string | number | boolean>>(), // Props used to render
+    propsSnapshot: json("props_snapshot").$type<
+      Record<string, string | number | boolean>
+    >(), // Props used to render
     locale: text("locale"), // Locale used for rendering (e.g., "en-US")
 
     // Status and tracking
-    status: text("status", { enum: EmailStatusDB }).notNull().default(EmailStatus.PENDING),
+    status: text("status", { enum: EmailStatusDB })
+      .notNull()
+      .default(EmailStatus.PENDING),
 
     // Provider information
     emailProvider: text("email_provider").default(EmailProvider.SMTP),
@@ -105,7 +118,9 @@ export const emails = pgTable(
 
     // Sync metadata
     lastSyncAt: timestamp("last_sync_at"),
-    syncStatus: text("sync_status", { enum: ImapSyncStatusDB }).default(ImapSyncStatus.PENDING),
+    syncStatus: text("sync_status", { enum: ImapSyncStatusDB }).default(
+      ImapSyncStatus.PENDING,
+    ),
     syncError: text("sync_error"),
 
     // Additional metadata
@@ -118,22 +133,32 @@ export const emails = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => ({
-    recipientEmailIdx: index("emails_recipient_email_idx").on(table.recipientEmail),
+    recipientEmailIdx: index("emails_recipient_email_idx").on(
+      table.recipientEmail,
+    ),
     statusIdx: index("emails_status_idx").on(table.status),
     typeIdx: index("emails_type_idx").on(table.type),
     sentAtIdx: index("emails_sent_at_idx").on(table.sentAt),
     templateIdIdx: index("emails_template_id_idx").on(table.templateId),
-    templateVersionIdx: index("emails_template_version_idx").on(table.templateVersion),
+    templateVersionIdx: index("emails_template_version_idx").on(
+      table.templateVersion,
+    ),
     localeIdx: index("emails_locale_idx").on(table.locale),
     userIdIdx: index("emails_user_id_idx").on(table.userId),
     leadIdIdx: index("emails_lead_id_idx").on(table.leadId),
     createdAtIdx: index("emails_created_at_idx").on(table.createdAt),
     // IMAP-specific indexes
     imapUidIdx: index("emails_imap_uid_idx").on(table.imapUid),
-    imapMessageIdIdx: index("emails_imap_message_id_idx").on(table.imapMessageId),
+    imapMessageIdIdx: index("emails_imap_message_id_idx").on(
+      table.imapMessageId,
+    ),
     imapFolderIdIdx: index("emails_imap_folder_id_idx").on(table.imapFolderId),
-    smtpAccountIdIdx: index("emails_smtp_account_id_idx").on(table.smtpAccountId),
-    imapAccountIdIdx: index("emails_imap_account_id_idx").on(table.imapAccountId),
+    smtpAccountIdIdx: index("emails_smtp_account_id_idx").on(
+      table.smtpAccountId,
+    ),
+    imapAccountIdIdx: index("emails_imap_account_id_idx").on(
+      table.imapAccountId,
+    ),
     isReadIdx: index("emails_is_read_idx").on(table.isRead),
     isFlaggedIdx: index("emails_is_flagged_idx").on(table.isFlagged),
     threadIdIdx: index("emails_thread_id_idx").on(table.threadId),
@@ -169,7 +194,9 @@ export const imapServerConfigs = pgTable("imap_server_configs", {
 
   // Server settings
   enabled: boolean("enabled").notNull().default(true),
-  maxConcurrentConnections: integer("max_concurrent_connections").notNull().default(10),
+  maxConcurrentConnections: integer("max_concurrent_connections")
+    .notNull()
+    .default(10),
   connectionTimeout: integer("connection_timeout").notNull().default(30000),
   keepAlive: boolean("keep_alive").notNull().default(true),
   poolIdleTimeout: integer("pool_idle_timeout").notNull().default(300000),
@@ -188,15 +215,23 @@ export const imapServerConfigs = pgTable("imap_server_configs", {
   memoryThreshold: integer("memory_threshold").notNull().default(80), // percentage
 
   // Resilience settings
-  circuitBreakerEnabled: boolean("circuit_breaker_enabled").notNull().default(true),
-  circuitBreakerThreshold: integer("circuit_breaker_threshold").notNull().default(5),
-  circuitBreakerTimeout: integer("circuit_breaker_timeout").notNull().default(60000),
+  circuitBreakerEnabled: boolean("circuit_breaker_enabled")
+    .notNull()
+    .default(true),
+  circuitBreakerThreshold: integer("circuit_breaker_threshold")
+    .notNull()
+    .default(5),
+  circuitBreakerTimeout: integer("circuit_breaker_timeout")
+    .notNull()
+    .default(60000),
   retryMaxAttempts: integer("retry_max_attempts").notNull().default(3),
   retryDelay: integer("retry_delay").notNull().default(5000),
 
   // Monitoring settings
   metricsEnabled: boolean("metrics_enabled").notNull().default(true),
-  healthCheckInterval: integer("health_check_interval").notNull().default(30000),
+  healthCheckInterval: integer("health_check_interval")
+    .notNull()
+    .default(30000),
   alertingEnabled: boolean("alerting_enabled").notNull().default(true),
 
   // Rate limiting settings
@@ -222,9 +257,13 @@ export const imapSyncConfigs = pgTable("imap_sync_configs", {
   id: uuid("id").primaryKey().defaultRandom(),
   // Sync configuration settings
   maxAccountsPerRun: integer("max_accounts_per_run").notNull().default(5),
-  maxMessagesPerFolder: integer("max_messages_per_folder").notNull().default(1000),
+  maxMessagesPerFolder: integer("max_messages_per_folder")
+    .notNull()
+    .default(1000),
   batchSize: integer("batch_size").notNull().default(100),
-  enableBidirectionalSync: boolean("enable_bidirectional_sync").notNull().default(true),
+  enableBidirectionalSync: boolean("enable_bidirectional_sync")
+    .notNull()
+    .default(true),
   syncFlags: boolean("sync_flags").notNull().default(true),
   syncDeleted: boolean("sync_deleted").notNull().default(false),
   dryRun: boolean("dry_run").notNull().default(false),
@@ -258,8 +297,10 @@ export const selectImapFolderSchema = createSelectSchema(imapFolders);
 export const insertImapFolderSchema = createInsertSchema(imapFolders);
 export const selectImapAccountSchema = createSelectSchema(imapAccounts);
 export const insertImapAccountSchema = createInsertSchema(imapAccounts);
-export const selectImapServerConfigSchema = createSelectSchema(imapServerConfigs);
-export const insertImapServerConfigSchema = createInsertSchema(imapServerConfigs);
+export const selectImapServerConfigSchema =
+  createSelectSchema(imapServerConfigs);
+export const insertImapServerConfigSchema =
+  createInsertSchema(imapServerConfigs);
 export const selectImapSyncConfigSchema = createSelectSchema(imapSyncConfigs);
 export const insertImapSyncConfigSchema = createInsertSchema(imapSyncConfigs);
 

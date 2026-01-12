@@ -222,7 +222,8 @@ export const translations: typeof enTranslations = {
   email: {
     success: {
       title: "Witamy w {{planName}}, {{firstName}}!",
-      subject: "Twoja subskrypcja {{appName}} jest aktywna - Nieograniczona AI czeka",
+      subject:
+        "Twoja subskrypcja {{appName}} jest aktywna - Nieograniczona AI czeka",
       previewText:
         "Twoja subskrypcja {{planName}} jest teraz aktywna! Ciesz się nieograniczonym dostępem do 38 modeli AI.",
       welcomeMessage: "Twoja subskrypcja {{planName}} jest teraz aktywna!",

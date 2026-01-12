@@ -5,7 +5,11 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import Stripe from "stripe";
 
@@ -15,7 +19,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { users } from "../../../user/db";
 import { paymentInvoices, paymentTransactions } from "../../db";
-import { InvoiceStatus, PaymentProvider as PaymentProviderEnum, PaymentStatus } from "../../enum";
+import {
+  InvoiceStatus,
+  PaymentProvider as PaymentProviderEnum,
+  PaymentStatus,
+} from "../../enum";
 import { paymentEnv } from "../../env";
 import type {
   CheckoutSessionParams,
@@ -34,7 +42,12 @@ export const stripe = new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
 export class StripeProvider implements PaymentProvider {
   name = "stripe";
 
-  async ensureCustomer(userId: string, email: string, name: string | null, logger: EndpointLogger) {
+  async ensureCustomer(
+    userId: string,
+    email: string,
+    name: string | null,
+    logger: EndpointLogger,
+  ) {
     try {
       const [user] = await db
         .select({ stripeCustomerId: users.stripeCustomerId })
@@ -64,18 +77,25 @@ export class StripeProvider implements PaymentProvider {
             error.message.includes("No such customer") ||
             error.message.includes("resource_missing")
           ) {
-            logger.warn("Invalid Stripe customer ID detected, creating new one", {
-              userId,
-              oldCustomerId: user.stripeCustomerId,
-              error: error.message,
-            });
+            logger.warn(
+              "Invalid Stripe customer ID detected, creating new one",
+              {
+                userId,
+                oldCustomerId: user.stripeCustomerId,
+                error: error.message,
+              },
+            );
 
             // Clear invalid customer ID
-            await db.update(users).set({ stripeCustomerId: null }).where(eq(users.id, userId));
+            await db
+              .update(users)
+              .set({ stripeCustomerId: null })
+              .where(eq(users.id, userId));
           } else {
             // Other errors (network, etc.) should be returned as failure
             return fail({
-              message: "app.api.payment.providers.stripe.errors.customerRetrievalFailed.title",
+              message:
+                "app.api.payment.providers.stripe.errors.customerRetrievalFailed.title",
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
               messageParams: { error: error.message, userId },
             });
@@ -90,7 +110,10 @@ export class StripeProvider implements PaymentProvider {
         metadata: { userId },
       });
 
-      await db.update(users).set({ stripeCustomerId: customer.id }).where(eq(users.id, userId));
+      await db
+        .update(users)
+        .set({ stripeCustomerId: customer.id })
+        .where(eq(users.id, userId));
 
       logger.debug("Created Stripe customer", {
         userId,
@@ -106,7 +129,8 @@ export class StripeProvider implements PaymentProvider {
         userId,
       });
       return fail({
-        message: "app.api.payment.providers.stripe.errors.customerCreationFailed.title",
+        message:
+          "app.api.payment.providers.stripe.errors.customerCreationFailed.title",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message, userId },
       });
@@ -252,7 +276,8 @@ export class StripeProvider implements PaymentProvider {
         userId: params.userId,
       });
       return fail({
-        message: "app.api.payment.providers.stripe.errors.checkoutCreationFailed.title",
+        message:
+          "app.api.payment.providers.stripe.errors.checkoutCreationFailed.title",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -274,13 +299,18 @@ export class StripeProvider implements PaymentProvider {
       };
 
       // Add optional fields if they exist
-      if ("metadata" in eventData && typeof eventData.metadata === "object" && eventData.metadata) {
+      if (
+        "metadata" in eventData &&
+        typeof eventData.metadata === "object" &&
+        eventData.metadata
+      ) {
         webhookData.metadata = Object.fromEntries(
           Object.entries(eventData.metadata).map(([k, v]) => [k, String(v)]),
         );
       }
       if ("customer" in eventData) {
-        webhookData.customer = typeof eventData.customer === "string" ? eventData.customer : null;
+        webhookData.customer =
+          typeof eventData.customer === "string" ? eventData.customer : null;
       }
       if ("status" in eventData && typeof eventData.status === "string") {
         webhookData.status = eventData.status;
@@ -297,15 +327,23 @@ export class StripeProvider implements PaymentProvider {
       ) {
         webhookData.current_period_start = eventData.current_period_start;
       }
-      if ("current_period_end" in eventData && typeof eventData.current_period_end === "number") {
+      if (
+        "current_period_end" in eventData &&
+        typeof eventData.current_period_end === "number"
+      ) {
         webhookData.current_period_end = eventData.current_period_end;
       }
-      if ("amount_total" in eventData && typeof eventData.amount_total === "number") {
+      if (
+        "amount_total" in eventData &&
+        typeof eventData.amount_total === "number"
+      ) {
         webhookData.amount_total = eventData.amount_total;
       }
       if ("subscription" in eventData) {
         webhookData.subscription =
-          typeof eventData.subscription === "string" ? eventData.subscription : undefined;
+          typeof eventData.subscription === "string"
+            ? eventData.subscription
+            : undefined;
       }
 
       return success<WebhookEvent>({
@@ -318,7 +356,8 @@ export class StripeProvider implements PaymentProvider {
         error: parseError(error),
       });
       return fail({
-        message: "app.api.payment.providers.stripe.errors.webhookVerificationFailed.title",
+        message:
+          "app.api.payment.providers.stripe.errors.webhookVerificationFailed.title",
         errorType: ErrorResponseTypes.BAD_REQUEST,
         messageParams: { error: parseError(error).message },
       });
@@ -332,13 +371,16 @@ export class StripeProvider implements PaymentProvider {
       // In API version 2025-09-30.clover, current_period_end/start were removed from Subscription
       // Use start_date/created for period start and billing_cycle_anchor for the cycle anchor
       // Use start_date if available, otherwise fall back to created timestamp
-      const currentPeriodStart = subscription.start_date || subscription.created;
+      const currentPeriodStart =
+        subscription.start_date || subscription.created;
 
       // Calculate currentPeriodEnd based on billing interval
       // billing_cycle_anchor is the start of the billing cycle, not the end
       // We need to add the interval duration to get the period end
-      const billingInterval = subscription.items.data[0]?.plan.interval || "month";
-      const intervalCount = subscription.items.data[0]?.plan.interval_count || 1;
+      const billingInterval =
+        subscription.items.data[0]?.plan.interval || "month";
+      const intervalCount =
+        subscription.items.data[0]?.plan.interval_count || 1;
 
       // Calculate period end by adding the interval to period start
       const periodStartDate = new Date(currentPeriodStart * 1000);
@@ -385,7 +427,8 @@ export class StripeProvider implements PaymentProvider {
         subscriptionId,
       });
       return fail({
-        message: "app.api.payment.providers.stripe.errors.subscriptionRetrievalFailed.title",
+        message:
+          "app.api.payment.providers.stripe.errors.subscriptionRetrievalFailed.title",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -405,7 +448,8 @@ export class StripeProvider implements PaymentProvider {
         subscriptionId,
       });
       return fail({
-        message: "app.api.payment.providers.stripe.errors.subscriptionCancellationFailed.title",
+        message:
+          "app.api.payment.providers.stripe.errors.subscriptionCancellationFailed.title",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message },
       });

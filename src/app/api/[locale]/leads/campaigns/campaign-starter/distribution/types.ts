@@ -19,7 +19,9 @@ export const distributionCalculationInputSchema = z.object({
   cronSchedule: z.string(),
 });
 
-export type DistributionCalculationInputType = z.infer<typeof distributionCalculationInputSchema>;
+export type DistributionCalculationInputType = z.infer<
+  typeof distributionCalculationInputSchema
+>;
 
 /**
  * Distribution Calculation Output
@@ -33,7 +35,9 @@ export const distributionCalculationOutputSchema = z.object({
   runsPerWeek: z.coerce.number(),
 });
 
-export type DistributionCalculationOutputType = z.infer<typeof distributionCalculationOutputSchema>;
+export type DistributionCalculationOutputType = z.infer<
+  typeof distributionCalculationOutputSchema
+>;
 
 /**
  * Locale Quota Calculation Input
@@ -52,7 +56,9 @@ export const localeQuotaCalculationInputSchema = z.object({
   now: z.date(),
 });
 
-export type LocaleQuotaCalculationInputType = z.infer<typeof localeQuotaCalculationInputSchema>;
+export type LocaleQuotaCalculationInputType = z.infer<
+  typeof localeQuotaCalculationInputSchema
+>;
 
 /**
  * Locale Processing Info Output
@@ -72,4 +78,6 @@ export const localeProcessingInfoOutputSchema = z.object({
   adjustedLeadsPerRun: z.coerce.number(),
 });
 
-export type LocaleProcessingInfoOutputType = z.infer<typeof localeProcessingInfoOutputSchema>;
+export type LocaleProcessingInfoOutputType = z.infer<
+  typeof localeProcessingInfoOutputSchema
+>;

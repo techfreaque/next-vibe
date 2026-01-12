@@ -9,7 +9,8 @@ export const translations: typeof enTranslations = {
     fields: {
       uid: {
         label: "UID elementu",
-        description: "UID elementu do zrzutu ekranu (pomiń, aby zrobić zrzut ekranu całej strony)",
+        description:
+          "UID elementu do zrzutu ekranu (pomiń, aby zrobić zrzut ekranu całej strony)",
         placeholder: "Wprowadź UID elementu",
       },
       fullPage: {
@@ -71,11 +72,13 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description: "Wystąpił wewnętrzny błąd serwera podczas przechwytywania zrzutu ekranu",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas przechwytywania zrzutu ekranu",
     },
     unknown: {
       title: "Nieznany błąd",
-      description: "Wystąpił nieznany błąd podczas przechwytywania zrzutu ekranu",
+      description:
+        "Wystąpił nieznany błąd podczas przechwytywania zrzutu ekranu",
     },
     unsavedChanges: {
       title: "Niezapisane zmiany",

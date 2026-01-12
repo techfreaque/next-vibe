@@ -16,7 +16,9 @@ import type { FieldUsageConfig } from "../endpoint";
 // ============================================================================
 
 // Test 1.1: Specific literal TKey extends string
-type Test1_1_LiteralExtendsString = "app.test.label" extends string ? "PASS" : "FAIL";
+type Test1_1_LiteralExtendsString = "app.test.label" extends string
+  ? "PASS"
+  : "FAIL";
 const test1_1: Test1_1_LiteralExtendsString = "PASS";
 
 // ============================================================================
@@ -51,7 +53,14 @@ const test3_1: Test3_1_PrimitiveFieldVariance = "PASS";
 // Test 4.1: ObjectField with specific TKey extends UnifiedField<string, z.ZodTypeAny>
 type Test4_1_ObjectFieldVariance =
   ObjectField<
-    { field1: PrimitiveField<z.ZodString, FieldUsageConfig, "app.test", WidgetConfig<"app.test">> },
+    {
+      field1: PrimitiveField<
+        z.ZodString,
+        FieldUsageConfig,
+        "app.test",
+        WidgetConfig<"app.test">
+      >;
+    },
     FieldUsageConfig,
     "app.test",
     WidgetConfig<"app.test">
@@ -63,7 +72,14 @@ const test4_1: Test4_1_ObjectFieldVariance = "PASS";
 // Test 4.2: ObjectField with generic string TKey extends UnifiedField<string, z.ZodTypeAny>
 type Test4_2_ObjectFieldGeneric =
   ObjectField<
-    { field1: PrimitiveField<z.ZodString, FieldUsageConfig, string, WidgetConfig<string>> },
+    {
+      field1: PrimitiveField<
+        z.ZodString,
+        FieldUsageConfig,
+        string,
+        WidgetConfig<string>
+      >;
+    },
     FieldUsageConfig,
     string,
     WidgetConfig<string>
@@ -78,19 +94,22 @@ const test4_2: Test4_2_ObjectFieldGeneric = "PASS";
 
 // Test 5.1: Specific UserRoleValue literal extends UserRoleValue
 type SpecificRole = "app.api.user.userRoles.enums.userRole.admin";
-type Test5_1_SpecificRoleExtendsUnion = SpecificRole extends UserRoleValue ? "PASS" : "FAIL";
+type Test5_1_SpecificRoleExtendsUnion = SpecificRole extends UserRoleValue
+  ? "PASS"
+  : "FAIL";
 const test5_1: Test5_1_SpecificRoleExtendsUnion = "PASS";
 
 // Test 5.2: Tuple of specific role extends readonly UserRoleValue[]
-type Test5_2_TupleExtendsArray = readonly [SpecificRole] extends readonly UserRoleValue[]
+type Test5_2_TupleExtendsArray = readonly [
+  SpecificRole,
+] extends readonly UserRoleValue[]
   ? "PASS"
   : "FAIL";
 const test5_2: Test5_2_TupleExtendsArray = "PASS";
 
 // Test 5.3: Array of specific role extends readonly UserRoleValue[]
-type Test5_3_ArrayExtendsArray = readonly SpecificRole[] extends readonly UserRoleValue[]
-  ? "PASS"
-  : "FAIL";
+type Test5_3_ArrayExtendsArray =
+  readonly SpecificRole[] extends readonly UserRoleValue[] ? "PASS" : "FAIL";
 const test5_3: Test5_3_ArrayExtendsArray = "PASS";
 
 // ============================================================================
@@ -110,9 +129,8 @@ type GenericEndpoint = CreateApiEndpoint<
   UnifiedField<string, z.ZodTypeAny>
 >;
 
-type Test6_1_GenericEndpointExtendsAny = GenericEndpoint extends CreateApiEndpointAny
-  ? "PASS"
-  : "FAIL";
+type Test6_1_GenericEndpointExtendsAny =
+  GenericEndpoint extends CreateApiEndpointAny ? "PASS" : "FAIL";
 const test6_1: Test6_1_GenericEndpointExtendsAny = "PASS";
 
 // Test 6.2: CreateApiEndpoint with specific types extends CreateApiEndpointAny
@@ -122,16 +140,22 @@ type SpecificEndpoint = CreateApiEndpoint<
   readonly [SpecificRole],
   "app.test",
   ObjectField<
-    { field1: PrimitiveField<z.ZodString, FieldUsageConfig, "app.test", WidgetConfig<"app.test">> },
+    {
+      field1: PrimitiveField<
+        z.ZodString,
+        FieldUsageConfig,
+        "app.test",
+        WidgetConfig<"app.test">
+      >;
+    },
     FieldUsageConfig,
     "app.test",
     WidgetConfig<"app.test">
   >
 >;
 
-type Test6_2_SpecificEndpointExtendsAny = SpecificEndpoint extends CreateApiEndpointAny
-  ? "PASS"
-  : "FAIL";
+type Test6_2_SpecificEndpointExtendsAny =
+  SpecificEndpoint extends CreateApiEndpointAny ? "PASS" : "FAIL";
 const test6_2: Test6_2_SpecificEndpointExtendsAny = "PASS";
 
 // ============================================================================
@@ -144,7 +168,9 @@ interface DefinitionsObject {
 }
 
 type Test7_1_DefinitionsObjectExtends =
-  DefinitionsObject extends Partial<Record<Methods, CreateApiEndpointAny>> ? "PASS" : "FAIL";
+  DefinitionsObject extends Partial<Record<Methods, CreateApiEndpointAny>>
+    ? "PASS"
+    : "FAIL";
 const test7_1: Test7_1_DefinitionsObjectExtends = "PASS";
 
 // Test 7.2: as const object pattern
@@ -153,7 +179,9 @@ const syntheticDefinitions = {
 } as const;
 
 type Test7_2_AsConstPattern =
-  typeof syntheticDefinitions extends Partial<Record<Methods, CreateApiEndpointAny>>
+  typeof syntheticDefinitions extends Partial<
+    Record<Methods, CreateApiEndpointAny>
+  >
     ? "PASS"
     : "FAIL";
 const test7_2: Test7_2_AsConstPattern = "PASS";

@@ -18,9 +18,11 @@ import { imapClientEnv } from "./env";
  */
 function getImapSeedConfig(): NewImapAccount {
   // Required account-specific environment variables
-  const name = imapClientEnv.IMAP_SEED_ACCOUNT_NAME || "Development IMAP Account";
+  const name =
+    imapClientEnv.IMAP_SEED_ACCOUNT_NAME || "Development IMAP Account";
   const email = imapClientEnv.IMAP_SEED_EMAIL || "test@example.com";
-  const host = imapClientEnv.IMAP_SEED_HOST || "app.api.emails.imapClient.imap.gmail.com";
+  const host =
+    imapClientEnv.IMAP_SEED_HOST || "app.api.emails.imapClient.imap.gmail.com";
   const username = imapClientEnv.IMAP_SEED_USERNAME || "";
   const password = imapClientEnv.IMAP_SEED_PASSWORD || "";
   const port = imapClientEnv.IMAP_SEED_PORT || 993;
@@ -69,8 +71,12 @@ export async function dev(logger: EndpointLogger): Promise<void> {
   // Check if environment variables are configured
   const email = imapClientEnv.IMAP_SEED_EMAIL;
   if (!email || email === "your-email@example.com") {
-    logger.debug("⚠️  IMAP seed environment variables not configured, skipping seeding");
-    logger.debug("   Configure IMAP_SEED_* environment variables to enable IMAP account seeding");
+    logger.debug(
+      "⚠️  IMAP seed environment variables not configured, skipping seeding",
+    );
+    logger.debug(
+      "   Configure IMAP_SEED_* environment variables to enable IMAP account seeding",
+    );
     return;
   }
 
@@ -91,7 +97,9 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     const seedAccount = getImapSeedConfig();
     await db.insert(imapAccounts).values([seedAccount]);
 
-    logger.debug(`✅ Seeded IMAP account: ${seedAccount.name} (${seedAccount.email})`);
+    logger.debug(
+      `✅ Seeded IMAP account: ${seedAccount.name} (${seedAccount.email})`,
+    );
   } catch (error) {
     logger.error("❌ Failed to seed IMAP accounts:", parseError(error));
   }

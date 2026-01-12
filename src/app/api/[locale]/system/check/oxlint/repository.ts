@@ -274,11 +274,9 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     if (paths.length === 0) {
       return;
     }
-    const command =  ["oxfmt", "--config", configPath, ...paths];
+    const command = ["oxfmt", "--config", configPath, ...paths];
 
-    logger.debug(
-      `[OXLINT] Executing Oxfmt command: bunx ${command.join(" ")}`,
-    );
+    logger.debug(`[OXLINT] Executing Oxfmt command: bunx ${command.join(" ")}`);
 
     const { spawn } = await import("node:child_process");
 

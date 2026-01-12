@@ -8,7 +8,11 @@ import "server-only";
 import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -92,7 +96,9 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
 
       if (definitionsWithoutRoute.length > 0) {
         const defList = definitionsWithoutRoute
-          .map((d) => `    • ${d.replace(process.cwd(), "").replace(/^\//, "")}`)
+          .map(
+            (d) => `    • ${d.replace(process.cwd(), "").replace(/^\//, "")}`,
+          )
           .join("\n");
         logger.warn(
           formatWarning(
@@ -102,7 +108,10 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
       }
 
       // Generate content
-      const content = await this.generateContent(validDefinitionFiles, outputFile);
+      const content = await this.generateContent(
+        validDefinitionFiles,
+        outputFile,
+      );
 
       // Write file
       await writeGeneratedFile(outputFile, content, data.dryRun);
@@ -143,7 +152,9 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
   /**
    * Extract HTTP methods from definition file (async)
    */
-  private async extractMethodsFromDefinition(defFile: string): Promise<string[]> {
+  private async extractMethodsFromDefinition(
+    defFile: string,
+  ): Promise<string[]> {
     try {
       const definition = (await import(defFile)) as {
         default?: ApiSection;
@@ -156,7 +167,9 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
 
       // Get all HTTP methods from the definition
       const methods = Object.keys(defaultExport).filter((key) =>
-        ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(key),
+        ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(
+          key,
+        ),
       );
       return methods;
     } catch {
@@ -167,7 +180,9 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
   /**
    * Extract aliases from definition file (async)
    */
-  private async extractAliasesFromDefinition(defFile: string): Promise<string[]> {
+  private async extractAliasesFromDefinition(
+    defFile: string,
+  ): Promise<string[]> {
     try {
       const definition = (await import(defFile)) as {
         default?: Record<string, { aliases?: string[] }>;
@@ -208,7 +223,10 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
    * Each import includes method in the name (e.g., endpointDefinition_POST_0)
    * No aliases generated
    */
-  private async generateContent(definitionFiles: string[], outputFile: string): Promise<string> {
+  private async generateContent(
+    definitionFiles: string[],
+    outputFile: string,
+  ): Promise<string> {
     const imports: string[] = [];
     const setNestedPathCalls: string[] = [];
     let importCounter = 0;
@@ -235,7 +253,11 @@ class EndpointsIndexGeneratorRepositoryImpl implements EndpointsIndexGeneratorRe
         // eslint-disable-next-line i18next/no-literal-string
         const singleLine = `  setNestedPath(endpoints, ${arrayStr}, ${importName}.${method});`;
         // Use multiline format for: 5+ segments, array already split, OR line > 100 chars
-        if (pathWithMethod.length >= 5 || arrayStr.includes("\n") || singleLine.length > 100) {
+        if (
+          pathWithMethod.length >= 5 ||
+          arrayStr.includes("\n") ||
+          singleLine.length > 100
+        ) {
           // eslint-disable-next-line i18next/no-literal-string
           const multiLine = `  setNestedPath(\n    endpoints,\n    ${arrayStr},\n    ${importName}.${method},\n  );`;
           setNestedPathCalls.push(multiLine);
@@ -298,4 +320,5 @@ export function setupEndpoints(): Record<string, ApiSection> {
   }
 }
 
-export const endpointsIndexGeneratorRepository = new EndpointsIndexGeneratorRepositoryImpl();
+export const endpointsIndexGeneratorRepository =
+  new EndpointsIndexGeneratorRepositoryImpl();

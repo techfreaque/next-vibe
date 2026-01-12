@@ -87,42 +87,48 @@ export const { GET } = createEndpoint({
             currentUses: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.referral.codes.list.get.response.codes.currentUses",
+                content:
+                  "app.api.referral.codes.list.get.response.codes.currentUses",
               },
               z.coerce.number(),
             ),
             isActive: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.referral.codes.list.get.response.codes.isActive",
+                content:
+                  "app.api.referral.codes.list.get.response.codes.isActive",
               },
               z.boolean(),
             ),
             createdAt: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.referral.codes.list.get.response.codes.createdAt",
+                content:
+                  "app.api.referral.codes.list.get.response.codes.createdAt",
               },
               z.string(),
             ),
             totalSignups: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.referral.codes.list.get.response.codes.totalSignups",
+                content:
+                  "app.api.referral.codes.list.get.response.codes.totalSignups",
               },
               z.coerce.number(),
             ),
             totalRevenueCents: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.referral.codes.list.get.response.codes.totalRevenueCents",
+                content:
+                  "app.api.referral.codes.list.get.response.codes.totalRevenueCents",
               },
               z.coerce.number(),
             ),
             totalEarningsCents: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.referral.codes.list.get.response.codes.totalEarningsCents",
+                content:
+                  "app.api.referral.codes.list.get.response.codes.totalEarningsCents",
               },
               z.coerce.number(),
             ),

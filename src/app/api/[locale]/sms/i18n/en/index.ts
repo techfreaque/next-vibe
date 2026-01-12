@@ -1,7 +1,8 @@
 export const translations = {
   sms: {
     error: {
-      invalid_phone_format: "Invalid phone number format. Please provide a valid phone number.",
+      invalid_phone_format:
+        "Invalid phone number format. Please provide a valid phone number.",
       delivery_failed: "Failed to deliver SMS to {{phoneNumber}}: {{error}}",
       unexpected_error: "Unexpected error occurred while sending SMS",
       all_failed: "All SMS messages failed to send",

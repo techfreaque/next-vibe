@@ -7,7 +7,11 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { hashPassword, verifyPassword } from "next-vibe/shared/utils/password";
 
@@ -20,7 +24,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { users } from "../../../db";
 import { UserDetailLevel } from "../../../enum";
 import { UserRepository } from "../../../repository";
-import type { PasswordPostRequestOutput, PasswordPostResponseOutput } from "./definition";
+import type {
+  PasswordPostRequestOutput,
+  PasswordPostResponseOutput,
+} from "./definition";
 
 /**
  * Password Update Repository - Static class pattern
@@ -49,7 +56,8 @@ export class PasswordUpdateRepository {
 
       if (!passwords.currentCredentials || !passwords.newCredentials) {
         return fail({
-          message: "app.api.user.private.me.password.errors.invalid_request.title",
+          message:
+            "app.api.user.private.me.password.errors.invalid_request.title",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -67,7 +75,8 @@ export class PasswordUpdateRepository {
 
       if (newPassword !== confirmPassword) {
         return fail({
-          message: "app.api.user.private.me.password.errors.passwords_do_not_match",
+          message:
+            "app.api.user.private.me.password.errors.passwords_do_not_match",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -105,7 +114,10 @@ export class PasswordUpdateRepository {
         });
       }
 
-      const isPasswordValid = await verifyPassword(currentPassword, user.password);
+      const isPasswordValid = await verifyPassword(
+        currentPassword,
+        user.password,
+      );
       if (!isPasswordValid) {
         return fail({
           message: "app.api.user.private.me.password.errors.incorrect_password",
@@ -114,19 +126,25 @@ export class PasswordUpdateRepository {
       }
 
       if (user.twoFactorEnabled && user.twoFactorSecret) {
-        const twoFactorCode = (passwords as { twoFactorCode?: string }).twoFactorCode;
+        const twoFactorCode = (passwords as { twoFactorCode?: string })
+          .twoFactorCode;
 
         if (!twoFactorCode) {
           return fail({
-            message: "app.api.user.private.me.password.errors.two_factor_code_required",
+            message:
+              "app.api.user.private.me.password.errors.two_factor_code_required",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
 
-        const is2FAValid = this.verify2FACode(twoFactorCode, user.twoFactorSecret);
+        const is2FAValid = this.verify2FACode(
+          twoFactorCode,
+          user.twoFactorSecret,
+        );
         if (!is2FAValid) {
           return fail({
-            message: "app.api.user.private.me.password.errors.invalid_two_factor_code",
+            message:
+              "app.api.user.private.me.password.errors.invalid_two_factor_code",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -136,7 +154,11 @@ export class PasswordUpdateRepository {
         });
       }
 
-      const setPasswordResponse = await this.setPassword(userId, newPassword, logger);
+      const setPasswordResponse = await this.setPassword(
+        userId,
+        newPassword,
+        logger,
+      );
       if (!setPasswordResponse.success) {
         return setPasswordResponse as ResponseType<PasswordPostResponseOutput>;
       }
@@ -198,7 +220,8 @@ export class PasswordUpdateRepository {
     } catch (error) {
       logger.error("Error setting password", parseError(error));
       return fail({
-        message: "app.api.user.private.me.password.errors.token_creation_failed",
+        message:
+          "app.api.user.private.me.password.errors.token_creation_failed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
       });
     }

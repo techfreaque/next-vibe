@@ -1,4 +1,10 @@
-import { Body, Container, Html, Preview, Section } from "@react-email/components";
+import {
+  Body,
+  Container,
+  Html,
+  Preview,
+  Section,
+} from "@react-email/components";
 import type { JSX, ReactNode } from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
@@ -60,7 +66,8 @@ export function EmailTemplate({
               borderTopRightRadius: "8px",
               padding: "32px 24px",
               textAlign: "left",
-              backgroundImage: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+              backgroundImage:
+                "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
               borderBottom: "3px solid #3b82f6",
             }}
           >
@@ -235,10 +242,13 @@ export function EmailTemplate({
                 margin: "16px 0 0 0",
               }}
             >
-              {t("app.api.emails.smtpClient.components.email.footer.copyright", {
-                currentYear,
-                appName: t("config.appName"),
-              })}
+              {t(
+                "app.api.emails.smtpClient.components.email.footer.copyright",
+                {
+                  currentYear,
+                  appName: t("config.appName"),
+                },
+              )}
             </div>
           </Section>
         </Container>

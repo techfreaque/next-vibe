@@ -13,7 +13,12 @@ import { useTranslation } from "@/i18n/core/client";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
 import { executeQuery } from "./query-executor";
 import { buildKey } from "./query-key-builder";
-import { deserializeQueryParams, type FormQueryParams, queryClient, useApiStore } from "./store";
+import {
+  deserializeQueryParams,
+  type FormQueryParams,
+  queryClient,
+  useApiStore,
+} from "./store";
 import type { ApiQueryReturn } from "./types";
 
 /**
@@ -112,7 +117,8 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
 
       // Use stored params if available and non-empty, otherwise fall back to the prop value
       // Deserialize any JSON-stringified nested objects
-      const hasStoredParams = storedParams && Object.keys(storedParams).length > 0;
+      const hasStoredParams =
+        storedParams && Object.keys(storedParams).length > 0;
       const currentRequestData = hasStoredParams
         ? deserializeQueryParams<TEndpoint["types"]["RequestOutput"]>(
             storedParams as FormQueryParams,
@@ -132,7 +138,12 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
         locale,
         options: {
           onSuccess: onSuccess
-            ? (context): void | ErrorResponseType | Promise<void | ErrorResponseType> => {
+            ? (
+                context,
+              ):
+                | void
+                | ErrorResponseType
+                | Promise<void | ErrorResponseType> => {
                 const result = onSuccess({
                   responseData: context.responseData,
                   requestData: context.requestData,
@@ -155,7 +166,8 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     // initialData populates the cache and respects staleTime
     // This allows optimistic updates to work because data is in the cache
     initialData: initialData
-      ? (): ResponseType<TEndpoint["types"]["ResponseOutput"]> => success(initialData)
+      ? (): ResponseType<TEndpoint["types"]["ResponseOutput"]> =>
+          success(initialData)
       : undefined,
   });
 

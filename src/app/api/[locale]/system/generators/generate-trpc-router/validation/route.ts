@@ -15,6 +15,7 @@ import { trpcValidationRepository as repository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: ({ data, logger }) => repository.executeValidationOperation(data, logger),
+    handler: ({ data, logger }) =>
+      repository.executeValidationOperation(data, logger),
   },
 });

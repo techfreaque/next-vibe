@@ -34,8 +34,10 @@ const { GET } = createEndpoint({
   path: ["agent", "chat", "threads", "[threadId]", "messages", "search"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title: "app.api.agent.chat.threads.threadId.messages.search.get.title" as const,
-  description: "app.api.agent.chat.threads.threadId.messages.search.get.description" as const,
+  title:
+    "app.api.agent.chat.threads.threadId.messages.search.get.title" as const,
+  description:
+    "app.api.agent.chat.threads.threadId.messages.search.get.description" as const,
   icon: "search",
   category: "app.api.agent.chat.category" as const,
   tags: ["app.api.agent.chat.tags.messages" as const],
@@ -48,56 +50,67 @@ const { GET } = createEndpoint({
         "app.api.agent.chat.threads.threadId.messages.search.get.errors.validationFailed.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.threads.threadId.messages.search.get.errors.network.title",
+      title:
+        "app.api.agent.chat.threads.threadId.messages.search.get.errors.network.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.search.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.chat.threads.threadId.messages.search.get.errors.unauthorized.title",
+      title:
+        "app.api.agent.chat.threads.threadId.messages.search.get.errors.unauthorized.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.search.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.threads.threadId.messages.search.get.errors.forbidden.title",
+      title:
+        "app.api.agent.chat.threads.threadId.messages.search.get.errors.forbidden.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.search.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.threads.threadId.messages.search.get.errors.notFound.title",
+      title:
+        "app.api.agent.chat.threads.threadId.messages.search.get.errors.notFound.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.search.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.threads.threadId.messages.search.get.errors.serverError.title",
+      title:
+        "app.api.agent.chat.threads.threadId.messages.search.get.errors.serverError.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.search.get.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.threads.threadId.messages.search.get.errors.unknown.title",
+      title:
+        "app.api.agent.chat.threads.threadId.messages.search.get.errors.unknown.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.search.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.agent.chat.threads.threadId.messages.search.get.errors.unsavedChanges.title",
+      title:
+        "app.api.agent.chat.threads.threadId.messages.search.get.errors.unsavedChanges.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.search.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.threads.threadId.messages.search.get.errors.conflict.title",
+      title:
+        "app.api.agent.chat.threads.threadId.messages.search.get.errors.conflict.title",
       description:
         "app.api.agent.chat.threads.threadId.messages.search.get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.threads.threadId.messages.search.get.success.title",
-    description: "app.api.agent.chat.threads.threadId.messages.search.get.success.description",
+    title:
+      "app.api.agent.chat.threads.threadId.messages.search.get.success.title",
+    description:
+      "app.api.agent.chat.threads.threadId.messages.search.get.success.description",
   },
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.threads.threadId.messages.search.get.container.title" as const,
+      title:
+        "app.api.agent.chat.threads.threadId.messages.search.get.container.title" as const,
       description:
         "app.api.agent.chat.threads.threadId.messages.search.get.container.description" as const,
       layoutType: LayoutType.STACKED,
@@ -109,7 +122,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
-          label: "app.api.agent.chat.threads.threadId.messages.search.get.threadId.label" as const,
+          label:
+            "app.api.agent.chat.threads.threadId.messages.search.get.threadId.label" as const,
           description:
             "app.api.agent.chat.threads.threadId.messages.search.get.threadId.description" as const,
         },
@@ -121,7 +135,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.threads.threadId.messages.search.get.query.label" as const,
+          label:
+            "app.api.agent.chat.threads.threadId.messages.search.get.query.label" as const,
           description:
             "app.api.agent.chat.threads.threadId.messages.search.get.query.description" as const,
         },
@@ -144,7 +159,8 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
-              label: "app.api.agent.chat.threads.threadId.messages.search.get.page.label" as const,
+              label:
+                "app.api.agent.chat.threads.threadId.messages.search.get.page.label" as const,
               description:
                 "app.api.agent.chat.threads.threadId.messages.search.get.page.description" as const,
             },
@@ -154,7 +170,8 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
-              label: "app.api.agent.chat.threads.threadId.messages.search.get.limit.label" as const,
+              label:
+                "app.api.agent.chat.threads.threadId.messages.search.get.limit.label" as const,
               description:
                 "app.api.agent.chat.threads.threadId.messages.search.get.limit.description" as const,
             },
@@ -277,7 +294,8 @@ const { GET } = createEndpoint({
  */
 export type MessageSearchRequestOutput = typeof GET.types.RequestOutput;
 export type MessageSearchResponseOutput = typeof GET.types.ResponseOutput;
-export type MessageSearchUrlVariablesOutput = typeof GET.types.UrlVariablesOutput;
+export type MessageSearchUrlVariablesOutput =
+  typeof GET.types.UrlVariablesOutput;
 
 /**
  * Export definitions

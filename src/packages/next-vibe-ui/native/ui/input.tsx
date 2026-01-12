@@ -35,7 +35,10 @@ export type InputProps<
 > = InputBaseProps<T> & StyleType;
 
 // Create compatibility layer functions
-function createInputRefObject(input: TextInput | null, value: string | undefined): InputRefObject {
+function createInputRefObject(
+  input: TextInput | null,
+  value: string | undefined,
+): InputRefObject {
   return {
     focus: (): void => {
       if (input) {
@@ -54,7 +57,9 @@ function createInputRefObject(input: TextInput | null, value: string | undefined
   };
 }
 
-function createInputGenericTarget<T = undefined>(value: InferValueType<T>): InputGenericTarget<T> {
+function createInputGenericTarget<T = undefined>(
+  value: InferValueType<T>,
+): InputGenericTarget<T> {
   return {
     addEventListener: (): void => {
       // No-op for React Native
@@ -143,7 +148,8 @@ function InputInner<
   }: Omit<InputProps<T>, "ref">,
   ref: React.ForwardedRef<InputRefObject>,
 ): JSX.Element {
-  const stringValue: string | undefined = value !== undefined ? String(value) : undefined;
+  const stringValue: string | undefined =
+    value !== undefined ? String(value) : undefined;
   const stringDefaultValue: string | undefined =
     defaultValue !== undefined ? String(defaultValue) : undefined;
 
@@ -293,7 +299,9 @@ function InputInner<
       nativeID={id}
       accessibilityLabel={ariaLabel}
       {...applyStyleType({
-        nativeStyle: disabledStyle ? { ...nativeStyle, ...disabledStyle } : nativeStyle,
+        nativeStyle: disabledStyle
+          ? { ...nativeStyle, ...disabledStyle }
+          : nativeStyle,
         className: cn(
           "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground shadow-sm",
           className,

@@ -28,7 +28,9 @@ interface EmailsListClientProps {
   locale: CountryLanguage;
 }
 
-export function EmailsListClient({ locale }: EmailsListClientProps): React.JSX.Element {
+export function EmailsListClient({
+  locale,
+}: EmailsListClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
   const emailsEndpoint = useEmailMessagesList(logger);
@@ -37,13 +39,19 @@ export function EmailsListClient({ locale }: EmailsListClientProps): React.JSX.E
   const emails: EmailsListResponseType["emails"] = apiResponse?.success
     ? apiResponse.data.emails
     : [];
-  const totalEmails = apiResponse?.success ? apiResponse.data.pagination.total : 0;
-  const totalPages = apiResponse?.success ? apiResponse.data.pagination.totalPages : 0;
+  const totalEmails = apiResponse?.success
+    ? apiResponse.data.pagination.total
+    : 0;
+  const totalPages = apiResponse?.success
+    ? apiResponse.data.pagination.totalPages
+    : 0;
   const queryLoading = emailsEndpoint.read?.isLoading || false;
 
   // Get current form values for pagination display
-  const currentPage = emailsEndpoint.read?.form.getValues("displayOptions.page") || 1;
-  const currentLimit = emailsEndpoint.read?.form.getValues("displayOptions.limit") || 20;
+  const currentPage =
+    emailsEndpoint.read?.form.getValues("displayOptions.page") || 1;
+  const currentLimit =
+    emailsEndpoint.read?.form.getValues("displayOptions.limit") || 20;
 
   return (
     <Card>
@@ -62,7 +70,9 @@ export function EmailsListClient({ locale }: EmailsListClientProps): React.JSX.E
               onClick={emailsEndpoint.read.refetch}
               disabled={queryLoading}
             >
-              <RefreshCw className={cn("h-4 w-4", queryLoading && "animate-spin")} />
+              <RefreshCw
+                className={cn("h-4 w-4", queryLoading && "animate-spin")}
+              />
             </Button>
           </Div>
         </Div>
@@ -79,13 +89,20 @@ export function EmailsListClient({ locale }: EmailsListClientProps): React.JSX.E
 
           <Form form={emailsEndpoint.read.form}>
             <Div className="flex flex-col gap-4">
-              <EmailsListFilters form={emailsEndpoint.read.form} locale={locale} />
+              <EmailsListFilters
+                form={emailsEndpoint.read.form}
+                locale={locale}
+              />
             </Div>
           </Form>
         </Div>
 
         {/* Results */}
-        <EmailsListTable emails={emails} loading={queryLoading} locale={locale} />
+        <EmailsListTable
+          emails={emails}
+          loading={queryLoading}
+          locale={locale}
+        />
 
         {/* Pagination */}
         <EmailsListPagination

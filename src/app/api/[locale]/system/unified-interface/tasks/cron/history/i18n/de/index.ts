@@ -7,7 +7,8 @@ export const translations: typeof enTranslations = {
       monitoring: "Überwachung",
     },
     title: "Task-Ausführungsverlauf",
-    description: "Historische Ausführungsaufzeichnungen für Cron-Tasks anzeigen",
+    description:
+      "Historische Ausführungsaufzeichnungen für Cron-Tasks anzeigen",
     fields: {
       taskId: {
         label: "Task-ID",
@@ -94,7 +95,8 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description: "Sie haben keine Berechtigung, den Task-Verlauf anzuzeigen",
+        description:
+          "Sie haben keine Berechtigung, den Task-Verlauf anzuzeigen",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -102,7 +104,8 @@ export const translations: typeof enTranslations = {
       },
       network: {
         title: "Netzwerkfehler",
-        description: "Netzwerkfehler beim Abrufen des Task-Verlaufs aufgetreten",
+        description:
+          "Netzwerkfehler beim Abrufen des Task-Verlaufs aufgetreten",
       },
       forbidden: {
         title: "Verboten",

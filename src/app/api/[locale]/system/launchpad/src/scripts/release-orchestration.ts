@@ -4,7 +4,11 @@ import inquirer from "inquirer";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { ReleaseOrchestrationOptions, ReleaseTarget, VersionBumpType } from "../types/types";
+import type {
+  ReleaseOrchestrationOptions,
+  ReleaseTarget,
+  VersionBumpType,
+} from "../types/types";
 import {
   discoverReleaseTargets,
   findTargetByGitTag,
@@ -30,7 +34,8 @@ export async function ciReleaseCommand(
 
   if (targetDirectory) {
     // Use explicitly provided target directory
-    targetToRelease = targets.find((t) => t.directory === targetDirectory) || null;
+    targetToRelease =
+      targets.find((t) => t.directory === targetDirectory) || null;
     if (!targetToRelease) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
       throw new Error(`Target directory not found: ${targetDirectory}`);
@@ -38,7 +43,9 @@ export async function ciReleaseCommand(
   } else {
     // Determine target from git tag
     const tagToUse =
-      gitTag || getCurrentGitTag() || process.env.GITHUB_REF?.replace("refs/tags/", "");
+      gitTag ||
+      getCurrentGitTag() ||
+      process.env.GITHUB_REF?.replace("refs/tags/", "");
     if (!tagToUse) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
       throw new Error(
@@ -84,17 +91,24 @@ export async function ciReleaseCommand(
 /**
  * Force Update All Command - updates dependencies for all packages
  */
-export function forceUpdateAllCommand(logger: EndpointLogger, rootDir: string): void {
+export function forceUpdateAllCommand(
+  logger: EndpointLogger,
+  rootDir: string,
+): void {
   logger.info("🔄 Force Update All Packages");
 
   const targets = discoverReleaseTargets(rootDir);
   logger.info(`Found ${targets.length} targets to update`);
 
   // Validate all targets
-  const validTargets = targets.filter((target) => validateReleaseTarget(rootDir, target));
+  const validTargets = targets.filter((target) =>
+    validateReleaseTarget(rootDir, target),
+  );
 
   if (validTargets.length !== targets.length) {
-    logger.info(`Warning: ${targets.length - validTargets.length} targets failed validation`);
+    logger.info(
+      `Warning: ${targets.length - validTargets.length} targets failed validation`,
+    );
   }
 
   const executor = new ReleaseExecutor(logger, rootDir);
@@ -105,17 +119,24 @@ export function forceUpdateAllCommand(logger: EndpointLogger, rootDir: string): 
 /**
  * Release All Command - releases all packages sequentially
  */
-export async function releaseAllCommand(logger: EndpointLogger, rootDir: string): Promise<void> {
+export async function releaseAllCommand(
+  logger: EndpointLogger,
+  rootDir: string,
+): Promise<void> {
   logger.info("🚀 Release All Packages");
 
   const targets = discoverReleaseTargets(rootDir);
   logger.info(`Found ${targets.length} targets to release`);
 
   // Validate all targets
-  const validTargets = targets.filter((target) => validateReleaseTarget(rootDir, target));
+  const validTargets = targets.filter((target) =>
+    validateReleaseTarget(rootDir, target),
+  );
 
   if (validTargets.length !== targets.length) {
-    logger.info(`Warning: ${targets.length - validTargets.length} targets failed validation`);
+    logger.info(
+      `Warning: ${targets.length - validTargets.length} targets failed validation`,
+    );
   }
 
   const options: ReleaseOrchestrationOptions = {
@@ -143,10 +164,14 @@ export async function forceReleaseCommand(
   logger.info(`Found ${targets.length} targets to release`);
 
   // Validate all targets
-  const validTargets = targets.filter((target) => validateReleaseTarget(rootDir, target));
+  const validTargets = targets.filter((target) =>
+    validateReleaseTarget(rootDir, target),
+  );
 
   if (validTargets.length !== targets.length) {
-    logger.info(`Warning: ${targets.length - validTargets.length} targets failed validation`);
+    logger.info(
+      `Warning: ${targets.length - validTargets.length} targets failed validation`,
+    );
   }
 
   // Prompt for version bump if not provided
@@ -252,7 +277,10 @@ export async function continueReleaseCommand(
 /**
  * Show Release Status Command - displays current state
  */
-export function showReleaseStatusCommand(logger: EndpointLogger, rootDir: string): void {
+export function showReleaseStatusCommand(
+  logger: EndpointLogger,
+  rootDir: string,
+): void {
   logger.info("📊 Release Status");
 
   const stateManager = new StateManager(rootDir);

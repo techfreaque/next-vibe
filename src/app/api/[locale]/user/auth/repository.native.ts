@@ -4,7 +4,11 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/lib/storage";
 
@@ -81,10 +85,15 @@ export class AuthRepository {
   ): Promise<ResponseType<void>> {
     try {
       const expirationDays = rememberMe ? 30 : 7;
-      const expiresAt = new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000);
+      const expiresAt = new Date(
+        Date.now() + expirationDays * 24 * 60 * 60 * 1000,
+      );
 
       await storage.setItem(AUTH_TOKEN_STORAGE_KEY, token);
-      await storage.setItem(AUTH_EXPIRES_AT_STORAGE_KEY, expiresAt.toISOString());
+      await storage.setItem(
+        AUTH_EXPIRES_AT_STORAGE_KEY,
+        expiresAt.toISOString(),
+      );
 
       return success();
     } catch (error) {
@@ -97,7 +106,9 @@ export class AuthRepository {
     }
   }
 
-  static async clearAuthCookies(logger: EndpointLogger): Promise<ResponseType<void>> {
+  static async clearAuthCookies(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
     try {
       await storage.removeItem(AUTH_TOKEN_STORAGE_KEY);
       await storage.removeItem(AUTH_EXPIRES_AT_STORAGE_KEY);

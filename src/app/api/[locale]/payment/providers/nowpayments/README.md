@@ -54,7 +54,11 @@ The `NOWPaymentsProvider` class implements the `PaymentProvider` interface with 
 interface PaymentProvider {
   name: string;
   ensureCustomer(userId, email, name, logger): Promise<CustomerResult>;
-  createCheckoutSession(params, customerId, logger): Promise<CheckoutSessionResult>;
+  createCheckoutSession(
+    params,
+    customerId,
+    logger,
+  ): Promise<CheckoutSessionResult>;
   verifyWebhook(body, signature, logger): Promise<WebhookEvent>;
   retrieveSubscription(subscriptionId, logger): Promise<SubscriptionResult>;
   cancelSubscription(subscriptionId, logger): Promise<void>;
@@ -168,7 +172,10 @@ if (subscriptionResult.success) {
 
 ```typescript
 // Retrieve subscription details
-const subscription = await provider.retrieveSubscription(subscriptionId, logger);
+const subscription = await provider.retrieveSubscription(
+  subscriptionId,
+  logger,
+);
 
 if (subscription.success) {
   console.log("Current Period:", {
@@ -425,7 +432,11 @@ All errors follow the i18n translation pattern:
 
 ```typescript
 // 1. Create checkout session
-const session = await provider.createCheckoutSession(params, customerId, logger);
+const session = await provider.createCheckoutSession(
+  params,
+  customerId,
+  logger,
+);
 
 // 2. User completes payment on NOWPayments checkout page
 // 3. Webhook is triggered

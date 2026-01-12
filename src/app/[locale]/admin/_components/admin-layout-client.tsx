@@ -9,7 +9,15 @@ import { cn } from "next-vibe/shared/utils";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Clock, Home, Mail, Menu, Shield, Users, X } from "next-vibe-ui/ui/icons";
+import {
+  Clock,
+  Home,
+  Mail,
+  Menu,
+  Shield,
+  Users,
+  X,
+} from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { Main } from "next-vibe-ui/ui/main";
 import { Span } from "next-vibe-ui/ui/span";
@@ -82,7 +90,12 @@ export function AdminLayoutClient({
   return (
     <Div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Mobile sidebar */}
-      <Div className={cn("fixed inset-0 z-50 lg:hidden", sidebarOpen ? "block" : "hidden")}>
+      <Div
+        className={cn(
+          "fixed inset-0 z-50 lg:hidden",
+          sidebarOpen ? "block" : "hidden",
+        )}
+      >
         <Button
           variant="ghost"
           size="unset"
@@ -99,7 +112,11 @@ export function AdminLayoutClient({
                 {t("app.admin.components.navigation.admin")}
               </Span>
             </Div>
-            <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarOpen(false)}
+            >
               <X className="h-6 w-6" />
             </Button>
           </Div>
@@ -119,7 +136,9 @@ export function AdminLayoutClient({
                 <item.icon
                   className={cn(
                     "mr-3 h-5 w-5",
-                    item.current ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500",
+                    item.current
+                      ? "text-blue-500"
+                      : "text-gray-400 group-hover:text-gray-500",
                   )}
                 />
                 {item.name}
@@ -153,7 +172,9 @@ export function AdminLayoutClient({
                 <item.icon
                   className={cn(
                     "mr-3 h-5 w-5",
-                    item.current ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500",
+                    item.current
+                      ? "text-blue-500"
+                      : "text-gray-400 group-hover:text-gray-500",
                   )}
                 />
                 {item.name}
@@ -165,7 +186,9 @@ export function AdminLayoutClient({
           <Div className="shrink-0 border-t border-gray-200 dark:border-gray-700 p-4">
             <Div className="flex items-center">
               <Div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
-                <Span className="text-sm font-medium text-white">{user.privateName.charAt(0)}</Span>
+                <Span className="text-sm font-medium text-white">
+                  {user.privateName.charAt(0)}
+                </Span>
               </Div>
               <Div className="ml-3">
                 <Span className="text-sm font-medium text-gray-700 dark:text-gray-200">

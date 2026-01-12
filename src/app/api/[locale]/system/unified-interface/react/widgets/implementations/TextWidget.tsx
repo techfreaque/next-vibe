@@ -120,7 +120,11 @@ export function TextWidget<const TKey extends string>({
 
   // Text alignment classes
   const alignmentClass =
-    textAlign === "center" ? "text-center" : textAlign === "right" ? "text-right" : "";
+    textAlign === "center"
+      ? "text-center"
+      : textAlign === "right"
+        ? "text-right"
+        : "";
 
   // Size class from config (no hardcoding!)
   const sizeClass = getTextSizeClassName(size);
@@ -140,14 +144,23 @@ export function TextWidget<const TKey extends string>({
     const displayText = formatText(translatedContent, maxLength);
 
     const textElement = multiline ? (
-      <Span className={cn("whitespace-pre-wrap", styleClasses)}>{displayText}</Span>
+      <Span className={cn("whitespace-pre-wrap", styleClasses)}>
+        {displayText}
+      </Span>
     ) : (
       <Span className={styleClasses}>{displayText}</Span>
     );
 
     if (label) {
       return (
-        <Div className={cn("flex flex-col", gapClass || "gap-1.5", alignmentClass, className)}>
+        <Div
+          className={cn(
+            "flex flex-col",
+            gapClass || "gap-1.5",
+            alignmentClass,
+            className,
+          )}
+        >
           <Label className=" font-medium">{label}</Label>
           {textElement}
         </Div>
@@ -199,7 +212,14 @@ export function TextWidget<const TKey extends string>({
 
     if (label) {
       return (
-        <Div className={cn("flex flex-col", gapClass || "gap-1.5", alignmentClass, className)}>
+        <Div
+          className={cn(
+            "flex flex-col",
+            gapClass || "gap-1.5",
+            alignmentClass,
+            className,
+          )}
+        >
           <Label className=" font-medium">{label}</Label>
           {emptyElement}
         </Div>
@@ -211,18 +231,28 @@ export function TextWidget<const TKey extends string>({
 
   const { text, truncate, format: dataFormat } = data;
   const displayText = formatText(text, maxLength || truncate);
-  const normalizedFormat = dataFormat === "plain" || dataFormat === "link" ? "normal" : dataFormat;
+  const normalizedFormat =
+    dataFormat === "plain" || dataFormat === "link" ? "normal" : dataFormat;
   const formatClassName = getTextFormatClassName(normalizedFormat);
 
   const textElement = multiline ? (
-    <Span className={cn(formatClassName, styleClasses, "whitespace-pre-wrap")}>{displayText}</Span>
+    <Span className={cn(formatClassName, styleClasses, "whitespace-pre-wrap")}>
+      {displayText}
+    </Span>
   ) : (
     <Span className={cn(formatClassName, styleClasses)}>{displayText}</Span>
   );
 
   if (label) {
     return (
-      <Div className={cn("flex flex-col", gapClass || "gap-1.5", alignmentClass, className)}>
+      <Div
+        className={cn(
+          "flex flex-col",
+          gapClass || "gap-1.5",
+          alignmentClass,
+          className,
+        )}
+      >
         <Label className=" font-medium">{label}</Label>
         {textElement}
       </Div>

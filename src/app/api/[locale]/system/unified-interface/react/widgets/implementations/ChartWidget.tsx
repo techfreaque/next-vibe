@@ -11,7 +11,10 @@ import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { WidgetType } from "../../../shared/types/enums";
-import { type ChartDataPoint, extractChartData } from "../../../shared/widgets/logic/chart";
+import {
+  type ChartDataPoint,
+  extractChartData,
+} from "../../../shared/widgets/logic/chart";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import {
   getSpacingClassName,
@@ -97,7 +100,9 @@ export function ChartWidget<const TKey extends string>({
       <Card className={cn("h-full", className)}>
         {title && (
           <CardHeader className="pb-2">
-            <CardTitle className={cn("font-medium", titleTextSizeClass || "text-sm")}>
+            <CardTitle
+              className={cn("font-medium", titleTextSizeClass || "text-sm")}
+            >
               {title}
             </CardTitle>
           </CardHeader>
@@ -113,7 +118,9 @@ export function ChartWidget<const TKey extends string>({
             }}
           >
             <Span className={cn("text-muted-foreground", emptyTextSizeClass)}>
-              {globalT("app.api.system.unifiedInterface.widgets.chart.noDataAvailable")}
+              {globalT(
+                "app.api.system.unifiedInterface.widgets.chart.noDataAvailable",
+              )}
             </Span>
           </Div>
         </CardContent>
@@ -153,7 +160,9 @@ export function ChartWidget<const TKey extends string>({
             }}
           >
             <Span className={cn("text-muted-foreground", emptyTextSizeClass)}>
-              {globalT("app.api.system.unifiedInterface.widgets.chart.noDataToDisplay")}
+              {globalT(
+                "app.api.system.unifiedInterface.widgets.chart.noDataToDisplay",
+              )}
             </Span>
           </Div>
         );
@@ -178,7 +187,9 @@ export function ChartWidget<const TKey extends string>({
     // Line/Bar/Area charts
     // Collect all unique x values for categorical axis (with translation)
     const allXValues = chartData.data.flatMap((series) =>
-      series.data.map((d) => context.t(String(d.label ?? d.x ?? "") as TranslationKey)),
+      series.data.map((d) =>
+        context.t(String(d.label ?? d.x ?? "") as TranslationKey),
+      ),
     );
     const uniqueXValues = [...new Set(allXValues)];
 
@@ -265,12 +276,19 @@ export function ChartWidget<const TKey extends string>({
       {(title || description) && (
         <CardHeader className="pb-2">
           {title && (
-            <CardTitle className={cn("font-medium", titleTextSizeClass || "text-sm")}>
+            <CardTitle
+              className={cn("font-medium", titleTextSizeClass || "text-sm")}
+            >
               {title}
             </CardTitle>
           )}
           {description && (
-            <Span className={cn("text-muted-foreground", descriptionTextSizeClass || "text-xs")}>
+            <Span
+              className={cn(
+                "text-muted-foreground",
+                descriptionTextSizeClass || "text-xs",
+              )}
+            >
               {description}
             </Span>
           )}
@@ -291,17 +309,26 @@ export function ChartWidget<const TKey extends string>({
             {chartData.data.map((series, i) => (
               <Div
                 key={series.name}
-                className={cn("flex items-center", legendItemGapClass || "gap-2")}
+                className={cn(
+                  "flex items-center",
+                  legendItemGapClass || "gap-2",
+                )}
               >
                 <Div
                   style={{
-                    backgroundColor: series.color || CHART_COLORS[i % CHART_COLORS.length],
+                    backgroundColor:
+                      series.color || CHART_COLORS[i % CHART_COLORS.length],
                     height: 12,
                     width: 12,
                     borderRadius: 9999,
                   }}
                 />
-                <Span className={cn("text-muted-foreground", legendTextSizeClass || "text-xs")}>
+                <Span
+                  className={cn(
+                    "text-muted-foreground",
+                    legendTextSizeClass || "text-xs",
+                  )}
+                >
                   {series.name}
                 </Span>
               </Div>

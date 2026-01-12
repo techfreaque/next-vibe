@@ -2,7 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/lib/storage";
 import { useCallback, useEffect, useMemo, useRef } from "react";
@@ -53,7 +57,11 @@ function mergeWithDefaults<T>(saved: T, defaults: T): T {
 
     if (savedValue !== undefined && savedValue !== null && savedValue !== "") {
       // Saved value exists and is not empty - use it (with recursive merge for objects)
-      if (typeof savedValue === "object" && !Array.isArray(savedValue) && savedValue !== null) {
+      if (
+        typeof savedValue === "object" &&
+        !Array.isArray(savedValue) &&
+        savedValue !== null
+      ) {
         result[key] = mergeWithDefaults(savedValue, defaultValue);
       } else {
         result[key] = savedValue;
@@ -133,17 +141,17 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   // Recursively extract default values from the Zod schema
   // This traverses the entire schema tree and builds an object with all default values
   // Works even when the top-level schema has required fields without defaults
-  const schemaDefaultValues = useMemo<TEndpoint["types"]["RequestOutput"]>(() => {
+  const schemaDefaultValues = useMemo<
+    TEndpoint["types"]["RequestOutput"]
+  >(() => {
     // Step 1: Extract defaults recursively from schema structure
     // Use forFormInit=true to get empty defaults for primitives (e.g., "" for strings)
     // This ensures required fields are initialized with proper empty values
-    const extracted = extractSchemaDefaults<TEndpoint["types"]["RequestOutput"]>(
-      endpoint.requestSchema,
-      logger,
-      "",
-      true,
-    );
-    const baseDefaults = (extracted ?? {}) as TEndpoint["types"]["RequestOutput"];
+    const extracted = extractSchemaDefaults<
+      TEndpoint["types"]["RequestOutput"]
+    >(endpoint.requestSchema, logger, "", true);
+    const baseDefaults = (extracted ??
+      {}) as TEndpoint["types"]["RequestOutput"];
 
     // Step 2: Pass through Zod's parse to validate and apply transformations
     // This ensures coercions (z.coerce.number()) and other transforms work
@@ -157,9 +165,15 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   }, [endpoint.requestSchema, logger]);
 
   // Merge schema defaults with provided defaultValues
-  const mergedDefaultValues = useMemo<TEndpoint["types"]["RequestOutput"]>(() => {
+  const mergedDefaultValues = useMemo<
+    TEndpoint["types"]["RequestOutput"]
+  >(() => {
     const provided = restFormOptions.defaultValues;
-    if (provided && typeof provided === "object" && Object.keys(provided).length > 0) {
+    if (
+      provided &&
+      typeof provided === "object" &&
+      Object.keys(provided).length > 0
+    ) {
       // Merge provided values over schema defaults
       return {
         ...schemaDefaultValues,
@@ -171,7 +185,10 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
 
   // Get query params reactively using a memoized selector with stable default
   // Use mergedDefaultValues (schema defaults + provided defaults) as the default query params
-  const defaultQueryParams = useMemo(() => mergedDefaultValues, [mergedDefaultValues]);
+  const defaultQueryParams = useMemo(
+    () => mergedDefaultValues,
+    [mergedDefaultValues],
+  );
   // Selector must return stable references - just get raw params from store
   const rawQueryParamsSelector = useMemo(
     () =>
@@ -187,7 +204,9 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       return defaultQueryParams;
     }
     // Deserialize JSON-stringified nested objects back to their original form
-    return deserializeQueryParams<TEndpoint["types"]["RequestOutput"]>(rawQueryParams);
+    return deserializeQueryParams<TEndpoint["types"]["RequestOutput"]>(
+      rawQueryParams,
+    );
   }, [rawQueryParams, defaultQueryParams]);
 
   // Create a function to update query params in the store
@@ -259,10 +278,13 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   const clearFormErrorStore = useApiStore((state) => state.clearFormError);
 
   // Generate a storage key based on the endpoint if not provided
-  const storageKey = persistenceKey || buildKey("query-form", endpoint, undefined, logger);
+  const storageKey =
+    persistenceKey || buildKey("query-form", endpoint, undefined, logger);
 
   // Create form configuration with schema defaults
-  const formConfigWithDefaults: UseFormProps<TEndpoint["types"]["RequestOutput"]> = {
+  const formConfigWithDefaults: UseFormProps<
+    TEndpoint["types"]["RequestOutput"]
+  > = {
     ...restFormOptions,
     resolver: zodResolver<
       TEndpoint["types"]["RequestOutput"],
@@ -274,7 +296,9 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   };
 
   // Initialize form with the proper configuration including schema defaults
-  const formMethods = useForm<TEndpoint["types"]["RequestOutput"]>(formConfigWithDefaults);
+  const formMethods = useForm<TEndpoint["types"]["RequestOutput"]>(
+    formConfigWithDefaults,
+  );
   const { watch } = formMethods;
 
   // Implement form persistence directly
@@ -311,7 +335,9 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       try {
         const savedFormData = await storage.getItem(storageKey);
         if (savedFormData) {
-          const parsedData = JSON.parse(savedFormData) as TEndpoint["types"]["RequestOutput"];
+          const parsedData = JSON.parse(
+            savedFormData,
+          ) as TEndpoint["types"]["RequestOutput"];
           // Merge saved data with schema defaults - defaults take precedence for undefined/null values
           const mergedData = mergeWithDefaults(parsedData, mergedDefaultValues);
           formMethods.reset(mergedData);
@@ -323,7 +349,13 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         // In a production app, this would use a proper error logging service
       }
     })();
-  }, [formMethods, storageKey, persistForm, setQueryParams, mergedDefaultValues]);
+  }, [
+    formMethods,
+    storageKey,
+    persistForm,
+    setQueryParams,
+    mergedDefaultValues,
+  ]);
 
   // Save form values when they change
   useEffect(() => {
@@ -374,7 +406,8 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       if (error) {
         // Convert Error to ErrorResponseType
         const errorResponse = fail({
-          message: "app.api.system.unifiedInterface.react.hooks.queryForm.errors.validation_failed",
+          message:
+            "app.api.system.unifiedInterface.react.hooks.queryForm.errors.validation_failed",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { formId, message: error.message },
         });
@@ -400,7 +433,9 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       // Respect staleTime and cacheTime from queryOptions
       // Don't hardcode to 0 as this breaks caching for all read endpoints
       // Custom onSuccess handler to merge response data into form
-      onSuccess: (data): void | ErrorResponseType | Promise<void | ErrorResponseType> => {
+      onSuccess: (
+        data,
+      ): void | ErrorResponseType | Promise<void | ErrorResponseType> => {
         // Merge response data into form so FormFieldWidget can display it
         const responseData = data.responseData;
         const currentFormData = formMethods.getValues();
@@ -445,12 +480,20 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   });
 
   // Force refetch when queryParams change (since useApiQuery doesn't auto-refetch)
-  const prevQueryParamsRef = useRef<TEndpoint["types"]["RequestOutput"] | undefined>(undefined);
+  const prevQueryParamsRef = useRef<
+    TEndpoint["types"]["RequestOutput"] | undefined
+  >(undefined);
   useEffect(() => {
     // Skip the first render (initial load)
-    if (prevQueryParamsRef.current && queryParams && typeof queryParams === "object") {
+    if (
+      prevQueryParamsRef.current &&
+      queryParams &&
+      typeof queryParams === "object"
+    ) {
       // Deep compare to avoid infinite rerenders
-      const hasChanged = JSON.stringify(prevQueryParamsRef.current) !== JSON.stringify(queryParams);
+      const hasChanged =
+        JSON.stringify(prevQueryParamsRef.current) !==
+        JSON.stringify(queryParams);
       if (hasChanged && Object.keys(queryParams).length > 0) {
         // Only refetch if not already loading to avoid conflicts
         if (!query.isLoading) {
@@ -599,7 +642,8 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         lastSubmitTimeRef.current = Date.now();
 
         // Get form data
-        const formData: TEndpoint["types"]["RequestOutput"] = formMethods.getValues();
+        const formData: TEndpoint["types"]["RequestOutput"] =
+          formMethods.getValues();
 
         // Clear any previous errors
         clearFormError();
@@ -613,7 +657,9 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         const response = await query.refetch();
         // Convert the response to a proper ResponseType
         const result =
-          typeof response === "object" && response !== null && "success" in response
+          typeof response === "object" &&
+          response !== null &&
+          "success" in response
             ? response
             : success(response);
 
@@ -647,7 +693,8 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         });
 
         const errorResponse = fail({
-          message: "app.api.system.unifiedInterface.react.hooks.queryForm.errors.network_failure",
+          message:
+            "app.api.system.unifiedInterface.react.hooks.queryForm.errors.network_failure",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { formId, error: errorMessage },
         });
@@ -703,9 +750,14 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   // Simplify error message to avoid complex union type - use explicit type assertion
   const queryError = query.error;
   const formError = formState.formError;
-  const queryErrorMessage: string = queryError ? (queryError.message as string) : "";
-  const formErrorMessage: string = formError ? (formError.message as string) : "";
-  const errorMessage: string | undefined = queryErrorMessage || formErrorMessage || undefined;
+  const queryErrorMessage: string = queryError
+    ? (queryError.message as string)
+    : "";
+  const formErrorMessage: string = formError
+    ? (formError.message as string)
+    : "";
+  const errorMessage: string | undefined =
+    queryErrorMessage || formErrorMessage || undefined;
 
   return {
     form: formMethods,

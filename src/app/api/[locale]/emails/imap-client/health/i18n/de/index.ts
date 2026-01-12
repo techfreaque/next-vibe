@@ -15,7 +15,8 @@ export const translations: typeof enTranslations = {
     },
     response: {
       title: "IMAP Gesundheitsstatus Antwort",
-      description: "Aktueller IMAP-Server Gesundheitsstatus und Leistungsmetriken",
+      description:
+        "Aktueller IMAP-Server Gesundheitsstatus und Leistungsmetriken",
       data: {
         title: "Gesundheitsdaten",
         description: "Gesundheitsstatus-Daten und Metriken",
@@ -31,14 +32,16 @@ export const translations: typeof enTranslations = {
   health: {
     get: {
       title: "IMAP Gesundheitsstatus Abrufen",
-      description: "Aktuellen IMAP-Server Gesundheitsstatus und Metriken abrufen",
+      description:
+        "Aktuellen IMAP-Server Gesundheitsstatus und Metriken abrufen",
       form: {
         title: "IMAP Gesundheitsstatus Anfrage",
         description: "Anfrageformular für IMAP-Server Gesundheitsüberwachung",
       },
       response: {
         title: "IMAP Gesundheitsstatus Antwort",
-        description: "Aktueller IMAP-Server Gesundheitsstatus und Leistungsmetriken",
+        description:
+          "Aktueller IMAP-Server Gesundheitsstatus und Leistungsmetriken",
         success: "Erfolgreich",
         message: "Gesundheitsstatus erfolgreich abgerufen",
         data: {
@@ -71,7 +74,8 @@ export const translations: typeof enTranslations = {
       errors: {
         unauthorized: {
           title: "Nicht Autorisiert",
-          description: "Authentifizierung erforderlich für Zugriff auf IMAP-Gesundheitsstatus",
+          description:
+            "Authentifizierung erforderlich für Zugriff auf IMAP-Gesundheitsstatus",
         },
         validation: {
           title: "Validierungsfehler",
@@ -79,7 +83,8 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Server Fehler",
-          description: "Interner Serverfehler beim Abrufen des Gesundheitsstatus",
+          description:
+            "Interner Serverfehler beim Abrufen des Gesundheitsstatus",
         },
         unknown: {
           title: "Unbekannter Fehler",

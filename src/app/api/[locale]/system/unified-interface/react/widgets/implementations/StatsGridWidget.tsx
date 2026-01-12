@@ -52,7 +52,13 @@ export function StatsGridWidget<const TKey extends string>({
 
   if (!data) {
     return (
-      <Div className={cn("text-center text-muted-foreground", paddingClass || "py-8", className)}>
+      <Div
+        className={cn(
+          "text-center text-muted-foreground",
+          paddingClass || "py-8",
+          className,
+        )}
+      >
         —
       </Div>
     );
@@ -67,7 +73,8 @@ export function StatsGridWidget<const TKey extends string>({
     3: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
     4: "grid-cols-1 md:grid-cols-2 lg:grid-cols-4",
   };
-  const gridClass = gridClassMap[columns] ?? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+  const gridClass =
+    gridClassMap[columns] ?? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
   /* eslint-enable i18next/no-literal-string */
 
   return (

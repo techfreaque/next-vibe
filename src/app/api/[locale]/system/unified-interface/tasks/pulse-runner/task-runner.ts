@@ -75,7 +75,10 @@ const pulseTaskRunner: TaskRunner = {
             ),
           );
         } else {
-          logger.error(`Pulse #${pulseCount} failed`, new Error(pulseResult.message));
+          logger.error(
+            `Pulse #${pulseCount} failed`,
+            new Error(pulseResult.message),
+          );
         }
       } catch (error) {
         const errorMsg = parseError(error).message;

@@ -14,7 +14,11 @@ export const { GET, PATCH, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined,
     handler: async (props) => {
-      return await getFolderPermissions(props.user, { id: props.urlPathParams.id }, props.logger);
+      return await getFolderPermissions(
+        props.user,
+        { id: props.urlPathParams.id },
+        props.logger,
+      );
     },
   },
   [Methods.PATCH]: {
@@ -24,7 +28,11 @@ export const { GET, PATCH, tools } = endpointsHandler({
         ...props.data,
         id: props.urlPathParams.id,
       };
-      return await updateFolderPermissions(props.user, dataWithId, props.logger);
+      return await updateFolderPermissions(
+        props.user,
+        dataWithId,
+        props.logger,
+      );
     },
   },
 });

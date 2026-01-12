@@ -7,7 +7,11 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
@@ -19,7 +23,10 @@ import { simpleT } from "@/i18n/core/shared";
 import { db } from "../../system/db";
 import { newsletterSubscriptions } from "../db";
 import { NewsletterSubscriptionStatus } from "../enum";
-import type { UnsubscribePostRequestOutput, UnsubscribePostResponseOutput } from "./definition";
+import type {
+  UnsubscribePostRequestOutput,
+  UnsubscribePostResponseOutput,
+} from "./definition";
 
 export class NewsletterUnsubscribeRepository {
   static async unsubscribe(
@@ -36,21 +43,25 @@ export class NewsletterUnsubscribeRepository {
       });
 
       // Update lead status to unsubscribed if lead exists
-      const leadUpdateResult = await LeadsRepository.updateLeadStatusOnNewsletterUnsubscribe(
-        data.email,
-        logger,
-      );
+      const leadUpdateResult =
+        await LeadsRepository.updateLeadStatusOnNewsletterUnsubscribe(
+          data.email,
+          logger,
+        );
       if (leadUpdateResult.success) {
         logger.debug("Lead status update result", {
           email: data.email,
           leadFound: leadUpdateResult.data?.leadFound,
         });
       } else {
-        logger.error("Failed to update lead status during newsletter unsubscribe", {
-          email: data.email,
-          errorType: leadUpdateResult.errorType,
-          message: leadUpdateResult.message,
-        });
+        logger.error(
+          "Failed to update lead status during newsletter unsubscribe",
+          {
+            email: data.email,
+            errorType: leadUpdateResult.errorType,
+            message: leadUpdateResult.message,
+          },
+        );
       }
 
       // Handle newsletter subscription
@@ -114,14 +125,16 @@ export class NewsletterUnsubscribeRepository {
       });
 
       // Send SMS notifications after successful unsubscription (fire-and-forget)
-      const { sendConfirmationSms, sendAdminNotificationSms } = await import("./sms");
+      const { sendConfirmationSms, sendAdminNotificationSms } =
+        await import("./sms");
       sendConfirmationSms(data, user, locale, logger).catch((smsError: Error) =>
         logger.debug("Confirmation SMS failed but continuing", {
           smsError,
         }),
       );
-      sendAdminNotificationSms(data, user, locale, logger).catch((smsError: Error) =>
-        logger.debug("Admin SMS failed but continuing", { smsError }),
+      sendAdminNotificationSms(data, user, locale, logger).catch(
+        (smsError: Error) =>
+          logger.debug("Admin SMS failed but continuing", { smsError }),
       );
 
       return success({

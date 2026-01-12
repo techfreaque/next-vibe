@@ -7,7 +7,11 @@ import "server-only";
 
 import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -80,7 +84,8 @@ export class SmtpAccountsListRepository {
         sortColumn = smtpAccounts.createdAt;
       }
 
-      const orderBy = sortOrder === SortOrder.ASC ? sortColumn : desc(sortColumn);
+      const orderBy =
+        sortOrder === SortOrder.ASC ? sortColumn : desc(sortColumn);
 
       // Pagination
       const page = data.page || 1;
@@ -91,7 +96,9 @@ export class SmtpAccountsListRepository {
       const totalResult = await db
         .select({ count: sql<number>`count(*)::int` })
         .from(smtpAccounts)
-        .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
+        .where(
+          whereConditions.length > 0 ? and(...whereConditions) : undefined,
+        );
 
       const total = totalResult[0]?.count || 0;
       const totalPages = Math.ceil(total / limit);

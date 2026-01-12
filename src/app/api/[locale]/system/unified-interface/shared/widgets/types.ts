@@ -144,7 +144,10 @@ export interface WidgetComponentProps<
 /**
  * Field type with narrowed widget config based on WidgetType discriminator.
  */
-type NarrowedField<TKey extends string, T extends WidgetType> = UnifiedField<TKey> & {
+type NarrowedField<
+  TKey extends string,
+  T extends WidgetType,
+> = UnifiedField<TKey> & {
   ui: ExtractWidgetConfig<T, TKey>;
 };
 
@@ -212,7 +215,10 @@ export type ReactWidgetPropsUnion<
   TFieldValues extends FieldValues = FieldValues,
 > = ReactWidgetPropsMap<TKey, TFieldValues>[WidgetType];
 
-export type WidgetRenderer<TKey extends string, TFieldValues extends FieldValues = FieldValues> = (
+export type WidgetRenderer<
+  TKey extends string,
+  TFieldValues extends FieldValues = FieldValues,
+> = (
   props: WidgetComponentProps<TKey, TFieldValues>,
 ) => React.ReactElement | string | null;
 

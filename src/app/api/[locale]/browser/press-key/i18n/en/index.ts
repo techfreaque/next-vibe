@@ -7,7 +7,8 @@ export const translations = {
     fields: {
       key: {
         label: "Key",
-        description: "A key or a combination (e.g., Enter, Control+A, Control+Shift+R)",
+        description:
+          "A key or a combination (e.g., Enter, Control+A, Control+Shift+R)",
         placeholder: "Enter key or combination",
       },
     },
@@ -41,7 +42,8 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred during the key press operation",
+      description:
+        "An internal server error occurred during the key press operation",
     },
     unknown: {
       title: "Unknown Error",

@@ -128,7 +128,8 @@ export const translations = {
       freeResourceTitle: "Free Resource for You",
       freeResourceDescription:
         "Download our comprehensive guide packed with actionable tips and strategies",
-      noObligationText: "No strings attached - this is our way of helping you succeed",
+      noObligationText:
+        "No strings attached - this is our way of helping you succeed",
       ctaText: "Download Free Resource",
       subject: "Insights to Help Your Business Grow",
     },

@@ -15,7 +15,11 @@ interface LoginFormProps {
  * Client component for login form with redirect handling
  * Uses EndpointsPage with custom onSuccess logic for redirects
  */
-export function LoginForm({ locale, callbackUrl, user }: LoginFormProps): React.JSX.Element {
+export function LoginForm({
+  locale,
+  callbackUrl,
+  user,
+}: LoginFormProps): React.JSX.Element {
   return (
     <EndpointsPage
       endpoint={loginEndpoints}

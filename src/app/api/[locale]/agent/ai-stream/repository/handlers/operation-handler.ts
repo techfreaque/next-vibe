@@ -64,12 +64,13 @@ export class OperationHandler {
             fileType: data.audioInput.file.type,
           });
 
-          const transcriptionResult = await SpeechToTextRepository.transcribeAudio(
-            data.audioInput.file,
-            user,
-            locale,
-            logger,
-          );
+          const transcriptionResult =
+            await SpeechToTextRepository.transcribeAudio(
+              data.audioInput.file,
+              user,
+              locale,
+              logger,
+            );
 
           if (!transcriptionResult.success) {
             logger.error("[Setup] Audio transcription failed", {
@@ -79,7 +80,8 @@ export class OperationHandler {
           }
 
           const transcribedText = transcriptionResult.data.response.text;
-          const confidence = transcriptionResult.data.response.confidence ?? null;
+          const confidence =
+            transcriptionResult.data.response.confidence ?? null;
           logger.debug("[Setup] Audio transcription successful", {
             textLength: transcribedText.length,
             confidence,

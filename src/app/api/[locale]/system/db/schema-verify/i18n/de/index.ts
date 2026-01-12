@@ -4,7 +4,8 @@ export const translations: typeof enTranslations = {
   tag: "schema-verify",
   post: {
     title: "Schema-Verifizierung",
-    description: "Datenbankschema-Integrität prüfen und optional Probleme beheben",
+    description:
+      "Datenbankschema-Integrität prüfen und optional Probleme beheben",
     form: {
       title: "Schema-Verifizierungskonfiguration",
       description: "Schema-Verifizierungsparameter konfigurieren",
@@ -32,7 +33,8 @@ export const translations: typeof enTranslations = {
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist während der Schema-Verifizierung aufgetreten",
+        description:
+          "Ein unbekannter Fehler ist während der Schema-Verifizierung aufgetreten",
       },
       network: {
         title: "Netzwerkfehler",
@@ -88,7 +90,9 @@ export const translations: typeof enTranslations = {
     constraints: "✅ {{count}} Einschränkungen verifiziert",
   },
   fixed: "🔧 {{count}} Schema-Probleme behoben",
-  validationPassed: "\n✅ Schema-Validierung bestanden - alle Prüfungen erfolgreich",
-  validationFailed: "\n❌ Schema-Validierung fehlgeschlagen - {{count}} Probleme gefunden",
+  validationPassed:
+    "\n✅ Schema-Validierung bestanden - alle Prüfungen erfolgreich",
+  validationFailed:
+    "\n❌ Schema-Validierung fehlgeschlagen - {{count}} Probleme gefunden",
   dbConnectionFailed: "Verbindung zur Datenbank fehlgeschlagen",
 };

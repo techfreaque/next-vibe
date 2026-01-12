@@ -39,7 +39,8 @@ export const translations: typeof enTranslations = {
 
   container: {
     title: "Konfiguracja Vibe Check",
-    description: "Skonfiguruj parametry dla kompleksowego sprawdzania jakości kodu",
+    description:
+      "Skonfiguruj parametry dla kompleksowego sprawdzania jakości kodu",
   },
 
   fields: {

@@ -6,7 +6,8 @@ export const translations: typeof enTranslations = {
     "Rozpoczyna nagrywanie trace wydajności na wybranej stronie w celu analizy metryk wydajności i core web vitals",
   form: {
     label: "Rozpocznij trace wydajności",
-    description: "Rozpocznij nagrywanie metryk wydajności dla strony przeglądarki",
+    description:
+      "Rozpocznij nagrywanie metryk wydajności dla strony przeglądarki",
     fields: {
       reload: {
         label: "Przeładuj stronę",
@@ -16,7 +17,8 @@ export const translations: typeof enTranslations = {
       },
       autoStop: {
         label: "Automatyczne zatrzymanie",
-        description: "Określa, czy nagrywanie trace powinno zostać automatycznie zatrzymane",
+        description:
+          "Określa, czy nagrywanie trace powinno zostać automatycznie zatrzymane",
         placeholder: "true",
       },
     },
@@ -50,11 +52,13 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description: "Wystąpił wewnętrzny błąd serwera podczas rozpoczynania trace wydajności",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas rozpoczynania trace wydajności",
     },
     unknown: {
       title: "Nieznany błąd",
-      description: "Wystąpił nieznany błąd podczas rozpoczynania trace wydajności",
+      description:
+        "Wystąpił nieznany błąd podczas rozpoczynania trace wydajności",
     },
     unsavedChanges: {
       title: "Niezapisane zmiany",

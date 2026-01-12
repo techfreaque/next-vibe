@@ -51,8 +51,8 @@ export function AdvancedPreview(): JSX.Element {
                   Array.from({ length: 20 }, (item, i) => {
                     return (
                       <P key={i}>
-                        Scrollable content item {i + 1}. This is a long piece of text to demonstrate
-                        scrolling behavior.
+                        Scrollable content item {i + 1}. This is a long piece of
+                        text to demonstrate scrolling behavior.
                       </P>
                     );
                   })

@@ -7,7 +7,10 @@ import { CONTACT_FORM_ALIAS } from "../../contact/definition";
 import { aliasToPathMap } from "../../system/generated/endpoint";
 import { SEARCH_ALIAS } from "../brave-search/definition";
 import { FETCH_URL_ALIAS } from "../fetch-url-content/definition";
-import { MEMORY_DELETE_ALIAS, MEMORY_UPDATE_ALIAS } from "./memories/[id]/definition";
+import {
+  MEMORY_DELETE_ALIAS,
+  MEMORY_UPDATE_ALIAS,
+} from "./memories/[id]/definition";
 import { MEMORY_ADD_ALIAS, MEMORY_LIST_ALIAS } from "./memories/definition";
 
 /**
@@ -61,4 +64,6 @@ export const DEFAULT_TOOL_IDS = [
  * Default AI tools that require confirmation
  * These tools will prompt the user before execution when called by the AI
  */
-export const DEFAULT_TOOL_CONFIRMATION_IDS = [aliasToPathMap[CONTACT_FORM_ALIAS]] as const;
+export const DEFAULT_TOOL_CONFIRMATION_IDS = [
+  aliasToPathMap[CONTACT_FORM_ALIAS],
+] as const;

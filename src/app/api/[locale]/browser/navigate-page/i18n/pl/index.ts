@@ -9,7 +9,8 @@ export const translations: typeof enTranslations = {
     fields: {
       type: {
         label: "Typ nawigacji",
-        description: "Nawiguj po URL, wstecz lub do przodu w historii, lub odśwież",
+        description:
+          "Nawiguj po URL, wstecz lub do przodu w historii, lub odśwież",
         placeholder: "Wybierz typ nawigacji",
         options: {
           url: "URL",
@@ -30,7 +31,8 @@ export const translations: typeof enTranslations = {
       },
       timeout: {
         label: "Limit czasu",
-        description: "Maksymalny czas oczekiwania w milisekundach (0 dla domyślnego)",
+        description:
+          "Maksymalny czas oczekiwania w milisekundach (0 dla domyślnego)",
         placeholder: "Wprowadź limit czasu",
       },
     },

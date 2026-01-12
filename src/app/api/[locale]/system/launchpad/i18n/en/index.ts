@@ -2,7 +2,8 @@ export const translations = {
   category: "Release Executor",
 
   errors: {
-    configNotLoaded: "Configuration not loaded. Please load the configuration first.",
+    configNotLoaded:
+      "Configuration not loaded. Please load the configuration first.",
     configFileNotFound: "Config file not found: {{path}}",
     configFileNotFoundInParents:
       "Config file '{{filename}}' not found in current directory or any parent directories",
@@ -56,14 +57,16 @@ export const translations = {
     },
 
     forceRelease: {
-      starting: "🚀 Force releasing all targets with {{versionBump}} version bump...",
+      starting:
+        "🚀 Force releasing all targets with {{versionBump}} version bump...",
     },
 
     weeklyUpdate: {
       starting: "📅 Starting weekly update process...",
       targetBranch: "Target branch: {{branchName}}",
       creatingBranch: "🌿 Creating update branch...",
-      gitCheckout: "git checkout -b {{branchName}} || git checkout {{branchName}}",
+      gitCheckout:
+        "git checkout -b {{branchName}} || git checkout {{branchName}}",
       updatingPackages: "🔄 Updating all package dependencies...",
       runningSnyk: "🔍 Running Snyk security monitoring...",
       noChanges: "📝 No changes detected, skipping commit and PR creation",
@@ -76,7 +79,8 @@ export const translations = {
     },
 
     snyk: {
-      noCredentials: "⚠️  Snyk credentials not found, skipping security monitoring",
+      noCredentials:
+        "⚠️  Snyk credentials not found, skipping security monitoring",
       monitoring: "🔍 Monitoring {{packageName}}...",
       failed: "⚠️  Snyk monitoring failed for {{packageFile}}, continuing...",
     },
@@ -105,8 +109,10 @@ export const translations = {
 
   updateAll: {
     updating: "🔄 Updating all repositories...",
-    failedClone: "⚠️  Failed to clone {{repoPath}}, continuing with other repositories...",
-    failedUpdate: "⚠️  Failed to update {{repoPath}}, continuing with other repositories...",
+    failedClone:
+      "⚠️  Failed to clone {{repoPath}}, continuing with other repositories...",
+    failedUpdate:
+      "⚠️  Failed to update {{repoPath}}, continuing with other repositories...",
     clonedSuccess: "✅ Successfully cloned {{count}} missing repositories.",
     updatedSuccess: "✅ Successfully updated {{count}} existing repositories.",
     cloneFailed: "❌ Failed to clone {{count}} repositories:",

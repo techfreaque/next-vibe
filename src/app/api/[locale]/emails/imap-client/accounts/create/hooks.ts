@@ -14,7 +14,9 @@ import definitions from "./definition";
 /**
  * Hook for creating IMAP accounts
  */
-export function useImapAccountCreate(logger: EndpointLogger): EndpointReturn<typeof definitions> {
+export function useImapAccountCreate(
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {
@@ -27,4 +29,6 @@ export function useImapAccountCreate(logger: EndpointLogger): EndpointReturn<typ
 // Export with alternative name for compatibility
 export const useImapAccountCreateEndpoint = useImapAccountCreate;
 
-export type ImapAccountCreateEndpointReturn = EndpointReturn<typeof definitions>;
+export type ImapAccountCreateEndpointReturn = EndpointReturn<
+  typeof definitions
+>;

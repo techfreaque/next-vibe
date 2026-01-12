@@ -7,7 +7,11 @@ import { styledNative } from "../utils/style-converter";
 
 const StyledText = styledNative(LabelPrimitive.Text);
 
-export function Label({ className, children, htmlFor }: LabelRootProps): React.JSX.Element {
+export function Label({
+  className,
+  children,
+  htmlFor,
+}: LabelRootProps): React.JSX.Element {
   return (
     <LabelPrimitive.Root>
       <StyledText

@@ -31,7 +31,10 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <Div role="contentinfo" className="w-full border-t bg-gray-50 dark:bg-gray-900">
+    <Div
+      role="contentinfo"
+      className="w-full border-t bg-gray-50 dark:bg-gray-900"
+    >
       <Div className="container px-4 md:px-6 py-12 md:py-16">
         <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand Column */}

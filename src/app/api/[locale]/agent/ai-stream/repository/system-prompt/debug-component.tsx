@@ -108,7 +108,11 @@ export function DebugSystemPrompt({
               className="h-7 px-2 hover:bg-purple-500/20"
               title={showMarkdown ? "Show as plain text" : "Show as markdown"}
             >
-              {showMarkdown ? <FileText className="h-4 w-4" /> : <Code className="h-4 w-4" />}
+              {showMarkdown ? (
+                <FileText className="h-4 w-4" />
+              ) : (
+                <Code className="h-4 w-4" />
+              )}
             </Button>
           </Div>
 

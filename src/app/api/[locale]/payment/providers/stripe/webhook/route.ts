@@ -45,17 +45,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     if (!signature) {
       logger.error("payment.webhook.stripe.signature.missing");
-      return NextResponse.json({ error: ERROR_MISSING_SIGNATURE }, { status: 400 });
+      return NextResponse.json(
+        { error: ERROR_MISSING_SIGNATURE },
+        { status: 400 },
+      );
     }
 
     // Process the webhook
-    const result = await PaymentRepository.handleWebhook(body, signature, logger);
+    const result = await PaymentRepository.handleWebhook(
+      body,
+      signature,
+      logger,
+    );
 
     if (!result.success) {
       logger.error("payment.webhook.stripe.processing.failed", {
         message: result.message,
       });
-      return NextResponse.json({ error: ERROR_WEBHOOK_PROCESSING_FAILED }, { status: 400 });
+      return NextResponse.json(
+        { error: ERROR_WEBHOOK_PROCESSING_FAILED },
+        { status: 400 },
+      );
     }
 
     logger.debug("payment.webhook.stripe.processed.success");
@@ -70,5 +80,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
  * GET handler - not allowed for webhooks
  */
 export function GET(): NextResponse {
-  return NextResponse.json({ error: ERROR_METHOD_NOT_ALLOWED }, { status: 405 });
+  return NextResponse.json(
+    { error: ERROR_METHOD_NOT_ALLOWED },
+    { status: 405 },
+  );
 }

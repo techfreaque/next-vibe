@@ -108,7 +108,8 @@ export function ChartLegend({
   }
 
   const containerStyle = {
-    flexDirection: orientation === "horizontal" ? ("row" as const) : ("column" as const),
+    flexDirection:
+      orientation === "horizontal" ? ("row" as const) : ("column" as const),
     gap: gutter,
     padding: 8,
     ...style,
@@ -152,7 +153,10 @@ export function ChartTooltipContent({
     <View
       {...applyStyleType({
         nativeStyle,
-        className: cn("rounded-lg border bg-background p-2 shadow-md", className),
+        className: cn(
+          "rounded-lg border bg-background p-2 shadow-md",
+          className,
+        ),
       })}
       {...props}
     >
@@ -251,7 +255,9 @@ function ChartFallback(): React.JSX.Element {
         minHeight: 200,
       }}
     >
-      <Text style={{ color: "#999", fontSize: 14, fontWeight: "600" }}>Chart unavailable</Text>
+      <Text style={{ color: "#999", fontSize: 14, fontWeight: "600" }}>
+        Chart unavailable
+      </Text>
       <Text
         style={{
           color: "#666",
@@ -356,7 +362,15 @@ export function Line({
   return <VictoryLine {...lineProps} />;
 }
 
-export function Bar({ data, x, y, animate, barWidth, style, labels }: BarProps): React.JSX.Element {
+export function Bar({
+  data,
+  x,
+  y,
+  animate,
+  barWidth,
+  style,
+  labels,
+}: BarProps): React.JSX.Element {
   const components = getVictoryComponents();
   if (!components || !components.Bar) {
     return <ChartFallback />;

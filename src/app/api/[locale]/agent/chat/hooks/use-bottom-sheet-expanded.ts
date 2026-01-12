@@ -14,7 +14,10 @@ const STORAGE_KEY = "chat-bottom-sheet-expanded";
  * - Initial state: false (collapsed) for SSR
  * - Persists user preference to localStorage
  */
-export function useBottomSheetExpanded(): [boolean, (expanded: boolean) => void] {
+export function useBottomSheetExpanded(): [
+  boolean,
+  (expanded: boolean) => void,
+] {
   // Initialize state - default to collapsed
   const [expanded, setExpanded] = useState<boolean>(false);
 

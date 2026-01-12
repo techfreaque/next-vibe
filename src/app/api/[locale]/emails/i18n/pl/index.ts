@@ -510,7 +510,8 @@ export const translations: typeof enTranslations = {
             totalProcessed: "Całkowita liczba przetworzonych",
             totalProcessed_description: "Liczba przetworzonych leadów",
             totalUpdated: "Całkowita liczba zaktualizowanych",
-            totalUpdated_description: "Liczba pomyślnie zaktualizowanych leadów",
+            totalUpdated_description:
+              "Liczba pomyślnie zaktualizowanych leadów",
             errorsCount: "Liczba błędów",
             errorsCount_description: "Liczba błędów podczas przetwarzania",
             dryRun: "Tryb testowy",
@@ -541,7 +542,8 @@ export const translations: typeof enTranslations = {
       form: {
         meta: {
           name: "Przesłanie formularza kontaktowego",
-          description: "E-mail wysyłany przy przesłaniu formularza kontaktowego",
+          description:
+            "E-mail wysyłany przy przesłaniu formularza kontaktowego",
         },
         preview: {
           name: "Imię i nazwisko",
@@ -555,7 +557,8 @@ export const translations: typeof enTranslations = {
           message: "Wiadomość",
           message_description: "Treść wiadomości",
           isForCompany: "Dla konta firmowego",
-          isForCompany_description: "Czy ta wiadomość jest wysyłana do zespołu firmowego",
+          isForCompany_description:
+            "Czy ta wiadomość jest wysyłana do zespołu firmowego",
           userId: "ID użytkownika",
           userId_description: "ID powiązanego użytkownika (opcjonalnie)",
           leadId: "ID leada",

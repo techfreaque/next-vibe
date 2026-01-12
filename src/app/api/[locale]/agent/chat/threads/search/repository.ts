@@ -9,7 +9,10 @@ import { db } from "@/app/api/[locale]/system/db";
 
 import { chatThreads } from "../../db";
 import { ThreadStatus } from "../../enum";
-import type { ThreadSearchGetRequestOutput, ThreadSearchGetResponseOutput } from "./definition";
+import type {
+  ThreadSearchGetRequestOutput,
+  ThreadSearchGetResponseOutput,
+} from "./definition";
 
 /**
  * Search threads using PostgreSQL full-text search

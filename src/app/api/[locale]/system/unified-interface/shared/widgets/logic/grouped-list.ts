@@ -109,18 +109,25 @@ export function groupListData(
   }
 
   // Sort groups by key alphabetically
-  return new Map([...groups.entries()].toSorted((a, b) => a[0].localeCompare(b[0])));
+  return new Map(
+    [...groups.entries()].toSorted((a, b) => a[0].localeCompare(b[0])),
+  );
 }
 
 /**
  * Sort grouped items by specified field
  */
-export function sortGroupedItems(items: GroupedListItem[], sortBy: string): GroupedListItem[] {
+export function sortGroupedItems(
+  items: GroupedListItem[],
+  sortBy: string,
+): GroupedListItem[] {
   return items.toSorted((a, b) => {
     if (sortBy === "severity") {
       const severityOrder = { error: 0, warning: 1, info: 2 };
-      const aOrder = severityOrder[a.severity as keyof typeof severityOrder] ?? 3;
-      const bOrder = severityOrder[b.severity as keyof typeof severityOrder] ?? 3;
+      const aOrder =
+        severityOrder[a.severity as keyof typeof severityOrder] ?? 3;
+      const bOrder =
+        severityOrder[b.severity as keyof typeof severityOrder] ?? 3;
       if (aOrder !== bOrder) {
         return aOrder - bOrder;
       }
@@ -138,7 +145,10 @@ export function sortGroupedItems(items: GroupedListItem[], sortBy: string): Grou
 /**
  * Build hierarchical tree structure from flat data
  */
-export function buildHierarchicalTree(data: GroupedListItem[], groupBy: string): TreeNode {
+export function buildHierarchicalTree(
+  data: GroupedListItem[],
+  groupBy: string,
+): TreeNode {
   const root: TreeNode = {
     name: "",
     fullPath: "",
@@ -194,7 +204,10 @@ export function countItemsRecursive(node: TreeNode): number {
 /**
  * Calculate stat count for a specific field/value combination
  */
-export function calculateStatCount(data: GroupedListItem[], stat: StatConfig): number {
+export function calculateStatCount(
+  data: GroupedListItem[],
+  stat: StatConfig,
+): number {
   if (!stat.field || !stat.value) {
     return 0;
   }
@@ -264,14 +277,16 @@ export function extractGroupedListData(
   }
 
   // Narrow to object type
-  const isObject = typeof value === "object" && value !== null && !Array.isArray(value);
+  const isObject =
+    typeof value === "object" && value !== null && !Array.isArray(value);
 
   if (!isObject) {
     return null;
   }
 
   // Extract properties with explicit checks
-  const groups = "groups" in value && Array.isArray(value.groups) ? value.groups : [];
+  const groups =
+    "groups" in value && Array.isArray(value.groups) ? value.groups : [];
   const maxItemsPerGroup =
     "maxItemsPerGroup" in value && typeof value.maxItemsPerGroup === "number"
       ? value.maxItemsPerGroup
@@ -284,7 +299,9 @@ export function extractGroupedListData(
   // If no groups found, try to find an array property to auto-group
   if (!groups || groups.length === 0) {
     // Look for array properties in the value object (direct or nested)
-    let arrayKeys = Object.keys(value).filter((key) => Array.isArray(value[key]));
+    let arrayKeys = Object.keys(value).filter((key) =>
+      Array.isArray(value[key]),
+    );
 
     // If no direct arrays found, check nested objects (common pattern: { response: { items: [...] } })
     if (arrayKeys.length === 0) {
@@ -369,9 +386,12 @@ export function extractGroupedListData(
 
       const groupKey = "key" in group ? String(group.key) : "";
       const groupLabel = "label" in group ? String(group.label) : "";
-      const groupItems = "items" in group && Array.isArray(group.items) ? group.items : [];
+      const groupItems =
+        "items" in group && Array.isArray(group.items) ? group.items : [];
       const groupSummary =
-        "summary" in group && typeof group.summary === "object" && group.summary !== null
+        "summary" in group &&
+        typeof group.summary === "object" &&
+        group.summary !== null
           ? (group.summary as Record<string, WidgetData>)
           : undefined;
 
@@ -418,7 +438,10 @@ export function getDisplayItems(
 /**
  * Calculate remaining items count
  */
-export function getRemainingItemsCount(totalItems: number, maxItems: number | undefined): number {
+export function getRemainingItemsCount(
+  totalItems: number,
+  maxItems: number | undefined,
+): number {
   if (!maxItems || totalItems <= maxItems) {
     return 0;
   }

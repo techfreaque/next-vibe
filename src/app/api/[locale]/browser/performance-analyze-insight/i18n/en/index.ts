@@ -4,7 +4,8 @@ export const translations = {
     "Provides more detailed information on a specific Performance Insight of an insight set that was highlighted in the results of a trace recording",
   form: {
     label: "Analyze Performance Insight",
-    description: "Get detailed information about a specific performance insight",
+    description:
+      "Get detailed information about a specific performance insight",
     fields: {
       insightSetId: {
         label: "Insight Set ID",
@@ -33,7 +34,8 @@ export const translations = {
     },
     network: {
       title: "Network Error",
-      description: "A network error occurred while analyzing the performance insight",
+      description:
+        "A network error occurred while analyzing the performance insight",
     },
     unauthorized: {
       title: "Unauthorized",
@@ -49,11 +51,13 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred while analyzing the performance insight",
+      description:
+        "An internal server error occurred while analyzing the performance insight",
     },
     unknown: {
       title: "Unknown Error",
-      description: "An unknown error occurred while analyzing the performance insight",
+      description:
+        "An unknown error occurred while analyzing the performance insight",
     },
     unsavedChanges: {
       title: "Unsaved Changes",
@@ -61,7 +65,8 @@ export const translations = {
     },
     conflict: {
       title: "Conflict",
-      description: "A conflict occurred while analyzing the performance insight",
+      description:
+        "A conflict occurred while analyzing the performance insight",
     },
   },
   success: {

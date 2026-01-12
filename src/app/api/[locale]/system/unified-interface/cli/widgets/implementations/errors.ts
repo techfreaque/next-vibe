@@ -19,7 +19,9 @@ import { extractErrorData } from "@/app/api/[locale]/system/unified-interface/sh
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class ErrorWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.ERROR> {
+export class ErrorWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.ERROR
+> {
   readonly widgetType = WidgetType.ERROR;
 
   /**
@@ -60,7 +62,11 @@ export class ErrorWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.ER
       const codeLabel = context.t(
         "app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.errors.code",
       );
-      const codeText = this.styleText(`${codeLabel}: ${data.code}`, "dim", context);
+      const codeText = this.styleText(
+        `${codeLabel}: ${data.code}`,
+        "dim",
+        context,
+      );
       lines.push(`${indent}${codeText}`);
     }
 
@@ -70,7 +76,9 @@ export class ErrorWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.ER
       const stackTraceLabel = context.t(
         "app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.errors.stackTrace",
       );
-      lines.push(`${indent}${this.styleText(`${stackTraceLabel}:`, "dim", context)}`);
+      lines.push(
+        `${indent}${this.styleText(`${stackTraceLabel}:`, "dim", context)}`,
+      );
       const stackLines = data.stack.split("\n").slice(0, 5);
       for (const stackLine of stackLines) {
         lines.push(`${indent}  ${this.styleText(stackLine, "dim", context)}`);
@@ -80,7 +88,9 @@ export class ErrorWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.ER
     // Action
     if (data.action) {
       lines.push("");
-      lines.push(`${indent}${this.styleText(data.action.label, "yellow", context)}`);
+      lines.push(
+        `${indent}${this.styleText(data.action.label, "yellow", context)}`,
+      );
     }
 
     return lines.join("\n");

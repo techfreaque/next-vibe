@@ -15,7 +15,15 @@ export interface LabelRootProps {
   className?: string;
 }
 
-export function Label({ className, ...props }: LabelRootProps): React.JSX.Element {
-  return <LabelPrimitive.Root className={cn(labelVariants(), className)} {...props} />;
+export function Label({
+  className,
+  ...props
+}: LabelRootProps): React.JSX.Element {
+  return (
+    <LabelPrimitive.Root
+      className={cn(labelVariants(), className)}
+      {...props}
+    />
+  );
 }
 Label.displayName = LabelPrimitive.Root.displayName;

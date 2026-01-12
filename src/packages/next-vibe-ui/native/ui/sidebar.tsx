@@ -12,13 +12,22 @@ import { useTranslation } from "@/i18n/core/client";
 
 import { applyStyleType } from "../../web/utils/style-type";
 import { useIsMobile } from "../hooks/use-mobile";
-import { convertCSSToViewStyle, styledNative, styledNativeRef } from "../utils/style-converter";
+import {
+  convertCSSToViewStyle,
+  styledNative,
+  styledNativeRef,
+} from "../utils/style-converter";
 import { Button } from "./button";
 import { PanelLeft } from "./icons/PanelLeft";
 import { Separator } from "./separator";
 import { Sheet, SheetContent } from "./sheet";
 import { Skeleton } from "./skeleton";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./tooltip";
 
 // Constants
 export const SIDEBAR_COOKIE_NAME = "sidebar:state";
@@ -294,7 +303,10 @@ function SidebarProvider({
         <StyledView
           {...applyStyleType({
             nativeStyle,
-            className: cn("group/sidebar-wrapper flex min-h-screen w-full", className),
+            className: cn(
+              "group/sidebar-wrapper flex min-h-screen w-full",
+              className,
+            ),
           })}
           {...props}
         >
@@ -342,7 +354,9 @@ function Sidebar({
           className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground"
           side={side}
         >
-          <StyledView className="flex h-full w-full flex-col">{children}</StyledView>
+          <StyledView className="flex h-full w-full flex-col">
+            {children}
+          </StyledView>
         </SheetContent>
       </Sheet>
     );
@@ -426,14 +440,24 @@ function SidebarTrigger({
 }
 SidebarTrigger.displayName = "SidebarTrigger";
 
-export function TopBar({ children }: { children: React.ReactNode }): React.JSX.Element {
+export function TopBar({
+  children,
+}: {
+  children: React.ReactNode;
+}): React.JSX.Element {
   return (
-    <StyledView className="absolute top-4 left-4 z-51 flex flex-row gap-1">{children}</StyledView>
+    <StyledView className="absolute top-4 left-4 z-51 flex flex-row gap-1">
+      {children}
+    </StyledView>
   );
 }
 TopBar.displayName = "TopBar";
 
-function SidebarRail({ className, style, onClick }: SidebarRailProps): React.JSX.Element {
+function SidebarRail({
+  className,
+  style,
+  onClick,
+}: SidebarRailProps): React.JSX.Element {
   const { toggleSidebar } = useSidebar();
   const { t } = useTranslation();
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
@@ -701,7 +725,15 @@ const SidebarMenuButton = React.forwardRef<
   } & VariantProps<typeof sidebarMenuButtonVariants>
 >(
   (
-    { asChild = false, variant = "default", size = "default", tooltip, className, style, ...props },
+    {
+      asChild = false,
+      variant = "default",
+      size = "default",
+      tooltip,
+      className,
+      style,
+      ...props
+    },
     ref,
   ) => {
     const Comp = asChild ? Slot.Pressable : StyledPressable;
@@ -713,7 +745,10 @@ const SidebarMenuButton = React.forwardRef<
         ref={ref}
         {...applyStyleType({
           nativeStyle,
-          className: cn(sidebarMenuButtonVariants({ variant, size }), className),
+          className: cn(
+            sidebarMenuButtonVariants({ variant, size }),
+            className,
+          ),
         })}
         {...props}
       />
@@ -752,32 +787,37 @@ const SidebarMenuAction = React.forwardRef<
     className?: string;
     style?: React.CSSProperties;
   }
->(({ className, style, asChild = false, showOnHover = false, ...props }, ref) => {
-  const Comp = asChild ? Slot.Pressable : StyledPressable;
-  const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
+>(
+  (
+    { className, style, asChild = false, showOnHover = false, ...props },
+    ref,
+  ) => {
+    const Comp = asChild ? Slot.Pressable : StyledPressable;
+    const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
-  return (
-    <Comp
-      ref={ref}
-      {...applyStyleType({
-        nativeStyle,
-        className: cn(
-          "absolute right-1 top-1.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-none ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 peer-hover/menu-button:text-sidebar-accent-foreground [&>svg]:size-4 [&>svg]:shrink-0",
-          // Increases the hit area of the button on mobile.
-          "after:absolute after:-inset-2 after:md:hidden",
-          "peer-data-[size=sm]/menu-button:top-1",
-          "peer-data-[size=default]/menu-button:top-1.5",
-          "peer-data-[size=lg]/menu-button:top-2.5",
-          "group-data-[collapsible=icon]:hidden",
-          showOnHover &&
-            "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0",
-          className,
-        ),
-      })}
-      {...props}
-    />
-  );
-});
+    return (
+      <Comp
+        ref={ref}
+        {...applyStyleType({
+          nativeStyle,
+          className: cn(
+            "absolute right-1 top-1.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-none ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 peer-hover/menu-button:text-sidebar-accent-foreground [&>svg]:size-4 [&>svg]:shrink-0",
+            // Increases the hit area of the button on mobile.
+            "after:absolute after:-inset-2 after:md:hidden",
+            "peer-data-[size=sm]/menu-button:top-1",
+            "peer-data-[size=default]/menu-button:top-1.5",
+            "peer-data-[size=lg]/menu-button:top-2.5",
+            "group-data-[collapsible=icon]:hidden",
+            showOnHover &&
+              "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0",
+            className,
+          ),
+        })}
+        {...props}
+      />
+    );
+  },
+);
 SidebarMenuAction.displayName = "SidebarMenuAction";
 
 const SidebarMenuBadge = React.forwardRef<
@@ -865,7 +905,13 @@ const SidebarMenuSubItem = React.forwardRef<
   ViewProps & { className?: string; style?: React.CSSProperties }
 >(({ className, style, ...props }, ref) => {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
-  return <StyledView ref={ref} {...applyStyleType({ nativeStyle, className })} {...props} />;
+  return (
+    <StyledView
+      ref={ref}
+      {...applyStyleType({ nativeStyle, className })}
+      {...props}
+    />
+  );
 });
 SidebarMenuSubItem.displayName = "SidebarMenuSubItem";
 
@@ -986,10 +1032,14 @@ export function SidebarLayout({
           justifyContent: "space-between",
         }}
       >
-        <StyledView style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <StyledView
+          style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+        >
           {topBarLeft}
         </StyledView>
-        <StyledView style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <StyledView
+          style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+        >
           {topBarRight}
         </StyledView>
       </StyledView>
@@ -1028,7 +1078,10 @@ export function SidebarLayout({
           }}
         >
           <StyledView
-            className={cn("flex-1 bg-background border-border shadow-lg", sidebarClassName)}
+            className={cn(
+              "flex-1 bg-background border-border shadow-lg",
+              sidebarClassName,
+            )}
           >
             <ScrollView style={{ flex: 1 }}>{sidebar}</ScrollView>
           </StyledView>

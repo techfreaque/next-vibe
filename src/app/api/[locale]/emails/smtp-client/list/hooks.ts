@@ -14,7 +14,9 @@ import definitions from "./definition";
 /**
  * Hook for fetching SMTP accounts list
  */
-export function useSmtpAccountsList(logger: EndpointLogger): EndpointReturn<typeof definitions> {
+export function useSmtpAccountsList(
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

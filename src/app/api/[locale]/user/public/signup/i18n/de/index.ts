@@ -63,7 +63,8 @@ export const translations: typeof enTranslations = {
       validation: {
         required: "Passwort ist erforderlich",
         minLength: "Passwort muss mindestens 8 Zeichen lang sein",
-        complexity: "Passwort muss Großbuchstaben, Kleinbuchstaben und eine Zahl enthalten",
+        complexity:
+          "Passwort muss Großbuchstaben, Kleinbuchstaben und eine Zahl enthalten",
       },
     },
     confirmPassword: {
@@ -107,7 +108,8 @@ export const translations: typeof enTranslations = {
       placeholder: "Ich akzeptiere die Nutzungsbedingungen",
       help: "Bitte lesen und akzeptieren Sie unsere Nutzungsbedingungen, um fortzufahren",
       validation: {
-        required: "Sie müssen die Nutzungsbedingungen akzeptieren, um fortzufahren",
+        required:
+          "Sie müssen die Nutzungsbedingungen akzeptieren, um fortzufahren",
       },
     },
     subscribeToNewsletter: {
@@ -166,7 +168,8 @@ export const translations: typeof enTranslations = {
     title: "Anmeldefehler",
     validation: {
       title: "Validierungsfehler",
-      description: "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut",
+      description:
+        "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -207,7 +210,8 @@ export const translations: typeof enTranslations = {
   },
   emailCheck: {
     title: "E-Mail-Verfügbarkeitsprüfung",
-    description: "Prüfen Sie, ob die E-Mail für die Registrierung verfügbar ist",
+    description:
+      "Prüfen Sie, ob die E-Mail für die Registrierung verfügbar ist",
     tag: "E-Mail-Prüfung",
     fields: {
       email: {
@@ -401,7 +405,8 @@ export const translations: typeof enTranslations = {
     needMoreDesc:
       "Hol dir 40× mehr Credits – 800/Monat für nur 8 €! Das ist unbegrenzter Zugang zu allen 38 Modellen ohne tägliche Limits. Perfekt für ernsthafte KI-Nutzer. Plus: Abonniere und schalte die Möglichkeit frei, Credit-Pakete zu kaufen, die niemals ablaufen – ideal für Power-User, die zusätzliche Credits auf Abruf brauchen.",
     viewPlans: "Jetzt auf Unlimited upgraden",
-    signoff: "Willkommen in der Zukunft der KI-Gespräche,\nDas {{appName}} Team",
+    signoff:
+      "Willkommen in der Zukunft der KI-Gespräche,\nDas {{appName}} Team",
     ps: "P.S. Deine Privatsphäre ist uns wichtig. Wähle den Inkognito-Modus, um Gespräche nur auf deinem Gerät zu speichern – sie werden niemals an unsere Server gesendet.",
   },
 };

@@ -2,7 +2,8 @@ export const translations = {
   tag: "Messages List",
   get: {
     title: "List IMAP Messages",
-    description: "Retrieve a paginated list of IMAP messages with filtering and sorting",
+    description:
+      "Retrieve a paginated list of IMAP messages with filtering and sorting",
     container: {
       title: "Messages Query",
       description: "Configure message listing parameters",

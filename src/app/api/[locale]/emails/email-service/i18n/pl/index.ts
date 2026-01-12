@@ -100,7 +100,8 @@ export const translations: typeof enTranslations = {
     },
     skipRateLimitCheck: {
       label: "Pomiń Sprawdzanie Limitu",
-      description: "Pomiń ograniczenie częstotliwości dla tego e-maila (tylko admin)",
+      description:
+        "Pomiń ograniczenie częstotliwości dla tego e-maila (tylko admin)",
     },
     leadId: {
       label: "ID Leada",
@@ -184,7 +185,8 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd Serwera",
-        description: "Wystąpił wewnętrzny błąd serwera podczas wysyłania e-maila",
+        description:
+          "Wystąpił wewnętrzny błąd serwera podczas wysyłania e-maila",
       },
       network: {
         title: "Błąd Sieci",

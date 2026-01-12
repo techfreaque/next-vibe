@@ -53,7 +53,8 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Brak autoryzacji",
-        description: "Musisz być zalogowany, aby wyświetlić linki udostępniania",
+        description:
+          "Musisz być zalogowany, aby wyświetlić linki udostępniania",
       },
       forbidden: {
         title: "Zabronione",
@@ -106,7 +107,8 @@ export const translations: typeof enTranslations = {
     },
     requireAuth: {
       label: "Wymagaj uwierzytelnienia",
-      description: "Wymagaj od użytkowników zalogowania się, aby uzyskać dostęp do tego linku",
+      description:
+        "Wymagaj od użytkowników zalogowania się, aby uzyskać dostęp do tego linku",
     },
     response: {
       id: {
@@ -127,7 +129,8 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Zabronione",
-        description: "Tylko wątki w folderze Udostępnione mogą być udostępniane przez linki",
+        description:
+          "Tylko wątki w folderze Udostępnione mogą być udostępniane przez linki",
       },
       notFound: {
         title: "Nie znaleziono",
@@ -180,7 +183,8 @@ export const translations: typeof enTranslations = {
     },
     requireAuth: {
       label: "Wymagaj uwierzytelnienia",
-      description: "Wymagaj od użytkowników zalogowania się, aby uzyskać dostęp do tego linku",
+      description:
+        "Wymagaj od użytkowników zalogowania się, aby uzyskać dostęp do tego linku",
     },
     deleteAction: {
       text: "Odwołaj link",
@@ -197,7 +201,8 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Brak autoryzacji",
-        description: "Musisz być zalogowany, aby aktualizować linki udostępniania",
+        description:
+          "Musisz być zalogowany, aby aktualizować linki udostępniania",
       },
       forbidden: {
         title: "Zabronione",
@@ -256,7 +261,8 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Brak autoryzacji",
-        description: "Musisz być zalogowany, aby unieważnić linki udostępniania",
+        description:
+          "Musisz być zalogowany, aby unieważnić linki udostępniania",
       },
       forbidden: {
         title: "Zabronione",

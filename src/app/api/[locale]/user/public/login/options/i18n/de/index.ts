@@ -188,7 +188,8 @@ export const translations: typeof enTranslations = {
   },
   messages: {
     successMessage: "Login-Optionen erfolgreich abgerufen",
-    passwordAuthDescription: "Melden Sie sich mit Ihrer E-Mail-Adresse und Ihrem Passwort an",
+    passwordAuthDescription:
+      "Melden Sie sich mit Ihrer E-Mail-Adresse und Ihrem Passwort an",
     socialAuthDescription: "Melden Sie sich mit Ihren Social-Media-Konten an",
     continueWithProvider: "Weiter mit {{provider}}",
     twoFactorRequired: "Erhöhte Sicherheit: 2FA erforderlich",

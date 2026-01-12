@@ -30,7 +30,12 @@ const { POST } = createEndpoint({
   category: "app.api.system.db.category",
   tags: ["app.api.system.db.seed.tag"],
   icon: "leaf",
-  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["seed", "db:seed"],
 
   fields: objectField(
@@ -122,7 +127,8 @@ const { POST } = createEndpoint({
             recordsCreated: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.system.db.seed.fields.collections.recordsCreated.title",
+                content:
+                  "app.api.system.db.seed.fields.collections.recordsCreated.title",
                 fieldType: FieldDataType.NUMBER,
               },
               z.coerce.number(),
@@ -157,7 +163,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.db.seed.post.errors.unauthorized.title",
-      description: "app.api.system.db.seed.post.errors.unauthorized.description",
+      description:
+        "app.api.system.db.seed.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.db.seed.post.errors.server.title",

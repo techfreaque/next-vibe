@@ -37,7 +37,9 @@ interface RootLayoutMetaProps {
 /**
  * Generate metadata for the homepage with translations
  */
-export async function generateMetadata({ params }: RootLayoutMetaProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: RootLayoutMetaProps): Promise<Metadata> {
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "",
@@ -76,8 +78,12 @@ export default async function RootLayoutServer({
     ],
     contactPoint: {
       "@type": t("app.layout.structuredData.organization.types.contactPoint"),
-      telephone: t("app.layout.structuredData.organization.contactPoint.telephone"),
-      contactType: t("app.layout.structuredData.organization.contactPoint.contactType"),
+      telephone: t(
+        "app.layout.structuredData.organization.contactPoint.telephone",
+      ),
+      contactType: t(
+        "app.layout.structuredData.organization.contactPoint.contactType",
+      ),
       availableLanguage: [
         t("app.constants.languages.en"),
         t("app.constants.languages.de"),

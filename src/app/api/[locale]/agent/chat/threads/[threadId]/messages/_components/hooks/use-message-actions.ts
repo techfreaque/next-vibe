@@ -40,7 +40,9 @@ export interface UseMessageActionsReturn {
   startDelete: (messageId: string) => void;
   cancelAction: () => void;
   setAnswerContent: (content: string) => void;
-  setEditorAttachments: (attachments: File[] | ((prev: File[]) => File[])) => void;
+  setEditorAttachments: (
+    attachments: File[] | ((prev: File[]) => File[]),
+  ) => void;
 
   // Combined handlers for save operations
   handleSaveEdit: (
@@ -64,22 +66,38 @@ export interface UseMessageActionsReturn {
   ) => Promise<void>;
   handleConfirmAnswer: (
     messageId: string,
-    onAnswer?: (id: string, content: string, attachments: File[] | undefined) => Promise<void>,
+    onAnswer?: (
+      id: string,
+      content: string,
+      attachments: File[] | undefined,
+    ) => Promise<void>,
   ) => Promise<void>;
-  handleConfirmDelete: (messageId: string, onDelete?: (id: string) => void) => void;
+  handleConfirmDelete: (
+    messageId: string,
+    onDelete?: (id: string) => void,
+  ) => void;
 }
 
 /**
  * Hook for managing message action states
  */
-export function useMessageActions(logger: EndpointLogger): UseMessageActionsReturn {
+export function useMessageActions(
+  logger: EndpointLogger,
+): UseMessageActionsReturn {
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
-  const [retryingMessageId, setRetryingMessageId] = useState<string | null>(null);
-  const [answeringMessageId, setAnsweringMessageId] = useState<string | null>(null);
-  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null);
+  const [retryingMessageId, setRetryingMessageId] = useState<string | null>(
+    null,
+  );
+  const [answeringMessageId, setAnsweringMessageId] = useState<string | null>(
+    null,
+  );
+  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(
+    null,
+  );
   const [answerContent, setAnswerContent] = useState<string>("");
   const [editorAttachments, setEditorAttachments] = useState<File[]>([]);
-  const [isLoadingRetryAttachments, setIsLoadingRetryAttachments] = useState<boolean>(false);
+  const [isLoadingRetryAttachments, setIsLoadingRetryAttachments] =
+    useState<boolean>(false);
 
   // Check functions
   const isEditing = useCallback(
@@ -162,8 +180,12 @@ export function useMessageActions(logger: EndpointLogger): UseMessageActionsRetu
         await onEdit(messageId, content);
         setEditingMessageId(null);
       } catch (error) {
-        const errorObj = error instanceof Error ? error : new Error(String(error));
-        logger.error("app.chat.messages.actions.handleSaveEdit.error", errorObj);
+        const errorObj =
+          error instanceof Error ? error : new Error(String(error));
+        logger.error(
+          "app.chat.messages.actions.handleSaveEdit.error",
+          errorObj,
+        );
         // Don't clear editing state on error so user can retry
       }
     },
@@ -195,8 +217,12 @@ export function useMessageActions(logger: EndpointLogger): UseMessageActionsRetu
         setEditingMessageId(null);
         setEditorAttachments([]);
       } catch (error) {
-        const errorObj = error instanceof Error ? error : new Error(String(error));
-        logger.error("app.chat.messages.actions.handleBranchEdit.error", errorObj);
+        const errorObj =
+          error instanceof Error ? error : new Error(String(error));
+        logger.error(
+          "app.chat.messages.actions.handleBranchEdit.error",
+          errorObj,
+        );
       }
     },
     [logger, editorAttachments],
@@ -212,12 +238,19 @@ export function useMessageActions(logger: EndpointLogger): UseMessageActionsRetu
       }
 
       try {
-        await onRetry(messageId, editorAttachments.length > 0 ? editorAttachments : undefined);
+        await onRetry(
+          messageId,
+          editorAttachments.length > 0 ? editorAttachments : undefined,
+        );
         setRetryingMessageId(null);
         setEditorAttachments([]);
       } catch (error) {
-        const errorObj = error instanceof Error ? error : new Error(String(error));
-        logger.error("app.chat.messages.actions.handleConfirmRetry.error", errorObj);
+        const errorObj =
+          error instanceof Error ? error : new Error(String(error));
+        logger.error(
+          "app.chat.messages.actions.handleConfirmRetry.error",
+          errorObj,
+        );
       }
     },
     [logger, editorAttachments],
@@ -226,7 +259,11 @@ export function useMessageActions(logger: EndpointLogger): UseMessageActionsRetu
   const handleConfirmAnswer = useCallback(
     async (
       messageId: string,
-      onAnswer?: (id: string, content: string, attachments: File[] | undefined) => Promise<void>,
+      onAnswer?: (
+        id: string,
+        content: string,
+        attachments: File[] | undefined,
+      ) => Promise<void>,
     ) => {
       if (!onAnswer) {
         return;
@@ -242,8 +279,12 @@ export function useMessageActions(logger: EndpointLogger): UseMessageActionsRetu
         setAnswerContent("");
         setEditorAttachments([]);
       } catch (error) {
-        const errorObj = error instanceof Error ? error : new Error(String(error));
-        logger.error("app.chat.messages.actions.handleConfirmAnswer.error", errorObj);
+        const errorObj =
+          error instanceof Error ? error : new Error(String(error));
+        logger.error(
+          "app.chat.messages.actions.handleConfirmAnswer.error",
+          errorObj,
+        );
       }
     },
     [logger, answerContent, editorAttachments],
@@ -259,8 +300,12 @@ export function useMessageActions(logger: EndpointLogger): UseMessageActionsRetu
         onDelete(messageId);
         setDeletingMessageId(null);
       } catch (error) {
-        const errorObj = error instanceof Error ? error : new Error(String(error));
-        logger.error("app.chat.messages.actions.handleConfirmDelete.error", errorObj);
+        const errorObj =
+          error instanceof Error ? error : new Error(String(error));
+        logger.error(
+          "app.chat.messages.actions.handleConfirmDelete.error",
+          errorObj,
+        );
       }
     },
     [logger],

@@ -5,7 +5,10 @@ import { Div } from "next-vibe-ui/ui/div";
 import { H2, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { ProductIds, productsRepository } from "@/app/api/[locale]/products/repository-client";
+import {
+  ProductIds,
+  productsRepository,
+} from "@/app/api/[locale]/products/repository-client";
 import { BuyCreditsTab } from "@/app/api/[locale]/subscription/_components/buy-credits-tab";
 import { OverviewTab } from "@/app/api/[locale]/subscription/_components/overview-tab";
 import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";

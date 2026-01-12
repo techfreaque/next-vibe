@@ -29,7 +29,8 @@ export const translations: typeof enTranslations = {
     namePlaceholder: "Wprowadź nazwę zadania",
     description: "Opis",
     descriptionPlaceholder: "Wprowadź opis zadania",
-    schedulingDescription: "Skonfiguruj kiedy i jak często zadanie będzie uruchamiane",
+    schedulingDescription:
+      "Skonfiguruj kiedy i jak często zadanie będzie uruchamiane",
     schedulePlaceholder: "Wybierz lub wprowadź harmonogram cron",
     searchSchedule: "Szukaj harmonogramów...",
     configuration: "Konfiguracja",

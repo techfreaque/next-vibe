@@ -3,7 +3,8 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
     title: "Verfügbare KI-Tools abrufen",
-    description: "Liste der für den aktuellen Benutzer verfügbaren KI-Tools abrufen",
+    description:
+      "Liste der für den aktuellen Benutzer verfügbaren KI-Tools abrufen",
     response: {
       title: "KI-Tools Antwort",
       description: "Liste der verfügbaren KI-Tools",

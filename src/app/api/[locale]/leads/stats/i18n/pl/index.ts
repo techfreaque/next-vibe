@@ -6,7 +6,8 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Statystyki leadów",
-  description: "Kompleksowe statystyki i analityka leadów z danymi historycznymi",
+  description:
+    "Kompleksowe statystyki i analityka leadów z danymi historycznymi",
   category: "Zarządzanie leadami",
   tags: {
     leads: "Leady",
@@ -285,7 +286,8 @@ export const translations: typeof enTranslations = {
     },
     server: {
       title: "Błąd serwera",
-      description: "Wewnętrzny błąd serwera podczas pobierania statystyk leadów",
+      description:
+        "Wewnętrzny błąd serwera podczas pobierania statystyk leadów",
     },
     unknown: {
       title: "Nieznany błąd",
@@ -301,7 +303,8 @@ export const translations: typeof enTranslations = {
     },
     notFound: {
       title: "Brak danych",
-      description: "Nie znaleziono danych statystycznych dla określonych kryteriów",
+      description:
+        "Nie znaleziono danych statystycznych dla określonych kryteriów",
     },
     conflict: {
       title: "Konflikt",

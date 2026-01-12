@@ -62,18 +62,29 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
     );
 
     const items: ThreadItem[] = threads.map((thread) => {
-      const messages = Object.values(chat.messages).filter((msg) => msg.threadId === thread.id);
+      const messages = Object.values(chat.messages).filter(
+        (msg) => msg.threadId === thread.id,
+      );
 
       // Calculate votes
-      const upvotes = messages.reduce((sum, msg) => sum + (msg.upvotes ?? 0), 0);
-      const downvotes = messages.reduce((sum, msg) => sum + (msg.downvotes ?? 0), 0);
+      const upvotes = messages.reduce(
+        (sum, msg) => sum + (msg.upvotes ?? 0),
+        0,
+      );
+      const downvotes = messages.reduce(
+        (sum, msg) => sum + (msg.downvotes ?? 0),
+        0,
+      );
       const score = upvotes - downvotes;
 
       // Get unique model names (display names, not IDs)
       const modelNames = [
         ...new Set(
           messages
-            .filter((msg): msg is typeof msg & { model: ModelId } => msg.model !== null)
+            .filter(
+              (msg): msg is typeof msg & { model: ModelId } =>
+                msg.model !== null,
+            )
             .map((msg) => {
               try {
                 return getModelById(msg.model).name;
@@ -90,7 +101,8 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
       );
 
       // Determine if rising (recent + growing engagement)
-      const hoursSinceCreation = (Date.now() - thread.createdAt.getTime()) / (1000 * 60 * 60);
+      const hoursSinceCreation =
+        (Date.now() - thread.createdAt.getTime()) / (1000 * 60 * 60);
       const isRising = hoursSinceCreation < 24 && score > 10;
 
       // Get category from folder name if available
@@ -103,10 +115,12 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
       }
 
       // Get author name from first message
-      const firstMessage = (messages.filter((msg) => msg.role === "user") || []).toSorted(
-        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-      )[0];
-      const authorName = firstMessage?.authorName ? `u/${firstMessage.authorName}` : "u/anonymous";
+      const firstMessage = (
+        messages.filter((msg) => msg.role === "user") || []
+      ).toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime())[0];
+      const authorName = firstMessage?.authorName
+        ? `u/${firstMessage.authorName}`
+        : "u/anonymous";
 
       return {
         id: thread.id,
@@ -144,8 +158,10 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
       case "hot":
         // Hot algorithm: score / (time + 2)^1.5
         filtered = (filtered || []).toSorted((a, b) => {
-          const hoursA = (Date.now() - a.timestamp.getTime()) / (1000 * 60 * 60) + 2;
-          const hoursB = (Date.now() - b.timestamp.getTime()) / (1000 * 60 * 60) + 2;
+          const hoursA =
+            (Date.now() - a.timestamp.getTime()) / (1000 * 60 * 60) + 2;
+          const hoursB =
+            (Date.now() - b.timestamp.getTime()) / (1000 * 60 * 60) + 2;
           const hotA = a.score / Math.pow(hoursA, 1.5);
           const hotB = b.score / Math.pow(hoursB, 1.5);
           return hotB - hotA;
@@ -182,7 +198,9 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
 
   const handleVote = (threadId: string, vote: 1 | -1): void => {
     // Vote on the first message of the thread (thread starter)
-    const threadMessages = Object.values(chat.messages).filter((msg) => msg.threadId === threadId);
+    const threadMessages = Object.values(chat.messages).filter(
+      (msg) => msg.threadId === threadId,
+    );
     const firstMessage = (threadMessages || []).toSorted(
       (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
     )[0];
@@ -219,7 +237,9 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
         <Div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-8 lg:px-10 pt-20 pb-8">
           {/* Forum Header */}
           <Div className="mb-6 flex flex-col gap-2">
-            <Span className="text-3xl font-bold">{t("app.chat.publicFeed.header.title")}</Span>
+            <Span className="text-3xl font-bold">
+              {t("app.chat.publicFeed.header.title")}
+            </Span>
             <Span className="text-muted-foreground block">
               {t("app.chat.publicFeed.header.description")}
             </Span>
@@ -235,7 +255,8 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
                 onClick={() => setSortMode("hot")}
                 className={cn(
                   "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
-                  sortMode === "hot" && "bg-primary/10 text-primary hover:bg-primary/20",
+                  sortMode === "hot" &&
+                    "bg-primary/10 text-primary hover:bg-primary/20",
                 )}
               >
                 <Flame className="h-4 w-4" />
@@ -247,7 +268,8 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
                 onClick={() => setSortMode("rising")}
                 className={cn(
                   "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
-                  sortMode === "rising" && "bg-primary/10 text-primary hover:bg-primary/20",
+                  sortMode === "rising" &&
+                    "bg-primary/10 text-primary hover:bg-primary/20",
                 )}
               >
                 <TrendingUp className="h-4 w-4" />
@@ -259,7 +281,8 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
                 onClick={() => setSortMode("new")}
                 className={cn(
                   "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
-                  sortMode === "new" && "bg-primary/10 text-primary hover:bg-primary/20",
+                  sortMode === "new" &&
+                    "bg-primary/10 text-primary hover:bg-primary/20",
                 )}
               >
                 <Plus className="h-4 w-4" />
@@ -271,7 +294,8 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
                 onClick={() => setSortMode("following")}
                 className={cn(
                   "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
-                  sortMode === "following" && "bg-primary/10 text-primary hover:bg-primary/20",
+                  sortMode === "following" &&
+                    "bg-primary/10 text-primary hover:bg-primary/20",
                 )}
               >
                 <Heart className="h-4 w-4" />
@@ -366,7 +390,9 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
                         {thread.category}
                       </Badge>
                       <Span>{formatTimestamp(thread.timestamp)}</Span>
-                      <Span className="hover:underline">{thread.authorName}</Span>
+                      <Span className="hover:underline">
+                        {thread.authorName}
+                      </Span>
                       {thread.modelNames.length > 0 && (
                         <Span className="text-blue-500 font-medium">
                           {thread.modelNames.join(", ")}
@@ -388,7 +414,8 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
                       <Div className="flex items-center gap-1">
                         <MessageSquare className="h-3.5 w-3.5" />
                         <Span>
-                          {thread.messageCount} {t("app.chat.publicFeed.comments")}
+                          {thread.messageCount}{" "}
+                          {t("app.chat.publicFeed.comments")}
                         </Span>
                       </Div>
                       {thread.isRising && (

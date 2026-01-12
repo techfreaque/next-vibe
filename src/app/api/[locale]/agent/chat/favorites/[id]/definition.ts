@@ -11,9 +11,18 @@ import {
   PRICE_DISPLAY,
   SPEED_DISPLAY,
 } from "@/app/api/[locale]/agent/chat/favorites/enum";
-import { ModelUtilityDB, ModelUtilityOptions } from "@/app/api/[locale]/agent/models/enum";
-import { ModelId, ModelIdOptions } from "@/app/api/[locale]/agent/models/models";
-import { TtsVoiceDB, TtsVoiceOptions } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import {
+  ModelUtilityDB,
+  ModelUtilityOptions,
+} from "@/app/api/[locale]/agent/models/enum";
+import {
+  ModelId,
+  ModelIdOptions,
+} from "@/app/api/[locale]/agent/models/models";
+import {
+  TtsVoiceDB,
+  TtsVoiceOptions,
+} from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -74,7 +83,8 @@ const { GET } = createEndpoint({
       id: requestResponseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.id.content" as const,
+          content:
+            "app.api.agent.chat.favorites.id.get.response.id.content" as const,
         },
         z.string().uuid(),
         true,
@@ -82,35 +92,40 @@ const { GET } = createEndpoint({
       characterId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.characterId.content" as const,
+          content:
+            "app.api.agent.chat.favorites.id.get.response.characterId.content" as const,
         },
         z.string(),
       ),
       customName: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.customName.content" as const,
+          content:
+            "app.api.agent.chat.favorites.id.get.response.customName.content" as const,
         },
         z.string().nullable(),
       ),
       customIcon: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.customIcon.content" as const,
+          content:
+            "app.api.agent.chat.favorites.id.get.response.customIcon.content" as const,
         },
         iconSchema.nullable(),
       ),
       voice: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.voice.content" as const,
+          content:
+            "app.api.agent.chat.favorites.id.get.response.voice.content" as const,
         },
         z.enum(TtsVoiceDB).nullable(),
       ),
       modelSelection: objectUnionField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.agent.chat.favorites.id.get.response.modelSelection.title" as const,
+          title:
+            "app.api.agent.chat.favorites.id.get.response.modelSelection.title" as const,
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -213,21 +228,24 @@ const { GET } = createEndpoint({
       position: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.position.content" as const,
+          content:
+            "app.api.agent.chat.favorites.id.get.response.position.content" as const,
         },
         z.number(),
       ),
       color: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.color.content" as const,
+          content:
+            "app.api.agent.chat.favorites.id.get.response.color.content" as const,
         },
         z.string().nullable(),
       ),
       useCount: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.get.response.useCount.content" as const,
+          content:
+            "app.api.agent.chat.favorites.id.get.response.useCount.content" as const,
         },
         z.number(),
       ),
@@ -238,46 +256,64 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.chat.favorites.id.get.errors.validation.title" as const,
-      description: "app.api.agent.chat.favorites.id.get.errors.validation.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.get.errors.validation.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.favorites.id.get.errors.network.title" as const,
-      description: "app.api.agent.chat.favorites.id.get.errors.network.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.get.errors.network.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.chat.favorites.id.get.errors.unauthorized.title" as const,
-      description: "app.api.agent.chat.favorites.id.get.errors.unauthorized.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.get.errors.unauthorized.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.favorites.id.get.errors.forbidden.title" as const,
-      description: "app.api.agent.chat.favorites.id.get.errors.forbidden.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.get.errors.forbidden.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.favorites.id.get.errors.notFound.title" as const,
-      description: "app.api.agent.chat.favorites.id.get.errors.notFound.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.get.errors.notFound.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.favorites.id.get.errors.server.title" as const,
-      description: "app.api.agent.chat.favorites.id.get.errors.server.description" as const,
+      description:
+        "app.api.agent.chat.favorites.id.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.favorites.id.get.errors.unknown.title" as const,
-      description: "app.api.agent.chat.favorites.id.get.errors.unknown.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.get.errors.unknown.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.agent.chat.favorites.id.get.errors.unsavedChanges.title" as const,
-      description: "app.api.agent.chat.favorites.id.get.errors.unsavedChanges.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.get.errors.unsavedChanges.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.favorites.id.get.errors.conflict.title" as const,
-      description: "app.api.agent.chat.favorites.id.get.errors.conflict.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.get.errors.conflict.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.get.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
     title: "app.api.agent.chat.favorites.id.get.success.title" as const,
-    description: "app.api.agent.chat.favorites.id.get.success.description" as const,
+    description:
+      "app.api.agent.chat.favorites.id.get.success.description" as const,
   },
 
   examples: {
@@ -356,7 +392,8 @@ const { PATCH } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.favorites.id.patch.characterId.label" as const,
+          label:
+            "app.api.agent.chat.favorites.id.patch.characterId.label" as const,
           columns: 6,
         },
         z.string().optional(),
@@ -365,7 +402,8 @@ const { PATCH } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.favorites.id.patch.customName.label" as const,
+          label:
+            "app.api.agent.chat.favorites.id.patch.customName.label" as const,
           columns: 6,
         },
         z.string().nullable().optional(),
@@ -375,7 +413,8 @@ const { PATCH } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.agent.chat.favorites.id.patch.voice.label" as const,
-          description: "app.api.agent.chat.favorites.id.patch.voice.description" as const,
+          description:
+            "app.api.agent.chat.favorites.id.patch.voice.description" as const,
           options: TtsVoiceOptions,
           columns: 6,
         },
@@ -385,8 +424,10 @@ const { PATCH } = createEndpoint({
       modelSelection: objectUnionField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.agent.chat.favorites.post.modelSelection.title" as const,
-          description: "app.api.agent.chat.favorites.post.modelSelection.description" as const,
+          title:
+            "app.api.agent.chat.favorites.post.modelSelection.title" as const,
+          description:
+            "app.api.agent.chat.favorites.post.modelSelection.description" as const,
           layoutType: LayoutType.STACKED,
           border: false,
           showSubmitButton: false,
@@ -406,15 +447,18 @@ const { PATCH } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.FILTER_PILLS,
-                  label: "app.api.agent.chat.favorites.post.selectionType.label" as const,
+                  label:
+                    "app.api.agent.chat.favorites.post.selectionType.label" as const,
                   options: [
                     {
                       value: ModelSelectionType.MANUAL,
-                      label: "app.api.agent.chat.favorites.post.selectionType.manual" as const,
+                      label:
+                        "app.api.agent.chat.favorites.post.selectionType.manual" as const,
                     },
                     {
                       value: ModelSelectionType.FILTERS,
-                      label: "app.api.agent.chat.favorites.post.selectionType.filters" as const,
+                      label:
+                        "app.api.agent.chat.favorites.post.selectionType.filters" as const,
                     },
                   ],
                   columns: 12,
@@ -432,7 +476,8 @@ const { PATCH } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.SELECT,
-                  label: "app.api.agent.chat.favorites.post.manualModelId.label" as const,
+                  label:
+                    "app.api.agent.chat.favorites.post.manualModelId.label" as const,
                   description:
                     "app.api.agent.chat.favorites.post.manualModelId.description" as const,
                   options: ModelIdOptions,
@@ -454,15 +499,18 @@ const { PATCH } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.FILTER_PILLS,
-                  label: "app.api.agent.chat.favorites.post.selectionType.label" as const,
+                  label:
+                    "app.api.agent.chat.favorites.post.selectionType.label" as const,
                   options: [
                     {
                       value: ModelSelectionType.MANUAL,
-                      label: "app.api.agent.chat.favorites.post.selectionType.manual" as const,
+                      label:
+                        "app.api.agent.chat.favorites.post.selectionType.manual" as const,
                     },
                     {
                       value: ModelSelectionType.FILTERS,
-                      label: "app.api.agent.chat.favorites.post.selectionType.filters" as const,
+                      label:
+                        "app.api.agent.chat.favorites.post.selectionType.filters" as const,
                     },
                   ],
                   columns: 12,
@@ -480,7 +528,8 @@ const { PATCH } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.RANGE_SLIDER,
-                  label: "app.api.agent.chat.favorites.post.intelligenceRange.label" as const,
+                  label:
+                    "app.api.agent.chat.favorites.post.intelligenceRange.label" as const,
                   description:
                     "app.api.agent.chat.favorites.post.intelligenceRange.description" as const,
                   options: INTELLIGENCE_DISPLAY.map((tier) => ({
@@ -489,8 +538,10 @@ const { PATCH } = createEndpoint({
                     icon: tier.icon,
                     description: tier.description,
                   })),
-                  minLabel: "app.api.agent.chat.favorites.post.intelligenceRange.minLabel" as const,
-                  maxLabel: "app.api.agent.chat.favorites.post.intelligenceRange.maxLabel" as const,
+                  minLabel:
+                    "app.api.agent.chat.favorites.post.intelligenceRange.minLabel" as const,
+                  maxLabel:
+                    "app.api.agent.chat.favorites.post.intelligenceRange.maxLabel" as const,
                   columns: 12,
                 },
                 z.enum(IntelligenceLevelFilterDB),
@@ -499,16 +550,20 @@ const { PATCH } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.RANGE_SLIDER,
-                  label: "app.api.agent.chat.favorites.post.priceRange.label" as const,
-                  description: "app.api.agent.chat.favorites.post.priceRange.description" as const,
+                  label:
+                    "app.api.agent.chat.favorites.post.priceRange.label" as const,
+                  description:
+                    "app.api.agent.chat.favorites.post.priceRange.description" as const,
                   options: PRICE_DISPLAY.map((tier) => ({
                     label: tier.label,
                     value: tier.value,
                     icon: tier.icon,
                     description: tier.description,
                   })),
-                  minLabel: "app.api.agent.chat.favorites.post.priceRange.minLabel" as const,
-                  maxLabel: "app.api.agent.chat.favorites.post.priceRange.maxLabel" as const,
+                  minLabel:
+                    "app.api.agent.chat.favorites.post.priceRange.minLabel" as const,
+                  maxLabel:
+                    "app.api.agent.chat.favorites.post.priceRange.maxLabel" as const,
                   columns: 12,
                 },
                 z.enum(PriceLevelFilterDB),
@@ -517,7 +572,8 @@ const { PATCH } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.RANGE_SLIDER,
-                  label: "app.api.agent.chat.favorites.post.contentRange.label" as const,
+                  label:
+                    "app.api.agent.chat.favorites.post.contentRange.label" as const,
                   description:
                     "app.api.agent.chat.favorites.post.contentRange.description" as const,
                   options: CONTENT_DISPLAY.map((tier) => ({
@@ -526,8 +582,10 @@ const { PATCH } = createEndpoint({
                     icon: tier.icon,
                     description: tier.description,
                   })),
-                  minLabel: "app.api.agent.chat.favorites.post.contentRange.minLabel" as const,
-                  maxLabel: "app.api.agent.chat.favorites.post.contentRange.maxLabel" as const,
+                  minLabel:
+                    "app.api.agent.chat.favorites.post.contentRange.minLabel" as const,
+                  maxLabel:
+                    "app.api.agent.chat.favorites.post.contentRange.maxLabel" as const,
                   columns: 12,
                 },
                 z.enum(ContentLevelFilterDB),
@@ -536,16 +594,20 @@ const { PATCH } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.RANGE_SLIDER,
-                  label: "app.api.agent.chat.favorites.post.speedRange.label" as const,
-                  description: "app.api.agent.chat.favorites.post.speedRange.description" as const,
+                  label:
+                    "app.api.agent.chat.favorites.post.speedRange.label" as const,
+                  description:
+                    "app.api.agent.chat.favorites.post.speedRange.description" as const,
                   options: SPEED_DISPLAY.map((tier) => ({
                     label: tier.label,
                     value: tier.value,
                     icon: tier.icon,
                     description: tier.description,
                   })),
-                  minLabel: "app.api.agent.chat.favorites.post.speedRange.minLabel" as const,
-                  maxLabel: "app.api.agent.chat.favorites.post.speedRange.maxLabel" as const,
+                  minLabel:
+                    "app.api.agent.chat.favorites.post.speedRange.minLabel" as const,
+                  maxLabel:
+                    "app.api.agent.chat.favorites.post.speedRange.maxLabel" as const,
                   columns: 12,
                 },
                 z.enum(SpeedLevelFilterDB),
@@ -554,7 +616,8 @@ const { PATCH } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.MULTISELECT,
-                  label: "app.api.agent.chat.favorites.post.preferredStrengths.label" as const,
+                  label:
+                    "app.api.agent.chat.favorites.post.preferredStrengths.label" as const,
                   description:
                     "app.api.agent.chat.favorites.post.preferredStrengths.description" as const,
                   options: ModelUtilityOptions,
@@ -566,7 +629,8 @@ const { PATCH } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.MULTISELECT,
-                  label: "app.api.agent.chat.favorites.post.ignoredWeaknesses.label" as const,
+                  label:
+                    "app.api.agent.chat.favorites.post.ignoredWeaknesses.label" as const,
                   description:
                     "app.api.agent.chat.favorites.post.ignoredWeaknesses.description" as const,
                   options: ModelUtilityOptions,
@@ -591,7 +655,8 @@ const { PATCH } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.ICON,
-          label: "app.api.agent.chat.favorites.id.patch.customIcon.label" as const,
+          label:
+            "app.api.agent.chat.favorites.id.patch.customIcon.label" as const,
           columns: 6,
         },
         iconSchema.optional(),
@@ -600,7 +665,8 @@ const { PATCH } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.agent.chat.favorites.id.patch.position.label" as const,
+          label:
+            "app.api.agent.chat.favorites.id.patch.position.label" as const,
           columns: 6,
         },
         z.number().optional(),
@@ -610,7 +676,8 @@ const { PATCH } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.patch.response.success.content" as const,
+          content:
+            "app.api.agent.chat.favorites.id.patch.response.success.content" as const,
         },
         z.boolean(),
       ),
@@ -621,47 +688,65 @@ const { PATCH } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.chat.favorites.id.patch.errors.validation.title" as const,
-      description: "app.api.agent.chat.favorites.id.patch.errors.validation.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.patch.errors.validation.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.patch.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.favorites.id.patch.errors.network.title" as const,
-      description: "app.api.agent.chat.favorites.id.patch.errors.network.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.patch.errors.network.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.patch.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.chat.favorites.id.patch.errors.unauthorized.title" as const,
-      description: "app.api.agent.chat.favorites.id.patch.errors.unauthorized.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.patch.errors.unauthorized.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.patch.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.favorites.id.patch.errors.forbidden.title" as const,
-      description: "app.api.agent.chat.favorites.id.patch.errors.forbidden.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.patch.errors.forbidden.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.patch.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.favorites.id.patch.errors.notFound.title" as const,
-      description: "app.api.agent.chat.favorites.id.patch.errors.notFound.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.patch.errors.notFound.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.patch.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.favorites.id.patch.errors.server.title" as const,
-      description: "app.api.agent.chat.favorites.id.patch.errors.server.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.patch.errors.server.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.patch.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.favorites.id.patch.errors.unknown.title" as const,
-      description: "app.api.agent.chat.favorites.id.patch.errors.unknown.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.patch.errors.unknown.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.patch.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.agent.chat.favorites.id.patch.errors.unsavedChanges.title" as const,
+      title:
+        "app.api.agent.chat.favorites.id.patch.errors.unsavedChanges.title" as const,
       description:
         "app.api.agent.chat.favorites.id.patch.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.favorites.id.patch.errors.conflict.title" as const,
-      description: "app.api.agent.chat.favorites.id.patch.errors.conflict.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.patch.errors.conflict.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.patch.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
     title: "app.api.agent.chat.favorites.id.patch.success.title" as const,
-    description: "app.api.agent.chat.favorites.id.patch.success.description" as const,
+    description:
+      "app.api.agent.chat.favorites.id.patch.success.description" as const,
   },
 
   examples: {
@@ -736,7 +821,8 @@ const { DELETE } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.favorites.id.delete.response.success.content" as const,
+          content:
+            "app.api.agent.chat.favorites.id.delete.response.success.content" as const,
         },
         z.boolean(),
       ),
@@ -747,48 +833,65 @@ const { DELETE } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.chat.favorites.id.delete.errors.validation.title" as const,
-      description: "app.api.agent.chat.favorites.id.delete.errors.validation.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.delete.errors.validation.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.favorites.id.delete.errors.network.title" as const,
-      description: "app.api.agent.chat.favorites.id.delete.errors.network.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.delete.errors.network.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.delete.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.chat.favorites.id.delete.errors.unauthorized.title" as const,
+      title:
+        "app.api.agent.chat.favorites.id.delete.errors.unauthorized.title" as const,
       description:
         "app.api.agent.chat.favorites.id.delete.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.favorites.id.delete.errors.forbidden.title" as const,
-      description: "app.api.agent.chat.favorites.id.delete.errors.forbidden.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.delete.errors.forbidden.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.delete.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.favorites.id.delete.errors.notFound.title" as const,
-      description: "app.api.agent.chat.favorites.id.delete.errors.notFound.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.delete.errors.notFound.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.favorites.id.delete.errors.server.title" as const,
-      description: "app.api.agent.chat.favorites.id.delete.errors.server.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.delete.errors.server.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.delete.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.favorites.id.delete.errors.unknown.title" as const,
-      description: "app.api.agent.chat.favorites.id.delete.errors.unknown.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.delete.errors.unknown.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.delete.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.agent.chat.favorites.id.delete.errors.unsavedChanges.title" as const,
+      title:
+        "app.api.agent.chat.favorites.id.delete.errors.unsavedChanges.title" as const,
       description:
         "app.api.agent.chat.favorites.id.delete.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.favorites.id.delete.errors.conflict.title" as const,
-      description: "app.api.agent.chat.favorites.id.delete.errors.conflict.description" as const,
+      title:
+        "app.api.agent.chat.favorites.id.delete.errors.conflict.title" as const,
+      description:
+        "app.api.agent.chat.favorites.id.delete.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
     title: "app.api.agent.chat.favorites.id.delete.success.title" as const,
-    description: "app.api.agent.chat.favorites.id.delete.success.description" as const,
+    description:
+      "app.api.agent.chat.favorites.id.delete.success.description" as const,
   },
 
   examples: {
@@ -814,15 +917,19 @@ export type FavoriteGetResponseOutput = typeof GET.types.ResponseOutput;
 
 export type FavoriteUpdateRequestInput = typeof PATCH.types.RequestInput;
 export type FavoriteUpdateRequestOutput = typeof PATCH.types.RequestOutput;
-export type FavoriteUpdateUrlVariablesInput = typeof PATCH.types.UrlVariablesInput;
-export type FavoriteUpdateUrlVariablesOutput = typeof PATCH.types.UrlVariablesOutput;
+export type FavoriteUpdateUrlVariablesInput =
+  typeof PATCH.types.UrlVariablesInput;
+export type FavoriteUpdateUrlVariablesOutput =
+  typeof PATCH.types.UrlVariablesOutput;
 export type FavoriteUpdateResponseInput = typeof PATCH.types.ResponseInput;
 export type FavoriteUpdateResponseOutput = typeof PATCH.types.ResponseOutput;
 
 export type FavoriteDeleteRequestInput = typeof DELETE.types.RequestInput;
 export type FavoriteDeleteRequestOutput = typeof DELETE.types.RequestOutput;
-export type FavoriteDeleteUrlVariablesInput = typeof DELETE.types.UrlVariablesInput;
-export type FavoriteDeleteUrlVariablesOutput = typeof DELETE.types.UrlVariablesOutput;
+export type FavoriteDeleteUrlVariablesInput =
+  typeof DELETE.types.UrlVariablesInput;
+export type FavoriteDeleteUrlVariablesOutput =
+  typeof DELETE.types.UrlVariablesOutput;
 export type FavoriteDeleteResponseInput = typeof DELETE.types.ResponseInput;
 export type FavoriteDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 

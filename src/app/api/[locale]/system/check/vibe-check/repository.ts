@@ -5,7 +5,11 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -21,7 +25,10 @@ import type { OxlintResponseOutput } from "../oxlint/definition";
 import { oxlintRepository } from "../oxlint/repository";
 import type { TypecheckResponseOutput } from "../typecheck/definition";
 import { typecheckRepository } from "../typecheck/repository";
-import type { VibeCheckRequestOutput, VibeCheckResponseOutput } from "./definition";
+import type {
+  VibeCheckRequestOutput,
+  VibeCheckResponseOutput,
+} from "./definition";
 
 type CheckType = "oxlint" | "eslint" | "typecheck";
 
@@ -139,7 +146,9 @@ export class VibeCheckRepository {
     };
   }
 
-  private static extractIssuesFromResult(result: CheckResult["result"]): CheckIssue[] {
+  private static extractIssuesFromResult(
+    result: CheckResult["result"],
+  ): CheckIssue[] {
     if (!result.success) {
       if (
         "data" in result &&
@@ -254,7 +263,9 @@ export class VibeCheckRepository {
       // Oxlint can handle multiple paths efficiently in a single run
       if (!effectiveData.skipOxlint && configResult.config.oxlint.enabled) {
         const oxlintPaths =
-          pathsToCheck.length === 0 ? baseDir : pathsToCheck.map((p) => p || baseDir);
+          pathsToCheck.length === 0
+            ? baseDir
+            : pathsToCheck.map((p) => p || baseDir);
         logger.info("Starting Oxlint check...");
         promises.push(
           this.runOxlintCheck(
@@ -294,7 +305,10 @@ export class VibeCheckRepository {
           );
         }
 
-        if (!effectiveData.skipTypecheck && configResult.config.typecheck.enabled) {
+        if (
+          !effectiveData.skipTypecheck &&
+          configResult.config.typecheck.enabled
+        ) {
           logger.info("Starting TypeScript check...");
           promises.push(
             this.runTypecheckCheck(
@@ -322,7 +336,10 @@ export class VibeCheckRepository {
           lastCheckEnd - firstCheckStart;
       }
 
-      const { allIssues, hasErrors } = this.processCheckResults(checkResults, performanceTimings);
+      const { allIssues, hasErrors } = this.processCheckResults(
+        checkResults,
+        performanceTimings,
+      );
 
       const sortedIssues = this.sortIssues(allIssues);
       const response = this.buildResponse(
@@ -346,7 +363,9 @@ export class VibeCheckRepository {
     }
   }
 
-  private static normalizePaths(paths: string | string[] | undefined): (string | undefined)[] {
+  private static normalizePaths(
+    paths: string | string[] | undefined,
+  ): (string | undefined)[] {
     if (!paths) {
       return [undefined];
     }
@@ -431,7 +450,9 @@ export class VibeCheckRepository {
   ): VibeCheckResponseOutput {
     const totalIssues = allIssues.length;
     const totalFiles = new Set(allIssues.map((issue) => issue.file)).size;
-    const totalErrors = allIssues.filter((issue) => issue.severity === "error").length;
+    const totalErrors = allIssues.filter(
+      (issue) => issue.severity === "error",
+    ).length;
 
     const totalPages = Math.ceil(totalIssues / limit);
     const startIndex = (page - 1) * limit;
@@ -439,7 +460,8 @@ export class VibeCheckRepository {
     const limitedIssues = allIssues.slice(startIndex, endIndex);
 
     const displayedIssues = limitedIssues.length;
-    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file)).size;
+    const displayedFiles = new Set(limitedIssues.map((issue) => issue.file))
+      .size;
 
     // Build files list only if not skipped (for compact MCP responses)
     let files:
@@ -480,7 +502,10 @@ export class VibeCheckRepository {
   private static buildFileStats(
     issues: CheckIssue[],
   ): Map<string, { errors: number; warnings: number; total: number }> {
-    const fileStats = new Map<string, { errors: number; warnings: number; total: number }>();
+    const fileStats = new Map<
+      string,
+      { errors: number; warnings: number; total: number }
+    >();
 
     for (const issue of issues) {
       const stats = fileStats.get(issue.file) || {

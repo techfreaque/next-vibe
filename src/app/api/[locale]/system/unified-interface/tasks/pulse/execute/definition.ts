@@ -31,15 +31,20 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
 
   title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.title",
-  description: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.description",
+  description:
+    "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.description",
   icon: "activity",
-  category: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.category",
-  tags: ["app.api.system.unifiedInterface.tasks.pulseSystem.execute.tags.execute"],
+  category:
+    "app.api.system.unifiedInterface.tasks.pulseSystem.execute.category",
+  tags: [
+    "app.api.system.unifiedInterface.tasks.pulseSystem.execute.tags.execute",
+  ],
 
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.container.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.container.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.container.description",
       layoutType: LayoutType.GRID,
@@ -124,7 +129,8 @@ const { POST } = createEndpoint({
       results: responseArrayField(
         {
           type: WidgetType.DATA_LIST,
-          title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.results",
+          title:
+            "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.results",
         },
         objectField(
           {
@@ -196,39 +202,46 @@ const { POST } = createEndpoint({
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.network.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.network.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unknown.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unknown.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.conflict.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.conflict.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.conflict.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.notFound.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.notFound.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unsaved.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unsaved.title",
       description:
         "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unsaved.description",
     },
   },
 
   successTypes: {
-    title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.success.title",
+    title:
+      "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.success.title",
     description:
       "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.success.description",
   },

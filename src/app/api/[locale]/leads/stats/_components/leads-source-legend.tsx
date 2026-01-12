@@ -55,7 +55,8 @@ export function LeadsSourceLegend({
       <CardHeader className="pb-4">
         <Div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold">
-            {title || t("app.admin.leads.leads.admin.stats.sources.legend.title")}
+            {title ||
+              t("app.admin.leads.leads.admin.stats.sources.legend.title")}
           </CardTitle>
           <Badge variant="outline">
             {visibleCount}/{totalCount}{" "}
@@ -130,10 +131,13 @@ export function LeadsSourceLegend({
                     {t(source.source)}
                   </Div>
                   <Div className="text-sm text-muted-foreground">
-                    {t("app.admin.leads.leads.admin.stats.sources.legend.leads", {
-                      count: source.count,
-                      percentage: source.percentage.toFixed(1),
-                    })}
+                    {t(
+                      "app.admin.leads.leads.admin.stats.sources.legend.leads",
+                      {
+                        count: source.count,
+                        percentage: source.percentage.toFixed(1),
+                      },
+                    )}
                   </Div>
                 </Div>
               </Div>
@@ -143,7 +147,11 @@ export function LeadsSourceLegend({
                 onClick={() => onToggleSource(source.source)}
                 className="opacity-60 hover:opacity-100"
               >
-                {source.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                {source.visible ? (
+                  <Eye className="h-4 w-4" />
+                ) : (
+                  <EyeOff className="h-4 w-4" />
+                )}
               </Button>
             </Div>
           ))}
@@ -155,7 +163,10 @@ export function LeadsSourceLegend({
             {t("app.admin.leads.leads.admin.stats.sources.legend.summary", {
               visible: visibleCount,
               total: totalCount,
-              percentage: totalCount > 0 ? ((visibleCount / totalCount) * 100).toFixed(1) : 0,
+              percentage:
+                totalCount > 0
+                  ? ((visibleCount / totalCount) * 100).toFixed(1)
+                  : 0,
             })}
           </Div>
         </Div>

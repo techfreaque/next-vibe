@@ -63,6 +63,10 @@ export function useRecommendedModels(
     if (!character) {
       return [];
     }
-    return CharactersRepositoryClient.getRecommendedModels(models, character, limit);
+    return CharactersRepositoryClient.getRecommendedModels(
+      models,
+      character,
+      limit,
+    );
   }, [models, character, limit]);
 }

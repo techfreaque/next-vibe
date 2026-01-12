@@ -94,7 +94,9 @@ export function isServerlessEnvironment(): boolean {
 /**
  * Get environment configuration for the detected environment
  */
-export function getEnvironmentConfig(environment?: ServerEnvironmentType): EnvironmentConfig {
+export function getEnvironmentConfig(
+  environment?: ServerEnvironmentType,
+): EnvironmentConfig {
   const detectedEnv = environment || detectEnvironment();
 
   switch (detectedEnv) {

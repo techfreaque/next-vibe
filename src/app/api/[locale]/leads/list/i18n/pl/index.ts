@@ -127,7 +127,8 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera podczas pobierania leadów",
+        description:
+          "Wystąpił wewnętrzny błąd serwera podczas pobierania leadów",
       },
       unknown: {
         title: "Nieznany błąd",

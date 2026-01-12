@@ -14,7 +14,12 @@ import type { CountryLanguage } from "./i18n/core/config";
 const defaultLocale: `${typeof languageDefaults.language}-${typeof languageDefaults.country}` =
   "en-GLOBAL";
 
-const supportedLocales: CountryLanguage[] = ["de-DE", "pl-PL", "en-GLOBAL", "en-US"];
+const supportedLocales: CountryLanguage[] = [
+  "de-DE",
+  "pl-PL",
+  "en-GLOBAL",
+  "en-US",
+];
 
 /**
  * Middleware implementation

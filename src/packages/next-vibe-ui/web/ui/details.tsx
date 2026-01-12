@@ -8,7 +8,13 @@ export type DetailsProps = {
   open?: boolean;
 } & StyleType;
 
-export function Details({ className, style, children, id, open }: DetailsProps): JSX.Element {
+export function Details({
+  className,
+  style,
+  children,
+  id,
+  open,
+}: DetailsProps): JSX.Element {
   return (
     <details className={className} style={style} id={id} open={open}>
       {children}

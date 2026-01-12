@@ -91,7 +91,14 @@ export interface ScanResultWithSegments extends ScanResultWithRelative {
 /**
  * Default directories to exclude
  */
-const DEFAULT_EXCLUDE_DIRS = ["node_modules", ".git", ".next", ".tmp", "dist", ".dist"];
+const DEFAULT_EXCLUDE_DIRS = [
+  "node_modules",
+  ".git",
+  ".next",
+  ".tmp",
+  "dist",
+  ".dist",
+];
 
 /**
  * Scan directory recursively and find matching files
@@ -121,7 +128,11 @@ export function scanDirectory(
   /**
    * Recursive scan function
    */
-  function scan(currentDir: string, currentSegments: string[] = [], depth = 0): void {
+  function scan(
+    currentDir: string,
+    currentSegments: string[] = [],
+    depth = 0,
+  ): void {
     // Check max depth
     if (maxDepth !== undefined && depth > maxDepth) {
       return;
@@ -141,14 +152,19 @@ export function scanDirectory(
           }
 
           // Check exclude patterns
-          if (excludePatterns.some((pattern) => relativePath.includes(pattern))) {
+          if (
+            excludePatterns.some((pattern) => relativePath.includes(pattern))
+          ) {
             continue;
           }
 
           // Recurse into subdirectory
           const newSegments = [...currentSegments, entry.name];
           scan(fullPath, newSegments, depth + 1);
-        } else if (entry.isFile() || (followSymlinks && entry.isSymbolicLink())) {
+        } else if (
+          entry.isFile() ||
+          (followSymlinks && entry.isSymbolicLink())
+        ) {
           // Skip excluded files
           if (excludeFiles.includes(entry.name)) {
             continue;

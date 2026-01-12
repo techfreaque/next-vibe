@@ -99,13 +99,18 @@ export const translations: typeof enTranslations = {
         taskRunnerStarted: "✅ Task Runner produkcyjny uruchomiony z",
         taskRunnerStartedSuffix: " zadań",
         failedTaskRunner: "Nie udało się uruchomić Task Runner",
-        taskRunnerSkipped: "Task Runner produkcyjny pominięty (użyto flagi --skip-task-runner)",
-        skipNextStart: "Pomijanie startu Next.js (będzie obsługiwane przez package.json)",
-        serverWillStart: "Serwer produkcyjny zostanie uruchomiony przez package.json",
+        taskRunnerSkipped:
+          "Task Runner produkcyjny pominięty (użyto flagi --skip-task-runner)",
+        skipNextStart:
+          "Pomijanie startu Next.js (będzie obsługiwane przez package.json)",
+        serverWillStart:
+          "Serwer produkcyjny zostanie uruchomiony przez package.json",
         serverAvailable: "Serwer będzie dostępny pod adresem http://localhost:",
-        startupPrepared: "✅ Start serwera produkcyjnego przygotowany pomyślnie",
+        startupPrepared:
+          "✅ Start serwera produkcyjnego przygotowany pomyślnie",
         failedStart: "❌ Start serwera produkcyjnego nie powiódł się:",
-        gracefulShutdown: "Żądanie graceful shutdown dla Task Runner produkcyjnego",
+        gracefulShutdown:
+          "Żądanie graceful shutdown dla Task Runner produkcyjnego",
       },
     },
   },

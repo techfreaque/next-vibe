@@ -13,8 +13,13 @@ export type CollapsibleProps = {
   defaultOpen?: boolean;
 } & StyleType;
 
-export function Collapsible({ children, ...props }: CollapsibleProps): React.JSX.Element {
-  return <CollapsiblePrimitive.Root {...props}>{children}</CollapsiblePrimitive.Root>;
+export function Collapsible({
+  children,
+  ...props
+}: CollapsibleProps): React.JSX.Element {
+  return (
+    <CollapsiblePrimitive.Root {...props}>{children}</CollapsiblePrimitive.Root>
+  );
 }
 Collapsible.displayName = CollapsiblePrimitive.Root.displayName;
 
@@ -35,7 +40,8 @@ export function CollapsibleTrigger({
     </CollapsiblePrimitive.CollapsibleTrigger>
   );
 }
-CollapsibleTrigger.displayName = CollapsiblePrimitive.CollapsibleTrigger.displayName;
+CollapsibleTrigger.displayName =
+  CollapsiblePrimitive.CollapsibleTrigger.displayName;
 
 export type CollapsibleContentProps = {
   children?: React.ReactNode;
@@ -52,4 +58,5 @@ export function CollapsibleContent({
     </CollapsiblePrimitive.CollapsibleContent>
   );
 }
-CollapsibleContent.displayName = CollapsiblePrimitive.CollapsibleContent.displayName;
+CollapsibleContent.displayName =
+  CollapsiblePrimitive.CollapsibleContent.displayName;

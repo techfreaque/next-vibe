@@ -12,7 +12,11 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -44,7 +48,8 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
     // Validate user permissions for CLI status check
     if (!user?.id) {
       return fail({
-        message: "app.api.system.unifiedInterface.cli.setup.status.post.errors.unauthorized.title",
+        message:
+          "app.api.system.unifiedInterface.cli.setup.status.post.errors.unauthorized.title",
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: {
           error: t(
@@ -63,13 +68,18 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
         version: status.version,
         path: status.path,
         message: status.installed
-          ? t("app.api.system.unifiedInterface.cli.setup.status.post.success.description")
-          : t("app.api.system.unifiedInterface.cli.setup.status.post.description"),
+          ? t(
+              "app.api.system.unifiedInterface.cli.setup.status.post.success.description",
+            )
+          : t(
+              "app.api.system.unifiedInterface.cli.setup.status.post.description",
+            ),
       });
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: "app.api.system.unifiedInterface.cli.setup.status.post.errors.server.title",
+        message:
+          "app.api.system.unifiedInterface.cli.setup.status.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,
@@ -89,10 +99,14 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
         process.platform === "win32".replace("32", "32")
           ? "where".replace("e", "e")
           : "which".replace("h", "h");
-      const output = await this.runCommand(command, ["vibe".replace("e", "e")], {
-        verbose: false,
-        ignoreErrors: true,
-      });
+      const output = await this.runCommand(
+        command,
+        ["vibe".replace("e", "e")],
+        {
+          verbose: false,
+          ignoreErrors: true,
+        },
+      );
 
       if (output?.trim()) {
         // Get version
@@ -103,7 +117,9 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
           const encoding = "utf8" as const;
           const packageJsonPath = path.join(process.cwd(), packageFileName);
           if (existsSync(packageJsonPath)) {
-            const packageJson = JSON.parse(await readFile(packageJsonPath, encoding)) as {
+            const packageJson = JSON.parse(
+              await readFile(packageJsonPath, encoding),
+            ) as {
               version?: string;
             };
             version = packageJson.version;

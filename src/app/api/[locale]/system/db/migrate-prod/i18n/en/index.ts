@@ -1,7 +1,8 @@
 export const translations = {
   post: {
     title: "Production Database Migration",
-    description: "Run production database migrations with safety checks for CI/CD pipelines",
+    description:
+      "Run production database migrations with safety checks for CI/CD pipelines",
     form: {
       title: "Production Migration Options",
       description: "Configure production migration operation settings",
@@ -13,23 +14,28 @@ export const translations = {
       },
       network: {
         title: "Network Error",
-        description: "Failed to connect to the database for production migration",
+        description:
+          "Failed to connect to the database for production migration",
       },
       unauthorized: {
         title: "Unauthorized",
-        description: "You are not authorized to perform production migration operations",
+        description:
+          "You are not authorized to perform production migration operations",
       },
       forbidden: {
         title: "Forbidden",
-        description: "Production migration operations are not allowed for your role",
+        description:
+          "Production migration operations are not allowed for your role",
       },
       notFound: {
         title: "Not Found",
-        description: "The requested production migration resource was not found",
+        description:
+          "The requested production migration resource was not found",
       },
       server: {
         title: "Server Error",
-        description: "An internal server error occurred during production migration",
+        description:
+          "An internal server error occurred during production migration",
       },
       unknown: {
         title: "Unknown Error",
@@ -37,7 +43,8 @@ export const translations = {
       },
       conflict: {
         title: "Conflict",
-        description: "A conflict occurred during production migration operation",
+        description:
+          "A conflict occurred during production migration operation",
       },
     },
     success: {
@@ -82,14 +89,17 @@ export const translations = {
   },
   messages: {
     dryRunComplete: "✅ Dry run completed - no changes made",
-    successWithSeeding: "✅ Production migration completed successfully! 🚀 Ready for deployment",
+    successWithSeeding:
+      "✅ Production migration completed successfully! 🚀 Ready for deployment",
     successWithoutSeeding:
       "✅ Production migration completed successfully (seeding skipped)! 🚀 Ready for deployment",
   },
   errors: {
-    notProduction: "❌ NODE_ENV is not set to 'production'. Use --force to override.",
+    notProduction:
+      "❌ NODE_ENV is not set to 'production'. Use --force to override.",
     noDatabaseUrl: "❌ DATABASE_URL environment variable is required",
-    localhostDatabase: "❌ DATABASE_URL appears to be localhost. Use --force to override.",
+    localhostDatabase:
+      "❌ DATABASE_URL appears to be localhost. Use --force to override.",
   },
   tag: "Database",
 };

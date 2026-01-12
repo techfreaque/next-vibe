@@ -157,18 +157,25 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     // Side Tasks errors
-    fetchSideTaskByName: "Fehler beim Abrufen der Hintergrund-Aufgabe nach Name",
+    fetchSideTaskByName:
+      "Fehler beim Abrufen der Hintergrund-Aufgabe nach Name",
     updateSideTask: "Fehler beim Aktualisieren der Hintergrund-Aufgabe",
     deleteSideTask: "Fehler beim Löschen der Hintergrund-Aufgabe",
-    createSideTaskExecution: "Fehler beim Erstellen der Hintergrund-Aufgaben-Ausführung",
-    updateSideTaskExecution: "Fehler beim Aktualisieren der Hintergrund-Aufgaben-Ausführung",
-    fetchSideTaskExecutions: "Fehler beim Abrufen der Hintergrund-Aufgaben-Ausführungen",
+    createSideTaskExecution:
+      "Fehler beim Erstellen der Hintergrund-Aufgaben-Ausführung",
+    updateSideTaskExecution:
+      "Fehler beim Aktualisieren der Hintergrund-Aufgaben-Ausführung",
+    fetchSideTaskExecutions:
+      "Fehler beim Abrufen der Hintergrund-Aufgaben-Ausführungen",
     fetchRecentSideTaskExecutions:
       "Fehler beim Abrufen der letzten Hintergrund-Aufgaben-Ausführungen",
-    createSideTaskHealthCheck: "Fehler beim Erstellen des Hintergrund-Aufgaben-Gesundheitschecks",
+    createSideTaskHealthCheck:
+      "Fehler beim Erstellen des Hintergrund-Aufgaben-Gesundheitschecks",
     fetchLatestHealthCheck: "Fehler beim Abrufen des letzten Gesundheitschecks",
-    fetchHealthCheckHistory: "Fehler beim Abrufen der Gesundheitscheck-Historie",
-    fetchSideTaskStatistics: "Fehler beim Abrufen der Hintergrund-Aufgaben-Statistiken",
+    fetchHealthCheckHistory:
+      "Fehler beim Abrufen der Gesundheitscheck-Historie",
+    fetchSideTaskStatistics:
+      "Fehler beim Abrufen der Hintergrund-Aufgaben-Statistiken",
     sideTaskNotFound: "Hintergrund-Aufgabe nicht gefunden",
     sideTaskExecutionNotFound: "Hintergrund-Aufgaben-Ausführung nicht gefunden",
 
@@ -201,16 +208,23 @@ export const translations: typeof enTranslations = {
     pulseExecutionFailed: "Pulse-Ausführung fehlgeschlagen",
   },
   common: {
-    cronRepositoryTaskUpdateFailed: "Fehler beim Aktualisieren der Cron-Aufgabe",
+    cronRepositoryTaskUpdateFailed:
+      "Fehler beim Aktualisieren der Cron-Aufgabe",
     cronRepositoryTaskDeleteFailed: "Fehler beim Löschen der Cron-Aufgabe",
-    cronRepositoryExecutionCreateFailed: "Fehler beim Erstellen der Cron-Aufgabenausführung",
-    cronRepositoryExecutionUpdateFailed: "Fehler beim Aktualisieren der Cron-Aufgabenausführung",
-    cronRepositoryExecutionsFetchFailed: "Fehler beim Abrufen der Cron-Aufgabenausführungen",
+    cronRepositoryExecutionCreateFailed:
+      "Fehler beim Erstellen der Cron-Aufgabenausführung",
+    cronRepositoryExecutionUpdateFailed:
+      "Fehler beim Aktualisieren der Cron-Aufgabenausführung",
+    cronRepositoryExecutionsFetchFailed:
+      "Fehler beim Abrufen der Cron-Aufgabenausführungen",
     cronRepositoryRecentExecutionsFetchFailed:
       "Fehler beim Abrufen der letzten Cron-Aufgabenausführungen",
-    cronRepositorySchedulesFetchFailed: "Fehler beim Abrufen der Cron-Aufgabenpläne",
-    cronRepositoryScheduleUpdateFailed: "Fehler beim Aktualisieren des Cron-Aufgabenplans",
-    cronRepositoryStatisticsFetchFailed: "Fehler beim Abrufen der Cron-Aufgabenstatistiken",
+    cronRepositorySchedulesFetchFailed:
+      "Fehler beim Abrufen der Cron-Aufgabenpläne",
+    cronRepositoryScheduleUpdateFailed:
+      "Fehler beim Aktualisieren des Cron-Aufgabenplans",
+    cronRepositoryStatisticsFetchFailed:
+      "Fehler beim Abrufen der Cron-Aufgabenstatistiken",
   },
   cronSystem: cronTranslations,
   pulseSystem: pulseTranslations,

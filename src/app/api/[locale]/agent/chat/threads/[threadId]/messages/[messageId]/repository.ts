@@ -7,7 +7,11 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -234,7 +238,12 @@ export class MessageRepository {
       // User must be the author or have write permission on the thread
       const userId = user.isPublic ? user.leadId : user.id;
       const isAuthor = existingMessage.authorId === userId;
-      const hasWritePermission = await canWriteMessage(user, thread, folder, logger);
+      const hasWritePermission = await canWriteMessage(
+        user,
+        thread,
+        folder,
+        logger,
+      );
 
       if (!isAuthor && !hasWritePermission) {
         return fail({
@@ -346,7 +355,9 @@ export class MessageRepository {
       }
 
       // Check if user can delete this message
-      if (!(await canDeleteMessage(user, existingMessage, thread, folder, logger))) {
+      if (
+        !(await canDeleteMessage(user, existingMessage, thread, folder, logger))
+      ) {
         return fail({
           message:
             "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.forbidden.title" as const,
@@ -355,7 +366,9 @@ export class MessageRepository {
       }
 
       // Delete message
-      await db.delete(chatMessages).where(eq(chatMessages.id, urlPathParams.messageId));
+      await db
+        .delete(chatMessages)
+        .where(eq(chatMessages.id, urlPathParams.messageId));
 
       return success({
         success: true,

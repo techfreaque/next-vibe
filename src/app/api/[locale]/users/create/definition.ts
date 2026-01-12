@@ -20,8 +20,16 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole, UserRoleOptions } from "@/app/api/[locale]/user/user-roles/enum";
-import { Countries, CountriesOptions, Languages, LanguagesOptions } from "@/i18n/core/config";
+import {
+  UserRole,
+  UserRoleOptions,
+} from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 import { dateSchema } from "../../shared/types/common.schema";
 
@@ -37,7 +45,10 @@ const { POST } = createEndpoint({
   description: "app.api.users.create.post.description" as const,
   icon: "user-plus",
   category: "app.api.users.category" as const,
-  tags: ["app.api.users.tags.create" as const, "app.api.users.tags.admin" as const],
+  tags: [
+    "app.api.users.tags.create" as const,
+    "app.api.users.tags.admin" as const,
+  ],
 
   fields: objectField(
     {
@@ -64,7 +75,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.EMAIL,
               label: "app.api.users.create.post.email.label" as const,
-              description: "app.api.users.create.post.email.description" as const,
+              description:
+                "app.api.users.create.post.email.description" as const,
               placeholder: "app.api.users.create.post.email.label" as const,
               columns: 12,
             },
@@ -78,8 +90,10 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
               label: "app.api.users.create.post.password.label" as const,
-              description: "app.api.users.create.post.password.description" as const,
-              helpText: "app.api.users.create.post.password.description" as const,
+              description:
+                "app.api.users.create.post.password.description" as const,
+              helpText:
+                "app.api.users.create.post.password.description" as const,
               columns: 12,
             },
             z
@@ -92,7 +106,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.users.create.post.privateName.label" as const,
-              description: "app.api.users.create.post.privateName.description" as const,
+              description:
+                "app.api.users.create.post.privateName.description" as const,
               columns: 6,
             },
             z
@@ -106,7 +121,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.users.create.post.publicName.label" as const,
-              description: "app.api.users.create.post.publicName.description" as const,
+              description:
+                "app.api.users.create.post.publicName.description" as const,
               columns: 6,
             },
             z
@@ -158,7 +174,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.MULTISELECT,
               label: "app.api.users.create.post.roles.label" as const,
-              description: "app.api.users.create.post.roles.description" as const,
+              description:
+                "app.api.users.create.post.roles.description" as const,
               helpText: "app.api.users.create.post.roles.description" as const,
               columns: 12,
               options: UserRoleOptions,
@@ -170,7 +187,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "app.api.users.create.post.emailVerified.label" as const,
-              description: "app.api.users.create.post.emailVerified.description" as const,
+              description:
+                "app.api.users.create.post.emailVerified.description" as const,
               columns: 6,
             },
             z.boolean().optional(),
@@ -180,7 +198,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "app.api.users.create.post.isActive.label" as const,
-              description: "app.api.users.create.post.isActive.description" as const,
+              description:
+                "app.api.users.create.post.isActive.description" as const,
               columns: 6,
             },
             z.boolean().optional(),
@@ -190,7 +209,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.UUID,
               label: "app.api.users.create.post.leadId.label" as const,
-              description: "app.api.users.create.post.leadId.description" as const,
+              description:
+                "app.api.users.create.post.leadId.description" as const,
               helpText: "app.api.users.create.post.leadId.description" as const,
               columns: 6,
             },
@@ -220,7 +240,8 @@ const { POST } = createEndpoint({
           message: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.users.create.post.success.message.content" as const,
+              content:
+                "app.api.users.create.post.success.message.content" as const,
             },
             z.string().describe("Human-readable success message"),
           ),
@@ -230,7 +251,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.users.create.post.response.title" as const,
-          description: "app.api.users.create.post.response.description" as const,
+          description:
+            "app.api.users.create.post.response.description" as const,
           layoutType: LayoutType.GRID,
           columns: 3,
         },
@@ -246,28 +268,32 @@ const { POST } = createEndpoint({
           email: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.users.create.post.response.email.content" as const,
+              content:
+                "app.api.users.create.post.response.email.content" as const,
             },
             z.email().describe("User's email address"),
           ),
           privateName: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.users.create.post.response.privateName.content" as const,
+              content:
+                "app.api.users.create.post.response.privateName.content" as const,
             },
             z.string().describe("User's private name"),
           ),
           publicName: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.users.create.post.response.publicName.content" as const,
+              content:
+                "app.api.users.create.post.response.publicName.content" as const,
             },
             z.string().describe("User's public name"),
           ),
           createdAt: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.users.create.post.response.createdAt.content" as const,
+              content:
+                "app.api.users.create.post.response.createdAt.content" as const,
             },
             dateSchema.describe("When the user was created"),
           ),
@@ -297,14 +323,16 @@ const { POST } = createEndpoint({
       responsePrivateName: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.users.create.post.response.privateName.content" as const,
+          content:
+            "app.api.users.create.post.response.privateName.content" as const,
         },
         z.string(),
       ),
       responsePublicName: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.users.create.post.response.publicName.content" as const,
+          content:
+            "app.api.users.create.post.response.publicName.content" as const,
         },
         z.string(),
       ),
@@ -325,7 +353,8 @@ const { POST } = createEndpoint({
       responseStripeCustomerId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.users.create.post.response.stripeCustomerId.content" as const,
+          content:
+            "app.api.users.create.post.response.stripeCustomerId.content" as const,
         },
         z.string().nullable(),
       ),
@@ -344,14 +373,16 @@ const { POST } = createEndpoint({
             id: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.users.create.post.response.userRoles.id.content" as const,
+                content:
+                  "app.api.users.create.post.response.userRoles.id.content" as const,
               },
               z.uuid(),
             ),
             role: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.users.create.post.response.userRoles.role.content" as const,
+                content:
+                  "app.api.users.create.post.response.userRoles.role.content" as const,
               },
               z.string(),
             ),
@@ -361,14 +392,16 @@ const { POST } = createEndpoint({
       responseCreatedAt: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.users.create.post.response.createdAt.content" as const,
+          content:
+            "app.api.users.create.post.response.createdAt.content" as const,
         },
         dateSchema,
       ),
       responseUpdatedAt: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.users.create.post.response.updatedAt.content" as const,
+          content:
+            "app.api.users.create.post.response.updatedAt.content" as const,
         },
         dateSchema,
       ),
@@ -378,39 +411,48 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.users.create.post.errors.validation.title" as const,
-      description: "app.api.users.create.post.errors.validation.description" as const,
+      description:
+        "app.api.users.create.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.users.create.post.errors.server.title" as const,
-      description: "app.api.users.create.post.errors.server.description" as const,
+      description:
+        "app.api.users.create.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.users.create.post.errors.unauthorized.title" as const,
-      description: "app.api.users.create.post.errors.unauthorized.description" as const,
+      description:
+        "app.api.users.create.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.users.create.post.errors.forbidden.title" as const,
-      description: "app.api.users.create.post.errors.forbidden.description" as const,
+      description:
+        "app.api.users.create.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.users.create.post.errors.notFound.title" as const,
-      description: "app.api.users.create.post.errors.notFound.description" as const,
+      description:
+        "app.api.users.create.post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.users.create.post.errors.server.title" as const,
-      description: "app.api.users.create.post.errors.server.description" as const,
+      description:
+        "app.api.users.create.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.users.create.post.errors.unknown.title" as const,
-      description: "app.api.users.create.post.errors.unknown.description" as const,
+      description:
+        "app.api.users.create.post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.users.create.post.errors.unsavedChanges.title" as const,
-      description: "app.api.users.create.post.errors.unsavedChanges.description" as const,
+      description:
+        "app.api.users.create.post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.users.create.post.errors.conflict.title" as const,
-      description: "app.api.users.create.post.errors.conflict.description" as const,
+      description:
+        "app.api.users.create.post.errors.conflict.description" as const,
     },
   },
 

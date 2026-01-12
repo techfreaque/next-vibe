@@ -84,7 +84,8 @@ export const translations = {
     },
     content: {
       label: "Memory Content",
-      description: "The fact to remember (e.g., 'Profession: Software engineer')",
+      description:
+        "The fact to remember (e.g., 'Profession: Software engineer')",
     },
     tags: {
       label: "Tags",

@@ -14,7 +14,9 @@ interface SubscriptionTabsNavProps {
   locale: CountryLanguage;
 }
 
-export function SubscriptionTabsNav({ locale }: SubscriptionTabsNavProps): JSX.Element {
+export function SubscriptionTabsNav({
+  locale,
+}: SubscriptionTabsNavProps): JSX.Element {
   const { t } = simpleT(locale);
   const pathname = usePathname();
 

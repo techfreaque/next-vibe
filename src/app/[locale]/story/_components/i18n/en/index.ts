@@ -40,8 +40,10 @@ export const translations = {
     forumHero: {
       badge: "Welcome to the Community",
       title: "The AI-Powered Community Forum",
-      subtitle: "Ask questions, share your knowledge, and connect with others in the world of AI.",
-      description: "Explore discussions, get help, and contribute to the future of AI development.",
+      subtitle:
+        "Ask questions, share your knowledge, and connect with others in the world of AI.",
+      description:
+        "Explore discussions, get help, and contribute to the future of AI development.",
       cta: "Create New Thread",
       secondaryCta: "Browse Threads",
     },
@@ -130,7 +132,8 @@ export const translations = {
     pricing: {
       free: {
         name: "Free Tier",
-        description: "Get started with {{credits}} free credits - no card required",
+        description:
+          "Get started with {{credits}} free credits - no card required",
         credits: "{{credits}} free credits (one-time)",
         features: {
           credits: "{{credits}} credits to start",
@@ -203,7 +206,8 @@ export const translations = {
     process: {
       badge: "How It Works",
       title: "Get Started in 4 Simple Steps",
-      subtitle: "From private AI chats to public forum discussions - all in one platform",
+      subtitle:
+        "From private AI chats to public forum discussions - all in one platform",
       readyTransform: "Ready to experience AI chat + community?",
       handleSocial: "Your privacy, your choice",
       getStarted: "Get Started Today",
@@ -218,7 +222,8 @@ export const translations = {
           },
           insights: {
             title: "Free Forever",
-            description: "{{freeCredits}} credits monthly, all models, all folder types",
+            description:
+              "{{freeCredits}} credits monthly, all models, all folder types",
           },
         },
         contentCreation: {
@@ -316,25 +321,31 @@ export const translations = {
       description:
         "Help us build the future of uncensored AI chat. We're looking for passionate people who believe in freedom of expression and user privacy.",
       joinTeam: "Join Our Team",
-      subtitle: "Be part of a mission to make AI honest, accessible, and uncensored.",
+      subtitle:
+        "Be part of a mission to make AI honest, accessible, and uncensored.",
       whyWorkWithUs: "Why Work With Us",
       workplaceDescription:
         "We're a remote-first company that values autonomy, creativity, and impact. Join a team that's changing how people interact with AI.",
       benefits: {
         title: "What We Offer",
         growthTitle: "Growth & Learning",
-        growthDesc: "Work with cutting-edge AI technology and learn from industry experts.",
+        growthDesc:
+          "Work with cutting-edge AI technology and learn from industry experts.",
         meaningfulTitle: "Meaningful Work",
-        meaningfulDesc: "Build products that empower users and protect their privacy.",
+        meaningfulDesc:
+          "Build products that empower users and protect their privacy.",
         balanceTitle: "Work-Life Balance",
         balanceDesc:
           "Flexible hours, remote work, and unlimited PTO. We trust you to do great work.",
         compensationTitle: "Competitive Compensation",
-        compensationDesc: "Industry-leading salary, equity, and benefits package.",
+        compensationDesc:
+          "Industry-leading salary, equity, and benefits package.",
         innovationTitle: "Innovation & Impact",
-        innovationDesc: "Work on cutting-edge AI technology that makes a real difference.",
+        innovationDesc:
+          "Work on cutting-edge AI technology that makes a real difference.",
         teamTitle: "Great Team",
-        teamDesc: "Work with talented, passionate people who care about AI ethics.",
+        teamDesc:
+          "Work with talented, passionate people who care about AI ethics.",
       },
       openPositions: "Open Positions",
       noOpenings: "No open positions at the moment",
@@ -379,7 +390,8 @@ export const translations = {
         },
         contentCreator: {
           title: "Community Manager",
-          shortDescription: "Build and engage our community of AI enthusiasts and power users.",
+          shortDescription:
+            "Build and engage our community of AI enthusiasts and power users.",
           longDescription:
             "We're seeking a Community Manager to build and nurture our growing community of AI enthusiasts, create engaging content, and foster meaningful discussions.",
           location: "Remote",
@@ -447,7 +459,8 @@ export const translations = {
         "We're on a mission to democratize access to uncensored AI. Founded in {{foundedYear}}, {{appName}} provides a platform where users can have honest, unfiltered conversations with the world's most advanced AI models.",
       values: {
         title: "Our Values",
-        description: "The principles that guide everything we do at {{appName}}",
+        description:
+          "The principles that guide everything we do at {{appName}}",
         excellence: {
           title: "Excellence",
           description:
@@ -455,7 +468,8 @@ export const translations = {
         },
         innovation: {
           title: "Innovation",
-          description: "We continuously innovate to bring you the latest AI models and features.",
+          description:
+            "We continuously innovate to bring you the latest AI models and features.",
         },
         integrity: {
           title: "Integrity",
@@ -464,7 +478,8 @@ export const translations = {
         },
         collaboration: {
           title: "Collaboration",
-          description: "We work together with our community to build the best AI chat platform.",
+          description:
+            "We work together with our community to build the best AI chat platform.",
         },
       },
       mission: {
@@ -504,17 +519,20 @@ export const translations = {
       sections: {
         partnerships: {
           title: "Partnerships & Affiliations",
-          description: "Information about our business partnerships and affiliations.",
+          description:
+            "Information about our business partnerships and affiliations.",
           content:
             "{{appName}} maintains partnerships with leading AI providers to deliver the best possible service to our users.",
         },
         companyInfo: {
           title: "Company Information",
-          description: "Legal information about {{appName}} and our registered business entity.",
+          description:
+            "Legal information about {{appName}} and our registered business entity.",
         },
         responsiblePerson: {
           title: "Responsible Person",
-          description: "Information about the person responsible for the content of this website.",
+          description:
+            "Information about the person responsible for the content of this website.",
         },
         contactInfo: {
           title: "Contact Information",
@@ -543,7 +561,8 @@ export const translations = {
         },
         disputeResolution: {
           title: "Dispute Resolution",
-          description: "Information about how disputes are handled and resolved.",
+          description:
+            "Information about how disputes are handled and resolved.",
           content:
             "Any disputes arising from the use of this website shall be resolved in accordance with applicable law.",
         },
@@ -598,8 +617,10 @@ export const translations = {
           description:
             "Your privacy is our priority. We implement industry-standard security measures:",
           items: {
-            encryption: "End-to-end encryption for private folders and sensitive data",
-            incognito: "Incognito mode for session-only chats that are never stored",
+            encryption:
+              "End-to-end encryption for private folders and sensitive data",
+            incognito:
+              "Incognito mode for session-only chats that are never stored",
             gdpr: "Full GDPR compliance for EU users",
             noSelling: "We never sell your data to third parties",
             minimal: "Minimal data collection - only what's necessary",
@@ -645,14 +666,18 @@ export const translations = {
         },
         useOfInformation: {
           title: "Use of Your Information",
-          description: "We use the information we collect for various purposes, including:",
+          description:
+            "We use the information we collect for various purposes, including:",
           items: {
             provide: "To provide and maintain our AI chat services",
             process: "To process your transactions and manage your account",
             send: "To send you updates, newsletters, and marketing communications",
-            respond: "To respond to your inquiries and provide customer support",
-            monitor: "To monitor and analyze usage patterns to improve our platform",
-            personalize: "To personalize your experience and deliver relevant content",
+            respond:
+              "To respond to your inquiries and provide customer support",
+            monitor:
+              "To monitor and analyze usage patterns to improve our platform",
+            personalize:
+              "To personalize your experience and deliver relevant content",
           },
         },
         disclosure: {
@@ -702,7 +727,8 @@ export const translations = {
           items: {
             access: "Right to access your personal data",
             correction: "Right to correct inaccurate or incomplete data",
-            deletion: "Right to request deletion of your data (right to be forgotten)",
+            deletion:
+              "Right to request deletion of your data (right to be forgotten)",
             objection: "Right to object to processing of your data",
             portability: "Right to data portability and transfer",
           },
@@ -772,7 +798,8 @@ export const translations = {
           },
           guidelines: {
             title: "Content Guidelines",
-            intro: "While we provide uncensored AI access, you must not use the service to:",
+            intro:
+              "While we provide uncensored AI access, you must not use the service to:",
             items: {
               item1: "Engage in illegal activities",
               item2: "Harass, threaten, or harm others",
@@ -822,7 +849,8 @@ export const translations = {
   },
   footer: {
     tagline: "Chat with AI, Connect with Community",
-    privacyTagline: "Privacy-first AI chat with {{modelCount}} uncensored models",
+    privacyTagline:
+      "Privacy-first AI chat with {{modelCount}} uncensored models",
     platform: {
       title: "Platform",
       features: "Features",

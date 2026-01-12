@@ -30,7 +30,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.fill-form.description",
   category: "app.api.browser.category",
   icon: "pen-tool",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.inputAutomation"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.inputAutomation",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -55,8 +58,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.browser.fill-form.form.fields.elements.label",
-          description: "app.api.browser.fill-form.form.fields.elements.description",
-          placeholder: "app.api.browser.fill-form.form.fields.elements.placeholder",
+          description:
+            "app.api.browser.fill-form.form.fields.elements.description",
+          placeholder:
+            "app.api.browser.fill-form.form.fields.elements.placeholder",
           columns: 12,
         },
         objectField(
@@ -71,8 +76,10 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label: "app.api.browser.fill-form.form.fields.elements.uid.label",
-                description: "app.api.browser.fill-form.form.fields.elements.uid.description",
+                label:
+                  "app.api.browser.fill-form.form.fields.elements.uid.label",
+                description:
+                  "app.api.browser.fill-form.form.fields.elements.uid.description",
                 columns: 6,
               },
               z.string().describe("The uid of the element to fill out"),
@@ -81,8 +88,10 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label: "app.api.browser.fill-form.form.fields.elements.value.label",
-                description: "app.api.browser.fill-form.form.fields.elements.value.description",
+                label:
+                  "app.api.browser.fill-form.form.fields.elements.value.label",
+                description:
+                  "app.api.browser.fill-form.form.fields.elements.value.description",
                 columns: 6,
               },
               z.string().describe("Value for the element"),
@@ -137,14 +146,16 @@ const { POST } = createEndpoint({
                 uid: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.browser.fill-form.response.result.elements.uid",
+                    content:
+                      "app.api.browser.fill-form.response.result.elements.uid",
                   },
                   z.string(),
                 ),
                 filled: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.browser.fill-form.response.result.elements.filled",
+                    content:
+                      "app.api.browser.fill-form.response.result.elements.filled",
                   },
                   z.boolean(),
                 ),
@@ -217,7 +228,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.fill-form.errors.unsavedChanges.title",
-      description: "app.api.browser.fill-form.errors.unsavedChanges.description",
+      description:
+        "app.api.browser.fill-form.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.fill-form.errors.conflict.title",

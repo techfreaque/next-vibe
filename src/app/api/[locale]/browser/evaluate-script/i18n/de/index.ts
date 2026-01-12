@@ -2,7 +2,8 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Skript auswerten",
-  description: "Eine JavaScript-Funktion in der aktuell ausgewählten Seite auswerten",
+  description:
+    "Eine JavaScript-Funktion in der aktuell ausgewählten Seite auswerten",
   form: {
     label: "Skript auswerten",
     description: "JavaScript in der Browser-Seite ausführen",
@@ -14,7 +15,8 @@ export const translations: typeof enTranslations = {
       },
       args: {
         label: "Argumente",
-        description: "Optionale Liste von Argumenten (Element-UIDs) zur Übergabe an die Funktion",
+        description:
+          "Optionale Liste von Argumenten (Element-UIDs) zur Übergabe an die Funktion",
         placeholder: '[{"uid": "element-uid"}]',
         uid: {
           label: "Element-UID",
@@ -37,11 +39,13 @@ export const translations: typeof enTranslations = {
   errors: {
     validation: {
       title: "Validierungsfehler",
-      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description:
+        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
     },
     network: {
       title: "Netzwerkfehler",
-      description: "Ein Netzwerkfehler ist während der Skript-Auswertung aufgetreten",
+      description:
+        "Ein Netzwerkfehler ist während der Skript-Auswertung aufgetreten",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -57,15 +61,18 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Serverfehler",
-      description: "Ein interner Serverfehler ist während der Skript-Auswertung aufgetreten",
+      description:
+        "Ein interner Serverfehler ist während der Skript-Auswertung aufgetreten",
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description: "Ein unbekannter Fehler ist während der Skript-Auswertung aufgetreten",
+      description:
+        "Ein unbekannter Fehler ist während der Skript-Auswertung aufgetreten",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
+      description:
+        "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
     },
     conflict: {
       title: "Konflikt",

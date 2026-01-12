@@ -28,7 +28,11 @@ export function ThemeProvider({
     <StyledView
       {...applyStyleType({
         nativeStyle,
-        className: cn("will-change-variable", colorScheme === "dark" ? "dark" : "", className),
+        className: cn(
+          "will-change-variable",
+          colorScheme === "dark" ? "dark" : "",
+          className,
+        ),
       })}
     >
       {children}

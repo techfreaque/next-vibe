@@ -75,7 +75,10 @@ export function EmptyStateWidget<const TKey extends string>({
   const titleSizeClass = getTextSizeClassName(titleSize);
   const titleSpacingClass = getSpacingClassName("margin", titleSpacing);
   const descriptionSizeClass = getTextSizeClassName(descriptionSize);
-  const descriptionSpacingClass = getSpacingClassName("margin", descriptionSpacing);
+  const descriptionSpacingClass = getSpacingClassName(
+    "margin",
+    descriptionSpacing,
+  );
 
   // Icon container size mapping
   const iconContainerSizeClass =
@@ -115,12 +118,24 @@ export function EmptyStateWidget<const TKey extends string>({
               iconSpacingClass || "mb-4",
             )}
           >
-            <Icon icon={icon} className={cn("text-muted-foreground", iconSizeClass || "h-6 w-6")} />
+            <Icon
+              icon={icon}
+              className={cn(
+                "text-muted-foreground",
+                iconSizeClass || "h-6 w-6",
+              )}
+            />
           </Div>
         )}
 
         {/* Title */}
-        <P className={cn("font-medium", titleSizeClass || "text-lg", titleSpacingClass || "mb-2")}>
+        <P
+          className={cn(
+            "font-medium",
+            titleSizeClass || "text-lg",
+            titleSpacingClass || "mb-2",
+          )}
+        >
           {title}
         </P>
 

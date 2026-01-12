@@ -71,7 +71,9 @@ interface CardItem {
   file?: string;
 }
 
-export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DATA_CARDS> {
+export class DataCardsWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.DATA_CARDS
+> {
   readonly widgetType = WidgetType.DATA_CARDS;
 
   render(props: CLIWidgetProps<typeof WidgetType.DATA_CARDS, string>): string {
@@ -175,7 +177,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Render individual ESLint issue
    */
-  private renderESLintIssue(item: CardItem, context: WidgetRenderContext): string {
+  private renderESLintIssue(
+    item: CardItem,
+    context: WidgetRenderContext,
+  ): string {
     const parts: string[] = [];
 
     // Location (line:column)
@@ -233,7 +238,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Render individual code issue card
    */
-  private renderCodeIssueCard(item: CardItem, context: WidgetRenderContext): string {
+  private renderCodeIssueCard(
+    item: CardItem,
+    context: WidgetRenderContext,
+  ): string {
     const lines: string[] = [];
 
     // Header with file and location
@@ -260,7 +268,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Render default cards format
    */
-  private renderDefaultCards(data: CardItem[], context: WidgetRenderContext): string {
+  private renderDefaultCards(
+    data: CardItem[],
+    context: WidgetRenderContext,
+  ): string {
     const result: string[] = [];
     const indent = this.createIndent(context.depth, context);
 
@@ -276,7 +287,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
    * Render default card format.
    * Uses centralized renderValue helper for consistent formatting.
    */
-  private renderDefaultCard(item: CardItem, context: WidgetRenderContext): string {
+  private renderDefaultCard(
+    item: CardItem,
+    context: WidgetRenderContext,
+  ): string {
     const lines: string[] = [];
 
     for (const [key, value] of Object.entries(item)) {
@@ -292,7 +306,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Build card header with file and location info
    */
-  private buildCardHeader(item: CardItem, context: WidgetRenderContext): string {
+  private buildCardHeader(
+    item: CardItem,
+    context: WidgetRenderContext,
+  ): string {
     const parts: string[] = [];
 
     const fileStr = isWidgetDataString(item.file, context);
@@ -330,8 +347,13 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Format severity with colors and icons
    */
-  private formatSeverity(severity: string, context: WidgetRenderContext): string {
-    const icon = context.options.useEmojis ? this.getSeverityIcon(severity) : "";
+  private formatSeverity(
+    severity: string,
+    context: WidgetRenderContext,
+  ): string {
+    const icon = context.options.useEmojis
+      ? this.getSeverityIcon(severity)
+      : "";
     const text = severity;
 
     if (!context.options.useColors) {
@@ -386,7 +408,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Render custom summary using template
    */
-  private renderCustomSummary(counts: Record<string, number>, template: string): string {
+  private renderCustomSummary(
+    counts: Record<string, number>,
+    template: string,
+  ): string {
     let summary = template;
     for (const [key, value] of Object.entries(counts)) {
       // Use replaceAll for better performance than RegExp in loop
@@ -404,7 +429,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     context: WidgetRenderContext,
   ): string {
     const t = context.t;
-    const totalCount = Object.values(counts).reduce((sum, count) => sum + count, 0);
+    const totalCount = Object.values(counts).reduce(
+      (sum, count) => sum + count,
+      0,
+    );
 
     if (totalCount === 0) {
       const icon = context.options.useEmojis ? SEVERITY_ICONS.SUCCESS : "";
@@ -441,13 +469,20 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Group data by specified field
    */
-  private groupData(data: CardItem[], groupBy: string): Map<string, CardItem[]> {
+  private groupData(
+    data: CardItem[],
+    groupBy: string,
+  ): Map<string, CardItem[]> {
     const groups = new Map<string, CardItem[]>();
 
     for (const item of data) {
       const groupValue = item[groupBy];
       let groupKey = "unknown";
-      if (isWidgetDataPrimitive(groupValue) && groupValue !== null && groupValue !== undefined) {
+      if (
+        isWidgetDataPrimitive(groupValue) &&
+        groupValue !== null &&
+        groupValue !== undefined
+      ) {
         if (isWidgetDataBoolean(groupValue)) {
           groupKey = groupValue ? "true" : "false";
         } else {
@@ -466,7 +501,10 @@ export class DataCardsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
   /**
    * Count items by severity
    */
-  private countBySeverity(data: CardItem[], context: WidgetRenderContext): Record<string, number> {
+  private countBySeverity(
+    data: CardItem[],
+    context: WidgetRenderContext,
+  ): Record<string, number> {
     const counts: Record<string, number> = { error: 0, warning: 0, info: 0 };
 
     for (const item of data) {

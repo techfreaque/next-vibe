@@ -140,7 +140,8 @@ function Carousel({
         carouselRef,
         api: api,
         opts,
-        orientation: orientation || (opts?.axis === "y" ? "vertical" : "horizontal"),
+        orientation:
+          orientation || (opts?.axis === "y" ? "vertical" : "horizontal"),
         scrollPrev,
         scrollNext,
         canScrollPrev,
@@ -160,13 +161,21 @@ function Carousel({
   );
 }
 
-function CarouselContent({ className, style, children }: CarouselContentProps): React.JSX.Element {
+function CarouselContent({
+  className,
+  style,
+  children,
+}: CarouselContentProps): React.JSX.Element {
   const { carouselRef, orientation } = useCarousel();
 
   return (
     <div ref={carouselRef} className="overflow-hidden">
       <div
-        className={cn("flex", orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col", className)}
+        className={cn(
+          "flex",
+          orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
+          className,
+        )}
         style={style}
       >
         {children}
@@ -175,7 +184,11 @@ function CarouselContent({ className, style, children }: CarouselContentProps): 
   );
 }
 
-function CarouselItem({ className, style, children }: CarouselItemProps): React.JSX.Element {
+function CarouselItem({
+  className,
+  style,
+  children,
+}: CarouselItemProps): React.JSX.Element {
   const { orientation } = useCarousel();
 
   return (
@@ -195,11 +208,25 @@ function CarouselItem({ className, style, children }: CarouselItemProps): React.
 }
 
 export interface CarouselButtonProps {
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  variant?:
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link";
   size?: "default" | "sm" | "lg" | "icon" | "unset";
   className?: string;
   suppressHydrationWarning?: boolean;
-  role?: "button" | "link" | "menuitem" | "tab" | "switch" | "checkbox" | "radio" | "combobox";
+  role?:
+    | "button"
+    | "link"
+    | "menuitem"
+    | "tab"
+    | "switch"
+    | "checkbox"
+    | "radio"
+    | "combobox";
   title?: string;
   type?: "button" | "submit" | "reset";
 }
@@ -264,4 +291,10 @@ function CarouselNext(props: CarouselButtonProps): React.JSX.Element {
   );
 }
 
-export { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious };
+export {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+};

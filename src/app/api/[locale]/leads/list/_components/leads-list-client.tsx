@@ -18,7 +18,10 @@ interface LeadsListClientProps {
   user: JwtPayloadType;
 }
 
-export function LeadsListClient({ locale, user }: LeadsListClientProps): React.JSX.Element {
+export function LeadsListClient({
+  locale,
+  user,
+}: LeadsListClientProps): React.JSX.Element {
   return (
     <EndpointsPage
       endpoint={leadsListEndpoints}

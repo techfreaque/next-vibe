@@ -116,19 +116,30 @@ export const translations: typeof enTranslations = {
       "Ta operacja jest dozwolona tylko w środowisku deweloperskim",
     autoMigrationTaskNotFound: "Zadanie automatycznej migracji nie znalezione",
     taskConfigurationMissing: "Brak konfiguracji zadania",
-    autoMigrationStartedSuccessfully: "Automatyczna migracja rozpoczęta pomyślnie",
-    failedToStartAutoMigration: "Nie udało się rozpocząć automatycznej migracji",
-    backupMonitorTaskNotFound: "Zadanie monitora kopii zapasowych nie znalezione",
-    backupMonitorStartedSuccessfully: "Monitor kopii zapasowych rozpoczęty pomyślnie",
-    failedToStartBackupMonitor: "Nie udało się uruchomić monitora kopii zapasowych",
-    autoMigrationStoppedSuccessfully: "Automatyczna migracja zatrzymana pomyślnie",
-    failedToStopAutoMigrationTask: "Nie udało się zatrzymać zadania automatycznej migracji",
-    backupMonitorStoppedSuccessfully: "Monitor kopii zapasowych zatrzymany pomyślnie",
-    failedToStopBackupMonitorTask: "Nie udało się zatrzymać zadania monitora kopii zapasowych",
+    autoMigrationStartedSuccessfully:
+      "Automatyczna migracja rozpoczęta pomyślnie",
+    failedToStartAutoMigration:
+      "Nie udało się rozpocząć automatycznej migracji",
+    backupMonitorTaskNotFound:
+      "Zadanie monitora kopii zapasowych nie znalezione",
+    backupMonitorStartedSuccessfully:
+      "Monitor kopii zapasowych rozpoczęty pomyślnie",
+    failedToStartBackupMonitor:
+      "Nie udało się uruchomić monitora kopii zapasowych",
+    autoMigrationStoppedSuccessfully:
+      "Automatyczna migracja zatrzymana pomyślnie",
+    failedToStopAutoMigrationTask:
+      "Nie udało się zatrzymać zadania automatycznej migracji",
+    backupMonitorStoppedSuccessfully:
+      "Monitor kopii zapasowych zatrzymany pomyślnie",
+    failedToStopBackupMonitorTask:
+      "Nie udało się zatrzymać zadania monitora kopii zapasowych",
     migrationTaskNotFound: "Zadanie migracji nie znalezione",
     migrationTaskDoesNotExist: "Zadanie migracji '{taskName}' nie istnieje",
-    migrationTaskStatusRetrieved: "Status zadania migracji '{taskName}' pobrany pomyślnie",
-    failedToGetMigrationTaskStatus: "Nie udało się pobrać statusu zadania migracji",
+    migrationTaskStatusRetrieved:
+      "Status zadania migracji '{taskName}' pobrany pomyślnie",
+    failedToGetMigrationTaskStatus:
+      "Nie udało się pobrać statusu zadania migracji",
     foundMigrationTasks: "Znaleziono {count} zadań migracji",
     failedToListMigrationTasks: "Nie udało się wylistować zadań migracji",
   },

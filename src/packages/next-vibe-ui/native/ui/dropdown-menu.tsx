@@ -37,8 +37,15 @@ const StyledView = styledNative(View);
 const StyledText = styledNative(Text);
 const StyledPressable = styledNative(Pressable);
 
-function DropdownMenu({ children, ...props }: DropdownMenuRootProps): React.JSX.Element {
-  return <DropdownMenuPrimitive.Root {...props}>{children}</DropdownMenuPrimitive.Root>;
+function DropdownMenu({
+  children,
+  ...props
+}: DropdownMenuRootProps): React.JSX.Element {
+  return (
+    <DropdownMenuPrimitive.Root {...props}>
+      {children}
+    </DropdownMenuPrimitive.Root>
+  );
 }
 DropdownMenu.displayName = DropdownMenuPrimitive.Root.displayName;
 
@@ -55,18 +62,29 @@ function DropdownMenuTrigger({
 }
 DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName;
 
-function DropdownMenuGroup({ children }: DropdownMenuGroupProps): React.JSX.Element {
+function DropdownMenuGroup({
+  children,
+}: DropdownMenuGroupProps): React.JSX.Element {
   return <DropdownMenuPrimitive.Group>{children}</DropdownMenuPrimitive.Group>;
 }
 DropdownMenuGroup.displayName = DropdownMenuPrimitive.Group.displayName;
 
-function DropdownMenuPortal({ children }: DropdownMenuPortalProps): React.JSX.Element {
-  return <DropdownMenuPrimitive.Portal>{children}</DropdownMenuPrimitive.Portal>;
+function DropdownMenuPortal({
+  children,
+}: DropdownMenuPortalProps): React.JSX.Element {
+  return (
+    <DropdownMenuPrimitive.Portal>{children}</DropdownMenuPrimitive.Portal>
+  );
 }
 DropdownMenuPortal.displayName = "DropdownMenuPortal";
 
-function DropdownMenuSub({ children, ...props }: DropdownMenuSubProps): React.JSX.Element {
-  return <DropdownMenuPrimitive.Sub {...props}>{children}</DropdownMenuPrimitive.Sub>;
+function DropdownMenuSub({
+  children,
+  ...props
+}: DropdownMenuSubProps): React.JSX.Element {
+  return (
+    <DropdownMenuPrimitive.Sub {...props}>{children}</DropdownMenuPrimitive.Sub>
+  );
 }
 DropdownMenuSub.displayName = DropdownMenuPrimitive.Sub.displayName;
 
@@ -87,7 +105,8 @@ function DropdownMenuRadioGroup({
     </DropdownMenuPrimitive.RadioGroup>
   );
 }
-DropdownMenuRadioGroup.displayName = DropdownMenuPrimitive.RadioGroup.displayName;
+DropdownMenuRadioGroup.displayName =
+  DropdownMenuPrimitive.RadioGroup.displayName;
 
 function DropdownMenuSubTrigger({
   className,
@@ -100,7 +119,10 @@ function DropdownMenuSubTrigger({
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
   return (
     <TextClassContext.Provider
-      value={cn("select-none text-sm text-lg text-primary", open && "text-accent-foreground")}
+      value={cn(
+        "select-none text-sm text-lg text-primary",
+        open && "text-accent-foreground",
+      )}
     >
       <DropdownMenuPrimitive.SubTrigger asChild {...props}>
         <StyledPressable
@@ -121,7 +143,8 @@ function DropdownMenuSubTrigger({
     </TextClassContext.Provider>
   );
 }
-DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName;
+DropdownMenuSubTrigger.displayName =
+  DropdownMenuPrimitive.SubTrigger.displayName;
 
 function DropdownMenuSubContent({
   className,
@@ -138,7 +161,9 @@ function DropdownMenuSubContent({
           nativeStyle,
           className: cn(
             "z-50 min-w-32 overflow-hidden rounded-md border border-border mt-1 bg-popover p-1 shadow-md shadow-foreground/5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-            open ? "animate-in fade-in-0 zoom-in-95" : "animate-out fade-out-0 zoom-out",
+            open
+              ? "animate-in fade-in-0 zoom-in-95"
+              : "animate-out fade-out-0 zoom-out",
             className,
           ),
         })}
@@ -148,7 +173,8 @@ function DropdownMenuSubContent({
     </DropdownMenuPrimitive.SubContent>
   );
 }
-DropdownMenuSubContent.displayName = DropdownMenuPrimitive.SubContent.displayName;
+DropdownMenuSubContent.displayName =
+  DropdownMenuPrimitive.SubContent.displayName;
 
 function DropdownMenuContent({
   className,
@@ -176,7 +202,9 @@ function DropdownMenuContent({
               nativeStyle,
               className: cn(
                 "z-50 min-w-32 overflow-hidden rounded-md border border-border bg-popover p-1 shadow-md shadow-foreground/5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-                open ? "animate-in fade-in-0 zoom-in-95" : "animate-out fade-out-0 zoom-out-95",
+                open
+                  ? "animate-in fade-in-0 zoom-in-95"
+                  : "animate-out fade-out-0 zoom-out-95",
                 className,
               ),
             })}
@@ -204,7 +232,9 @@ function DropdownMenuItem({
   if (asChild) {
     return (
       <TextClassContext.Provider value={TEXT_CLASS_ITEM}>
-        <DropdownMenuPrimitive.Item asChild>{children}</DropdownMenuPrimitive.Item>
+        <DropdownMenuPrimitive.Item asChild>
+          {children}
+        </DropdownMenuPrimitive.Item>
       </TextClassContext.Provider>
     );
   }
@@ -270,7 +300,8 @@ function DropdownMenuCheckboxItem({
     </DropdownMenuPrimitive.CheckboxItem>
   );
 }
-DropdownMenuCheckboxItem.displayName = DropdownMenuPrimitive.CheckboxItem.displayName;
+DropdownMenuCheckboxItem.displayName =
+  DropdownMenuPrimitive.CheckboxItem.displayName;
 
 function DropdownMenuRadioItem({
   className,
@@ -359,7 +390,10 @@ function DropdownMenuShortcut({
 }: DropdownMenuShortcutProps): React.JSX.Element {
   return (
     <Span
-      className={cn("ml-auto text-sm tracking-widest text-muted-foreground", className)}
+      className={cn(
+        "ml-auto text-sm tracking-widest text-muted-foreground",
+        className,
+      )}
       {...props}
     >
       {children}

@@ -22,7 +22,11 @@ export function AnimatePresence({
   onExitComplete,
 }: AnimatePresenceProps): JSX.Element {
   return (
-    <FMAnimatePresence mode={mode} initial={initial} onExitComplete={onExitComplete}>
+    <FMAnimatePresence
+      mode={mode}
+      initial={initial}
+      onExitComplete={onExitComplete}
+    >
       {children}
     </FMAnimatePresence>
   );

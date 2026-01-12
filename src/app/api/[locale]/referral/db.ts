@@ -3,7 +3,15 @@
  */
 
 import { relations } from "drizzle-orm";
-import { boolean, integer, pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 import { leads } from "../leads/db";
@@ -99,7 +107,11 @@ export const referralEarnings = pgTable(
   },
   (table) => ({
     // Ensure idempotency: one earning per transaction per earner per level
-    uniqueEarning: unique().on(table.transactionId, table.earnerUserId, table.level),
+    uniqueEarning: unique().on(
+      table.transactionId,
+      table.earnerUserId,
+      table.level,
+    ),
   }),
 );
 
@@ -114,7 +126,9 @@ export const payoutRequests = pgTable("payout_requests", {
     .references(() => users.id, { onDelete: "cascade" }),
   amountCents: integer("amount_cents").notNull(),
   currency: text("currency", { enum: PayoutCurrencyDB }).notNull(),
-  status: text("status", { enum: PayoutStatusDB }).notNull().default(PayoutStatus.PENDING),
+  status: text("status", { enum: PayoutStatusDB })
+    .notNull()
+    .default(PayoutStatus.PENDING),
   walletAddress: text("wallet_address"), // For BTC/USDC payouts
   adminNotes: text("admin_notes"),
   rejectionReason: text("rejection_reason"),
@@ -127,14 +141,17 @@ export const payoutRequests = pgTable("payout_requests", {
 /**
  * Relations
  */
-export const referralCodesRelations = relations(referralCodes, ({ one, many }) => ({
-  owner: one(users, {
-    fields: [referralCodes.ownerUserId],
-    references: [users.id],
+export const referralCodesRelations = relations(
+  referralCodes,
+  ({ one, many }) => ({
+    owner: one(users, {
+      fields: [referralCodes.ownerUserId],
+      references: [users.id],
+    }),
+    leadReferrals: many(leadReferrals),
+    userReferrals: many(userReferrals),
   }),
-  leadReferrals: many(leadReferrals),
-  userReferrals: many(userReferrals),
-}));
+);
 
 export const leadReferralsRelations = relations(leadReferrals, ({ one }) => ({
   lead: one(leads, {
@@ -164,22 +181,25 @@ export const userReferralsRelations = relations(userReferrals, ({ one }) => ({
   }),
 }));
 
-export const referralEarningsRelations = relations(referralEarnings, ({ one }) => ({
-  earner: one(users, {
-    fields: [referralEarnings.earnerUserId],
-    references: [users.id],
-    relationName: "earner",
+export const referralEarningsRelations = relations(
+  referralEarnings,
+  ({ one }) => ({
+    earner: one(users, {
+      fields: [referralEarnings.earnerUserId],
+      references: [users.id],
+      relationName: "earner",
+    }),
+    source: one(users, {
+      fields: [referralEarnings.sourceUserId],
+      references: [users.id],
+      relationName: "source",
+    }),
+    transaction: one(paymentTransactions, {
+      fields: [referralEarnings.transactionId],
+      references: [paymentTransactions.id],
+    }),
   }),
-  source: one(users, {
-    fields: [referralEarnings.sourceUserId],
-    references: [users.id],
-    relationName: "source",
-  }),
-  transaction: one(paymentTransactions, {
-    fields: [referralEarnings.transactionId],
-    references: [paymentTransactions.id],
-  }),
-}));
+);
 
 /**
  * Schemas for validation

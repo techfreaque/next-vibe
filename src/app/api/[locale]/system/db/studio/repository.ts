@@ -6,7 +6,11 @@
 import { spawn } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -40,11 +44,15 @@ export class StudioRepository {
       logger.info(`Starting Drizzle Studio on port ${port}...`);
 
       // Launch drizzle-kit studio
-      const studioProcess = spawn("bunx", ["drizzle-kit", "studio", "--port", port.toString()], {
-        stdio: "inherit",
-        env: { ...process.env },
-        shell: true,
-      });
+      const studioProcess = spawn(
+        "bunx",
+        ["drizzle-kit", "studio", "--port", port.toString()],
+        {
+          stdio: "inherit",
+          env: { ...process.env },
+          shell: true,
+        },
+      );
 
       // Wait a bit to ensure the process started successfully
       await new Promise((resolve) => {

@@ -4,7 +4,16 @@
  */
 
 import { relations } from "drizzle-orm";
-import { index, integer, jsonb, pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
+import {
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
@@ -50,7 +59,9 @@ export const leads = pgTable("leads", {
   ipAddress: text("ip_address"),
 
   // Lead qualification
-  status: text("status", { enum: LeadStatusDB }).notNull().default(LeadStatus.NEW),
+  status: text("status", { enum: LeadStatusDB })
+    .notNull()
+    .default(LeadStatus.NEW),
   source: text("source", { enum: LeadSourceDB }),
   notes: text("notes"),
 
@@ -114,8 +125,12 @@ export const emailCampaigns = pgTable("email_campaigns", {
   sentAt: timestamp("sent_at"),
 
   // Status and tracking
-  status: text("status", { enum: EmailStatusDB }).notNull().default(EmailStatus.PENDING),
-  emailProvider: text("email_provider", { enum: EmailProviderDB }).default(EmailProvider.SMTP),
+  status: text("status", { enum: EmailStatusDB })
+    .notNull()
+    .default(EmailStatus.PENDING),
+  emailProvider: text("email_provider", { enum: EmailProviderDB }).default(
+    EmailProvider.SMTP,
+  ),
   externalId: text("external_id"), // Provider's email ID
   smtpAccountId: uuid("smtp_account_id"), // SMTP account used for sending
 
@@ -185,24 +200,30 @@ export const leadsRelations = relations(leads, ({ one, many }) => ({
   userLeadLinks: many(userLeadLinks),
 }));
 
-export const emailCampaignsRelations = relations(emailCampaigns, ({ one, many }) => ({
-  lead: one(leads, {
-    fields: [emailCampaigns.leadId],
-    references: [leads.id],
+export const emailCampaignsRelations = relations(
+  emailCampaigns,
+  ({ one, many }) => ({
+    lead: one(leads, {
+      fields: [emailCampaigns.leadId],
+      references: [leads.id],
+    }),
+    engagements: many(leadEngagements),
   }),
-  engagements: many(leadEngagements),
-}));
+);
 
-export const leadEngagementsRelations = relations(leadEngagements, ({ one }) => ({
-  lead: one(leads, {
-    fields: [leadEngagements.leadId],
-    references: [leads.id],
+export const leadEngagementsRelations = relations(
+  leadEngagements,
+  ({ one }) => ({
+    lead: one(leads, {
+      fields: [leadEngagements.leadId],
+      references: [leads.id],
+    }),
+    campaign: one(emailCampaigns, {
+      fields: [leadEngagements.campaignId],
+      references: [emailCampaigns.id],
+    }),
   }),
-  campaign: one(emailCampaigns, {
-    fields: [leadEngagements.campaignId],
-    references: [emailCampaigns.id],
-  }),
-}));
+);
 
 /**
  * Lead-to-Lead Links Table
@@ -246,7 +267,9 @@ export const userLeadLinks = pgTable(
     leadId: uuid("lead_id")
       .notNull()
       .references(() => leads.id, { onDelete: "cascade" }),
-    linkReason: text("link_reason").$type<"signup" | "login" | "merge" | "manual">().notNull(),
+    linkReason: text("link_reason")
+      .$type<"signup" | "login" | "merge" | "manual">()
+      .notNull(),
     linkedAt: timestamp("linked_at").defaultNow().notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },

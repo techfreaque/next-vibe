@@ -53,7 +53,8 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.agent.chat.folders.get.container.title" as const,
-      description: "app.api.agent.chat.folders.get.container.description" as const,
+      description:
+        "app.api.agent.chat.folders.get.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
@@ -64,7 +65,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.agent.chat.folders.get.rootFolderId.label" as const,
-          description: "app.api.agent.chat.folders.get.rootFolderId.description" as const,
+          description:
+            "app.api.agent.chat.folders.get.rootFolderId.description" as const,
           columns: 12,
           options: [
             {
@@ -82,8 +84,14 @@ const { GET } = createEndpoint({
           ],
         },
         z
-          .enum([DefaultFolderId.PRIVATE, DefaultFolderId.SHARED, DefaultFolderId.PUBLIC])
-          .describe("Root folder to filter folders (incognito not allowed - local-only)"),
+          .enum([
+            DefaultFolderId.PRIVATE,
+            DefaultFolderId.SHARED,
+            DefaultFolderId.PUBLIC,
+          ])
+          .describe(
+            "Root folder to filter folders (incognito not allowed - local-only)",
+          ),
       ),
 
       // === RESPONSE ===
@@ -91,7 +99,8 @@ const { GET } = createEndpoint({
       rootFolderPermissions: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.agent.chat.folders.get.response.rootFolderPermissions.title" as const,
+          title:
+            "app.api.agent.chat.folders.get.response.rootFolderPermissions.title" as const,
           description:
             "app.api.agent.chat.folders.get.response.rootFolderPermissions.description" as const,
           layoutType: LayoutType.GRID,
@@ -105,7 +114,11 @@ const { GET } = createEndpoint({
               content:
                 "app.api.agent.chat.folders.get.response.rootFolderPermissions.canCreateThread.content" as const,
             },
-            z.boolean().describe("Whether the current user can create threads in the root folder"),
+            z
+              .boolean()
+              .describe(
+                "Whether the current user can create threads in the root folder",
+              ),
           ),
           canCreateFolder: responseField(
             {
@@ -113,7 +126,11 @@ const { GET } = createEndpoint({
               content:
                 "app.api.agent.chat.folders.get.response.rootFolderPermissions.canCreateFolder.content" as const,
             },
-            z.boolean().describe("Whether the current user can create folders in the root folder"),
+            z
+              .boolean()
+              .describe(
+                "Whether the current user can create folders in the root folder",
+              ),
           ),
         },
       ),
@@ -124,7 +141,8 @@ const { GET } = createEndpoint({
         objectField(
           {
             type: WidgetType.CONTAINER,
-            title: "app.api.agent.chat.folders.get.response.folders.folder.title" as const,
+            title:
+              "app.api.agent.chat.folders.get.response.folders.folder.title" as const,
             layoutType: LayoutType.GRID,
             columns: 2,
           },
@@ -300,7 +318,11 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.folders.get.response.folders.folder.canCreateThread.content" as const,
               },
-              z.boolean().describe("Whether the current user can create threads in this folder"),
+              z
+                .boolean()
+                .describe(
+                  "Whether the current user can create threads in this folder",
+                ),
             ),
             canModerate: responseField(
               {
@@ -310,7 +332,9 @@ const { GET } = createEndpoint({
               },
               z
                 .boolean()
-                .describe("Whether the current user can moderate/hide content in this folder"),
+                .describe(
+                  "Whether the current user can moderate/hide content in this folder",
+                ),
             ),
             canDelete: responseField(
               {
@@ -318,7 +342,9 @@ const { GET } = createEndpoint({
                 content:
                   "app.api.agent.chat.folders.get.response.folders.folder.canDelete.content" as const,
               },
-              z.boolean().describe("Whether the current user can delete this folder"),
+              z
+                .boolean()
+                .describe("Whether the current user can delete this folder"),
             ),
             canManagePermissions: responseField(
               {
@@ -328,7 +354,9 @@ const { GET } = createEndpoint({
               },
               z
                 .boolean()
-                .describe("Whether the current user can manage permissions for this folder"),
+                .describe(
+                  "Whether the current user can manage permissions for this folder",
+                ),
             ),
             createdAt: responseField(
               {
@@ -355,15 +383,18 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.chat.folders.get.errors.validation.title",
-      description: "app.api.agent.chat.folders.get.errors.validation.description",
+      description:
+        "app.api.agent.chat.folders.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.agent.chat.folders.get.errors.unauthorized.title",
-      description: "app.api.agent.chat.folders.get.errors.unauthorized.description",
+      description:
+        "app.api.agent.chat.folders.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.folders.get.errors.forbidden.title",
-      description: "app.api.agent.chat.folders.get.errors.forbidden.description",
+      description:
+        "app.api.agent.chat.folders.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.folders.get.errors.notFound.title",
@@ -383,7 +414,8 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.agent.chat.folders.get.errors.unsavedChanges.title",
-      description: "app.api.agent.chat.folders.get.errors.unsavedChanges.description",
+      description:
+        "app.api.agent.chat.folders.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.folders.get.errors.conflict.title",
@@ -433,7 +465,8 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.agent.chat.folders.post.container.title" as const,
-      description: "app.api.agent.chat.folders.post.container.description" as const,
+      description:
+        "app.api.agent.chat.folders.post.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
@@ -442,8 +475,10 @@ const { POST } = createEndpoint({
       folder: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.agent.chat.folders.post.sections.folder.title" as const,
-          description: "app.api.agent.chat.folders.post.sections.folder.description" as const,
+          title:
+            "app.api.agent.chat.folders.post.sections.folder.title" as const,
+          description:
+            "app.api.agent.chat.folders.post.sections.folder.description" as const,
           layoutType: LayoutType.STACKED,
         },
         { request: "data" },
@@ -452,7 +487,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label: "app.api.agent.chat.folders.post.sections.folder.rootFolderId.label" as const,
+              label:
+                "app.api.agent.chat.folders.post.sections.folder.rootFolderId.label" as const,
               description:
                 "app.api.agent.chat.folders.post.sections.folder.rootFolderId.description" as const,
               columns: 12,
@@ -481,7 +517,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "app.api.agent.chat.folders.post.sections.folder.name.label" as const,
+              label:
+                "app.api.agent.chat.folders.post.sections.folder.name.label" as const,
               description:
                 "app.api.agent.chat.folders.post.sections.folder.name.description" as const,
               columns: 12,
@@ -492,7 +529,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "app.api.agent.chat.folders.post.sections.folder.icon.label" as const,
+              label:
+                "app.api.agent.chat.folders.post.sections.folder.icon.label" as const,
               description:
                 "app.api.agent.chat.folders.post.sections.folder.icon.description" as const,
               columns: 6,
@@ -504,7 +542,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "app.api.agent.chat.folders.post.sections.folder.color.label" as const,
+              label:
+                "app.api.agent.chat.folders.post.sections.folder.color.label" as const,
               description:
                 "app.api.agent.chat.folders.post.sections.folder.color.description" as const,
               columns: 6,
@@ -515,7 +554,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.UUID,
-              label: "app.api.agent.chat.folders.post.sections.folder.parentId.label" as const,
+              label:
+                "app.api.agent.chat.folders.post.sections.folder.parentId.label" as const,
               description:
                 "app.api.agent.chat.folders.post.sections.folder.parentId.description" as const,
               columns: 12,
@@ -530,7 +570,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.agent.chat.folders.post.response.title" as const,
-          description: "app.api.agent.chat.folders.post.response.description" as const,
+          description:
+            "app.api.agent.chat.folders.post.response.description" as const,
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -538,7 +579,8 @@ const { POST } = createEndpoint({
           folder: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.agent.chat.folders.post.response.folder.title" as const,
+              title:
+                "app.api.agent.chat.folders.post.response.folder.title" as const,
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -547,7 +589,8 @@ const { POST } = createEndpoint({
               id: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.agent.chat.folders.post.response.folder.id.content" as const,
+                  content:
+                    "app.api.agent.chat.folders.post.response.folder.id.content" as const,
                 },
                 z.uuid(),
               ),
@@ -570,14 +613,16 @@ const { POST } = createEndpoint({
               name: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.agent.chat.folders.post.response.folder.name.content" as const,
+                  content:
+                    "app.api.agent.chat.folders.post.response.folder.name.content" as const,
                 },
                 z.string(),
               ),
               icon: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.agent.chat.folders.post.response.folder.icon.content" as const,
+                  content:
+                    "app.api.agent.chat.folders.post.response.folder.icon.content" as const,
                 },
                 // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null
                 z.string().nullable() as z.ZodType<IconKey | null>,
@@ -585,7 +630,8 @@ const { POST } = createEndpoint({
               color: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.agent.chat.folders.post.response.folder.color.content" as const,
+                  content:
+                    "app.api.agent.chat.folders.post.response.folder.color.content" as const,
                 },
                 z.string().nullable(),
               ),
@@ -717,19 +763,23 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.chat.folders.post.errors.validation.title",
-      description: "app.api.agent.chat.folders.post.errors.validation.description",
+      description:
+        "app.api.agent.chat.folders.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.agent.chat.folders.post.errors.unauthorized.title",
-      description: "app.api.agent.chat.folders.post.errors.unauthorized.description",
+      description:
+        "app.api.agent.chat.folders.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.folders.post.errors.forbidden.title",
-      description: "app.api.agent.chat.folders.post.errors.forbidden.description",
+      description:
+        "app.api.agent.chat.folders.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.folders.post.errors.notFound.title",
-      description: "app.api.agent.chat.folders.post.errors.notFound.description",
+      description:
+        "app.api.agent.chat.folders.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.folders.post.errors.server.title",
@@ -745,11 +795,13 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.agent.chat.folders.post.errors.unsavedChanges.title",
-      description: "app.api.agent.chat.folders.post.errors.unsavedChanges.description",
+      description:
+        "app.api.agent.chat.folders.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.folders.post.errors.conflict.title",
-      description: "app.api.agent.chat.folders.post.errors.conflict.description",
+      description:
+        "app.api.agent.chat.folders.post.errors.conflict.description",
     },
   },
 

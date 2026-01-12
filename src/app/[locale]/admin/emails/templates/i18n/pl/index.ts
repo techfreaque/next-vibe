@@ -40,7 +40,8 @@ export const translations: typeof enTranslations = {
     },
     form: {
       title: "Dostosuj Podgląd E-maila",
-      description: "Dostosuj właściwości e-maila, aby podejrzeć różne scenariusze",
+      description:
+        "Dostosuj właściwości e-maila, aby podejrzeć różne scenariusze",
       reset: "Resetuj",
       select_option: "Wybierz opcję...",
     },
@@ -59,7 +60,8 @@ export const translations: typeof enTranslations = {
       welcome: {
         meta: {
           name: "Powitalna wiadomość e-mail rejestracji",
-          description: "Powitalna wiadomość e-mail wysyłana do nowych użytkowników po rejestracji",
+          description:
+            "Powitalna wiadomość e-mail wysyłana do nowych użytkowników po rejestracji",
         },
         preview: {
           privateName: {
@@ -72,7 +74,8 @@ export const translations: typeof enTranslations = {
           },
           leadId: {
             label: "ID potencjalnego klienta",
-            description: "Identyfikator śledzenia potencjalnego klienta do analityki",
+            description:
+              "Identyfikator śledzenia potencjalnego klienta do analityki",
           },
         },
       },
@@ -81,7 +84,8 @@ export const translations: typeof enTranslations = {
       welcome: {
         meta: {
           name: "Powitalna wiadomość e-mail biuletynu",
-          description: "Powitalna wiadomość e-mail wysyłana do nowych subskrybentów biuletynu",
+          description:
+            "Powitalna wiadomość e-mail wysyłana do nowych subskrybentów biuletynu",
         },
         preview: {
           email: {
@@ -107,7 +111,8 @@ export const translations: typeof enTranslations = {
       success: {
         meta: {
           name: "Wiadomość e-mail potwierdzenia subskrypcji",
-          description: "Potwierdzająca wiadomość e-mail wysyłana po udanej subskrypcji",
+          description:
+            "Potwierdzająca wiadomość e-mail wysyłana po udanej subskrypcji",
         },
         preview: {
           privateName: {
@@ -173,7 +178,8 @@ export const translations: typeof enTranslations = {
       form: {
         meta: {
           name: "Wiadomość e-mail formularza kontaktowego",
-          description: "Wiadomość e-mail wysyłana po przesłaniu formularza kontaktowego",
+          description:
+            "Wiadomość e-mail wysyłana po przesłaniu formularza kontaktowego",
         },
         preview: {
           name: {

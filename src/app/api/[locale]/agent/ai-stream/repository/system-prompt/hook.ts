@@ -26,7 +26,15 @@ export function useDebugSystemPrompt(params: {
   user: JwtPayloadType;
   logger: EndpointLogger;
 }): string {
-  const { locale, rootFolderId, subFolderId, characterId, selectedModel, user, logger } = params;
+  const {
+    locale,
+    rootFolderId,
+    subFolderId,
+    characterId,
+    selectedModel,
+    user,
+    logger,
+  } = params;
 
   // Get call mode setting for current model+character combination
   const getCallMode = useVoiceModeStore((state) => state.getCallMode);
@@ -77,5 +85,12 @@ export function useDebugSystemPrompt(params: {
       memorySummary,
       callMode: isCallMode ?? false,
     });
-  }, [locale, rootFolderId, subFolderId, characterPrompt, isCallMode, memorySummary]);
+  }, [
+    locale,
+    rootFolderId,
+    subFolderId,
+    characterPrompt,
+    isCallMode,
+    memorySummary,
+  ]);
 }

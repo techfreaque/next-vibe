@@ -57,7 +57,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Wiederholungskonflikt",
-        description: "Job kann nicht wiederholt werden, während er verarbeitet wird",
+        description:
+          "Job kann nicht wiederholt werden, während er verarbeitet wird",
       },
     },
     success: {

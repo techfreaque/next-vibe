@@ -33,12 +33,18 @@ export class MacTyper extends BaseTyper {
   protected async insertTextImpl(text: string): Promise<void> {
     // Step 1: Copy text to clipboard using pbcopy
     const escapedText = escapeShellString(text);
-    const copyProc = Bun.spawn(["bash", "-c", `printf '%s' "${escapedText}" | pbcopy`]);
+    const copyProc = Bun.spawn([
+      "bash",
+      "-c",
+      `printf '%s' "${escapedText}" | pbcopy`,
+    ]);
 
     const copyExitCode = await copyProc.exited;
     if (copyExitCode !== 0) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Typer execution error
-      throw new Error(`Failed to copy text to clipboard (exit code: ${copyExitCode})`);
+      throw new Error(
+        `Failed to copy text to clipboard (exit code: ${copyExitCode})`,
+      );
     }
 
     // Step 2: Use AppleScript to paste (Command+V)
@@ -70,6 +76,8 @@ export class MacTyper extends BaseTyper {
 /**
  * Factory function for macOS typer
  */
-export function createMacTyper(options?: { readonly useDirectTyping?: boolean }): MacTyper {
+export function createMacTyper(options?: {
+  readonly useDirectTyping?: boolean;
+}): MacTyper {
   return new MacTyper(options);
 }

@@ -23,7 +23,9 @@ import type { InferJwtPayloadTypeFromRoles } from "../../endpoints/route/handler
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;
 type Equal<X, Y> =
-  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false;
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
+    ? true
+    : false;
 
 /**
  * TEST 1: Single PUBLIC role should infer JWTPublicPayloadType
@@ -46,7 +48,9 @@ type Test3Check = Expect<Equal<Test3, JwtPrivatePayloadType>>;
 /**
  * TEST 4: Multiple roles with PUBLIC should infer union type
  */
-type Test4 = InferJwtPayloadTypeFromRoles<readonly [typeof UserRole.PUBLIC, typeof UserRole.ADMIN]>;
+type Test4 = InferJwtPayloadTypeFromRoles<
+  readonly [typeof UserRole.PUBLIC, typeof UserRole.ADMIN]
+>;
 type Test4Check = Expect<Equal<Test4, JwtPayloadType>>;
 
 /**
@@ -61,7 +65,11 @@ type Test5Check = Expect<Equal<Test5, JwtPrivatePayloadType>>;
  * TEST 6: Mixed roles (PUBLIC + others) should infer union type
  */
 type Test6 = InferJwtPayloadTypeFromRoles<
-  readonly [typeof UserRole.ADMIN, typeof UserRole.PUBLIC, typeof UserRole.CUSTOMER]
+  readonly [
+    typeof UserRole.ADMIN,
+    typeof UserRole.PUBLIC,
+    typeof UserRole.CUSTOMER,
+  ]
 >;
 type Test6Check = Expect<Equal<Test6, JwtPayloadType>>;
 

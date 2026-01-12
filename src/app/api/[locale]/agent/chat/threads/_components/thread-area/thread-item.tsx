@@ -40,7 +40,10 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useState } from "react";
 
-import { chatColors, chatTransitions } from "@/app/[locale]/chat/lib/design-tokens";
+import {
+  chatColors,
+  chatTransitions,
+} from "@/app/[locale]/chat/lib/design-tokens";
 import type { UseChatReturn } from "@/app/api/[locale]/agent/chat/hooks/hooks";
 import type { ChatThread } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
@@ -168,7 +171,9 @@ export function ThreadItem({
 
   // Get all folders for the move menu - only folders from the same root folder
   const allFolders = chat
-    ? Object.values(chat.folders).filter((folder) => folder.rootFolderId === thread.rootFolderId)
+    ? Object.values(chat.folders).filter(
+        (folder) => folder.rootFolderId === thread.rootFolderId,
+      )
     : [];
   const currentFolderId = thread.folderId;
 
@@ -195,7 +200,9 @@ export function ThreadItem({
       className={cn(
         "relative flex items-center gap-2 px-2 py-2 rounded-md cursor-pointer",
         chatTransitions.colors,
-        isActive ? cn(chatColors.sidebar.active, "shadow-sm") : chatColors.sidebar.hover,
+        isActive
+          ? cn(chatColors.sidebar.active, "shadow-sm")
+          : chatColors.sidebar.hover,
         compact && "py-1.5",
       )}
       onClick={handleThreadClick}
@@ -229,18 +236,27 @@ export function ThreadItem({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Div className="flex-1 min-w-0">
-                  <Div className={cn("text-sm font-medium truncate", compact && "text-xs")}>
+                  <Div
+                    className={cn(
+                      "text-sm font-medium truncate",
+                      compact && "text-xs",
+                    )}
+                  >
                     {thread.title}
                   </Div>
                   {!compact && thread.preview && (
-                    <Div className="text-xs text-muted-foreground truncate">{thread.preview}</Div>
+                    <Div className="text-xs text-muted-foreground truncate">
+                      {thread.preview}
+                    </Div>
                   )}
                 </Div>
               </TooltipTrigger>
               <TooltipContent side="right" className="max-w-xs">
                 <P className="text-sm">{thread.title}</P>
                 {thread.preview && (
-                  <P className="text-xs text-muted-foreground mt-1">{thread.preview}</P>
+                  <P className="text-xs text-muted-foreground mt-1">
+                    {thread.preview}
+                  </P>
                 )}
               </TooltipContent>
             </Tooltip>
@@ -294,7 +310,10 @@ export function ThreadItem({
                 >
                   {/* Only show Rename if user has permission (computed server-side) */}
                   {thread.canEdit && (
-                    <DropdownMenuItem onSelect={handleEdit} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onSelect={handleEdit}
+                      className="cursor-pointer"
+                    >
                       <Edit2 className="h-4 w-4 mr-2" />
                       {t("app.chat.actions.rename")}
                     </DropdownMenuItem>
@@ -302,7 +321,10 @@ export function ThreadItem({
 
                   {/* Only show Pin/Unpin if user has permission (computed server-side) */}
                   {onPinThread && thread.canEdit && (
-                    <DropdownMenuItem onSelect={handlePinToggle} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onSelect={handlePinToggle}
+                      className="cursor-pointer"
+                    >
                       {thread.pinned ? (
                         <>
                           <PinOff className="h-4 w-4 mr-2" />
@@ -319,7 +341,10 @@ export function ThreadItem({
 
                   {/* Only show Archive/Unarchive if user has permission (computed server-side) */}
                   {onArchiveThread && thread.canEdit && (
-                    <DropdownMenuItem onSelect={handleArchiveToggle} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onSelect={handleArchiveToggle}
+                      className="cursor-pointer"
+                    >
                       {thread.archived ? (
                         <>
                           <ArchiveRestore className="h-4 w-4 mr-2" />
@@ -336,7 +361,10 @@ export function ThreadItem({
 
                   {/* Only show Manage Permissions if user has permission (computed server-side) */}
                   {thread.canManagePermissions && (
-                    <DropdownMenuItem onSelect={handleManagePermissions} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onSelect={handleManagePermissions}
+                      className="cursor-pointer"
+                    >
                       <Shield className="h-4 w-4 mr-2" />
                       {t("app.chat.folderList.managePermissions")}
                     </DropdownMenuItem>
@@ -344,7 +372,10 @@ export function ThreadItem({
 
                   {/* Only show Manage Sharing for threads in SHARED folder */}
                   {thread.rootFolderId === "shared" && thread.canEdit && (
-                    <DropdownMenuItem onSelect={handleManageSharing} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onSelect={handleManageSharing}
+                      className="cursor-pointer"
+                    >
                       <Share2 className="h-4 w-4 mr-2" />
                       {t("app.chat.actions.manageSharing")}
                     </DropdownMenuItem>
@@ -381,7 +412,10 @@ export function ThreadItem({
                                   disabled={currentFolderId === folder.id}
                                   className="cursor-pointer"
                                 >
-                                  <Icon icon={folder.icon ?? "folder"} className="h-4 w-4 mr-2" />
+                                  <Icon
+                                    icon={folder.icon ?? "folder"}
+                                    className="h-4 w-4 mr-2"
+                                  />
                                   {folder.name}
                                 </DropdownMenuItem>
                               );
@@ -425,7 +459,9 @@ export function ThreadItem({
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("app.chat.threadList.deleteDialog.title")}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t("app.chat.threadList.deleteDialog.title")}
+            </AlertDialogTitle>
             <AlertDialogDescription>
               {t("app.chat.threadList.deleteDialog.description", {
                 title: thread.title,

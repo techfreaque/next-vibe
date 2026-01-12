@@ -4,13 +4,20 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { CronStatsGetRequestOutput, CronStatsGetResponseOutput } from "./definition";
+import type {
+  CronStatsGetRequestOutput,
+  CronStatsGetResponseOutput,
+} from "./definition";
 
 /**
  * Cron Stats Repository Interface
@@ -112,7 +119,8 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
         error: errorDetails.message,
       });
       return fail({
-        message: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.server.title",
+        message:
+          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: errorDetails.message,

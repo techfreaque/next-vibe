@@ -83,17 +83,22 @@ export function useUsersStats(
 
   const formatNumber = useCallback(
     (value: number): string => {
-      return new Intl.NumberFormat(locale.replace(`-${Countries.GLOBAL}`, "")).format(value);
+      return new Intl.NumberFormat(
+        locale.replace(`-${Countries.GLOBAL}`, ""),
+      ).format(value);
     },
     [locale],
   );
 
-  const calculatePercentageChange = useCallback((current: number, previous: number): number => {
-    if (previous === 0) {
-      return current > 0 ? 100 : 0;
-    }
-    return ((current - previous) / previous) * 100;
-  }, []);
+  const calculatePercentageChange = useCallback(
+    (current: number, previous: number): number => {
+      if (previous === 0) {
+        return current > 0 ? 100 : 0;
+      }
+      return ((current - previous) / previous) * 100;
+    },
+    [],
+  );
 
   const getTrendIndicator = useCallback(
     (current: number, previous: number): "up" | "down" | "neutral" => {
@@ -146,7 +151,10 @@ export interface UseUsersStatsReturn {
   formatPercentage: (num: number) => string;
   formatNumber: (num: number) => string;
   calculatePercentageChange: (current: number, previous: number) => number;
-  getTrendIndicator: (current: number, previous: number) => "up" | "down" | "neutral";
+  getTrendIndicator: (
+    current: number,
+    previous: number,
+  ) => "up" | "down" | "neutral";
   form: UsersStatsEndpointReturn["read"]["form"];
   alert: FormAlertState | null;
 }

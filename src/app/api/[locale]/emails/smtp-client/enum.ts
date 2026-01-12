@@ -218,7 +218,9 @@ export const {
  * Map campaign type filter to actual campaign type
  */
 export function mapCampaignTypeFilter(
-  filter: (typeof CampaignTypeFilter)[keyof typeof CampaignTypeFilter] | undefined,
+  filter:
+    | (typeof CampaignTypeFilter)[keyof typeof CampaignTypeFilter]
+    | undefined,
 ): (typeof CampaignType)[keyof typeof CampaignType] | null {
   switch (filter) {
     case CampaignTypeFilter.LEAD_CAMPAIGN:
@@ -274,7 +276,9 @@ export const {
  * Map status filter to actual status
  */
 export function mapStatusFilter(
-  filter: (typeof SmtpAccountStatusFilter)[keyof typeof SmtpAccountStatusFilter] | undefined,
+  filter:
+    | (typeof SmtpAccountStatusFilter)[keyof typeof SmtpAccountStatusFilter]
+    | undefined,
 ): (typeof SmtpAccountStatus)[keyof typeof SmtpAccountStatus] | null {
   switch (filter) {
     case SmtpAccountStatusFilter.ACTIVE:

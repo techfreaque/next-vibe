@@ -6,7 +6,9 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { executeResizePage, filterUndefinedArgs } from "../shared/repository";
-import resizePageEndpoints, { type ResizePageResponseOutput } from "./definition";
+import resizePageEndpoints, {
+  type ResizePageResponseOutput,
+} from "./definition";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: resizePageEndpoints,

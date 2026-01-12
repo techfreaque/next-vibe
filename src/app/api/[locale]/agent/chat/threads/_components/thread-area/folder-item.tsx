@@ -37,10 +37,16 @@ import {
   getFolderIcon,
   isDefaultFolder,
 } from "@/app/[locale]/chat/lib/utils/folder-utils";
-import { buildFolderUrl, getRootFolderId } from "@/app/[locale]/chat/lib/utils/navigation";
+import {
+  buildFolderUrl,
+  getRootFolderId,
+} from "@/app/[locale]/chat/lib/utils/navigation";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
-import { Icon, type IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import {
+  Icon,
+  type IconKey,
+} from "@/app/api/[locale]/system/unified-interface/react/icons";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -79,7 +85,8 @@ export function FolderItem({
   const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
   const [moveDialogOpen, setMoveDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [permissionsDialogOpen, setPermissionsDialogOpen] = React.useState(false);
+  const [permissionsDialogOpen, setPermissionsDialogOpen] =
+    React.useState(false);
 
   // Get data and callbacks from context
   const {
@@ -216,7 +223,11 @@ export function FolderItem({
   // Memoize move capabilities based on sibling folders
   const { canMoveUp, canMoveDown } = useMemo(() => {
     const siblings = Object.values(folders)
-      .filter((f) => f.parentId === folder.parentId && f.rootFolderId === folder.rootFolderId)
+      .filter(
+        (f) =>
+          f.parentId === folder.parentId &&
+          f.rootFolderId === folder.rootFolderId,
+      )
       .toSorted((a, b) => {
         // First sort by sortOrder
         if (a.sortOrder !== b.sortOrder) {
@@ -258,7 +269,8 @@ export function FolderItem({
         className={cn(
           "flex items-center gap-1 px-2 py-1.5 rounded-md transition-colors min-h-9 cursor-pointer",
           colorClasses.hover,
-          isActive && `${colorClasses.active} border-l-2 ${colorClasses.border}`,
+          isActive &&
+            `${colorClasses.active} border-l-2 ${colorClasses.border}`,
         )}
         onClick={handleFolderClick}
         onMouseEnter={() => setIsHovered(true)}
@@ -275,14 +287,22 @@ export function FolderItem({
           onClick={handleToggleExpanded}
           className="h-5 w-5 p-0 hover:bg-transparent shrink-0"
         >
-          {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          {isExpanded ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
         </Button>
 
         <Div className="flex items-center gap-2 flex-1 min-w-0">
           <Icon icon={folderIcon} className="h-4 w-4 shrink-0" />
-          <Span className="text-sm font-medium truncate">{folderDisplayName}</Span>
+          <Span className="text-sm font-medium truncate">
+            {folderDisplayName}
+          </Span>
           {/* eslint-disable i18next/no-literal-string -- Formatting characters for count display */}
-          <Span className="text-xs text-muted-foreground shrink-0">({threadCount})</Span>
+          <Span className="text-xs text-muted-foreground shrink-0">
+            ({threadCount})
+          </Span>
           {/* eslint-enable i18next/no-literal-string */}
         </Div>
 
@@ -339,7 +359,10 @@ export function FolderItem({
                         <MoreVertical className="h-3.5 w-3.5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" onCloseAutoFocus={(e) => e.preventDefault()}>
+                    <DropdownMenuContent
+                      align="end"
+                      onCloseAutoFocus={(e) => e.preventDefault()}
+                    >
                       {/* Only show move up/down if user has manage permission */}
                       {folder.canManage && (
                         <>
@@ -459,7 +482,11 @@ export function FolderItem({
                   <Div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
                     {t("app.chat.folderList.today")}
                   </Div>
-                  <ThreadList threads={groupedThreads.today} locale={locale} logger={logger} />
+                  <ThreadList
+                    threads={groupedThreads.today}
+                    locale={locale}
+                    logger={logger}
+                  />
                 </Div>
               )}
 
@@ -468,7 +495,11 @@ export function FolderItem({
                   <Div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
                     {t("app.chat.folderList.lastWeek")}
                   </Div>
-                  <ThreadList threads={groupedThreads.lastWeek} locale={locale} logger={logger} />
+                  <ThreadList
+                    threads={groupedThreads.lastWeek}
+                    locale={locale}
+                    logger={logger}
+                  />
                 </Div>
               )}
 
@@ -477,7 +508,11 @@ export function FolderItem({
                   <Div className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
                     {t("app.chat.folderList.lastMonth")}
                   </Div>
-                  <ThreadList threads={groupedThreads.lastMonth} locale={locale} logger={logger} />
+                  <ThreadList
+                    threads={groupedThreads.lastMonth}
+                    locale={locale}
+                    logger={logger}
+                  />
                 </Div>
               )}
             </Div>
@@ -516,7 +551,9 @@ export function FolderItem({
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("app.chat.folderList.deleteDialog.title")}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t("app.chat.folderList.deleteDialog.title")}
+            </AlertDialogTitle>
             <AlertDialogDescription>
               {threadsInFolder.length > 0
                 ? t("app.chat.folderList.deleteDialog.descriptionWithThreads", {

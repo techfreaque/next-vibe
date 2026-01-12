@@ -35,12 +35,14 @@ export function BranchNavigator({
   }
 
   const handlePrevious = (): void => {
-    const newIndex = currentBranchIndex > 0 ? currentBranchIndex - 1 : totalBranches - 1;
+    const newIndex =
+      currentBranchIndex > 0 ? currentBranchIndex - 1 : totalBranches - 1;
     onSwitchBranch(newIndex);
   };
 
   const handleNext = (): void => {
-    const newIndex = currentBranchIndex < totalBranches - 1 ? currentBranchIndex + 1 : 0;
+    const newIndex =
+      currentBranchIndex < totalBranches - 1 ? currentBranchIndex + 1 : 0;
     onSwitchBranch(newIndex);
   };
   return (

@@ -26,7 +26,13 @@ export const { POST, tools } = endpointsHandler({
       },
     ],
     handler: async ({ data, user, locale, logger, t }) => {
-      return await userCreateRepository.createUser(data, user, locale, logger, t);
+      return await userCreateRepository.createUser(
+        data,
+        user,
+        locale,
+        logger,
+        t,
+      );
     },
   },
 });

@@ -36,7 +36,8 @@ export const translations: typeof enTranslations = {
     leadId: "Identyfikator Lead",
     subscriptionId: "ID subskrypcji",
     userId: "ID użytkownika",
-    alreadySubscribed: "Ten adres e-mail jest już zapisany do naszego newslettera",
+    alreadySubscribed:
+      "Ten adres e-mail jest już zapisany do naszego newslettera",
   },
   errors: {
     badRequest: {
@@ -78,7 +79,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Już zasubskrybowany",
-        description: "Ten adres e-mail jest już zapisany do naszego newslettera",
+        description:
+          "Ten adres e-mail jest już zapisany do naszego newslettera",
       },
       badRequest: {
         title: "Nieprawidłowe żądanie",
@@ -95,8 +97,10 @@ export const translations: typeof enTranslations = {
     linking_to_lead: "Łączenie subskrypcji newslettera z leadem",
     lead_found: "Znaleziono lead dla subskrypcji newslettera",
     lead_updated: "Zaktualizowano lead z danymi subskrypcji newslettera",
-    lead_update_failed: "Nie udało się zaktualizować leada z danymi newslettera",
-    lead_not_found: "Lead nie znaleziony lub nie kwalifikuje się do aktualizacji",
+    lead_update_failed:
+      "Nie udało się zaktualizować leada z danymi newslettera",
+    lead_not_found:
+      "Lead nie znaleziony lub nie kwalifikuje się do aktualizacji",
     lead_linking_error: "Błąd podczas łączenia leada z newsletterem",
     missing_lead_id: "Próba subskrypcji newslettera bez leadId",
     already_subscribed: "Użytkownik już zasubskrybował newsletter",
@@ -115,10 +119,12 @@ export const translations: typeof enTranslations = {
       "Wysyłanie powiadomienia SMS administratora dla subskrypcji newslettera",
     admin_notification_error: "Błąd wysyłania powiadomienia SMS administratora",
     welcome: {
-      message: "Cześć {{name}}! Witamy w naszym newsletterze. Czekaj na aktualizacje!",
+      message:
+        "Cześć {{name}}! Witamy w naszym newsletterze. Czekaj na aktualizacje!",
     },
     admin_notification: {
-      message: "Nowa subskrypcja newslettera: {{displayName}} ({{email}}) zasubskrybował",
+      message:
+        "Nowa subskrypcja newslettera: {{displayName}} ({{email}}) zasubskrybował",
     },
   },
   route: {
@@ -136,7 +142,8 @@ export const translations: typeof enTranslations = {
         "Witamy w newsletterze {{appName}}! Jesteś teraz częścią naszej społeczności entuzjastów AI, którzy cenią szczere, niecenzurowane rozmowy z AI.",
       what_to_expect: "Oto, co będziesz otrzymywać:",
       benefit_1: "Ogłoszenia i aktualizacje dotyczące nowych modeli AI",
-      benefit_2: "Wskazówki i triki, jak najlepiej wykorzystać niecenzurowane modele AI",
+      benefit_2:
+        "Wskazówki i triki, jak najlepiej wykorzystać niecenzurowane modele AI",
       benefit_3: "Ekskluzywne oferty i wczesny dostęp do nowych funkcji",
       benefit_4: "Najciekawsze momenty społeczności i historie sukcesu",
       frequency:

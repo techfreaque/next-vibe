@@ -18,7 +18,10 @@ import definitions from "./definition";
  * - Fetches default or custom character
  * - Returns full character details
  */
-export function useCharacter(characterId: string, logger: EndpointLogger): CharacterEndpointReturn {
+export function useCharacter(
+  characterId: string,
+  logger: EndpointLogger,
+): CharacterEndpointReturn {
   return useEndpoint(
     definitions,
     {

@@ -108,8 +108,10 @@ export const translations = {
     healthCheckCompleted:
       "Health check completed: {migrationsChecked} migrations checked, {pendingMigrations} pending",
     healthCheckFailed: "Database migration health check failed",
-    autoMigrationSkippedNotDevelopment: "Auto migration skipped - not in development environment",
-    operationOnlyAllowedInDevelopment: "This operation is only allowed in development environment",
+    autoMigrationSkippedNotDevelopment:
+      "Auto migration skipped - not in development environment",
+    operationOnlyAllowedInDevelopment:
+      "This operation is only allowed in development environment",
     autoMigrationTaskNotFound: "Auto migration task not found",
     taskConfigurationMissing: "Task configuration missing",
     autoMigrationStartedSuccessfully: "Auto migration started successfully",
@@ -123,22 +125,26 @@ export const translations = {
     failedToStopBackupMonitorTask: "Failed to stop backup monitor task",
     migrationTaskNotFound: "Migration task not found",
     migrationTaskDoesNotExist: "Migration task '{taskName}' does not exist",
-    migrationTaskStatusRetrieved: "Migration task '{taskName}' status retrieved successfully",
+    migrationTaskStatusRetrieved:
+      "Migration task '{taskName}' status retrieved successfully",
     failedToGetMigrationTaskStatus: "Failed to get migration task status",
     foundMigrationTasks: "Found {count} migration tasks",
     failedToListMigrationTasks: "Failed to list migration tasks",
   },
   tasks: {
     healthCheck: {
-      description: "Performs health checks on database migrations to ensure system integrity",
+      description:
+        "Performs health checks on database migrations to ensure system integrity",
       schedule: "0 */6 * * *",
     },
     autoMigration: {
-      description: "Automatically runs pending database migrations in development environment",
+      description:
+        "Automatically runs pending database migrations in development environment",
       schedule: "*/30 * * * *",
     },
     backupMonitor: {
-      description: "Monitors and manages database migration backup files and cleanup",
+      description:
+        "Monitors and manages database migration backup files and cleanup",
     },
   },
 };

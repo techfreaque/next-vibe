@@ -2,7 +2,8 @@ export const translations = {
   task: {
     description:
       "Abgelaufene Benutzersitzungen bereinigen, um die Systemsicherheit zu gewährleisten",
-    purpose: "Entfernt abgelaufene Sitzungen zur Erhaltung der Sicherheit und Leistung",
+    purpose:
+      "Entfernt abgelaufene Sitzungen zur Erhaltung der Sicherheit und Leistung",
     impact:
       "Verbessert die Systemleistung und Sicherheit durch Entfernung veralteter Sitzungsdaten",
     rollback: "Rollback nicht anwendbar für Bereinigungsoperationen",
@@ -19,7 +20,8 @@ export const translations = {
     },
     unknown_error: {
       title: "Unbekannter Sitzungsbereinigungsfehler",
-      description: "Ein unbekannter Fehler ist während der Sitzungsbereinigung aufgetreten",
+      description:
+        "Ein unbekannter Fehler ist während der Sitzungsbereinigung aufgetreten",
     },
     invalid_session_retention: {
       title: "Ungültige Sitzungsaufbewahrung",
@@ -35,7 +37,8 @@ export const translations = {
     },
     validation_failed: {
       title: "Validierung fehlgeschlagen",
-      description: "Validierung der Sitzungsbereinigungskonfiguration fehlgeschlagen",
+      description:
+        "Validierung der Sitzungsbereinigungskonfiguration fehlgeschlagen",
     },
   },
   success: {

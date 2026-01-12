@@ -11,7 +11,8 @@ export const translations: typeof enTranslations = {
     },
     internal: {
       title: "Interner Fehler",
-      description: "Ein interner Fehler ist bei der Verarbeitung der Benutzeranfrage aufgetreten",
+      description:
+        "Ein interner Fehler ist bei der Verarbeitung der Benutzeranfrage aufgetreten",
     },
   },
   id: idTranslations,

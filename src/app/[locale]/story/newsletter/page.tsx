@@ -16,7 +16,9 @@ interface PageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 
@@ -42,7 +44,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function Newsletter({ params }: PageProps): Promise<JSX.Element> {
+export default async function Newsletter({
+  params,
+}: PageProps): Promise<JSX.Element> {
   const { locale } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
   const authUser = await AuthRepository.getAuthMinimalUser(

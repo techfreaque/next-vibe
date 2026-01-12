@@ -37,7 +37,9 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;
 type Equal<X, Y> =
-  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false;
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
+    ? true
+    : false;
 
 /**
  * TEST: Optional array field type inference
@@ -149,7 +151,9 @@ const testObjectOptional = objectOptionalField(
 
 // Verify type is object-optional
 type TestObjectOptionalType = typeof testObjectOptional.type;
-type TestObjectOptionalCheck = Expect<Equal<TestObjectOptionalType, "object-optional">>;
+type TestObjectOptionalCheck = Expect<
+  Equal<TestObjectOptionalType, "object-optional">
+>;
 
 // Export a dummy value to make this a valid module
 export const OPTIONAL_FIELD_TYPE_TESTS_PASS = true;

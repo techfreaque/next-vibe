@@ -31,7 +31,9 @@ import { isWidgetDataString } from "@/app/api/[locale]/system/unified-interface/
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class TabsWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TABS> {
+export class TabsWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.TABS
+> {
   readonly widgetType = WidgetType.TABS;
 
   /**

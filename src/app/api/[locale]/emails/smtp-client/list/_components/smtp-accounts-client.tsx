@@ -11,7 +11,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
-import { Filter, List, Plus, RefreshCw, Table, Users } from "next-vibe-ui/ui/icons";
+import {
+  Filter,
+  List,
+  Plus,
+  RefreshCw,
+  Table,
+  Users,
+} from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
@@ -37,18 +44,23 @@ interface SmtpAccountsClientProps {
   locale: CountryLanguage;
 }
 
-export function SmtpAccountsClient({ locale }: SmtpAccountsClientProps): React.JSX.Element {
+export function SmtpAccountsClient({
+  locale,
+}: SmtpAccountsClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
   const smtpAccountsEndpoint = useSmtpAccountsListEndpoint(logger);
   const [viewMode, setViewMode] = useState<"list" | "table">("list");
 
   const apiResponse = smtpAccountsEndpoint.read?.response;
-  const accounts: SmtpAccountsListGETResponseOutput["accounts"] = apiResponse?.success
-    ? apiResponse.data.accounts
-    : [];
-  const totalAccounts = apiResponse?.success ? apiResponse.data.pagination.total : 0;
-  const totalPages = apiResponse?.success ? apiResponse.data.pagination.totalPages : 0;
+  const accounts: SmtpAccountsListGETResponseOutput["accounts"] =
+    apiResponse?.success ? apiResponse.data.accounts : [];
+  const totalAccounts = apiResponse?.success
+    ? apiResponse.data.pagination.total
+    : 0;
+  const totalPages = apiResponse?.success
+    ? apiResponse.data.pagination.totalPages
+    : 0;
   const queryLoading = smtpAccountsEndpoint.read.isLoading || false;
 
   // Get current form values for pagination display
@@ -114,7 +126,9 @@ export function SmtpAccountsClient({ locale }: SmtpAccountsClientProps): React.J
               onClick={smtpAccountsEndpoint.read.refetch}
               disabled={queryLoading}
             >
-              <RefreshCw className={cn("h-4 w-4", queryLoading && "animate-spin")} />
+              <RefreshCw
+                className={cn("h-4 w-4", queryLoading && "animate-spin")}
+              />
             </Button>
           </Div>
         </Div>
@@ -182,7 +196,11 @@ export function SmtpAccountsClient({ locale }: SmtpAccountsClientProps): React.J
               </Div>
 
               <Div className="flex justify-between items-center mt-4">
-                <Button type="button" variant="outline" onClick={handleClearFilters}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClearFilters}
+                >
                   {t("app.admin.emails.smtp.list.actions.clearFilters")}
                 </Button>
 
@@ -221,7 +239,11 @@ export function SmtpAccountsClient({ locale }: SmtpAccountsClientProps): React.J
             )}
           </Div>
         ) : viewMode === "table" ? (
-          <SmtpAccountsTable locale={locale} accounts={accounts} isLoading={queryLoading} />
+          <SmtpAccountsTable
+            locale={locale}
+            accounts={accounts}
+            isLoading={queryLoading}
+          />
         ) : (
           <Div className="flex flex-col gap-3">
             {accounts.map((account) => (
@@ -257,7 +279,12 @@ export function SmtpAccountsClient({ locale }: SmtpAccountsClientProps): React.J
                 variant="outline"
                 size="sm"
                 disabled={currentPage <= 1}
-                onClick={() => smtpAccountsEndpoint.read.form.setValue("page", currentPage - 1)}
+                onClick={() =>
+                  smtpAccountsEndpoint.read.form.setValue(
+                    "page",
+                    currentPage - 1,
+                  )
+                }
               >
                 {t("app.admin.emails.smtp.list.pagination.previous")}
               </Button>
@@ -271,7 +298,12 @@ export function SmtpAccountsClient({ locale }: SmtpAccountsClientProps): React.J
                 variant="outline"
                 size="sm"
                 disabled={currentPage >= totalPages}
-                onClick={() => smtpAccountsEndpoint.read.form.setValue("page", currentPage + 1)}
+                onClick={() =>
+                  smtpAccountsEndpoint.read.form.setValue(
+                    "page",
+                    currentPage + 1,
+                  )
+                }
               >
                 {t("app.admin.emails.smtp.list.pagination.next")}
               </Button>

@@ -22,7 +22,9 @@ export const campaignStarterConfigSchema = z.object({
   leadsPerWeek: z.record(z.string(), z.coerce.number().min(0)),
 });
 
-export type CampaignStarterConfigType = z.infer<typeof campaignStarterConfigSchema>;
+export type CampaignStarterConfigType = z.infer<
+  typeof campaignStarterConfigSchema
+>;
 
 /**
  * Campaign Starter Result Schema
@@ -41,7 +43,9 @@ export const campaignStarterResultSchema = z.object({
   ),
 });
 
-export type CampaignStarterResultType = z.infer<typeof campaignStarterResultSchema>;
+export type CampaignStarterResultType = z.infer<
+  typeof campaignStarterResultSchema
+>;
 
 /**
  * Distribution Calculation Result

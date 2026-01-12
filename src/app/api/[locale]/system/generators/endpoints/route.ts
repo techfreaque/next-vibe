@@ -12,6 +12,7 @@ import { functionalGeneratorsRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) => functionalGeneratorsRepository.runGenerators(data, logger),
+    handler: ({ data, logger }) =>
+      functionalGeneratorsRepository.runGenerators(data, logger),
   },
 });

@@ -35,7 +35,9 @@ export enum Status {
 }
 
 // typescript/no-extra-non-null-assertion - Extra non-null assertion
-export function getNested(obj: { a?: { b?: string } } | null): string | undefined {
+export function getNested(
+  obj: { a?: { b?: string } } | null,
+): string | undefined {
   return obj!!?.a?.b;
 }
 

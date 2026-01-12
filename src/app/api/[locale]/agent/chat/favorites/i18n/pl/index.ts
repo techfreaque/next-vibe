@@ -209,11 +209,13 @@ export const translations: typeof enTranslations = {
     },
     minIntelligence: {
       label: "Minimalna inteligencja",
-      description: "Minimalny poziom inteligencji/możliwości wymagany dla modelu",
+      description:
+        "Minimalny poziom inteligencji/możliwości wymagany dla modelu",
     },
     maxIntelligence: {
       label: "Maksymalna inteligencja",
-      description: "Maksymalny poziom inteligencji/możliwości dozwolony dla modelu",
+      description:
+        "Maksymalny poziom inteligencji/możliwości dozwolony dla modelu",
     },
     intelligenceRange: {
       label: "Zakres inteligencji",
@@ -303,7 +305,8 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nie znaleziono",
-        description: "Element, który próbujesz dodać do ulubionych, nie istnieje",
+        description:
+          "Element, który próbujesz dodać do ulubionych, nie istnieje",
       },
       server: {
         title: "Błąd serwera",

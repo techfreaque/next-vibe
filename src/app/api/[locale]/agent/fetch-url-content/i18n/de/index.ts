@@ -6,12 +6,14 @@ export const translations = {
       "Rufen Sie Inhalte von einer beliebigen URL ab und konvertieren Sie sie in lesbares Markdown-Format. Verwenden Sie dies, wenn Sie Webseiteninhalte lesen oder analysieren müssen.",
     form: {
       title: "URL-Abruf-Parameter",
-      description: "Konfigurieren Sie die URL, von der Inhalte abgerufen werden sollen",
+      description:
+        "Konfigurieren Sie die URL, von der Inhalte abgerufen werden sollen",
     },
     fields: {
       url: {
         title: "URL",
-        description: "Die vollständige URL zum Abrufen (muss http:// oder https:// enthalten)",
+        description:
+          "Die vollständige URL zum Abrufen (muss http:// oder https:// enthalten)",
         placeholder: "https://beispiel.de",
       },
     },

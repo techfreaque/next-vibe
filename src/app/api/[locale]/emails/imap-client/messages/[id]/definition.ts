@@ -40,7 +40,8 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.emails.imapClient.messages.id.get.container.title",
-      description: "app.api.emails.imapClient.messages.id.get.container.description",
+      description:
+        "app.api.emails.imapClient.messages.id.get.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -52,8 +53,10 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.imapClient.messages.id.get.id.label",
-          description: "app.api.emails.imapClient.messages.id.get.id.description",
-          placeholder: "app.api.emails.imapClient.messages.id.get.id.placeholder",
+          description:
+            "app.api.emails.imapClient.messages.id.get.id.description",
+          placeholder:
+            "app.api.emails.imapClient.messages.id.get.id.placeholder",
         },
         z.uuid(),
       ),
@@ -65,46 +68,59 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.emails.imapClient.messages.id.get.errors.validation.title",
-      description: "app.api.emails.imapClient.messages.id.get.errors.validation.description",
+      title:
+        "app.api.emails.imapClient.messages.id.get.errors.validation.title",
+      description:
+        "app.api.emails.imapClient.messages.id.get.errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.emails.imapClient.messages.id.get.errors.notFound.title",
-      description: "app.api.emails.imapClient.messages.id.get.errors.notFound.description",
+      description:
+        "app.api.emails.imapClient.messages.id.get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.emails.imapClient.messages.id.get.errors.unauthorized.title",
-      description: "app.api.emails.imapClient.messages.id.get.errors.unauthorized.description",
+      title:
+        "app.api.emails.imapClient.messages.id.get.errors.unauthorized.title",
+      description:
+        "app.api.emails.imapClient.messages.id.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.emails.imapClient.messages.id.get.errors.forbidden.title",
-      description: "app.api.emails.imapClient.messages.id.get.errors.forbidden.description",
+      description:
+        "app.api.emails.imapClient.messages.id.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.emails.imapClient.messages.id.get.errors.server.title",
-      description: "app.api.emails.imapClient.messages.id.get.errors.server.description",
+      description:
+        "app.api.emails.imapClient.messages.id.get.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.emails.imapClient.messages.id.get.errors.conflict.title",
-      description: "app.api.emails.imapClient.messages.id.get.errors.conflict.description",
+      description:
+        "app.api.emails.imapClient.messages.id.get.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.emails.imapClient.messages.id.get.errors.network.title",
-      description: "app.api.emails.imapClient.messages.id.get.errors.network.description",
+      description:
+        "app.api.emails.imapClient.messages.id.get.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.emails.imapClient.messages.id.get.errors.unsavedChanges.title",
-      description: "app.api.emails.imapClient.messages.id.get.errors.unsavedChanges.description",
+      title:
+        "app.api.emails.imapClient.messages.id.get.errors.unsavedChanges.title",
+      description:
+        "app.api.emails.imapClient.messages.id.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.imapClient.messages.id.get.errors.unknown.title",
-      description: "app.api.emails.imapClient.messages.id.get.errors.unknown.description",
+      description:
+        "app.api.emails.imapClient.messages.id.get.errors.unknown.description",
     },
   },
 
   successTypes: {
     title: "app.api.emails.imapClient.messages.id.get.success.title",
-    description: "app.api.emails.imapClient.messages.id.get.success.description",
+    description:
+      "app.api.emails.imapClient.messages.id.get.success.description",
   },
 
   examples: {
@@ -128,7 +144,8 @@ const { GET } = createEndpoint({
           imapFolderId: "456e7890-e89b-12d3-a456-426614174001",
           accountId: "789e0123-e89b-12d3-a456-426614174002",
           bodyText: "Please join us for the important meeting tomorrow...",
-          bodyHtml: "<p>Please join us for the important meeting tomorrow...</p>",
+          bodyHtml:
+            "<p>Please join us for the important meeting tomorrow...</p>",
           headers: {
             "Message-ID": "<message-id@example.com>",
             Date: "Mon, 1 Jan 2023 10:00:00 +0000",
@@ -177,7 +194,8 @@ const { PATCH } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.emails.imapClient.messages.id.patch.container.title",
-      description: "app.api.emails.imapClient.messages.id.patch.container.description",
+      description:
+        "app.api.emails.imapClient.messages.id.patch.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -189,8 +207,10 @@ const { PATCH } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.imapClient.messages.id.patch.id.label",
-          description: "app.api.emails.imapClient.messages.id.patch.id.description",
-          placeholder: "app.api.emails.imapClient.messages.id.patch.id.placeholder",
+          description:
+            "app.api.emails.imapClient.messages.id.patch.id.description",
+          placeholder:
+            "app.api.emails.imapClient.messages.id.patch.id.placeholder",
         },
         z.uuid(),
       ),
@@ -201,7 +221,8 @@ const { PATCH } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.emails.imapClient.messages.id.patch.isRead.label",
-          description: "app.api.emails.imapClient.messages.id.patch.isRead.description",
+          description:
+            "app.api.emails.imapClient.messages.id.patch.isRead.description",
         },
         z.boolean().optional(),
       ),
@@ -211,7 +232,8 @@ const { PATCH } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.emails.imapClient.messages.id.patch.isFlagged.label",
-          description: "app.api.emails.imapClient.messages.id.patch.isFlagged.description",
+          description:
+            "app.api.emails.imapClient.messages.id.patch.isFlagged.description",
         },
         z.boolean().optional(),
       ),
@@ -221,8 +243,10 @@ const { PATCH } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.imapClient.messages.id.patch.subject.label",
-          description: "app.api.emails.imapClient.messages.id.patch.subject.description",
-          placeholder: "app.api.emails.imapClient.messages.id.patch.subject.placeholder",
+          description:
+            "app.api.emails.imapClient.messages.id.patch.subject.description",
+          placeholder:
+            "app.api.emails.imapClient.messages.id.patch.subject.placeholder",
         },
         z.string().min(1).max(255).optional(),
       ),
@@ -234,46 +258,62 @@ const { PATCH } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.emails.imapClient.messages.id.patch.errors.validation.title",
-      description: "app.api.emails.imapClient.messages.id.patch.errors.validation.description",
+      title:
+        "app.api.emails.imapClient.messages.id.patch.errors.validation.title",
+      description:
+        "app.api.emails.imapClient.messages.id.patch.errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.imapClient.messages.id.patch.errors.notFound.title",
-      description: "app.api.emails.imapClient.messages.id.patch.errors.notFound.description",
+      title:
+        "app.api.emails.imapClient.messages.id.patch.errors.notFound.title",
+      description:
+        "app.api.emails.imapClient.messages.id.patch.errors.notFound.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.emails.imapClient.messages.id.patch.errors.unauthorized.title",
-      description: "app.api.emails.imapClient.messages.id.patch.errors.unauthorized.description",
+      title:
+        "app.api.emails.imapClient.messages.id.patch.errors.unauthorized.title",
+      description:
+        "app.api.emails.imapClient.messages.id.patch.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.imapClient.messages.id.patch.errors.forbidden.title",
-      description: "app.api.emails.imapClient.messages.id.patch.errors.forbidden.description",
+      title:
+        "app.api.emails.imapClient.messages.id.patch.errors.forbidden.title",
+      description:
+        "app.api.emails.imapClient.messages.id.patch.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.emails.imapClient.messages.id.patch.errors.server.title",
-      description: "app.api.emails.imapClient.messages.id.patch.errors.server.description",
+      description:
+        "app.api.emails.imapClient.messages.id.patch.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.imapClient.messages.id.patch.errors.conflict.title",
-      description: "app.api.emails.imapClient.messages.id.patch.errors.conflict.description",
+      title:
+        "app.api.emails.imapClient.messages.id.patch.errors.conflict.title",
+      description:
+        "app.api.emails.imapClient.messages.id.patch.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.emails.imapClient.messages.id.patch.errors.network.title",
-      description: "app.api.emails.imapClient.messages.id.patch.errors.network.description",
+      description:
+        "app.api.emails.imapClient.messages.id.patch.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.emails.imapClient.messages.id.patch.errors.unsavedChanges.title",
-      description: "app.api.emails.imapClient.messages.id.patch.errors.unsavedChanges.description",
+      title:
+        "app.api.emails.imapClient.messages.id.patch.errors.unsavedChanges.title",
+      description:
+        "app.api.emails.imapClient.messages.id.patch.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.imapClient.messages.id.patch.errors.unknown.title",
-      description: "app.api.emails.imapClient.messages.id.patch.errors.unknown.description",
+      description:
+        "app.api.emails.imapClient.messages.id.patch.errors.unknown.description",
     },
   },
 
   successTypes: {
     title: "app.api.emails.imapClient.messages.id.patch.success.title",
-    description: "app.api.emails.imapClient.messages.id.patch.success.description",
+    description:
+      "app.api.emails.imapClient.messages.id.patch.success.description",
   },
 
   examples: {
@@ -303,7 +343,8 @@ const { PATCH } = createEndpoint({
           imapFolderId: "456e7890-e89b-12d3-a456-426614174001",
           accountId: "789e0123-e89b-12d3-a456-426614174002",
           bodyText: "Please join us for the important meeting tomorrow...",
-          bodyHtml: "<p>Please join us for the important meeting tomorrow...</p>",
+          bodyHtml:
+            "<p>Please join us for the important meeting tomorrow...</p>",
           headers: {
             "Message-ID": "<message-id@example.com>",
             Date: "Mon, 1 Jan 2023 10:00:00 +0000",

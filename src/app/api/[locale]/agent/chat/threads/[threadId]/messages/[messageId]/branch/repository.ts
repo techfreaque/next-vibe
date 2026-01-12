@@ -54,7 +54,12 @@ export const branchRepository = {
       const [thread] = await db
         .select()
         .from(chatThreads)
-        .where(and(eq(chatThreads.id, urlPathParams.threadId), eq(chatThreads.userId, userId)))
+        .where(
+          and(
+            eq(chatThreads.id, urlPathParams.threadId),
+            eq(chatThreads.userId, userId),
+          ),
+        )
         .limit(1);
 
       if (!thread) {

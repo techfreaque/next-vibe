@@ -20,7 +20,10 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { AiStreamPostRequestOutput, AiStreamPostResponseOutput } from "../definition";
+import type {
+  AiStreamPostRequestOutput,
+  AiStreamPostResponseOutput,
+} from "../definition";
 import { StreamErrorCatchHandler } from "./handlers/stream-error-catch-handler";
 import { StreamExecutionHandler } from "./handlers/stream-execution-handler";
 import { StreamStartHandler } from "./handlers/stream-start-handler";
@@ -43,9 +46,14 @@ function extractUserIdentifiers(
   ipAddress?: string;
 } {
   const userId = !user.isPublic && "id" in user ? user.id : undefined;
-  const leadId = "leadId" in user && typeof user.leadId === "string" ? user.leadId : undefined;
+  const leadId =
+    "leadId" in user && typeof user.leadId === "string"
+      ? user.leadId
+      : undefined;
   const ipAddress = request
-    ? request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || undefined
+    ? request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      undefined
     : "cli";
 
   return { userId, leadId, ipAddress };
@@ -123,29 +131,30 @@ export class AiStreamRepository {
       const stream = new ReadableStream({
         async start(controller): Promise<void> {
           // Initialize stream context, TTS handler, and emit initial events
-          const { ctx, ttsHandler, emittedToolResultIds } = StreamStartHandler.initializeStream({
-            userMessageId,
-            effectiveParentMessageId,
-            messageDepth,
-            toolConfirmationResults,
-            voiceMode,
-            voiceTranscription,
-            userMessageMetadata,
-            fileUploadPromise,
-            isNewThread,
-            threadId: threadResultThreadId,
-            rootFolderId: data.rootFolderId,
-            subFolderId: data.subFolderId,
-            effectiveContent,
-            operation: data.operation,
-            effectiveRole,
-            messages,
-            controller,
-            encoder,
-            locale,
-            userId,
-            logger,
-          });
+          const { ctx, ttsHandler, emittedToolResultIds } =
+            StreamStartHandler.initializeStream({
+              userMessageId,
+              effectiveParentMessageId,
+              messageDepth,
+              toolConfirmationResults,
+              voiceMode,
+              voiceTranscription,
+              userMessageMetadata,
+              fileUploadPromise,
+              isNewThread,
+              threadId: threadResultThreadId,
+              rootFolderId: data.rootFolderId,
+              subFolderId: data.subFolderId,
+              effectiveContent,
+              operation: data.operation,
+              effectiveRole,
+              messages,
+              controller,
+              encoder,
+              locale,
+              userId,
+              logger,
+            });
 
           try {
             await StreamExecutionHandler.executeStream({
@@ -206,14 +215,16 @@ export class AiStreamRepository {
         }),
       );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       logger.error("Failed to create AI stream", {
         error: errorMessage,
         model: data.model,
       });
 
       return fail({
-        message: "app.api.agent.chat.aiStream.route.errors.streamCreationFailed",
+        message:
+          "app.api.agent.chat.aiStream.route.errors.streamCreationFailed",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: {
           error: errorMessage,

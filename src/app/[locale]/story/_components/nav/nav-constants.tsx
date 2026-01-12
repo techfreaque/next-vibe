@@ -3,7 +3,10 @@ import type { JSX } from "react";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { BadgeTranslationPayload, NavSingleItemType } from "./nav-single-item";
+import type {
+  BadgeTranslationPayload,
+  NavSingleItemType,
+} from "./nav-single-item";
 
 export type NavPaths =
   | ""
@@ -23,7 +26,12 @@ export type NavItemType = NavSingleItemType | NavParentItemType;
 /**
  * Badge variant types for navigation items
  */
-export type NavBadgeVariant = "default" | "secondary" | "destructive" | "outline" | undefined;
+export type NavBadgeVariant =
+  | "default"
+  | "secondary"
+  | "destructive"
+  | "outline"
+  | undefined;
 
 export interface NavChildItem {
   icon: JSX.Element;

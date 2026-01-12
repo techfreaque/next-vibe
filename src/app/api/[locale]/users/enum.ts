@@ -126,7 +126,8 @@ export const {
   CANCELED: "app.api.users.stats.enums.subscriptionStatusFilter.canceled",
   UNPAID: "app.api.users.stats.enums.subscriptionStatusFilter.unpaid",
   PAUSED: "app.api.users.stats.enums.subscriptionStatusFilter.paused",
-  NO_SUBSCRIPTION: "app.api.users.stats.enums.subscriptionStatusFilter.noSubscription",
+  NO_SUBSCRIPTION:
+    "app.api.users.stats.enums.subscriptionStatusFilter.noSubscription",
 });
 export const SubscriptionStatusFilterDB = [
   SubscriptionStatusFilter.ALL,
@@ -155,7 +156,8 @@ export const {
   GOOGLE_PAY: "app.api.users.stats.enums.paymentMethodFilter.googlePay",
   SEPA_DEBIT: "app.api.users.stats.enums.paymentMethodFilter.sepaDebit",
   CRYPTO: "app.api.users.stats.enums.paymentMethodFilter.crypto",
-  NO_PAYMENT_METHOD: "app.api.users.stats.enums.paymentMethodFilter.noPaymentMethod",
+  NO_PAYMENT_METHOD:
+    "app.api.users.stats.enums.paymentMethodFilter.noPaymentMethod",
 });
 export const PaymentMethodFilterDB = [
   PaymentMethodFilter.ALL,

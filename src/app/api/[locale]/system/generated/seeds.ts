@@ -13,7 +13,9 @@ import type { EnvironmentSeeds } from "@/app/api/[locale]/system/db/seed/seed-ma
  * @param moduleName - The seed module name (e.g., "user", "leads")
  * @returns The seed module or null if not found
  */
-export async function getSeedModule(moduleName: string): Promise<EnvironmentSeeds | null> {
+export async function getSeedModule(
+  moduleName: string,
+): Promise<EnvironmentSeeds | null> {
   switch (moduleName) {
     case "folders":
       return (await import("../../agent/chat/folders/seeds")) as EnvironmentSeeds;

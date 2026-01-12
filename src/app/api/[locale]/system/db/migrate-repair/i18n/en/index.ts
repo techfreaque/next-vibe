@@ -1,7 +1,8 @@
 export const translations = {
   post: {
     title: "Database Migration Repair",
-    description: "Repair migration tracking to ensure proper state for production builds",
+    description:
+      "Repair migration tracking to ensure proper state for production builds",
     form: {
       title: "Migration Repair Options",
       description: "Configure migration repair operation settings",
@@ -17,11 +18,13 @@ export const translations = {
       },
       unauthorized: {
         title: "Unauthorized",
-        description: "You are not authorized to perform migration repair operations",
+        description:
+          "You are not authorized to perform migration repair operations",
       },
       forbidden: {
         title: "Forbidden",
-        description: "Migration repair operations are not allowed for your role",
+        description:
+          "Migration repair operations are not allowed for your role",
       },
       notFound: {
         title: "Not Found",
@@ -29,7 +32,8 @@ export const translations = {
       },
       server: {
         title: "Server Error",
-        description: "An internal server error occurred during migration repair",
+        description:
+          "An internal server error occurred during migration repair",
       },
       unknown: {
         title: "Unknown Error",
@@ -88,7 +92,8 @@ export const translations = {
     dryRunComplete: "✅ Dry run completed - no changes made",
     repairComplete:
       "✅ Migration repair completed successfully! Marked {{count}} migrations as applied",
-    success: "✅ Migration repair completed successfully! 🚀 Ready for production builds",
+    success:
+      "✅ Migration repair completed successfully! 🚀 Ready for production builds",
   },
   tag: "Database",
 };

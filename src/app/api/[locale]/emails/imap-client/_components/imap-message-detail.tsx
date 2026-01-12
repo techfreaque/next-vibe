@@ -14,7 +14,16 @@ import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
-import { ArrowLeft, Calendar, Edit, Eye, Mail, Paperclip, Star, User } from "next-vibe-ui/ui/icons";
+import {
+  ArrowLeft,
+  Calendar,
+  Edit,
+  Eye,
+  Mail,
+  Paperclip,
+  Star,
+  User,
+} from "next-vibe-ui/ui/icons";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
@@ -41,7 +50,9 @@ function formatDate(dateString: string): string {
  * IMAP Message Detail Component
  * Production-ready with real API integration and edit capabilities
  */
-export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.Element {
+export function ImapMessageDetail({
+  messageId,
+}: ImapMessageDetailProps): JSX.Element {
   const { t, locale } = useTranslation();
   const router = useRouter();
   const [isEditMode, setIsEditMode] = useState(false);
@@ -66,7 +77,9 @@ export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.El
       <Div className="flex items-center justify-center p-8">
         <Div className="text-center">
           <Div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <P className="text-gray-600">{t("app.admin.emails.imap.common.loading")}</P>
+          <P className="text-gray-600">
+            {t("app.admin.emails.imap.common.loading")}
+          </P>
         </Div>
       </Div>
     );
@@ -141,7 +154,9 @@ export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.El
                 {t("app.admin.emails.imap.messages.unread")}
               </Badge>
             )}
-            {messageData.isFlagged && <Star className="h-5 w-5 text-yellow-500 fill-current" />}
+            {messageData.isFlagged && (
+              <Star className="h-5 w-5 text-yellow-500 fill-current" />
+            )}
           </Div>
           <Button variant="outline" size="sm" onClick={handleToggleEditMode}>
             {isEditMode ? (
@@ -157,7 +172,10 @@ export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.El
             )}
           </Button>
           {isEditMode && (
-            <Button onClick={handleSave} disabled={messageEndpoint.create?.isSubmitting}>
+            <Button
+              onClick={handleSave}
+              disabled={messageEndpoint.create?.isSubmitting}
+            >
               {messageEndpoint.create?.isSubmitting
                 ? t("app.admin.emails.imap.common.saving")
                 : t("app.admin.emails.imap.common.save")}
@@ -170,7 +188,9 @@ export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.El
       {isEditMode ? (
         <Card>
           <CardHeader>
-            <CardTitle>{t("app.admin.emails.imap.messages.edit.title")}</CardTitle>
+            <CardTitle>
+              {t("app.admin.emails.imap.messages.edit.title")}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Form
@@ -213,7 +233,10 @@ export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.El
                 locale={locale}
               />
 
-              <Button type="submit" disabled={messageEndpoint.create?.isSubmitting}>
+              <Button
+                type="submit"
+                disabled={messageEndpoint.create?.isSubmitting}
+              >
                 {messageEndpoint.create?.isSubmitting
                   ? t("app.admin.emails.imap.common.saving")
                   : t("app.admin.emails.imap.common.save")}
@@ -244,7 +267,9 @@ export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.El
                 <Div className="flex items-center flex-row gap-3">
                   <User className="h-5 w-5 text-gray-500" />
                   <Div>
-                    <Div className="font-medium">{t("app.admin.emails.imap.messages.from")}</Div>
+                    <Div className="font-medium">
+                      {t("app.admin.emails.imap.messages.from")}
+                    </Div>
                     <Div className="text-sm text-gray-600">
                       {messageData.senderName ? (
                         <>
@@ -260,7 +285,9 @@ export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.El
                 <Div className="flex items-center flex-row gap-3">
                   <Mail className="h-5 w-5 text-gray-500" />
                   <Div>
-                    <Div className="font-medium">{t("app.admin.emails.imap.messages.to")}</Div>
+                    <Div className="font-medium">
+                      {t("app.admin.emails.imap.messages.to")}
+                    </Div>
                     <Div className="text-sm text-gray-600">
                       {messageData.recipientName ? (
                         <>
@@ -279,7 +306,9 @@ export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.El
               <Div className="flex items-center flex-row gap-3">
                 <Calendar className="h-5 w-5 text-gray-500" />
                 <Div>
-                  <Div className="font-medium">{t("app.admin.emails.imap.messages.sentAt")}</Div>
+                  <Div className="font-medium">
+                    {t("app.admin.emails.imap.messages.sentAt")}
+                  </Div>
                   <Div className="text-sm text-gray-600">
                     {messageData.sentAt
                       ? formatDate(messageData.sentAt)
@@ -301,7 +330,9 @@ export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.El
           {/* Message Content */}
           <Card>
             <CardHeader>
-              <CardTitle>{t("app.admin.emails.imap.messages.content")}</CardTitle>
+              <CardTitle>
+                {t("app.admin.emails.imap.messages.content")}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <Div className="prose max-w-none">
@@ -312,7 +343,8 @@ export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.El
                   />
                 ) : (
                   <Div className="whitespace-pre-wrap">
-                    {messageData.bodyText || t("app.admin.emails.imap.messages.noContent")}
+                    {messageData.bodyText ||
+                      t("app.admin.emails.imap.messages.noContent")}
                   </Div>
                 )}
               </Div>
@@ -322,7 +354,9 @@ export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.El
           {/* Technical Details */}
           <Card>
             <CardHeader>
-              <CardTitle>{t("app.admin.emails.imap.messages.technicalDetails")}</CardTitle>
+              <CardTitle>
+                {t("app.admin.emails.imap.messages.technicalDetails")}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <Div className="flex flex-col gap-2">
@@ -342,7 +376,8 @@ export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.El
                       {t("app.admin.emails.imap.messages.returnPath")}:
                     </Span>
                     <Div className="text-gray-600">
-                      {messageData.headers?.["Return-Path"] || messageData.senderEmail}
+                      {messageData.headers?.["Return-Path"] ||
+                        messageData.senderEmail}
                     </Div>
                   </Div>
                 </Div>
@@ -352,7 +387,9 @@ export function ImapMessageDetail({ messageId }: ImapMessageDetailProps): JSX.El
                     {t("app.admin.emails.imap.messages.createdAt")}:
                   </Span>
                   <Span className="text-gray-600 ml-2">
-                    {messageData.createdAt ? formatDate(messageData.createdAt) : "-"}
+                    {messageData.createdAt
+                      ? formatDate(messageData.createdAt)
+                      : "-"}
                   </Span>
                 </Div>
                 <Div className="text-sm">

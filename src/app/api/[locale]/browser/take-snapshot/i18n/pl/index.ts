@@ -2,10 +2,12 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Zrób snapshot",
-  description: "Zrób tekstowy snapshot aktualnie wybranej strony na podstawie drzewa dostępności",
+  description:
+    "Zrób tekstowy snapshot aktualnie wybranej strony na podstawie drzewa dostępności",
   form: {
     label: "Zrób snapshot",
-    description: "Przechwyć tekstowy snapshot strony przeglądarki na podstawie drzewa a11y",
+    description:
+      "Przechwyć tekstowy snapshot strony przeglądarki na podstawie drzewa a11y",
     fields: {
       verbose: {
         label: "Szczegółowy",
@@ -50,7 +52,8 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description: "Wystąpił wewnętrzny błąd serwera podczas przechwytywania snapshot",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas przechwytywania snapshot",
     },
     unknown: {
       title: "Nieznany błąd",

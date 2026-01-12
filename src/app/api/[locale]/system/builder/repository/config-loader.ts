@@ -7,12 +7,21 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { BuildConfig, CopyConfig, FileToCompile, NpmPackageConfig } from "../definition";
+import type {
+  BuildConfig,
+  CopyConfig,
+  FileToCompile,
+  NpmPackageConfig,
+} from "../definition";
 import { ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";
 
@@ -112,7 +121,11 @@ export class ConfigLoader implements IConfigLoader {
     }
 
     // Use inline configuration
-    output.push(outputFormatter.formatStep(t("app.api.system.builder.messages.usingInlineConfig")));
+    output.push(
+      outputFormatter.formatStep(
+        t("app.api.system.builder.messages.usingInlineConfig"),
+      ),
+    );
     logger.info("Using inline config");
 
     return success({

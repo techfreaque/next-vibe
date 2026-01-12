@@ -4,7 +4,10 @@
  */
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
-import { type UserPermissionRoleValue, UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  type UserPermissionRoleValue,
+  UserRole,
+} from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 /**
@@ -133,7 +136,9 @@ export const DEFAULT_FOLDER_CONFIGS = {
  * @param folderId - Folder ID to check
  * @returns True if the folder is a default system folder
  */
-export function isDefaultFolderId(folderId: string): folderId is DefaultFolderId {
+export function isDefaultFolderId(
+  folderId: string,
+): folderId is DefaultFolderId {
   return Object.values(DefaultFolderId).includes(folderId as DefaultFolderId);
 }
 
@@ -142,7 +147,9 @@ export function isDefaultFolderId(folderId: string): folderId is DefaultFolderId
  * @param folderId - Default folder ID
  * @returns Default folder configuration or undefined
  */
-export function getDefaultFolderConfig(folderId: string): DefaultFolderConfig | undefined {
+export function getDefaultFolderConfig(
+  folderId: string,
+): DefaultFolderConfig | undefined {
   if (!isDefaultFolderId(folderId)) {
     return undefined;
   }

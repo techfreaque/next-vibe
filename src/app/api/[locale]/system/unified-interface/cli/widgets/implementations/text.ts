@@ -33,7 +33,9 @@ import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
  * Renders TEXT widgets with comprehensive formatting options.
  * Supports all UI config options with consistent shared logic.
  */
-export class TextWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TEXT> {
+export class TextWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.TEXT
+> {
   readonly widgetType = WidgetType.TEXT;
 
   /**
@@ -80,20 +82,43 @@ export class TextWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TEX
     const { field, value, context } = props;
     const indent = this.createIndent(context.depth, context);
     const label = this.formatLabel(field, context);
-    const { content, fieldType, variant, multiline, emphasis, maxLength, format, href } = field.ui;
+    const {
+      content,
+      fieldType,
+      variant,
+      multiline,
+      emphasis,
+      maxLength,
+      format,
+      href,
+    } = field.ui;
 
     // Handle static content from UI config
     if (content) {
       const translatedContent = context.t(content);
       const displayText = formatText(translatedContent, maxLength);
-      return this.renderFormattedText(displayText, label, indent, variant, emphasis, context);
+      return this.renderFormattedText(
+        displayText,
+        label,
+        indent,
+        variant,
+        emphasis,
+        context,
+      );
     }
 
     // Handle date formatting if fieldType is DATE or DATETIME
     const dateFormatted = formatIfDate(value, fieldType, context.locale);
     if (dateFormatted) {
       const displayText = formatText(dateFormatted, maxLength);
-      return this.renderFormattedText(displayText, label, indent, variant, emphasis, context);
+      return this.renderFormattedText(
+        displayText,
+        label,
+        indent,
+        variant,
+        emphasis,
+        context,
+      );
     }
 
     // Handle link format
@@ -105,7 +130,9 @@ export class TextWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TEX
       const styledLink = mappedColor
         ? this.styleText(displayText, mappedColor, context)
         : displayText;
-      return label ? `${indent}${label}: ${styledLink}` : `${indent}${styledLink}`;
+      return label
+        ? `${indent}${label}: ${styledLink}`
+        : `${indent}${styledLink}`;
     }
 
     // Extract data using shared logic with translation context
@@ -124,7 +151,14 @@ export class TextWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TEX
     }
 
     // Handle single-line rendering with variant and emphasis
-    return this.renderFormattedText(displayText, label, indent, variant, emphasis, context);
+    return this.renderFormattedText(
+      displayText,
+      label,
+      indent,
+      variant,
+      emphasis,
+      context,
+    );
   }
 
   /**
@@ -155,16 +189,22 @@ export class TextWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TEX
       const styledValue = mappedColor
         ? this.styleText(displayValue, mappedColor, context)
         : displayValue;
-      return label ? `${indent}${label}: ${styledValue}` : `${indent}${styledValue}`;
+      return label
+        ? `${indent}${label}: ${styledValue}`
+        : `${indent}${styledValue}`;
     }
 
     // Apply emphasis if specified
     if (emphasis) {
       const styledValue = this.styleText(displayValue, emphasis, context);
-      return label ? `${indent}${label}: ${styledValue}` : `${indent}${styledValue}`;
+      return label
+        ? `${indent}${label}: ${styledValue}`
+        : `${indent}${styledValue}`;
     }
 
-    return label ? `${indent}${label}: ${displayValue}` : `${indent}${displayValue}`;
+    return label
+      ? `${indent}${label}: ${displayValue}`
+      : `${indent}${displayValue}`;
   }
 
   /**

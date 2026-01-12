@@ -8,7 +8,11 @@ import "server-only";
 
 import { and, desc, eq, inArray } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -32,7 +36,9 @@ const UNIQUE_CONSTRAINT_ERROR = "unique constraint";
 /**
  * Format task response with DB fields
  */
-function formatTaskResponse(task: typeof cronTasks.$inferSelect): CronTaskResponseType {
+function formatTaskResponse(
+  task: typeof cronTasks.$inferSelect,
+): CronTaskResponseType {
   const formatted: CronTaskResponseType = {
     id: task.id,
     name: task.name,
@@ -165,7 +171,8 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       logger.error("Failed to retrieve cron tasks", parsedError);
 
       return fail({
-        message: "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.internal.title",
+        message:
+          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.internal.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -218,7 +225,10 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       logger.debug("Inserting task into database", taskData);
 
       // Insert the task into the database
-      const [createdTask] = await db.insert(cronTasks).values(taskData).returning();
+      const [createdTask] = await db
+        .insert(cronTasks)
+        .values(taskData)
+        .returning();
 
       if (!createdTask) {
         logger.error("Failed to create task - no task returned");

@@ -91,7 +91,8 @@ export const translations: typeof enTranslations = {
     contentFilter: "Inhalt",
     maxPrice: "Maximalpreis",
     modelSelection: "Modellauswahl",
-    autoModeDescription: "Bestes Modell wird basierend auf Ihren Filtern ausgewählt",
+    autoModeDescription:
+      "Bestes Modell wird basierend auf Ihren Filtern ausgewählt",
     manualModeDescription: "Wählen Sie ein bestimmtes Modell manuell aus",
     autoMode: "Auto",
     manualMode: "Manuell",
@@ -260,8 +261,10 @@ export const translations: typeof enTranslations = {
     capturing: "Erfassen...",
     capture: "Screenshot aufnehmen",
     failed: "Screenshot konnte nicht aufgenommen werden",
-    failedWithMessage: "Screenshot konnte nicht aufgenommen werden: {{message}}",
-    tryAgain: "Screenshot konnte nicht aufgenommen werden. Bitte versuchen Sie es erneut.",
+    failedWithMessage:
+      "Screenshot konnte nicht aufgenommen werden: {{message}}",
+    tryAgain:
+      "Screenshot konnte nicht aufgenommen werden. Bitte versuchen Sie es erneut.",
     noMessages:
       "Chat-Nachrichtenbereich konnte nicht gefunden werden. Bitte stellen Sie sicher, dass Sie Nachrichten im Chat haben.",
     quotaExceeded: "Speicherplatz überschritten. Screenshot ist zu groß.",
@@ -316,7 +319,8 @@ export const translations: typeof enTranslations = {
   },
   models: {
     descriptions: {
-      uncensoredLmV11: "Unzensiertes KI-Modell für kreative und uneingeschränkte Konversationen",
+      uncensoredLmV11:
+        "Unzensiertes KI-Modell für kreative und uneingeschränkte Konversationen",
       freedomgptLiberty:
         "FreedomGPT Liberty - Unzensiertes KI-Modell mit Fokus auf freie Meinungsäußerung und kreative Inhalte",
       gabAiArya:
@@ -327,8 +331,10 @@ export const translations: typeof enTranslations = {
         "DeepSeek V3.2 - Hochleistungs-Reasoning-Modell mit erweiterten Coding-Fähigkeiten",
       gpt52Pro:
         "GPT-5.2 Pro - Fortgeschrittenes OpenAI-Modell mit verbessertem Reasoning und Coding-Fähigkeiten",
-      gpt52: "GPT-5.2 - Hochleistungs-OpenAI-Modell für komplexe Aufgaben und Analyse",
-      gpt52_chat: "GPT-5.2 Chat - Optimiertes OpenAI-Modell für Konversationsinteraktionen",
+      gpt52:
+        "GPT-5.2 - Hochleistungs-OpenAI-Modell für komplexe Aufgaben und Analyse",
+      gpt52_chat:
+        "GPT-5.2 Chat - Optimiertes OpenAI-Modell für Konversationsinteraktionen",
       dolphin3_0_r1_mistral_24b:
         "Dolphin 3.0 R1 Mistral 24B - Unzensiertes großes Sprachmodell basierend auf Mistral",
       dolphinLlama3_70B:

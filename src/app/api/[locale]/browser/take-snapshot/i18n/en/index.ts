@@ -4,7 +4,8 @@ export const translations = {
     "Take a text snapshot of the currently selected page based on the accessibility tree",
   form: {
     label: "Take Snapshot",
-    description: "Capture a text snapshot of the browser page based on the a11y tree",
+    description:
+      "Capture a text snapshot of the browser page based on the a11y tree",
     fields: {
       verbose: {
         label: "Verbose",
@@ -49,7 +50,8 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred while capturing the snapshot",
+      description:
+        "An internal server error occurred while capturing the snapshot",
     },
     unknown: {
       title: "Unknown Error",

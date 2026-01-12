@@ -134,7 +134,9 @@ function NavigationMenuTrigger({
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   const progress = useDerivedValue(() =>
-    value === itemValue ? withTiming(1, { duration: 250 }) : withTiming(0, { duration: 200 }),
+    value === itemValue
+      ? withTiming(1, { duration: 250 })
+      : withTiming(0, { duration: 200 }),
   );
   const chevronStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${progress.value * 180}deg` }],
@@ -233,7 +235,8 @@ function NavigationMenuViewport({
     </StyledView>
   );
 }
-NavigationMenuViewport.displayName = NavigationMenuPrimitive.Viewport.displayName;
+NavigationMenuViewport.displayName =
+  NavigationMenuPrimitive.Viewport.displayName;
 
 function NavigationMenuIndicator({
   className,
@@ -258,7 +261,8 @@ function NavigationMenuIndicator({
     </NavigationMenuPrimitive.Indicator>
   );
 }
-NavigationMenuIndicator.displayName = NavigationMenuPrimitive.Indicator.displayName;
+NavigationMenuIndicator.displayName =
+  NavigationMenuPrimitive.Indicator.displayName;
 
 export {
   NavigationMenu,

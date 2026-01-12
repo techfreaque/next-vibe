@@ -23,7 +23,10 @@ interface UsersNavigationProps {
   currentPage: CurrentPageType;
 }
 
-export function UsersNavigation({ locale, currentPage }: UsersNavigationProps): JSX.Element {
+export function UsersNavigation({
+  locale,
+  currentPage,
+}: UsersNavigationProps): JSX.Element {
   const { t } = simpleT(locale);
 
   const navigationItems = [
@@ -52,7 +55,10 @@ export function UsersNavigation({ locale, currentPage }: UsersNavigationProps): 
 
   return (
     <Div className="border-b border-gray-200 dark:border-gray-700">
-      <Nav className="flex flex-row gap-8" aria-label={t("app.admin.users.tabs.overview")}>
+      <Nav
+        className="flex flex-row gap-8"
+        aria-label={t("app.admin.users.tabs.overview")}
+      >
         {navigationItems.map((item) => {
           const Icon = item.icon;
           const isActive = item.key === currentPage;

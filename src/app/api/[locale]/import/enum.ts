@@ -161,7 +161,10 @@ export const getImportDomainLabel = (
 export const isJobInProgress = (
   status: (typeof CsvImportJobStatus)[keyof typeof CsvImportJobStatus],
 ): boolean => {
-  const inProgressStatuses = [CsvImportJobStatus.PENDING, CsvImportJobStatus.PROCESSING] as const;
+  const inProgressStatuses = [
+    CsvImportJobStatus.PENDING,
+    CsvImportJobStatus.PROCESSING,
+  ] as const;
   return (inProgressStatuses as readonly string[]).includes(status);
 };
 

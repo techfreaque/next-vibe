@@ -26,7 +26,10 @@ export function PasswordStrengthWidget<const TKey extends string>({
   context,
   className,
   form,
-}: ReactWidgetProps<typeof WidgetType.PASSWORD_STRENGTH, TKey>): JSX.Element | null {
+}: ReactWidgetProps<
+  typeof WidgetType.PASSWORD_STRENGTH,
+  TKey
+>): JSX.Element | null {
   const { t } = simpleT(context.locale);
   const {
     watchField = "password",
@@ -49,7 +52,10 @@ export function PasswordStrengthWidget<const TKey extends string>({
   const containerGapClass = getSpacingClassName("gap", containerGap);
   const labelTextSizeClass = getTextSizeClassName(labelTextSize);
   const suggestionTextSizeClass = getTextSizeClassName(suggestionTextSize);
-  const suggestionMarginTopClass = getSpacingClassName("margin", suggestionMarginTop);
+  const suggestionMarginTopClass = getSpacingClassName(
+    "margin",
+    suggestionMarginTop,
+  );
   const barHeightClass = getHeightClassName(barHeight);
 
   const password = form?.watch(watchField) as string | undefined;
@@ -80,12 +86,20 @@ export function PasswordStrengthWidget<const TKey extends string>({
           ? goodTextColor
           : strongTextColor;
 
-  const labelText = t(`app.user.components.auth.common.passwordStrength.${level}`);
+  const labelText = t(
+    `app.user.components.auth.common.passwordStrength.${level}`,
+  );
 
   return (
-    <Div className={cn("flex flex-col", containerGapClass || "gap-1", className)}>
-      <Div className={cn("flex justify-between", labelTextSizeClass || "text-xs")}>
-        <Span>{t("app.user.components.auth.common.passwordStrength.label")}</Span>
+    <Div
+      className={cn("flex flex-col", containerGapClass || "gap-1", className)}
+    >
+      <Div
+        className={cn("flex justify-between", labelTextSizeClass || "text-xs")}
+      >
+        <Span>
+          {t("app.user.components.auth.common.passwordStrength.label")}
+        </Span>
         <Span className={textColorClass}>{labelText}</Span>
       </Div>
       <Div
@@ -95,7 +109,9 @@ export function PasswordStrengthWidget<const TKey extends string>({
         )}
       >
         <Div style={{ width: `${widthPercentage}%` }}>
-          <Div className={cn("h-full transition-all duration-300", colorClass)} />
+          <Div
+            className={cn("h-full transition-all duration-300", colorClass)}
+          />
         </Div>
       </Div>
       {level === "weak" && (

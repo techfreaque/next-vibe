@@ -27,7 +27,8 @@ import { UserRole } from "../../../../../user/user-roles/enum";
  */
 const { POST } = createEndpoint({
   title: "app.api.system.unifiedInterface.cli.setup.install.post.title",
-  description: "app.api.system.unifiedInterface.cli.setup.install.post.description",
+  description:
+    "app.api.system.unifiedInterface.cli.setup.install.post.description",
   icon: "download",
   category: "app.api.system.unifiedInterface.cli.setup.install.post.title",
   tags: ["app.api.system.unifiedInterface.cli.setup.install.post.title"],
@@ -63,24 +64,30 @@ const { POST } = createEndpoint({
         installed: true,
         version: "1.0.0",
         path: "/usr/local/bin/vibe",
-        message: "app.api.system.unifiedInterface.cli.setup.install.installSuccessAt",
-        output: "app.api.system.unifiedInterface.cli.setup.install.installSuccess",
+        message:
+          "app.api.system.unifiedInterface.cli.setup.install.installSuccessAt",
+        output:
+          "app.api.system.unifiedInterface.cli.setup.install.installSuccess",
       },
       force: {
         success: true,
         installed: true,
         version: "1.0.0",
         path: "/usr/local/bin/vibe",
-        message: "app.api.system.unifiedInterface.cli.setup.install.installSuccessAt",
-        output: "app.api.system.unifiedInterface.cli.setup.install.installSuccess",
+        message:
+          "app.api.system.unifiedInterface.cli.setup.install.installSuccessAt",
+        output:
+          "app.api.system.unifiedInterface.cli.setup.install.installSuccess",
       },
       verbose: {
         success: true,
         installed: true,
         version: "1.0.0",
         path: "/usr/local/bin/vibe",
-        message: "app.api.system.unifiedInterface.cli.setup.install.installSuccessAt",
-        output: "app.api.system.unifiedInterface.cli.setup.install.installSuccess",
+        message:
+          "app.api.system.unifiedInterface.cli.setup.install.installSuccessAt",
+        output:
+          "app.api.system.unifiedInterface.cli.setup.install.installSuccess",
       },
     },
   },
@@ -89,7 +96,8 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.system.unifiedInterface.cli.setup.install.post.title",
-      description: "app.api.system.unifiedInterface.cli.setup.install.post.description",
+      description:
+        "app.api.system.unifiedInterface.cli.setup.install.post.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -101,7 +109,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.unifiedInterface.cli.setup.install.post.title",
-          description: "app.api.system.unifiedInterface.cli.setup.install.post.description",
+          description:
+            "app.api.system.unifiedInterface.cli.setup.install.post.description",
           columns: 6,
         },
         z.boolean().default(false),
@@ -112,7 +121,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.unifiedInterface.cli.setup.install.post.title",
-          description: "app.api.system.unifiedInterface.cli.setup.install.post.description",
+          description:
+            "app.api.system.unifiedInterface.cli.setup.install.post.description",
           columns: 6,
         },
         z.boolean().default(false),
@@ -122,7 +132,8 @@ const { POST } = createEndpoint({
       success: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.unifiedInterface.cli.setup.install.post.success.title",
+          content:
+            "app.api.system.unifiedInterface.cli.setup.install.post.success.title",
         },
         z.boolean(),
       ),
@@ -130,7 +141,8 @@ const { POST } = createEndpoint({
       installed: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.unifiedInterface.cli.setup.install.post.title",
+          content:
+            "app.api.system.unifiedInterface.cli.setup.install.post.title",
         },
         z.boolean(),
       ),
@@ -138,7 +150,8 @@ const { POST } = createEndpoint({
       version: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.unifiedInterface.cli.setup.install.post.description",
+          content:
+            "app.api.system.unifiedInterface.cli.setup.install.post.description",
         },
         z.string().optional(),
       ),
@@ -146,7 +159,8 @@ const { POST } = createEndpoint({
       path: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.unifiedInterface.cli.setup.install.post.title",
+          content:
+            "app.api.system.unifiedInterface.cli.setup.install.post.title",
         },
         z.string().optional(),
       ),
@@ -154,7 +168,8 @@ const { POST } = createEndpoint({
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.unifiedInterface.cli.setup.install.post.title",
+          content:
+            "app.api.system.unifiedInterface.cli.setup.install.post.title",
         },
         z.string(),
       ),
@@ -162,7 +177,8 @@ const { POST } = createEndpoint({
       output: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.unifiedInterface.cli.setup.install.post.title",
+          content:
+            "app.api.system.unifiedInterface.cli.setup.install.post.title",
         },
         z.string().optional(),
       ),
@@ -172,47 +188,56 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.unifiedInterface.cli.setup.install.post.errors.validation.title",
+      title:
+        "app.api.system.unifiedInterface.cli.setup.install.post.errors.validation.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.install.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
+      title:
+        "app.api.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.unifiedInterface.cli.setup.install.post.errors.server.title",
+      title:
+        "app.api.system.unifiedInterface.cli.setup.install.post.errors.server.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.install.post.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.unifiedInterface.cli.setup.install.post.errors.network.title",
+      title:
+        "app.api.system.unifiedInterface.cli.setup.install.post.errors.network.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.install.post.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.unifiedInterface.cli.setup.install.post.errors.forbidden.title",
+      title:
+        "app.api.system.unifiedInterface.cli.setup.install.post.errors.forbidden.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.install.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.unifiedInterface.cli.setup.install.post.errors.notFound.title",
+      title:
+        "app.api.system.unifiedInterface.cli.setup.install.post.errors.notFound.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.install.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.unifiedInterface.cli.setup.install.post.errors.unknown.title",
+      title:
+        "app.api.system.unifiedInterface.cli.setup.install.post.errors.unknown.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.install.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.unifiedInterface.cli.setup.install.post.errors.conflict.title",
+      title:
+        "app.api.system.unifiedInterface.cli.setup.install.post.errors.conflict.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.install.post.errors.conflict.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.unifiedInterface.cli.setup.install.post.errors.conflict.title",
+      title:
+        "app.api.system.unifiedInterface.cli.setup.install.post.errors.conflict.title",
       description:
         "app.api.system.unifiedInterface.cli.setup.install.post.errors.conflict.description",
     },
@@ -220,8 +245,10 @@ const { POST } = createEndpoint({
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.unifiedInterface.cli.setup.install.post.success.title",
-    description: "app.api.system.unifiedInterface.cli.setup.install.post.success.description",
+    title:
+      "app.api.system.unifiedInterface.cli.setup.install.post.success.title",
+    description:
+      "app.api.system.unifiedInterface.cli.setup.install.post.success.description",
   },
 });
 

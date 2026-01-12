@@ -37,7 +37,9 @@ No memories stored yet.
     .map((memory, index) => {
       const memoryNum = memory.memoryNumber;
       const priority = memory.priority ?? 0;
-      const age = getRelativeTime(memory.createdAt ? new Date(memory.createdAt) : new Date());
+      const age = getRelativeTime(
+        memory.createdAt ? new Date(memory.createdAt) : new Date(),
+      );
       return `${index + 1}. [ID:${memoryNum} | P:${priority} | ${age}] ${memory.content}`;
     })
     .join("\n");

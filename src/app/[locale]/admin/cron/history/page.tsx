@@ -17,7 +17,9 @@ interface CronHistoryPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: CronHistoryPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: CronHistoryPageProps): Promise<Metadata> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 

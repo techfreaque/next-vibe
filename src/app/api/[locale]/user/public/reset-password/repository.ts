@@ -10,7 +10,11 @@ import { randomBytes } from "node:crypto";
 import { and, eq, gt, lt, or } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { success, ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
+import {
+  success,
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 
 import { RESET_TOKEN_EXPIRY } from "@/config/constants";
 import { env } from "@/config/env";
@@ -51,13 +55,19 @@ export class PasswordRepository {
       const results = await db
         .select()
         .from(passwordResets)
-        .where(and(eq(passwordResets.token, token), gt(passwordResets.expiresAt, now)));
+        .where(
+          and(
+            eq(passwordResets.token, token),
+            gt(passwordResets.expiresAt, now),
+          ),
+        );
 
       return success(results.length > 0 ? results[0] : null);
     } catch (error) {
       logger.error("Error finding valid reset token", parseError(error));
       return fail({
-        message: "app.api.user.public.resetPassword.errors.tokenValidationFailed",
+        message:
+          "app.api.user.public.resetPassword.errors.tokenValidationFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -89,7 +99,10 @@ export class PasswordRepository {
   /**
    * Delete a password reset by token
    */
-  static async deleteByToken(token: string, logger: EndpointLogger): Promise<ResponseType<null>> {
+  static async deleteByToken(
+    token: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<null>> {
     try {
       await db.delete(passwordResets).where(eq(passwordResets.token, token));
       return success(null);
@@ -105,7 +118,10 @@ export class PasswordRepository {
   /**
    * Delete a password reset by user ID
    */
-  static async deleteByUserId(userId: string, logger: EndpointLogger): Promise<ResponseType<null>> {
+  static async deleteByUserId(
+    userId: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<null>> {
     try {
       await db.delete(passwordResets).where(eq(passwordResets.userId, userId));
       return success(null);
@@ -121,12 +137,19 @@ export class PasswordRepository {
   /**
    * Delete expired password resets
    */
-  static async deleteExpired(logger: EndpointLogger): Promise<ResponseType<null>> {
+  static async deleteExpired(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<null>> {
     try {
       const now = new Date();
       await db
         .delete(passwordResets)
-        .where(or(eq(passwordResets.expiresAt, new Date(0)), lt(passwordResets.expiresAt, now)));
+        .where(
+          or(
+            eq(passwordResets.expiresAt, new Date(0)),
+            lt(passwordResets.expiresAt, now),
+          ),
+        );
       return success(null);
     } catch (error) {
       logger.error("Error deleting expired reset tokens", parseError(error));
@@ -156,7 +179,9 @@ export class PasswordRepository {
         .setExpirationTime(RESET_TOKEN_EXPIRY_STRING)
         .sign(SECRET_KEY);
 
-      const expiryDate = new Date(Date.now() + RESET_TOKEN_EXPIRY * 60 * 60 * 1000);
+      const expiryDate = new Date(
+        Date.now() + RESET_TOKEN_EXPIRY * 60 * 60 * 1000,
+      );
       const existingRecordResponse = await this.findByUserId(userId, logger);
 
       if (existingRecordResponse.success && existingRecordResponse.data) {
@@ -176,11 +201,15 @@ export class PasswordRepository {
 
         const validatedData = insertPasswordResetSchema.parse(resetData);
 
-        const results = await db.insert(passwordResets).values(validatedData).returning();
+        const results = await db
+          .insert(passwordResets)
+          .values(validatedData)
+          .returning();
 
         if (!results || results.length === 0) {
           return fail({
-            message: "app.api.user.public.resetPassword.errors.tokenCreationFailed",
+            message:
+              "app.api.user.public.resetPassword.errors.tokenCreationFailed",
             errorType: ErrorResponseTypes.DATABASE_ERROR,
           });
         }
@@ -207,9 +236,15 @@ export class PasswordRepository {
       const SECRET_KEY = new TextEncoder().encode(env.JWT_SECRET_KEY);
 
       try {
-        const { payload } = await jwtVerify<PasswordResetTokenPayload>(token, SECRET_KEY);
+        const { payload } = await jwtVerify<PasswordResetTokenPayload>(
+          token,
+          SECRET_KEY,
+        );
 
-        const resetRecordResponse = await this.findByUserId(payload.userId, logger);
+        const resetRecordResponse = await this.findByUserId(
+          payload.userId,
+          logger,
+        );
         if (!resetRecordResponse.success || !resetRecordResponse.data) {
           return fail({
             message: "app.api.user.public.resetPassword.errors.tokenInvalid",
@@ -219,7 +254,10 @@ export class PasswordRepository {
 
         const resetRecord = resetRecordResponse.data;
         if (resetRecord.expiresAt < new Date()) {
-          const deleteResponse = await this.deleteByUserId(payload.userId, logger);
+          const deleteResponse = await this.deleteByUserId(
+            payload.userId,
+            logger,
+          );
           if (!deleteResponse.success) {
             logger.debug("Failed to delete expired token", {
               userId: payload.userId,
@@ -246,7 +284,8 @@ export class PasswordRepository {
     } catch (error) {
       logger.error("Error verifying JWT token", parseError(error));
       return fail({
-        message: "app.api.user.public.resetPassword.errors.tokenVerificationFailed",
+        message:
+          "app.api.user.public.resetPassword.errors.tokenVerificationFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -309,7 +348,8 @@ export class PasswordRepository {
     } catch (error) {
       logger.error("Error verifying password reset token", parseError(error));
       return fail({
-        message: "app.api.user.public.resetPassword.errors.tokenVerificationFailed",
+        message:
+          "app.api.user.public.resetPassword.errors.tokenVerificationFailed",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -333,7 +373,8 @@ export class PasswordRepository {
     return success({
       response: {
         valid: true,
-        message: "app.api.user.public.resetPassword.validate.response.validationMessage",
+        message:
+          "app.api.user.public.resetPassword.validate.response.validationMessage",
         userId: verifyResult.data,
         expiresAt: undefined,
         nextSteps: [
@@ -355,7 +396,8 @@ export class PasswordRepository {
     return success({
       response: {
         success: true,
-        message: "app.api.user.public.resetPassword.request.response.success.message",
+        message:
+          "app.api.user.public.resetPassword.request.response.success.message",
         nextSteps: [
           "app.api.user.public.resetPassword.request.response.nextSteps.checkEmail",
           "app.api.user.public.resetPassword.request.response.nextSteps.clickLink",
@@ -383,11 +425,16 @@ export class PasswordRepository {
 
       const userId = verifyResponse.data;
 
-      const updatedUser = await PasswordUpdateRepository.setPassword(userId, newPassword, logger);
+      const updatedUser = await PasswordUpdateRepository.setPassword(
+        userId,
+        newPassword,
+        logger,
+      );
 
       if (!updatedUser) {
         return fail({
-          message: "app.api.user.public.resetPassword.errors.passwordUpdateFailed",
+          message:
+            "app.api.user.public.resetPassword.errors.passwordUpdateFailed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }

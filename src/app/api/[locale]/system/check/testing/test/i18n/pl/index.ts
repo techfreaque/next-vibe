@@ -44,7 +44,8 @@ export const translations: typeof enTranslations = {
     },
     internal: {
       title: "Błąd wewnętrzny",
-      description: "Wykonanie testów nie powiodło się z powodu błędu wewnętrznego",
+      description:
+        "Wykonanie testów nie powiodło się z powodu błędu wewnętrznego",
     },
     unauthorized: {
       title: "Brak autoryzacji",

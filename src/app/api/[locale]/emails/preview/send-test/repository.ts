@@ -6,7 +6,11 @@
 import "server-only";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { EmailSendingRepository } from "@/app/api/[locale]/emails/smtp-client/email-sending/repository";
@@ -74,7 +78,10 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
       }
 
       // Construct locale from language + country
-      const locale = getLocaleFromLanguageAndCountry(data.language, data.country);
+      const locale = getLocaleFromLanguageAndCountry(
+        data.language,
+        data.country,
+      );
 
       // Get translation function
       const { t } = simpleT(locale);
@@ -109,7 +116,8 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
 
       // Get subject
       const subjectRaw = template.meta.defaultSubject;
-      const subject = typeof subjectRaw === "function" ? subjectRaw(t) : subjectRaw;
+      const subject =
+        typeof subjectRaw === "function" ? subjectRaw(t) : subjectRaw;
 
       // Send email using existing email sending infrastructure
       const sendResult = await EmailSendingRepository.sendEmail(
@@ -172,4 +180,5 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
   }
 }
 
-export const emailPreviewSendTestRepository = new EmailPreviewSendTestRepositoryImpl();
+export const emailPreviewSendTestRepository =
+  new EmailPreviewSendTestRepositoryImpl();

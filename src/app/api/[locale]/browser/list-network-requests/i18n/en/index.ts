@@ -1,13 +1,15 @@
 export const translations = {
   title: "List Network Requests",
-  description: "List all requests for the currently selected page since the last navigation",
+  description:
+    "List all requests for the currently selected page since the last navigation",
   form: {
     label: "List Network Requests",
     description: "Get all network requests from the browser page",
     fields: {
       includePreservedRequests: {
         label: "Include Preserved Requests",
-        description: "Set to true to return the preserved requests over the last 3 navigations",
+        description:
+          "Set to true to return the preserved requests over the last 3 navigations",
         placeholder: "false",
       },
       pageIdx: {
@@ -17,7 +19,8 @@ export const translations = {
       },
       pageSize: {
         label: "Page Size",
-        description: "Maximum number of requests to return (omit to return all requests)",
+        description:
+          "Maximum number of requests to return (omit to return all requests)",
         placeholder: "Enter page size",
       },
       resourceTypes: {
@@ -89,7 +92,8 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred while listing network requests",
+      description:
+        "An internal server error occurred while listing network requests",
     },
     unknown: {
       title: "Unknown Error",

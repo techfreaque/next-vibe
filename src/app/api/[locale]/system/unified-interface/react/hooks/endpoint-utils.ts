@@ -10,14 +10,18 @@ import { clearFormsAfterSuccessInDev } from "@/config/debug";
 import { envClient } from "@/config/env-client";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint";
-import type { AutoPrefillConfig, FormDataPriority, FormDataSources } from "./endpoint-types";
+import type {
+  AutoPrefillConfig,
+  FormDataPriority,
+  FormDataSources,
+} from "./endpoint-types";
 
 /**
  * Utility to detect available HTTP methods from endpoints object
  */
-export function useAvailableMethods<T extends Partial<Record<Methods, CreateApiEndpointAny>>>(
-  endpoints: T,
-): Methods[] {
+export function useAvailableMethods<
+  T extends Partial<Record<Methods, CreateApiEndpointAny>>,
+>(endpoints: T): Methods[] {
   return useMemo(() => {
     return Object.keys(endpoints).filter((method) =>
       ALL_METHODS.includes(method as Methods),
@@ -28,7 +32,9 @@ export function useAvailableMethods<T extends Partial<Record<Methods, CreateApiE
 /**
  * Utility to determine primary mutation method (prefer POST, then PUT, then PATCH, then DELETE)
  */
-export function usePrimaryMutationMethod(availableMethods: Methods[]): Methods | null {
+export function usePrimaryMutationMethod(
+  availableMethods: Methods[],
+): Methods | null {
   return useMemo(() => {
     if (availableMethods.includes(Methods.POST)) {
       return Methods.POST;

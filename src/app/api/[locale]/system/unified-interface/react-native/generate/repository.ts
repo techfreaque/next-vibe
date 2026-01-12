@@ -10,7 +10,11 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { findFilesByName } from "@/app/api/[locale]/system/unified-interface/shared/utils/scanner";
@@ -112,7 +116,8 @@ class GenerateExpoIndexesRepositoryImpl implements GenerateExpoIndexesRepository
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message: "app.api.system.unifiedInterface.reactNative.generate.post.errors.server.title",
+        message:
+          "app.api.system.unifiedInterface.reactNative.generate.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,
@@ -147,7 +152,10 @@ class GenerateExpoIndexesRepositoryImpl implements GenerateExpoIndexesRepository
   /**
    * Generate the content for a page index.tsx file
    */
-  private generatePageIndex(relativePath: string, componentType: "page" | "layout"): string {
+  private generatePageIndex(
+    relativePath: string,
+    componentType: "page" | "layout",
+  ): string {
     // Use absolute @/ import path
     const importPath = `@/app/[locale]${relativePath ? `/${relativePath}` : ""}/${componentType}`;
 
@@ -262,7 +270,10 @@ export default createLayoutWrapperWithImport(() => import("${importPath}"));
         this.ensureDir(dirname(targetPath));
 
         // Generate content
-        const content = this.generatePageIndex(relativePath === "." ? "" : relativePath, "page");
+        const content = this.generatePageIndex(
+          relativePath === "." ? "" : relativePath,
+          "page",
+        );
 
         // Write file
         writeFileSync(targetPath, content, "utf-8");
@@ -277,7 +288,11 @@ export default createLayoutWrapperWithImport(() => import("${importPath}"));
     // Process layouts - always generate _layout.tsx
     for (const layoutFile of layoutFiles) {
       const relativePath = dirname(layoutFile);
-      const layoutTargetPath = join(this.TARGET_DIR, relativePath, "_layout.tsx");
+      const layoutTargetPath = join(
+        this.TARGET_DIR,
+        relativePath,
+        "_layout.tsx",
+      );
 
       try {
         // Check for custom directive in _layout.tsx file
@@ -290,7 +305,10 @@ export default createLayoutWrapperWithImport(() => import("${importPath}"));
         this.ensureDir(dirname(layoutTargetPath));
 
         // Generate content for layout
-        const content = this.generatePageIndex(relativePath === "." ? "" : relativePath, "layout");
+        const content = this.generatePageIndex(
+          relativePath === "." ? "" : relativePath,
+          "layout",
+        );
 
         // Write _layout.tsx file
         writeFileSync(layoutTargetPath, content, "utf-8");
@@ -309,4 +327,5 @@ export default createLayoutWrapperWithImport(() => import("${importPath}"));
 /**
  * Default repository instance
  */
-export const generateExpoIndexesRepository = new GenerateExpoIndexesRepositoryImpl();
+export const generateExpoIndexesRepository =
+  new GenerateExpoIndexesRepositoryImpl();

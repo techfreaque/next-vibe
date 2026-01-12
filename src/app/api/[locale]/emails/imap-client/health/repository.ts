@@ -7,7 +7,11 @@ import "server-only";
 
 import { and, count, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -64,7 +68,8 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
 
       if (!accountsResponse.success) {
         return fail({
-          message: "app.api.emails.imapClient.health.health.get.errors.server.title",
+          message:
+            "app.api.emails.imapClient.health.health.get.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: accountsResponse.message },
           cause: accountsResponse,
@@ -106,7 +111,8 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
       const parsedError = parseError(error);
       logger.error("Error getting IMAP health status", parsedError);
       return fail({
-        message: "app.api.emails.imapClient.health.health.get.errors.server.title",
+        message:
+          "app.api.emails.imapClient.health.health.get.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -128,7 +134,9 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
     }
 
     const connectedAccounts = accounts.filter((account) => account.isConnected);
-    const errorAccounts = accounts.filter((account) => account.syncStatus === ImapSyncStatus.ERROR);
+    const errorAccounts = accounts.filter(
+      (account) => account.syncStatus === ImapSyncStatus.ERROR,
+    );
 
     if (errorAccounts.length > accounts.length * 0.5) {
       return ImapHealthStatus.ERROR;
@@ -154,7 +162,12 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
       const [{ count: activeCount }] = await db
         .select({ count: count() })
         .from(imapAccounts)
-        .where(and(eq(imapAccounts.enabled, true), eq(imapAccounts.isConnected, true)));
+        .where(
+          and(
+            eq(imapAccounts.enabled, true),
+            eq(imapAccounts.isConnected, true),
+          ),
+        );
 
       return activeCount;
     } catch {
@@ -166,7 +179,9 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
   /**
    * Get last sync time from accounts
    */
-  private getLastSyncTime(accounts: Array<{ lastSyncAt: string | null }>): string | null {
+  private getLastSyncTime(
+    accounts: Array<{ lastSyncAt: string | null }>,
+  ): string | null {
     const syncTimes = accounts
       .map((account) => account.lastSyncAt)
       .filter((time): time is string => time !== null)

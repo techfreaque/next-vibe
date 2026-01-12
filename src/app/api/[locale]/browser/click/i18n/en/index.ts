@@ -12,7 +12,8 @@ export const translations = {
     fields: {
       uid: {
         label: "Element UID",
-        description: "The uid of an element on the page from the page content snapshot",
+        description:
+          "The uid of an element on the page from the page content snapshot",
         placeholder: "Enter element UID",
       },
       dblClick: {
@@ -52,7 +53,8 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred during the click operation",
+      description:
+        "An internal server error occurred during the click operation",
     },
     unknown: {
       title: "Unknown Error",

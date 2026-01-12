@@ -3,7 +3,11 @@
 import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "next-vibe-ui/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "next-vibe-ui/ui/collapsible";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
@@ -40,7 +44,9 @@ export function CodeQualityListWidget<const TKey extends string>({
   if (!data) {
     return (
       <Div className={cn("text-muted-foreground italic", className)}>
-        {t("app.api.system.unifiedInterface.react.widgets.codeQualityList.noData")}
+        {t(
+          "app.api.system.unifiedInterface.react.widgets.codeQualityList.noData",
+        )}
       </Div>
     );
   }
@@ -98,16 +104,23 @@ export function CodeQualityListWidget<const TKey extends string>({
                   )}
                 </Div>
               </Div>
-              <Badge variant={getSeverityVariant(item.severity)}>{item.severity}</Badge>
+              <Badge variant={getSeverityVariant(item.severity)}>
+                {item.severity}
+              </Badge>
             </Div>
 
-            <Div className="text-sm text-gray-700 dark:text-gray-300">{item.message}</Div>
+            <Div className="text-sm text-gray-700 dark:text-gray-300">
+              {item.message}
+            </Div>
 
             {item.rule && (
               <Div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                {t("app.api.system.unifiedInterface.react.widgets.codeQualityList.rule", {
-                  rule: item.rule,
-                })}
+                {t(
+                  "app.api.system.unifiedInterface.react.widgets.codeQualityList.rule",
+                  {
+                    rule: item.rule,
+                  },
+                )}
               </Div>
             )}
           </Div>
@@ -129,7 +142,9 @@ export function CodeQualityListWidget<const TKey extends string>({
           {severityCounts.warning > 0 && (
             <Badge variant="default">{severityCounts.warning} warnings</Badge>
           )}
-          {severityCounts.info > 0 && <Badge variant="secondary">{severityCounts.info} info</Badge>}
+          {severityCounts.info > 0 && (
+            <Badge variant="secondary">{severityCounts.info} info</Badge>
+          )}
         </Div>
       )}
 
@@ -138,7 +153,11 @@ export function CodeQualityListWidget<const TKey extends string>({
         const groupSeverityCounts = countCodeQualityBySeverity(groupItems);
 
         return (
-          <Collapsible key={groupKey} open={isExpanded} onOpenChange={() => toggleGroup(groupKey)}>
+          <Collapsible
+            key={groupKey}
+            open={isExpanded}
+            onOpenChange={() => toggleGroup(groupKey)}
+          >
             <Div className="rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
               <CollapsibleTrigger asChild>
                 <Button
@@ -151,13 +170,19 @@ export function CodeQualityListWidget<const TKey extends string>({
                     </Span>
                     <Div className="flex gap-2">
                       {groupSeverityCounts.error > 0 && (
-                        <Badge variant="destructive">{groupSeverityCounts.error}</Badge>
+                        <Badge variant="destructive">
+                          {groupSeverityCounts.error}
+                        </Badge>
                       )}
                       {groupSeverityCounts.warning > 0 && (
-                        <Badge variant="default">{groupSeverityCounts.warning}</Badge>
+                        <Badge variant="default">
+                          {groupSeverityCounts.warning}
+                        </Badge>
                       )}
                       {groupSeverityCounts.info > 0 && (
-                        <Badge variant="secondary">{groupSeverityCounts.info}</Badge>
+                        <Badge variant="secondary">
+                          {groupSeverityCounts.info}
+                        </Badge>
                       )}
                     </Div>
                   </Div>
@@ -173,7 +198,10 @@ export function CodeQualityListWidget<const TKey extends string>({
               <CollapsibleContent>
                 <Div className="divide-y divide-gray-200 dark:divide-gray-700">
                   {groupItems.map((item: CodeQualityItem, index: number) => (
-                    <Div key={index} className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-750">
+                    <Div
+                      key={index}
+                      className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-750"
+                    >
                       <Div className="mb-2 flex items-start justify-between gap-3">
                         <Div className="flex-1">
                           <Div className="font-mono text-sm text-gray-900 dark:text-gray-100">
@@ -186,16 +214,23 @@ export function CodeQualityListWidget<const TKey extends string>({
                             )}
                           </Div>
                         </Div>
-                        <Badge variant={getSeverityVariant(item.severity)}>{item.severity}</Badge>
+                        <Badge variant={getSeverityVariant(item.severity)}>
+                          {item.severity}
+                        </Badge>
                       </Div>
 
-                      <Div className="text-sm text-gray-700 dark:text-gray-300">{item.message}</Div>
+                      <Div className="text-sm text-gray-700 dark:text-gray-300">
+                        {item.message}
+                      </Div>
 
                       {item.rule && groupBy !== "rule" && (
                         <Div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                          {t("app.api.system.unifiedInterface.react.widgets.codeQualityList.rule", {
-                            rule: item.rule,
-                          })}
+                          {t(
+                            "app.api.system.unifiedInterface.react.widgets.codeQualityList.rule",
+                            {
+                              rule: item.rule,
+                            },
+                          )}
                         </Div>
                       )}
                     </Div>

@@ -32,7 +32,9 @@ export function SubscriptionHeader({
       {!isAuthenticated && (
         <Div className="flex gap-2">
           <Button variant="ghost" asChild className="hidden sm:inline-flex">
-            <Link href={`/${locale}/user/login`}>{t("app.story._components.nav.user.login")}</Link>
+            <Link href={`/${locale}/user/login`}>
+              {t("app.story._components.nav.user.login")}
+            </Link>
           </Button>
           <Button
             asChild

@@ -7,7 +7,14 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import { BarChart3, List, Mail, Settings, TestTube, Upload } from "next-vibe-ui/ui/icons";
+import {
+  BarChart3,
+  List,
+  Mail,
+  Settings,
+  TestTube,
+  Upload,
+} from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { Nav } from "next-vibe-ui/ui/nav";
 import { Span } from "next-vibe-ui/ui/span";
@@ -23,7 +30,10 @@ interface LeadsNavigationProps {
   currentPage: CurrentPageType;
 }
 
-export function LeadsNavigation({ locale, currentPage }: LeadsNavigationProps): JSX.Element {
+export function LeadsNavigation({
+  locale,
+  currentPage,
+}: LeadsNavigationProps): JSX.Element {
   const { t } = simpleT(locale);
 
   const navigationItems = [
@@ -60,7 +70,9 @@ export function LeadsNavigation({ locale, currentPage }: LeadsNavigationProps): 
       href: `/${locale}/admin/leads/campaign-starter` as const,
       icon: Settings,
       label: t("app.admin.leads.leads.admin.tabs.campaignStarter"),
-      description: t("app.admin.leads.leads.admin.tabs.campaignStarter_description"),
+      description: t(
+        "app.admin.leads.leads.admin.tabs.campaignStarter_description",
+      ),
     },
     {
       key: CurrentPageType.import,

@@ -47,9 +47,13 @@ export function defineEnvClient<T extends Fields>(
   const schemaShape = Object.fromEntries(
     Object.entries(fields).map(([key, def]) => [key, def.schema]),
   );
-  const schema = zod.object(schemaShape) as z.ZodObject<{ [K in keyof T]: T[K]["schema"] }>;
+  const schema = zod.object(schemaShape) as z.ZodObject<{
+    [K in keyof T]: T[K]["schema"];
+  }>;
 
-  const values = Object.fromEntries(Object.entries(fields).map(([key, def]) => [key, def.value]));
+  const values = Object.fromEntries(
+    Object.entries(fields).map(([key, def]) => [key, def.value]),
+  );
 
   const envClient = schema.parse(values) as InferEnv<T>;
 

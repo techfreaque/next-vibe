@@ -10,7 +10,12 @@ import type { SummaryProps } from "@/packages/next-vibe-ui/web/ui/summary";
 import { convertCSSToTextStyle } from "../utils/style-converter";
 import { DetailsContext } from "./details";
 
-export function Summary({ className, style, children, id }: SummaryProps): JSX.Element {
+export function Summary({
+  className,
+  style,
+  children,
+  id,
+}: SummaryProps): JSX.Element {
   const { toggle } = React.useContext(DetailsContext);
   const nativeStyle = style ? convertCSSToTextStyle(style) : undefined;
 

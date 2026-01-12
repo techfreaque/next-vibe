@@ -12,7 +12,10 @@ import type { ReactWidgetProps } from "../../../shared/widgets/types";
  * Get vertical margin class (mt-* or mb-*) for separator spacing
  * Uses full string literals for Tailwind JIT compilation
  */
-function getVerticalMarginClass(size: string | undefined, position: "top" | "bottom"): string {
+function getVerticalMarginClass(
+  size: string | undefined,
+  position: "top" | "bottom",
+): string {
   if (!size) {
     return "";
   }
@@ -85,11 +88,20 @@ export function SeparatorWidget<const TKey extends string>({
 
   if (translatedLabel) {
     return (
-      <Div className={cn("relative flex items-center", topSpacing, bottomSpacing, className)}>
+      <Div
+        className={cn(
+          "relative flex items-center",
+          topSpacing,
+          bottomSpacing,
+          className,
+        )}
+      >
         <Div className="flex-grow">
           <Separator />
         </Div>
-        <Div className="px-4 text-xs text-muted-foreground">{translatedLabel}</Div>
+        <Div className="px-4 text-xs text-muted-foreground">
+          {translatedLabel}
+        </Div>
         <Div className="flex-grow">
           <Separator />
         </Div>

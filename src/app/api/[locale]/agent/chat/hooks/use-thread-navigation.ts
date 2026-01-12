@@ -6,7 +6,10 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { useCallback } from "react";
 
-import { DefaultFolderId, isDefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  isDefaultFolderId,
+} from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -18,7 +21,10 @@ interface UseThreadNavigationProps {
   currentSubFolderId: string | null;
   folders: Record<string, ChatFolder>;
   navigateToThread: (threadId: string) => void;
-  navigateToNewThread: (rootFolderId: DefaultFolderId, subFolderId: string | null) => void;
+  navigateToNewThread: (
+    rootFolderId: DefaultFolderId,
+    subFolderId: string | null,
+  ) => void;
   deleteThread: (threadId: string) => Promise<void>;
   activeThreadId: string | null;
   logger: EndpointLogger;
@@ -87,7 +93,10 @@ export function useThreadNavigation({
   // Handle thread deletion
   const handleDeleteThread = useCallback(
     async (threadId: string): Promise<void> => {
-      logger.debug("Chat: Handling thread deletion", { threadId, activeThreadId });
+      logger.debug("Chat: Handling thread deletion", {
+        threadId,
+        activeThreadId,
+      });
 
       // Delete the thread
       await deleteThread(threadId);

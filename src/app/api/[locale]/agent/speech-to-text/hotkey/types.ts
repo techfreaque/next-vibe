@@ -134,7 +134,9 @@ export interface DependencyChecker {
    * @param dependencies - Map of command to friendly name
    * @returns Map of command to availability status
    */
-  checkMultiple(dependencies: Record<string, string>): Promise<Record<string, boolean>>;
+  checkMultiple(
+    dependencies: Record<string, string>,
+  ): Promise<Record<string, boolean>>;
 }
 
 /**
@@ -403,7 +405,11 @@ export class SessionError extends Error {
 /**
  * Utility type for async generator
  */
-export type AsyncEventGenerator = AsyncGenerator<SpeechHotkeyEvent, void, undefined>;
+export type AsyncEventGenerator = AsyncGenerator<
+  SpeechHotkeyEvent,
+  void,
+  undefined
+>;
 
 /**
  * Command execution result

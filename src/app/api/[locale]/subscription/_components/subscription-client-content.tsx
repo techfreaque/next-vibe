@@ -11,7 +11,10 @@ import { useEffect, useState } from "react";
 
 import type { CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
 import type { CreditBalance } from "@/app/api/[locale]/credits/repository";
-import { ProductIds, productsRepository } from "@/app/api/[locale]/products/repository-client";
+import {
+  ProductIds,
+  productsRepository,
+} from "@/app/api/[locale]/products/repository-client";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
@@ -72,17 +75,25 @@ export function SubscriptionClientContent({
       if (payment === "success") {
         setAlertType("success");
         if (type === "subscription") {
-          setAlertMessage(t("app.subscription.subscription.payment.success.subscription"));
+          setAlertMessage(
+            t("app.subscription.subscription.payment.success.subscription"),
+          );
         } else if (type === "credits") {
-          setAlertMessage(t("app.subscription.subscription.payment.success.credits"));
+          setAlertMessage(
+            t("app.subscription.subscription.payment.success.credits"),
+          );
         }
         setShowAlert(true);
       } else if (payment === "canceled") {
         setAlertType("error");
         if (type === "subscription") {
-          setAlertMessage(t("app.subscription.subscription.payment.canceled.subscription"));
+          setAlertMessage(
+            t("app.subscription.subscription.payment.canceled.subscription"),
+          );
         } else if (type === "credits") {
-          setAlertMessage(t("app.subscription.subscription.payment.canceled.credits"));
+          setAlertMessage(
+            t("app.subscription.subscription.payment.canceled.credits"),
+          );
         }
         setShowAlert(true);
       }
@@ -130,11 +141,18 @@ export function SubscriptionClientContent({
 
       {/* Subscription Status Card */}
       {initialSubscription && (
-        <SubscriptionStatusCard locale={locale} initialSubscription={initialSubscription} />
+        <SubscriptionStatusCard
+          locale={locale}
+          initialSubscription={initialSubscription}
+        />
       )}
 
       {/* Tabs Section */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col gap-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="flex flex-col gap-6"
+      >
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
@@ -179,7 +197,11 @@ export function SubscriptionClientContent({
 
         {/* Usage History Tab */}
         <TabsContent value="history" className="flex flex-col gap-6">
-          <HistoryTab locale={locale} initialData={initialHistory} user={user} />
+          <HistoryTab
+            locale={locale}
+            initialData={initialHistory}
+            user={user}
+          />
         </TabsContent>
       </Tabs>
     </Container>

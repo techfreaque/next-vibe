@@ -46,21 +46,30 @@ export default async function SharedTokenPage({
     return (
       <Div className="flex items-center justify-center min-h-screen p-4">
         <Div className="max-w-md text-center">
-          <P className="text-lg font-semibold mb-2">{t("app.shared.error.title")}</P>
-          <P className="text-sm text-muted-foreground">{t("app.shared.error.userError")}</P>
+          <P className="text-lg font-semibold mb-2">
+            {t("app.shared.error.title")}
+          </P>
+          <P className="text-sm text-muted-foreground">
+            {t("app.shared.error.userError")}
+          </P>
         </Div>
       </Div>
     );
   }
 
   // Get share link by token
-  const shareLinkResponse = await ShareLinksRepository.getByToken(token, logger);
+  const shareLinkResponse = await ShareLinksRepository.getByToken(
+    token,
+    logger,
+  );
 
   if (!shareLinkResponse.success || !shareLinkResponse.data) {
     return (
       <Div className="flex items-center justify-center min-h-screen p-4">
         <Div className="max-w-md text-center">
-          <P className="text-lg font-semibold mb-2">{t("app.shared.error.title")}</P>
+          <P className="text-lg font-semibold mb-2">
+            {t("app.shared.error.title")}
+          </P>
           <P className="text-sm text-muted-foreground">
             {shareLinkResponse.message || t("app.shared.error.invalidToken")}
           </P>

@@ -29,7 +29,10 @@ function Progress({
 }: ProgressRootProps): React.JSX.Element {
   return (
     <StyledProgressRoot
-      className={cn("relative h-4 w-full overflow-hidden rounded-full bg-secondary", className)}
+      className={cn(
+        "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
+        className,
+      )}
       value={value ?? undefined}
       max={max}
       getValueLabel={getValueLabel}
@@ -57,7 +60,11 @@ function ProgressIndicator({
   });
 
   return (
-    <StyledProgressIndicator asChild className={cn("h-full bg-foreground", className)} {...props}>
+    <StyledProgressIndicator
+      asChild
+      className={cn("h-full bg-foreground", className)}
+      {...props}
+    >
       <Animated.View style={indicator} />
     </StyledProgressIndicator>
   );

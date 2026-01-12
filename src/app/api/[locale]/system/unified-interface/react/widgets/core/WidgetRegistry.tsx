@@ -26,7 +26,9 @@ export type WidgetComponent = FC<WidgetComponentProps<string>>;
  */
 type RegisterableComponent<T extends WidgetType> =
   | FC<WidgetComponentProps<string>>
-  | (<const TKey extends string>(props: ReactWidgetProps<T, TKey, FieldValues>) => JSX.Element)
+  | (<const TKey extends string>(
+      props: ReactWidgetProps<T, TKey, FieldValues>,
+    ) => JSX.Element)
   | FC<ValueOnlyReactWidgetProps<T>>;
 
 /**
@@ -48,7 +50,10 @@ export class WidgetRegistry {
    * Register a widget component
    * Accepts various widget prop types and stores as WidgetComponent
    */
-  register<T extends WidgetType>(type: T, component: RegisterableComponent<T>): void {
+  register<T extends WidgetType>(
+    type: T,
+    component: RegisterableComponent<T>,
+  ): void {
     // Safe cast: widgets are stored generically but called with correct props at runtime
     this.widgets.set(type, component as WidgetComponent);
   }

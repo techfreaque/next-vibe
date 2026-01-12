@@ -36,19 +36,27 @@ export abstract class BaseTyper implements Typer {
     const hasDepends = await this.checkDependencies();
     if (!hasDepends) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Typer dependency error
-      throw new TyperError("Required dependencies not available", "MISSING_DEPENDENCIES", {
-        backend: this._backend,
-      });
+      throw new TyperError(
+        "Required dependencies not available",
+        "MISSING_DEPENDENCIES",
+        {
+          backend: this._backend,
+        },
+      );
     }
 
     try {
       await this.insertTextImpl(text);
     } catch (error) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Typer execution error
-      throw new TyperError(`Failed to insert text: ${String(error)}`, "INSERT_FAILED", {
-        text,
-        error: error instanceof Error ? error.message : String(error),
-      });
+      throw new TyperError(
+        `Failed to insert text: ${String(error)}`,
+        "INSERT_FAILED",
+        {
+          text,
+          error: error instanceof Error ? error.message : String(error),
+        },
+      );
     }
   }
 

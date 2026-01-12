@@ -222,7 +222,8 @@ export const translations: typeof enTranslations = {
           },
           insights: {
             title: "Für immer kostenlos",
-            description: "{{freeCredits}} Credits monatlich, alle Modelle, alle Ordnertypen",
+            description:
+              "{{freeCredits}} Credits monatlich, alle Modelle, alle Ordnertypen",
           },
         },
         contentCreation: {
@@ -304,7 +305,8 @@ export const translations: typeof enTranslations = {
       },
       contact: {
         title: "Kontaktieren Sie uns",
-        description: "Haben Sie Fragen oder Feedback? Wir würden gerne von Ihnen hören.",
+        description:
+          "Haben Sie Fragen oder Feedback? Wir würden gerne von Ihnen hören.",
         cta: "Kontaktieren Sie uns",
       },
     },
@@ -315,13 +317,15 @@ export const translations: typeof enTranslations = {
           "Werden Sie Teil unseres Teams und helfen Sie, die Zukunft der unzensierten KI zu gestalten",
         category: "Karriere",
         imageAlt: "Karriere bei {{appName}}",
-        keywords: "karriere, jobs, KI-Jobs, remote-arbeit, {{appName}} karriere",
+        keywords:
+          "karriere, jobs, KI-Jobs, remote-arbeit, {{appName}} karriere",
       },
       title: "Werden Sie Teil unseres Teams",
       description:
         "Helfen Sie uns, die Zukunft des unzensierten KI-Chats zu gestalten. Wir suchen leidenschaftliche Menschen, die an Meinungsfreiheit und Datenschutz glauben.",
       joinTeam: "Werden Sie Teil unseres Teams",
-      subtitle: "Seien Sie Teil einer Mission, KI ehrlich, zugänglich und unzensiert zu machen.",
+      subtitle:
+        "Seien Sie Teil einer Mission, KI ehrlich, zugänglich und unzensiert zu machen.",
       whyWorkWithUs: "Warum bei uns arbeiten",
       workplaceDescription:
         "Wir sind ein Remote-First-Unternehmen, das Autonomie, Kreativität und Wirkung schätzt. Werden Sie Teil eines Teams, das verändert, wie Menschen mit KI interagieren.",
@@ -337,7 +341,8 @@ export const translations: typeof enTranslations = {
         balanceDesc:
           "Flexible Arbeitszeiten, Remote-Arbeit und unbegrenzter Urlaub. Wir vertrauen darauf, dass Sie großartige Arbeit leisten.",
         compensationTitle: "Wettbewerbsfähige Vergütung",
-        compensationDesc: "Branchenführendes Gehalt, Eigenkapital und Leistungspaket.",
+        compensationDesc:
+          "Branchenführendes Gehalt, Eigenkapital und Leistungspaket.",
         innovationTitle: "Innovation & Wirkung",
         innovationDesc:
           "Arbeiten Sie an modernster KI-Technologie, die einen echten Unterschied macht.",
@@ -362,7 +367,8 @@ export const translations: typeof enTranslations = {
             item1: "Neue KI-Modelle integrieren und optimieren",
             item2: "Plattformleistung und Skalierbarkeit verbessern",
             item3: "Neue Funktionen und Fähigkeiten entwickeln",
-            item4: "Mit dem Team an technischen Entscheidungen zusammenarbeiten",
+            item4:
+              "Mit dem Team an technischen Entscheidungen zusammenarbeiten",
             item5: "Bestehende Codebasis warten und verbessern",
           },
           requirements: {
@@ -457,7 +463,8 @@ export const translations: typeof enTranslations = {
         "Wir haben die Mission, den Zugang zu unzensierter KI zu demokratisieren. Gegründet im Jahr {{foundedYear}}, bietet {{appName}} eine Plattform, auf der Benutzer ehrliche, ungefilterte Gespräche mit den fortschrittlichsten KI-Modellen der Welt führen können.",
       values: {
         title: "Unsere Werte",
-        description: "Die Prinzipien, die alles leiten, was wir bei {{appName}} tun",
+        description:
+          "Die Prinzipien, die alles leiten, was wir bei {{appName}} tun",
         excellence: {
           title: "Exzellenz",
           description:
@@ -502,7 +509,8 @@ export const translations: typeof enTranslations = {
       },
       contact: {
         title: "Kontaktieren Sie uns",
-        description: "Haben Sie Fragen oder Feedback? Wir würden gerne von Ihnen hören.",
+        description:
+          "Haben Sie Fragen oder Feedback? Wir würden gerne von Ihnen hören.",
         cta: "Kontaktieren Sie uns",
       },
     },
@@ -516,7 +524,8 @@ export const translations: typeof enTranslations = {
       sections: {
         partnerships: {
           title: "Partnerschaften & Zugehörigkeiten",
-          description: "Informationen über unsere Geschäftspartnerschaften und Zugehörigkeiten.",
+          description:
+            "Informationen über unsere Geschäftspartnerschaften und Zugehörigkeiten.",
           content:
             "{{appName}} unterhält Partnerschaften mit führenden KI-Anbietern, um unseren Nutzern den bestmöglichen Service zu bieten.",
         },
@@ -532,7 +541,8 @@ export const translations: typeof enTranslations = {
         },
         contactInfo: {
           title: "Kontaktinformationen",
-          description: "So erreichen Sie uns für rechtliche und geschäftliche Anfragen.",
+          description:
+            "So erreichen Sie uns für rechtliche und geschäftliche Anfragen.",
           communication: {
             phone: "{{config.group.contact.phone}}",
           },
@@ -557,7 +567,8 @@ export const translations: typeof enTranslations = {
         },
         disputeResolution: {
           title: "Streitbeilegung",
-          description: "Informationen darüber, wie Streitigkeiten behandelt und gelöst werden.",
+          description:
+            "Informationen darüber, wie Streitigkeiten behandelt und gelöst werden.",
           content:
             "Alle Streitigkeiten, die sich aus der Nutzung dieser Website ergeben, werden gemäß geltendem Recht beigelegt.",
         },
@@ -602,7 +613,8 @@ export const translations: typeof enTranslations = {
             service: "Zugang zu KI-Modellen und Funktionen bereitstellen",
             support: "Kundensupport bereitstellen",
             billing: "Zahlungen verarbeiten und Abonnements verwalten",
-            improve: "Unsere Plattform verbessern und neue Funktionen entwickeln",
+            improve:
+              "Unsere Plattform verbessern und neue Funktionen entwickeln",
             security: "Sicherheit aufrechterhalten und Betrug verhindern",
             legal: "Gesetzliche Verpflichtungen erfüllen",
           },
@@ -612,8 +624,10 @@ export const translations: typeof enTranslations = {
           description:
             "Ihre Privatsphäre ist unsere Priorität. Wir implementieren branchenübliche Sicherheitsmaßnahmen:",
           items: {
-            encryption: "End-to-End-Verschlüsselung für private Ordner und sensible Daten",
-            incognito: "Inkognito-Modus für Sitzungs-Chats, die nie gespeichert werden",
+            encryption:
+              "End-to-End-Verschlüsselung für private Ordner und sensible Daten",
+            incognito:
+              "Inkognito-Modus für Sitzungs-Chats, die nie gespeichert werden",
             gdpr: "Volle DSGVO-Konformität für EU-Nutzer",
             noSelling: "Wir verkaufen Ihre Daten niemals an Dritte",
             minimal: "Minimale Datenerfassung - nur das Notwendige",
@@ -663,12 +677,15 @@ export const translations: typeof enTranslations = {
             "Wir verwenden die gesammelten Informationen für verschiedene Zwecke, einschließlich:",
           items: {
             provide: "Bereitstellung und Wartung unserer KI-Chat-Dienste",
-            process: "Verarbeitung Ihrer Transaktionen und Verwaltung Ihres Kontos",
+            process:
+              "Verarbeitung Ihrer Transaktionen und Verwaltung Ihres Kontos",
             send: "Versand von Updates, Newslettern und Marketingmitteilungen",
-            respond: "Beantwortung Ihrer Anfragen und Bereitstellung von Kundensupport",
+            respond:
+              "Beantwortung Ihrer Anfragen und Bereitstellung von Kundensupport",
             monitor:
               "Überwachung und Analyse von Nutzungsmustern zur Verbesserung unserer Plattform",
-            personalize: "Personalisierung Ihrer Erfahrung und Bereitstellung relevanter Inhalte",
+            personalize:
+              "Personalisierung Ihrer Erfahrung und Bereitstellung relevanter Inhalte",
           },
         },
         disclosure: {
@@ -717,9 +734,12 @@ export const translations: typeof enTranslations = {
             "Gemäß den Datenschutzgesetzen haben Sie bestimmte Rechte in Bezug auf Ihre persönlichen Informationen:",
           items: {
             access: "Recht auf Zugang zu Ihren personenbezogenen Daten",
-            correction: "Recht auf Berichtigung ungenauer oder unvollständiger Daten",
-            deletion: "Recht auf Löschung Ihrer Daten (Recht auf Vergessenwerden)",
-            objection: "Recht auf Widerspruch gegen die Verarbeitung Ihrer Daten",
+            correction:
+              "Recht auf Berichtigung ungenauer oder unvollständiger Daten",
+            deletion:
+              "Recht auf Löschung Ihrer Daten (Recht auf Vergessenwerden)",
+            objection:
+              "Recht auf Widerspruch gegen die Verarbeitung Ihrer Daten",
             portability: "Recht auf Datenübertragbarkeit und -transfer",
           },
         },
@@ -839,7 +859,8 @@ export const translations: typeof enTranslations = {
   },
   footer: {
     tagline: "Chatten Sie mit KI, Verbinden Sie sich mit der Community",
-    privacyTagline: "Datenschutzorientierter KI-Chat mit {{modelCount}} unzensierten Modellen",
+    privacyTagline:
+      "Datenschutzorientierter KI-Chat mit {{modelCount}} unzensierten Modellen",
     platform: {
       title: "Plattform",
       features: "Funktionen",

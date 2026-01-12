@@ -29,7 +29,9 @@ export function FormFieldWidget<const TKey extends string>({
     return (
       <Div className={className}>
         <Div className="text-sm text-muted-foreground">
-          {t("app.api.system.unifiedInterface.react.widgets.formField.requiresContext")}
+          {t(
+            "app.api.system.unifiedInterface.react.widgets.formField.requiresContext",
+          )}
         </Div>
       </Div>
     );

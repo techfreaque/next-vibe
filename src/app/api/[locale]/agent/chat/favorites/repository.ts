@@ -7,7 +7,11 @@ import "server-only";
 
 import { asc, eq, max } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -110,7 +114,8 @@ export class ChatFavoritesRepository {
         );
         if (!character) {
           return fail({
-            message: "app.api.agent.chat.favorites.post.errors.characterNotFound.title",
+            message:
+              "app.api.agent.chat.favorites.post.errors.characterNotFound.title",
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
@@ -166,14 +171,18 @@ export class ChatFavoritesRepository {
 
     // Get character if favorite has one
     const character: CharacterGetResponseOutput | null = favorite.characterId
-      ? await CharactersRepository.getCharacterByIdSimple(favorite.characterId, userId ?? undefined)
+      ? await CharactersRepository.getCharacterByIdSimple(
+          favorite.characterId,
+          userId ?? undefined,
+        )
       : null;
 
     // Resolve model for this favorite
-    const resolvedModel: ModelOption | null = CharactersRepositoryClient.resolveModelForSelection(
-      favorite.modelSelection,
-      allModels,
-    );
+    const resolvedModel: ModelOption | null =
+      CharactersRepositoryClient.resolveModelForSelection(
+        favorite.modelSelection,
+        allModels,
+      );
 
     // Compute display icon
     let icon: IconKey;

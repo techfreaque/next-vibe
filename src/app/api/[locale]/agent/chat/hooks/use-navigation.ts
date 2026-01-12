@@ -70,8 +70,14 @@ function buildNewThreadUrl(
  */
 export interface NavigationOperations {
   navigateToThread: (threadId: string) => void;
-  navigateToFolder: (rootFolderId: DefaultFolderId, subFolderId: string | null) => void;
-  navigateToNewThread: (rootFolderId: DefaultFolderId, subFolderId: string | null) => void;
+  navigateToFolder: (
+    rootFolderId: DefaultFolderId,
+    subFolderId: string | null,
+  ) => void;
+  navigateToNewThread: (
+    rootFolderId: DefaultFolderId,
+    subFolderId: string | null,
+  ) => void;
 }
 
 /**

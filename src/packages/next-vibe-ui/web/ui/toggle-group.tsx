@@ -58,7 +58,10 @@ export function ToggleGroup({
         loop={loop}
         orientation={orientation}
         dir={dir}
-        className={cn("flex flex-row items-center justify-center gap-1", className)}
+        className={cn(
+          "flex flex-row items-center justify-center gap-1",
+          className,
+        )}
         style={style}
       >
         <ToggleGroupContext.Provider value={{ variant, size }}>
@@ -79,7 +82,10 @@ export function ToggleGroup({
       loop={loop}
       orientation={orientation}
       dir={dir}
-      className={cn("flex flex-row items-center justify-center gap-1", className)}
+      className={cn(
+        "flex flex-row items-center justify-center gap-1",
+        className,
+      )}
     >
       <ToggleGroupContext.Provider value={{ variant, size }}>
         {children}

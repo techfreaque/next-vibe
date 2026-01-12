@@ -14,7 +14,9 @@ import definitions from "./definition";
 /**
  * Hook for fetching IMAP accounts list
  */
-export function useImapAccountsList(logger: EndpointLogger): EndpointReturn<typeof definitions> {
+export function useImapAccountsList(
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

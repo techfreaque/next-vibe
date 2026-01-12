@@ -6,7 +6,11 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -119,22 +123,31 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
       const adminPhone = smsEnv.ADMIN_NOTIFICATION_PHONE;
 
       if (!adminPhone) {
-        logger.debug("No admin phone number configured, skipping SMS notification", {
-          subscriptionEmail: subscriptionData.email,
-        });
+        logger.debug(
+          "No admin phone number configured, skipping SMS notification",
+          {
+            subscriptionEmail: subscriptionData.email,
+          },
+        );
         return success({
           messageId: "",
           sent: false,
         });
       }
 
-      logger.debug("Sending admin notification SMS for newsletter subscription", {
-        subscriptionEmail: subscriptionData.email,
-        subscriptionName: subscriptionData.name,
-        adminPhone,
-      });
+      logger.debug(
+        "Sending admin notification SMS for newsletter subscription",
+        {
+          subscriptionEmail: subscriptionData.email,
+          subscriptionName: subscriptionData.name,
+          adminPhone,
+        },
+      );
 
-      const message = this.generateAdminNotificationMessage(subscriptionData, locale);
+      const message = this.generateAdminNotificationMessage(
+        subscriptionData,
+        locale,
+      );
 
       const smsResult = await smsServiceRepository.sendSms(
         {
@@ -200,7 +213,8 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
 /**
  * SMS Service Singleton Instance
  */
-export const newsletterSubscribeSmsService = new NewsletterSubscribeSmsServiceImpl();
+export const newsletterSubscribeSmsService =
+  new NewsletterSubscribeSmsServiceImpl();
 
 /**
  * Helper functions for easy integration in routes
@@ -211,7 +225,12 @@ export const sendWelcomeSms = async (
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
-  return await newsletterSubscribeSmsService.sendWelcomeSms(subscriptionData, user, locale, logger);
+  return await newsletterSubscribeSmsService.sendWelcomeSms(
+    subscriptionData,
+    user,
+    locale,
+    logger,
+  );
 };
 
 export const sendAdminNotificationSms = async (

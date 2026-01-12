@@ -15,8 +15,14 @@ import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface
 // Import env modules
 import { agentEnv, agentEnvSchema } from "../../agent/env";
 import { emailEnv, emailEnvSchema } from "../../emails/env";
-import { imapClientEnv, imapClientEnvSchema } from "../../emails/imap-client/env";
-import { leadsCampaignsEnv, leadsCampaignsEnvSchema } from "../../leads/campaigns/env";
+import {
+  imapClientEnv,
+  imapClientEnvSchema,
+} from "../../emails/imap-client/env";
+import {
+  leadsCampaignsEnv,
+  leadsCampaignsEnvSchema,
+} from "../../leads/campaigns/env";
 import { paymentEnv, paymentEnvSchema } from "../../payment/env";
 import { smsEnv, smsEnvSchema } from "../../sms/env";
 import { hostingEnv, hostingEnvSchema } from "../hosting/env";
@@ -61,7 +67,11 @@ export type Env = z.infer<typeof envSchema>;
  * Call this explicitly at dev/build time
  */
 export function validateAllEnv(): Env {
-  return validateEnv({ ...process.env, platform }, envSchema, envValidationLogger);
+  return validateEnv(
+    { ...process.env, platform },
+    envSchema,
+    envValidationLogger,
+  );
 }
 
 /**

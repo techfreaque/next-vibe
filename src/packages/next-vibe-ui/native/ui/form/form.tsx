@@ -39,16 +39,22 @@ const StyledView = styled(View, { className: "style" });
 // IMPLEMENTATION - Uses imported types, platform-specific components
 // ============================================================================
 
-function Form<TRequest extends FieldValues>(props: FormProps<TRequest>): React.JSX.Element {
+function Form<TRequest extends FieldValues>(
+  props: FormProps<TRequest>,
+): React.JSX.Element {
   if (props.form) {
     return (
       <FormProvider {...props.form}>
-        <StyledView className={cn(props.className)}>{props.children}</StyledView>
+        <StyledView className={cn(props.className)}>
+          {props.children}
+        </StyledView>
       </FormProvider>
     );
   }
 
-  return <StyledView className={cn(props.className)}>{props.children}</StyledView>;
+  return (
+    <StyledView className={cn(props.className)}>{props.children}</StyledView>
+  );
 }
 
 /**
@@ -64,7 +70,10 @@ const FormFieldContext = React.createContext<
  * Wraps react-hook-form Controller with context provider
  * Function signature identical to web version
  */
-const FormField = <TFieldValues extends FieldValues, TName extends FieldPath<TFieldValues>>({
+const FormField = <
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+>({
   ...props
 }: FormFieldProps<TFieldValues, TName>): React.JSX.Element => {
   return (
@@ -78,7 +87,9 @@ const FormField = <TFieldValues extends FieldValues, TName extends FieldPath<TFi
  * FormItemContext - Identical to web implementation
  * Stores the unique ID for the form item
  */
-const FormItemContext = React.createContext<FormItemContextValue | undefined>(undefined);
+const FormItemContext = React.createContext<FormItemContextValue | undefined>(
+  undefined,
+);
 
 /**
  * useFormField - Identical to web implementation
@@ -156,12 +167,15 @@ FormLabel.displayName = "FormLabel";
  * to React Native accessibility props by the Slot component
  */
 function FormControl({ ...props }: FormControlProps): React.JSX.Element {
-  const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
 
   return (
     <Slot
       id={formItemId}
-      aria-describedby={error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`}
+      aria-describedby={
+        error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`
+      }
       aria-invalid={!!error}
       {...props}
     />
@@ -176,12 +190,18 @@ FormControl.displayName = "FormControl";
  * TYPE COMPATIBILITY: FormDescriptionProps is HTMLAttributes<HTMLParagraphElement> on web.
  * We accept all props and filter to native-compatible ones internally.
  */
-function FormDescription({ className, children }: FormDescriptionProps): React.JSX.Element {
+function FormDescription({
+  className,
+  children,
+}: FormDescriptionProps): React.JSX.Element {
   const { formDescriptionId } = useFormField();
 
   // Note: style prop is not passed due to StyleType discriminated union
   return (
-    <P id={formDescriptionId} className={cn("text-[0.8rem] text-muted-foreground", className)}>
+    <P
+      id={formDescriptionId}
+      className={cn("text-[0.8rem] text-muted-foreground", className)}
+    >
       {children}
     </P>
   );
@@ -198,7 +218,10 @@ FormDescription.displayName = "FormDescription";
  * TYPE COMPATIBILITY: FormMessageProps is HTMLAttributes<HTMLParagraphElement> on web.
  * We accept all props and filter to native-compatible ones internally.
  */
-function FormMessage({ className, children }: FormMessageProps): React.JSX.Element | null {
+function FormMessage({
+  className,
+  children,
+}: FormMessageProps): React.JSX.Element | null {
   const { error, formMessageId } = useFormField();
   const { t } = useTranslation();
   const body = error ? String(error.message) : children;
@@ -211,7 +234,10 @@ function FormMessage({ className, children }: FormMessageProps): React.JSX.Eleme
   return (
     <P
       id={formMessageId}
-      className={cn("text-[0.8rem] font-medium text-red-600 dark:text-red-400", className)}
+      className={cn(
+        "text-[0.8rem] font-medium text-red-600 dark:text-red-400",
+        className,
+      )}
     >
       {t(body as TranslationKey)}
     </P>

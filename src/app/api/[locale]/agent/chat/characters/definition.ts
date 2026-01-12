@@ -69,7 +69,8 @@ const { GET } = createEndpoint({
             targetEndpoint: createCharacterDefinitions.POST,
             extractParams: () => ({}),
             prefillFromGet: false,
-            label: "app.api.agent.chat.characters.get.createButton.label" as const,
+            label:
+              "app.api.agent.chat.characters.get.createButton.label" as const,
             icon: "plus",
             variant: "default",
             className: "ml-auto",
@@ -127,7 +128,11 @@ const { GET } = createEndpoint({
             characters: responseArrayField(
               {
                 type: WidgetType.DATA_CARDS,
-                layout: { type: LayoutType.GRID, columns: 1, spacing: "normal" },
+                layout: {
+                  type: LayoutType.GRID,
+                  columns: 1,
+                  spacing: "normal",
+                },
                 maxItems: 3,
                 metadata: {
                   onCardClick: {
@@ -148,7 +153,10 @@ const { GET } = createEndpoint({
                 },
                 { response: true },
                 {
-                  id: responseField({ type: WidgetType.TEXT, hidden: true }, z.string()),
+                  id: responseField(
+                    { type: WidgetType.TEXT, hidden: true },
+                    z.string(),
+                  ),
                   category: responseField(
                     { type: WidgetType.TEXT, hidden: true },
                     z.enum(CharacterCategoryDB),
@@ -280,46 +288,60 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.chat.characters.get.errors.validation.title" as const,
-      description: "app.api.agent.chat.characters.get.errors.validation.description" as const,
+      title:
+        "app.api.agent.chat.characters.get.errors.validation.title" as const,
+      description:
+        "app.api.agent.chat.characters.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.chat.characters.get.errors.network.title" as const,
-      description: "app.api.agent.chat.characters.get.errors.network.description" as const,
+      description:
+        "app.api.agent.chat.characters.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.chat.characters.get.errors.unauthorized.title" as const,
-      description: "app.api.agent.chat.characters.get.errors.unauthorized.description" as const,
+      title:
+        "app.api.agent.chat.characters.get.errors.unauthorized.title" as const,
+      description:
+        "app.api.agent.chat.characters.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.characters.get.errors.forbidden.title" as const,
-      description: "app.api.agent.chat.characters.get.errors.forbidden.description" as const,
+      title:
+        "app.api.agent.chat.characters.get.errors.forbidden.title" as const,
+      description:
+        "app.api.agent.chat.characters.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.characters.get.errors.notFound.title" as const,
-      description: "app.api.agent.chat.characters.get.errors.notFound.description" as const,
+      description:
+        "app.api.agent.chat.characters.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.characters.get.errors.server.title" as const,
-      description: "app.api.agent.chat.characters.get.errors.server.description" as const,
+      description:
+        "app.api.agent.chat.characters.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.agent.chat.characters.get.errors.unknown.title" as const,
-      description: "app.api.agent.chat.characters.get.errors.unknown.description" as const,
+      description:
+        "app.api.agent.chat.characters.get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.agent.chat.characters.get.errors.unsavedChanges.title" as const,
-      description: "app.api.agent.chat.characters.get.errors.unsavedChanges.description" as const,
+      title:
+        "app.api.agent.chat.characters.get.errors.unsavedChanges.title" as const,
+      description:
+        "app.api.agent.chat.characters.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.characters.get.errors.conflict.title" as const,
-      description: "app.api.agent.chat.characters.get.errors.conflict.description" as const,
+      description:
+        "app.api.agent.chat.characters.get.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
     title: "app.api.agent.chat.characters.get.success.title" as const,
-    description: "app.api.agent.chat.characters.get.success.description" as const,
+    description:
+      "app.api.agent.chat.characters.get.success.description" as const,
   },
 
   examples: {
@@ -337,11 +359,13 @@ const { GET } = createEndpoint({
               {
                 id: "default",
                 icon: "robot-face",
-                category: "app.api.agent.chat.characters.enums.category.assistant",
+                category:
+                  "app.api.agent.chat.characters.enums.category.assistant",
                 content: {
                   name: "app.api.agent.chat.characters.default.name",
                   tagline: "app.api.agent.chat.characters.default.tagline",
-                  description: "app.api.agent.chat.characters.default.description",
+                  description:
+                    "app.api.agent.chat.characters.default.description",
                   modelRow: {
                     modelIcon: "sparkles",
                     modelInfo: "Claude Sonnet 4.5",
@@ -366,7 +390,8 @@ const { GET } = createEndpoint({
                 content: {
                   name: "app.api.agent.chat.characters.custom.name",
                   tagline: "app.api.agent.chat.characters.custom.tagline",
-                  description: "app.api.agent.chat.characters.custom.description",
+                  description:
+                    "app.api.agent.chat.characters.custom.description",
                   modelRow: {
                     modelIcon: "sparkles",
                     modelInfo: "GPT-5",

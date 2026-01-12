@@ -113,7 +113,9 @@ function Li({
         onPressOut={handlePressOut}
         accessibilityRole={accessibilityRole}
         accessibilityLabel={ariaLabel}
-        accessibilityValue={value === undefined ? undefined : { text: String(value) }}
+        accessibilityValue={
+          value === undefined ? undefined : { text: String(value) }
+        }
         nativeID={id}
       >
         {children}
@@ -126,7 +128,9 @@ function Li({
       {...applyStyleType({ nativeStyle, className: cn(className) })}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={ariaLabel}
-      accessibilityValue={value === undefined ? undefined : { text: String(value) }}
+      accessibilityValue={
+        value === undefined ? undefined : { text: String(value) }
+      }
       nativeID={id}
     >
       {children}

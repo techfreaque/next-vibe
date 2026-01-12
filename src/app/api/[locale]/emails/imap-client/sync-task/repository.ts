@@ -6,7 +6,11 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -27,7 +31,9 @@ export interface ImapSyncTaskRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ExecuteImapSyncResponseOutput>>;
 
-  validateImapSync(logger: EndpointLogger): ResponseType<ValidateImapSyncResponseOutput>;
+  validateImapSync(
+    logger: EndpointLogger,
+  ): ResponseType<ValidateImapSyncResponseOutput>;
 }
 
 /**
@@ -90,7 +96,10 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
       });
     } catch (error) {
       logger.error("tasks.imap_sync.failed", {
-        error: error instanceof Error ? error.message : "tasks.imap_sync.unknown_error",
+        error:
+          error instanceof Error
+            ? error.message
+            : "tasks.imap_sync.unknown_error",
       });
 
       return fail({
@@ -103,7 +112,9 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
   /**
    * Validate IMAP sync task
    */
-  validateImapSync(logger: EndpointLogger): ResponseType<ValidateImapSyncResponseOutput> {
+  validateImapSync(
+    logger: EndpointLogger,
+  ): ResponseType<ValidateImapSyncResponseOutput> {
     try {
       // Basic validation - check if IMAP sync service is available
       // For now, we'll just return true since we don't have a health check method

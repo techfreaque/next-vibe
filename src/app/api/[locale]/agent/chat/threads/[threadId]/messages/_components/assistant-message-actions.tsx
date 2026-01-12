@@ -51,22 +51,31 @@ export function AssistantMessageActions({
   const { ttsAutoplay, ttsVoice, deductCredits } = useChatContext();
 
   // Check if this message is currently streaming
-  const streamingMessage = useAIStreamStore((state) => state.streamingMessages[messageId]);
+  const streamingMessage = useAIStreamStore(
+    (state) => state.streamingMessages[messageId],
+  );
   const isMessageStreaming = streamingMessage?.isStreaming ?? false;
 
   // Prepare content for TTS (strip think tags, markdown, convert line breaks)
   const ttsText = prepareTextForTTS(stripThinkTags(content));
 
-  const { isLoading, isPlaying, playAudio, stopAudio, cancelLoading, currentChunk, totalChunks } =
-    useTTSAudio({
-      text: ttsText,
-      enabled: ttsAutoplay,
-      isStreaming: isMessageStreaming,
-      voice: ttsVoice,
-      locale,
-      logger,
-      deductCredits,
-    });
+  const {
+    isLoading,
+    isPlaying,
+    playAudio,
+    stopAudio,
+    cancelLoading,
+    currentChunk,
+    totalChunks,
+  } = useTTSAudio({
+    text: ttsText,
+    enabled: ttsAutoplay,
+    isStreaming: isMessageStreaming,
+    voice: ttsVoice,
+    locale,
+    logger,
+    deductCredits,
+  });
 
   // Calculate TTS credit cost based on text length
   const ttsCreditCost = ttsText.length * FEATURE_COSTS.TTS;

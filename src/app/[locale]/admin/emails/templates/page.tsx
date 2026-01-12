@@ -31,7 +31,9 @@ export default async function EmailTemplatesPage({
 
   // Get all templates and group by category
   const allTemplates = getAllTemplateMetadata();
-  const categories = [...new Set(allTemplates.map((template) => template.category))].toSorted();
+  const categories = [
+    ...new Set(allTemplates.map((template) => template.category)),
+  ].toSorted();
 
   const templatesByCategory = categories.map((category) => ({
     category,
@@ -67,9 +69,14 @@ export default async function EmailTemplatesPage({
                 const translatedDescription = t(template.description);
 
                 return (
-                  <Card key={template.id} className="hover:shadow-lg transition-shadow">
+                  <Card
+                    key={template.id}
+                    className="hover:shadow-lg transition-shadow"
+                  >
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-lg">{translatedName}</CardTitle>
+                      <CardTitle className="text-lg">
+                        {translatedName}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-3">
                       <P className="text-sm text-gray-600 dark:text-gray-400">
@@ -78,16 +85,22 @@ export default async function EmailTemplatesPage({
 
                       <Div className="text-xs text-gray-500 dark:text-gray-500 space-y-1">
                         <P>
-                          {t("app.admin.emails.templates.overview.version")}: {template.version}
+                          {t("app.admin.emails.templates.overview.version")}:{" "}
+                          {template.version}
                         </P>
                         <P>
-                          {t("app.admin.emails.templates.overview.id")}: {template.id}
+                          {t("app.admin.emails.templates.overview.id")}:{" "}
+                          {template.id}
                         </P>
                       </Div>
 
                       <Button asChild className="w-full">
-                        <Link href={`/${locale}/admin/emails/templates/${template.id}`}>
-                          {t("app.admin.emails.templates.overview.view_preview")}
+                        <Link
+                          href={`/${locale}/admin/emails/templates/${template.id}`}
+                        >
+                          {t(
+                            "app.admin.emails.templates.overview.view_preview",
+                          )}
                         </Link>
                       </Button>
                     </CardContent>

@@ -28,7 +28,12 @@ const { POST } = createEndpoint({
   category: "app.api.system.server.category",
   tags: ["app.api.system.server.build.tags.build"],
   icon: "package",
-  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF, UserRole.WEB_OFF, UserRole.CLI_AUTH_BYPASS],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+    UserRole.WEB_OFF,
+    UserRole.CLI_AUTH_BYPASS,
+  ],
   aliases: ["build", "b"],
 
   fields: objectField(
@@ -47,7 +52,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.build.post.fields.package.title",
-          description: "app.api.system.server.build.post.fields.package.description",
+          description:
+            "app.api.system.server.build.post.fields.package.description",
         },
         z.boolean().default(false),
       ),
@@ -56,8 +62,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.build.post.fields.skipNextCommand.title",
-          description: "app.api.system.server.build.post.fields.skipNextCommand.description",
+          label:
+            "app.api.system.server.build.post.fields.skipNextCommand.title",
+          description:
+            "app.api.system.server.build.post.fields.skipNextCommand.description",
         },
         z.boolean().default(false),
       ),
@@ -67,7 +75,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.system.server.build.post.fields.target.title",
-          description: "app.api.system.server.build.post.fields.target.description",
+          description:
+            "app.api.system.server.build.post.fields.target.description",
         },
         z.string().optional(),
       ),
@@ -77,7 +86,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.build.post.fields.skipGeneration.title",
-          description: "app.api.system.server.build.post.fields.skipGeneration.description",
+          description:
+            "app.api.system.server.build.post.fields.skipGeneration.description",
         },
         z.boolean().default(false),
       ),
@@ -87,7 +97,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.build.post.fields.force.title",
-          description: "app.api.system.server.build.post.fields.force.description",
+          description:
+            "app.api.system.server.build.post.fields.force.description",
         },
         z.boolean().default(false),
       ),
@@ -97,7 +108,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.build.post.fields.skipEndpoints.title",
-          description: "app.api.system.server.build.post.fields.skipEndpoints.description",
+          description:
+            "app.api.system.server.build.post.fields.skipEndpoints.description",
         },
         z.boolean().default(false),
       ),
@@ -107,7 +119,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.build.post.fields.skipSeeds.title",
-          description: "app.api.system.server.build.post.fields.skipSeeds.description",
+          description:
+            "app.api.system.server.build.post.fields.skipSeeds.description",
         },
         z.boolean().default(false),
       ),
@@ -116,8 +129,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.build.post.fields.skipProdMigrations.title",
-          description: "app.api.system.server.build.post.fields.skipProdMigrations.description",
+          label:
+            "app.api.system.server.build.post.fields.skipProdMigrations.title",
+          description:
+            "app.api.system.server.build.post.fields.skipProdMigrations.description",
         },
         z.boolean().default(true),
       ),
@@ -126,8 +141,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.build.post.fields.skipProdSeeding.title",
-          description: "app.api.system.server.build.post.fields.skipProdSeeding.description",
+          label:
+            "app.api.system.server.build.post.fields.skipProdSeeding.title",
+          description:
+            "app.api.system.server.build.post.fields.skipProdSeeding.description",
         },
         z.boolean().default(true),
       ),
@@ -136,8 +153,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.build.post.fields.runProdDatabase.title",
-          description: "app.api.system.server.build.post.fields.runProdDatabase.description",
+          label:
+            "app.api.system.server.build.post.fields.runProdDatabase.title",
+          description:
+            "app.api.system.server.build.post.fields.runProdDatabase.description",
         },
         z.boolean().default(false),
       ),
@@ -181,23 +200,28 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.server.build.post.errors.validation.title",
-      description: "app.api.system.server.build.post.errors.validation.description",
+      description:
+        "app.api.system.server.build.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.server.build.post.errors.network.title",
-      description: "app.api.system.server.build.post.errors.network.description",
+      description:
+        "app.api.system.server.build.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.server.build.post.errors.unauthorized.title",
-      description: "app.api.system.server.build.post.errors.unauthorized.description",
+      description:
+        "app.api.system.server.build.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.server.build.post.errors.forbidden.title",
-      description: "app.api.system.server.build.post.errors.forbidden.description",
+      description:
+        "app.api.system.server.build.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.server.build.post.errors.notFound.title",
-      description: "app.api.system.server.build.post.errors.notFound.description",
+      description:
+        "app.api.system.server.build.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.server.build.post.errors.server.title",
@@ -205,15 +229,18 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.server.build.post.errors.unknown.title",
-      description: "app.api.system.server.build.post.errors.unknown.description",
+      description:
+        "app.api.system.server.build.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.server.build.post.errors.unknown.title",
-      description: "app.api.system.server.build.post.errors.unknown.description",
+      description:
+        "app.api.system.server.build.post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.server.build.post.errors.conflict.title",
-      description: "app.api.system.server.build.post.errors.conflict.description",
+      description:
+        "app.api.system.server.build.post.errors.conflict.description",
     },
   },
 

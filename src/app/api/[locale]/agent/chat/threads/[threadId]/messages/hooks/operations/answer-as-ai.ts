@@ -69,7 +69,8 @@ export async function answerAsAI(
     // Load thread messages
     let threadMessages: ChatMessage[];
     if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-      const { getMessagesForThread } = await import("../../../../../incognito/storage");
+      const { getMessagesForThread } =
+        await import("../../../../../incognito/storage");
       threadMessages = await getMessagesForThread(message.threadId);
     } else {
       threadMessages = chatStore.getThreadMessages(message.threadId);
@@ -78,7 +79,9 @@ export async function answerAsAI(
     // Build message history (incognito only - server fetches from DB)
     let messageHistory: ChatMessage[] | null = null;
     if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-      const parentIndex = threadMessages.findIndex((msg) => msg.id === messageId);
+      const parentIndex = threadMessages.findIndex(
+        (msg) => msg.id === messageId,
+      );
       if (parentIndex !== -1) {
         messageHistory = threadMessages.slice(0, parentIndex + 1);
       }
@@ -111,7 +114,10 @@ export async function answerAsAI(
         audioInput: { file: null },
       },
       {
-        onContentDone: createCreditUpdateCallback(settings.selectedModel, deductCredits),
+        onContentDone: createCreditUpdateCallback(
+          settings.selectedModel,
+          deductCredits,
+        ),
       },
     );
   } catch (error) {

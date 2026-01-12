@@ -28,10 +28,17 @@ interface TestEmailFormProps {
   onSuccess?: () => void;
 }
 
-export function TestEmailForm({ locale, templateId, onSuccess }: TestEmailFormProps): ReactElement {
+export function TestEmailForm({
+  locale,
+  templateId,
+  onSuccess,
+}: TestEmailFormProps): ReactElement {
   const { t } = useTranslation();
   const [recipientEmail, setRecipientEmail] = useState("");
-  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
 
   const { language, country } = getLanguageAndCountryFromLocale(locale);
 

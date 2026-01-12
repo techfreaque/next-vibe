@@ -34,7 +34,9 @@ interface HomePageProps {
   }>;
 }
 
-export default async function HomePage({ params }: HomePageProps): Promise<JSX.Element> {
+export default async function HomePage({
+  params,
+}: HomePageProps): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
   return (
@@ -42,7 +44,9 @@ export default async function HomePage({ params }: HomePageProps): Promise<JSX.E
       <Div className="max-w-4xl mx-auto flex flex-col gap-6">
         {/* Header */}
         <Div className="text-center flex flex-col gap-2">
-          <H1>{t("app.native.page.welcome", { appName: t("config.appName") })}</H1>
+          <H1>
+            {t("app.native.page.welcome", { appName: t("config.appName") })}
+          </H1>
           <P className="text-muted-foreground">
             {t("app.native.page.description")} {locale}
           </P>
@@ -52,7 +56,9 @@ export default async function HomePage({ params }: HomePageProps): Promise<JSX.E
         <Card>
           <CardHeader>
             <CardTitle>{t("app.native.page.locale.title")}</CardTitle>
-            <CardDescription>{t("app.native.page.locale.description")}</CardDescription>
+            <CardDescription>
+              {t("app.native.page.locale.description")}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Div className="flex-row items-center flex gap-2">
@@ -65,23 +71,31 @@ export default async function HomePage({ params }: HomePageProps): Promise<JSX.E
         <Card>
           <CardHeader>
             <CardTitle>{t("app.native.page.features.title")}</CardTitle>
-            <CardDescription>{t("app.native.page.features.description")}</CardDescription>
+            <CardDescription>
+              {t("app.native.page.features.description")}
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <Div>
-              <H2 className="text-lg mb-2">{t("app.native.page.features.unified.title")}</H2>
+              <H2 className="text-lg mb-2">
+                {t("app.native.page.features.unified.title")}
+              </H2>
               <P className="text-muted-foreground">
                 {t("app.native.page.features.unified.description")}
               </P>
             </Div>
             <Div>
-              <H2 className="text-lg mb-2">{t("app.native.page.features.types.title")}</H2>
+              <H2 className="text-lg mb-2">
+                {t("app.native.page.features.types.title")}
+              </H2>
               <P className="text-muted-foreground">
                 {t("app.native.page.features.types.description")}
               </P>
             </Div>
             <Div>
-              <H2 className="text-lg mb-2">{t("app.native.page.features.async.title")}</H2>
+              <H2 className="text-lg mb-2">
+                {t("app.native.page.features.async.title")}
+              </H2>
               <P className="text-muted-foreground">
                 {t("app.native.page.features.async.description")}
               </P>
@@ -129,19 +143,25 @@ export default async function HomePage({ params }: HomePageProps): Promise<JSX.E
                 <Span className="text-muted-foreground">
                   {t("app.native.page.status.platform")}:
                 </Span>
-                <Span className="font-medium">{t("app.native.page.status.universal")}</Span>
+                <Span className="font-medium">
+                  {t("app.native.page.status.universal")}
+                </Span>
               </Div>
               <Div className="flex flex-row justify-between">
                 <Span className="text-muted-foreground">
                   {t("app.native.page.status.routing")}:
                 </Span>
-                <Span className="font-medium">{t("app.native.page.status.filebased")}</Span>
+                <Span className="font-medium">
+                  {t("app.native.page.status.filebased")}
+                </Span>
               </Div>
               <Div className="flex flex-row justify-between">
                 <Span className="text-muted-foreground">
                   {t("app.native.page.status.styling")}:
                 </Span>
-                <Span className="font-medium">{t("app.native.page.status.nativewind")}</Span>
+                <Span className="font-medium">
+                  {t("app.native.page.status.nativewind")}
+                </Span>
               </Div>
             </Div>
           </CardContent>

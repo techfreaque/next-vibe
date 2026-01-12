@@ -11,7 +11,11 @@ import type { MarkdownProps } from "../../web/ui/markdown";
 import { applyStyleType } from "../../web/utils/style-type";
 import { convertCSSToViewStyle } from "../utils/style-converter";
 
-export function Markdown({ className, style, content }: MarkdownProps): React.JSX.Element {
+export function Markdown({
+  className,
+  style,
+  content,
+}: MarkdownProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (

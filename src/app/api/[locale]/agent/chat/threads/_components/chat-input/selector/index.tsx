@@ -4,7 +4,11 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { Popover, PopoverContent, PopoverTrigger } from "next-vibe-ui/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -27,7 +31,10 @@ import type {
   FavoriteCreateRequestOutput,
 } from "@/app/api/[locale]/agent/chat/favorites/definition";
 import { useChatFavorites } from "@/app/api/[locale]/agent/chat/favorites/hooks";
-import { type ModelId, modelOptions } from "@/app/api/[locale]/agent/models/models";
+import {
+  type ModelId,
+  modelOptions,
+} from "@/app/api/[locale]/agent/models/models";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -107,8 +114,12 @@ export function Selector({
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [view, setView] = useState<SelectorView>("favorites");
   const [isOnboardingActive, setIsOnboardingActive] = useState(false);
-  const [onboardingStep, setOnboardingStep] = useState<"story" | "pick" | "specialists">("story");
-  const [onboardingSelectedId, setOnboardingSelectedId] = useState<string | null>(null);
+  const [onboardingStep, setOnboardingStep] = useState<
+    "story" | "pick" | "specialists"
+  >("story");
+  const [onboardingSelectedId, setOnboardingSelectedId] = useState<
+    string | null
+  >(null);
 
   const needsOnboarding = useMemo(() => {
     return !favoritesLoading && favorites.length === 0;
@@ -117,8 +128,12 @@ export function Selector({
   // Use tour state if active
   const open = tourIsActive ? tourOpen : popoverOpen;
 
-  const [editingFavoriteId, setEditingFavoriteId] = useState<string | null>(null);
-  const [editingCharacterId, setEditingCharacterId] = useState<string | null>(null);
+  const [editingFavoriteId, setEditingFavoriteId] = useState<string | null>(
+    null,
+  );
+  const [editingCharacterId, setEditingCharacterId] = useState<string | null>(
+    null,
+  );
   const [editingCharacterData, setEditingCharacterData] = useState<
     CharacterListResponseOutput["characters"][number] | null
   >(null);
@@ -138,11 +153,19 @@ export function Selector({
       }
     }
     prevTourOpen.current = tourOpen;
-  }, [tourIsActive, tourOpen, needsOnboarding, favoritesLoading, isOnboardingActive]);
+  }, [
+    tourIsActive,
+    tourOpen,
+    needsOnboarding,
+    favoritesLoading,
+    isOnboardingActive,
+  ]);
 
   // Derive actual view - allow switching to settings even during onboarding
   const actualView =
-    isOnboardingActive && view !== "settings" && view !== "edit" ? "onboarding" : view;
+    isOnboardingActive && view !== "settings" && view !== "edit"
+      ? "onboarding"
+      : view;
 
   // Get current selections
   const currentCharacter = useMemo(
@@ -153,7 +176,10 @@ export function Selector({
   const modelSupportsTools = currentModel?.supportsTools ?? false;
 
   // Get active favorite
-  const activeFavorite = useMemo(() => favorites.find((f) => f.isActive), [favorites]);
+  const activeFavorite = useMemo(
+    () => favorites.find((f) => f.isActive),
+    [favorites],
+  );
 
   // Get the favorite being edited (could be different from active)
   const editingFavorite = useMemo(() => {
@@ -165,7 +191,13 @@ export function Selector({
       return createFavoriteFromCharacter(editingCharacterId, characters);
     }
     return activeFavorite;
-  }, [editingFavoriteId, editingCharacterId, favorites, activeFavorite, characters]);
+  }, [
+    editingFavoriteId,
+    editingCharacterId,
+    favorites,
+    activeFavorite,
+    characters,
+  ]);
 
   // Handle open state changes
   const handleOpenChange = useCallback(
@@ -192,7 +224,13 @@ export function Selector({
         setIsOnboardingActive(false);
       }
     },
-    [tourIsActive, setTourOpen, needsOnboarding, favoritesLoading, isOnboardingActive],
+    [
+      tourIsActive,
+      setTourOpen,
+      needsOnboarding,
+      favoritesLoading,
+      isOnboardingActive,
+    ],
   );
 
   // Close modal and reset to favorites view
@@ -208,12 +246,23 @@ export function Selector({
 
       const selected = favorites.find((f) => f.id === favoriteId);
       if (selected) {
-        applyFavoriteSelection(selected, characters, onCharacterChange, onModelChange);
+        applyFavoriteSelection(
+          selected,
+          characters,
+          onCharacterChange,
+          onModelChange,
+        );
       }
 
       closeModal();
     },
-    [favorites, onCharacterChange, onModelChange, closeModal, setActiveFavorite, characters],
+    [
+	favorites,
+	onCharacterChange,
+	onModelChange,
+	closeModal,
+	characters
+],
   );
 
   // Switch to settings view for a specific favorite
@@ -247,7 +296,12 @@ export function Selector({
 
       if (saveMode === "temporary") {
         // Just apply to current chat without saving
-        applyFavoriteSelection(updatedFavorite, characters, onCharacterChange, onModelChange);
+        applyFavoriteSelection(
+          updatedFavorite,
+          characters,
+          onCharacterChange,
+          onModelChange,
+        );
       } else if (saveMode === "update") {
         if (isNewCharacter) {
           // Creating new favorite from character browser
@@ -268,7 +322,12 @@ export function Selector({
 
           // Apply changes if this is the active favorite
           if (editingFavorite.isActive) {
-            applyFavoriteSelection(updatedFavorite, characters, onCharacterChange, onModelChange);
+            applyFavoriteSelection(
+              updatedFavorite,
+              characters,
+              onCharacterChange,
+              onModelChange,
+            );
           }
         }
       } else {
@@ -289,7 +348,12 @@ export function Selector({
         });
 
         // Apply changes (new favorite is always active)
-        applyFavoriteSelection(updatedFavorite, characters, onCharacterChange, onModelChange);
+        applyFavoriteSelection(
+          updatedFavorite,
+          characters,
+          onCharacterChange,
+          onModelChange,
+        );
       }
 
       setEditingFavoriteId(null);
@@ -321,7 +385,8 @@ export function Selector({
     async (newCharacterId: string): Promise<void> => {
       // Check if non-customized version already exists
       const exists = favorites.some(
-        (f) => f.characterId === newCharacterId && !f.customName && !f.customIcon,
+        (f) =>
+          f.characterId === newCharacterId && !f.customName && !f.customIcon,
       );
 
       // Don't add duplicates
@@ -329,7 +394,10 @@ export function Selector({
         return;
       }
 
-      const favoriteData = createFavoriteFromCharacter(newCharacterId, characters);
+      const favoriteData = createFavoriteFromCharacter(
+        newCharacterId,
+        characters,
+      );
 
       await addFavorite({
         characterId: favoriteData.characterId,
@@ -351,7 +419,8 @@ export function Selector({
     (newCharacterId: string): void => {
       // Check if non-customized version already exists
       const existingFavorite = favorites.find(
-        (f) => f.characterId === newCharacterId && !f.customName && !f.customIcon,
+        (f) =>
+          f.characterId === newCharacterId && !f.customName && !f.customIcon,
       );
 
       if (existingFavorite) {
@@ -405,7 +474,12 @@ export function Selector({
         useCount: favoriteData.useCount,
       });
 
-      applyFavoriteSelection(favoriteData, characters, onCharacterChange, onModelChange);
+      applyFavoriteSelection(
+        favoriteData,
+        characters,
+        onCharacterChange,
+        onModelChange,
+      );
 
       closeModal();
     },
@@ -451,18 +525,33 @@ export function Selector({
         const updatedFavorite: FavoriteItem = {
           ...editingFavorite,
           ...updates,
-          modelSelection: updates.modelSelection || editingFavorite.modelSelection,
+          modelSelection:
+            updates.modelSelection || editingFavorite.modelSelection,
         };
-        applyFavoriteSelection(updatedFavorite, characters, onCharacterChange, onModelChange);
+        applyFavoriteSelection(
+          updatedFavorite,
+          characters,
+          onCharacterChange,
+          onModelChange,
+        );
       }
     },
-    [editingFavorite, updateFavorite, onCharacterChange, onModelChange, characters],
+    [
+      editingFavorite,
+      updateFavorite,
+      onCharacterChange,
+      onModelChange,
+      characters,
+    ],
   );
 
   // Handle saving favorite during onboarding (called when clicking Continue on pick screen)
   const handleSaveFavorite = useCallback(
     async (selectedCharacterId: string): Promise<void> => {
-      const favoriteData = createFavoriteFromCharacter(selectedCharacterId, characters);
+      const favoriteData = createFavoriteFromCharacter(
+        selectedCharacterId,
+        characters,
+      );
 
       await deactivateAllFavorites(favorites, updateFavorite);
 
@@ -478,20 +567,37 @@ export function Selector({
         useCount: favoriteData.useCount,
       });
 
-      applyFavoriteSelection(favoriteData, characters, onCharacterChange, onModelChange);
+      applyFavoriteSelection(
+        favoriteData,
+        characters,
+        onCharacterChange,
+        onModelChange,
+      );
     },
-    [favorites, onCharacterChange, onModelChange, addFavorite, updateFavorite, characters],
+    [
+      favorites,
+      onCharacterChange,
+      onModelChange,
+      addFavorite,
+      updateFavorite,
+      characters,
+    ],
   );
 
   // Handle onboarding completion (Start Chatting clicked)
   const handleOnboardingComplete = useCallback(
     async (selectedCharacterId: string): Promise<void> => {
       // Check if favorite already exists for this character
-      const existingFavorite = favorites.find((f) => f.characterId === selectedCharacterId);
+      const existingFavorite = favorites.find(
+        (f) => f.characterId === selectedCharacterId,
+      );
 
       // Only save if no existing favorite (fallback case)
       if (!existingFavorite) {
-        const favoriteData = createFavoriteFromCharacter(selectedCharacterId, characters);
+        const favoriteData = createFavoriteFromCharacter(
+          selectedCharacterId,
+          characters,
+        );
 
         await deactivateAllFavorites(favorites, updateFavorite);
 
@@ -507,7 +613,12 @@ export function Selector({
           useCount: favoriteData.useCount,
         });
 
-        applyFavoriteSelection(favoriteData, characters, onCharacterChange, onModelChange);
+        applyFavoriteSelection(
+          favoriteData,
+          characters,
+          onCharacterChange,
+          onModelChange,
+        );
       }
 
       // Reset onboarding state and close modal
@@ -542,7 +653,9 @@ export function Selector({
         >
           {/* Character icon */}
           <Span className="flex items-center justify-center w-5 h-5 shrink-0">
-            {currentCharacter ? renderIcon(currentCharacter.icon, "h-4 w-4") : null}
+            {currentCharacter
+              ? renderIcon(currentCharacter.icon, "h-4 w-4")
+              : null}
           </Span>
 
           {/* Character name - hidden when container is narrow, always shown when no tools */}
@@ -567,7 +680,9 @@ export function Selector({
 
           {/* Model icon */}
           <Span className="flex items-center justify-center w-5 h-5 shrink-0 opacity-70">
-            {currentModel?.icon ? renderIcon(currentModel.icon, "h-4 w-4") : null}
+            {currentModel?.icon
+              ? renderIcon(currentModel.icon, "h-4 w-4")
+              : null}
           </Span>
 
           {/* Model name - hidden when container is too narrow, shown earlier when no tools */}
@@ -670,7 +785,9 @@ export function Selector({
                       const wasActive = editingFavorite.isActive;
 
                       // Calculate what will remain BEFORE deleting
-                      const willRemain = favorites.filter((f) => f.id !== deletedId);
+                      const willRemain = favorites.filter(
+                        (f) => f.id !== deletedId,
+                      );
                       const willBeEmpty = willRemain.length === 0;
 
                       // Close settings panel

@@ -117,9 +117,12 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
 
       return [];
     } catch (error) {
-      logger.warn("[Route Execution Executor] Failed to check required fields", {
-        error: parseError(error).message,
-      });
+      logger.warn(
+        "[Route Execution Executor] Failed to check required fields",
+        {
+          error: parseError(error).message,
+        },
+      );
       return [];
     }
   }
@@ -160,7 +163,8 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
 
       if (!handlerResult) {
         return fail({
-          message: "app.api.system.unifiedInterface.cli.vibe.errors.routeNotFound",
+          message:
+            "app.api.system.unifiedInterface.cli.vibe.errors.routeNotFound",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -178,7 +182,8 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
       // Streaming responses are not supported in CLI/AI/MCP platforms
       if (isStreamingResponse(result)) {
         return fail({
-          message: "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+          message:
+            "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -186,7 +191,8 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
       // File responses are not supported in CLI/AI/MCP platforms
       if (isFileResponse(result)) {
         return fail({
-          message: "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+          message:
+            "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -202,10 +208,14 @@ export class RouteExecutionExecutor implements IRouteExecutionExecutor {
       return result;
     } catch (error) {
       const parsedError = parseError(error);
-      params.logger.error("[Route Execution Executor] Handler execution failed", parsedError, {
-        toolName: params.toolName,
-        error: parsedError.message,
-      });
+      params.logger.error(
+        "[Route Execution Executor] Handler execution failed",
+        parsedError,
+        {
+          toolName: params.toolName,
+          error: parsedError.message,
+        },
+      );
       return fail({
         message: "app.api.system.unifiedInterface.cli.vibe.errors.unknownError",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

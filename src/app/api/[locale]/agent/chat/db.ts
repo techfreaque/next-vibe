@@ -207,11 +207,14 @@ export const chatFolders = pgTable(
 
     // rolesManage: Who can edit/rename folder AND create subfolders
     // Inherits to: subfolders only (not threads)
-    rolesManage: jsonb("roles_manage").$type<(typeof UserPermissionRoleValue)[]>(),
+    rolesManage:
+      jsonb("roles_manage").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // rolesCreateThread: Who can create new threads in this folder
     // Inherits to: subfolders, threads
-    rolesCreateThread: jsonb("roles_create_thread").$type<(typeof UserPermissionRoleValue)[]>(),
+    rolesCreateThread: jsonb("roles_create_thread").$type<
+      (typeof UserPermissionRoleValue)[]
+    >(),
 
     // rolesPost: Who can post messages in threads within this folder
     // Inherits to: subfolders, threads
@@ -219,11 +222,13 @@ export const chatFolders = pgTable(
 
     // rolesModerate: Who can moderate/hide content (messages, threads)
     // Inherits to: subfolders, threads
-    rolesModerate: jsonb("roles_moderate").$type<(typeof UserPermissionRoleValue)[]>(),
+    rolesModerate:
+      jsonb("roles_moderate").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // rolesAdmin: Who can delete content and manage permissions
     // Inherits to: subfolders, threads
-    rolesAdmin: jsonb("roles_admin").$type<(typeof UserPermissionRoleValue)[]>(),
+    rolesAdmin:
+      jsonb("roles_admin").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -232,19 +237,36 @@ export const chatFolders = pgTable(
   (table) => ({
     // Indexes for common queries
     userIdIdx: index("chat_folders_user_id_idx").on(table.userId),
-    rootFolderIdIdx: index("chat_folders_root_folder_id_idx").on(table.rootFolderId),
+    rootFolderIdIdx: index("chat_folders_root_folder_id_idx").on(
+      table.rootFolderId,
+    ),
     parentIdIdx: index("chat_folders_parent_id_idx").on(table.parentId),
     sortOrderIdx: index("chat_folders_sort_order_idx").on(table.sortOrder),
     // GIN indexes for array containment queries on role fields
-    rolesViewIdx: index("chat_folders_roles_view_idx").using("gin", table.rolesView),
-    rolesManageIdx: index("chat_folders_roles_manage_idx").using("gin", table.rolesManage),
+    rolesViewIdx: index("chat_folders_roles_view_idx").using(
+      "gin",
+      table.rolesView,
+    ),
+    rolesManageIdx: index("chat_folders_roles_manage_idx").using(
+      "gin",
+      table.rolesManage,
+    ),
     rolesCreateThreadIdx: index("chat_folders_roles_create_thread_idx").using(
       "gin",
       table.rolesCreateThread,
     ),
-    rolesPostIdx: index("chat_folders_roles_post_idx").using("gin", table.rolesPost),
-    rolesModerateIdx: index("chat_folders_roles_moderate_idx").using("gin", table.rolesModerate),
-    rolesAdminIdx: index("chat_folders_roles_admin_idx").using("gin", table.rolesAdmin),
+    rolesPostIdx: index("chat_folders_roles_post_idx").using(
+      "gin",
+      table.rolesPost,
+    ),
+    rolesModerateIdx: index("chat_folders_roles_moderate_idx").using(
+      "gin",
+      table.rolesModerate,
+    ),
+    rolesAdminIdx: index("chat_folders_roles_admin_idx").using(
+      "gin",
+      table.rolesAdmin,
+    ),
   }),
 );
 
@@ -273,7 +295,9 @@ export const chatThreads = pgTable(
     }),
 
     // Status
-    status: text("status", { enum: ThreadStatusDB }).notNull().default(ThreadStatusDB[0]),
+    status: text("status", { enum: ThreadStatusDB })
+      .notNull()
+      .default(ThreadStatusDB[0]),
 
     // Settings
     defaultModel: text("default_model").$type<ModelId | null>(), // ModelId
@@ -304,10 +328,12 @@ export const chatThreads = pgTable(
     rolesPost: jsonb("roles_post").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // rolesModerate: Who can moderate/hide messages in this thread
-    rolesModerate: jsonb("roles_moderate").$type<(typeof UserPermissionRoleValue)[]>(),
+    rolesModerate:
+      jsonb("roles_moderate").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // rolesAdmin: Who can delete the thread and manage permissions
-    rolesAdmin: jsonb("roles_admin").$type<(typeof UserPermissionRoleValue)[]>(),
+    rolesAdmin:
+      jsonb("roles_admin").$type<(typeof UserPermissionRoleValue)[]>(),
 
     // Published status (for SHARED folders - allows public read access via link)
     published: boolean("published").default(false).notNull(),
@@ -327,17 +353,34 @@ export const chatThreads = pgTable(
     ),
     // Additional indexes for common queries
     userIdIdx: index("chat_threads_user_id_idx").on(table.userId),
-    rootFolderIdIdx: index("chat_threads_root_folder_id_idx").on(table.rootFolderId),
+    rootFolderIdIdx: index("chat_threads_root_folder_id_idx").on(
+      table.rootFolderId,
+    ),
     folderIdIdx: index("chat_threads_folder_id_idx").on(table.folderId),
     statusIdx: index("chat_threads_status_idx").on(table.status),
     createdAtIdx: index("chat_threads_created_at_idx").on(table.createdAt),
     updatedAtIdx: index("chat_threads_updated_at_idx").on(table.updatedAt),
     // GIN indexes for array containment queries on role fields
-    rolesViewIdx: index("chat_threads_roles_view_idx").using("gin", table.rolesView),
-    rolesEditIdx: index("chat_threads_roles_edit_idx").using("gin", table.rolesEdit),
-    rolesPostIdx: index("chat_threads_roles_post_idx").using("gin", table.rolesPost),
-    rolesModerateIdx: index("chat_threads_roles_moderate_idx").using("gin", table.rolesModerate),
-    rolesAdminIdx: index("chat_threads_roles_admin_idx").using("gin", table.rolesAdmin),
+    rolesViewIdx: index("chat_threads_roles_view_idx").using(
+      "gin",
+      table.rolesView,
+    ),
+    rolesEditIdx: index("chat_threads_roles_edit_idx").using(
+      "gin",
+      table.rolesEdit,
+    ),
+    rolesPostIdx: index("chat_threads_roles_post_idx").using(
+      "gin",
+      table.rolesPost,
+    ),
+    rolesModerateIdx: index("chat_threads_roles_moderate_idx").using(
+      "gin",
+      table.rolesModerate,
+    ),
+    rolesAdminIdx: index("chat_threads_roles_admin_idx").using(
+      "gin",
+      table.rolesAdmin,
+    ),
   }),
 );
 
@@ -461,7 +504,9 @@ export const threadShareLinks = pgTable(
   (table) => ({
     threadIdIdx: index("thread_share_links_thread_id_idx").on(table.threadId),
     tokenIdx: index("thread_share_links_token_idx").on(table.token),
-    createdByIdx: index("thread_share_links_created_by_idx").on(table.createdBy),
+    createdByIdx: index("thread_share_links_created_by_idx").on(
+      table.createdBy,
+    ),
     activeIdx: index("thread_share_links_active_idx").on(table.active),
   }),
 );
@@ -498,31 +543,37 @@ export const chatThreadsRelations = relations(chatThreads, ({ one, many }) => ({
   shareLinks: many(threadShareLinks),
 }));
 
-export const threadShareLinksRelations = relations(threadShareLinks, ({ one }) => ({
-  thread: one(chatThreads, {
-    fields: [threadShareLinks.threadId],
-    references: [chatThreads.id],
+export const threadShareLinksRelations = relations(
+  threadShareLinks,
+  ({ one }) => ({
+    thread: one(chatThreads, {
+      fields: [threadShareLinks.threadId],
+      references: [chatThreads.id],
+    }),
+    creator: one(users, {
+      fields: [threadShareLinks.createdBy],
+      references: [users.id],
+    }),
   }),
-  creator: one(users, {
-    fields: [threadShareLinks.createdBy],
-    references: [users.id],
-  }),
-}));
+);
 
-export const chatMessagesRelations = relations(chatMessages, ({ one, many }) => ({
-  thread: one(chatThreads, {
-    fields: [chatMessages.threadId],
-    references: [chatThreads.id],
+export const chatMessagesRelations = relations(
+  chatMessages,
+  ({ one, many }) => ({
+    thread: one(chatThreads, {
+      fields: [chatMessages.threadId],
+      references: [chatThreads.id],
+    }),
+    parent: one(chatMessages, {
+      fields: [chatMessages.parentId],
+      references: [chatMessages.id],
+      relationName: "messageTree",
+    }),
+    children: many(chatMessages, {
+      relationName: "messageTree",
+    }),
   }),
-  parent: one(chatMessages, {
-    fields: [chatMessages.parentId],
-    references: [chatMessages.id],
-    relationName: "messageTree",
-  }),
-  children: many(chatMessages, {
-    relationName: "messageTree",
-  }),
-}));
+);
 
 /**
  * Schemas for validation

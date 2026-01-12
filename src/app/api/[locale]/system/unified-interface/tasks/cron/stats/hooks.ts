@@ -13,7 +13,9 @@ import definitions from "@/app/api/[locale]/system/unified-interface/tasks/cron/
 /**
  * Hook for fetching cron statistics
  */
-export function useCronStats(logger: EndpointLogger): EndpointReturn<typeof definitions> {
+export function useCronStats(
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

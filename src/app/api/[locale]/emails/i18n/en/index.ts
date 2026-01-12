@@ -554,7 +554,8 @@ export const translations = {
           message: "Message",
           message_description: "Message content",
           isForCompany: "For Company Account",
-          isForCompany_description: "Whether this email is sent to company team",
+          isForCompany_description:
+            "Whether this email is sent to company team",
           userId: "User ID",
           userId_description: "ID of the associated user (optional)",
           leadId: "Lead ID",

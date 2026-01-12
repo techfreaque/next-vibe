@@ -11,7 +11,9 @@ interface SmtpAdminPageProps {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-export default async function SmtpAdminPage({ params }: SmtpAdminPageProps): Promise<never> {
+export default async function SmtpAdminPage({
+  params,
+}: SmtpAdminPageProps): Promise<never> {
   const { locale } = await params;
 
   // Redirect to the accounts page

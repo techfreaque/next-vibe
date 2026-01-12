@@ -64,7 +64,8 @@ const { GET } = createEndpoint({
     },
     unauthorized: {
       title: "app.api.agent.chat.files.get.errors.unauthorized.title",
-      description: "app.api.agent.chat.files.get.errors.unauthorized.description",
+      description:
+        "app.api.agent.chat.files.get.errors.unauthorized.description",
     },
     forbidden: {
       title: "app.api.agent.chat.files.get.errors.forbidden.title",
@@ -84,7 +85,8 @@ const { GET } = createEndpoint({
     },
     unsaved_changes: {
       title: "app.api.agent.chat.files.get.errors.unsavedChanges.title",
-      description: "app.api.agent.chat.files.get.errors.unsavedChanges.description",
+      description:
+        "app.api.agent.chat.files.get.errors.unsavedChanges.description",
     },
     conflict: {
       title: "app.api.agent.chat.files.get.errors.conflict.title",

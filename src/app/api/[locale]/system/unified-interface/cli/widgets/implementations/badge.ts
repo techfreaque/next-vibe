@@ -25,7 +25,9 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class BadgeWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.BADGE> {
+export class BadgeWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.BADGE
+> {
   readonly widgetType = WidgetType.BADGE;
 
   /**
@@ -45,7 +47,11 @@ export class BadgeWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.BA
     const { field, value, context } = props;
     const indent = this.createIndent(context.depth, context);
     const label = this.formatLabel(field, context);
-    const { text: staticText, enumOptions, variant: semanticVariant } = field.ui;
+    const {
+      text: staticText,
+      enumOptions,
+      variant: semanticVariant,
+    } = field.ui;
 
     // Handle static text from UI config
     if (staticText) {
@@ -55,7 +61,9 @@ export class BadgeWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.BA
         : "default";
       const color = getBadgeColor(variant);
       const styledBadge = this.styleText(translatedText, color, context);
-      return label ? `${indent}${label}: ${styledBadge}` : `${indent}${styledBadge}`;
+      return label
+        ? `${indent}${label}: ${styledBadge}`
+        : `${indent}${styledBadge}`;
     }
 
     // Handle enum options - find matching label for value
@@ -67,7 +75,9 @@ export class BadgeWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.BA
           : "default";
         const color = getBadgeColor(variant);
         const styledBadge = this.styleText(enumLabel, color, context);
-        return label ? `${indent}${label}: ${styledBadge}` : `${indent}${styledBadge}`;
+        return label
+          ? `${indent}${label}: ${styledBadge}`
+          : `${indent}${styledBadge}`;
       }
     }
 

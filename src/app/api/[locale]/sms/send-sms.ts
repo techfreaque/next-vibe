@@ -1,7 +1,11 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -88,8 +92,11 @@ export async function sendSms(
   params: SendSmsParams,
   logger: EndpointLogger,
 ): Promise<ResponseType<SmsResult>> {
-  const maxAttempts = params.retry?.attempts || parseInt(smsEnv.SMS_MAX_RETRY_ATTEMPTS || "3", 10);
-  const delayMs = params.retry?.delayMs || parseInt(smsEnv.SMS_RETRY_DELAY_MS || "1000", 10);
+  const maxAttempts =
+    params.retry?.attempts ||
+    parseInt(smsEnv.SMS_MAX_RETRY_ATTEMPTS || "3", 10);
+  const delayMs =
+    params.retry?.delayMs || parseInt(smsEnv.SMS_RETRY_DELAY_MS || "1000", 10);
 
   // Validate phone number
   const validation = validatePhoneNumber(params.to, logger);
@@ -150,7 +157,8 @@ export async function sendSms(
           });
         }
       } catch (error) {
-        lastError = error instanceof Error ? error : new Error("error.general.unknown");
+        lastError =
+          error instanceof Error ? error : new Error("error.general.unknown");
         logger.error("SMS send attempt exception", {
           error: parseError(error),
           attempt,

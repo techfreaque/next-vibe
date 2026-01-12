@@ -23,7 +23,10 @@ export function isObjectField<TKey extends string>(
  */
 export function isObjectOptionalField<TKey extends string>(
   field: UnifiedField<TKey, z.ZodTypeAny>,
-): field is Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "object-optional" }> {
+): field is Extract<
+  UnifiedField<TKey, z.ZodTypeAny>,
+  { type: "object-optional" }
+> {
   return field.type === "object-optional";
 }
 
@@ -32,7 +35,10 @@ export function isObjectOptionalField<TKey extends string>(
  */
 export function isObjectUnionField<TKey extends string>(
   field: UnifiedField<TKey, z.ZodTypeAny>,
-): field is Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "object-union" }> {
+): field is Extract<
+  UnifiedField<TKey, z.ZodTypeAny>,
+  { type: "object-union" }
+> {
   return field.type === "object-union";
 }
 
@@ -59,7 +65,10 @@ export function isArrayField<TKey extends string>(
  */
 export function isArrayOptionalField<TKey extends string>(
   field: UnifiedField<TKey, z.ZodTypeAny>,
-): field is Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "array-optional" }> {
+): field is Extract<
+  UnifiedField<TKey, z.ZodTypeAny>,
+  { type: "array-optional" }
+> {
   return field.type === "array-optional";
 }
 
@@ -93,7 +102,9 @@ export function canHaveChildren<TKey extends string>(
   | Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "object-optional" }>
   | Extract<UnifiedField<TKey, z.ZodTypeAny>, { type: "object-union" }> {
   return (
-    field.type === "object" || field.type === "object-optional" || field.type === "object-union"
+    field.type === "object" ||
+    field.type === "object-optional" ||
+    field.type === "object-union"
   );
 }
 
@@ -133,12 +144,16 @@ export function hasWidgetTypeInTree<TKey extends string>(
 
   // Check children
   if (hasChildren(field)) {
-    return Object.values(field.children).some((child) => hasWidgetTypeInTree(child, widgetType));
+    return Object.values(field.children).some((child) =>
+      hasWidgetTypeInTree(child, widgetType),
+    );
   }
 
   // Check union variants
   if (isObjectUnionField(field)) {
-    return field.variants.some((variant) => hasWidgetTypeInTree(variant, widgetType));
+    return field.variants.some((variant) =>
+      hasWidgetTypeInTree(variant, widgetType),
+    );
   }
 
   return false;
@@ -157,7 +172,9 @@ import type { WidgetData } from "../types";
  * Type guard for WidgetData plain objects (excludes arrays, primitives, null, undefined)
  * Useful for safely narrowing to Record<string, WidgetData> type
  */
-export function isWidgetDataObject(value: WidgetData): value is Record<string, WidgetData> {
+export function isWidgetDataObject(
+  value: WidgetData,
+): value is Record<string, WidgetData> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
@@ -193,7 +210,9 @@ export function isWidgetDataBoolean(value: WidgetData): value is boolean {
 /**
  * Type guard for WidgetData null/undefined values
  */
-export function isWidgetDataNullish(value: WidgetData): value is null | undefined {
+export function isWidgetDataNullish(
+  value: WidgetData,
+): value is null | undefined {
   return value === null || value === undefined;
 }
 

@@ -6,8 +6,15 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -18,9 +25,16 @@ import { importRepository } from "../../import/repository";
 import type { DomainRecord } from "../../import/types";
 import type { JwtPrivatePayloadType } from "../../user/auth/types";
 import { leads, type NewLead } from "../db";
-import type { EmailCampaignStageValues, LeadSourceValues, LeadStatusValues } from "../enum";
+import type {
+  EmailCampaignStageValues,
+  LeadSourceValues,
+  LeadStatusValues,
+} from "../enum";
 import { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
-import type { LeadsImportRequestOutput, LeadsImportResponseOutput } from "./definition";
+import type {
+  LeadsImportRequestOutput,
+  LeadsImportResponseOutput,
+} from "./definition";
 import type { CsvImportJobStatus, CsvImportJobStatusValue } from "./enum";
 import type { ImportJobsStatusGetResponseOutput } from "./status/definition";
 
@@ -44,7 +58,9 @@ export interface DomainImportRepository<T extends DomainRecord> {
     data: T,
     config: CsvImportConfig,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ created: boolean; updated: boolean; duplicate: boolean }>>;
+  ): Promise<
+    ResponseType<{ created: boolean; updated: boolean; duplicate: boolean }>
+  >;
 
   /**
    * Check if a record exists by email
@@ -242,7 +258,10 @@ export class LeadsImportRepository {
   /**
    * Validate a CSV row for leads
    */
-  validateCsvRow(row: Record<string, string>, config: CsvImportConfig): CsvRowValidationResult {
+  validateCsvRow(
+    row: Record<string, string>,
+    config: CsvImportConfig,
+  ): CsvRowValidationResult {
     const errors: ErrorResponseType[] = [];
     const data: Record<string, string | number | boolean | null> = {};
 
@@ -263,7 +282,8 @@ export class LeadsImportRepository {
     } else {
       errors.push(
         fail({
-          message: "app.admin.leads.leadsErrors.leadsImport.post.error.validation.email_required",
+          message:
+            "app.admin.leads.leadsErrors.leadsImport.post.error.validation.email_required",
           errorType: ErrorResponseTypes.BAD_REQUEST,
         }),
       );
@@ -305,7 +325,9 @@ export class LeadsImportRepository {
     data: LeadRecord,
     config: CsvImportConfig,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ created: boolean; updated: boolean; duplicate: boolean }>> {
+  ): Promise<
+    ResponseType<{ created: boolean; updated: boolean; duplicate: boolean }>
+  > {
     try {
       // Check if lead exists
       const existingLead = await db
@@ -352,7 +374,10 @@ export class LeadsImportRepository {
             updateData.currentCampaignStage = data.currentCampaignStage;
           }
 
-          await db.update(leads).set(updateData).where(eq(leads.id, existingLead[0].id));
+          await db
+            .update(leads)
+            .set(updateData)
+            .where(eq(leads.id, existingLead[0].id));
 
           logger.debug("Updated existing lead", {
             leadId: existingLead[0].id,
@@ -401,7 +426,8 @@ export class LeadsImportRepository {
     } catch (error) {
       logger.error("Error creating/updating lead", parseError(error));
       return fail({
-        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        message:
+          "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -410,7 +436,10 @@ export class LeadsImportRepository {
   /**
    * Check if a lead exists by email
    */
-  async recordExistsByEmail(email: string, logger: EndpointLogger): Promise<boolean> {
+  async recordExistsByEmail(
+    email: string,
+    logger: EndpointLogger,
+  ): Promise<boolean> {
     try {
       const existingLead = await db
         .select({ id: leads.id })
@@ -444,7 +473,8 @@ export class LeadsImportRepository {
         defaultCountry: data.defaultCountry,
         defaultLanguage: data.defaultLanguage,
         defaultStatus: data.defaultStatus ?? LeadStatus.NEW,
-        defaultCampaignStage: data.defaultCampaignStage ?? EmailCampaignStage.NOT_STARTED,
+        defaultCampaignStage:
+          data.defaultCampaignStage ?? EmailCampaignStage.NOT_STARTED,
         defaultSource: data.defaultSource ?? LeadSource.CSV_IMPORT,
         useChunkedProcessing: data.useChunkedProcessing ?? false,
         batchSize: data.batchSize ?? 100,
@@ -458,7 +488,12 @@ export class LeadsImportRepository {
       });
 
       // Use the generic import repository with this domain-specific implementation
-      const result = await importRepository.importFromCsv(config, user.id, this, logger);
+      const result = await importRepository.importFromCsv(
+        config,
+        user.id,
+        this,
+        logger,
+      );
 
       // Map the generic result to the leads-specific response format
       if (result.success) {
@@ -479,7 +514,8 @@ export class LeadsImportRepository {
     } catch (error) {
       logger.error("Error importing leads from CSV", parseError(error));
       return fail({
-        message: "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        message:
+          "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -579,7 +615,11 @@ export class LeadsImportRepository {
       };
     }>
   > {
-    const response = await importRepository.updateImportJob(userId, updates, logger);
+    const response = await importRepository.updateImportJob(
+      userId,
+      updates,
+      logger,
+    );
 
     if (!response.success) {
       return response;
@@ -631,7 +671,11 @@ export class LeadsImportRepository {
       };
     }>
   > {
-    const response = await importRepository.deleteImportJob(userId, jobId, logger);
+    const response = await importRepository.deleteImportJob(
+      userId,
+      jobId,
+      logger,
+    );
 
     if (!response.success) {
       return response;

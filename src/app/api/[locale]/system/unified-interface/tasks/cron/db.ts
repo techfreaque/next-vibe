@@ -3,7 +3,15 @@
  * Database tables specific to cron task functionality
  */
 
-import { boolean, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
@@ -121,11 +129,15 @@ export const cronTaskSchedules = pgTable("cron_task_schedules", {
 export const insertCronTaskSchema = createInsertSchema(cronTasks);
 export const selectCronTaskSchema = createSelectSchema(cronTasks);
 
-export const insertCronTaskExecutionSchema = createInsertSchema(cronTaskExecutions);
-export const selectCronTaskExecutionSchema = createSelectSchema(cronTaskExecutions);
+export const insertCronTaskExecutionSchema =
+  createInsertSchema(cronTaskExecutions);
+export const selectCronTaskExecutionSchema =
+  createSelectSchema(cronTaskExecutions);
 
-export const insertCronTaskScheduleSchema = createInsertSchema(cronTaskSchedules);
-export const selectCronTaskScheduleSchema = createSelectSchema(cronTaskSchedules);
+export const insertCronTaskScheduleSchema =
+  createInsertSchema(cronTaskSchedules);
+export const selectCronTaskScheduleSchema =
+  createSelectSchema(cronTaskSchedules);
 
 /**
  * Type exports for cron tasks
@@ -134,7 +146,9 @@ export type CronTask = z.infer<typeof selectCronTaskSchema>;
 export type NewCronTask = z.infer<typeof insertCronTaskSchema>;
 
 export type CronTaskExecution = z.infer<typeof selectCronTaskExecutionSchema>;
-export type NewCronTaskExecution = z.infer<typeof insertCronTaskExecutionSchema>;
+export type NewCronTaskExecution = z.infer<
+  typeof insertCronTaskExecutionSchema
+>;
 
 export type CronTaskSchedule = z.infer<typeof selectCronTaskScheduleSchema>;
 export type NewCronTaskSchedule = z.infer<typeof insertCronTaskScheduleSchema>;

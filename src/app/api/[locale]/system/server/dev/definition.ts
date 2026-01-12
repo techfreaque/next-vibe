@@ -58,7 +58,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.dev.post.fields.skipDbSetup.title",
-          description: "app.api.system.server.dev.post.fields.skipDbSetup.description",
+          description:
+            "app.api.system.server.dev.post.fields.skipDbSetup.description",
         },
         z.boolean().default(false),
       ),
@@ -68,7 +69,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.dev.post.fields.skipNextCommand.title",
-          description: "app.api.system.server.dev.post.fields.skipNextCommand.description",
+          description:
+            "app.api.system.server.dev.post.fields.skipNextCommand.description",
         },
         z.boolean().default(false),
       ),
@@ -78,7 +80,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.dev.post.fields.skipDbReset.title",
-          description: "app.api.system.server.dev.post.fields.skipDbReset.description",
+          description:
+            "app.api.system.server.dev.post.fields.skipDbReset.description",
         },
         z.boolean().default(false),
       ),
@@ -88,7 +91,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.dev.post.fields.skipDbReset.title",
-          description: "app.api.system.server.dev.post.fields.skipDbReset.description",
+          description:
+            "app.api.system.server.dev.post.fields.skipDbReset.description",
         },
         z.boolean().default(false),
       ),
@@ -107,8 +111,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.dev.post.fields.skipGeneratorWatcher.title",
-          description: "app.api.system.server.dev.post.fields.skipGeneratorWatcher.description",
+          label:
+            "app.api.system.server.dev.post.fields.skipGeneratorWatcher.title",
+          description:
+            "app.api.system.server.dev.post.fields.skipGeneratorWatcher.description",
         },
         z.boolean().default(false),
       ),
@@ -117,8 +123,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.server.dev.post.fields.generatorWatcherInterval.title",
-          description: "app.api.system.server.dev.post.fields.generatorWatcherInterval.description",
+          label:
+            "app.api.system.server.dev.post.fields.generatorWatcherInterval.title",
+          description:
+            "app.api.system.server.dev.post.fields.generatorWatcherInterval.description",
         },
         z.coerce.number().default(5000),
       ),
@@ -128,7 +136,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.dev.post.fields.skipTaskRunner.title",
-          description: "app.api.system.server.dev.post.fields.skipTaskRunner.description",
+          description:
+            "app.api.system.server.dev.post.fields.skipTaskRunner.description",
         },
         z.boolean().default(false),
       ),
@@ -138,7 +147,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.dev.post.fields.skipMigrations.title",
-          description: "app.api.system.server.dev.post.fields.skipMigrations.description",
+          description:
+            "app.api.system.server.dev.post.fields.skipMigrations.description",
         },
         z.boolean().default(false),
       ),
@@ -147,8 +157,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.server.dev.post.fields.skipMigrationGeneration.title",
-          description: "app.api.system.server.dev.post.fields.skipMigrationGeneration.description",
+          label:
+            "app.api.system.server.dev.post.fields.skipMigrationGeneration.title",
+          description:
+            "app.api.system.server.dev.post.fields.skipMigrationGeneration.description",
         },
         z.boolean().default(false),
       ),
@@ -158,7 +170,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.server.dev.post.fields.skipSeeding.title",
-          description: "app.api.system.server.dev.post.fields.skipSeeding.description",
+          description:
+            "app.api.system.server.dev.post.fields.skipSeeding.description",
         },
         z.boolean().default(false),
       ),
@@ -177,7 +190,8 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.server.dev.post.errors.validation.title",
-      description: "app.api.system.server.dev.post.errors.validation.description",
+      description:
+        "app.api.system.server.dev.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.server.dev.post.errors.network.title",
@@ -185,11 +199,13 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.server.dev.post.errors.unauthorized.title",
-      description: "app.api.system.server.dev.post.errors.unauthorized.description",
+      description:
+        "app.api.system.server.dev.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.server.dev.post.errors.forbidden.title",
-      description: "app.api.system.server.dev.post.errors.forbidden.description",
+      description:
+        "app.api.system.server.dev.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.server.dev.post.errors.server.title",

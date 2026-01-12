@@ -14,6 +14,12 @@ export const { GET, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined,
     handler: ({ data, urlPathParams, user, locale, logger }) =>
-      MessageSearchRepository.searchMessages(data, urlPathParams, user, locale, logger),
+      MessageSearchRepository.searchMessages(
+        data,
+        urlPathParams,
+        user,
+        locale,
+        logger,
+      ),
   },
 });

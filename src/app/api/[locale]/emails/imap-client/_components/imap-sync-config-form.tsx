@@ -22,7 +22,10 @@ interface ImapSyncConfigFormProps {
 /**
  * IMAP Sync Configuration Form Component
  */
-export function ImapSyncConfigForm({ control, locale }: ImapSyncConfigFormProps): JSX.Element {
+export function ImapSyncConfigForm({
+  control,
+  locale,
+}: ImapSyncConfigFormProps): JSX.Element {
   return (
     <Div className="flex flex-col gap-4">
       <EndpointFormField

@@ -23,7 +23,9 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class LinkListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.LINK_LIST> {
+export class LinkListWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.LINK_LIST
+> {
   readonly widgetType = WidgetType.LINK_LIST;
 
   /**
@@ -56,7 +58,10 @@ export class LinkListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
    * - Description (wrapped) on following lines if present
    * - Each link item rendered with icon/bullet, title/URL, and optional description
    */
-  private renderLinkList(data: ProcessedLinkList, context: WidgetRenderContext): string {
+  private renderLinkList(
+    data: ProcessedLinkList,
+    context: WidgetRenderContext,
+  ): string {
     const { items, title, description } = data;
     const indent = this.createIndent(context.depth, context);
     const result: string[] = [];
@@ -95,7 +100,11 @@ export class LinkListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
    * - Optional description prefixed with dash
    * All parts joined on one line with spaces.
    */
-  private renderLinkItem(item: LinkItem, indent: string, context: WidgetRenderContext): string {
+  private renderLinkItem(
+    item: LinkItem,
+    indent: string,
+    context: WidgetRenderContext,
+  ): string {
     const { url, title, description, icon } = item;
 
     // Build the link display text
@@ -105,7 +114,11 @@ export class LinkListWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
     const parts: string[] = [];
 
     // Add icon and title/url
-    const styledText = this.styleText(`${iconPrefix}${displayText}`, "blue", context);
+    const styledText = this.styleText(
+      `${iconPrefix}${displayText}`,
+      "blue",
+      context,
+    );
     parts.push(styledText);
 
     // Add URL in parentheses if different from title

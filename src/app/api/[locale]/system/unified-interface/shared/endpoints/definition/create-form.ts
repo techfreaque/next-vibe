@@ -29,7 +29,10 @@ import {
   Methods,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { WidgetConfig } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
-import { UserRole, type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  UserRole,
+  type UserRoleValue,
+} from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { simpleT } from "@/i18n/core/shared";
@@ -63,13 +66,23 @@ type InferMethodRequestDataSchema<
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
   TMethod extends Methods,
-> = InferSchemaFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.RequestData>;
+> = InferSchemaFromFieldForMethod<
+  TScopedTranslationKey,
+  TFields,
+  TMethod,
+  FieldUsage.RequestData
+>;
 
 type InferMethodResponseDataSchema<
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
   TMethod extends Methods,
-> = InferSchemaFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.ResponseData>;
+> = InferSchemaFromFieldForMethod<
+  TScopedTranslationKey,
+  TFields,
+  TMethod,
+  FieldUsage.ResponseData
+>;
 
 type InferMethodUrlParamsSchema<
   TScopedTranslationKey extends string,
@@ -89,19 +102,25 @@ type InferMethodRequestInput<
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
   TMethod extends Methods,
-> = ExtractInput<InferMethodRequestDataSchema<TScopedTranslationKey, TFields, TMethod>>;
+> = ExtractInput<
+  InferMethodRequestDataSchema<TScopedTranslationKey, TFields, TMethod>
+>;
 
 type InferMethodResponseOutput<
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
   TMethod extends Methods,
-> = ExtractOutput<InferMethodResponseDataSchema<TScopedTranslationKey, TFields, TMethod>>;
+> = ExtractOutput<
+  InferMethodResponseDataSchema<TScopedTranslationKey, TFields, TMethod>
+>;
 
 type InferMethodUrlVariablesInput<
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
   TMethod extends Methods,
-> = ExtractInput<InferMethodUrlParamsSchema<TScopedTranslationKey, TFields, TMethod>>;
+> = ExtractInput<
+  InferMethodUrlParamsSchema<TScopedTranslationKey, TFields, TMethod>
+>;
 
 /**
  * Cache schemas for a method to avoid repeated evaluation
@@ -111,9 +130,21 @@ export interface CachedMethodSchemas<
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
   TMethod extends Methods,
 > {
-  requestData: InferMethodRequestDataSchema<TScopedTranslationKey, TFields, TMethod>;
-  response: InferMethodResponseDataSchema<TScopedTranslationKey, TFields, TMethod>;
-  urlParams: InferMethodUrlParamsSchema<TScopedTranslationKey, TFields, TMethod>;
+  requestData: InferMethodRequestDataSchema<
+    TScopedTranslationKey,
+    TFields,
+    TMethod
+  >;
+  response: InferMethodResponseDataSchema<
+    TScopedTranslationKey,
+    TFields,
+    TMethod
+  >;
+  urlParams: InferMethodUrlParamsSchema<
+    TScopedTranslationKey,
+    TFields,
+    TMethod
+  >;
 }
 
 /**
@@ -121,7 +152,11 @@ export interface CachedMethodSchemas<
  * Uses the cached schema types and extracts Input/Output as needed
  */
 export interface MethodExamples<
-  TSchemas extends CachedMethodSchemas<string, UnifiedField<string, z.ZodTypeAny>, Methods>,
+  TSchemas extends CachedMethodSchemas<
+    string,
+    UnifiedField<string, z.ZodTypeAny>,
+    Methods
+  >,
   TExampleKey extends string,
 > {
   requests?: ExtractInput<TSchemas["requestData"]> extends never
@@ -157,11 +192,19 @@ export type FormExamples<
         > extends never
           ? undefined
           : ExamplesList<
-              InferMethodRequestInput<TScopedTranslationKey, TFields, Methods.GET>,
+              InferMethodRequestInput<
+                TScopedTranslationKey,
+                TFields,
+                Methods.GET
+              >,
               TExampleKey
             >;
         responses: ExamplesList<
-          InferMethodResponseOutput<TScopedTranslationKey, TFields, Methods.GET>,
+          InferMethodResponseOutput<
+            TScopedTranslationKey,
+            TFields,
+            Methods.GET
+          >,
           TExampleKey
         >;
         urlPathParams?: InferMethodUrlVariablesInput<
@@ -171,7 +214,11 @@ export type FormExamples<
         > extends never
           ? undefined
           : ExamplesList<
-              InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, Methods.GET>,
+              InferMethodUrlVariablesInput<
+                TScopedTranslationKey,
+                TFields,
+                Methods.GET
+              >,
               TExampleKey
             >;
       }
@@ -185,11 +232,19 @@ export type FormExamples<
         > extends never
           ? undefined
           : ExamplesList<
-              InferMethodRequestInput<TScopedTranslationKey, TFields, Methods.POST>,
+              InferMethodRequestInput<
+                TScopedTranslationKey,
+                TFields,
+                Methods.POST
+              >,
               TExampleKey
             >;
         responses: ExamplesList<
-          InferMethodResponseOutput<TScopedTranslationKey, TFields, Methods.POST>,
+          InferMethodResponseOutput<
+            TScopedTranslationKey,
+            TFields,
+            Methods.POST
+          >,
           TExampleKey
         >;
         urlPathParams?: InferMethodUrlVariablesInput<
@@ -199,7 +254,11 @@ export type FormExamples<
         > extends never
           ? undefined
           : ExamplesList<
-              InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, Methods.POST>,
+              InferMethodUrlVariablesInput<
+                TScopedTranslationKey,
+                TFields,
+                Methods.POST
+              >,
               TExampleKey
             >;
       }
@@ -213,11 +272,19 @@ export type FormExamples<
         > extends never
           ? undefined
           : ExamplesList<
-              InferMethodRequestInput<TScopedTranslationKey, TFields, Methods.PATCH>,
+              InferMethodRequestInput<
+                TScopedTranslationKey,
+                TFields,
+                Methods.PATCH
+              >,
               TExampleKey
             >;
         responses: ExamplesList<
-          InferMethodResponseOutput<TScopedTranslationKey, TFields, Methods.PATCH>,
+          InferMethodResponseOutput<
+            TScopedTranslationKey,
+            TFields,
+            Methods.PATCH
+          >,
           TExampleKey
         >;
         urlPathParams?: InferMethodUrlVariablesInput<
@@ -227,7 +294,11 @@ export type FormExamples<
         > extends never
           ? undefined
           : ExamplesList<
-              InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, Methods.PATCH>,
+              InferMethodUrlVariablesInput<
+                TScopedTranslationKey,
+                TFields,
+                Methods.PATCH
+              >,
               TExampleKey
             >;
       }
@@ -241,11 +312,19 @@ export type FormExamples<
         > extends never
           ? undefined
           : ExamplesList<
-              InferMethodRequestInput<TScopedTranslationKey, TFields, Methods.DELETE>,
+              InferMethodRequestInput<
+                TScopedTranslationKey,
+                TFields,
+                Methods.DELETE
+              >,
               TExampleKey
             >;
         responses: ExamplesList<
-          InferMethodResponseOutput<TScopedTranslationKey, TFields, Methods.DELETE>,
+          InferMethodResponseOutput<
+            TScopedTranslationKey,
+            TFields,
+            Methods.DELETE
+          >,
           TExampleKey
         >;
         urlPathParams?: InferMethodUrlVariablesInput<
@@ -255,7 +334,11 @@ export type FormExamples<
         > extends never
           ? undefined
           : ExamplesList<
-              InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, Methods.DELETE>,
+              InferMethodUrlVariablesInput<
+                TScopedTranslationKey,
+                TFields,
+                Methods.DELETE
+              >,
               TExampleKey
             >;
       }
@@ -304,7 +387,9 @@ export interface CreateFormEndpointConfig<
   };
 
   // Method-specific examples
-  readonly examples: NoInfer<FormExamples<TScopedTranslationKey, TFields, TExampleKey, TMethods>>;
+  readonly examples: NoInfer<
+    FormExamples<TScopedTranslationKey, TFields, TExampleKey, TMethods>
+  >;
 
   // Scoped translation
   readonly scopedTranslation?: {
@@ -376,7 +461,11 @@ export type FilterSchemaForMethod<
     TScopedTranslationKey,
     WidgetConfig<TScopedTranslationKey>
   >
-    ? SupportsMethodAndUsage<TFields["usage"], TMethod, TTargetUsage> extends true
+    ? SupportsMethodAndUsage<
+        TFields["usage"],
+        TMethod,
+        TTargetUsage
+      > extends true
       ? TSchema
       : z.ZodNever
     : TFields extends ObjectField<
@@ -385,7 +474,11 @@ export type FilterSchemaForMethod<
           TScopedTranslationKey,
           WidgetConfig<TScopedTranslationKey>
         >
-      ? SupportsMethodAndUsage<TFields["usage"], TMethod, TTargetUsage> extends true
+      ? SupportsMethodAndUsage<
+          TFields["usage"],
+          TMethod,
+          TTargetUsage
+        > extends true
         ? z.ZodObject<{
             [K in keyof TChildren as FilterSchemaForMethod<
               TScopedTranslationKey,
@@ -421,10 +514,30 @@ export type MethodSpecificEndpoint<
   TScopedTranslationKey,
   TFields,
   // Override type parameters with method-specific inference
-  InferInputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.RequestData>,
-  InferOutputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.RequestData>,
-  InferInputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.ResponseData>,
-  InferOutputFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.ResponseData>,
+  InferInputFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.RequestData
+  >,
+  InferOutputFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.RequestData
+  >,
+  InferInputFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.ResponseData
+  >,
+  InferOutputFromFieldForMethod<
+    TScopedTranslationKey,
+    TFields,
+    TMethod,
+    FieldUsage.ResponseData
+  >,
   InferInputFromFieldForMethod<
     TScopedTranslationKey,
     TFields,
@@ -472,7 +585,12 @@ export type GetResponseSchemaFromFields<
   TScopedTranslationKey extends string,
   TFields extends UnifiedField<TScopedTranslationKey, z.ZodTypeAny>,
   TMethod extends Methods,
-> = InferSchemaFromFieldForMethod<TScopedTranslationKey, TFields, TMethod, FieldUsage.ResponseData>;
+> = InferSchemaFromFieldForMethod<
+  TScopedTranslationKey,
+  TFields,
+  TMethod,
+  FieldUsage.ResponseData
+>;
 
 /**
  * Return type for createFormEndpoint - provides GET, POST, PATCH, and DELETE endpoints
@@ -731,7 +849,10 @@ function transformFieldForMethod<F>(field: F, method: Methods): F {
     }
 
     // Transform all children recursively
-    const transformedChildren: Record<string, UnifiedField<string, z.ZodTypeAny>> = {};
+    const transformedChildren: Record<
+      string,
+      UnifiedField<string, z.ZodTypeAny>
+    > = {};
     if (typedField.children) {
       for (const [key, childField] of Object.entries(typedField.children)) {
         transformedChildren[key] = transformFieldForMethod(childField, method);
@@ -799,7 +920,9 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
   }
 
   const typedField = field as F & FieldWithType;
-  const hasMethodSpecificUsage = (usage: FieldUsageConfig | undefined): boolean => {
+  const hasMethodSpecificUsage = (
+    usage: FieldUsageConfig | undefined,
+  ): boolean => {
     if (!usage) {
       return false;
     }
@@ -885,12 +1008,14 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
         return "response" in usage && usage.response === true;
       case FieldUsage.RequestData:
         return (
-          "request" in usage && (usage.request === "data" || usage.request === "data&urlPathParams")
+          "request" in usage &&
+          (usage.request === "data" || usage.request === "data&urlPathParams")
         );
       case FieldUsage.RequestUrlParams:
         return (
           "request" in usage &&
-          (usage.request === "urlPathParams" || usage.request === "data&urlPathParams")
+          (usage.request === "urlPathParams" ||
+            usage.request === "data&urlPathParams")
         );
       default:
         return false;
@@ -912,7 +1037,11 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
 
     if (typedField.children) {
       for (const [key, childField] of Object.entries(typedField.children)) {
-        const childSchema = generateSchemaForMethodAndUsage(childField, method, targetUsage);
+        const childSchema = generateSchemaForMethodAndUsage(
+          childField,
+          method,
+          targetUsage,
+        );
         if (!(childSchema instanceof z.ZodNever)) {
           shape[key] = childSchema;
         }
@@ -937,8 +1066,14 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
   if (typedField.type === "array") {
     const methodUsage = getUsageForMethod(typedField.usage, method);
     if (methodUsage && hasTargetUsage(methodUsage) && typedField.child) {
-      const childSchema = generateSchemaForMethodAndUsage(typedField.child, method, targetUsage);
-      return childSchema instanceof z.ZodNever ? z.never() : z.array(childSchema);
+      const childSchema = generateSchemaForMethodAndUsage(
+        typedField.child,
+        method,
+        targetUsage,
+      );
+      return childSchema instanceof z.ZodNever
+        ? z.never()
+        : z.array(childSchema);
     }
     return z.never();
   }
@@ -949,22 +1084,39 @@ export function generateSchemaForMethodAndUsage<F, Usage extends FieldUsage>(
 /**
  * Generate request data schema for a specific HTTP method using proper method-specific filtering
  */
-export function generateRequestDataSchemaForMethod<F>(field: F, method: Methods): z.ZodTypeAny {
+export function generateRequestDataSchemaForMethod<F>(
+  field: F,
+  method: Methods,
+): z.ZodTypeAny {
   return generateSchemaForMethodAndUsage(field, method, FieldUsage.RequestData);
 }
 
 /**
  * Generate response schema for a specific HTTP method using proper method-specific filtering
  */
-export function generateResponseSchemaForMethod<F>(field: F, method: Methods): z.ZodTypeAny {
-  return generateSchemaForMethodAndUsage(field, method, FieldUsage.ResponseData);
+export function generateResponseSchemaForMethod<F>(
+  field: F,
+  method: Methods,
+): z.ZodTypeAny {
+  return generateSchemaForMethodAndUsage(
+    field,
+    method,
+    FieldUsage.ResponseData,
+  );
 }
 
 /**
  * Generate request URL params schema for a specific HTTP method using proper method-specific filtering
  */
-export function generateRequestUrlSchemaForMethod<F>(field: F, method: Methods): z.ZodTypeAny {
-  return generateSchemaForMethodAndUsage(field, method, FieldUsage.RequestUrlParams);
+export function generateRequestUrlSchemaForMethod<F>(
+  field: F,
+  method: Methods,
+): z.ZodTypeAny {
+  return generateSchemaForMethodAndUsage(
+    field,
+    method,
+    FieldUsage.RequestUrlParams,
+  );
 }
 
 /**
@@ -995,7 +1147,13 @@ export function createFormEndpoint<
     TFields,
     TMethods
   >,
-): CreateFormEndpointReturn<TExampleKey, TUserRoleValue, TScopedTranslationKey, TFields, TMethods> {
+): CreateFormEndpointReturn<
+  TExampleKey,
+  TUserRoleValue,
+  TScopedTranslationKey,
+  TFields,
+  TMethods
+> {
   // Generate schemas directly from the original fields with method-specific filtering
 
   // Default scopedTranslation when none provided - uses global TranslationKey with simpleT
@@ -1020,12 +1178,32 @@ export function createFormEndpoint<
   const createMethodEndpoint = <TMethod extends Methods>(
     method: TMethod,
     methodConfig: FormMethodConfig<TScopedTranslationKey>,
-    requestSchema: InferMethodRequestDataSchema<TScopedTranslationKey, TFields, TMethod>,
-    responseSchema: InferMethodResponseDataSchema<TScopedTranslationKey, TFields, TMethod>,
-    urlSchema: InferMethodUrlParamsSchema<TScopedTranslationKey, TFields, TMethod>,
-    examples: (InferMethodRequestInput<TScopedTranslationKey, TFields, TMethod> extends undefined
+    requestSchema: InferMethodRequestDataSchema<
+      TScopedTranslationKey,
+      TFields,
+      TMethod
+    >,
+    responseSchema: InferMethodResponseDataSchema<
+      TScopedTranslationKey,
+      TFields,
+      TMethod
+    >,
+    urlSchema: InferMethodUrlParamsSchema<
+      TScopedTranslationKey,
+      TFields,
+      TMethod
+    >,
+    examples: (InferMethodRequestInput<
+      TScopedTranslationKey,
+      TFields,
+      TMethod
+    > extends undefined
       ? { requests?: undefined }
-      : InferMethodRequestInput<TScopedTranslationKey, TFields, TMethod> extends never
+      : InferMethodRequestInput<
+            TScopedTranslationKey,
+            TFields,
+            TMethod
+          > extends never
         ? { requests?: undefined }
         : {
             requests: ExamplesList<
@@ -1033,13 +1211,25 @@ export function createFormEndpoint<
               TExampleKey
             >;
           }) &
-      (InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, TMethod> extends undefined
+      (InferMethodUrlVariablesInput<
+        TScopedTranslationKey,
+        TFields,
+        TMethod
+      > extends undefined
         ? { urlPathParams?: undefined }
-        : InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, TMethod> extends never
+        : InferMethodUrlVariablesInput<
+              TScopedTranslationKey,
+              TFields,
+              TMethod
+            > extends never
           ? { urlPathParams?: undefined }
           : {
               urlPathParams: ExamplesList<
-                InferMethodUrlVariablesInput<TScopedTranslationKey, TFields, TMethod>,
+                InferMethodUrlVariablesInput<
+                  TScopedTranslationKey,
+                  TFields,
+                  TMethod
+                >,
                 TExampleKey
               >;
             }) & {
@@ -1129,19 +1319,28 @@ export function createFormEndpoint<
     ? createMethodEndpoint(
         Methods.GET,
         config.methods.GET as FormMethodConfig<TScopedTranslationKey>,
-        generateRequestDataSchemaForMethod(fields, Methods.GET) as InferSchemaFromFieldForMethod<
+        generateRequestDataSchemaForMethod(
+          fields,
+          Methods.GET,
+        ) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.GET,
           FieldUsage.RequestData
         >,
-        generateResponseSchemaForMethod(fields, Methods.GET) as InferSchemaFromFieldForMethod<
+        generateResponseSchemaForMethod(
+          fields,
+          Methods.GET,
+        ) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.GET,
           FieldUsage.ResponseData
         >,
-        generateRequestUrlSchemaForMethod(fields, Methods.GET) as InferSchemaFromFieldForMethod<
+        generateRequestUrlSchemaForMethod(
+          fields,
+          Methods.GET,
+        ) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.GET,
@@ -1159,19 +1358,28 @@ export function createFormEndpoint<
     ? createMethodEndpoint(
         Methods.POST,
         config.methods.POST as FormMethodConfig<TScopedTranslationKey>,
-        generateRequestDataSchemaForMethod(fields, Methods.POST) as InferSchemaFromFieldForMethod<
+        generateRequestDataSchemaForMethod(
+          fields,
+          Methods.POST,
+        ) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.POST,
           FieldUsage.RequestData
         >,
-        generateResponseSchemaForMethod(fields, Methods.POST) as InferSchemaFromFieldForMethod<
+        generateResponseSchemaForMethod(
+          fields,
+          Methods.POST,
+        ) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.POST,
           FieldUsage.ResponseData
         >,
-        generateRequestUrlSchemaForMethod(fields, Methods.POST) as InferSchemaFromFieldForMethod<
+        generateRequestUrlSchemaForMethod(
+          fields,
+          Methods.POST,
+        ) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.POST,
@@ -1189,19 +1397,28 @@ export function createFormEndpoint<
     ? createMethodEndpoint(
         Methods.PATCH,
         config.methods.PATCH as FormMethodConfig<TScopedTranslationKey>,
-        generateRequestDataSchemaForMethod(fields, Methods.PATCH) as InferSchemaFromFieldForMethod<
+        generateRequestDataSchemaForMethod(
+          fields,
+          Methods.PATCH,
+        ) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.PATCH,
           FieldUsage.RequestData
         >,
-        generateResponseSchemaForMethod(fields, Methods.PATCH) as InferSchemaFromFieldForMethod<
+        generateResponseSchemaForMethod(
+          fields,
+          Methods.PATCH,
+        ) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.PATCH,
           FieldUsage.ResponseData
         >,
-        generateRequestUrlSchemaForMethod(fields, Methods.PATCH) as InferSchemaFromFieldForMethod<
+        generateRequestUrlSchemaForMethod(
+          fields,
+          Methods.PATCH,
+        ) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.PATCH,
@@ -1219,19 +1436,28 @@ export function createFormEndpoint<
     ? createMethodEndpoint(
         Methods.DELETE,
         config.methods.DELETE as FormMethodConfig<TScopedTranslationKey>,
-        generateRequestDataSchemaForMethod(fields, Methods.DELETE) as InferSchemaFromFieldForMethod<
+        generateRequestDataSchemaForMethod(
+          fields,
+          Methods.DELETE,
+        ) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.DELETE,
           FieldUsage.RequestData
         >,
-        generateResponseSchemaForMethod(fields, Methods.DELETE) as InferSchemaFromFieldForMethod<
+        generateResponseSchemaForMethod(
+          fields,
+          Methods.DELETE,
+        ) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.DELETE,
           FieldUsage.ResponseData
         >,
-        generateRequestUrlSchemaForMethod(fields, Methods.DELETE) as InferSchemaFromFieldForMethod<
+        generateRequestUrlSchemaForMethod(
+          fields,
+          Methods.DELETE,
+        ) as InferSchemaFromFieldForMethod<
           TScopedTranslationKey,
           TFields,
           Methods.DELETE,

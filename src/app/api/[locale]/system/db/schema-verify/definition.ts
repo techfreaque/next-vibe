@@ -29,7 +29,12 @@ const { POST } = createEndpoint({
   category: "app.api.system.db.category",
   tags: ["app.api.system.db.schemaVerify.tag"],
   icon: "database",
-  allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF, UserRole.PRODUCTION_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+    UserRole.PRODUCTION_OFF,
+  ],
   aliases: ["schema-verify", "db:schema-verify"],
 
   fields: objectField(
@@ -48,7 +53,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.db.schemaVerify.fields.fixIssues.title",
-          description: "app.api.system.db.schemaVerify.fields.fixIssues.description",
+          description:
+            "app.api.system.db.schemaVerify.fields.fixIssues.description",
           columns: 6,
         },
         z.boolean().optional().default(false),
@@ -59,7 +65,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.db.schemaVerify.fields.silent.title",
-          description: "app.api.system.db.schemaVerify.fields.silent.description",
+          description:
+            "app.api.system.db.schemaVerify.fields.silent.description",
           columns: 6,
         },
         z.boolean().optional().default(false),
@@ -112,39 +119,48 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.system.db.schemaVerify.post.errors.validation.title",
-      description: "app.api.system.db.schemaVerify.post.errors.validation.description",
+      description:
+        "app.api.system.db.schemaVerify.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.system.db.schemaVerify.post.errors.network.title",
-      description: "app.api.system.db.schemaVerify.post.errors.network.description",
+      description:
+        "app.api.system.db.schemaVerify.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.system.db.schemaVerify.post.errors.unauthorized.title",
-      description: "app.api.system.db.schemaVerify.post.errors.unauthorized.description",
+      description:
+        "app.api.system.db.schemaVerify.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.system.db.schemaVerify.post.errors.forbidden.title",
-      description: "app.api.system.db.schemaVerify.post.errors.forbidden.description",
+      description:
+        "app.api.system.db.schemaVerify.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.system.db.schemaVerify.post.errors.server.title",
-      description: "app.api.system.db.schemaVerify.post.errors.server.description",
+      description:
+        "app.api.system.db.schemaVerify.post.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.system.db.schemaVerify.post.errors.notFound.title",
-      description: "app.api.system.db.schemaVerify.post.errors.notFound.description",
+      description:
+        "app.api.system.db.schemaVerify.post.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.system.db.schemaVerify.post.errors.conflict.title",
-      description: "app.api.system.db.schemaVerify.post.errors.conflict.description",
+      description:
+        "app.api.system.db.schemaVerify.post.errors.conflict.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.system.db.schemaVerify.post.errors.unknown.title",
-      description: "app.api.system.db.schemaVerify.post.errors.unknown.description",
+      description:
+        "app.api.system.db.schemaVerify.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.db.schemaVerify.post.errors.server.title",
-      description: "app.api.system.db.schemaVerify.post.errors.server.description",
+      description:
+        "app.api.system.db.schemaVerify.post.errors.server.description",
     },
   },
 
@@ -215,7 +231,10 @@ const { POST } = createEndpoint({
         success: true,
         valid: false,
         output: "⚠️ Database schema has issues",
-        issues: ["Missing index on table_name.column", "Outdated constraint on other_table"],
+        issues: [
+          "Missing index on table_name.column",
+          "Outdated constraint on other_table",
+        ],
         fixedIssues: [],
       },
       fixed: {

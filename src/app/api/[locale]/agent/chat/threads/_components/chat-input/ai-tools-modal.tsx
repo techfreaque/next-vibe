@@ -12,7 +12,13 @@ import {
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
-import { Check, ChevronDown, ChevronRight, Search, X } from "next-vibe-ui/ui/icons";
+import {
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Search,
+  X,
+} from "next-vibe-ui/ui/icons";
 import { Input } from "next-vibe-ui/ui/input";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Span } from "next-vibe-ui/ui/span";
@@ -38,7 +44,10 @@ interface AIToolsModalProps {
  * AI Tools Modal
  * Displays all available AI tools and allows user to toggle them on/off
  */
-export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element {
+export function AIToolsModal({
+  locale,
+  logger,
+}: AIToolsModalProps): JSX.Element {
   // Get state and callbacks from context
   const {
     enabledTools,
@@ -49,7 +58,9 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
 
   const { t } = simpleT(locale);
   const [searchQuery, setSearchQuery] = useState("");
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    new Set(),
+  );
 
   // Use the proper hooks pattern to fetch tools
   const toolsEndpoint = useAIToolsList(logger, {
@@ -159,7 +170,9 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
   const handleToggleConfirmation = (toolName: string): void => {
     setEnabledTools(
       enabledTools.map((t) =>
-        t.id === toolName ? { ...t, requiresConfirmation: !t.requiresConfirmation } : t,
+        t.id === toolName
+          ? { ...t, requiresConfirmation: !t.requiresConfirmation }
+          : t,
       ),
     );
 
@@ -173,11 +186,15 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
   // Toggle all tools in current view
   const handleToggleAll = (): void => {
     const allEndpointIds = filteredTools.map((tool) => tool.toolName);
-    const allEnabled = allEndpointIds.every((id) => enabledTools.some((t) => t.id === id));
+    const allEnabled = allEndpointIds.every((id) =>
+      enabledTools.some((t) => t.id === id),
+    );
 
     if (allEnabled) {
       // Disable all visible tools
-      const remainingEnabled = enabledTools.filter((t) => !allEndpointIds.includes(t.id));
+      const remainingEnabled = enabledTools.filter(
+        (t) => !allEndpointIds.includes(t.id),
+      );
       setEnabledTools(remainingEnabled);
       logger.debug("AIToolsModal", "All visible tools disabled");
     } else {
@@ -198,7 +215,9 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
     if (filteredTools.length === 0) {
       return false;
     }
-    return filteredTools.every((tool) => enabledTools.some((t) => t.id === tool.toolName));
+    return filteredTools.every((tool) =>
+      enabledTools.some((t) => t.id === tool.toolName),
+    );
   }, [filteredTools, enabledTools]);
 
   // Toggle category expansion
@@ -213,13 +232,19 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
   };
 
   // Toggle all tools in a category
-  const toggleCategoryTools = (categoryTools: AIToolMetadataSerialized[]): void => {
+  const toggleCategoryTools = (
+    categoryTools: AIToolMetadataSerialized[],
+  ): void => {
     const categoryEndpointIds = categoryTools.map((t) => t.toolName);
-    const allEnabled = categoryEndpointIds.every((id) => enabledTools.some((t) => t.id === id));
+    const allEnabled = categoryEndpointIds.every((id) =>
+      enabledTools.some((t) => t.id === id),
+    );
 
     if (allEnabled) {
       // Disable all tools in category
-      setEnabledTools(enabledTools.filter((t) => !categoryEndpointIds.includes(t.id)));
+      setEnabledTools(
+        enabledTools.filter((t) => !categoryEndpointIds.includes(t.id)),
+      );
     } else {
       // Enable all tools in category
       const categoryToolsToAdd = categoryTools
@@ -262,7 +287,9 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
       <DialogContent className="sm:max-w-[700px] max-h-[90dvh] flex flex-col overflow-x-hidden overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t("app.chat.aiTools.modal.title")}</DialogTitle>
-          <DialogDescription>{t("app.chat.aiTools.modal.description")}</DialogDescription>
+          <DialogDescription>
+            {t("app.chat.aiTools.modal.description")}
+          </DialogDescription>
         </DialogHeader>
 
         <Div className="flex gap-4 flex-1 flex-col">
@@ -285,7 +312,9 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
               <Div className="flex gap-2">
                 {/* Expand/Collapse All */}
                 <Button
-                  onClick={expandedCategories.size === 0 ? expandAll : collapseAll}
+                  onClick={
+                    expandedCategories.size === 0 ? expandAll : collapseAll
+                  }
                   variant="outline"
                   size="sm"
                   className="flex-1 min-w-0"
@@ -307,12 +336,16 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
                   {allVisibleToolsEnabled ? (
                     <>
                       <X className="h-4 w-4 mr-1 shrink-0" />
-                      <Span className="truncate">{t("app.chat.aiTools.modal.deselectAll")}</Span>
+                      <Span className="truncate">
+                        {t("app.chat.aiTools.modal.deselectAll")}
+                      </Span>
                     </>
                   ) : (
                     <>
                       <Check className="h-4 w-4 mr-1 shrink-0" />
-                      <Span className="truncate">{t("app.chat.aiTools.modal.selectAll")}</Span>
+                      <Span className="truncate">
+                        {t("app.chat.aiTools.modal.selectAll")}
+                      </Span>
                     </>
                   )}
                 </Button>
@@ -324,7 +357,9 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
                   size="sm"
                   className="flex-1 min-w-0"
                 >
-                  <Span className="truncate">{t("app.chat.aiTools.modal.resetToDefault")}</Span>
+                  <Span className="truncate">
+                    {t("app.chat.aiTools.modal.resetToDefault")}
+                  </Span>
                 </Button>
               </Div>
             )}
@@ -337,7 +372,9 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
                 {t("app.chat.aiTools.modal.loading")}
               </Div>
             ) : error ? (
-              <Div className="text-center py-8 text-destructive text-sm">{error}</Div>
+              <Div className="text-center py-8 text-destructive text-sm">
+                {error}
+              </Div>
             ) : filteredTools.length === 0 ? (
               <Div className="text-center py-8 text-muted-foreground text-sm">
                 {searchQuery.length > 0
@@ -388,7 +425,9 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
                       {isExpanded && (
                         <Div className="px-4 pb-3 flex flex-col gap-2 border-t">
                           {tools.map((tool) => {
-                            const isEnabled = enabledTools.some((t) => t.id === tool.toolName);
+                            const isEnabled = enabledTools.some(
+                              (t) => t.id === tool.toolName,
+                            );
                             const requiresConfirmation =
                               enabledTools.find((t) => t.id === tool.toolName)
                                 ?.requiresConfirmation ?? false;
@@ -405,12 +444,16 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
                               >
                                 {/* Main tool info with enable checkbox */}
                                 <Div
-                                  onClick={() => handleToggleTool(tool.toolName)}
+                                  onClick={() =>
+                                    handleToggleTool(tool.toolName)
+                                  }
                                   className="flex items-start gap-3 cursor-pointer"
                                 >
                                   <Checkbox
                                     checked={isEnabled}
-                                    onCheckedChange={() => handleToggleTool(tool.toolName)}
+                                    onCheckedChange={() =>
+                                      handleToggleTool(tool.toolName)
+                                    }
                                     className="mt-0.5 shrink-0"
                                     onClick={(e) => e.stopPropagation()}
                                   />
@@ -435,12 +478,13 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
                                     </P>
 
                                     {/* Aliases */}
-                                    {tool.aliases && tool.aliases.length > 0 && (
-                                      <P className="text-[10px] text-muted-foreground/70 mt-1 font-mono">
-                                        {t("app.chat.aiTools.modal.aliases")}:{" "}
-                                        {tool.aliases.join(", ")}
-                                      </P>
-                                    )}
+                                    {tool.aliases &&
+                                      tool.aliases.length > 0 && (
+                                        <P className="text-[10px] text-muted-foreground/70 mt-1 font-mono">
+                                          {t("app.chat.aiTools.modal.aliases")}:{" "}
+                                          {tool.aliases.join(", ")}
+                                        </P>
+                                      )}
 
                                     {/* Tags */}
                                     {tool.tags.length > 0 && (
@@ -462,7 +506,9 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
                                 {/* Confirmation toggle - only show when tool is enabled */}
                                 {isEnabled && (
                                   <Div
-                                    onClick={() => handleToggleConfirmation(tool.toolName)}
+                                    onClick={() =>
+                                      handleToggleConfirmation(tool.toolName)
+                                    }
                                     className="flex items-center gap-2 pl-9 cursor-pointer hover:bg-accent/30 -mx-1 px-1 py-1 rounded"
                                   >
                                     <Checkbox
@@ -474,7 +520,9 @@ export function AIToolsModal({ locale, logger }: AIToolsModalProps): JSX.Element
                                       onClick={(e) => e.stopPropagation()}
                                     />
                                     <Span className="text-[11px] text-muted-foreground">
-                                      {t("app.chat.aiTools.modal.requireConfirmation")}
+                                      {t(
+                                        "app.chat.aiTools.modal.requireConfirmation",
+                                      )}
                                     </Span>
                                   </Div>
                                 )}

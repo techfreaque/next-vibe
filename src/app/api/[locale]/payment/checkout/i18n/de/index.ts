@@ -116,7 +116,8 @@ export const translations: typeof enTranslations = {
         title: "Validierungsfehler",
         description: "Ungültige Checkout-Parameter",
         reason: {
-          enterpriseCustomPricing: "ENTERPRISE-Plan erfordert individuelle Preisgestaltung",
+          enterpriseCustomPricing:
+            "ENTERPRISE-Plan erfordert individuelle Preisgestaltung",
         },
       },
       network: {

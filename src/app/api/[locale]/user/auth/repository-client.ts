@@ -15,7 +15,11 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { storage } from "next-vibe-ui/lib/storage";
 
@@ -38,7 +42,10 @@ export interface AuthClientRepository {
    * @param logger - Optional logger for debugging
    * @returns Promise<ResponseType> indicating success or failure
    */
-  setAuthToken(token: string, logger: EndpointLogger): Promise<ResponseType<void>>;
+  setAuthToken(
+    token: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>>;
 
   /**
    * Retrieves the stored JWT token using platform-agnostic storage (next-vibe-ui)
@@ -47,7 +54,9 @@ export interface AuthClientRepository {
    * @param logger - Optional logger for debugging
    * @returns Promise<ResponseType> with the token or undefined
    */
-  getAuthToken(logger: EndpointLogger): Promise<ResponseType<string | undefined>>;
+  getAuthToken(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<string | undefined>>;
 
   /**
    * Removes the stored JWT token using platform-agnostic storage (next-vibe-ui)
@@ -68,7 +77,10 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
    * For web, uses localStorage (tokens can also be in httpOnly cookies)
    * For React Native, uses AsyncStorage automatically via next-vibe-ui
    */
-  async setAuthToken(token: string, logger: EndpointLogger): Promise<ResponseType<void>> {
+  async setAuthToken(
+    token: string,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
     try {
       if (platform.isServer) {
         logger.error("setAuthToken cannot be called on the server");
@@ -100,7 +112,9 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
    * For web, retrieves from localStorage
    * For React Native, retrieves from AsyncStorage automatically via next-vibe-ui
    */
-  async getAuthToken(logger: EndpointLogger): Promise<ResponseType<string | undefined>> {
+  async getAuthToken(
+    logger: EndpointLogger,
+  ): Promise<ResponseType<string | undefined>> {
     try {
       if (platform.isServer) {
         logger.error("getAuthToken cannot be called on the server");

@@ -189,7 +189,10 @@ class BrowserRepositoryClientImpl implements BrowserRepositoryClient {
           break;
 
         case BrowserTool.TAKE_SCREENSHOT:
-          if (parsed.format && !["png", "jpeg", "webp"].includes(parsed.format)) {
+          if (
+            parsed.format &&
+            !["png", "jpeg", "webp"].includes(parsed.format)
+          ) {
             return { valid: false, error: "Format must be png, jpeg, or webp" };
           }
           break;

@@ -22,11 +22,13 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description: "Authentifizierung für Zurücksetzungsoperationen erforderlich",
+        description:
+          "Authentifizierung für Zurücksetzungsoperationen erforderlich",
       },
       forbidden: {
         title: "Verboten",
-        description: "Unzureichende Berechtigungen für Zurücksetzungsoperationen",
+        description:
+          "Unzureichende Berechtigungen für Zurücksetzungsoperationen",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -42,7 +44,8 @@ export const translations: typeof enTranslations = {
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist während der Zurücksetzung aufgetreten",
+        description:
+          "Ein unbekannter Fehler ist während der Zurücksetzung aufgetreten",
       },
       conflict: {
         title: "Konflikt",
@@ -54,7 +57,8 @@ export const translations: typeof enTranslations = {
       },
       migration: {
         title: "Migrationsfehler",
-        description: "Fehler beim Ausführen der Migrationen nach der Zurücksetzung",
+        description:
+          "Fehler beim Ausführen der Migrationen nach der Zurücksetzung",
       },
       internal: {
         title: "Interner Fehler",
@@ -76,7 +80,8 @@ export const translations: typeof enTranslations = {
     },
     force: {
       title: "Zurücksetzung erzwingen",
-      description: "Sicherheitsprüfungen überspringen (erforderlich für destruktive Operationen)",
+      description:
+        "Sicherheitsprüfungen überspringen (erforderlich für destruktive Operationen)",
     },
     skipMigrations: {
       title: "Migrationen überspringen",
@@ -148,7 +153,8 @@ export const translations: typeof enTranslations = {
     truncatedTables: "{{count}} Tabellen erfolgreich geleert",
     failedToTruncate: "Fehler beim Leeren der Tabellen: {{error}}",
     dropRequiresForce: "Löschvorgang erfordert --force Flag für Sicherheit",
-    droppedSchema: "Schema gelöscht und neu erstellt ({{count}} Tabellen entfernt)",
+    droppedSchema:
+      "Schema gelöscht und neu erstellt ({{count}} Tabellen entfernt)",
     failedToDrop: "Fehler beim Löschen und Neuerstellen: {{error}}",
     databaseInitialized: "Datenbank erfolgreich initialisiert {{output}}",
     failedToInitialize: "Fehler beim Initialisieren der Datenbank: {{error}}",

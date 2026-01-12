@@ -3,7 +3,15 @@
  * Database tables for health monitoring and pulse checks
  */
 
-import { boolean, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
@@ -73,9 +81,12 @@ export const pulseExecutions = pgTable("pulse_executions", {
  */
 export const pulseNotifications = pgTable("pulse_notifications", {
   id: uuid("id").primaryKey().defaultRandom(),
-  pulseExecutionId: uuid("pulse_execution_id").references(() => pulseExecutions.id, {
-    onDelete: "cascade",
-  }),
+  pulseExecutionId: uuid("pulse_execution_id").references(
+    () => pulseExecutions.id,
+    {
+      onDelete: "cascade",
+    },
+  ),
 
   // Notification details
   type: text("type").notNull(), // health_degraded, health_critical, recovery
@@ -108,8 +119,10 @@ export const selectPulseHealthSchema = createSelectSchema(pulseHealth);
 export const insertPulseExecutionSchema = createInsertSchema(pulseExecutions);
 export const selectPulseExecutionSchema = createSelectSchema(pulseExecutions);
 
-export const insertPulseNotificationSchema = createInsertSchema(pulseNotifications);
-export const selectPulseNotificationSchema = createSelectSchema(pulseNotifications);
+export const insertPulseNotificationSchema =
+  createInsertSchema(pulseNotifications);
+export const selectPulseNotificationSchema =
+  createSelectSchema(pulseNotifications);
 
 /**
  * Type exports for pulse health
@@ -121,4 +134,6 @@ export type PulseExecution = z.infer<typeof selectPulseExecutionSchema>;
 export type NewPulseExecution = z.infer<typeof insertPulseExecutionSchema>;
 
 export type PulseNotification = z.infer<typeof selectPulseNotificationSchema>;
-export type NewPulseNotification = z.infer<typeof insertPulseNotificationSchema>;
+export type NewPulseNotification = z.infer<
+  typeof insertPulseNotificationSchema
+>;

@@ -161,7 +161,11 @@ const SAMPLE_SOURCES = [
   LeadSource.API,
 ] as const;
 
-const SAMPLE_COUNTRIES = [Countries.DE, Countries.PL, Countries.GLOBAL] as const;
+const SAMPLE_COUNTRIES = [
+  Countries.DE,
+  Countries.PL,
+  Countries.GLOBAL,
+] as const;
 const SAMPLE_LANGUAGES = [Languages.DE, Languages.PL, Languages.EN] as const;
 const COMPANY_SIZES = ["small", "medium", "large", "enterprise"] as const;
 const BUDGET_RANGES = [
@@ -270,13 +274,17 @@ function generateEngagementMetrics(
   // Generate opens based on status and emails sent
   if (emailsSent > 0) {
     const openRate = getOpenRateByStatus(status);
-    emailsOpened = Math.floor(emailsSent * openRate * (0.8 + Math.random() * 0.4));
+    emailsOpened = Math.floor(
+      emailsSent * openRate * (0.8 + Math.random() * 0.4),
+    );
   }
 
   // Generate clicks based on opens
   if (emailsOpened > 0) {
     const clickRate = getClickRateByStatus(status);
-    emailsClicked = Math.floor(emailsOpened * clickRate * (0.5 + Math.random() * 1.0));
+    emailsClicked = Math.floor(
+      emailsOpened * clickRate * (0.5 + Math.random() * 1.0),
+    );
   }
 
   return { emailsSent, emailsOpened, emailsClicked };
@@ -285,7 +293,9 @@ function generateEngagementMetrics(
 /**
  * Get realistic open rates based on lead status
  */
-function getOpenRateByStatus(status: (typeof LeadStatus)[keyof typeof LeadStatus]): number {
+function getOpenRateByStatus(
+  status: (typeof LeadStatus)[keyof typeof LeadStatus],
+): number {
   switch (status) {
     case LeadStatus.NEW:
       return 0.15;
@@ -317,7 +327,9 @@ function getOpenRateByStatus(status: (typeof LeadStatus)[keyof typeof LeadStatus
 /**
  * Get realistic click rates based on lead status
  */
-function getClickRateByStatus(status: (typeof LeadStatus)[keyof typeof LeadStatus]): number {
+function getClickRateByStatus(
+  status: (typeof LeadStatus)[keyof typeof LeadStatus],
+): number {
   switch (status) {
     case LeadStatus.NEW:
       return 0.05;
@@ -359,9 +371,15 @@ function generateRandomLead(index: number): NewLead {
   const companySizeIndex = Math.floor(Math.random() * COMPANY_SIZES.length);
   const budgetIndex = Math.floor(Math.random() * BUDGET_RANGES.length);
   const statusIndex = Math.floor(Math.random() * SAMPLE_STATUSES.length);
-  const campaignStageIndex = Math.floor(Math.random() * SAMPLE_CAMPAIGN_STAGES.length);
-  const journeyVariantIndex = Math.floor(Math.random() * SAMPLE_JOURNEY_VARIANTS.length);
-  const websiteIndex = Math.floor(Math.random() * SAMPLE_WEBSITE_DOMAINS.length);
+  const campaignStageIndex = Math.floor(
+    Math.random() * SAMPLE_CAMPAIGN_STAGES.length,
+  );
+  const journeyVariantIndex = Math.floor(
+    Math.random() * SAMPLE_JOURNEY_VARIANTS.length,
+  );
+  const websiteIndex = Math.floor(
+    Math.random() * SAMPLE_WEBSITE_DOMAINS.length,
+  );
 
   const contactName = SAMPLE_NAMES[nameIndex];
   const businessName = SAMPLE_BUSINESSES[businessIndex];
@@ -396,7 +414,9 @@ function generateRandomLead(index: number): NewLead {
   // Generate timestamps based on status
   const createdAt = getRandomPastDate(180);
   const campaignStartedAt =
-    campaignStage === EmailCampaignStage.NOT_STARTED ? null : getRandomPastDate(90);
+    campaignStage === EmailCampaignStage.NOT_STARTED
+      ? null
+      : getRandomPastDate(90);
   const lastEmailSentAt = emailsSent > 0 ? getRandomPastDate(30) : null;
   const lastEngagementAt = emailsOpened > 0 ? getRandomPastDate(20) : null;
 
@@ -409,18 +429,22 @@ function generateRandomLead(index: number): NewLead {
       : null;
 
   const consultationBookedAt =
-    status === LeadStatus.CONSULTATION_BOOKED || status === LeadStatus.SUBSCRIPTION_CONFIRMED
+    status === LeadStatus.CONSULTATION_BOOKED ||
+    status === LeadStatus.SUBSCRIPTION_CONFIRMED
       ? getRandomPastDate(30)
       : null;
 
   const subscriptionConfirmedAt =
     status === LeadStatus.SUBSCRIPTION_CONFIRMED ? getRandomPastDate(15) : null;
 
-  const unsubscribedAt = status === LeadStatus.UNSUBSCRIBED ? getRandomPastDate(45) : null;
+  const unsubscribedAt =
+    status === LeadStatus.UNSUBSCRIBED ? getRandomPastDate(45) : null;
 
-  const bouncedAt = status === LeadStatus.BOUNCED ? getRandomPastDate(60) : null;
+  const bouncedAt =
+    status === LeadStatus.BOUNCED ? getRandomPastDate(60) : null;
 
-  const invalidAt = status === LeadStatus.INVALID ? getRandomPastDate(90) : null;
+  const invalidAt =
+    status === LeadStatus.INVALID ? getRandomPastDate(90) : null;
 
   return {
     email,
@@ -469,7 +493,10 @@ function generateRandomLead(index: number): NewLead {
 /**
  * Generate sample lead engagements
  */
-async function generateLeadEngagements(leadIds: string[], logger: EndpointLogger): Promise<void> {
+async function generateLeadEngagements(
+  leadIds: string[],
+  logger: EndpointLogger,
+): Promise<void> {
   const engagements: NewLeadEngagement[] = [];
 
   for (const leadId of leadIds) {
@@ -477,8 +504,11 @@ async function generateLeadEngagements(leadIds: string[], logger: EndpointLogger
     const engagementCount = Math.floor(Math.random() * 11);
 
     for (let i = 0; i < engagementCount; i++) {
-      const engagementTypeIndex = Math.floor(Math.random() * Object.values(EngagementTypes).length);
-      const engagementType = Object.values(EngagementTypes)[engagementTypeIndex];
+      const engagementTypeIndex = Math.floor(
+        Math.random() * Object.values(EngagementTypes).length,
+      );
+      const engagementType =
+        Object.values(EngagementTypes)[engagementTypeIndex];
 
       const engagement: NewLeadEngagement = {
         leadId,
@@ -491,8 +521,12 @@ async function generateLeadEngagements(leadIds: string[], logger: EndpointLogger
         ][Math.floor(Math.random() * 3)],
         metadata: {
           source: "seed_data",
-          device: ["desktop", "mobile", "tablet"][Math.floor(Math.random() * 3)],
-          browser: ["chrome", "firefox", "safari", "edge"][Math.floor(Math.random() * 4)],
+          device: ["desktop", "mobile", "tablet"][
+            Math.floor(Math.random() * 3)
+          ],
+          browser: ["chrome", "firefox", "safari", "edge"][
+            Math.floor(Math.random() * 4)
+          ],
         },
         timestamp: getRandomPastDate(60),
         createdAt: getRandomPastDate(60),
@@ -511,7 +545,10 @@ async function generateLeadEngagements(leadIds: string[], logger: EndpointLogger
 /**
  * Generate sample email campaigns
  */
-async function generateEmailCampaigns(leadIds: string[], logger: EndpointLogger): Promise<void> {
+async function generateEmailCampaigns(
+  leadIds: string[],
+  logger: EndpointLogger,
+): Promise<void> {
   const campaigns: NewEmailCampaign[] = [];
 
   for (const leadId of leadIds) {
@@ -519,9 +556,13 @@ async function generateEmailCampaigns(leadIds: string[], logger: EndpointLogger)
     const campaignCount = Math.floor(Math.random() * 6);
 
     for (let i = 0; i < campaignCount; i++) {
-      const stageIndex = Math.floor(Math.random() * SAMPLE_CAMPAIGN_STAGES.length);
+      const stageIndex = Math.floor(
+        Math.random() * SAMPLE_CAMPAIGN_STAGES.length,
+      );
       const stage = SAMPLE_CAMPAIGN_STAGES[stageIndex];
-      const journeyVariantIndex = Math.floor(Math.random() * SAMPLE_JOURNEY_VARIANTS.length);
+      const journeyVariantIndex = Math.floor(
+        Math.random() * SAMPLE_JOURNEY_VARIANTS.length,
+      );
       const journeyVariant = SAMPLE_JOURNEY_VARIANTS[journeyVariantIndex];
 
       const subjects = [
@@ -548,7 +589,8 @@ async function generateEmailCampaigns(leadIds: string[], logger: EndpointLogger)
         stage,
         journeyVariant,
         subject: subjects[Math.floor(Math.random() * subjects.length)],
-        templateName: templateNames[Math.floor(Math.random() * templateNames.length)],
+        templateName:
+          templateNames[Math.floor(Math.random() * templateNames.length)],
         scheduledAt: getRandomPastDate(90),
         sentAt: Math.random() > 0.2 ? getRandomPastDate(60) : null,
         status: Math.random() > 0.2 ? EmailStatus.SENT : EmailStatus.PENDING,
@@ -594,7 +636,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
   }
 
   // Insert sample leads
-  const insertedLeads = await db.insert(leads).values(sampleLeads).returning({ id: leads.id });
+  const insertedLeads = await db
+    .insert(leads)
+    .values(sampleLeads)
+    .returning({ id: leads.id });
   const leadIds = insertedLeads.map((lead) => lead.id);
 
   logger.debug(`✅ Seeded ${sampleLeads.length} development leads`);
@@ -704,7 +749,10 @@ export async function test(logger: EndpointLogger): Promise<void> {
     },
   ];
 
-  const insertedTestLeads = await db.insert(leads).values(testLeads).returning({ id: leads.id });
+  const insertedTestLeads = await db
+    .insert(leads)
+    .values(testLeads)
+    .returning({ id: leads.id });
   const testLeadIds = insertedTestLeads.map((lead) => lead.id);
 
   logger.debug(`✅ Seeded ${testLeads.length} test leads`);

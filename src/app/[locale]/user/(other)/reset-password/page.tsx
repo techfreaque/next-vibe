@@ -33,7 +33,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     additionalMetadata: {
       openGraph: {
         title: "app.user.other.resetPassword.meta.passwordReset.title",
-        description: "app.user.other.resetPassword.meta.passwordReset.description",
+        description:
+          "app.user.other.resetPassword.meta.passwordReset.description",
         url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/reset-password`,
         type: "website",
         images: [
@@ -48,7 +49,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       twitter: {
         card: "summary_large_image",
         title: "app.user.other.resetPassword.meta.passwordReset.title",
-        description: "app.user.other.resetPassword.meta.passwordReset.description",
+        description:
+          "app.user.other.resetPassword.meta.passwordReset.description",
         images: [
           "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
         ],
@@ -57,13 +59,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function ResetPasswordPage({ params }: Props): Promise<JSX.Element> {
+export default async function ResetPasswordPage({
+  params,
+}: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 
   const logger = createEndpointLogger(false, Date.now(), locale);
   // Check if user is already logged in using repository-first pattern
-  const verifiedUserResponse = await UserRepository.getUserByAuth({}, locale, logger);
+  const verifiedUserResponse = await UserRepository.getUserByAuth(
+    {},
+    locale,
+    logger,
+  );
 
   // Redirect to dashboard if already authenticated
   if (

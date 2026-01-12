@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.navigate-page.description",
   category: "app.api.browser.category",
   icon: "navigation",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.navigationAutomation"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.navigationAutomation",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -52,24 +55,30 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.browser.navigate-page.form.fields.type.label",
-          description: "app.api.browser.navigate-page.form.fields.type.description",
-          placeholder: "app.api.browser.navigate-page.form.fields.type.placeholder",
+          description:
+            "app.api.browser.navigate-page.form.fields.type.description",
+          placeholder:
+            "app.api.browser.navigate-page.form.fields.type.placeholder",
           columns: 6,
           options: [
             {
-              label: "app.api.browser.navigate-page.form.fields.type.options.url" as const,
+              label:
+                "app.api.browser.navigate-page.form.fields.type.options.url" as const,
               value: "url",
             },
             {
-              label: "app.api.browser.navigate-page.form.fields.type.options.back" as const,
+              label:
+                "app.api.browser.navigate-page.form.fields.type.options.back" as const,
               value: "back",
             },
             {
-              label: "app.api.browser.navigate-page.form.fields.type.options.forward" as const,
+              label:
+                "app.api.browser.navigate-page.form.fields.type.options.forward" as const,
               value: "forward",
             },
             {
-              label: "app.api.browser.navigate-page.form.fields.type.options.reload" as const,
+              label:
+                "app.api.browser.navigate-page.form.fields.type.options.reload" as const,
               value: "reload",
             },
           ],
@@ -77,15 +86,19 @@ const { POST } = createEndpoint({
         z
           .enum(["url", "back", "forward", "reload"])
           .optional()
-          .describe("Navigate the page by URL, back or forward in history, or reload."),
+          .describe(
+            "Navigate the page by URL, back or forward in history, or reload.",
+          ),
       ),
       url: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.browser.navigate-page.form.fields.url.label",
-          description: "app.api.browser.navigate-page.form.fields.url.description",
-          placeholder: "app.api.browser.navigate-page.form.fields.url.placeholder",
+          description:
+            "app.api.browser.navigate-page.form.fields.url.description",
+          placeholder:
+            "app.api.browser.navigate-page.form.fields.url.placeholder",
           columns: 6,
         },
         z.string().optional().describe("Target URL (only type=url)"),
@@ -95,8 +108,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.browser.navigate-page.form.fields.ignoreCache.label",
-          description: "app.api.browser.navigate-page.form.fields.ignoreCache.description",
-          placeholder: "app.api.browser.navigate-page.form.fields.ignoreCache.placeholder",
+          description:
+            "app.api.browser.navigate-page.form.fields.ignoreCache.description",
+          placeholder:
+            "app.api.browser.navigate-page.form.fields.ignoreCache.placeholder",
           columns: 6,
         },
         z.boolean().optional().describe("Whether to ignore cache on reload."),
@@ -106,8 +121,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.browser.navigate-page.form.fields.timeout.label",
-          description: "app.api.browser.navigate-page.form.fields.timeout.description",
-          placeholder: "app.api.browser.navigate-page.form.fields.timeout.placeholder",
+          description:
+            "app.api.browser.navigate-page.form.fields.timeout.description",
+          placeholder:
+            "app.api.browser.navigate-page.form.fields.timeout.placeholder",
           columns: 6,
         },
         z
@@ -134,8 +151,14 @@ const { POST } = createEndpoint({
         z
           .object({
             navigated: z.boolean().describe("Whether the page was navigated"),
-            url: z.string().optional().describe("The URL of the navigated page"),
-            title: z.string().optional().describe("The title of the navigated page"),
+            url: z
+              .string()
+              .optional()
+              .describe("The URL of the navigated page"),
+            title: z
+              .string()
+              .optional()
+              .describe("The title of the navigated page"),
           })
           .optional()
           .describe("Result of the navigation"),
@@ -176,7 +199,8 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.browser.navigate-page.errors.validation.title",
-      description: "app.api.browser.navigate-page.errors.validation.description",
+      description:
+        "app.api.browser.navigate-page.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.browser.navigate-page.errors.network.title",
@@ -184,7 +208,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.browser.navigate-page.errors.unauthorized.title",
-      description: "app.api.browser.navigate-page.errors.unauthorized.description",
+      description:
+        "app.api.browser.navigate-page.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.browser.navigate-page.errors.forbidden.title",
@@ -196,7 +221,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.browser.navigate-page.errors.serverError.title",
-      description: "app.api.browser.navigate-page.errors.serverError.description",
+      description:
+        "app.api.browser.navigate-page.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.browser.navigate-page.errors.unknown.title",
@@ -204,7 +230,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.navigate-page.errors.unsavedChanges.title",
-      description: "app.api.browser.navigate-page.errors.unsavedChanges.description",
+      description:
+        "app.api.browser.navigate-page.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.navigate-page.errors.conflict.title",

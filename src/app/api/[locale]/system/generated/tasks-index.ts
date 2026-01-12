@@ -36,28 +36,34 @@ const allTasks: Task[] = [
   ...runnerModule6,
 ];
 
-const cronTasks = allTasks.filter((task): task is Task & { type: "cron" } => task.type === "cron");
-const sideTasks = allTasks.filter((task): task is Task & { type: "side" } => task.type === "side");
+const cronTasks = allTasks.filter(
+  (task): task is Task & { type: "cron" } => task.type === "cron",
+);
+const sideTasks = allTasks.filter(
+  (task): task is Task & { type: "side" } => task.type === "side",
+);
 const taskRunners = allTasks.filter(
   (task): task is Task & { type: "task-runner" } => task.type === "task-runner",
 );
 
-const tasksByCategory: Record<string, Task[]> = allTasks.reduce<Record<string, Task[]>>(
+const tasksByCategory: Record<string, Task[]> = allTasks.reduce<
+  Record<string, Task[]>
+>((acc, task) => {
+  const category = String(task.category);
+  if (!acc[category]) {
+    acc[category] = [];
+  }
+  acc[category].push(task);
+  return acc;
+}, {});
+
+const tasksByName: Record<string, Task> = allTasks.reduce<Record<string, Task>>(
   (acc, task) => {
-    const category = String(task.category);
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(task);
+    acc[task.name] = task;
     return acc;
   },
   {},
 );
-
-const tasksByName: Record<string, Task> = allTasks.reduce<Record<string, Task>>((acc, task) => {
-  acc[task.name] = task;
-  return acc;
-}, {});
 
 // Create single unified task runner instance as per spec.md
 const taskRunner: TaskRunnerManager = new UnifiedTaskRunnerRepositoryImpl();
@@ -72,5 +78,13 @@ export const taskRegistry: TaskRegistry = {
   taskRunner, // Single unified task runner instance
 };
 
-export { allTasks, cronTasks, sideTasks, taskRunner, taskRunners, tasksByCategory, tasksByName };
+export {
+  allTasks,
+  cronTasks,
+  sideTasks,
+  taskRunner,
+  taskRunners,
+  tasksByCategory,
+  tasksByName,
+};
 export default allTasks;

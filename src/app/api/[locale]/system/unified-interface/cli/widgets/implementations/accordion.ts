@@ -13,7 +13,9 @@ import { isWidgetDataString } from "@/app/api/[locale]/system/unified-interface/
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class AccordionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.ACCORDION> {
+export class AccordionWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.ACCORDION
+> {
   readonly widgetType = WidgetType.ACCORDION;
 
   /**
@@ -47,13 +49,18 @@ export class AccordionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
           : "+ ";
 
       const translatedTitle = isWidgetDataString(item.title, context);
-      const title = this.styleText(translatedTitle || item.title, "bold", context);
+      const title = this.styleText(
+        translatedTitle || item.title,
+        "bold",
+        context,
+      );
       lines.push(`${indent}${icon}${title}`);
 
       // Item content (only if expanded)
       if (item.expanded && item.content !== null) {
         const translatedContent = isWidgetDataString(item.content, context);
-        const contentStr = translatedContent || JSON.stringify(item.content, null, 2);
+        const contentStr =
+          translatedContent || JSON.stringify(item.content, null, 2);
 
         // Indent content
         const contentLines = contentStr.split("\n");

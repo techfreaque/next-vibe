@@ -5,7 +5,11 @@
 
 import { Section, Text } from "@react-email/components";
 import type { UndefinedType } from "next-vibe/shared/types/common.schema";
-import { fail, success, ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
+import {
+  fail,
+  success,
+  ErrorResponseTypes,
+} from "next-vibe/shared/types/response.schema";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
@@ -35,7 +39,9 @@ const passwordResetConfirmPropsSchema = z.object({
   userId: z.string(),
 });
 
-type PasswordResetConfirmProps = z.infer<typeof passwordResetConfirmPropsSchema>;
+type PasswordResetConfirmProps = z.infer<
+  typeof passwordResetConfirmPropsSchema
+>;
 
 function PasswordResetConfirmEmail({
   props,
@@ -59,9 +65,12 @@ function PasswordResetConfirmEmail({
       title={t("app.api.user.public.resetPassword.confirm.email.title", {
         appName,
       })}
-      previewText={t("app.api.user.public.resetPassword.confirm.email.previewText", {
-        appName,
-      })}
+      previewText={t(
+        "app.api.user.public.resetPassword.confirm.email.previewText",
+        {
+          appName,
+        },
+      )}
       recipientEmail={recipientEmail}
       tracking={tracking}
     >
@@ -130,45 +139,48 @@ function PasswordResetConfirmEmail({
 }
 
 // Template Definition Export
-const passwordResetConfirmTemplate: EmailTemplateDefinition<PasswordResetConfirmProps> = {
-  meta: {
-    id: "password-reset-confirm",
-    version: "1.0.0",
-    name: "app.api.emails.templates.password.reset.confirm.meta.name",
-    description: "app.api.emails.templates.password.reset.confirm.meta.description",
-    category: "auth",
-    path: "/user/public/reset-password/confirm/email.tsx",
-    defaultSubject: (t) =>
-      t("app.api.user.public.resetPassword.confirm.email.subject", {
-        appName: "",
-      }),
-    previewFields: {
-      publicName: {
-        type: "text",
-        label:
-          "app.admin.emails.templates.templates.password.reset.confirm.preview.privateName.label",
-        description:
-          "app.admin.emails.templates.templates.password.reset.confirm.preview.privateName.description",
-        defaultValue: "Max Mustermann",
-        required: true,
-      },
-      userId: {
-        type: "text",
-        label: "app.admin.emails.templates.templates.password.reset.confirm.preview.userId.label",
-        description:
-          "app.admin.emails.templates.templates.password.reset.confirm.preview.userId.description",
-        defaultValue: "example-user-id-123",
-        required: true,
+const passwordResetConfirmTemplate: EmailTemplateDefinition<PasswordResetConfirmProps> =
+  {
+    meta: {
+      id: "password-reset-confirm",
+      version: "1.0.0",
+      name: "app.api.emails.templates.password.reset.confirm.meta.name",
+      description:
+        "app.api.emails.templates.password.reset.confirm.meta.description",
+      category: "auth",
+      path: "/user/public/reset-password/confirm/email.tsx",
+      defaultSubject: (t) =>
+        t("app.api.user.public.resetPassword.confirm.email.subject", {
+          appName: "",
+        }),
+      previewFields: {
+        publicName: {
+          type: "text",
+          label:
+            "app.admin.emails.templates.templates.password.reset.confirm.preview.privateName.label",
+          description:
+            "app.admin.emails.templates.templates.password.reset.confirm.preview.privateName.description",
+          defaultValue: "Max Mustermann",
+          required: true,
+        },
+        userId: {
+          type: "text",
+          label:
+            "app.admin.emails.templates.templates.password.reset.confirm.preview.userId.label",
+          description:
+            "app.admin.emails.templates.templates.password.reset.confirm.preview.userId.description",
+          defaultValue: "example-user-id-123",
+          required: true,
+        },
       },
     },
-  },
-  schema: passwordResetConfirmPropsSchema,
-  component: PasswordResetConfirmEmail,
-  exampleProps: {
-    publicName: "Max Mustermann",
-    userId: "example-user-id-123",
-  },
-};
+    schema: passwordResetConfirmPropsSchema,
+    component: PasswordResetConfirmEmail,
+    exampleProps: {
+      publicName: "Max Mustermann",
+      userId: "example-user-id-123",
+    },
+  };
 
 export default passwordResetConfirmTemplate;
 

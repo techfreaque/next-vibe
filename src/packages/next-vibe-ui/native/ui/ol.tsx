@@ -116,7 +116,9 @@ function Ol({
         onPressOut={handlePressOut}
         accessibilityRole={accessibilityRole}
         accessibilityLabel={ariaLabel}
-        accessibilityValue={start === undefined ? undefined : { text: String(start) }}
+        accessibilityValue={
+          start === undefined ? undefined : { text: String(start) }
+        }
         nativeID={id}
       >
         {children}
@@ -129,7 +131,9 @@ function Ol({
       {...applyStyleType({ nativeStyle, className: cn(className) })}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={ariaLabel}
-      accessibilityValue={start === undefined ? undefined : { text: String(start) }}
+      accessibilityValue={
+        start === undefined ? undefined : { text: String(start) }
+      }
       nativeID={id}
     >
       {children}

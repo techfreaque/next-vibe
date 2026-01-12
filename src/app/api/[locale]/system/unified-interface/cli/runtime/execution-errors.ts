@@ -8,7 +8,13 @@ import type { EndpointLogger } from "../../shared/logger/endpoint";
  * Error context type
  */
 interface ErrorContext {
-  [key: string]: string | number | boolean | string[] | undefined | Record<string, never>;
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | string[]
+    | undefined
+    | Record<string, never>;
 }
 
 /**
@@ -91,7 +97,8 @@ export class CommandNotFoundError extends CliError {
     // Type guard for availableCommands
     const commands = this.context?.availableCommands;
     const isStringArray =
-      Array.isArray(commands) && commands.every((cmd) => typeof cmd === "string");
+      Array.isArray(commands) &&
+      commands.every((cmd) => typeof cmd === "string");
 
     /* eslint-disable i18next/no-literal-string */
     const suggestions = isStringArray
@@ -250,7 +257,11 @@ export class ResourceNotFoundError extends CliError {
   readonly code = "RESOURCE_NOT_FOUND";
   readonly statusCode = 404;
 
-  constructor(resourceType: string, identifier: string, context?: ErrorContext) {
+  constructor(
+    resourceType: string,
+    identifier: string,
+    context?: ErrorContext,
+  ) {
     // eslint-disable-next-line i18next/no-literal-string
     const message = `${resourceType} '${identifier}' not found`;
     super(message, { resourceType, identifier, ...context });
@@ -298,7 +309,9 @@ export namespace ErrorHandler {
   } {
     if (error instanceof CliError) {
       return {
-        message: logger.isDebugEnabled ? formatVerboseError(error) : error.getUserMessage(),
+        message: logger.isDebugEnabled
+          ? formatVerboseError(error)
+          : error.getUserMessage(),
         exitCode: getExitCode(error.statusCode),
         shouldExit: true,
       };
@@ -307,7 +320,9 @@ export namespace ErrorHandler {
     if (error instanceof Error) {
       const cliError = new RouteExecutionError("unknown", error);
       return {
-        message: logger.isDebugEnabled ? formatVerboseError(cliError) : cliError.getUserMessage(),
+        message: logger.isDebugEnabled
+          ? formatVerboseError(cliError)
+          : cliError.getUserMessage(),
         exitCode: 1,
         shouldExit: true,
       };
@@ -368,7 +383,10 @@ export namespace ErrorHandler {
   /**
    * Create error from unknown value
    */
-  export function createError(error: UnknownError, context?: ErrorContext): CliError {
+  export function createError(
+    error: UnknownError,
+    context?: ErrorContext,
+  ): CliError {
     if (error instanceof CliError) {
       return error;
     }
@@ -377,7 +395,11 @@ export namespace ErrorHandler {
       return new RouteExecutionError("unknown", error, context);
     }
 
-    return new RouteExecutionError("unknown", new Error(errorToString(error)), context);
+    return new RouteExecutionError(
+      "unknown",
+      new Error(errorToString(error)),
+      context,
+    );
   }
 
   /**
@@ -399,7 +421,11 @@ export namespace ErrorHandler {
    * Check if error is recoverable
    */
   export function isRecoverable(error: CliError): boolean {
-    const recoverableCodes = ["VALIDATION_ERROR", "COMMAND_NOT_FOUND", "RESOURCE_NOT_FOUND"];
+    const recoverableCodes = [
+      "VALIDATION_ERROR",
+      "COMMAND_NOT_FOUND",
+      "RESOURCE_NOT_FOUND",
+    ];
 
     return recoverableCodes.includes(error.code);
   }
@@ -415,9 +441,12 @@ export function setupGlobalErrorHandlers(logger: EndpointLogger): void {
     process.exit(handled.exitCode);
   });
 
-  process.on("unhandledRejection", (reason: Error | Record<string, never>): void => {
-    const handled = ErrorHandler.handleError(reason, logger);
-    logger.error(handled.message);
-    process.exit(handled.exitCode);
-  });
+  process.on(
+    "unhandledRejection",
+    (reason: Error | Record<string, never>): void => {
+      const handled = ErrorHandler.handleError(reason, logger);
+      logger.error(handled.message);
+      process.exit(handled.exitCode);
+    },
+  );
 }

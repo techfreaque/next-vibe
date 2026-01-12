@@ -3,8 +3,19 @@
  * Reusable components for lead email templates
  */
 
-import { Body, Container, Head, Html, Img, Preview, Section } from "@react-email/components";
-import { createDataUrl, createTransparentPixelDataUrl } from "next-vibe/shared/utils";
+import {
+  Body,
+  Container,
+  Head,
+  Html,
+  Img,
+  Preview,
+  Section,
+} from "@react-email/components";
+import {
+  createDataUrl,
+  createTransparentPixelDataUrl,
+} from "next-vibe/shared/utils";
 import type * as icons from "next-vibe-ui/ui/icons";
 import type React from "react";
 import type { JSX, ReactNode } from "react";
@@ -194,10 +205,13 @@ export function EmailFooter({
           margin: "0 0 12px 0",
         }}
       >
-        {t("app.api.leads.campaigns.emails.emailJourneys.components.footer.copyright", {
-          currentYear,
-          companyName,
-        })}
+        {t(
+          "app.api.leads.campaigns.emails.emailJourneys.components.footer.copyright",
+          {
+            currentYear,
+            companyName,
+          },
+        )}
       </span>
 
       <span
@@ -207,7 +221,9 @@ export function EmailFooter({
           margin: "0 0 8px 0",
         }}
       >
-        {t("app.api.leads.campaigns.emails.emailJourneys.components.footer.helpText")}{" "}
+        {t(
+          "app.api.leads.campaigns.emails.emailJourneys.components.footer.helpText",
+        )}{" "}
         <TrackedLink
           href={`mailto:${companyEmail}`}
           tracking={tracking}
@@ -227,7 +243,9 @@ export function EmailFooter({
           margin: "0",
         }}
       >
-        {t("app.api.leads.campaigns.emails.emailJourneys.components.footer.unsubscribeText")}{" "}
+        {t(
+          "app.api.leads.campaigns.emails.emailJourneys.components.footer.unsubscribeText",
+        )}{" "}
         <TrackedLink
           href={unsubscribeUrl}
           tracking={tracking}
@@ -236,7 +254,9 @@ export function EmailFooter({
             textDecoration: "underline",
           }}
         >
-          {t("app.api.leads.campaigns.emails.emailJourneys.components.footer.unsubscribeLink")}
+          {t(
+            "app.api.leads.campaigns.emails.emailJourneys.components.footer.unsubscribeLink",
+          )}
         </TrackedLink>
       </span>
     </Section>
@@ -328,9 +348,13 @@ export function SocialProofBox({
           lineHeight: "1.6",
         }}
       >
-        {t("app.api.leads.campaigns.emails.emailJourneys.components.socialProof.quotePrefix")}
+        {t(
+          "app.api.leads.campaigns.emails.emailJourneys.components.socialProof.quotePrefix",
+        )}
         {quote}
-        {t("app.api.leads.campaigns.emails.emailJourneys.components.socialProof.quoteSuffix")}
+        {t(
+          "app.api.leads.campaigns.emails.emailJourneys.components.socialProof.quoteSuffix",
+        )}
       </span>
       <span
         style={{
@@ -340,10 +364,13 @@ export function SocialProofBox({
           margin: "0",
         }}
       >
-        {t("app.api.leads.campaigns.emails.emailJourneys.components.socialProof.attribution", {
-          author,
-          company,
-        })}
+        {t(
+          "app.api.leads.campaigns.emails.emailJourneys.components.socialProof.attribution",
+          {
+            author,
+            company,
+          },
+        )}
       </span>
     </Section>
   );
@@ -545,6 +572,11 @@ export async function LucideEmailIcon(
   const dataUrl = createDataUrl(svg, "image/svg+xml");
 
   return (
-    <Img src={dataUrl} alt={props.alt} width={props.width || "24"} height={props.height || "24"} />
+    <Img
+      src={dataUrl}
+      alt={props.alt}
+      width={props.width || "24"}
+      height={props.height || "24"}
+    />
   );
 }

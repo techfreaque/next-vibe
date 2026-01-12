@@ -62,7 +62,11 @@ export default async function ThreadsPathPage({
 
   // Fetch credit balance for all users (both authenticated and public)
   // Always fetch credits if we have a user (even public users have leadId)
-  const creditsResponse = await CreditRepository.getCreditBalanceForUser(user, locale, logger);
+  const creditsResponse = await CreditRepository.getCreditBalanceForUser(
+    user,
+    locale,
+    logger,
+  );
   const initialCredits = creditsResponse.success ? creditsResponse.data : null;
 
   logger.debug("Server-side credits fetch", {
@@ -74,7 +78,8 @@ export default async function ThreadsPathPage({
 
   // Parse URL server-side to get navigation state
   // This prevents hydration mismatch - URL is the single source of truth
-  let { initialRootFolderId, initialSubFolderId, initialThreadId } = parseChatUrl(path);
+  let { initialRootFolderId, initialSubFolderId, initialThreadId } =
+    parseChatUrl(path);
 
   // Disambiguate between thread IDs and folder IDs
   // Both are UUIDs, so we need to check the database to determine which one it is
@@ -132,12 +137,13 @@ export default async function ThreadsPathPage({
     canCreateFolder: false,
   };
   if (user) {
-    const permissionsResult = await RootFolderPermissionsRepository.getRootFolderPermissions(
-      { rootFolderId: initialRootFolderId },
-      user,
-      locale,
-      logger,
-    );
+    const permissionsResult =
+      await RootFolderPermissionsRepository.getRootFolderPermissions(
+        { rootFolderId: initialRootFolderId },
+        user,
+        locale,
+        logger,
+      );
     if (permissionsResult.success) {
       rootFolderPermissions = permissionsResult.data;
     }

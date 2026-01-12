@@ -36,7 +36,8 @@ export const translations = {
       },
       response: {
         title: "IMAP Health Status Response",
-        description: "Current IMAP server health status and performance metrics",
+        description:
+          "Current IMAP server health status and performance metrics",
         success: "Success",
         message: "Health status retrieved successfully",
         data: {
@@ -77,7 +78,8 @@ export const translations = {
         },
         server: {
           title: "Server Error",
-          description: "Internal server error occurred while retrieving health status",
+          description:
+            "Internal server error occurred while retrieving health status",
         },
         unknown: {
           title: "Unknown Error",

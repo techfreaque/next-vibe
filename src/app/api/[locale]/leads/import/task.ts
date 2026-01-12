@@ -8,7 +8,11 @@ import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 
@@ -111,7 +115,8 @@ async function executeCsvProcessor(
         });
 
         // Process the import job using the import repository
-        const { importRepository } = await import("@/app/api/[locale]/import/repository");
+        const { importRepository } =
+          await import("@/app/api/[locale]/import/repository");
         const { leadsImportRepository } = await import("./repository");
 
         // Process one batch of the job
@@ -146,7 +151,9 @@ async function executeCsvProcessor(
       } catch (error) {
         failedImports++;
         const errorMessage: string =
-          error instanceof Error ? error.message : "tasks.csv_processor.unknown_error";
+          error instanceof Error
+            ? error.message
+            : "tasks.csv_processor.unknown_error";
 
         errors.push({
           jobId: job.id,
@@ -184,13 +191,22 @@ async function executeCsvProcessor(
     const [summaryStats] = await db
       .select({
         total: db.$count(csvImportJobs),
-        pending: db.$count(csvImportJobs, eq(csvImportJobs.status, CsvImportJobStatus.PENDING)),
+        pending: db.$count(
+          csvImportJobs,
+          eq(csvImportJobs.status, CsvImportJobStatus.PENDING),
+        ),
         processing: db.$count(
           csvImportJobs,
           eq(csvImportJobs.status, CsvImportJobStatus.PROCESSING),
         ),
-        completed: db.$count(csvImportJobs, eq(csvImportJobs.status, CsvImportJobStatus.COMPLETED)),
-        failed: db.$count(csvImportJobs, eq(csvImportJobs.status, CsvImportJobStatus.FAILED)),
+        completed: db.$count(
+          csvImportJobs,
+          eq(csvImportJobs.status, CsvImportJobStatus.COMPLETED),
+        ),
+        failed: db.$count(
+          csvImportJobs,
+          eq(csvImportJobs.status, CsvImportJobStatus.FAILED),
+        ),
       })
       .from(csvImportJobs);
 
@@ -213,7 +229,10 @@ async function executeCsvProcessor(
     return success(result);
   } catch (error) {
     logger.error("tasks.csv_processor.failed", {
-      error: error instanceof Error ? error.message : "tasks.csv_processor.unknown_error",
+      error:
+        error instanceof Error
+          ? error.message
+          : "tasks.csv_processor.unknown_error",
     });
 
     return fail({

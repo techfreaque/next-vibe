@@ -19,7 +19,14 @@ import { Div } from "next-vibe-ui/ui/div";
 import { EndpointFormField } from "next-vibe-ui/ui/form/endpoint-form-field";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { FormAlert } from "next-vibe-ui/ui/form/form-alert";
-import { AlertCircle, CheckCircle, Clock, Filter, RefreshCw, XCircle } from "next-vibe-ui/ui/icons";
+import {
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Filter,
+  RefreshCw,
+  XCircle,
+} from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import { H4, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
@@ -64,19 +71,26 @@ const getStatusIcon = (status: CronTaskStatusType): React.ReactElement => {
 const STATUS_COLORS: Record<CronTaskStatusType, string> = {
   [CronTaskStatus.COMPLETED]:
     "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
-  [CronTaskStatus.FAILED]: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
-  [CronTaskStatus.TIMEOUT]: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
-  [CronTaskStatus.RUNNING]: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
+  [CronTaskStatus.FAILED]:
+    "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+  [CronTaskStatus.TIMEOUT]:
+    "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+  [CronTaskStatus.RUNNING]:
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
   [CronTaskStatus.PENDING]:
     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
-  [CronTaskStatus.CANCELLED]: "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
+  [CronTaskStatus.CANCELLED]:
+    "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
   [CronTaskStatus.SKIPPED]:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
-  [CronTaskStatus.STOPPED]: "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
-  [CronTaskStatus.ERROR]: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+  [CronTaskStatus.STOPPED]:
+    "bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400",
+  [CronTaskStatus.ERROR]:
+    "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
   [CronTaskStatus.BLOCKED]:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
-  [CronTaskStatus.SCHEDULED]: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
+  [CronTaskStatus.SCHEDULED]:
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
 };
 
 const getStatusColor = (status: CronTaskStatusType): string => {
@@ -96,14 +110,24 @@ export function ExecutionHistory({
   const { t } = simpleT(locale);
 
   const apiResponse = historyEndpoint.read.response;
-  const history: CronExecutionType[] = apiResponse?.success ? apiResponse.data.executions : [];
-  const totalExecutions = apiResponse?.success ? apiResponse.data.totalCount : 0;
+  const history: CronExecutionType[] = apiResponse?.success
+    ? apiResponse.data.executions
+    : [];
+  const totalExecutions = apiResponse?.success
+    ? apiResponse.data.totalCount
+    : 0;
 
   const queryLoading = historyEndpoint.read.isLoading || false;
 
   // Get current form values for pagination display
-  const currentOffset = parseInt(historyEndpoint.read.form?.getValues("offset") || "0", 10);
-  const currentLimit = parseInt(historyEndpoint.read.form?.getValues("limit") || "20", 10);
+  const currentOffset = parseInt(
+    historyEndpoint.read.form?.getValues("offset") || "0",
+    10,
+  );
+  const currentLimit = parseInt(
+    historyEndpoint.read.form?.getValues("limit") || "20",
+    10,
+  );
 
   const getDuration = (execution: CronExecutionType): string => {
     if (execution.durationMs) {
@@ -150,7 +174,12 @@ export function ExecutionHistory({
             onClick={historyEndpoint.read.refetch}
             disabled={isLoading || queryLoading}
           >
-            <RefreshCw className={cn("h-4 w-4", (isLoading || queryLoading) && "animate-spin")} />
+            <RefreshCw
+              className={cn(
+                "h-4 w-4",
+                (isLoading || queryLoading) && "animate-spin",
+              )}
+            />
           </Button>
         </Div>
       </CardHeader>
@@ -220,7 +249,12 @@ export function ExecutionHistory({
             </Div>
 
             <Div className="flex items-center justify-end">
-              <Button type="button" variant="outline" size="sm" onClick={handleClearFilters}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleClearFilters}
+              >
                 {t("app.admin.cron.cronErrors.admin.interface.clear")}
               </Button>
             </Div>
@@ -237,10 +271,14 @@ export function ExecutionHistory({
               {queryLoading ? (
                 <Div className="flex items-center justify-center">
                   <Div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 dark:border-gray-100 mr-2" />
-                  {t("app.admin.cron.cronErrors.admin.interface.executionHistory.loadingHistory")}
+                  {t(
+                    "app.admin.cron.cronErrors.admin.interface.executionHistory.loadingHistory",
+                  )}
                 </Div>
               ) : (
-                t("app.admin.cron.cronErrors.admin.interface.executionHistory.noHistory")
+                t(
+                  "app.admin.cron.cronErrors.admin.interface.executionHistory.noHistory",
+                )
               )}
             </Div>
           ) : (
@@ -257,18 +295,24 @@ export function ExecutionHistory({
                         {execution.taskName}
                       </H4>
                       <P className="text-sm text-gray-500 dark:text-gray-400">
-                        {t("app.admin.cron.cronErrors.admin.interface.executionHistory.started")}:{" "}
-                        {formatDate(execution.startedAt)}
+                        {t(
+                          "app.admin.cron.cronErrors.admin.interface.executionHistory.started",
+                        )}
+                        : {formatDate(execution.startedAt)}
                       </P>
                     </Div>
                   </Div>
 
                   <Div className="flex items-center flex-row gap-4">
                     <Div className="text-right">
-                      <Badge className={getStatusColor(execution.status)}>{execution.status}</Badge>
+                      <Badge className={getStatusColor(execution.status)}>
+                        {execution.status}
+                      </Badge>
                       <P className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {t("app.admin.cron.cronErrors.admin.interface.executionHistory.duration")}:{" "}
-                        {getDuration(execution)}
+                        {t(
+                          "app.admin.cron.cronErrors.admin.interface.executionHistory.duration",
+                        )}
+                        : {getDuration(execution)}
                       </P>
                     </Div>
                   </Div>
@@ -277,8 +321,10 @@ export function ExecutionHistory({
                 {execution.completedAt && (
                   <Div className="mt-2">
                     <P className="text-sm text-gray-500 dark:text-gray-400">
-                      {t("app.admin.cron.cronErrors.admin.interface.executionHistory.completed")}:{" "}
-                      {formatDate(execution.completedAt)}
+                      {t(
+                        "app.admin.cron.cronErrors.admin.interface.executionHistory.completed",
+                      )}
+                      : {formatDate(execution.completedAt)}
                     </P>
                   </Div>
                 )}
@@ -294,11 +340,13 @@ export function ExecutionHistory({
                         </AccordionTrigger>
                         <AccordionContent>
                           <Div className="text-xs bg-red-50 dark:bg-red-900/20 p-3 rounded border border-red-200 dark:border-red-800 mt-2 overflow-x-auto max-h-40 text-red-800 dark:text-red-300">
-                            <Div className="mb-2 font-medium">{execution.error.message}</Div>
+                            <Div className="mb-2 font-medium">
+                              {execution.error.message}
+                            </Div>
                             {execution.error.errorType && (
                               <Div className="text-xs opacity-75">
-                                {t("app.admin.cron.executionHistory.errorType")}:{" "}
-                                {execution.error.errorType}
+                                {t("app.admin.cron.executionHistory.errorType")}
+                                : {execution.error.errorType}
                               </Div>
                             )}
                           </Div>
@@ -328,7 +376,10 @@ export function ExecutionHistory({
                 size="sm"
                 onClick={() => {
                   const newOffset = Math.max(0, currentOffset - currentLimit);
-                  historyEndpoint.read.form?.setValue("offset", newOffset.toString());
+                  historyEndpoint.read.form?.setValue(
+                    "offset",
+                    newOffset.toString(),
+                  );
                 }}
                 disabled={currentOffset === 0}
               >
@@ -339,7 +390,10 @@ export function ExecutionHistory({
                 size="sm"
                 onClick={() => {
                   const newOffset = currentOffset + currentLimit;
-                  historyEndpoint.read.form?.setValue("offset", newOffset.toString());
+                  historyEndpoint.read.form?.setValue(
+                    "offset",
+                    newOffset.toString(),
+                  );
                 }}
                 disabled={!(apiResponse?.success && apiResponse.data.hasMore)}
               >

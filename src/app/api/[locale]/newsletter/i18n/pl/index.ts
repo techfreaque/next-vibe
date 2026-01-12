@@ -19,7 +19,8 @@ export const translations: typeof enTranslations = {
       benefit_2: "Wglądy branżowe i trendy",
       benefit_3: "Ekskluzywne treści i wskazówki",
       benefit_4: "Specjalne oferty i promocje",
-      frequency: "Będziemy wysyłać Ci newslettery tygodniowo z najnowszymi aktualizacjami.",
+      frequency:
+        "Będziemy wysyłać Ci newslettery tygodniowo z najnowszymi aktualizacjami.",
       unsubscribe_text: "Możesz wypisać się w dowolnym momencie klikając",
       unsubscribe_link: "tutaj",
       subject: "Witamy w naszym newsletterze!",
@@ -43,7 +44,8 @@ export const translations: typeof enTranslations = {
       resubscribe_info:
         "Jeśli zmienisz zdanie, zawsze możesz ponownie zapisać się odwiedzając naszą stronę",
       resubscribe_button: "Zapisz ponownie",
-      support_message: "Jeśli masz jakieś pytania, skontaktuj się z naszym zespołem wsparcia",
+      support_message:
+        "Jeśli masz jakieś pytania, skontaktuj się z naszym zespołem wsparcia",
       subject: "Potwierdzenie wypisania z newslettera",
       admin_unsubscribe_notification: {
         title: "Powiadomienie o wypisaniu z newslettera",

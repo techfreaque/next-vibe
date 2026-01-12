@@ -6,7 +6,8 @@ export const translations: typeof enTranslations = {
     "Dostarcza bardziej szczegółowych informacji o określonym insightu wydajności zestawu insightów, który został wyróżniony w wynikach nagrania trace",
   form: {
     label: "Analizuj insight wydajności",
-    description: "Pobierz szczegółowe informacje o określonym insightu wydajności",
+    description:
+      "Pobierz szczegółowe informacje o określonym insightu wydajności",
     fields: {
       insightSetId: {
         label: "ID zestawu insightów",
@@ -35,7 +36,8 @@ export const translations: typeof enTranslations = {
     },
     network: {
       title: "Błąd sieci",
-      description: "Wystąpił błąd sieci podczas analizowania insightu wydajności",
+      description:
+        "Wystąpił błąd sieci podczas analizowania insightu wydajności",
     },
     unauthorized: {
       title: "Nieautoryzowany",
@@ -51,11 +53,13 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description: "Wystąpił wewnętrzny błąd serwera podczas analizowania insightu wydajności",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas analizowania insightu wydajności",
     },
     unknown: {
       title: "Nieznany błąd",
-      description: "Wystąpił nieznany błąd podczas analizowania insightu wydajności",
+      description:
+        "Wystąpił nieznany błąd podczas analizowania insightu wydajności",
     },
     unsavedChanges: {
       title: "Niezapisane zmiany",

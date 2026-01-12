@@ -38,7 +38,8 @@ export const translations: typeof enTranslations = {
       },
       response: {
         title: "Odpowiedź Statusu Kondycji IMAP",
-        description: "Aktualny status kondycji serwera IMAP i metryki wydajności",
+        description:
+          "Aktualny status kondycji serwera IMAP i metryki wydajności",
         success: "Sukces",
         message: "Status kondycji pobrany pomyślnie",
         data: {
@@ -71,7 +72,8 @@ export const translations: typeof enTranslations = {
       errors: {
         unauthorized: {
           title: "Nieautoryzowany",
-          description: "Wymagane uwierzytelnienie aby uzyskać dostęp do statusu kondycji IMAP",
+          description:
+            "Wymagane uwierzytelnienie aby uzyskać dostęp do statusu kondycji IMAP",
         },
         validation: {
           title: "Błąd Walidacji",
@@ -79,7 +81,8 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Błąd Serwera",
-          description: "Wystąpił wewnętrzny błąd serwera podczas pobierania statusu kondycji",
+          description:
+            "Wystąpił wewnętrzny błąd serwera podczas pobierania statusu kondycji",
         },
         unknown: {
           title: "Nieznany Błąd",
@@ -87,7 +90,8 @@ export const translations: typeof enTranslations = {
         },
         network: {
           title: "Błąd Sieci",
-          description: "Wystąpił błąd sieci podczas pobierania statusu kondycji",
+          description:
+            "Wystąpił błąd sieci podczas pobierania statusu kondycji",
         },
         forbidden: {
           title: "Zabroniony",
@@ -99,11 +103,13 @@ export const translations: typeof enTranslations = {
         },
         unsavedChanges: {
           title: "Niezapisane Zmiany",
-          description: "Istnieją niezapisane zmiany, które należy najpierw zapisać",
+          description:
+            "Istnieją niezapisane zmiany, które należy najpierw zapisać",
         },
         conflict: {
           title: "Konflikt",
-          description: "Wystąpił konflikt danych podczas pobierania statusu kondycji",
+          description:
+            "Wystąpił konflikt danych podczas pobierania statusu kondycji",
         },
       },
       success: {

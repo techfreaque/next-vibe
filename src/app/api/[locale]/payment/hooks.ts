@@ -15,7 +15,9 @@ import definitions from "./definition";
  * Hook for payment management
  * Provides both query (GET) and mutation (POST) operations
  */
-export function usePayment(logger: EndpointLogger): EndpointReturn<typeof definitions> {
+export function usePayment(
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

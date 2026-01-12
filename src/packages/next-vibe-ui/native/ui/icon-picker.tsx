@@ -6,7 +6,14 @@
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
-import { FlatList, Modal, Pressable, ScrollView, TextInput, View } from "react-native";
+import {
+  FlatList,
+  Modal,
+  Pressable,
+  ScrollView,
+  TextInput,
+  View,
+} from "react-native";
 
 import type { CategoryKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
 import {
@@ -25,7 +32,11 @@ export { ICON_CATEGORIES };
 /**
  * Icon Picker Component for React Native
  */
-export function IconPicker({ value, onChange, className }: IconPickerProps): JSX.Element {
+export function IconPicker({
+  value,
+  onChange,
+  className,
+}: IconPickerProps): JSX.Element {
   const [modalVisible, setModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
@@ -39,7 +50,9 @@ export function IconPicker({ value, onChange, className }: IconPickerProps): JSX
     }
 
     const query = searchQuery.toLowerCase();
-    return categoryIcons.filter((iconKey) => iconKey.toLowerCase().includes(query));
+    return categoryIcons.filter((iconKey) =>
+      iconKey.toLowerCase().includes(query),
+    );
   }, [searchQuery, activeCategory]);
 
   return (
@@ -67,7 +80,9 @@ export function IconPicker({ value, onChange, className }: IconPickerProps): JSX
         <View className="flex-1 bg-background">
           {/* Header with search */}
           <View className="flex flex-col gap-3 p-4 border-b bg-card">
-            <Text className="text-lg font-semibold">{t("app.ui.iconPicker.title")}</Text>
+            <Text className="text-lg font-semibold">
+              {t("app.ui.iconPicker.title")}
+            </Text>
             <TextInput
               placeholder={t("app.ui.iconPicker.searchPlaceholder")}
               value={searchQuery}
@@ -126,7 +141,9 @@ export function IconPicker({ value, onChange, className }: IconPickerProps): JSX
                     }}
                     className={cn(
                       "flex-1 aspect-square items-center justify-center m-1 rounded-md",
-                      isSelected ? "bg-accent border-2 border-primary" : "bg-muted/30",
+                      isSelected
+                        ? "bg-accent border-2 border-primary"
+                        : "bg-muted/30",
                     )}
                   >
                     <Icon icon={iconKey} className="h-5 w-5" />

@@ -29,7 +29,9 @@ export default async function ImapOverviewPage({
   return (
     <Div className="container mx-auto py-6 flex flex-col gap-6">
       <Div className="mb-6">
-        <H1 className="text-3xl font-bold">{t("app.admin.emails.imap.admin.overview.title")}</H1>
+        <H1 className="text-3xl font-bold">
+          {t("app.admin.emails.imap.admin.overview.title")}
+        </H1>
         <P className="text-muted-foreground">
           {t("app.admin.emails.imap.admin.overview.description")}
         </P>

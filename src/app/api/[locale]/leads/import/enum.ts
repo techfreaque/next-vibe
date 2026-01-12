@@ -82,11 +82,14 @@ export const {
   options: ImportErrorTypeOptions,
   Value: ImportErrorTypeValue,
 } = createEnumOptions({
-  VALIDATION_ERROR: "app.api.leads.import.enums.importErrorType.validationError",
+  VALIDATION_ERROR:
+    "app.api.leads.import.enums.importErrorType.validationError",
   DUPLICATE_EMAIL: "app.api.leads.import.enums.importErrorType.duplicateEmail",
   INVALID_FORMAT: "app.api.leads.import.enums.importErrorType.invalidFormat",
-  MISSING_REQUIRED_FIELD: "app.api.leads.import.enums.importErrorType.missingRequiredField",
-  PROCESSING_ERROR: "app.api.leads.import.enums.importErrorType.processingError",
+  MISSING_REQUIRED_FIELD:
+    "app.api.leads.import.enums.importErrorType.missingRequiredField",
+  PROCESSING_ERROR:
+    "app.api.leads.import.enums.importErrorType.processingError",
   SYSTEM_ERROR: "app.api.leads.import.enums.importErrorType.systemError",
 });
 
@@ -206,7 +209,11 @@ export const ImportModeDB = [
   ImportMode.SKIP_DUPLICATES,
 ] as const;
 
-export const ImportFormatDB = [ImportFormat.CSV, ImportFormat.TSV, ImportFormat.JSON] as const;
+export const ImportFormatDB = [
+  ImportFormat.CSV,
+  ImportFormat.TSV,
+  ImportFormat.JSON,
+] as const;
 
 export const ImportProcessingTypeDB = [
   ImportProcessingType.IMMEDIATE,

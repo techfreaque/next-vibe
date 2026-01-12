@@ -2,7 +2,11 @@
 
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { cn } from "next-vibe/shared/utils/utils";
-import { CheckIcon, ChevronRightIcon, DotFilledIcon } from "next-vibe-ui/ui/icons";
+import {
+  CheckIcon,
+  ChevronRightIcon,
+  DotFilledIcon,
+} from "next-vibe-ui/ui/icons";
 import * as React from "react";
 
 import type { StyleType } from "../utils/style-type";
@@ -95,8 +99,15 @@ export interface DropdownMenuShortcutProps {
   className?: string;
 }
 
-export function DropdownMenu({ children, ...props }: DropdownMenuRootProps): React.JSX.Element {
-  return <DropdownMenuPrimitive.Root {...props}>{children}</DropdownMenuPrimitive.Root>;
+export function DropdownMenu({
+  children,
+  ...props
+}: DropdownMenuRootProps): React.JSX.Element {
+  return (
+    <DropdownMenuPrimitive.Root {...props}>
+      {children}
+    </DropdownMenuPrimitive.Root>
+  );
 }
 DropdownMenu.displayName = DropdownMenuPrimitive.Root.displayName;
 
@@ -113,7 +124,9 @@ export function DropdownMenuTrigger({
 }
 DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName;
 
-export function DropdownMenuGroup({ children }: DropdownMenuGroupProps): React.JSX.Element {
+export function DropdownMenuGroup({
+  children,
+}: DropdownMenuGroupProps): React.JSX.Element {
   return <DropdownMenuPrimitive.Group>{children}</DropdownMenuPrimitive.Group>;
 }
 DropdownMenuGroup.displayName = DropdownMenuPrimitive.Group.displayName;
@@ -131,8 +144,13 @@ export function DropdownMenuPortal({
 }
 DropdownMenuPortal.displayName = DropdownMenuPrimitive.Portal.displayName;
 
-export function DropdownMenuSub({ children, ...props }: DropdownMenuSubProps): React.JSX.Element {
-  return <DropdownMenuPrimitive.Sub {...props}>{children}</DropdownMenuPrimitive.Sub>;
+export function DropdownMenuSub({
+  children,
+  ...props
+}: DropdownMenuSubProps): React.JSX.Element {
+  return (
+    <DropdownMenuPrimitive.Sub {...props}>{children}</DropdownMenuPrimitive.Sub>
+  );
 }
 DropdownMenuSub.displayName = DropdownMenuPrimitive.Sub.displayName;
 
@@ -140,9 +158,14 @@ export function DropdownMenuRadioGroup({
   children,
   ...props
 }: DropdownMenuRadioGroupProps): React.JSX.Element {
-  return <DropdownMenuPrimitive.RadioGroup {...props}>{children}</DropdownMenuPrimitive.RadioGroup>;
+  return (
+    <DropdownMenuPrimitive.RadioGroup {...props}>
+      {children}
+    </DropdownMenuPrimitive.RadioGroup>
+  );
 }
-DropdownMenuRadioGroup.displayName = DropdownMenuPrimitive.RadioGroup.displayName;
+DropdownMenuRadioGroup.displayName =
+  DropdownMenuPrimitive.RadioGroup.displayName;
 
 export function DropdownMenuSubTrigger({
   className,
@@ -166,7 +189,8 @@ export function DropdownMenuSubTrigger({
     </DropdownMenuPrimitive.SubTrigger>
   );
 }
-DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName;
+DropdownMenuSubTrigger.displayName =
+  DropdownMenuPrimitive.SubTrigger.displayName;
 
 export function DropdownMenuSubContent({
   className,
@@ -187,7 +211,8 @@ export function DropdownMenuSubContent({
     </DropdownMenuPrimitive.SubContent>
   );
 }
-DropdownMenuSubContent.displayName = DropdownMenuPrimitive.SubContent.displayName;
+DropdownMenuSubContent.displayName =
+  DropdownMenuPrimitive.SubContent.displayName;
 
 export function DropdownMenuContent({
   className,
@@ -263,7 +288,8 @@ export function DropdownMenuCheckboxItem({
     </DropdownMenuPrimitive.CheckboxItem>
   );
 }
-DropdownMenuCheckboxItem.displayName = DropdownMenuPrimitive.CheckboxItem.displayName;
+DropdownMenuCheckboxItem.displayName =
+  DropdownMenuPrimitive.CheckboxItem.displayName;
 
 export function DropdownMenuRadioItem({
   className,
@@ -302,7 +328,11 @@ export function DropdownMenuLabel({
 }: DropdownMenuLabelProps): React.JSX.Element {
   return (
     <DropdownMenuPrimitive.Label
-      className={cn("px-2 py-1.5 text-sm font-semibold", inset && "pl-8", className)}
+      className={cn(
+        "px-2 py-1.5 text-sm font-semibold",
+        inset && "pl-8",
+        className,
+      )}
       style={style}
       {...props}
     >
@@ -333,7 +363,10 @@ export function DropdownMenuShortcut({
   ...props
 }: DropdownMenuShortcutProps): React.JSX.Element {
   return (
-    <span className={cn("ml-auto text-xs tracking-widest opacity-60", className)} {...props}>
+    <span
+      className={cn("ml-auto text-xs tracking-widest opacity-60", className)}
+      {...props}
+    >
       {children}
     </span>
   );

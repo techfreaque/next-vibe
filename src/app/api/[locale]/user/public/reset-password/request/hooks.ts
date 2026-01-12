@@ -65,7 +65,9 @@ export function useResetPasswordRequest(logger: EndpointLogger): ApiFormReturn<
 
         toast({
           title: t("app.api.user.public.resetPassword.request.success.title"),
-          description: t("app.api.user.public.resetPassword.request.response.success.message"),
+          description: t(
+            "app.api.user.public.resetPassword.request.response.success.message",
+          ),
           variant: "default",
         });
       },
@@ -88,7 +90,8 @@ export function useResetPasswordRequest(logger: EndpointLogger): ApiFormReturn<
           message: "app.api.user.public.resetPassword.request.success.title",
         },
         message: {
-          message: "app.api.user.public.resetPassword.request.success.description",
+          message:
+            "app.api.user.public.resetPassword.request.success.description",
         },
       };
     }

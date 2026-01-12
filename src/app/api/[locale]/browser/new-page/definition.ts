@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.new-page.description",
   category: "app.api.browser.category",
   icon: "file-plus",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.navigationAutomation"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.navigationAutomation",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -63,8 +66,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.browser.new-page.form.fields.timeout.label",
-          description: "app.api.browser.new-page.form.fields.timeout.description",
-          placeholder: "app.api.browser.new-page.form.fields.timeout.placeholder",
+          description:
+            "app.api.browser.new-page.form.fields.timeout.description",
+          placeholder:
+            "app.api.browser.new-page.form.fields.timeout.placeholder",
           columns: 4,
         },
         z
@@ -81,7 +86,9 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.browser.new-page.response.success",
         },
-        z.boolean().describe("Whether the new page creation operation succeeded"),
+        z
+          .boolean()
+          .describe("Whether the new page creation operation succeeded"),
       ),
       result: responseField(
         {

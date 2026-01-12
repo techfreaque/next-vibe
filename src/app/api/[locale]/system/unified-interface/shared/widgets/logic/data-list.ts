@@ -33,7 +33,9 @@ export interface ProcessedDataList {
 /**
  * Extract and validate data list from WidgetData
  */
-export function extractDataListData(value: WidgetData): ProcessedDataList | null {
+export function extractDataListData(
+  value: WidgetData,
+): ProcessedDataList | null {
   // Handle array of items directly
   if (Array.isArray(value)) {
     if (value.length === 0) {
@@ -42,7 +44,8 @@ export function extractDataListData(value: WidgetData): ProcessedDataList | null
 
     // Check if array contains simple values (strings, numbers) or objects
     const firstItem = value[0];
-    const isSimpleValueArray = typeof firstItem !== "object" || firstItem === null;
+    const isSimpleValueArray =
+      typeof firstItem !== "object" || firstItem === null;
 
     if (isSimpleValueArray) {
       // For simple value arrays, return them as-is
@@ -72,15 +75,24 @@ export function extractDataListData(value: WidgetData): ProcessedDataList | null
 
   // Handle object with items array
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const items = "items" in value && Array.isArray(value.items) ? value.items : [];
-    const title = "title" in value && typeof value.title === "string" ? value.title : undefined;
+    const items =
+      "items" in value && Array.isArray(value.items) ? value.items : [];
+    const title =
+      "title" in value && typeof value.title === "string"
+        ? value.title
+        : undefined;
     const showBullets =
-      "showBullets" in value && typeof value.showBullets === "boolean" ? value.showBullets : true;
+      "showBullets" in value && typeof value.showBullets === "boolean"
+        ? value.showBullets
+        : true;
     const maxItems =
-      "maxItems" in value && typeof value.maxItems === "number" ? value.maxItems : undefined;
+      "maxItems" in value && typeof value.maxItems === "number"
+        ? value.maxItems
+        : undefined;
 
     const validItems = items.filter(
-      (item): item is ListItem => typeof item === "object" && item !== null && !Array.isArray(item),
+      (item): item is ListItem =>
+        typeof item === "object" && item !== null && !Array.isArray(item),
     );
 
     if (validItems.length === 0) {
@@ -101,7 +113,10 @@ export function extractDataListData(value: WidgetData): ProcessedDataList | null
 /**
  * Get display items based on maxItems limit
  */
-export function getListDisplayItems(items: ListItem[], maxItems?: number): ListItem[] {
+export function getListDisplayItems(
+  items: ListItem[],
+  maxItems?: number,
+): ListItem[] {
   if (!maxItems || items.length <= maxItems) {
     return items;
   }
@@ -111,7 +126,10 @@ export function getListDisplayItems(items: ListItem[], maxItems?: number): ListI
 /**
  * Get remaining items count
  */
-export function getRemainingListItemsCount(totalItems: number, maxItems?: number): number {
+export function getRemainingListItemsCount(
+  totalItems: number,
+  maxItems?: number,
+): number {
   if (!maxItems || totalItems <= maxItems) {
     return 0;
   }

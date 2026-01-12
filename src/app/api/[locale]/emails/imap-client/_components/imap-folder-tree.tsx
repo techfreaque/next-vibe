@@ -9,7 +9,13 @@ import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { ChevronDown, ChevronRight, Folder, FolderOpen, Mail } from "next-vibe-ui/ui/icons";
+import {
+  ChevronDown,
+  ChevronRight,
+  Folder,
+  FolderOpen,
+  Mail,
+} from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3 } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
@@ -94,7 +100,13 @@ function buildFolderTree(
 /**
  * Individual Folder Tree Node Component
  */
-function FolderTreeNode({ folder, level, onSync, onView, t }: FolderTreeNodeProps): JSX.Element {
+function FolderTreeNode({
+  folder,
+  level,
+  onSync,
+  onView,
+  t,
+}: FolderTreeNodeProps): JSX.Element {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const getSpecialUseIcon = (type?: string): JSX.Element => {
@@ -152,7 +164,9 @@ function FolderTreeNode({ folder, level, onSync, onView, t }: FolderTreeNodeProp
           {/* Folder Info */}
           <Div className="flex-1 min-w-0">
             <Div className="flex items-center flex flex-row gap-2">
-              <Span className="font-medium truncate">{folder.displayName || folder.name}</Span>
+              <Span className="font-medium truncate">
+                {folder.displayName || folder.name}
+              </Span>
               {folder.specialUseType && (
                 <Badge variant="outline" className="text-xs">
                   {folder.specialUseType}
@@ -166,7 +180,9 @@ function FolderTreeNode({ folder, level, onSync, onView, t }: FolderTreeNodeProp
           <Div className="flex items-center flex flex-row gap-4 text-sm">
             <Div className="text-center">
               <Div className="font-medium">{folder.messageCount}</Div>
-              <Div className="text-xs text-gray-500">{t("app.admin.emails.imap.common.total")}</Div>
+              <Div className="text-xs text-gray-500">
+                {t("app.admin.emails.imap.common.total")}
+              </Div>
             </Div>
             {folder.unseenCount > 0 && (
               <Div className="text-center">
@@ -180,7 +196,9 @@ function FolderTreeNode({ folder, level, onSync, onView, t }: FolderTreeNodeProp
             )}
             {folder.recentCount > 0 && (
               <Div className="text-center">
-                <Div className="font-medium text-green-600">{folder.recentCount}</Div>
+                <Div className="font-medium text-green-600">
+                  {folder.recentCount}
+                </Div>
                 <Div className="text-xs text-gray-500">
                   {t("app.admin.emails.imap.common.recent")}
                 </Div>
@@ -190,7 +208,9 @@ function FolderTreeNode({ folder, level, onSync, onView, t }: FolderTreeNodeProp
 
           {/* Sync Status */}
           <Div className="ml-4 text-center">
-            <Div className={`text-sm font-medium ${getSyncStatusColor(folder.syncStatus)}`}>
+            <Div
+              className={`text-sm font-medium ${getSyncStatusColor(folder.syncStatus)}`}
+            >
               {folder.syncStatus}
             </Div>
             <Div className="text-xs text-gray-500">{folder.lastSyncAt}</Div>
@@ -198,10 +218,18 @@ function FolderTreeNode({ folder, level, onSync, onView, t }: FolderTreeNodeProp
 
           {/* Actions */}
           <Div className="ml-4 flex items-center flex flex-row gap-2">
-            <Button variant="outline" size="sm" onClick={() => onSync(folder.id)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onSync(folder.id)}
+            >
               {t("app.admin.emails.imap.folder.actions.sync")}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => onView(folder.id)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onView(folder.id)}
+            >
               {t("app.admin.emails.imap.common.view")}
             </Button>
           </Div>
@@ -230,7 +258,10 @@ function FolderTreeNode({ folder, level, onSync, onView, t }: FolderTreeNodeProp
 /**
  * IMAP Folder Tree Component
  */
-export function ImapFolderTree({ accountId, logger }: ImapFolderTreeProps): JSX.Element {
+export function ImapFolderTree({
+  accountId,
+  logger,
+}: ImapFolderTreeProps): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -260,7 +291,9 @@ export function ImapFolderTree({ accountId, logger }: ImapFolderTreeProps): JSX.
     return (
       <Div className="border rounded-lg">
         <Div className="bg-gray-50 px-4 py-3 border-b">
-          <H3 className="font-medium">{t("app.admin.emails.imap.admin.folders.title")}</H3>
+          <H3 className="font-medium">
+            {t("app.admin.emails.imap.admin.folders.title")}
+          </H3>
         </Div>
         <Div className="p-4 text-center text-gray-500">
           {t("app.admin.emails.imap.common.loading")}
@@ -272,7 +305,9 @@ export function ImapFolderTree({ accountId, logger }: ImapFolderTreeProps): JSX.
   return (
     <Div className="border rounded-lg">
       <Div className="bg-gray-50 px-4 py-3 border-b">
-        <H3 className="font-medium">{t("app.admin.emails.imap.admin.folders.title")}</H3>
+        <H3 className="font-medium">
+          {t("app.admin.emails.imap.admin.folders.title")}
+        </H3>
       </Div>
       <Div className="max-h-96 overflow-y-auto">
         {folderTree.length === 0 ? (

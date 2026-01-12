@@ -42,280 +42,469 @@ type IconLoader = () => Promise<{ [key: string]: IconComponent }>;
  * This ensures TypeScript can verify all icon names are correct
  */
 const ICON_LOADERS: Record<IconLibraryName, IconLoader> = {
-  Activity: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Activity"),
-  AlertCircle: async () => await import("@/packages/next-vibe-ui/web/ui/icons/AlertCircle"),
-  AlertTriangle: async () => await import("@/packages/next-vibe-ui/web/ui/icons/AlertTriangle"),
-  Archive: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Archive"),
-  ArchiveRestore: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ArchiveRestore"),
-  ArrowBigDown: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ArrowBigDown"),
-  ArrowBigUp: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ArrowBigUp"),
-  ArrowDown: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ArrowDown"),
-  ArrowLeft: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ArrowLeft"),
-  ArrowLeftIcon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ArrowLeftIcon"),
-  ArrowRight: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ArrowRight"),
-  ArrowRightIcon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ArrowRightIcon"),
-  ArrowUp: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ArrowUp"),
+  Activity: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Activity"),
+  AlertCircle: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/AlertCircle"),
+  AlertTriangle: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/AlertTriangle"),
+  Archive: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Archive"),
+  ArchiveRestore: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ArchiveRestore"),
+  ArrowBigDown: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ArrowBigDown"),
+  ArrowBigUp: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ArrowBigUp"),
+  ArrowDown: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ArrowDown"),
+  ArrowLeft: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ArrowLeft"),
+  ArrowLeftIcon: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ArrowLeftIcon"),
+  ArrowRight: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ArrowRight"),
+  ArrowRightIcon: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ArrowRightIcon"),
+  ArrowUp: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ArrowUp"),
   Atom: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Atom"),
   Award: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Award"),
-  Banknote: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Banknote"),
-  BarChart: async () => await import("@/packages/next-vibe-ui/web/ui/icons/BarChart"),
-  BarChart2: async () => await import("@/packages/next-vibe-ui/web/ui/icons/BarChart2"),
-  BarChart3: async () => await import("@/packages/next-vibe-ui/web/ui/icons/BarChart3"),
-  BarChart3Icon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/BarChart3Icon"),
+  Banknote: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Banknote"),
+  BarChart: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/BarChart"),
+  BarChart2: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/BarChart2"),
+  BarChart3: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/BarChart3"),
+  BarChart3Icon: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/BarChart3Icon"),
   Bell: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Bell"),
-  BellOff: async () => await import("@/packages/next-vibe-ui/web/ui/icons/BellOff"),
-  Bitcoin: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Bitcoin"),
+  BellOff: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/BellOff"),
+  Bitcoin: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Bitcoin"),
   Book: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Book"),
-  Bookmark: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Bookmark"),
-  BookOpen: async () => await import("@/packages/next-vibe-ui/web/ui/icons/BookOpen"),
+  Bookmark: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Bookmark"),
+  BookOpen: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/BookOpen"),
   Bot: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Bot"),
   Box: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Box"),
   Brain: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Brain"),
-  Briefcase: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Briefcase"),
+  Briefcase: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Briefcase"),
   Brush: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Brush"),
   Bug: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Bug"),
-  Building: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Building"),
-  Calendar: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Calendar"),
-  Camera: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Camera"),
+  Building: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Building"),
+  Calendar: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Calendar"),
+  Camera: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Camera"),
   Check: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Check"),
-  CheckCircle: async () => await import("@/packages/next-vibe-ui/web/ui/icons/CheckCircle"),
-  CheckCircle2: async () => await import("@/packages/next-vibe-ui/web/ui/icons/CheckCircle2"),
-  CheckIcon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/CheckIcon"),
-  ChevronDown: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ChevronDown"),
-  ChevronDownIcon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ChevronDownIcon"),
-  ChevronLeft: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ChevronLeft"),
-  ChevronLeftIcon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ChevronLeftIcon"),
-  ChevronRight: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ChevronRight"),
+  CheckCircle: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/CheckCircle"),
+  CheckCircle2: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/CheckCircle2"),
+  CheckIcon: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/CheckIcon"),
+  ChevronDown: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ChevronDown"),
+  ChevronDownIcon: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ChevronDownIcon"),
+  ChevronLeft: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ChevronLeft"),
+  ChevronLeftIcon: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ChevronLeftIcon"),
+  ChevronRight: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ChevronRight"),
   ChevronRightIcon: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/ChevronRightIcon"),
-  ChevronsLeft: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ChevronsLeft"),
-  ChevronsRight: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ChevronsRight"),
-  ChevronUp: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ChevronUp"),
-  Circle: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Circle"),
-  CircleDashed: async () => await import("@/packages/next-vibe-ui/web/ui/icons/CircleDashed"),
+  ChevronsLeft: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ChevronsLeft"),
+  ChevronsRight: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ChevronsRight"),
+  ChevronUp: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ChevronUp"),
+  Circle: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Circle"),
+  CircleDashed: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/CircleDashed"),
   Clock: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Clock"),
   Cloud: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Cloud"),
   Code: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Code"),
   Code2: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Code2"),
-  Coffee: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Coffee"),
+  Coffee: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Coffee"),
   Coins: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Coins"),
-  Compass: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Compass"),
+  Compass: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Compass"),
   Copy: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Copy"),
-  CornerDownRight: async () => await import("@/packages/next-vibe-ui/web/ui/icons/CornerDownRight"),
+  CornerDownRight: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/CornerDownRight"),
   Cpu: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Cpu"),
-  CreditCard: async () => await import("@/packages/next-vibe-ui/web/ui/icons/CreditCard"),
-  Cross2Icon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Cross2Icon"),
+  CreditCard: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/CreditCard"),
+  Cross2Icon: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Cross2Icon"),
   Crown: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Crown"),
-  DashIcon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/DashIcon"),
-  Database: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Database"),
-  DollarSign: async () => await import("@/packages/next-vibe-ui/web/ui/icons/DollarSign"),
-  DotFilledIcon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/DotFilledIcon"),
+  DashIcon: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/DashIcon"),
+  Database: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Database"),
+  DollarSign: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/DollarSign"),
+  DotFilledIcon: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/DotFilledIcon"),
   DotsHorizontalIcon: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/DotsHorizontalIcon"),
-  Download: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Download"),
+  Download: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Download"),
   DragHandleDots2Icon: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/DragHandleDots2Icon"),
-  Dumbbell: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Dumbbell"),
+  Dumbbell: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Dumbbell"),
   Edit: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Edit"),
   Edit2: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Edit2"),
-  ExternalLink: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ExternalLink"),
+  ExternalLink: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ExternalLink"),
   Eye: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Eye"),
-  EyeOff: async () => await import("@/packages/next-vibe-ui/web/ui/icons/EyeOff"),
-  Facebook: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Facebook"),
-  FileCode: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FileCode"),
-  FilePlus: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FilePlus"),
-  FileText: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FileText"),
+  EyeOff: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/EyeOff"),
+  Facebook: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Facebook"),
+  FileCode: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FileCode"),
+  FilePlus: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FilePlus"),
+  FileText: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FileText"),
   Film: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Film"),
-  Filter: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Filter"),
+  Filter: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Filter"),
   Flame: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Flame"),
-  Folder: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Folder"),
-  FolderClock: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FolderClock"),
-  FolderCode: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FolderCode"),
-  FolderGit: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FolderGit"),
-  FolderHeart: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FolderHeart"),
-  FolderIcon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FolderIcon"),
-  FolderInput: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FolderInput"),
-  FolderOpen: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FolderOpen"),
-  FolderPen: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FolderPen"),
-  FolderPlus: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FolderPlus"),
-  FolderTree: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FolderTree"),
-  FolderX: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FolderX"),
-  FreedomGptLogo: async () => await import("@/packages/next-vibe-ui/web/ui/icons/FreedomGptLogo"),
-  GabAILogo: async () => await import("@/packages/next-vibe-ui/web/ui/icons/GabAiLogo"),
-  Gamepad: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Gamepad"),
+  Folder: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Folder"),
+  FolderClock: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FolderClock"),
+  FolderCode: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FolderCode"),
+  FolderGit: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FolderGit"),
+  FolderHeart: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FolderHeart"),
+  FolderIcon: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FolderIcon"),
+  FolderInput: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FolderInput"),
+  FolderOpen: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FolderOpen"),
+  FolderPen: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FolderPen"),
+  FolderPlus: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FolderPlus"),
+  FolderTree: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FolderTree"),
+  FolderX: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FolderX"),
+  FreedomGptLogo: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/FreedomGptLogo"),
+  GabAILogo: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/GabAiLogo"),
+  Gamepad: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Gamepad"),
   Gift: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Gift"),
-  GitBranch: async () => await import("@/packages/next-vibe-ui/web/ui/icons/GitBranch"),
-  GitFork: async () => await import("@/packages/next-vibe-ui/web/ui/icons/GitFork"),
+  GitBranch: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/GitBranch"),
+  GitFork: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/GitFork"),
   Globe: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Globe"),
-  GraduationCap: async () => await import("@/packages/next-vibe-ui/web/ui/icons/GraduationCap"),
-  Grid3x3: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Grid3x3"),
-  GripVertical: async () => await import("@/packages/next-vibe-ui/web/ui/icons/GripVertical"),
-  Handshake: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Handshake"),
+  GraduationCap: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/GraduationCap"),
+  Grid3x3: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Grid3x3"),
+  GripVertical: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/GripVertical"),
+  Handshake: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Handshake"),
   Hash: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Hash"),
   Heart: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Heart"),
-  HelpCircle: async () => await import("@/packages/next-vibe-ui/web/ui/icons/HelpCircle"),
-  History: async () => await import("@/packages/next-vibe-ui/web/ui/icons/History"),
+  HelpCircle: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/HelpCircle"),
+  History: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/History"),
   Home: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Home"),
   Image: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Image"),
   Inbox: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Inbox"),
   Info: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Info"),
-  Instagram: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Instagram"),
+  Instagram: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Instagram"),
   Key: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Key"),
-  Keyboard: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Keyboard"),
-  Languages: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Languages"),
-  Laptop: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Laptop"),
-  Layers: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Layers"),
-  Layout: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Layout"),
-  LayoutTemplate: async () => await import("@/packages/next-vibe-ui/web/ui/icons/LayoutTemplate"),
+  Keyboard: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Keyboard"),
+  Languages: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Languages"),
+  Laptop: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Laptop"),
+  Layers: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Layers"),
+  Layout: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Layout"),
+  LayoutTemplate: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/LayoutTemplate"),
   Leaf: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Leaf"),
-  Library: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Library"),
-  Lightbulb: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Lightbulb"),
-  LineChart: async () => await import("@/packages/next-vibe-ui/web/ui/icons/LineChart"),
-  LineChartIcon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/LineChartIcon"),
+  Library: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Library"),
+  Lightbulb: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Lightbulb"),
+  LineChart: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/LineChart"),
+  LineChartIcon: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/LineChartIcon"),
   Link: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Link"),
   Link2: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Link2"),
-  Linkedin: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Linkedin"),
+  Linkedin: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Linkedin"),
   List: async () => await import("@/packages/next-vibe-ui/web/ui/icons/List"),
-  Loader2: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Loader2"),
+  Loader2: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Loader2"),
   Lock: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Lock"),
   LogIn: async () => await import("@/packages/next-vibe-ui/web/ui/icons/LogIn"),
-  LogOut: async () => await import("@/packages/next-vibe-ui/web/ui/icons/LogOut"),
+  LogOut: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/LogOut"),
   MagnifyingGlassIcon: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/MagnifyingGlassIcon"),
   Mail: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Mail"),
-  MailOpen: async () => await import("@/packages/next-vibe-ui/web/ui/icons/MailOpen"),
+  MailOpen: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/MailOpen"),
   Map: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Map"),
-  Maximize: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Maximize"),
-  Megaphone: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Megaphone"),
+  Maximize: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Maximize"),
+  Megaphone: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Megaphone"),
   Menu: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Menu"),
-  MessageCircle: async () => await import("@/packages/next-vibe-ui/web/ui/icons/MessageCircle"),
-  MessageSquare: async () => await import("@/packages/next-vibe-ui/web/ui/icons/MessageSquare"),
+  MessageCircle: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/MessageCircle"),
+  MessageSquare: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/MessageSquare"),
   MessageSquarePlus: async () =>
     await import("@/packages/next-vibe-ui/web/ui/icons/MessageSquarePlus"),
   Mic: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Mic"),
-  MicOff: async () => await import("@/packages/next-vibe-ui/web/ui/icons/MicOff"),
-  Microscope: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Microscope"),
+  MicOff: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/MicOff"),
+  Microscope: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Microscope"),
   Minus: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Minus"),
-  Monitor: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Monitor"),
+  Monitor: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Monitor"),
   Moon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Moon"),
-  MoonIcon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/MoonIcon"),
-  MoreHorizontal: async () => await import("@/packages/next-vibe-ui/web/ui/icons/MoreHorizontal"),
-  MoreVertical: async () => await import("@/packages/next-vibe-ui/web/ui/icons/MoreVertical"),
-  Mountain: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Mountain"),
-  MousePointer: async () => await import("@/packages/next-vibe-ui/web/ui/icons/MousePointer"),
+  MoonIcon: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/MoonIcon"),
+  MoreHorizontal: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/MoreHorizontal"),
+  MoreVertical: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/MoreVertical"),
+  Mountain: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Mountain"),
+  MousePointer: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/MousePointer"),
   Move: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Move"),
-  MoveLeft: async () => await import("@/packages/next-vibe-ui/web/ui/icons/MoveLeft"),
+  MoveLeft: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/MoveLeft"),
   Music: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Music"),
-  Navigation: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Navigation"),
-  Network: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Network"),
-  Newspaper: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Newspaper"),
-  Package: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Package"),
-  PackageCheck: async () => await import("@/packages/next-vibe-ui/web/ui/icons/PackageCheck"),
-  PackagePlus: async () => await import("@/packages/next-vibe-ui/web/ui/icons/PackagePlus"),
-  PackageX: async () => await import("@/packages/next-vibe-ui/web/ui/icons/PackageX"),
-  Palette: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Palette"),
-  PanelLeft: async () => await import("@/packages/next-vibe-ui/web/ui/icons/PanelLeft"),
-  Paperclip: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Paperclip"),
+  Navigation: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Navigation"),
+  Network: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Network"),
+  Newspaper: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Newspaper"),
+  Package: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Package"),
+  PackageCheck: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/PackageCheck"),
+  PackagePlus: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/PackagePlus"),
+  PackageX: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/PackageX"),
+  Palette: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Palette"),
+  PanelLeft: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/PanelLeft"),
+  Paperclip: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Paperclip"),
   Pause: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Pause"),
-  PauseCircle: async () => await import("@/packages/next-vibe-ui/web/ui/icons/PauseCircle"),
-  Pencil: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Pencil"),
-  PenTool: async () => await import("@/packages/next-vibe-ui/web/ui/icons/PenTool"),
+  PauseCircle: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/PauseCircle"),
+  Pencil: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Pencil"),
+  PenTool: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/PenTool"),
   Phone: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Phone"),
-  PieChart: async () => await import("@/packages/next-vibe-ui/web/ui/icons/PieChart"),
+  PieChart: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/PieChart"),
   Pin: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Pin"),
-  PinOff: async () => await import("@/packages/next-vibe-ui/web/ui/icons/PinOff"),
+  PinOff: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/PinOff"),
   Plane: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Plane"),
   Play: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Play"),
   Plug: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Plug"),
   Plus: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Plus"),
-  Printer: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Printer"),
+  Printer: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Printer"),
   Radio: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Radio"),
-  Receipt: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Receipt"),
-  RefreshCcw: async () => await import("@/packages/next-vibe-ui/web/ui/icons/RefreshCcw"),
-  RefreshCw: async () => await import("@/packages/next-vibe-ui/web/ui/icons/RefreshCw"),
-  Rocket: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Rocket"),
-  RotateCcw: async () => await import("@/packages/next-vibe-ui/web/ui/icons/RotateCcw"),
+  Receipt: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Receipt"),
+  RefreshCcw: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/RefreshCcw"),
+  RefreshCw: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/RefreshCw"),
+  Rocket: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Rocket"),
+  RotateCcw: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/RotateCcw"),
   Save: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Save"),
   Scale: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Scale"),
-  Search: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Search"),
+  Search: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Search"),
   Send: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Send"),
-  Server: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Server"),
-  Settings: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Settings"),
+  Server: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Server"),
+  Settings: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Settings"),
   Share: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Share"),
-  Share2: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Share2"),
-  Shield: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Shield"),
-  ShieldOff: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ShieldOff"),
-  ShieldPlus: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ShieldPlus"),
-  ShoppingBag: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ShoppingBag"),
-  ShoppingCart: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ShoppingCart"),
-  SiAlibabadotcom: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiAlibabadotcom"),
-  SiAndroid: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiAndroid"),
-  SiAnthropic: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiAnthropic"),
-  SiApple: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiApple"),
-  SiDiscord: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiDiscord"),
-  SiDocker: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiDocker"),
+  Share2: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Share2"),
+  Shield: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Shield"),
+  ShieldOff: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ShieldOff"),
+  ShieldPlus: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ShieldPlus"),
+  ShoppingBag: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ShoppingBag"),
+  ShoppingCart: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ShoppingCart"),
+  SiAlibabadotcom: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiAlibabadotcom"),
+  SiAndroid: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiAndroid"),
+  SiAnthropic: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiAnthropic"),
+  SiApple: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiApple"),
+  SiDiscord: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiDiscord"),
+  SiDocker: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiDocker"),
   SiGit: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiGit"),
-  SiGithub: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiGithub"),
+  SiGithub: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiGithub"),
   SiGo: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiGo"),
-  SiGoogle: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiGoogle"),
-  SiGooglegemini: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiGooglegemini"),
-  SiJavascript: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiJavascript"),
-  SiLinux: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiLinux"),
-  SiMistralai: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiMistralai"),
-  SiNextdotjs: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiNextdotjs"),
-  SiNodedotjs: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiNodedotjs"),
-  SiOpenai: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiOpenai"),
-  SiPython: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiPython"),
-  SiReact: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiReact"),
-  SiReddit: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiReddit"),
-  SiRust: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiRust"),
-  SiTypescript: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiTypescript"),
+  SiGoogle: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiGoogle"),
+  SiGooglegemini: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiGooglegemini"),
+  SiJavascript: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiJavascript"),
+  SiLinux: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiLinux"),
+  SiMistralai: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiMistralai"),
+  SiNextdotjs: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiNextdotjs"),
+  SiNodedotjs: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiNodedotjs"),
+  SiOpenai: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiOpenai"),
+  SiPython: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiPython"),
+  SiReact: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiReact"),
+  SiReddit: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiReddit"),
+  SiRust: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiRust"),
+  SiTypescript: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiTypescript"),
   SiX: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiX"),
-  SiZendesk: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SiZendesk"),
-  Smartphone: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Smartphone"),
-  Sparkle: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Sparkle"),
-  Sparkles: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Sparkles"),
-  Square: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Square"),
-  SquareCheck: async () => await import("@/packages/next-vibe-ui/web/ui/icons/SquareCheck"),
+  SiZendesk: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SiZendesk"),
+  Smartphone: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Smartphone"),
+  Sparkle: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Sparkle"),
+  Sparkles: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Sparkles"),
+  Square: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Square"),
+  SquareCheck: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/SquareCheck"),
   Star: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Star"),
   Sun: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Sun"),
   Table: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Table"),
   Tag: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Tag"),
-  Target: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Target"),
-  Terminal: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Terminal"),
-  TestTube: async () => await import("@/packages/next-vibe-ui/web/ui/icons/TestTube"),
-  Theater: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Theater"),
-  ThumbsDown: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ThumbsDown"),
-  ThumbsUp: async () => await import("@/packages/next-vibe-ui/web/ui/icons/ThumbsUp"),
-  Trash2: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Trash2"),
-  TrendingDown: async () => await import("@/packages/next-vibe-ui/web/ui/icons/TrendingDown"),
-  TrendingUp: async () => await import("@/packages/next-vibe-ui/web/ui/icons/TrendingUp"),
-  TrendingUpIcon: async () => await import("@/packages/next-vibe-ui/web/ui/icons/TrendingUpIcon"),
-  Trophy: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Trophy"),
+  Target: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Target"),
+  Terminal: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Terminal"),
+  TestTube: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/TestTube"),
+  Theater: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Theater"),
+  ThumbsDown: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ThumbsDown"),
+  ThumbsUp: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/ThumbsUp"),
+  Trash2: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Trash2"),
+  TrendingDown: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/TrendingDown"),
+  TrendingUp: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/TrendingUp"),
+  TrendingUpIcon: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/TrendingUpIcon"),
+  Trophy: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Trophy"),
   Tv: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Tv"),
-  Twitter: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Twitter"),
+  Twitter: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Twitter"),
   Type: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Type"),
-  Upload: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Upload"),
+  Upload: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Upload"),
   User: async () => await import("@/packages/next-vibe-ui/web/ui/icons/User"),
-  UserCheck: async () => await import("@/packages/next-vibe-ui/web/ui/icons/UserCheck"),
-  UserPlus: async () => await import("@/packages/next-vibe-ui/web/ui/icons/UserPlus"),
+  UserCheck: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/UserCheck"),
+  UserPlus: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/UserPlus"),
   Users: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Users"),
-  UserSearch: async () => await import("@/packages/next-vibe-ui/web/ui/icons/UserSearch"),
+  UserSearch: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/UserSearch"),
   UserX: async () => await import("@/packages/next-vibe-ui/web/ui/icons/UserX"),
-  Utensils: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Utensils"),
+  Utensils: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Utensils"),
   Video: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Video"),
-  Volume2: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Volume2"),
-  VolumeX: async () => await import("@/packages/next-vibe-ui/web/ui/icons/VolumeX"),
-  Wallet: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Wallet"),
+  Volume2: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Volume2"),
+  VolumeX: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/VolumeX"),
+  Wallet: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Wallet"),
   Wand2: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Wand2"),
   Wifi: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Wifi"),
-  WifiOff: async () => await import("@/packages/next-vibe-ui/web/ui/icons/WifiOff"),
+  WifiOff: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/WifiOff"),
   Wind: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Wind"),
-  Wrench: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Wrench"),
+  Wrench: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Wrench"),
   X: async () => await import("@/packages/next-vibe-ui/web/ui/icons/X"),
-  XCircle: async () => await import("@/packages/next-vibe-ui/web/ui/icons/XCircle"),
-  XSquare: async () => await import("@/packages/next-vibe-ui/web/ui/icons/XSquare"),
-  Youtube: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Youtube"),
+  XCircle: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/XCircle"),
+  XSquare: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/XSquare"),
+  Youtube: async () =>
+    await import("@/packages/next-vibe-ui/web/ui/icons/Youtube"),
   Zap: async () => await import("@/packages/next-vibe-ui/web/ui/icons/Zap"),
 } as const;
 
@@ -711,9 +900,9 @@ export const IconKeyDB = Object.keys(ICON_REGISTRY) as readonly IconKey[];
 /**
  * Fallback component shown while icons are loading
  */
-const IconLoadingFallback: React.FC<{ className?: string }> = ({ className }) => (
-  <Span className={cn("inline-block w-4 h-4", className)} />
-);
+const IconLoadingFallback: React.FC<{ className?: string }> = ({
+  className,
+}) => <Span className={cn("inline-block w-4 h-4", className)} />;
 
 /**
  * THE Icon component - use this everywhere
@@ -1050,7 +1239,16 @@ export const ICON_CATEGORIES = {
   },
   security: {
     name: "app.ui.iconPicker.categories.security",
-    icons: ["lock", "key", "eye", "eye-off", "shield", "shield-plus", "shield-off", "locked"],
+    icons: [
+      "lock",
+      "key",
+      "eye",
+      "eye-off",
+      "shield",
+      "shield-plus",
+      "shield-off",
+      "locked",
+    ],
   },
   programming: {
     name: "app.ui.iconPicker.categories.programming",
@@ -1181,7 +1379,10 @@ export const ICON_CATEGORIES = {
       "crown",
     ],
   },
-} as const satisfies Record<string, { readonly name: TranslationKey; readonly icons: IconKey[] }>;
+} as const satisfies Record<
+  string,
+  { readonly name: TranslationKey; readonly icons: IconKey[] }
+>;
 
 export const ICON_CATEGORIES_LIST = Object.entries(ICON_CATEGORIES) as [
   CategoryKey,

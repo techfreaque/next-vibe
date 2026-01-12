@@ -6,7 +6,11 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -71,7 +75,10 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         adminPhone,
       });
 
-      const message = this.generateAdminNotificationMessage(contactData, locale);
+      const message = this.generateAdminNotificationMessage(
+        contactData,
+        locale,
+      );
 
       const smsResult = await smsServiceRepository.sendSms(
         {
@@ -79,7 +86,8 @@ export class ContactSmsServiceImpl implements ContactSmsService {
           message,
           campaignType: CampaignType.NOTIFICATION,
         },
-        user || ({ id: crypto.randomUUID(), isPublic: false } as JwtPayloadType),
+        user ||
+          ({ id: crypto.randomUUID(), isPublic: false } as JwtPayloadType),
         logger,
       );
 
@@ -160,7 +168,10 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         sent: true,
       });
     } catch (error) {
-      logger.error("app.api.contact.sms.confirmation.send.error", parseError(error));
+      logger.error(
+        "app.api.contact.sms.confirmation.send.error",
+        parseError(error),
+      );
       return fail({
         message: "app.api.contact.error.general.internal_server_error",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -217,7 +228,12 @@ export const sendAdminNotificationSms = async (
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
-  return await contactSmsService.sendAdminNotificationSms(contactData, user, locale, logger);
+  return await contactSmsService.sendAdminNotificationSms(
+    contactData,
+    user,
+    locale,
+    logger,
+  );
 };
 
 export const sendConfirmationSms = async (
@@ -226,5 +242,10 @@ export const sendConfirmationSms = async (
   locale: CountryLanguage,
   logger: EndpointLogger,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
-  return await contactSmsService.sendConfirmationSms(contactData, user, locale, logger);
+  return await contactSmsService.sendConfirmationSms(
+    contactData,
+    user,
+    locale,
+    logger,
+  );
 };

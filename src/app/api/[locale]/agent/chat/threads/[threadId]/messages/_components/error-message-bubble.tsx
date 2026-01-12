@@ -12,7 +12,9 @@ interface ErrorMessageBubbleProps {
   message: ChatMessage;
 }
 
-export function ErrorMessageBubble({ message }: ErrorMessageBubbleProps): JSX.Element {
+export function ErrorMessageBubble({
+  message,
+}: ErrorMessageBubbleProps): JSX.Element {
   const { t } = useTranslation();
 
   // Translate error message if it's a translation key
@@ -27,7 +29,9 @@ export function ErrorMessageBubble({ message }: ErrorMessageBubbleProps): JSX.El
             "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800",
           )}
         >
-          <Div className="text-sm text-red-900 dark:text-red-100">{displayContent}</Div>
+          <Div className="text-sm text-red-900 dark:text-red-100">
+            {displayContent}
+          </Div>
         </Div>
 
         {/* Fixed height container to maintain consistent spacing */}

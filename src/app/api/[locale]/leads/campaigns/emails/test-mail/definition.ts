@@ -5,7 +5,10 @@
 
 import { z } from "zod";
 
-import { CampaignType, CampaignTypeOptions } from "@/app/api/[locale]/emails/smtp-client/enum";
+import {
+  CampaignType,
+  CampaignTypeOptions,
+} from "@/app/api/[locale]/emails/smtp-client/enum";
 import {
   EmailCampaignStage,
   EmailCampaignStageOptions,
@@ -31,7 +34,12 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { Countries, CountriesOptions, Languages, LanguagesOptions } from "@/i18n/core/config";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 /**
  * Send Test Email Endpoint (POST)
@@ -50,7 +58,8 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.leads.campaigns.emails.testMail.post.form.title",
-      description: "app.api.leads.campaigns.emails.testMail.post.form.description",
+      description:
+        "app.api.leads.campaigns.emails.testMail.post.form.description",
       layoutType: LayoutType.STACKED,
     },
     {
@@ -62,9 +71,12 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.campaigns.emails.testMail.post.campaignType.label",
-          description: "app.api.leads.campaigns.emails.testMail.post.campaignType.description",
-          placeholder: "app.api.leads.campaigns.emails.testMail.post.campaignType.placeholder",
+          label:
+            "app.api.leads.campaigns.emails.testMail.post.campaignType.label",
+          description:
+            "app.api.leads.campaigns.emails.testMail.post.campaignType.description",
+          placeholder:
+            "app.api.leads.campaigns.emails.testMail.post.campaignType.placeholder",
           columns: 12,
           options: CampaignTypeOptions,
         },
@@ -74,7 +86,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.campaigns.emails.testMail.post.emailJourneyVariant.label",
+          label:
+            "app.api.leads.campaigns.emails.testMail.post.emailJourneyVariant.label",
           description:
             "app.api.leads.campaigns.emails.testMail.post.emailJourneyVariant.description",
           placeholder:
@@ -88,7 +101,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.campaigns.emails.testMail.post.emailCampaignStage.label",
+          label:
+            "app.api.leads.campaigns.emails.testMail.post.emailCampaignStage.label",
           description:
             "app.api.leads.campaigns.emails.testMail.post.emailCampaignStage.description",
           placeholder:
@@ -105,8 +119,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.EMAIL,
           label: "app.api.leads.campaigns.emails.testMail.post.testEmail.label",
-          description: "app.api.leads.campaigns.emails.testMail.post.testEmail.description",
-          placeholder: "app.api.leads.campaigns.emails.testMail.post.testEmail.placeholder",
+          description:
+            "app.api.leads.campaigns.emails.testMail.post.testEmail.description",
+          placeholder:
+            "app.api.leads.campaigns.emails.testMail.post.testEmail.placeholder",
           columns: 12,
         },
         z
@@ -120,7 +136,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.leads.campaigns.emails.testMail.post.leadData.title",
-          description: "app.api.leads.campaigns.emails.testMail.post.leadData.description",
+          description:
+            "app.api.leads.campaigns.emails.testMail.post.leadData.description",
           layoutType: LayoutType.GRID,
           columns: 2,
         },
@@ -130,7 +147,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "app.api.leads.campaigns.emails.testMail.post.leadData.businessName.label",
+              label:
+                "app.api.leads.campaigns.emails.testMail.post.leadData.businessName.label",
               description:
                 "app.api.leads.campaigns.emails.testMail.post.leadData.businessName.description",
               placeholder:
@@ -147,7 +165,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "app.api.leads.campaigns.emails.testMail.post.leadData.contactName.label",
+              label:
+                "app.api.leads.campaigns.emails.testMail.post.leadData.contactName.label",
               description:
                 "app.api.leads.campaigns.emails.testMail.post.leadData.contactName.description",
               placeholder:
@@ -165,7 +184,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.URL,
-              label: "app.api.leads.campaigns.emails.testMail.post.leadData.website.label",
+              label:
+                "app.api.leads.campaigns.emails.testMail.post.leadData.website.label",
               description:
                 "app.api.leads.campaigns.emails.testMail.post.leadData.website.description",
               placeholder:
@@ -184,7 +204,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label: "app.api.leads.campaigns.emails.testMail.post.leadData.country.label",
+              label:
+                "app.api.leads.campaigns.emails.testMail.post.leadData.country.label",
               description:
                 "app.api.leads.campaigns.emails.testMail.post.leadData.country.description",
               placeholder:
@@ -198,7 +219,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label: "app.api.leads.campaigns.emails.testMail.post.leadData.language.label",
+              label:
+                "app.api.leads.campaigns.emails.testMail.post.leadData.language.label",
               description:
                 "app.api.leads.campaigns.emails.testMail.post.leadData.language.description",
               placeholder:
@@ -212,7 +234,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label: "app.api.leads.campaigns.emails.testMail.post.leadData.status.label",
+              label:
+                "app.api.leads.campaigns.emails.testMail.post.leadData.status.label",
               description:
                 "app.api.leads.campaigns.emails.testMail.post.leadData.status.description",
               placeholder:
@@ -226,7 +249,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label: "app.api.leads.campaigns.emails.testMail.post.leadData.source.label",
+              label:
+                "app.api.leads.campaigns.emails.testMail.post.leadData.source.label",
               description:
                 "app.api.leads.campaigns.emails.testMail.post.leadData.source.description",
               placeholder:
@@ -240,7 +264,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXTAREA,
-              label: "app.api.leads.campaigns.emails.testMail.post.leadData.notes.label",
+              label:
+                "app.api.leads.campaigns.emails.testMail.post.leadData.notes.label",
               description:
                 "app.api.leads.campaigns.emails.testMail.post.leadData.notes.description",
               placeholder:
@@ -262,7 +287,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.leads.campaigns.emails.testMail.post.response.title",
-          description: "app.api.leads.campaigns.emails.testMail.post.response.description",
+          description:
+            "app.api.leads.campaigns.emails.testMail.post.response.description",
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -270,35 +296,40 @@ const { POST } = createEndpoint({
           success: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.leads.campaigns.emails.testMail.post.response.success.content",
+              content:
+                "app.api.leads.campaigns.emails.testMail.post.response.success.content",
             },
             z.boolean(),
           ),
           messageId: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.leads.campaigns.emails.testMail.post.response.messageId.content",
+              content:
+                "app.api.leads.campaigns.emails.testMail.post.response.messageId.content",
             },
             z.string().optional(),
           ),
           testEmail: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.leads.campaigns.emails.testMail.post.response.testEmail.content",
+              content:
+                "app.api.leads.campaigns.emails.testMail.post.response.testEmail.content",
             },
             z.string().email(),
           ),
           subject: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.leads.campaigns.emails.testMail.post.response.subject.content",
+              content:
+                "app.api.leads.campaigns.emails.testMail.post.response.subject.content",
             },
             z.string(),
           ),
           sentAt: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.leads.campaigns.emails.testMail.post.response.sentAt.content",
+              content:
+                "app.api.leads.campaigns.emails.testMail.post.response.sentAt.content",
             },
             dateSchema,
           ),
@@ -309,46 +340,64 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.campaigns.emails.testMail.post.errors.validation.title",
-      description: "app.api.leads.campaigns.emails.testMail.post.errors.validation.description",
+      title:
+        "app.api.leads.campaigns.emails.testMail.post.errors.validation.title",
+      description:
+        "app.api.leads.campaigns.emails.testMail.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.campaigns.emails.testMail.post.errors.unauthorized.title",
-      description: "app.api.leads.campaigns.emails.testMail.post.errors.unauthorized.description",
+      title:
+        "app.api.leads.campaigns.emails.testMail.post.errors.unauthorized.title",
+      description:
+        "app.api.leads.campaigns.emails.testMail.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.leads.campaigns.emails.testMail.post.errors.server.title",
-      description: "app.api.leads.campaigns.emails.testMail.post.errors.server.description",
+      description:
+        "app.api.leads.campaigns.emails.testMail.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.campaigns.emails.testMail.post.errors.unknown.title",
-      description: "app.api.leads.campaigns.emails.testMail.post.errors.unknown.description",
+      title:
+        "app.api.leads.campaigns.emails.testMail.post.errors.unknown.title",
+      description:
+        "app.api.leads.campaigns.emails.testMail.post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.campaigns.emails.testMail.post.errors.network.title",
-      description: "app.api.leads.campaigns.emails.testMail.post.errors.network.description",
+      title:
+        "app.api.leads.campaigns.emails.testMail.post.errors.network.title",
+      description:
+        "app.api.leads.campaigns.emails.testMail.post.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.campaigns.emails.testMail.post.errors.forbidden.title",
-      description: "app.api.leads.campaigns.emails.testMail.post.errors.forbidden.description",
+      title:
+        "app.api.leads.campaigns.emails.testMail.post.errors.forbidden.title",
+      description:
+        "app.api.leads.campaigns.emails.testMail.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.campaigns.emails.testMail.post.errors.notFound.title",
-      description: "app.api.leads.campaigns.emails.testMail.post.errors.notFound.description",
+      title:
+        "app.api.leads.campaigns.emails.testMail.post.errors.notFound.title",
+      description:
+        "app.api.leads.campaigns.emails.testMail.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.campaigns.emails.testMail.post.errors.unsavedChanges.title",
-      description: "app.api.leads.campaigns.emails.testMail.post.errors.unsavedChanges.description",
+      title:
+        "app.api.leads.campaigns.emails.testMail.post.errors.unsavedChanges.title",
+      description:
+        "app.api.leads.campaigns.emails.testMail.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.campaigns.emails.testMail.post.errors.conflict.title",
-      description: "app.api.leads.campaigns.emails.testMail.post.errors.conflict.description",
+      title:
+        "app.api.leads.campaigns.emails.testMail.post.errors.conflict.title",
+      description:
+        "app.api.leads.campaigns.emails.testMail.post.errors.conflict.description",
     },
   },
 
   successTypes: {
     title: "app.api.leads.campaigns.emails.testMail.post.success.title",
-    description: "app.api.leads.campaigns.emails.testMail.post.success.description",
+    description:
+      "app.api.leads.campaigns.emails.testMail.post.success.description",
   },
 
   examples: {

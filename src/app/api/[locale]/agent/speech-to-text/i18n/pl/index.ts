@@ -8,7 +8,8 @@ export const translations: typeof enTranslations = {
   hotkey: {
     post: {
       title: "Hotkey mowy na tekst",
-      description: "Nagrywaj i transkrybuj audio z automatycznym wstawianiem tekstu",
+      description:
+        "Nagrywaj i transkrybuj audio z automatycznym wstawianiem tekstu",
       form: {
         title: "Konfiguracja hotkey",
         description: "Skonfiguruj ustawienia hotkey mowy na tekst",
@@ -81,7 +82,8 @@ export const translations: typeof enTranslations = {
           title: "Nieznany błąd",
           description: "Wystąpił nieoczekiwany błąd",
         },
-        dependenciesMissing: "Wymagane zależności niedostępne: {missing}. {recommendations}",
+        dependenciesMissing:
+          "Wymagane zależności niedostępne: {missing}. {recommendations}",
         invalidAction: "Nieprawidłowa akcja: {action}",
         actionFailed: "Nie udało się wykonać akcji: {error}",
         alreadyRecording: "Nagrywanie już w toku",

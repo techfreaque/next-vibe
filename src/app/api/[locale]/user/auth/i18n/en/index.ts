@@ -13,9 +13,11 @@ export const translations = {
     getAuthMinimalUserNext: {
       start: "getAuthMinimalUserNext: - Checking authentication first",
       result: "getAuthMinimalUserNext: getCurrentUserNext result",
-      authenticated: "getAuthMinimalUserNext: User is authenticated, getting leadId",
+      authenticated:
+        "getAuthMinimalUserNext: User is authenticated, getting leadId",
       returningAuth: "getAuthMinimalUserNext: Returning authenticated user",
-      notAuthenticated: "getAuthMinimalUserNext: User not authenticated, returning public user",
+      notAuthenticated:
+        "getAuthMinimalUserNext: User not authenticated, returning public user",
     },
     signingJwt: "Signing JWT",
     jwtSignedSuccessfully: "JWT signed successfully",
@@ -34,7 +36,8 @@ export const translations = {
     errorGettingAuthUserForTrpc: "Error getting auth user for tRPC",
     errorGettingUserRolesForTrpc: "Error getting user roles for tRPC",
     authenticatingCliUserWithPayload: "Authenticating CLI user with payload",
-    errorAuthenticatingCliUserWithPayload: "Error authenticating CLI user with payload",
+    errorAuthenticatingCliUserWithPayload:
+      "Error authenticating CLI user with payload",
     creatingCliToken: "Creating CLI token",
     errorCreatingCliToken: "Error creating CLI token",
     validatingCliToken: "Validating CLI token",
@@ -66,7 +69,8 @@ export const translations = {
     jwt_payload_missing_id: "JWT payload is missing user ID",
     cookie_set_failed: "Failed to set authentication cookie",
     cookie_clear_failed: "Failed to clear authentication cookie",
-    publicPayloadNotSupported: "Public JWT payload is not supported for CLI authentication",
+    publicPayloadNotSupported:
+      "Public JWT payload is not supported for CLI authentication",
     jwt_signing_failed: "Failed to sign JWT token",
     authentication_failed: "Authentication failed",
     user_not_authenticated: "User is not authenticated",
@@ -74,11 +78,13 @@ export const translations = {
     validation_failed: "Validation failed",
     failed_to_create_lead: "Failed to create lead",
     native: {
-      unsupported: "This authentication method is not supported on React Native",
+      unsupported:
+        "This authentication method is not supported on React Native",
       storage_failed: "Failed to store authentication data",
       clear_failed: "Failed to clear authentication data",
     },
-    not_implemented_native: "This feature is not yet implemented for React Native",
+    not_implemented_native:
+      "This feature is not yet implemented for React Native",
     unknownError: "An unknown error occurred during authentication",
   },
   post: {

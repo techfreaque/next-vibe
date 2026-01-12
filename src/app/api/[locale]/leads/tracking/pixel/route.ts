@@ -25,8 +25,9 @@ export const GET = (request: NextRequest): Response => {
   const url = new URL(request.url);
   const pathSegments = url.pathname.split("/");
   const localeSegment: CountryLanguage =
-    (pathSegments.find((segment) => /^[a-z]{2}-[A-Z]{2}$/.test(segment)) as CountryLanguage) ||
-    "en-GLOBAL";
+    (pathSegments.find((segment) =>
+      /^[a-z]{2}-[A-Z]{2}$/.test(segment),
+    ) as CountryLanguage) || "en-GLOBAL";
 
   const logger = createEndpointLogger(
     env.NODE_ENV === Environment.DEVELOPMENT,

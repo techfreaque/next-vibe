@@ -127,7 +127,9 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
       const storedToken = await authClientRepository.getAuthToken(logger);
       if (storedToken.success && storedToken.data) {
         headers.Authorization = `Bearer ${storedToken.data}`;
-        logger.debug("Added Authorization header for React Native authentication");
+        logger.debug(
+          "Added Authorization header for React Native authentication",
+        );
       }
     }
 
@@ -145,7 +147,9 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
 
     // Make the API call
     const response = await fetch(endpointUrl, options);
-    const json = (await response.json()) as ResponseType<TEndpoint["types"]["ResponseOutput"]>;
+    const json = (await response.json()) as ResponseType<
+      TEndpoint["types"]["ResponseOutput"]
+    >;
 
     // Handle API response
     if (!response.ok) {
@@ -156,7 +160,8 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
 
       // Fallback error when server doesn't return proper error format
       return fail({
-        message: "app.api.system.unifiedInterface.react.hooks.apiUtils.errors.http_error",
+        message:
+          "app.api.system.unifiedInterface.react.hooks.apiUtils.errors.http_error",
         errorType: ErrorResponseTypes.HTTP_ERROR,
         messageParams: {
           statusCode: response.status,
@@ -167,12 +172,17 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
 
     // Validate successful response against schema
     if (json.success) {
-      const validationResponse = validateData(json.data, endpoint.responseSchema, logger);
+      const validationResponse = validateData(
+        json.data,
+        endpoint.responseSchema,
+        logger,
+      );
 
       if (!validationResponse.success) {
         // Fallback error when response validation fails
         return fail({
-          message: "app.api.system.unifiedInterface.react.hooks.apiUtils.errors.validation_error",
+          message:
+            "app.api.system.unifiedInterface.react.hooks.apiUtils.errors.validation_error",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             message: validationResponse.message,
@@ -193,7 +203,8 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
 
     // Fallback error when server returns success but no data
     return fail({
-      message: "app.api.system.unifiedInterface.react.hooks.apiUtils.errors.internal_error",
+      message:
+        "app.api.system.unifiedInterface.react.hooks.apiUtils.errors.internal_error",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         url: endpointUrl,
@@ -202,7 +213,8 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   } catch (error) {
     // Fallback error when request fails completely
     return fail({
-      message: "app.api.system.unifiedInterface.react.hooks.apiUtils.errors.internal_error",
+      message:
+        "app.api.system.unifiedInterface.react.hooks.apiUtils.errors.internal_error",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         error: parseError(error).message,

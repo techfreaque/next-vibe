@@ -21,10 +21,17 @@ export interface AvatarFallbackProps {
   className?: string;
 }
 
-export function Avatar({ className, children, ...props }: AvatarRootProps): React.JSX.Element {
+export function Avatar({
+  className,
+  children,
+  ...props
+}: AvatarRootProps): React.JSX.Element {
   return (
     <AvatarPrimitive.Root
-      className={cn("relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full", className)}
+      className={cn(
+        "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
+        className,
+      )}
       {...props}
     >
       {children}
@@ -33,9 +40,15 @@ export function Avatar({ className, children, ...props }: AvatarRootProps): Reac
 }
 Avatar.displayName = AvatarPrimitive.Root.displayName;
 
-export function AvatarImage({ className, ...props }: AvatarImageProps): React.JSX.Element {
+export function AvatarImage({
+  className,
+  ...props
+}: AvatarImageProps): React.JSX.Element {
   return (
-    <AvatarPrimitive.Image className={cn("aspect-square h-full w-full", className)} {...props} />
+    <AvatarPrimitive.Image
+      className={cn("aspect-square h-full w-full", className)}
+      {...props}
+    />
   );
 }
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;

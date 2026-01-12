@@ -20,7 +20,10 @@ interface EmailsNavigationProps {
   currentPage: "stats" | "list" | "imap" | "smtp";
 }
 
-export function EmailsNavigation({ locale, currentPage }: EmailsNavigationProps): JSX.Element {
+export function EmailsNavigation({
+  locale,
+  currentPage,
+}: EmailsNavigationProps): JSX.Element {
   const { t } = simpleT(locale);
 
   const navigationItems = [

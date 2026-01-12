@@ -9,11 +9,13 @@ export const translations: typeof enTranslations = {
   },
   form: {
     title: "Newsletter-Status prüfen",
-    description: "Geben Sie eine E-Mail-Adresse ein, um den Newsletter-Abonnementstatus zu prüfen",
+    description:
+      "Geben Sie eine E-Mail-Adresse ein, um den Newsletter-Abonnementstatus zu prüfen",
   },
   email: {
     label: "E-Mail-Adresse",
-    description: "Die E-Mail-Adresse, für die der Abonnementstatus geprüft werden soll",
+    description:
+      "Die E-Mail-Adresse, für die der Abonnementstatus geprüft werden soll",
     placeholder: "benutzer@beispiel.de",
     helpText: "Geben Sie die E-Mail-Adresse ein, die Sie prüfen möchten",
   },
@@ -28,15 +30,18 @@ export const translations: typeof enTranslations = {
     },
     internal: {
       title: "Interner Fehler",
-      description: "Beim Prüfen des Abonnementstatus ist ein Fehler aufgetreten",
+      description:
+        "Beim Prüfen des Abonnementstatus ist ein Fehler aufgetreten",
     },
     unauthorized: {
       title: "Nicht autorisiert",
-      description: "Sie sind nicht berechtigt, diesen Abonnementstatus zu prüfen",
+      description:
+        "Sie sind nicht berechtigt, diesen Abonnementstatus zu prüfen",
     },
     notFound: {
       title: "Nicht gefunden",
-      description: "Keine Abonnementinformationen für diese E-Mail-Adresse gefunden",
+      description:
+        "Keine Abonnementinformationen für diese E-Mail-Adresse gefunden",
     },
   },
   success: {

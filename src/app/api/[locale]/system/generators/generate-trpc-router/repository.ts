@@ -4,14 +4,20 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 // Import types from the endpoint definition
 import type generateTrpcRouterEndpoints from "./definition";
 
-type GenerateTrpcRouterRequestType = typeof generateTrpcRouterEndpoints.POST.types.RequestOutput;
-type GenerateTrpcRouterResponseType = typeof generateTrpcRouterEndpoints.POST.types.ResponseOutput;
+type GenerateTrpcRouterRequestType =
+  typeof generateTrpcRouterEndpoints.POST.types.RequestOutput;
+type GenerateTrpcRouterResponseType =
+  typeof generateTrpcRouterEndpoints.POST.types.ResponseOutput;
 
 /**
  * Generate tRPC Router Repository Interface
@@ -89,7 +95,8 @@ export class GenerateTrpcRouterRepositoryImpl implements GenerateTrpcRouterRepos
       outputLines.push(SCANNING_ROUTES);
 
       // Import the tRPC router generator
-      const { generateTRPCRouter } = await import("./trpc-trpc-router-generator");
+      const { generateTRPCRouter } =
+        await import("./trpc-trpc-router-generator");
 
       // Prepare options for the generator
       const generatorOptions = {
@@ -100,7 +107,10 @@ export class GenerateTrpcRouterRepositoryImpl implements GenerateTrpcRouterRepos
       };
 
       // Execute the tRPC router generation
-      const generationResult = await generateTRPCRouter(generatorOptions, logger);
+      const generationResult = await generateTRPCRouter(
+        generatorOptions,
+        logger,
+      );
 
       // Extract statistics from the generation result
       totalRoutes = generationResult.routeFiles?.length || 0;
@@ -109,7 +119,9 @@ export class GenerateTrpcRouterRepositoryImpl implements GenerateTrpcRouterRepos
       routesWithWarnings = generationResult.warnings?.length || 0;
 
       if (routesWithWarnings > 0 && data.includeWarnings) {
-        outputLines.push(`${WARNINGS_FOUND} ${routesWithWarnings} ${ROUTES_WITH_WARNINGS}`);
+        outputLines.push(
+          `${WARNINGS_FOUND} ${routesWithWarnings} ${ROUTES_WITH_WARNINGS}`,
+        );
       }
 
       outputLines.push(GENERATING_ROUTER);
@@ -176,4 +188,5 @@ export class GenerateTrpcRouterRepositoryImpl implements GenerateTrpcRouterRepos
 /**
  * Export repository instance
  */
-export const generateTrpcRouterRepository = new GenerateTrpcRouterRepositoryImpl();
+export const generateTrpcRouterRepository =
+  new GenerateTrpcRouterRepositoryImpl();

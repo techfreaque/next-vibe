@@ -32,7 +32,9 @@ import { formatCamelCaseLabel } from "@/app/api/[locale]/system/unified-interfac
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.CONTAINER> {
+export class ContainerWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.CONTAINER
+> {
   readonly widgetType = WidgetType.CONTAINER;
 
   /**
@@ -58,7 +60,9 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     }
 
     const label = this.formatLabel(field, context);
-    const valueStr = isWidgetDataObject(value) ? JSON.stringify(value) : String(value);
+    const valueStr = isWidgetDataObject(value)
+      ? JSON.stringify(value)
+      : String(value);
     return `${label}: ${valueStr}`;
   }
 
@@ -122,7 +126,11 @@ export class ContainerWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
 
       if (field && hasChildren(field) && field.children[key]) {
         const childField = field.children[key];
-        const rendered = context.renderWidget(childField.ui.type, childField, value);
+        const rendered = context.renderWidget(
+          childField.ui.type,
+          childField,
+          value,
+        );
         if (rendered) {
           result.push(rendered);
         }

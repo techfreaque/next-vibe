@@ -33,7 +33,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     additionalMetadata: {
       openGraph: {
         title: "app.user.other.resetPassword.meta.passwordReset.title",
-        description: "app.user.other.resetPassword.meta.passwordReset.description",
+        description:
+          "app.user.other.resetPassword.meta.passwordReset.description",
         url: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/reset-password`,
         type: "website",
         images: [
@@ -48,7 +49,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       twitter: {
         card: "summary_large_image",
         title: "app.user.other.resetPassword.meta.passwordReset.title",
-        description: "app.user.other.resetPassword.meta.passwordReset.description",
+        description:
+          "app.user.other.resetPassword.meta.passwordReset.description",
         images: [
           "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&h=630&auto=format&fit=crop",
         ],
@@ -61,13 +63,19 @@ interface Props {
   params: Promise<{ locale: CountryLanguage; token: string }>;
 }
 
-export default async function ResetPasswordConfirmPage({ params }: Props): Promise<JSX.Element> {
+export default async function ResetPasswordConfirmPage({
+  params,
+}: Props): Promise<JSX.Element> {
   const { locale, token } = await params;
   const { t } = simpleT(locale);
 
   const logger = createEndpointLogger(false, Date.now(), locale);
   // Check if user is already logged in using repository-first pattern
-  const verifiedUserResponse = await UserRepository.getUserByAuth({}, locale, logger);
+  const verifiedUserResponse = await UserRepository.getUserByAuth(
+    {},
+    locale,
+    logger,
+  );
 
   // Redirect to dashboard if already authenticated
   if (
@@ -79,14 +87,19 @@ export default async function ResetPasswordConfirmPage({ params }: Props): Promi
   }
 
   // Validate token on the server side
-  const tokenValidationResponse = await PasswordRepository.verifyResetToken(token, logger);
+  const tokenValidationResponse = await PasswordRepository.verifyResetToken(
+    token,
+    logger,
+  );
 
   const errorFallback = (
     <Alert variant="destructive" className="mb-8">
       <AlertCircle className="h-4 w-4" />
       <AlertTitle>{t("app.user.common.error.title")}</AlertTitle>
       <AlertDescription>
-        {t("app.user.other.resetPassword.auth.resetPassword.errors.loadingError")}
+        {t(
+          "app.user.other.resetPassword.auth.resetPassword.errors.loadingError",
+        )}
       </AlertDescription>
     </Alert>
   );

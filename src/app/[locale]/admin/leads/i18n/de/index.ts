@@ -6,7 +6,8 @@ export const translations: typeof enTranslations = {
       title: "Lead-Verwaltung",
       abTesting: {
         title: "A/B-Test-Konfiguration",
-        subtitle: "A/B-Tests für E-Mail-Journey-Varianten überwachen und konfigurieren",
+        subtitle:
+          "A/B-Tests für E-Mail-Journey-Varianten überwachen und konfigurieren",
         status: {
           active: "Aktiv",
           inactive: "Inaktiv",
@@ -84,7 +85,8 @@ export const translations: typeof enTranslations = {
           title: "Batch-Löschung bestätigen",
         },
         result_title: "Batch-Operation Ergebnisse",
-        preview_description: "{{count}} Leads überprüfen, die aktualisiert werden",
+        preview_description:
+          "{{count}} Leads überprüfen, die aktualisiert werden",
         delete_preview_description:
           "{{count}} Leads überprüfen, die gelöscht werden. Diese Aktion kann nicht rückgängig gemacht werden.",
         planned_changes: "Geplante Änderungen",
@@ -93,9 +95,12 @@ export const translations: typeof enTranslations = {
         change_source: "Quelle → {{source}}",
         confirm_update: "Update bestätigen",
         confirm_delete: "Löschung bestätigen",
-        success_message: "{{updated}} von {{total}} Leads erfolgreich aktualisiert",
-        delete_success_message: "{{deleted}} von {{total}} Leads erfolgreich gelöscht",
-        error_message: "Fehler beim Aktualisieren der Leads. Bitte versuchen Sie es erneut.",
+        success_message:
+          "{{updated}} von {{total}} Leads erfolgreich aktualisiert",
+        delete_success_message:
+          "{{deleted}} von {{total}} Leads erfolgreich gelöscht",
+        error_message:
+          "Fehler beim Aktualisieren der Leads. Bitte versuchen Sie es erneut.",
         errors_title: "Fehler ({{count}})",
         processing: "Verarbeitung...",
         close: "Schließen",
@@ -108,8 +113,10 @@ export const translations: typeof enTranslations = {
       },
       campaigns: {
         title: "E-Mail-Kampagnen",
-        subtitle: "Überwachen und verwalten Sie Ihre automatisierten E-Mail-Kampagnen",
-        description: "Verwalten Sie automatisierte E-Mail-Kampagnen und -Sequenzen",
+        subtitle:
+          "Überwachen und verwalten Sie Ihre automatisierten E-Mail-Kampagnen",
+        description:
+          "Verwalten Sie automatisierte E-Mail-Kampagnen und -Sequenzen",
         error: "Fehler beim Laden der Kampagnenstatistiken",
         comingSoon: "Kampagnen-Verwaltungsschnittstelle kommt bald...",
         coming_soon: "Kampagnen-Verwaltungsschnittstelle kommt bald...",
@@ -137,11 +144,13 @@ export const translations: typeof enTranslations = {
         emails_this_month: "E-Mails diesen Monat",
       },
       campaignStarter: {
-        description: "Konfigurieren Sie automatisierte Kampagnen-Starter-Einstellungen und Planung",
+        description:
+          "Konfigurieren Sie automatisierte Kampagnen-Starter-Einstellungen und Planung",
         form: {
           cronSettings: {
             label: "Cron-Aufgaben-Einstellungen",
-            description: "Konfigurieren Sie die Ausführungseinstellungen des Cron-Jobs",
+            description:
+              "Konfigurieren Sie die Ausführungseinstellungen des Cron-Jobs",
             schedule: {
               label: "Zeitplan",
               placeholder: "Cron-Ausdruck eingeben (z.B. */3 * * * *)",
@@ -172,7 +181,8 @@ export const translations: typeof enTranslations = {
             },
             retryDelay: {
               label: "Wiederholungsverzögerung (ms)",
-              placeholder: "Verzögerung zwischen Wiederholungen in Millisekunden",
+              placeholder:
+                "Verzögerung zwischen Wiederholungen in Millisekunden",
             },
           },
           dryRun: {
@@ -217,7 +227,8 @@ export const translations: typeof enTranslations = {
           sections: {
             basic: {
               title: "Grundkonfiguration",
-              description: "Grundlegende Kampagnen-Starter-Einstellungen konfigurieren",
+              description:
+                "Grundlegende Kampagnen-Starter-Einstellungen konfigurieren",
             },
           },
           save: "Konfiguration speichern",
@@ -225,12 +236,14 @@ export const translations: typeof enTranslations = {
         },
         settings: {
           title: "Kampagnen-Starter-Einstellungen",
-          description: "Konfigurieren Sie die Kampagnen-Starter-Cron-Job-Einstellungen",
+          description:
+            "Konfigurieren Sie die Kampagnen-Starter-Cron-Job-Einstellungen",
         },
       },
       emails: {
         title: "E-Mail-Vorlagen",
-        description: "E-Mail-Vorlagen für Lead-Kampagnen in der Vorschau anzeigen und verwalten",
+        description:
+          "E-Mail-Vorlagen für Lead-Kampagnen in der Vorschau anzeigen und verwalten",
         subtitle: "Organisiert nach Customer Journey und Kampagnenphase",
         journey: "Journey",
         stage: "Phase",
@@ -263,7 +276,8 @@ export const translations: typeof enTranslations = {
             email: {
               label: "Test-E-Mail-Adresse",
               placeholder: "E-Mail-Adresse für den Test eingeben",
-              description: "Die E-Mail-Adresse, an die die Test-E-Mail gesendet wird",
+              description:
+                "Die E-Mail-Adresse, an die die Test-E-Mail gesendet wird",
             },
           },
           leadData: {
@@ -429,7 +443,8 @@ export const translations: typeof enTranslations = {
         },
         template: {
           title: "Vorlage herunterladen",
-          description: "Holen Sie sich die CSV-Vorlage mit erforderlichen Spalten",
+          description:
+            "Holen Sie sich die CSV-Vorlage mit erforderlichen Spalten",
           download: "Vorlage herunterladen",
           examples: {
             example1:
@@ -450,13 +465,15 @@ export const translations: typeof enTranslations = {
         },
         options: {
           title: "Import-Optionen",
-          description: "Konfigurieren Sie, wie der Import mit vorhandenen Daten umgehen soll",
+          description:
+            "Konfigurieren Sie, wie der Import mit vorhandenen Daten umgehen soll",
           skipDuplicates: "Leads mit doppelten E-Mail-Adressen überspringen",
           updateExisting: "Bestehende Leads mit neuen Daten aktualisieren",
         },
         batch: {
           title: "Batch-Verarbeitung",
-          description: "Konfigurieren Sie, wie große Importe verarbeitet werden sollen",
+          description:
+            "Konfigurieren Sie, wie große Importe verarbeitet werden sollen",
           useChunkedProcessing: "Batch-Verarbeitung verwenden",
           useChunkedProcessingDescription:
             "Große CSV-Dateien in kleineren Batches über Hintergrund-Jobs verarbeiten. Empfohlen für Dateien mit mehr als 1000 Zeilen.",
@@ -466,22 +483,27 @@ export const translations: typeof enTranslations = {
         },
         defaults: {
           title: "Standardwerte",
-          description: "Standardwerte für Leads festlegen, die diese Felder nicht angeben",
+          description:
+            "Standardwerte für Leads festlegen, die diese Felder nicht angeben",
           country: "Standardland",
-          countryDescription: "Land, das verwendet wird, wenn nicht in CSV angegeben",
+          countryDescription:
+            "Land, das verwendet wird, wenn nicht in CSV angegeben",
           countryPlaceholder: "Standardland auswählen",
           language: "Standardsprache",
-          languageDescription: "Sprache, die verwendet wird, wenn nicht in CSV angegeben",
+          languageDescription:
+            "Sprache, die verwendet wird, wenn nicht in CSV angegeben",
           languagePlaceholder: "Standardsprache auswählen",
           status: "Standardstatus",
-          statusDescription: "Status, der verwendet wird, wenn nicht in CSV angegeben",
+          statusDescription:
+            "Status, der verwendet wird, wenn nicht in CSV angegeben",
           statusPlaceholder: "Standardstatus auswählen",
           campaignStage: "Standard-Kampagnenstufe",
           campaignStageDescription:
             "Kampagnenstufe, die verwendet wird, wenn nicht in CSV angegeben",
           campaignStagePlaceholder: "Standard-Kampagnenstufe auswählen",
           source: "Standardquelle",
-          sourceDescription: "Quelle, die verwendet wird, wenn nicht in CSV angegeben",
+          sourceDescription:
+            "Quelle, die verwendet wird, wenn nicht in CSV angegeben",
           sourcePlaceholder: "Standardquelle auswählen",
         },
         progress: {
@@ -554,7 +576,8 @@ export const translations: typeof enTranslations = {
       stats: {
         // Page metadata
         title: "Leads-Statistiken",
-        description: "Ansicht und Analyse von Lead-Statistiken und Leistungskennzahlen",
+        description:
+          "Ansicht und Analyse von Lead-Statistiken und Leistungskennzahlen",
         filter: "Filtern",
         refresh: "Aktualisieren",
 
@@ -583,7 +606,8 @@ export const translations: typeof enTranslations = {
         invalidLeads: "Ungültige Leads",
         leadsWithEmailEngagement: "Leads Mit E-Mail-Engagement",
         leadsWithoutEmailEngagement: "Leads Ohne E-Mail-Engagement",
-        averageEmailEngagementScore: "Durchschnittlicher E-Mail-Engagement-Score",
+        averageEmailEngagementScore:
+          "Durchschnittlicher E-Mail-Engagement-Score",
         engagementScore: "Engagement-Score",
         totalEmailEngagements: "Gesamte E-Mail-Engagements",
         totalEngagements: "Gesamte Engagements",
@@ -662,7 +686,8 @@ export const translations: typeof enTranslations = {
           title: "Diagramm-Legende",
           showAll: "Alle anzeigen",
           hideAll: "Alle ausblenden",
-          clickToToggle: "Klicken Sie, um die Sichtbarkeit der Serie umzuschalten",
+          clickToToggle:
+            "Klicken Sie, um die Sichtbarkeit der Serie umzuschalten",
         },
         metrics: {
           total_leads: "Gesamt Leads",
@@ -688,7 +713,8 @@ export const translations: typeof enTranslations = {
           signup_rate: "Anmelderate",
           consultation_booking_rate: "Beratungsbuchungsrate",
           subscription_confirmation_rate: "Abonnement-Bestätigungsrate",
-          average_email_engagement_score: "Durchschnittlicher E-Mail-Engagement-Score",
+          average_email_engagement_score:
+            "Durchschnittlicher E-Mail-Engagement-Score",
           lead_velocity: "Lead-Geschwindigkeit",
           data_completeness_rate: "Datenvollständigkeitsrate",
           status_historical: "Status Historische Daten",
@@ -746,7 +772,8 @@ export const translations: typeof enTranslations = {
             leads: "{{count}} Lead_one ({{percentage}}%)",
             leads_one: "{{count}} Lead ({{percentage}}%)",
             leads_other: "{{count}} Leads ({{percentage}}%)",
-            summary: "{{visible}} von {{total}} Quellen sichtbar ({{percentage}}%)",
+            summary:
+              "{{visible}} von {{total}} Quellen sichtbar ({{percentage}}%)",
           },
         },
       },
@@ -788,7 +815,8 @@ export const translations: typeof enTranslations = {
         source: "Quelle",
         notes: "Notizen",
         actions: "Aktionen",
-        scroll_hint: "💡 Horizontal scrollen, um alle Lead-Details und Spalten zu sehen",
+        scroll_hint:
+          "💡 Horizontal scrollen, um alle Lead-Details und Spalten zu sehen",
         select_all: "Alle Leads auswählen",
         select_lead: "{{business}} auswählen",
         description: {
@@ -808,9 +836,11 @@ export const translations: typeof enTranslations = {
         emails: "E-Mail-Vorschauen",
         emails_description: "E-Mail-Vorlagen anzeigen und verwalten",
         abTesting: "A/B-Tests",
-        abTesting_description: "A/B-Tests für E-Mail-Kampagnen konfigurieren und überwachen",
+        abTesting_description:
+          "A/B-Tests für E-Mail-Kampagnen konfigurieren und überwachen",
         campaignStarter: "Kampagnen-Starter",
-        campaignStarter_description: "Kampagnen-Starter-Einstellungen konfigurieren",
+        campaignStarter_description:
+          "Kampagnen-Starter-Einstellungen konfigurieren",
         import: "Importieren",
         import_description: "Leads aus CSV-Dateien importieren",
       },
@@ -948,7 +978,8 @@ export const translations: typeof enTranslations = {
           },
           convertedUserId: {
             label: "Konvertierter Benutzer",
-            placeholder: "Wählen Sie einen Benutzer aus, zu dem dieser Lead konvertiert wurde...",
+            placeholder:
+              "Wählen Sie einen Benutzer aus, zu dem dieser Lead konvertiert wurde...",
             searchPlaceholder: "Benutzer suchen...",
             searchHint: "Geben Sie mindestens 2 Zeichen ein, um zu suchen",
             noResults: "Keine Benutzer gefunden",
@@ -1017,11 +1048,13 @@ export const translations: typeof enTranslations = {
       create: {
         conflict: {
           title: "Lead existiert bereits",
-          description: "Ein Lead mit dieser E-Mail-Adresse existiert bereits im System.",
+          description:
+            "Ein Lead mit dieser E-Mail-Adresse existiert bereits im System.",
         },
         validation: {
           title: "Ungültige Lead-Daten",
-          description: "Bitte überprüfen Sie die Lead-Informationen und versuchen Sie es erneut.",
+          description:
+            "Bitte überprüfen Sie die Lead-Informationen und versuchen Sie es erneut.",
         },
       },
       get: {
@@ -1038,7 +1071,8 @@ export const translations: typeof enTranslations = {
         },
         validation: {
           title: "Ungültige Update-Daten",
-          description: "Bitte überprüfen Sie die Update-Informationen und versuchen Sie es erneut.",
+          description:
+            "Bitte überprüfen Sie die Update-Informationen und versuchen Sie es erneut.",
         },
       },
       import: {
@@ -1048,7 +1082,8 @@ export const translations: typeof enTranslations = {
         },
         validation: {
           title: "CSV-Validierungsfehler",
-          description: "Einige Zeilen in der CSV-Datei enthalten ungültige Daten.",
+          description:
+            "Einige Zeilen in der CSV-Datei enthalten ungültige Daten.",
         },
       },
     },
@@ -1155,7 +1190,8 @@ export const translations: typeof enTranslations = {
     pagination: {
       page_size: "Seitengröße",
       page_info: "Seite {{current}} von {{total}}",
-      page_info_with_count: "Seite {{current}} von {{total}} ({{count}} gesamt)",
+      page_info_with_count:
+        "Seite {{current}} von {{total}} ({{count}} gesamt)",
       first: "Erste",
       previous: "Vorherige",
       next: "Nächste",
@@ -1166,7 +1202,8 @@ export const translations: typeof enTranslations = {
       error: {
         validation: {
           title: "Validierungsfehler",
-          description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
+          description:
+            "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
         },
         unauthorized: {
           title: "Unbefugter Zugriff",
@@ -1174,7 +1211,8 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Serverfehler",
-          description: "Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+          description:
+            "Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
         },
         unknown: {
           title: "Unbekannter Fehler",
@@ -1229,7 +1267,8 @@ export const translations: typeof enTranslations = {
       errors: {
         missingId: "Lead-ID ist für das Tracking erforderlich",
         invalidIdFormat: "Lead-ID muss ein gültiges UUID-Format haben",
-        invalidCampaignIdFormat: "Kampagnen-ID muss ein gültiges UUID-Format haben",
+        invalidCampaignIdFormat:
+          "Kampagnen-ID muss ein gültiges UUID-Format haben",
         invalidUrl: "Ungültiges URL-Format angegeben",
       },
     },
@@ -1252,11 +1291,13 @@ export const translations: typeof enTranslations = {
         error: {
           server: {
             title: "Batch-Update fehlgeschlagen",
-            description: "Leads konnten aufgrund eines Serverfehlers nicht aktualisiert werden",
+            description:
+              "Leads konnten aufgrund eines Serverfehlers nicht aktualisiert werden",
           },
           validation: {
             title: "Validierung fehlgeschlagen",
-            description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+            description:
+              "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
           },
           unauthorized: {
             title: "Nicht autorisiert",
@@ -1272,7 +1313,8 @@ export const translations: typeof enTranslations = {
           },
           unknown: {
             title: "Unbekannter Fehler",
-            description: "Ein unerwarteter Fehler ist beim Batch-Update aufgetreten",
+            description:
+              "Ein unerwarteter Fehler ist beim Batch-Update aufgetreten",
           },
         },
         validation: {
@@ -1285,27 +1327,33 @@ export const translations: typeof enTranslations = {
         error: {
           validation: {
             title: "Kampagnen-Validierung fehlgeschlagen",
-            description: "Bitte überprüfen Sie Ihre Kampagnendaten und versuchen Sie es erneut",
+            description:
+              "Bitte überprüfen Sie Ihre Kampagnendaten und versuchen Sie es erneut",
           },
           unauthorized: {
             title: "Kampagnen-Zugriff verweigert",
-            description: "Sie haben keine Berechtigung zum Zugriff auf Kampagnen",
+            description:
+              "Sie haben keine Berechtigung zum Zugriff auf Kampagnen",
           },
           server: {
             title: "Kampagnen-Serverfehler",
-            description: "Kampagne kann aufgrund eines Serverfehlers nicht verarbeitet werden",
+            description:
+              "Kampagne kann aufgrund eines Serverfehlers nicht verarbeitet werden",
           },
           unknown: {
             title: "Kampagnen-Operation fehlgeschlagen",
-            description: "Ein unerwarteter Fehler ist während der Kampagnen-Operation aufgetreten",
+            description:
+              "Ein unerwarteter Fehler ist während der Kampagnen-Operation aufgetreten",
           },
           forbidden: {
             title: "Kampagnen-Zugriff verboten",
-            description: "Sie haben keine Berechtigung für diese Kampagnen-Operation",
+            description:
+              "Sie haben keine Berechtigung für diese Kampagnen-Operation",
           },
           notFound: {
             title: "Kampagne nicht gefunden",
-            description: "Die angeforderte Kampagne konnte nicht gefunden werden",
+            description:
+              "Die angeforderte Kampagne konnte nicht gefunden werden",
           },
         },
       },
@@ -1325,7 +1373,8 @@ export const translations: typeof enTranslations = {
         error: {
           validation: {
             title: "Kampagnen-Verwaltung-Validierung fehlgeschlagen",
-            description: "Bitte überprüfen Sie Ihre Kampagnendaten und versuchen Sie es erneut",
+            description:
+              "Bitte überprüfen Sie Ihre Kampagnendaten und versuchen Sie es erneut",
           },
           unauthorized: {
             title: "Kampagnen-Verwaltung-Zugriff verweigert",
@@ -1333,11 +1382,13 @@ export const translations: typeof enTranslations = {
           },
           server: {
             title: "Kampagnen-Verwaltung-Serverfehler",
-            description: "Kampagne kann aufgrund eines Serverfehlers nicht verwaltet werden",
+            description:
+              "Kampagne kann aufgrund eines Serverfehlers nicht verwaltet werden",
           },
           unknown: {
             title: "Kampagnen-Verwaltung-Operation fehlgeschlagen",
-            description: "Ein unerwarteter Fehler ist während der Kampagnen-Verwaltung aufgetreten",
+            description:
+              "Ein unerwarteter Fehler ist während der Kampagnen-Verwaltung aufgetreten",
           },
           forbidden: {
             title: "Kampagnen-Verwaltung-Zugriff verboten",
@@ -1345,7 +1396,8 @@ export const translations: typeof enTranslations = {
           },
           notFound: {
             title: "Kampagne nicht gefunden",
-            description: "Die angeforderte Kampagne konnte nicht gefunden werden",
+            description:
+              "Die angeforderte Kampagne konnte nicht gefunden werden",
           },
           campaignActive:
             "Aktive Kampagne kann nicht gelöscht werden. Bitte deaktivieren Sie sie zuerst.",
@@ -1385,27 +1437,33 @@ export const translations: typeof enTranslations = {
         error: {
           validation: {
             title: "Kampagnen-Statistik-Validierung fehlgeschlagen",
-            description: "Bitte überprüfen Sie Ihre Statistikparameter und versuchen Sie es erneut",
+            description:
+              "Bitte überprüfen Sie Ihre Statistikparameter und versuchen Sie es erneut",
           },
           unauthorized: {
             title: "Kampagnen-Statistik-Zugriff verweigert",
-            description: "Sie haben keine Berechtigung, Kampagnen-Statistiken anzuzeigen",
+            description:
+              "Sie haben keine Berechtigung, Kampagnen-Statistiken anzuzeigen",
           },
           server: {
             title: "Kampagnen-Statistik-Serverfehler",
-            description: "Statistiken können aufgrund eines Serverfehlers nicht abgerufen werden",
+            description:
+              "Statistiken können aufgrund eines Serverfehlers nicht abgerufen werden",
           },
           unknown: {
             title: "Kampagnen-Statistik-Operation fehlgeschlagen",
-            description: "Ein unerwarteter Fehler ist beim Abrufen der Statistiken aufgetreten",
+            description:
+              "Ein unerwarteter Fehler ist beim Abrufen der Statistiken aufgetreten",
           },
           forbidden: {
             title: "Kampagnen-Statistik-Zugriff verboten",
-            description: "Sie haben keine Berechtigung, Kampagnen-Statistiken anzuzeigen",
+            description:
+              "Sie haben keine Berechtigung, Kampagnen-Statistiken anzuzeigen",
           },
           notFound: {
             title: "Kampagnen-Statistiken nicht gefunden",
-            description: "Die angeforderten Kampagnen-Statistiken konnten nicht gefunden werden",
+            description:
+              "Die angeforderten Kampagnen-Statistiken konnten nicht gefunden werden",
           },
         },
         success: {
@@ -1428,15 +1486,18 @@ export const translations: typeof enTranslations = {
           },
           unauthorized: {
             title: "Lead-Datenzugriff verweigert",
-            description: "Sie haben keine Berechtigung für den Zugriff auf Lead-Daten",
+            description:
+              "Sie haben keine Berechtigung für den Zugriff auf Lead-Daten",
           },
           server: {
             title: "Lead-Daten Serverfehler",
-            description: "Lead-Daten konnten aufgrund eines Serverfehlers nicht geladen werden",
+            description:
+              "Lead-Daten konnten aufgrund eines Serverfehlers nicht geladen werden",
           },
           unknown: {
             title: "Lead-Datenzugriff fehlgeschlagen",
-            description: "Ein unerwarteter Fehler beim Laden der Lead-Daten ist aufgetreten",
+            description:
+              "Ein unerwarteter Fehler beim Laden der Lead-Daten ist aufgetreten",
           },
           not_found: {
             title: "Lead nicht gefunden",
@@ -1448,15 +1509,18 @@ export const translations: typeof enTranslations = {
           },
           network: {
             title: "Netzwerkfehler",
-            description: "Lead-Daten konnten aufgrund eines Netzwerkfehlers nicht geladen werden",
+            description:
+              "Lead-Daten konnten aufgrund eines Netzwerkfehlers nicht geladen werden",
           },
           unsaved_changes: {
             title: "Nicht gespeicherte Änderungen",
-            description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen werden",
+            description:
+              "Sie haben nicht gespeicherte Änderungen, die verloren gehen werden",
           },
           conflict: {
             title: "Datenkonflikt",
-            description: "Die Lead-Daten wurden von einem anderen Benutzer geändert",
+            description:
+              "Die Lead-Daten wurden von einem anderen Benutzer geändert",
           },
         },
         success: {
@@ -1468,7 +1532,8 @@ export const translations: typeof enTranslations = {
         error: {
           validation: {
             title: "Lead-Update-Validierung fehlgeschlagen",
-            description: "Bitte überprüfen Sie Ihre Lead-Updates und versuchen Sie es erneut",
+            description:
+              "Bitte überprüfen Sie Ihre Lead-Updates und versuchen Sie es erneut",
           },
           unauthorized: {
             title: "Lead-Update nicht autorisiert",
@@ -1476,31 +1541,38 @@ export const translations: typeof enTranslations = {
           },
           server: {
             title: "Lead-Update Serverfehler",
-            description: "Lead konnte aufgrund eines Serverfehlers nicht aktualisiert werden",
+            description:
+              "Lead konnte aufgrund eines Serverfehlers nicht aktualisiert werden",
           },
           unknown: {
             title: "Lead-Update fehlgeschlagen",
-            description: "Ein unerwarteter Fehler beim Aktualisieren des Leads ist aufgetreten",
+            description:
+              "Ein unerwarteter Fehler beim Aktualisieren des Leads ist aufgetreten",
           },
           not_found: {
             title: "Lead nicht gefunden",
-            description: "Der zu aktualisierende Lead konnte nicht gefunden werden",
+            description:
+              "Der zu aktualisierende Lead konnte nicht gefunden werden",
           },
           forbidden: {
             title: "Lead-Update verboten",
-            description: "Sie haben keine Berechtigung, diesen Lead zu aktualisieren",
+            description:
+              "Sie haben keine Berechtigung, diesen Lead zu aktualisieren",
           },
           network: {
             title: "Netzwerkfehler",
-            description: "Lead konnte aufgrund eines Netzwerkfehlers nicht aktualisiert werden",
+            description:
+              "Lead konnte aufgrund eines Netzwerkfehlers nicht aktualisiert werden",
           },
           unsaved_changes: {
             title: "Nicht gespeicherte Änderungen",
-            description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen werden",
+            description:
+              "Sie haben nicht gespeicherte Änderungen, die verloren gehen werden",
           },
           conflict: {
             title: "Datenkonflikt",
-            description: "Die Lead-Daten wurden von einem anderen Benutzer geändert",
+            description:
+              "Die Lead-Daten wurden von einem anderen Benutzer geändert",
           },
         },
         success: {
@@ -1512,7 +1584,8 @@ export const translations: typeof enTranslations = {
         error: {
           validation: {
             title: "Lead-Erstellung Validierung fehlgeschlagen",
-            description: "Bitte überprüfen Sie Ihre Lead-Informationen und versuchen Sie es erneut",
+            description:
+              "Bitte überprüfen Sie Ihre Lead-Informationen und versuchen Sie es erneut",
           },
           unauthorized: {
             title: "Lead-Erstellung nicht autorisiert",
@@ -1520,11 +1593,13 @@ export const translations: typeof enTranslations = {
           },
           server: {
             title: "Lead-Erstellung Serverfehler",
-            description: "Lead konnte aufgrund eines Serverfehlers nicht erstellt werden",
+            description:
+              "Lead konnte aufgrund eines Serverfehlers nicht erstellt werden",
           },
           unknown: {
             title: "Lead-Erstellung fehlgeschlagen",
-            description: "Ein unerwarteter Fehler beim Erstellen des Leads ist aufgetreten",
+            description:
+              "Ein unerwarteter Fehler beim Erstellen des Leads ist aufgetreten",
           },
           forbidden: {
             title: "Lead-Erstellung verboten",
@@ -1532,11 +1607,13 @@ export const translations: typeof enTranslations = {
           },
           duplicate: {
             title: "Lead bereits vorhanden",
-            description: "Ein Lead mit dieser E-Mail-Adresse existiert bereits im System",
+            description:
+              "Ein Lead mit dieser E-Mail-Adresse existiert bereits im System",
           },
           conflict: {
             title: "Lead bereits vorhanden",
-            description: "Ein Lead mit dieser E-Mail-Adresse existiert bereits im System",
+            description:
+              "Ein Lead mit dieser E-Mail-Adresse existiert bereits im System",
           },
         },
         success: {
@@ -1550,15 +1627,18 @@ export const translations: typeof enTranslations = {
         error: {
           validation: {
             title: "Lead-Engagement-Validierung fehlgeschlagen",
-            description: "Bitte überprüfen Sie Ihre Engagement-Daten und versuchen Sie es erneut",
+            description:
+              "Bitte überprüfen Sie Ihre Engagement-Daten und versuchen Sie es erneut",
           },
           unauthorized: {
             title: "Lead-Engagement nicht autorisiert",
-            description: "Sie haben keine Berechtigung, Lead-Engagement zu erfassen",
+            description:
+              "Sie haben keine Berechtigung, Lead-Engagement zu erfassen",
           },
           server: {
             title: "Lead-Engagement Serverfehler",
-            description: "Lead-Engagement konnte aufgrund eines Serverfehlers nicht erfasst werden",
+            description:
+              "Lead-Engagement konnte aufgrund eines Serverfehlers nicht erfasst werden",
           },
           unknown: {
             title: "Lead-Engagement fehlgeschlagen",
@@ -1567,7 +1647,8 @@ export const translations: typeof enTranslations = {
           },
           forbidden: {
             title: "Lead-Engagement verboten",
-            description: "Sie haben keine Berechtigung, Lead-Engagement zu erfassen",
+            description:
+              "Sie haben keine Berechtigung, Lead-Engagement zu erfassen",
           },
         },
         success: {
@@ -1581,19 +1662,23 @@ export const translations: typeof enTranslations = {
         error: {
           validation: {
             title: "Lead-Export-Validierung fehlgeschlagen",
-            description: "Bitte überprüfen Sie Ihre Export-Parameter und versuchen Sie es erneut",
+            description:
+              "Bitte überprüfen Sie Ihre Export-Parameter und versuchen Sie es erneut",
           },
           unauthorized: {
             title: "Lead-Export nicht autorisiert",
-            description: "Sie haben keine Berechtigung zum Exportieren von Leads",
+            description:
+              "Sie haben keine Berechtigung zum Exportieren von Leads",
           },
           server: {
             title: "Lead-Export-Serverfehler",
-            description: "Leads können aufgrund eines Serverfehlers nicht exportiert werden",
+            description:
+              "Leads können aufgrund eines Serverfehlers nicht exportiert werden",
           },
           unknown: {
             title: "Lead-Export fehlgeschlagen",
-            description: "Ein unerwarteter Fehler ist beim Exportieren von Leads aufgetreten",
+            description:
+              "Ein unerwarteter Fehler ist beim Exportieren von Leads aufgetreten",
           },
         },
         success: {
@@ -1615,7 +1700,8 @@ export const translations: typeof enTranslations = {
           },
           forbidden: {
             title: "Löschen des Import-Jobs verboten",
-            description: "Sie haben keine Berechtigung, diesen Import-Job zu löschen",
+            description:
+              "Sie haben keine Berechtigung, diesen Import-Job zu löschen",
           },
           not_found: {
             title: "Import-Job nicht gefunden",
@@ -1623,7 +1709,8 @@ export const translations: typeof enTranslations = {
           },
           server: {
             title: "Server-Fehler beim Löschen des Import-Jobs",
-            description: "Import-Job konnte aufgrund eines Server-Fehlers nicht gelöscht werden",
+            description:
+              "Import-Job konnte aufgrund eines Server-Fehlers nicht gelöscht werden",
           },
         },
       },
@@ -1639,7 +1726,8 @@ export const translations: typeof enTranslations = {
           },
           unauthorized: {
             title: "Import-Aufträge-Zugriff nicht autorisiert",
-            description: "Sie haben keine Berechtigung, Import-Aufträge anzuzeigen",
+            description:
+              "Sie haben keine Berechtigung, Import-Aufträge anzuzeigen",
           },
           server: {
             title: "Import-Aufträge Serverfehler",
@@ -1648,7 +1736,8 @@ export const translations: typeof enTranslations = {
           },
           unknown: {
             title: "Import-Aufträge-Abruf fehlgeschlagen",
-            description: "Ein unerwarteter Fehler beim Abrufen der Import-Aufträge ist aufgetreten",
+            description:
+              "Ein unerwarteter Fehler beim Abrufen der Import-Aufträge ist aufgetreten",
           },
         },
       },
@@ -1664,11 +1753,13 @@ export const translations: typeof enTranslations = {
           },
           unauthorized: {
             title: "Auftragsaktualisierung nicht autorisiert",
-            description: "Sie haben keine Berechtigung, diesen Auftrag zu aktualisieren",
+            description:
+              "Sie haben keine Berechtigung, diesen Auftrag zu aktualisieren",
           },
           forbidden: {
             title: "Auftragsaktualisierung verboten",
-            description: "Sie haben keine Berechtigung, diesen Import-Auftrag zu aktualisieren",
+            description:
+              "Sie haben keine Berechtigung, diesen Import-Auftrag zu aktualisieren",
           },
           not_found: {
             title: "Import-Auftrag nicht gefunden",
@@ -1676,11 +1767,13 @@ export const translations: typeof enTranslations = {
           },
           server: {
             title: "Auftragsaktualisierung Serverfehler",
-            description: "Auftrag konnte aufgrund eines Serverfehlers nicht aktualisiert werden",
+            description:
+              "Auftrag konnte aufgrund eines Serverfehlers nicht aktualisiert werden",
           },
           unknown: {
             title: "Auftragsaktualisierung fehlgeschlagen",
-            description: "Ein unerwarteter Fehler beim Aktualisieren des Auftrags ist aufgetreten",
+            description:
+              "Ein unerwarteter Fehler beim Aktualisieren des Auftrags ist aufgetreten",
           },
         },
       },
@@ -1695,7 +1788,8 @@ export const translations: typeof enTranslations = {
         error: {
           validation: {
             title: "Lead-Import-Validierung fehlgeschlagen",
-            description: "Bitte überprüfen Sie Ihre CSV-Datei und versuchen Sie es erneut",
+            description:
+              "Bitte überprüfen Sie Ihre CSV-Datei und versuchen Sie es erneut",
             failed: "CSV-Zeilen-Validierung fehlgeschlagen",
             invalidData: "Ungültige Daten in CSV-Zeile",
             missingFields: "Erforderliche Felder fehlen",
@@ -1709,11 +1803,13 @@ export const translations: typeof enTranslations = {
           },
           server: {
             title: "Lead-Import Serverfehler",
-            description: "Leads konnten aufgrund eines Serverfehlers nicht importiert werden",
+            description:
+              "Leads konnten aufgrund eines Serverfehlers nicht importiert werden",
           },
           unknown: {
             title: "Lead-Import fehlgeschlagen",
-            description: "Ein unerwarteter Fehler beim Importieren der Leads ist aufgetreten",
+            description:
+              "Ein unerwarteter Fehler beim Importieren der Leads ist aufgetreten",
           },
           forbidden: {
             title: "Lead-Import verboten",
@@ -1721,7 +1817,8 @@ export const translations: typeof enTranslations = {
           },
           not_found: {
             title: "Import-Auftrag nicht gefunden",
-            description: "Der angeforderte Import-Auftrag konnte nicht gefunden werden",
+            description:
+              "Der angeforderte Import-Auftrag konnte nicht gefunden werden",
           },
           stopped_by_user: "Vom Benutzer gestoppt",
         },
@@ -1729,16 +1826,19 @@ export const translations: typeof enTranslations = {
       retry: {
         success: {
           title: "Import-Job wiederholt",
-          description: "Import-Job wurde zur Wiederholung in die Warteschlange eingereiht",
+          description:
+            "Import-Job wurde zur Wiederholung in die Warteschlange eingereiht",
         },
         error: {
           unauthorized: {
             title: "Wiederholung des Import-Jobs nicht autorisiert",
-            description: "Sie haben keine Berechtigung, Import-Jobs zu wiederholen",
+            description:
+              "Sie haben keine Berechtigung, Import-Jobs zu wiederholen",
           },
           forbidden: {
             title: "Wiederholung des Import-Jobs verboten",
-            description: "Sie haben keine Berechtigung, diesen Import-Job zu wiederholen",
+            description:
+              "Sie haben keine Berechtigung, diesen Import-Job zu wiederholen",
           },
           not_found: {
             title: "Import-Job nicht gefunden",
@@ -1751,7 +1851,8 @@ export const translations: typeof enTranslations = {
           },
           server: {
             title: "Server-Fehler bei der Wiederholung des Import-Jobs",
-            description: "Import-Job konnte aufgrund eines Server-Fehlers nicht wiederholt werden",
+            description:
+              "Import-Job konnte aufgrund eines Server-Fehlers nicht wiederholt werden",
           },
         },
       },
@@ -1767,7 +1868,8 @@ export const translations: typeof enTranslations = {
           },
           forbidden: {
             title: "Stoppen des Import-Jobs verboten",
-            description: "Sie haben keine Berechtigung, diesen Import-Job zu stoppen",
+            description:
+              "Sie haben keine Berechtigung, diesen Import-Job zu stoppen",
           },
           not_found: {
             title: "Import-Job nicht gefunden",
@@ -1775,11 +1877,13 @@ export const translations: typeof enTranslations = {
           },
           validation: {
             title: "Import-Job kann nicht gestoppt werden",
-            description: "Dieser Import-Job kann in seinem aktuellen Zustand nicht gestoppt werden",
+            description:
+              "Dieser Import-Job kann in seinem aktuellen Zustand nicht gestoppt werden",
           },
           server: {
             title: "Server-Fehler beim Stoppen des Import-Jobs",
-            description: "Import-Job konnte aufgrund eines Server-Fehlers nicht gestoppt werden",
+            description:
+              "Import-Job konnte aufgrund eines Server-Fehlers nicht gestoppt werden",
           },
         },
       },
@@ -1793,7 +1897,8 @@ export const translations: typeof enTranslations = {
           },
           unauthorized: {
             title: "Lead-Statistik-Zugriff verweigert",
-            description: "Sie haben keine Berechtigung für den Zugriff auf Lead-Statistiken",
+            description:
+              "Sie haben keine Berechtigung für den Zugriff auf Lead-Statistiken",
           },
           server: {
             title: "Lead-Statistik Serverfehler",
@@ -1802,11 +1907,13 @@ export const translations: typeof enTranslations = {
           },
           unknown: {
             title: "Lead-Statistik-Zugriff fehlgeschlagen",
-            description: "Ein unerwarteter Fehler beim Laden der Lead-Statistiken ist aufgetreten",
+            description:
+              "Ein unerwarteter Fehler beim Laden der Lead-Statistiken ist aufgetreten",
           },
           forbidden: {
             title: "Lead-Statistik-Zugriff verboten",
-            description: "Sie haben keine Berechtigung, auf Lead-Statistiken zuzugreifen",
+            description:
+              "Sie haben keine Berechtigung, auf Lead-Statistiken zuzugreifen",
           },
         },
         success: {
@@ -1820,27 +1927,33 @@ export const translations: typeof enTranslations = {
         error: {
           validation: {
             title: "Lead-Tracking-Validierung fehlgeschlagen",
-            description: "Bitte überprüfen Sie Ihre Tracking-Parameter und versuchen Sie es erneut",
+            description:
+              "Bitte überprüfen Sie Ihre Tracking-Parameter und versuchen Sie es erneut",
           },
           unauthorized: {
             title: "Lead-Tracking nicht autorisiert",
-            description: "Sie haben keine Berechtigung für den Zugriff auf Lead-Tracking",
+            description:
+              "Sie haben keine Berechtigung für den Zugriff auf Lead-Tracking",
           },
           server: {
             title: "Lead-Tracking-Serverfehler",
-            description: "Tracking kann aufgrund eines Serverfehlers nicht verarbeitet werden",
+            description:
+              "Tracking kann aufgrund eines Serverfehlers nicht verarbeitet werden",
           },
           unknown: {
             title: "Lead-Tracking fehlgeschlagen",
-            description: "Ein unerwarteter Fehler ist beim Lead-Tracking aufgetreten",
+            description:
+              "Ein unerwarteter Fehler ist beim Lead-Tracking aufgetreten",
           },
           forbidden: {
             title: "Lead-Tracking-Zugriff verboten",
-            description: "Sie haben keine Berechtigung für den Zugriff auf Lead-Tracking",
+            description:
+              "Sie haben keine Berechtigung für den Zugriff auf Lead-Tracking",
           },
           not_found: {
             title: "Lead nicht gefunden",
-            description: "Der angeforderte Lead konnte für das Tracking nicht gefunden werden",
+            description:
+              "Der angeforderte Lead konnte für das Tracking nicht gefunden werden",
           },
         },
         success: {
@@ -1854,7 +1967,8 @@ export const translations: typeof enTranslations = {
         error: {
           validation: {
             title: "Lead-Abmeldung-Validierung fehlgeschlagen",
-            description: "Bitte überprüfen Sie Ihre Abmeldeanfrage und versuchen Sie es erneut",
+            description:
+              "Bitte überprüfen Sie Ihre Abmeldeanfrage und versuchen Sie es erneut",
           },
           unauthorized: {
             title: "Lead-Abmeldung nicht autorisiert",
@@ -1862,11 +1976,13 @@ export const translations: typeof enTranslations = {
           },
           server: {
             title: "Lead-Abmeldung Serverfehler",
-            description: "Lead konnte aufgrund eines Serverfehlers nicht abgemeldet werden",
+            description:
+              "Lead konnte aufgrund eines Serverfehlers nicht abgemeldet werden",
           },
           unknown: {
             title: "Lead-Abmeldung fehlgeschlagen",
-            description: "Ein unerwarteter Fehler bei der Lead-Abmeldung ist aufgetreten",
+            description:
+              "Ein unerwarteter Fehler bei der Lead-Abmeldung ist aufgetreten",
           },
           forbidden: {
             title: "Lead-Abmeldung verboten",
@@ -1883,7 +1999,8 @@ export const translations: typeof enTranslations = {
       error: {
         validation: {
           title: "Test-E-Mail-Validierung fehlgeschlagen",
-          description: "Überprüfen Sie Ihre Test-E-Mail-Daten und versuchen Sie es erneut",
+          description:
+            "Überprüfen Sie Ihre Test-E-Mail-Daten und versuchen Sie es erneut",
         },
         unauthorized: {
           title: "Test-E-Mail nicht autorisiert",
@@ -1891,15 +2008,18 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Test-E-Mail-Serverfehler",
-          description: "Test-E-Mail konnte aufgrund eines Serverfehlers nicht gesendet werden",
+          description:
+            "Test-E-Mail konnte aufgrund eines Serverfehlers nicht gesendet werden",
         },
         unknown: {
           title: "Test-E-Mail fehlgeschlagen",
-          description: "Ein unerwarteter Fehler ist beim Senden der Test-E-Mail aufgetreten",
+          description:
+            "Ein unerwarteter Fehler ist beim Senden der Test-E-Mail aufgetreten",
         },
         templateNotFound: {
           title: "E-Mail-Vorlage nicht gefunden",
-          description: "Die angeforderte E-Mail-Vorlage konnte nicht gefunden werden",
+          description:
+            "Die angeforderte E-Mail-Vorlage konnte nicht gefunden werden",
         },
         sendingFailed: {
           title: "E-Mail-Versand fehlgeschlagen",
@@ -1907,7 +2027,8 @@ export const translations: typeof enTranslations = {
         },
         invalidConfiguration: {
           title: "Ungültige E-Mail-Konfiguration",
-          description: "Die E-Mail-Konfiguration ist ungültig oder unvollständig",
+          description:
+            "Die E-Mail-Konfiguration ist ungültig oder unvollständig",
         },
       },
       fields: {
@@ -1918,7 +2039,8 @@ export const translations: typeof enTranslations = {
           description: "Wählen Sie die E-Mail-Kampagnen-Phase zum Testen",
         },
         testEmail: {
-          description: "Geben Sie die E-Mail-Adresse ein, an die die Test-E-Mail gesendet wird",
+          description:
+            "Geben Sie die E-Mail-Adresse ein, an die die Test-E-Mail gesendet wird",
         },
         leadData: {
           email: {
@@ -1937,16 +2059,20 @@ export const translations: typeof enTranslations = {
             description: "Website-URL, die in der E-Mail-Vorlage erscheint",
           },
           country: {
-            description: "Land, das für die Lokalisierung in der E-Mail-Vorlage verwendet wird",
+            description:
+              "Land, das für die Lokalisierung in der E-Mail-Vorlage verwendet wird",
           },
           language: {
-            description: "Sprache, die für die Lokalisierung in der E-Mail-Vorlage verwendet wird",
+            description:
+              "Sprache, die für die Lokalisierung in der E-Mail-Vorlage verwendet wird",
           },
           status: {
-            description: "Lead-Status, der in der E-Mail-Vorlage verwendet wird",
+            description:
+              "Lead-Status, der in der E-Mail-Vorlage verwendet wird",
           },
           source: {
-            description: "Lead-Quelle, die in der E-Mail-Vorlage verwendet wird",
+            description:
+              "Lead-Quelle, die in der E-Mail-Vorlage verwendet wird",
           },
           notes: {
             description: "Notizen, die in der E-Mail-Vorlage verwendet werden",

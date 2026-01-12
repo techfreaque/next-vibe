@@ -31,4 +31,5 @@ export const scopedTranslation = createScopedTranslation({
 export const contactScopedT = scopedTranslation.scopedT;
 
 // Export the translation key type using the helper
-export type ContactTranslationKey = (typeof scopedTranslation)["ScopedTranslationKey"];
+export type ContactTranslationKey =
+  (typeof scopedTranslation)["ScopedTranslationKey"];

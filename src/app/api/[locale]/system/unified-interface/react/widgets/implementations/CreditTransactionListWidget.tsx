@@ -8,7 +8,10 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import type { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
+import type {
+  ReactWidgetProps,
+  WidgetData,
+} from "../../../shared/widgets/types";
 import { WidgetRenderer } from "../renderers/WidgetRenderer";
 
 /**
@@ -21,20 +24,28 @@ export function CreditTransactionListWidget<const TKey extends string>({
   context,
   className,
   endpoint,
-}: ReactWidgetProps<typeof WidgetType.CREDIT_TRANSACTION_LIST, TKey>): JSX.Element {
+}: ReactWidgetProps<
+  typeof WidgetType.CREDIT_TRANSACTION_LIST,
+  TKey
+>): JSX.Element {
   const { t } = simpleT(context.locale);
 
   if (!Array.isArray(value) || value.length === 0) {
     return (
       <Div className={cn("text-muted-foreground italic", className)}>
-        {t("app.api.system.unifiedInterface.react.widgets.creditTransactionList.noTransactions")}
+        {t(
+          "app.api.system.unifiedInterface.react.widgets.creditTransactionList.noTransactions",
+        )}
       </Div>
     );
   }
 
   // Extract child field definition
   let childField: UnifiedField<string> | null = null;
-  if ("type" in field && (field.type === "array" || field.type === "array-optional")) {
+  if (
+    "type" in field &&
+    (field.type === "array" || field.type === "array-optional")
+  ) {
     if ("child" in field && field.child) {
       childField = field.child as UnifiedField<string>;
     }
@@ -43,7 +54,9 @@ export function CreditTransactionListWidget<const TKey extends string>({
   if (!childField) {
     return (
       <Div className={cn("text-muted-foreground italic", className)}>
-        {t("app.api.system.unifiedInterface.react.widgets.creditTransactionList.invalidConfig")}
+        {t(
+          "app.api.system.unifiedInterface.react.widgets.creditTransactionList.invalidConfig",
+        )}
       </Div>
     );
   }

@@ -8,7 +8,10 @@ import { Pressable, ScrollView, View } from "react-native";
 
 import { useTranslation } from "@/i18n/core/client";
 // Import all types and constants from web (web is source of truth)
-import type { CountryData, PhoneFieldProps } from "@/packages/next-vibe-ui/web/ui/phone-field";
+import type {
+  CountryData,
+  PhoneFieldProps,
+} from "@/packages/next-vibe-ui/web/ui/phone-field";
 import { COUNTRIES } from "@/packages/next-vibe-ui/web/ui/phone-field";
 
 import { applyStyleType } from "../../web/utils/style-type";
@@ -38,7 +41,9 @@ export function PhoneField({
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   // Parse the current value to extract country and number
-  const parsePhoneValue = (phoneValue: string): { country: string; number: string } => {
+  const parsePhoneValue = (
+    phoneValue: string,
+  ): { country: string; number: string } => {
     if (!phoneValue) {
       return {
         country: defaultCountry || "US",
@@ -61,9 +66,11 @@ export function PhoneField({
     return { country: defaultCountry || "US", number: phoneValue };
   };
 
-  const { country: selectedCountry, number: phoneNumber } = parsePhoneValue(value);
+  const { country: selectedCountry, number: phoneNumber } =
+    parsePhoneValue(value);
   const currentCountry =
-    COUNTRIES.find((c: CountryData) => c.code === selectedCountry) || COUNTRIES[0];
+    COUNTRIES.find((c: CountryData) => c.code === selectedCountry) ||
+    COUNTRIES[0];
 
   // Organize countries with preferred ones first
   const organizedCountries = useMemo(() => {
@@ -77,9 +84,13 @@ export function PhoneField({
   }, [preferredCountries]);
 
   const handleCountrySelect = (countryCode: string): void => {
-    const newCountry = COUNTRIES.find((c: CountryData) => c.code === countryCode);
+    const newCountry = COUNTRIES.find(
+      (c: CountryData) => c.code === countryCode,
+    );
     if (newCountry) {
-      const newValue = phoneNumber ? `${newCountry.prefix} ${phoneNumber}` : newCountry.prefix;
+      const newValue = phoneNumber
+        ? `${newCountry.prefix} ${phoneNumber}`
+        : newCountry.prefix;
       onChange(newValue);
     }
     setOpen(false);
@@ -88,7 +99,9 @@ export function PhoneField({
   const handleNumberChange = (newNumber: string): void => {
     // Remove any non-digit characters except spaces and dashes
     const cleanNumber = newNumber.replaceAll(/[^\d\s-]/g, "");
-    const newValue = cleanNumber ? `${currentCountry.prefix} ${cleanNumber}` : "";
+    const newValue = cleanNumber
+      ? `${currentCountry.prefix} ${cleanNumber}`
+      : "";
     onChange(newValue);
   };
 
@@ -102,7 +115,9 @@ export function PhoneField({
         <UIText className="text-lg">{country.flag}</UIText>
         <UIText className="text-base">{country.name}</UIText>
       </View>
-      <UIText className="text-sm text-muted-foreground">{country.prefix}</UIText>
+      <UIText className="text-sm text-muted-foreground">
+        {country.prefix}
+      </UIText>
     </Pressable>
   );
 

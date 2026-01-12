@@ -116,12 +116,17 @@ class FetchUrlService {
     }, this.TIMEOUT);
 
     try {
-      const scrappeyResponse = await this.fetchFromScrappey(url, controller.signal);
+      const scrappeyResponse = await this.fetchFromScrappey(
+        url,
+        controller.signal,
+      );
 
       clearTimeout(timeoutId);
 
       // Convert HTML to Markdown
-      const markdown = this.convertHtmlToMarkdown(scrappeyResponse.solution.response);
+      const markdown = this.convertHtmlToMarkdown(
+        scrappeyResponse.solution.response,
+      );
 
       return {
         url: scrappeyResponse.solution.currentUrl,
@@ -140,7 +145,10 @@ class FetchUrlService {
   /**
    * Fetch content from Scrappey API
    */
-  private async fetchFromScrappey(url: string, signal: AbortSignal): Promise<ScrappeyResponse> {
+  private async fetchFromScrappey(
+    url: string,
+    signal: AbortSignal,
+  ): Promise<ScrappeyResponse> {
     const apiUrl = `${this.SCRAPPEY_API_URL}?key=${agentEnv.SCRAPPEY_API_KEY}`;
 
     try {
@@ -411,7 +419,8 @@ export class FetchUrlContentRepository {
     try {
       if (!url || typeof url !== "string" || url.trim() === "") {
         return fail({
-          message: "app.api.agent.chat.tools.fetchUrl.get.errors.validation.title" as const,
+          message:
+            "app.api.agent.chat.tools.fetchUrl.get.errors.validation.title" as const,
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { message: FETCH_MESSAGES.URL_REQUIRED },
         });
@@ -441,7 +450,8 @@ export class FetchUrlContentRepository {
       });
 
       return fail({
-        message: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
+        message:
+          "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { message: fetchError.message },
       });

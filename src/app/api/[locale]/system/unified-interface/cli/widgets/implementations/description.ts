@@ -14,7 +14,9 @@ import { extractDescriptionData } from "@/app/api/[locale]/system/unified-interf
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class DescriptionWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.DESCRIPTION> {
+export class DescriptionWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.DESCRIPTION
+> {
   readonly widgetType = WidgetType.DESCRIPTION;
 
   /**

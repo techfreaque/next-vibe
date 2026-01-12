@@ -11,7 +11,9 @@ interface EmailsAdminPageProps {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-export default async function EmailsAdminPage({ params }: EmailsAdminPageProps): Promise<never> {
+export default async function EmailsAdminPage({
+  params,
+}: EmailsAdminPageProps): Promise<never> {
   const { locale } = await params;
 
   // Redirect to the stats page

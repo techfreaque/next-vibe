@@ -44,13 +44,24 @@ export function ChatArea({ locale, logger, user }: ChatAreaProps): JSX.Element {
   const insets = useSafeAreaInsets();
 
   // Determine if we should show input (hide in public root without thread)
-  const shouldShowInput = !(rootFolderId === "public" && !chat.currentSubFolderId && !thread);
+  const shouldShowInput = !(
+    rootFolderId === "public" &&
+    !chat.currentSubFolderId &&
+    !thread
+  );
 
   const isLoadingThread = !!activeThreadId && activeThreadId !== NEW_MESSAGE_ID;
 
   return (
-    <KeyboardAvoidingView className="h-screen h-max-screen flex-1" keyboardVerticalOffset={0}>
-      <Div style={platform.isReactNative ? { paddingTop: insets.top + 60 } : undefined}>
+    <KeyboardAvoidingView
+      className="h-screen h-max-screen flex-1"
+      keyboardVerticalOffset={0}
+    >
+      <Div
+        style={
+          platform.isReactNative ? { paddingTop: insets.top + 60 } : undefined
+        }
+      >
         <Div
           className={
             platform.isReactNative
@@ -75,7 +86,9 @@ export function ChatArea({ locale, logger, user }: ChatAreaProps): JSX.Element {
                   logger={logger}
                   currentUserId={user?.id}
                   user={user}
-                  showBranding={viewMode === ViewMode.LINEAR && messages.length > 0}
+                  showBranding={
+                    viewMode === ViewMode.LINEAR && messages.length > 0
+                  }
                 />
               ) : rootFolderId === "public" && !chat.currentSubFolderId ? (
                 // Public folder root (no subfolder) - show feed view

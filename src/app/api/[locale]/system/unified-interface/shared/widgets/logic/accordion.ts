@@ -29,10 +29,13 @@ export interface ProcessedAccordion {
 /**
  * Extract and validate accordion data from WidgetData
  */
-export function extractAccordionData(value: WidgetData): ProcessedAccordion | null {
+export function extractAccordionData(
+  value: WidgetData,
+): ProcessedAccordion | null {
   // Handle object value with accordion properties
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    const items = "items" in value && Array.isArray(value.items) ? value.items : [];
+    const items =
+      "items" in value && Array.isArray(value.items) ? value.items : [];
     const allowMultiple =
       "allowMultiple" in value && typeof value.allowMultiple === "boolean"
         ? value.allowMultiple
@@ -47,10 +50,17 @@ export function extractAccordionData(value: WidgetData): ProcessedAccordion | nu
       .filter((item) => typeof item === "object" && item !== null)
       .map((item) => ({
         id: "id" in item && typeof item.id === "string" ? item.id : "",
-        title: "title" in item && typeof item.title === "string" ? item.title : "",
+        title:
+          "title" in item && typeof item.title === "string" ? item.title : "",
         content: "content" in item ? item.content : null,
-        expanded: "expanded" in item && typeof item.expanded === "boolean" ? item.expanded : false,
-        disabled: "disabled" in item && typeof item.disabled === "boolean" ? item.disabled : false,
+        expanded:
+          "expanded" in item && typeof item.expanded === "boolean"
+            ? item.expanded
+            : false,
+        disabled:
+          "disabled" in item && typeof item.disabled === "boolean"
+            ? item.disabled
+            : false,
       }))
       .filter((item) => item.id && item.title);
 

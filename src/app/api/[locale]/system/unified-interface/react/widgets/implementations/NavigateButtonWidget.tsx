@@ -4,10 +4,16 @@ import { cn } from "next-vibe/shared/utils";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import type { JSX } from "react";
 
-import { Icon, type IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import {
+  Icon,
+  type IconKey,
+} from "@/app/api/[locale]/system/unified-interface/react/icons";
 
 import type { WidgetType } from "../../../shared/types/enums";
-import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
+import type {
+  ReactWidgetProps,
+  WidgetData,
+} from "../../../shared/widgets/types";
 import { isWidgetDataObject } from "../../../shared/widgets/utils/field-type-guards";
 import {
   getIconSizeClassName,
@@ -29,7 +35,14 @@ export function NavigateButtonWidget<const TKey extends string>({
   className,
   value,
 }: ReactWidgetProps<typeof WidgetType.NAVIGATE_BUTTON, TKey>): JSX.Element {
-  const { label, icon, variant = "default", metadata, iconSize, iconSpacing } = field.ui;
+  const {
+    label,
+    icon,
+    variant = "default",
+    metadata,
+    iconSize,
+    iconSpacing,
+  } = field.ui;
 
   // Get classes from config (no hardcoding!)
   const iconSizeClass = getIconSizeClassName(iconSize);
@@ -65,7 +78,10 @@ export function NavigateButtonWidget<const TKey extends string>({
         {buttonIcon && (
           <Icon
             icon={buttonIcon}
-            className={cn(iconSizeClass || "h-4 w-4", buttonText ? iconSpacingClass || "mr-2" : "")}
+            className={cn(
+              iconSizeClass || "h-4 w-4",
+              buttonText ? iconSpacingClass || "mr-2" : "",
+            )}
           />
         )}
         {buttonText}
@@ -98,7 +114,11 @@ export function NavigateButtonWidget<const TKey extends string>({
   const handleClick = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
 
-    if (!context.navigation || !metadata.extractParams || metadata.targetEndpoint === null) {
+    if (
+      !context.navigation ||
+      !metadata.extractParams ||
+      metadata.targetEndpoint === null
+    ) {
       context.logger.warn(
         "NavigateButtonWidget: No navigation context, extractParams, or targetEndpoint",
       );
@@ -106,7 +126,9 @@ export function NavigateButtonWidget<const TKey extends string>({
     }
 
     // Extract params - use response.data as fallback if local value is empty (nested buttons)
-    let sourceData = isWidgetDataObject(value) ? (value as Record<string, WidgetData>) : {};
+    let sourceData = isWidgetDataObject(value)
+      ? (value as Record<string, WidgetData>)
+      : {};
 
     // If sourceData is empty and we have response data in context, use response.data
     // This handles nested buttons that don't have access to their parent data
@@ -121,15 +143,24 @@ export function NavigateButtonWidget<const TKey extends string>({
     }
 
     const params = metadata.extractParams(sourceData);
-    context.logger.debug("NavigateButtonWidget: extracted params", { sourceData, params });
+    context.logger.debug("NavigateButtonWidget: extracted params", {
+      sourceData,
+      params,
+    });
 
     // If prefillFromGet is true but no getEndpoint provided, use current endpoint if it's a GET
     let effectiveGetEndpoint = metadata.getEndpoint;
-    if (metadata.prefillFromGet && !effectiveGetEndpoint && context.currentEndpoint) {
+    if (
+      metadata.prefillFromGet &&
+      !effectiveGetEndpoint &&
+      context.currentEndpoint
+    ) {
       // Check if current endpoint is a GET endpoint
       if (context.currentEndpoint.method === "GET") {
         effectiveGetEndpoint = context.currentEndpoint;
-        context.logger.debug("NavigateButtonWidget: Using current GET endpoint for prefill");
+        context.logger.debug(
+          "NavigateButtonWidget: Using current GET endpoint for prefill",
+        );
       }
     }
 
@@ -151,7 +182,10 @@ export function NavigateButtonWidget<const TKey extends string>({
       {buttonIcon && (
         <Icon
           icon={buttonIcon}
-          className={cn(iconSizeClass || "h-4 w-4", buttonText ? iconSpacingClass || "mr-2" : "")}
+          className={cn(
+            iconSizeClass || "h-4 w-4",
+            buttonText ? iconSpacingClass || "mr-2" : "",
+          )}
         />
       )}
       {buttonText}

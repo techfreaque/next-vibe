@@ -7,7 +7,11 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { success, ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
+import {
+  success,
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { verifyPassword } from "next-vibe/shared/utils/password";
 
@@ -19,14 +23,20 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { AuthRepository } from "../../auth/repository";
-import type { JWTPublicPayloadType, JwtPrivatePayloadType } from "../../auth/types";
+import type {
+  JWTPublicPayloadType,
+  JwtPrivatePayloadType,
+} from "../../auth/types";
 import { UserPermissionRole } from "../../user-roles/enum";
 import { users } from "../../db";
 import { UserDetailLevel } from "../../enum";
 import { SessionRepository } from "../../private/session/repository";
 import { UserRepository } from "../../repository";
 import { UserRolesRepository } from "../../user-roles/repository";
-import type { LoginPostRequestOutput, LoginPostResponseOutput } from "./definition";
+import type {
+  LoginPostRequestOutput,
+  LoginPostResponseOutput,
+} from "./definition";
 import type {
   LoginOptionsGetRequestOutput,
   LoginOptionsGetResponseOutput,
@@ -95,7 +105,9 @@ export class LoginRepository {
     // Get client IP for security monitoring from request headers
     // In CLI context, request may be undefined
     const ipAddress = request
-      ? request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown"
+      ? request.headers.get("x-forwarded-for") ||
+        request.headers.get("x-real-ip") ||
+        "unknown"
       : "cli";
     try {
       logger.debug("Login attempt", { email });
@@ -210,7 +222,12 @@ export class LoginRepository {
       }
 
       // Link leadId to user (always happens during login)
-      await this.handleLeadConversion(leadId, email, userResponse.data.id, logger);
+      await this.handleLeadConversion(
+        leadId,
+        email,
+        userResponse.data.id,
+        logger,
+      );
 
       return sessionResponse;
     } catch (error) {
@@ -310,11 +327,14 @@ export class LoginRepository {
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     try {
       // Create session and get user data
-      logger.debug(isRenewal ? "Renewing session for user" : "Creating session for user", {
-        userId,
-        isRenewal,
-        rememberMe,
-      });
+      logger.debug(
+        isRenewal ? "Renewing session for user" : "Creating session for user",
+        {
+          userId,
+          isRenewal,
+          rememberMe,
+        },
+      );
 
       // Get full user data
       const userResponse = await UserRepository.getUserById(
@@ -343,7 +363,11 @@ export class LoginRepository {
       // Merge lead wallet into user wallet immediately
       // This ensures user gets their pre-login credits
       const { CreditRepository } = await import("../../../credits/repository");
-      const mergeResult = await CreditRepository.mergePendingLeadWallets(userId, [leadId], logger);
+      const mergeResult = await CreditRepository.mergePendingLeadWallets(
+        userId,
+        [leadId],
+        logger,
+      );
       if (!mergeResult.success) {
         logger.error("Failed to merge lead wallet during login", {
           userId,
@@ -358,14 +382,22 @@ export class LoginRepository {
       const sessionDurationSeconds = sessionDurationDays * 24 * 60 * 60;
 
       // Fetch user roles from DB to include in JWT
-      const rolesResult = await UserRolesRepository.getUserRoles(userResponse.data.id, logger);
+      const rolesResult = await UserRolesRepository.getUserRoles(
+        userResponse.data.id,
+        logger,
+      );
       // Default to CUSTOMER role if roles fetch fails
-      const roles = rolesResult.success ? rolesResult.data : [UserPermissionRole.CUSTOMER];
+      const roles = rolesResult.success
+        ? rolesResult.data
+        : [UserPermissionRole.CUSTOMER];
 
       if (!rolesResult.success) {
-        logger.warn("Failed to fetch user roles for JWT, using default CUSTOMER role", {
-          userId: userResponse.data.id,
-        });
+        logger.warn(
+          "Failed to fetch user roles for JWT, using default CUSTOMER role",
+          {
+            userId: userResponse.data.id,
+          },
+        );
       }
 
       // Create JWT payload with proper structure including leadId and roles
@@ -484,9 +516,12 @@ export class LoginRepository {
                 name: provider.name,
                 id: provider.providers[0] || "unknown",
                 enabled: provider.enabled,
-                description: t("app.api.user.public.login.options.messages.continueWithProvider", {
-                  provider: t(provider.name),
-                }),
+                description: t(
+                  "app.api.user.public.login.options.messages.continueWithProvider",
+                  {
+                    provider: t(provider.name),
+                  },
+                ),
               })) || [],
           },
         },
@@ -604,7 +639,8 @@ export class LoginRepository {
   private static isAccountLocked(email: string): boolean {
     const attempts = loginAttempts.get(email) || [];
     const recentAttempts = attempts.filter(
-      (attempt: LoginAttempt) => attempt.timestamp > new Date(Date.now() - 15 * 60 * 1000), // Last 15 minutes
+      (attempt: LoginAttempt) =>
+        attempt.timestamp > new Date(Date.now() - 15 * 60 * 1000), // Last 15 minutes
     );
     const failedAttempts = recentAttempts.filter(
       (attempt: LoginAttempt) => !attempt.success,

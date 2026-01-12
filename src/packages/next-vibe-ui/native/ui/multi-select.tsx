@@ -56,7 +56,9 @@ export function MultiSelect({
     onChange(value.filter((v) => v !== removeValue));
   };
 
-  const selectedOptions = options.filter((option) => value.includes(option.value));
+  const selectedOptions = options.filter((option) =>
+    value.includes(option.value),
+  );
 
   // Note: style prop is not passed to Button due to StyleType discriminated union
   // Button uses className for styling via NativeWind (either style OR className, not both)
@@ -75,7 +77,11 @@ export function MultiSelect({
           <View className="flex flex-row flex-wrap gap-1">
             {selectedOptions.length > 0
               ? selectedOptions.map((option) => (
-                  <Badge key={option.value} variant="secondary" className="mr-1">
+                  <Badge
+                    key={option.value}
+                    variant="secondary"
+                    className="mr-1"
+                  >
                     {option.label}
                     <Pressable
                       onPress={(e) => {
@@ -108,7 +114,10 @@ export function MultiSelect({
                     disabled={option.disabled}
                   >
                     <Check
-                      className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")}
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        isSelected ? "opacity-100" : "opacity-0",
+                      )}
                     />
                     {option.label}
                   </CommandItem>

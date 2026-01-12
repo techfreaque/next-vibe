@@ -13,7 +13,8 @@ export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ user, logger }) => repository.getMemories({ userId: user.id, logger }),
+    handler: ({ user, logger }) =>
+      repository.getMemories({ userId: user.id, logger }),
   },
   [Methods.POST]: {
     email: undefined,

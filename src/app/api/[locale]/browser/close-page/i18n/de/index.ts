@@ -32,11 +32,13 @@ export const translations: typeof enTranslations = {
   errors: {
     validation: {
       title: "Validierungsfehler",
-      description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description:
+        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
     },
     network: {
       title: "Netzwerkfehler",
-      description: "Ein Netzwerkfehler ist beim Schließen der Seite aufgetreten",
+      description:
+        "Ein Netzwerkfehler ist beim Schließen der Seite aufgetreten",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -52,15 +54,18 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Serverfehler",
-      description: "Ein interner Serverfehler ist beim Schließen der Seite aufgetreten",
+      description:
+        "Ein interner Serverfehler ist beim Schließen der Seite aufgetreten",
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description: "Ein unbekannter Fehler ist beim Schließen der Seite aufgetreten",
+      description:
+        "Ein unbekannter Fehler ist beim Schließen der Seite aufgetreten",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
+      description:
+        "Sie haben nicht gespeicherte Änderungen, die verloren gehen können",
     },
     conflict: {
       title: "Konflikt",

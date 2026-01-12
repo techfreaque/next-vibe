@@ -20,7 +20,12 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { Countries, CountriesOptions, Languages, LanguagesOptions } from "@/i18n/core/config";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 import { dateSchema } from "../../../shared/types/common.schema";
 import {
@@ -83,7 +88,8 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.leads.lead.id.get.response.basicInfo.title",
-              description: "app.api.leads.lead.id.get.response.basicInfo.description",
+              description:
+                "app.api.leads.lead.id.get.response.basicInfo.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -106,14 +112,16 @@ const { GET } = createEndpoint({
               businessName: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.businessName.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.businessName.content",
                 },
                 z.string(),
               ),
               contactName: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.contactName.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.contactName.content",
                 },
                 z.string().nullable(),
               ),
@@ -132,7 +140,8 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.leads.lead.id.get.response.contactDetails.title",
-              description: "app.api.leads.lead.id.get.response.contactDetails.description",
+              description:
+                "app.api.leads.lead.id.get.response.contactDetails.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -162,7 +171,8 @@ const { GET } = createEndpoint({
               language: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.language.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.language.content",
                 },
                 z.enum(Languages),
               ),
@@ -173,8 +183,10 @@ const { GET } = createEndpoint({
           campaignTracking: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.get.response.campaignTracking.title",
-              description: "app.api.leads.lead.id.get.response.campaignTracking.description",
+              title:
+                "app.api.leads.lead.id.get.response.campaignTracking.title",
+              description:
+                "app.api.leads.lead.id.get.response.campaignTracking.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -197,21 +209,24 @@ const { GET } = createEndpoint({
               emailJourneyVariant: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.emailJourneyVariant.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.emailJourneyVariant.content",
                 },
                 z.enum(EmailJourneyVariant).nullable(),
               ),
               emailsSent: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.emailsSent.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.emailsSent.content",
                 },
                 z.coerce.number(),
               ),
               lastEmailSentAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.lastEmailSentAt.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.lastEmailSentAt.content",
                 },
                 z.date().nullable(),
               ),
@@ -223,7 +238,8 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.leads.lead.id.get.response.engagement.title",
-              description: "app.api.leads.lead.id.get.response.engagement.description",
+              description:
+                "app.api.leads.lead.id.get.response.engagement.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -232,28 +248,32 @@ const { GET } = createEndpoint({
               emailsOpened: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.emailsOpened.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.emailsOpened.content",
                 },
                 z.coerce.number(),
               ),
               emailsClicked: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.emailsClicked.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.emailsClicked.content",
                 },
                 z.coerce.number(),
               ),
               lastEngagementAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.lastEngagementAt.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.lastEngagementAt.content",
                 },
                 z.date().nullable(),
               ),
               unsubscribedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.unsubscribedAt.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.unsubscribedAt.content",
                 },
                 z.date().nullable(),
               ),
@@ -265,7 +285,8 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.leads.lead.id.get.response.conversion.title",
-              description: "app.api.leads.lead.id.get.response.conversion.description",
+              description:
+                "app.api.leads.lead.id.get.response.conversion.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -274,35 +295,40 @@ const { GET } = createEndpoint({
               convertedUserId: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.convertedUserId.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.convertedUserId.content",
                 },
                 z.string().nullable(),
               ),
               convertedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.convertedAt.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.convertedAt.content",
                 },
                 z.date().nullable(),
               ),
               signedUpAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.signedUpAt.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.signedUpAt.content",
                 },
                 z.date().nullable(),
               ),
               consultationBookedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.consultationBookedAt.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.consultationBookedAt.content",
                 },
                 z.date().nullable(),
               ),
               subscriptionConfirmedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.subscriptionConfirmedAt.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.subscriptionConfirmedAt.content",
                 },
                 z.date().nullable(),
               ),
@@ -314,7 +340,8 @@ const { GET } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.leads.lead.id.get.response.metadata.title",
-              description: "app.api.leads.lead.id.get.response.metadata.description",
+              description:
+                "app.api.leads.lead.id.get.response.metadata.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -330,21 +357,24 @@ const { GET } = createEndpoint({
               metadata: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.metadata.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.metadata.content",
                 },
                 z.record(z.string(), z.any()),
               ),
               createdAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.createdAt.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.createdAt.content",
                 },
                 dateSchema,
               ),
               updatedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.get.response.updatedAt.content",
+                  content:
+                    "app.api.leads.lead.id.get.response.updatedAt.content",
                 },
                 dateSchema,
               ),
@@ -386,7 +416,8 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.leads.lead.id.get.errors.unsavedChanges.title",
-      description: "app.api.leads.lead.id.get.errors.unsavedChanges.description",
+      description:
+        "app.api.leads.lead.id.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.leads.lead.id.get.errors.conflict.title",
@@ -524,8 +555,10 @@ const { PATCH } = createEndpoint({
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "app.api.leads.lead.id.patch.businessName.label",
-                  description: "app.api.leads.lead.id.patch.businessName.description",
-                  placeholder: "app.api.leads.lead.id.patch.businessName.placeholder",
+                  description:
+                    "app.api.leads.lead.id.patch.businessName.description",
+                  placeholder:
+                    "app.api.leads.lead.id.patch.businessName.placeholder",
                   columns: 6,
                 },
                 z.string().min(1).max(255).optional(),
@@ -535,8 +568,10 @@ const { PATCH } = createEndpoint({
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "app.api.leads.lead.id.patch.contactName.label",
-                  description: "app.api.leads.lead.id.patch.contactName.description",
-                  placeholder: "app.api.leads.lead.id.patch.contactName.placeholder",
+                  description:
+                    "app.api.leads.lead.id.patch.contactName.description",
+                  placeholder:
+                    "app.api.leads.lead.id.patch.contactName.placeholder",
                   columns: 6,
                 },
                 z.string().optional().nullable(),
@@ -561,7 +596,8 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.leads.lead.id.patch.contactDetails.title",
-              description: "app.api.leads.lead.id.patch.contactDetails.description",
+              description:
+                "app.api.leads.lead.id.patch.contactDetails.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -586,8 +622,10 @@ const { PATCH } = createEndpoint({
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.URL,
                   label: "app.api.leads.lead.id.patch.website.label",
-                  description: "app.api.leads.lead.id.patch.website.description",
-                  placeholder: "app.api.leads.lead.id.patch.website.placeholder",
+                  description:
+                    "app.api.leads.lead.id.patch.website.description",
+                  placeholder:
+                    "app.api.leads.lead.id.patch.website.placeholder",
                   columns: 6,
                 },
                 z.string().url().optional().or(z.literal("")),
@@ -597,8 +635,10 @@ const { PATCH } = createEndpoint({
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.SELECT,
                   label: "app.api.leads.lead.id.patch.country.label",
-                  description: "app.api.leads.lead.id.patch.country.description",
-                  placeholder: "app.api.leads.lead.id.patch.country.placeholder",
+                  description:
+                    "app.api.leads.lead.id.patch.country.description",
+                  placeholder:
+                    "app.api.leads.lead.id.patch.country.placeholder",
                   columns: 6,
                   options: CountriesOptions,
                 },
@@ -609,8 +649,10 @@ const { PATCH } = createEndpoint({
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.SELECT,
                   label: "app.api.leads.lead.id.patch.language.label",
-                  description: "app.api.leads.lead.id.patch.language.description",
-                  placeholder: "app.api.leads.lead.id.patch.language.placeholder",
+                  description:
+                    "app.api.leads.lead.id.patch.language.description",
+                  placeholder:
+                    "app.api.leads.lead.id.patch.language.placeholder",
                   columns: 6,
                   options: LanguagesOptions,
                 },
@@ -624,7 +666,8 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.leads.lead.id.patch.campaignManagement.title",
-              description: "app.api.leads.lead.id.patch.campaignManagement.description",
+              description:
+                "app.api.leads.lead.id.patch.campaignManagement.description",
               layoutType: LayoutType.STACKED,
             },
             { request: "data" },
@@ -645,9 +688,12 @@ const { PATCH } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.SELECT,
-                  label: "app.api.leads.lead.id.patch.currentCampaignStage.label",
-                  description: "app.api.leads.lead.id.patch.currentCampaignStage.description",
-                  placeholder: "app.api.leads.lead.id.patch.currentCampaignStage.placeholder",
+                  label:
+                    "app.api.leads.lead.id.patch.currentCampaignStage.label",
+                  description:
+                    "app.api.leads.lead.id.patch.currentCampaignStage.description",
+                  placeholder:
+                    "app.api.leads.lead.id.patch.currentCampaignStage.placeholder",
                   columns: 12,
                   options: EmailCampaignStageOptions,
                 },
@@ -661,7 +707,8 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.leads.lead.id.patch.additionalDetails.title",
-              description: "app.api.leads.lead.id.patch.additionalDetails.description",
+              description:
+                "app.api.leads.lead.id.patch.additionalDetails.description",
               layoutType: LayoutType.STACKED,
             },
             { request: "data" },
@@ -682,19 +729,28 @@ const { PATCH } = createEndpoint({
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.JSON,
                   label: "app.api.leads.lead.id.patch.metadata.label",
-                  description: "app.api.leads.lead.id.patch.metadata.description",
-                  placeholder: "app.api.leads.lead.id.patch.metadata.placeholder",
+                  description:
+                    "app.api.leads.lead.id.patch.metadata.description",
+                  placeholder:
+                    "app.api.leads.lead.id.patch.metadata.placeholder",
                   columns: 12,
                 },
-                z.record(z.string(), z.string().or(z.coerce.number()).or(z.boolean())).optional(),
+                z
+                  .record(
+                    z.string(),
+                    z.string().or(z.coerce.number()).or(z.boolean()),
+                  )
+                  .optional(),
               ),
               convertedUserId: requestDataField(
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.UUID,
                   label: "app.api.leads.lead.id.patch.convertedUserId.label",
-                  description: "app.api.leads.lead.id.patch.convertedUserId.description",
-                  placeholder: "app.api.leads.lead.id.patch.convertedUserId.placeholder",
+                  description:
+                    "app.api.leads.lead.id.patch.convertedUserId.description",
+                  placeholder:
+                    "app.api.leads.lead.id.patch.convertedUserId.placeholder",
                   columns: 12,
                 },
                 z.uuid().nullable().optional(),
@@ -703,9 +759,12 @@ const { PATCH } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.DATETIME,
-                  label: "app.api.leads.lead.id.patch.consultationBookedAt.label",
-                  description: "app.api.leads.lead.id.patch.consultationBookedAt.description",
-                  placeholder: "app.api.leads.lead.id.patch.consultationBookedAt.placeholder",
+                  label:
+                    "app.api.leads.lead.id.patch.consultationBookedAt.label",
+                  description:
+                    "app.api.leads.lead.id.patch.consultationBookedAt.description",
+                  placeholder:
+                    "app.api.leads.lead.id.patch.consultationBookedAt.placeholder",
                   columns: 12,
                 },
                 z.coerce.date().nullable().optional(),
@@ -714,9 +773,12 @@ const { PATCH } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.DATETIME,
-                  label: "app.api.leads.lead.id.patch.subscriptionConfirmedAt.label",
-                  description: "app.api.leads.lead.id.patch.subscriptionConfirmedAt.description",
-                  placeholder: "app.api.leads.lead.id.patch.subscriptionConfirmedAt.placeholder",
+                  label:
+                    "app.api.leads.lead.id.patch.subscriptionConfirmedAt.label",
+                  description:
+                    "app.api.leads.lead.id.patch.subscriptionConfirmedAt.description",
+                  placeholder:
+                    "app.api.leads.lead.id.patch.subscriptionConfirmedAt.placeholder",
                   columns: 12,
                 },
                 z.coerce.date().nullable().optional(),
@@ -741,7 +803,8 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.leads.lead.id.patch.response.basicInfo.title",
-              description: "app.api.leads.lead.id.patch.response.basicInfo.description",
+              description:
+                "app.api.leads.lead.id.patch.response.basicInfo.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -764,14 +827,16 @@ const { PATCH } = createEndpoint({
               businessName: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.businessName.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.businessName.content",
                 },
                 z.string(),
               ),
               contactName: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.contactName.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.contactName.content",
                 },
                 z.string().nullable(),
               ),
@@ -788,8 +853,10 @@ const { PATCH } = createEndpoint({
           contactDetails: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.patch.response.contactDetails.title",
-              description: "app.api.leads.lead.id.patch.response.contactDetails.description",
+              title:
+                "app.api.leads.lead.id.patch.response.contactDetails.title",
+              description:
+                "app.api.leads.lead.id.patch.response.contactDetails.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -805,21 +872,24 @@ const { PATCH } = createEndpoint({
               website: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.website.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.website.content",
                 },
                 z.string().nullable(),
               ),
               country: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.country.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.country.content",
                 },
                 z.enum(Countries),
               ),
               language: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.language.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.language.content",
                 },
                 z.enum(Languages),
               ),
@@ -829,8 +899,10 @@ const { PATCH } = createEndpoint({
           campaignTracking: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.patch.response.campaignTracking.title",
-              description: "app.api.leads.lead.id.patch.response.campaignTracking.description",
+              title:
+                "app.api.leads.lead.id.patch.response.campaignTracking.title",
+              description:
+                "app.api.leads.lead.id.patch.response.campaignTracking.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -853,21 +925,24 @@ const { PATCH } = createEndpoint({
               emailJourneyVariant: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.emailJourneyVariant.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.emailJourneyVariant.content",
                 },
                 z.enum(EmailJourneyVariant).nullable(),
               ),
               emailsSent: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.emailsSent.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.emailsSent.content",
                 },
                 z.coerce.number(),
               ),
               lastEmailSentAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.lastEmailSentAt.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.lastEmailSentAt.content",
                 },
                 z.date().nullable(),
               ),
@@ -878,7 +953,8 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.leads.lead.id.patch.response.engagement.title",
-              description: "app.api.leads.lead.id.patch.response.engagement.description",
+              description:
+                "app.api.leads.lead.id.patch.response.engagement.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -887,28 +963,32 @@ const { PATCH } = createEndpoint({
               emailsOpened: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.emailsOpened.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.emailsOpened.content",
                 },
                 z.coerce.number(),
               ),
               emailsClicked: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.emailsClicked.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.emailsClicked.content",
                 },
                 z.coerce.number(),
               ),
               lastEngagementAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.lastEngagementAt.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.lastEngagementAt.content",
                 },
                 z.date().nullable(),
               ),
               unsubscribedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.unsubscribedAt.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.unsubscribedAt.content",
                 },
                 z.date().nullable(),
               ),
@@ -919,7 +999,8 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.leads.lead.id.patch.response.conversion.title",
-              description: "app.api.leads.lead.id.patch.response.conversion.description",
+              description:
+                "app.api.leads.lead.id.patch.response.conversion.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -928,35 +1009,40 @@ const { PATCH } = createEndpoint({
               convertedUserId: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.convertedUserId.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.convertedUserId.content",
                 },
                 z.string().nullable(),
               ),
               convertedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.convertedAt.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.convertedAt.content",
                 },
                 z.date().nullable(),
               ),
               signedUpAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.signedUpAt.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.signedUpAt.content",
                 },
                 z.date().nullable(),
               ),
               consultationBookedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.consultationBookedAt.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.consultationBookedAt.content",
                 },
                 z.date().nullable(),
               ),
               subscriptionConfirmedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.subscriptionConfirmedAt.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.subscriptionConfirmedAt.content",
                 },
                 z.date().nullable(),
               ),
@@ -967,7 +1053,8 @@ const { PATCH } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.leads.lead.id.patch.response.metadata.title",
-              description: "app.api.leads.lead.id.patch.response.metadata.description",
+              description:
+                "app.api.leads.lead.id.patch.response.metadata.description",
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -983,21 +1070,24 @@ const { PATCH } = createEndpoint({
               metadata: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.metadata.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.metadata.content",
                 },
                 z.record(z.string(), z.any()),
               ),
               createdAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.createdAt.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.createdAt.content",
                 },
                 dateSchema,
               ),
               updatedAt: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.lead.id.patch.response.updatedAt.content",
+                  content:
+                    "app.api.leads.lead.id.patch.response.updatedAt.content",
                 },
                 dateSchema,
               ),
@@ -1015,7 +1105,8 @@ const { PATCH } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.leads.lead.id.patch.errors.unauthorized.title",
-      description: "app.api.leads.lead.id.patch.errors.unauthorized.description",
+      description:
+        "app.api.leads.lead.id.patch.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.leads.lead.id.patch.errors.forbidden.title",
@@ -1043,7 +1134,8 @@ const { PATCH } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.leads.lead.id.patch.errors.unsavedChanges.title",
-      description: "app.api.leads.lead.id.patch.errors.unsavedChanges.description",
+      description:
+        "app.api.leads.lead.id.patch.errors.unsavedChanges.description",
     },
   },
 

@@ -19,7 +19,14 @@ export const { POST, tools } = endpointsHandler({
       },
     ],
     handler: async ({ data, user, locale, logger, request, platform }) => {
-      return await signupRepository.registerUser(data, user, locale, logger, request, platform);
+      return await signupRepository.registerUser(
+        data,
+        user,
+        locale,
+        logger,
+        request,
+        platform,
+      );
     },
   },
 });

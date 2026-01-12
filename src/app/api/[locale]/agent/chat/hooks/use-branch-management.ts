@@ -46,7 +46,9 @@ export function useBranchManagement({
     [allBranchIndices, threadId],
   );
 
-  const setBranchIndicesInStore = useChatStore((state) => state.setBranchIndices);
+  const setBranchIndicesInStore = useChatStore(
+    (state) => state.setBranchIndices,
+  );
   const updateBranchIndex = useChatStore((state) => state.updateBranchIndex);
 
   // Track initialization state
@@ -59,11 +61,12 @@ export function useBranchManagement({
   const messageCountRef = useRef<number>(0);
 
   // Persistence hooks
-  const { loadPersistedState, saveUserSelection, validateIndices } = useBranchPersistence({
-    threadId,
-    messages: activeThreadMessages,
-    logger,
-  });
+  const { loadPersistedState, saveUserSelection, validateIndices } =
+    useBranchPersistence({
+      threadId,
+      messages: activeThreadMessages,
+      logger,
+    });
 
   /**
    * Load persisted branch state when thread changes
@@ -104,43 +107,50 @@ export function useBranchManagement({
    * Build a map of all branch points in the message tree
    * Returns: Map<parentId, children[]> where children.length > 1
    */
-  const buildBranchMap = useCallback((messages: ChatMessage[]): Map<string, ChatMessage[]> => {
-    const branchMap = new Map<string, ChatMessage[]>();
+  const buildBranchMap = useCallback(
+    (messages: ChatMessage[]): Map<string, ChatMessage[]> => {
+      const branchMap = new Map<string, ChatMessage[]>();
 
-    // Group messages by parent
-    const childrenMap = new Map<string, ChatMessage[]>();
-    const rootMessages: ChatMessage[] = [];
+      // Group messages by parent
+      const childrenMap = new Map<string, ChatMessage[]>();
+      const rootMessages: ChatMessage[] = [];
 
-    for (const msg of messages) {
-      if (msg.parentId) {
-        const siblings = childrenMap.get(msg.parentId) || [];
-        siblings.push(msg);
-        childrenMap.set(msg.parentId, siblings);
-      } else {
-        rootMessages.push(msg);
+      for (const msg of messages) {
+        if (msg.parentId) {
+          const siblings = childrenMap.get(msg.parentId) || [];
+          siblings.push(msg);
+          childrenMap.set(msg.parentId, siblings);
+        } else {
+          rootMessages.push(msg);
+        }
       }
-    }
 
-    // Add root branches if multiple roots exist
-    if (rootMessages.length > 1) {
-      branchMap.set(
-        BRANCH_INDEX_KEY,
-        rootMessages.toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
-      );
-    }
-
-    // Add all branch points (where children > 1)
-    for (const [parentId, children] of childrenMap.entries()) {
-      if (children.length > 1) {
+      // Add root branches if multiple roots exist
+      if (rootMessages.length > 1) {
         branchMap.set(
-          parentId,
-          children.toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
+          BRANCH_INDEX_KEY,
+          rootMessages.toSorted(
+            (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+          ),
         );
       }
-    }
 
-    return branchMap;
-  }, []);
+      // Add all branch points (where children > 1)
+      for (const [parentId, children] of childrenMap.entries()) {
+        if (children.length > 1) {
+          branchMap.set(
+            parentId,
+            children.toSorted(
+              (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+            ),
+          );
+        }
+      }
+
+      return branchMap;
+    },
+    [],
+  );
 
   /**
    * Recursive auto-switching to newly created branches
@@ -156,7 +166,9 @@ export function useBranchManagement({
     const currentMessageIds = new Set(activeThreadMessages.map((m) => m.id));
 
     // Find new messages (IDs that didn't exist before)
-    const newMessageIds = [...currentMessageIds].filter((id) => !messageIdsRef.current.has(id));
+    const newMessageIds = [...currentMessageIds].filter(
+      (id) => !messageIdsRef.current.has(id),
+    );
 
     // Update tracked IDs
     messageIdsRef.current = currentMessageIds;
@@ -210,7 +222,13 @@ export function useBranchManagement({
       // Note: We don't save auto-switches to localStorage
       // Only user-initiated switches are persisted
     }
-  }, [activeThreadMessages, buildBranchMap, threadId, branchIndices, setBranchIndicesInStore]);
+  }, [
+    activeThreadMessages,
+    buildBranchMap,
+    threadId,
+    branchIndices,
+    setBranchIndicesInStore,
+  ]);
 
   /**
    * Validate branch indices when messages are DELETED
@@ -244,7 +262,13 @@ export function useBranchManagement({
     if (JSON.stringify(validated) !== JSON.stringify(currentIndices)) {
       setBranchIndicesInStore(threadId, validated);
     }
-  }, [activeThreadMessages, validateIndices, threadId, branchIndices, setBranchIndicesInStore]);
+  }, [
+    activeThreadMessages,
+    validateIndices,
+    threadId,
+    branchIndices,
+    setBranchIndicesInStore,
+  ]);
 
   return {
     branchIndices,

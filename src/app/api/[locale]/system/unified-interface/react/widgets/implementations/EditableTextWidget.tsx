@@ -31,7 +31,8 @@ export function EditableTextWidget<const TKey extends string>({
   onAction,
   className,
 }: ReactWidgetProps<typeof WidgetType.MARKDOWN_EDITOR, TKey>): JSX.Element {
-  const { gap, inputHeight, buttonSize, actionIconSize, editIconSize } = field.ui;
+  const { gap, inputHeight, buttonSize, actionIconSize, editIconSize } =
+    field.ui;
 
   // Get classes from config (no hardcoding!)
   const gapClass = getSpacingClassName("gap", gap);
@@ -58,7 +59,11 @@ export function EditableTextWidget<const TKey extends string>({
           : "h-8 w-8";
 
   const editButtonSizeClass =
-    buttonSize === "xs" ? "h-5 w-5" : buttonSize === "sm" ? "h-6 w-6" : "h-6 w-6";
+    buttonSize === "xs"
+      ? "h-5 w-5"
+      : buttonSize === "sm"
+        ? "h-6 w-6"
+        : "h-6 w-6";
 
   const extractedData = extractEditableTextData(data);
 
@@ -111,7 +116,11 @@ export function EditableTextWidget<const TKey extends string>({
   };
 
   if (!context.isInteractive || readonly) {
-    return <Span className={cn("text-foreground", className)}>{value || placeholder || "—"}</Span>;
+    return (
+      <Span className={cn("text-foreground", className)}>
+        {value || placeholder || "—"}
+      </Span>
+    );
   }
 
   if (isEditing) {
@@ -148,7 +157,9 @@ export function EditableTextWidget<const TKey extends string>({
   }
 
   return (
-    <Div className={cn("group flex items-center", gapClass || "gap-2", className)}>
+    <Div
+      className={cn("group flex items-center", gapClass || "gap-2", className)}
+    >
       <Span className="text-foreground">{value || placeholder || "—"}</Span>
       <Button
         size="sm"

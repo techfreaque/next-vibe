@@ -30,7 +30,9 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 // Helper type to test if two types are exactly equal
 type Expect<T extends true> = T;
 type Equal<X, Y> =
-  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false;
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
+    ? true
+    : false;
 
 /**
  * INTEGRATION TEST: Test actual endpoint creation
@@ -44,7 +46,11 @@ const testPublicEndpoint = createEndpoint({
   icon: "test-tube",
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField({ type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED }, {}, {}),
+  fields: objectField(
+    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
+    {},
+    {},
+  ),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -100,7 +106,11 @@ const testAdminEndpoint = createEndpoint({
   icon: "test-tube",
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
-  fields: objectField({ type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED }, {}, {}),
+  fields: objectField(
+    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
+    {},
+    {},
+  ),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -152,10 +162,16 @@ type PublicEndpointRoles = (typeof testPublicEndpoint.GET)["allowedRoles"];
 type AdminEndpointRoles = (typeof testAdminEndpoint.GET)["allowedRoles"];
 
 // These should be readonly [typeof UserRole.PUBLIC] and readonly [typeof UserRole.ADMIN] respectively
-type PublicRolesCheck = PublicEndpointRoles extends readonly [typeof UserRole.PUBLIC]
+type PublicRolesCheck = PublicEndpointRoles extends readonly [
+  typeof UserRole.PUBLIC,
+]
   ? true
   : false;
-type AdminRolesCheck = AdminEndpointRoles extends readonly [typeof UserRole.ADMIN] ? true : false;
+type AdminRolesCheck = AdminEndpointRoles extends readonly [
+  typeof UserRole.ADMIN,
+]
+  ? true
+  : false;
 
 /**
  * RESPONSE TYPE INFERENCE TESTS
@@ -232,7 +248,8 @@ const testResponseEndpoint = createEndpoint({
   },
 });
 
-type TestResponseType = (typeof testResponseEndpoint.GET)["types"]["ResponseOutput"];
+type TestResponseType =
+  (typeof testResponseEndpoint.GET)["types"]["ResponseOutput"];
 
 // The response type should be: { userId: string; count: number }
 interface ExpectedResponseType {

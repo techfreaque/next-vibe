@@ -198,7 +198,11 @@ const requestedTools =
   data.tools === null
     ? new Map()
     : data.tools?.length
-      ? new Map(Array.from(allTools.entries()).filter(([name]) => data.tools.includes(name)))
+      ? new Map(
+          Array.from(allTools.entries()).filter(([name]) =>
+            data.tools.includes(name),
+          ),
+        )
       : allTools;
 
 // Use in AI SDK

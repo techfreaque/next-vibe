@@ -18,7 +18,8 @@ export function ThemeProvider({
   storageKey = "theme",
   attribute = "class",
   ...props
-}: ThemeProviderProps & Omit<NextThemesProviderProps, keyof ThemeProviderProps>): JSX.Element {
+}: ThemeProviderProps &
+  Omit<NextThemesProviderProps, keyof ThemeProviderProps>): JSX.Element {
   return (
     <NextThemesProvider
       defaultTheme={defaultTheme}

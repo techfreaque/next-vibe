@@ -29,11 +29,18 @@ export default async function UserEditPage({
   const { t } = simpleT(locale);
 
   // Require admin user authentication
-  const user = await requireAdminUser(locale, `/${locale}/admin/users/${id}/edit`);
+  const user = await requireAdminUser(
+    locale,
+    `/${locale}/admin/users/${id}/edit`,
+  );
 
   // Fetch user data
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const userResponse = await UserByIdRepository.getUserById({ id }, user, logger);
+  const userResponse = await UserByIdRepository.getUserById(
+    { id },
+    user,
+    logger,
+  );
 
   // Handle user not found
   if (!userResponse.success) {
@@ -47,7 +54,9 @@ export default async function UserEditPage({
         <H1 className="text-3xl font-bold tracking-tight">
           {t("app.admin.users.actions.editUser")}
         </H1>
-        <P className="text-muted-foreground mt-2">{t("app.admin.users.overview.description")}</P>
+        <P className="text-muted-foreground mt-2">
+          {t("app.admin.users.overview.description")}
+        </P>
       </Div>
 
       {/* Edit Form */}

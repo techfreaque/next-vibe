@@ -106,10 +106,19 @@ export function DataListWidget<const TKey extends string>({
   const gapClass = getSpacingClassName("gap", gap);
   const simpleArrayGapClass = getSpacingClassName("gap", simpleArrayGap);
   const viewSwitcherGapClass = getSpacingClassName("gap", viewSwitcherGap);
-  const viewSwitcherPaddingClass = getSpacingClassName("padding", viewSwitcherPadding);
+  const viewSwitcherPaddingClass = getSpacingClassName(
+    "padding",
+    viewSwitcherPadding,
+  );
   const buttonPaddingClass = getSpacingClassName("padding", buttonPadding);
-  const tableHeadPaddingClass = getSpacingClassName("padding", tableHeadPadding);
-  const tableCellPaddingClass = getSpacingClassName("padding", tableCellPadding);
+  const tableHeadPaddingClass = getSpacingClassName(
+    "padding",
+    tableHeadPadding,
+  );
+  const tableCellPaddingClass = getSpacingClassName(
+    "padding",
+    tableCellPadding,
+  );
   const gridGapClass = getSpacingClassName("gap", gridGap);
   const cardPaddingClass = getSpacingClassName("padding", cardPadding);
   const cardInnerGapClass = getSpacingClassName("gap", cardInnerGap);
@@ -129,7 +138,9 @@ export function DataListWidget<const TKey extends string>({
   if (!data) {
     return (
       <Div className={cn("text-muted-foreground italic", className)}>
-        {globalT("app.api.system.unifiedInterface.react.widgets.dataList.noData")}
+        {globalT(
+          "app.api.system.unifiedInterface.react.widgets.dataList.noData",
+        )}
       </Div>
     );
   }
@@ -140,7 +151,10 @@ export function DataListWidget<const TKey extends string>({
   let childField: UnifiedField<string> | null = null;
   let isSimpleValueArray = false;
 
-  if ("type" in field && (field.type === "array" || field.type === "array-optional")) {
+  if (
+    "type" in field &&
+    (field.type === "array" || field.type === "array-optional")
+  ) {
     if ("child" in field && field.child) {
       childField = field.child as UnifiedField<string>;
       if (
@@ -148,7 +162,10 @@ export function DataListWidget<const TKey extends string>({
         (childField.type === "object" || childField.type === "object-optional")
       ) {
         if ("children" in childField && childField.children) {
-          fieldDefinitions = childField.children as Record<string, UnifiedField<string>>;
+          fieldDefinitions = childField.children as Record<
+            string,
+            UnifiedField<string>
+          >;
         }
       } else {
         // Simple value array (string, number, etc.)
@@ -164,7 +181,13 @@ export function DataListWidget<const TKey extends string>({
   // For simple value arrays, render as inline list
   if (isSimpleValueArray && childField) {
     return (
-      <Div className={cn("flex flex-wrap", simpleArrayGapClass || "gap-2", className)}>
+      <Div
+        className={cn(
+          "flex flex-wrap",
+          simpleArrayGapClass || "gap-2",
+          className,
+        )}
+      >
         {displayItems.map((item, index: number) => (
           <WidgetRenderer
             key={index}
@@ -200,7 +223,9 @@ export function DataListWidget<const TKey extends string>({
             onClick={() => setViewMode("list")}
             className={cn("h-8", buttonPaddingClass || "px-3")}
           >
-            {globalT("app.api.system.unifiedInterface.react.widgets.dataList.viewList")}
+            {globalT(
+              "app.api.system.unifiedInterface.react.widgets.dataList.viewList",
+            )}
           </Button>
           <Button
             variant={viewMode === "grid" ? "default" : "ghost"}
@@ -208,7 +233,9 @@ export function DataListWidget<const TKey extends string>({
             onClick={() => setViewMode("grid")}
             className={cn("h-8", buttonPaddingClass || "px-3")}
           >
-            {globalT("app.api.system.unifiedInterface.react.widgets.dataList.viewGrid")}
+            {globalT(
+              "app.api.system.unifiedInterface.react.widgets.dataList.viewGrid",
+            )}
           </Button>
         </Div>
       </Div>
@@ -223,13 +250,25 @@ export function DataListWidget<const TKey extends string>({
                   // Check for label first, then fallback to content/text/href, then key
                   let label = key;
                   if (fieldUi) {
-                    if ("label" in fieldUi && typeof fieldUi.label === "string") {
+                    if (
+                      "label" in fieldUi &&
+                      typeof fieldUi.label === "string"
+                    ) {
                       label = context.t(fieldUi.label);
-                    } else if ("content" in fieldUi && typeof fieldUi.content === "string") {
+                    } else if (
+                      "content" in fieldUi &&
+                      typeof fieldUi.content === "string"
+                    ) {
                       label = context.t(fieldUi.content);
-                    } else if ("text" in fieldUi && typeof fieldUi.text === "string") {
+                    } else if (
+                      "text" in fieldUi &&
+                      typeof fieldUi.text === "string"
+                    ) {
                       label = context.t(fieldUi.text);
-                    } else if ("href" in fieldUi && typeof fieldUi.href === "string") {
+                    } else if (
+                      "href" in fieldUi &&
+                      typeof fieldUi.href === "string"
+                    ) {
                       // For LINK widgets that use href as the label key
                       label = fieldUi.href;
                     }
@@ -257,7 +296,10 @@ export function DataListWidget<const TKey extends string>({
                 }
 
                 return (
-                  <TableRow key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <TableRow
+                    key={index}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
                     {Object.entries(fieldDefinitions).map(([key, fieldDef]) => {
                       const cellValue = key in item ? item[key] : null;
 
@@ -296,7 +338,10 @@ export function DataListWidget<const TKey extends string>({
 
       {viewMode === "grid" && (
         <Div
-          className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3", gridGapClass || "gap-4")}
+          className={cn(
+            "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+            gridGapClass || "gap-4",
+          )}
         >
           {displayItems.map((card, index: number) => (
             <Div
@@ -304,7 +349,9 @@ export function DataListWidget<const TKey extends string>({
               className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
             >
               <Div className={cn(cardPaddingClass || "p-4")}>
-                <Div className={cn("flex flex-col", cardInnerGapClass || "gap-2")}>
+                <Div
+                  className={cn("flex flex-col", cardInnerGapClass || "gap-2")}
+                >
                   {card &&
                     typeof card === "object" &&
                     Object.entries(card).map(([key, cardValue]) => {
@@ -313,13 +360,25 @@ export function DataListWidget<const TKey extends string>({
                       // Check for label first, then fallback to content/text/href, then key
                       let label = key;
                       if (fieldUi) {
-                        if ("label" in fieldUi && typeof fieldUi.label === "string") {
+                        if (
+                          "label" in fieldUi &&
+                          typeof fieldUi.label === "string"
+                        ) {
                           label = context.t(fieldUi.label);
-                        } else if ("content" in fieldUi && typeof fieldUi.content === "string") {
+                        } else if (
+                          "content" in fieldUi &&
+                          typeof fieldUi.content === "string"
+                        ) {
                           label = context.t(fieldUi.content);
-                        } else if ("text" in fieldUi && typeof fieldUi.text === "string") {
+                        } else if (
+                          "text" in fieldUi &&
+                          typeof fieldUi.text === "string"
+                        ) {
                           label = context.t(fieldUi.text);
-                        } else if ("href" in fieldUi && typeof fieldUi.href === "string") {
+                        } else if (
+                          "href" in fieldUi &&
+                          typeof fieldUi.href === "string"
+                        ) {
                           label = fieldUi.href;
                         }
                       }
@@ -371,9 +430,12 @@ export function DataListWidget<const TKey extends string>({
             buttonSizeClass || "text-sm",
           )}
         >
-          {globalT("app.api.system.unifiedInterface.react.widgets.dataList.showMore", {
-            count: remainingCount,
-          })}
+          {globalT(
+            "app.api.system.unifiedInterface.react.widgets.dataList.showMore",
+            {
+              count: remainingCount,
+            },
+          )}
         </Button>
       )}
 
@@ -387,7 +449,9 @@ export function DataListWidget<const TKey extends string>({
             buttonSizeClass || "text-sm",
           )}
         >
-          {globalT("app.api.system.unifiedInterface.react.widgets.dataList.showLess")}
+          {globalT(
+            "app.api.system.unifiedInterface.react.widgets.dataList.showLess",
+          )}
         </Button>
       )}
     </Div>

@@ -40,5 +40,11 @@ export function ImapAccountForm({
     );
   }
 
-  return <ImapAccountCreateForm locale={locale} onSuccess={onSuccess} onCancel={onCancel} />;
+  return (
+    <ImapAccountCreateForm
+      locale={locale}
+      onSuccess={onSuccess}
+      onCancel={onCancel}
+    />
+  );
 }

@@ -53,7 +53,9 @@ export async function generateMetadata(
   });
 }
 
-export default async function ImprintPage({ params }: Props): Promise<JSX.Element> {
+export default async function ImprintPage({
+  params,
+}: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
   const supportEmail = contactClientRepository.getSupportEmail(locale);
@@ -87,17 +89,24 @@ export default async function ImprintPage({ params }: Props): Promise<JSX.Elemen
 
             {/* Partnerships Section */}
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.imprint.sections.partnerships.title")}
+              {t(
+                "app.story._components.home.imprint.sections.partnerships.title",
+              )}
             </H2>
             <P className="mt-2">
-              {t("app.story._components.home.imprint.sections.partnerships.description")}
+              {t(
+                "app.story._components.home.imprint.sections.partnerships.description",
+              )}
             </P>
             <Alert variant="default" className="mt-4">
               <Info className="h-4 w-4" />
               <AlertDescription>
-                {t("app.story._components.home.imprint.sections.partnerships.content", {
-                  appName: t("config.appName"),
-                })}
+                {t(
+                  "app.story._components.home.imprint.sections.partnerships.content",
+                  {
+                    appName: t("config.appName"),
+                  },
+                )}
               </AlertDescription>
             </Alert>
 
@@ -106,12 +115,17 @@ export default async function ImprintPage({ params }: Props): Promise<JSX.Elemen
             {/* Company Information Section */}
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
               <Building className="h-5 w-5 mr-2" />
-              {t("app.story._components.home.imprint.sections.companyInfo.title")}
+              {t(
+                "app.story._components.home.imprint.sections.companyInfo.title",
+              )}
             </H2>
             <P className="mt-2">
-              {t("app.story._components.home.imprint.sections.companyInfo.description", {
-                appName: t("config.appName"),
-              })}
+              {t(
+                "app.story._components.home.imprint.sections.companyInfo.description",
+                {
+                  appName: t("config.appName"),
+                },
+              )}
             </P>
             <Ul className="flex flex-col gap-2 mt-4">
               <Li className="flex items-start">
@@ -140,14 +154,20 @@ export default async function ImprintPage({ params }: Props): Promise<JSX.Elemen
 
             {/* Contact Information Section */}
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.imprint.sections.contactInfo.title")}
+              {t(
+                "app.story._components.home.imprint.sections.contactInfo.title",
+              )}
             </H2>
             <P className="mt-2">
-              {t("app.story._components.home.imprint.sections.contactInfo.description")}
+              {t(
+                "app.story._components.home.imprint.sections.contactInfo.description",
+              )}
             </P>
 
             <Div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
-              <H3 className="font-medium text-lg mb-2">{t("config.group.address.title")}</H3>
+              <H3 className="font-medium text-lg mb-2">
+                {t("config.group.address.title")}
+              </H3>
               <P>{t("config.group.address.street")}</P>
               <P>{t("config.group.address.city")}</P>
               <P>{t("config.group.address.country")}</P>
@@ -159,10 +179,14 @@ export default async function ImprintPage({ params }: Props): Promise<JSX.Elemen
 
             {/* Responsible Person Section */}
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.imprint.sections.responsiblePerson.title")}
+              {t(
+                "app.story._components.home.imprint.sections.responsiblePerson.title",
+              )}
             </H2>
             <P className="mt-2">
-              {t("app.story._components.home.imprint.sections.responsiblePerson.description")}
+              {t(
+                "app.story._components.home.imprint.sections.responsiblePerson.description",
+              )}
             </P>
             <Div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mt-4">
               <P>
@@ -175,13 +199,19 @@ export default async function ImprintPage({ params }: Props): Promise<JSX.Elemen
 
             {/* Dispute Resolution Section */}
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.imprint.sections.disputeResolution.title")}
+              {t(
+                "app.story._components.home.imprint.sections.disputeResolution.title",
+              )}
             </H2>
             <P className="mt-2">
-              {t("app.story._components.home.imprint.sections.disputeResolution.description")}
+              {t(
+                "app.story._components.home.imprint.sections.disputeResolution.description",
+              )}
             </P>
             <P className="mt-4">
-              {t("app.story._components.home.imprint.sections.disputeResolution.content")}
+              {t(
+                "app.story._components.home.imprint.sections.disputeResolution.content",
+              )}
             </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
@@ -189,28 +219,42 @@ export default async function ImprintPage({ params }: Props): Promise<JSX.Elemen
             {/* Disclaimer Section */}
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
               <FileText className="h-5 w-5 mr-2" />
-              {t("app.story._components.home.imprint.sections.disclaimer.title")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.title",
+              )}
             </H2>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("app.story._components.home.imprint.sections.disclaimer.liability.title")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.liability.title",
+              )}
             </H3>
             <P className="mt-2">
-              {t("app.story._components.home.imprint.sections.disclaimer.liability.content")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.liability.content",
+              )}
             </P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("app.story._components.home.imprint.sections.disclaimer.links.title")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.links.title",
+              )}
             </H3>
             <P className="mt-2">
-              {t("app.story._components.home.imprint.sections.disclaimer.links.content")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.links.content",
+              )}
             </P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("app.story._components.home.imprint.sections.disclaimer.copyright.title")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.copyright.title",
+              )}
             </H3>
             <P className="mt-2">
-              {t("app.story._components.home.imprint.sections.disclaimer.copyright.content")}
+              {t(
+                "app.story._components.home.imprint.sections.disclaimer.copyright.content",
+              )}
             </P>
           </Div>
         </Div>

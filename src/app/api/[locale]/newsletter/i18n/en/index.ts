@@ -38,11 +38,13 @@ export const translations = {
       title: "Unsubscribe from Newsletter",
       preview: "You have successfully unsubscribed from our newsletter",
       greeting: "Hello",
-      confirmation: "We have successfully unsubscribed {{email}} from our newsletter",
+      confirmation:
+        "We have successfully unsubscribed {{email}} from our newsletter",
       resubscribe_info:
         "If you change your mind, you can always resubscribe by visiting our website",
       resubscribe_button: "Resubscribe",
-      support_message: "If you have any questions, please contact our support team",
+      support_message:
+        "If you have any questions, please contact our support team",
       subject: "Newsletter Unsubscribe Confirmation",
       admin_unsubscribe_notification: {
         title: "Newsletter Unsubscribe Notification",

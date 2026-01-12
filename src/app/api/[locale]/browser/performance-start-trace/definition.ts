@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.performance-start-trace.description",
   category: "app.api.browser.category",
   icon: "activity",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.performanceAutomation"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.performanceAutomation",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -51,9 +54,12 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.browser.performance-start-trace.form.fields.reload.label",
-          description: "app.api.browser.performance-start-trace.form.fields.reload.description",
-          placeholder: "app.api.browser.performance-start-trace.form.fields.reload.placeholder",
+          label:
+            "app.api.browser.performance-start-trace.form.fields.reload.label",
+          description:
+            "app.api.browser.performance-start-trace.form.fields.reload.description",
+          placeholder:
+            "app.api.browser.performance-start-trace.form.fields.reload.placeholder",
           columns: 6,
         },
         z
@@ -66,12 +72,19 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.browser.performance-start-trace.form.fields.autoStop.label",
-          description: "app.api.browser.performance-start-trace.form.fields.autoStop.description",
-          placeholder: "app.api.browser.performance-start-trace.form.fields.autoStop.placeholder",
+          label:
+            "app.api.browser.performance-start-trace.form.fields.autoStop.label",
+          description:
+            "app.api.browser.performance-start-trace.form.fields.autoStop.description",
+          placeholder:
+            "app.api.browser.performance-start-trace.form.fields.autoStop.placeholder",
           columns: 6,
         },
-        z.boolean().describe("Determines if the trace recording should be automatically stopped"),
+        z
+          .boolean()
+          .describe(
+            "Determines if the trace recording should be automatically stopped",
+          ),
       ),
 
       // Response fields
@@ -105,7 +118,8 @@ const { POST } = createEndpoint({
       executionId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.browser.performance-start-trace.response.executionId",
+          content:
+            "app.api.browser.performance-start-trace.response.executionId",
         },
         z.string().optional().describe("Unique identifier for this execution"),
       ),
@@ -130,39 +144,50 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.browser.performance-start-trace.errors.validation.title",
-      description: "app.api.browser.performance-start-trace.errors.validation.description",
+      description:
+        "app.api.browser.performance-start-trace.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.browser.performance-start-trace.errors.network.title",
-      description: "app.api.browser.performance-start-trace.errors.network.description",
+      description:
+        "app.api.browser.performance-start-trace.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.performance-start-trace.errors.unauthorized.title",
-      description: "app.api.browser.performance-start-trace.errors.unauthorized.description",
+      title:
+        "app.api.browser.performance-start-trace.errors.unauthorized.title",
+      description:
+        "app.api.browser.performance-start-trace.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.browser.performance-start-trace.errors.forbidden.title",
-      description: "app.api.browser.performance-start-trace.errors.forbidden.description",
+      description:
+        "app.api.browser.performance-start-trace.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.browser.performance-start-trace.errors.notFound.title",
-      description: "app.api.browser.performance-start-trace.errors.notFound.description",
+      description:
+        "app.api.browser.performance-start-trace.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.browser.performance-start-trace.errors.serverError.title",
-      description: "app.api.browser.performance-start-trace.errors.serverError.description",
+      description:
+        "app.api.browser.performance-start-trace.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.browser.performance-start-trace.errors.unknown.title",
-      description: "app.api.browser.performance-start-trace.errors.unknown.description",
+      description:
+        "app.api.browser.performance-start-trace.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.performance-start-trace.errors.unsavedChanges.title",
-      description: "app.api.browser.performance-start-trace.errors.unsavedChanges.description",
+      title:
+        "app.api.browser.performance-start-trace.errors.unsavedChanges.title",
+      description:
+        "app.api.browser.performance-start-trace.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.performance-start-trace.errors.conflict.title",
-      description: "app.api.browser.performance-start-trace.errors.conflict.description",
+      description:
+        "app.api.browser.performance-start-trace.errors.conflict.description",
     },
   },
   successTypes: {
@@ -172,9 +197,12 @@ const { POST } = createEndpoint({
 });
 
 export type PerformanceStartTraceRequestInput = typeof POST.types.RequestInput;
-export type PerformanceStartTraceRequestOutput = typeof POST.types.RequestOutput;
-export type PerformanceStartTraceResponseInput = typeof POST.types.ResponseInput;
-export type PerformanceStartTraceResponseOutput = typeof POST.types.ResponseOutput;
+export type PerformanceStartTraceRequestOutput =
+  typeof POST.types.RequestOutput;
+export type PerformanceStartTraceResponseInput =
+  typeof POST.types.ResponseInput;
+export type PerformanceStartTraceResponseOutput =
+  typeof POST.types.ResponseOutput;
 
 const endpoints = { POST };
 export default endpoints;

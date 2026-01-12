@@ -210,7 +210,9 @@ function InputInner<
       ref={ref as React.Ref<HTMLInputElement>}
       type={type}
       value={value !== undefined ? String(value) : undefined}
-      defaultValue={defaultValue !== undefined ? String(defaultValue) : undefined}
+      defaultValue={
+        defaultValue !== undefined ? String(defaultValue) : undefined
+      }
       placeholder={placeholder}
       disabled={disabled}
       readOnly={readOnly}
@@ -238,7 +240,8 @@ function InputInner<
           type === "number" && rawValue !== "" ? Number(rawValue) : rawValue
         ) as InferValueType<T>;
 
-        const elem = e.currentTarget instanceof HTMLInputElement ? e.currentTarget : null;
+        const elem =
+          e.currentTarget instanceof HTMLInputElement ? e.currentTarget : null;
 
         const changeEvent: InputChangeEvent<T> = {
           target: {
@@ -289,12 +292,17 @@ function InputInner<
       onClick={
         onClick
           ? (e): void => {
-              const elem = e.currentTarget instanceof HTMLInputElement ? e.currentTarget : null;
-              const targetElem = e.target instanceof HTMLInputElement ? e.target : null;
+              const elem =
+                e.currentTarget instanceof HTMLInputElement
+                  ? e.currentTarget
+                  : null;
+              const targetElem =
+                e.target instanceof HTMLInputElement ? e.target : null;
               const customEvent: InputMouseEvent<T> = {
                 currentTarget: {
                   addEventListener: elem?.addEventListener.bind(elem) ?? noop,
-                  removeEventListener: elem?.removeEventListener.bind(elem) ?? noop,
+                  removeEventListener:
+                    elem?.removeEventListener.bind(elem) ?? noop,
                   dispatchEvent: elem?.dispatchEvent.bind(elem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
@@ -318,9 +326,12 @@ function InputInner<
                     },
                 },
                 target: {
-                  addEventListener: targetElem?.addEventListener.bind(targetElem) ?? noop,
-                  removeEventListener: targetElem?.removeEventListener.bind(targetElem) ?? noop,
-                  dispatchEvent: targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
+                  addEventListener:
+                    targetElem?.addEventListener.bind(targetElem) ?? noop,
+                  removeEventListener:
+                    targetElem?.removeEventListener.bind(targetElem) ?? noop,
+                  dispatchEvent:
+                    targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
                     top: number;
@@ -362,13 +373,20 @@ function InputInner<
       onBlur={
         onBlur
           ? (e): void => {
-              const elem = e.currentTarget instanceof HTMLInputElement ? e.currentTarget : null;
-              const targetElem = e.target instanceof HTMLInputElement ? e.target : null;
+              const elem =
+                e.currentTarget instanceof HTMLInputElement
+                  ? e.currentTarget
+                  : null;
+              const targetElem =
+                e.target instanceof HTMLInputElement ? e.target : null;
               const customEvent: InputFocusEvent<T> = {
                 target: {
-                  addEventListener: targetElem?.addEventListener.bind(targetElem) ?? noop,
-                  removeEventListener: targetElem?.removeEventListener.bind(targetElem) ?? noop,
-                  dispatchEvent: targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
+                  addEventListener:
+                    targetElem?.addEventListener.bind(targetElem) ?? noop,
+                  removeEventListener:
+                    targetElem?.removeEventListener.bind(targetElem) ?? noop,
+                  dispatchEvent:
+                    targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
                     top: number;
@@ -392,7 +410,8 @@ function InputInner<
                 },
                 currentTarget: {
                   addEventListener: elem?.addEventListener.bind(elem) ?? noop,
-                  removeEventListener: elem?.removeEventListener.bind(elem) ?? noop,
+                  removeEventListener:
+                    elem?.removeEventListener.bind(elem) ?? noop,
                   dispatchEvent: elem?.dispatchEvent.bind(elem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
@@ -432,13 +451,20 @@ function InputInner<
       onFocus={
         onFocus
           ? (e): void => {
-              const elem = e.currentTarget instanceof HTMLInputElement ? e.currentTarget : null;
-              const targetElem = e.target instanceof HTMLInputElement ? e.target : null;
+              const elem =
+                e.currentTarget instanceof HTMLInputElement
+                  ? e.currentTarget
+                  : null;
+              const targetElem =
+                e.target instanceof HTMLInputElement ? e.target : null;
               const customEvent: InputFocusEvent<T> = {
                 target: {
-                  addEventListener: targetElem?.addEventListener.bind(targetElem) ?? noop,
-                  removeEventListener: targetElem?.removeEventListener.bind(targetElem) ?? noop,
-                  dispatchEvent: targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
+                  addEventListener:
+                    targetElem?.addEventListener.bind(targetElem) ?? noop,
+                  removeEventListener:
+                    targetElem?.removeEventListener.bind(targetElem) ?? noop,
+                  dispatchEvent:
+                    targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
                     top: number;
@@ -462,7 +488,8 @@ function InputInner<
                 },
                 currentTarget: {
                   addEventListener: elem?.addEventListener.bind(elem) ?? noop,
-                  removeEventListener: elem?.removeEventListener.bind(elem) ?? noop,
+                  removeEventListener:
+                    elem?.removeEventListener.bind(elem) ?? noop,
                   dispatchEvent: elem?.dispatchEvent.bind(elem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
@@ -502,8 +529,12 @@ function InputInner<
       onKeyPress={
         onKeyPress
           ? (e): void => {
-              const elem = e.currentTarget instanceof HTMLInputElement ? e.currentTarget : null;
-              const targetElem = e.target instanceof HTMLInputElement ? e.target : null;
+              const elem =
+                e.currentTarget instanceof HTMLInputElement
+                  ? e.currentTarget
+                  : null;
+              const targetElem =
+                e.target instanceof HTMLInputElement ? e.target : null;
               const customEvent: InputKeyboardEvent<T> = {
                 key: e.key,
                 code: e.code,
@@ -511,7 +542,8 @@ function InputInner<
                 stopPropagation: (): void => e.stopPropagation(),
                 currentTarget: {
                   addEventListener: elem?.addEventListener.bind(elem) ?? noop,
-                  removeEventListener: elem?.removeEventListener.bind(elem) ?? noop,
+                  removeEventListener:
+                    elem?.removeEventListener.bind(elem) ?? noop,
                   dispatchEvent: elem?.dispatchEvent.bind(elem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
@@ -535,9 +567,12 @@ function InputInner<
                     },
                 },
                 target: {
-                  addEventListener: targetElem?.addEventListener.bind(targetElem) ?? noop,
-                  removeEventListener: targetElem?.removeEventListener.bind(targetElem) ?? noop,
-                  dispatchEvent: targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
+                  addEventListener:
+                    targetElem?.addEventListener.bind(targetElem) ?? noop,
+                  removeEventListener:
+                    targetElem?.removeEventListener.bind(targetElem) ?? noop,
+                  dispatchEvent:
+                    targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
                     top: number;
@@ -580,8 +615,12 @@ function InputInner<
       onKeyDown={
         onKeyDown
           ? (e): void => {
-              const elem = e.currentTarget instanceof HTMLInputElement ? e.currentTarget : null;
-              const targetElem = e.target instanceof HTMLInputElement ? e.target : null;
+              const elem =
+                e.currentTarget instanceof HTMLInputElement
+                  ? e.currentTarget
+                  : null;
+              const targetElem =
+                e.target instanceof HTMLInputElement ? e.target : null;
               const customEvent: InputKeyboardEvent<T> = {
                 key: e.key,
                 code: e.code,
@@ -589,7 +628,8 @@ function InputInner<
                 stopPropagation: (): void => e.stopPropagation(),
                 currentTarget: {
                   addEventListener: elem?.addEventListener.bind(elem) ?? noop,
-                  removeEventListener: elem?.removeEventListener.bind(elem) ?? noop,
+                  removeEventListener:
+                    elem?.removeEventListener.bind(elem) ?? noop,
                   dispatchEvent: elem?.dispatchEvent.bind(elem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
@@ -613,9 +653,12 @@ function InputInner<
                     },
                 },
                 target: {
-                  addEventListener: targetElem?.addEventListener.bind(targetElem) ?? noop,
-                  removeEventListener: targetElem?.removeEventListener.bind(targetElem) ?? noop,
-                  dispatchEvent: targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
+                  addEventListener:
+                    targetElem?.addEventListener.bind(targetElem) ?? noop,
+                  removeEventListener:
+                    targetElem?.removeEventListener.bind(targetElem) ?? noop,
+                  dispatchEvent:
+                    targetElem?.dispatchEvent.bind(targetElem) ?? noopBool,
                   getBoundingClientRect: (): {
                     left: number;
                     top: number;

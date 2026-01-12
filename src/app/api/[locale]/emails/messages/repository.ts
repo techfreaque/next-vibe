@@ -7,7 +7,11 @@ import "server-only";
 
 import { and, count, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -15,7 +19,10 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { db } from "../../system/db";
 import { SortOrder } from "../imap-client/enum";
-import type { EmailGetGETResponseOutput, EmailGetGETUrlVariablesOutput } from "./[id]/definition";
+import type {
+  EmailGetGETResponseOutput,
+  EmailGetGETUrlVariablesOutput,
+} from "./[id]/definition";
 import { emails, type NewEmail } from "./db";
 import {
   EmailSortField,
@@ -24,7 +31,10 @@ import {
   mapEmailStatusFilter,
   mapEmailTypeFilter,
 } from "./enum";
-import type { EmailsListRequestOutput, EmailsListResponseOutput } from "./list/definition";
+import type {
+  EmailsListRequestOutput,
+  EmailsListResponseOutput,
+} from "./list/definition";
 
 /**
  * Emails Repository Interface
@@ -42,7 +52,10 @@ export interface EmailsRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailGetGETResponseOutput>>;
 
-  create(data: NewEmail, logger: EndpointLogger): Promise<ResponseType<{ id: string }>>;
+  create(
+    data: NewEmail,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ id: string }>>;
 }
 
 /**
@@ -71,7 +84,12 @@ class EmailsRepositoryImpl implements EmailsRepository {
         }
       )?.dateRange;
 
-      const { page = 1, limit = 20, sortBy, sortOrder } = data.displayOptions || {};
+      const {
+        page = 1,
+        limit = 20,
+        sortBy,
+        sortOrder,
+      } = data.displayOptions || {};
 
       // Extract date range if provided
       const dateFrom = dateRange?.dateFrom;
@@ -116,7 +134,8 @@ class EmailsRepositoryImpl implements EmailsRepository {
         whereConditions.push(sql`${emails.createdAt} <= ${dateTo}`);
       }
 
-      const whereClause = whereConditions.length > 0 ? and(...whereConditions) : undefined;
+      const whereClause =
+        whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
       // Build sort order
       const getSortColumn = ():
@@ -147,10 +166,14 @@ class EmailsRepositoryImpl implements EmailsRepository {
       };
 
       const sortColumn = getSortColumn();
-      const orderBy = sortOrder === SortOrder.ASC ? sortColumn : desc(sortColumn);
+      const orderBy =
+        sortOrder === SortOrder.ASC ? sortColumn : desc(sortColumn);
 
       // Get total count
-      const [totalResult] = await db.select({ count: count() }).from(emails).where(whereClause);
+      const [totalResult] = await db
+        .select({ count: count() })
+        .from(emails)
+        .where(whereClause);
 
       const total = Number(totalResult.count);
       const totalPages = Math.ceil(total / limit);
@@ -250,7 +273,10 @@ class EmailsRepositoryImpl implements EmailsRepository {
         userId: user.id,
       });
 
-      const [emailResult] = await db.select().from(emails).where(eq(emails.id, emailId));
+      const [emailResult] = await db
+        .select()
+        .from(emails)
+        .where(eq(emails.id, emailId));
 
       if (!emailResult) {
         return fail({
@@ -300,14 +326,20 @@ class EmailsRepositoryImpl implements EmailsRepository {
   /**
    * Create a new email record
    */
-  async create(data: NewEmail, logger: EndpointLogger): Promise<ResponseType<{ id: string }>> {
+  async create(
+    data: NewEmail,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<{ id: string }>> {
     try {
       logger.debug("Creating email record", {
         subject: data.subject,
         recipientEmail: data.recipientEmail,
       });
 
-      const [result] = await db.insert(emails).values(data).returning({ id: emails.id });
+      const [result] = await db
+        .insert(emails)
+        .values(data)
+        .returning({ id: emails.id });
 
       if (!result) {
         return fail({

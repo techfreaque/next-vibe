@@ -115,18 +115,21 @@ export const translations: typeof enTranslations = {
     },
     enableSearch: {
       label: "Web-Suche aktivieren",
-      description: "KI erlauben, das Web nach aktuellen Informationen zu durchsuchen",
+      description:
+        "KI erlauben, das Web nach aktuellen Informationen zu durchsuchen",
     },
     tools: {
       label: "KI-Tools",
-      description: "Liste der KI-Tool-IDs, die für diese Konversation aktiviert werden sollen",
+      description:
+        "Liste der KI-Tool-IDs, die für diese Konversation aktiviert werden sollen",
       toolId: {
         label: "Tool-ID",
         description: "Eindeutige Kennung für das KI-Tool",
       },
       requiresConfirmation: {
         label: "Benötigt Bestätigung",
-        description: "Ob dieses Tool eine Benutzerbestätigung vor der Ausführung benötigt",
+        description:
+          "Ob dieses Tool eine Benutzerbestätigung vor der Ausführung benötigt",
       },
     },
     resumeToken: {
@@ -138,7 +141,8 @@ export const translations: typeof enTranslations = {
       description: "Konfiguration für sprachbasierte Interaktion",
       enabled: {
         label: "Sprachmodus aktivieren",
-        description: "Sprachbasierte Interaktion mit Text-zu-Sprache aktivieren",
+        description:
+          "Sprachbasierte Interaktion mit Text-zu-Sprache aktivieren",
       },
       voice: {
         label: "Stimme",
@@ -157,11 +161,13 @@ export const translations: typeof enTranslations = {
     },
     attachments: {
       label: "Dateianhänge",
-      description: "An die Nachricht angehängte Dateien (Bilder, Dokumente, etc.)",
+      description:
+        "An die Nachricht angehängte Dateien (Bilder, Dokumente, etc.)",
     },
     enabledToolIds: {
       label: "Aktivierte Tool-IDs",
-      description: "Liste der KI-Tool-IDs, die für diese Konversation aktiviert werden sollen",
+      description:
+        "Liste der KI-Tool-IDs, die für diese Konversation aktiviert werden sollen",
     },
     toolConfirmation: {
       label: "Tool-Bestätigung",
@@ -224,7 +230,8 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Ungespeicherte Änderungen",
-        description: "Es gibt ungespeicherte Änderungen, die zuerst gespeichert werden müssen",
+        description:
+          "Es gibt ungespeicherte Änderungen, die zuerst gespeichert werden müssen",
       },
       conflict: {
         title: "Konflikt",

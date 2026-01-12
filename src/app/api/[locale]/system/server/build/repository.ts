@@ -4,7 +4,11 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
@@ -33,12 +37,14 @@ const MESSAGES = {
   BUILDING_NEXTJS: "Building Next.js application...",
   NEXTJS_BUILD_SUCCESS: "✅ Next.js build completed successfully",
   NEXTJS_BUILD_FAILED: "Next.js build failed",
-  SKIP_PROD_DB: "Skipping production database operations (--run-prod-database=false)",
+  SKIP_PROD_DB:
+    "Skipping production database operations (--run-prod-database=false)",
   BUILD_FAILED: "❌ Build failed",
   SCHEMA_GENERATION_START: "Generating database schema...",
   SCHEMA_GENERATION_SUCCESS: "✅ Database schema generation completed",
   SCHEMA_GENERATION_FAILED: "Database schema generation failed",
-  SKIP_SCHEMA_GENERATION: "Skipping database schema generation (--run-prod-database=false)",
+  SKIP_SCHEMA_GENERATION:
+    "Skipping database schema generation (--run-prod-database=false)",
   REPORTS_GENERATION_START: "Generating all reports...",
   REPORTS_GENERATION_SUCCESS: "✅ Reports generation completed",
   REPORTS_GENERATION_FAILED: "Reports generation failed",
@@ -182,7 +188,8 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
 
           if (!data.force) {
             return fail({
-              message: "app.api.system.server.build.post.errors.nextjs_build_failed.title",
+              message:
+                "app.api.system.server.build.post.errors.nextjs_build_failed.title",
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
               messageParams: {
                 error: parsedError.message,
@@ -197,16 +204,17 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         output.push(MESSAGES.PROD_DB_START);
         try {
           if (!data.skipProdMigrations) {
-            const migrateResult = await databaseMigrationRepository.runMigrations(
-              {
-                generate: false,
-                dryRun: false,
-                redo: false,
-                schema: "public",
-              },
-              locale,
-              logger,
-            );
+            const migrateResult =
+              await databaseMigrationRepository.runMigrations(
+                {
+                  generate: false,
+                  dryRun: false,
+                  redo: false,
+                  schema: "public",
+                },
+                locale,
+                logger,
+              );
 
             if (!migrateResult.success) {
               errors.push(MESSAGES.FAILED_PROD_MIGRATIONS);

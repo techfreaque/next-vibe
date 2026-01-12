@@ -38,7 +38,12 @@ export async function updateAllRepos(
     if (!repoExists(repo.path, rootDir) && repo.config.repoUrl) {
       // Clone missing repos
       try {
-        await cloneRepo(repo.config.repoUrl, join(...repo.path), repo.config.branch, rootDir);
+        await cloneRepo(
+          repo.config.repoUrl,
+          join(...repo.path),
+          repo.config.branch,
+          rootDir,
+        );
         clonedCount++;
       } catch {
         failedCloneCount++;

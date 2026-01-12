@@ -63,7 +63,10 @@ export type DialogDescriptionProps = {
   children?: React.ReactNode;
 } & StyleType;
 
-export function Dialog({ children, ...props }: DialogRootProps): React.JSX.Element {
+export function Dialog({
+  children,
+  ...props
+}: DialogRootProps): React.JSX.Element {
   return <DialogPrimitive.Root {...props}>{children}</DialogPrimitive.Root>;
 }
 Dialog.displayName = DialogPrimitive.Root.displayName;
@@ -94,7 +97,11 @@ export function DialogPortal({
 }
 DialogPortal.displayName = DialogPrimitive.Portal.displayName;
 
-export function DialogClose({ children, asChild, ...props }: DialogCloseProps): React.JSX.Element {
+export function DialogClose({
+  children,
+  asChild,
+  ...props
+}: DialogCloseProps): React.JSX.Element {
   return (
     <DialogPrimitive.Close asChild={asChild} {...props}>
       {children}
@@ -143,7 +150,9 @@ export function DialogContent({
         {children}
         <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
           <Cross2Icon className="h-4 w-4" />
-          <span className="sr-only">{t("app.common.accessibility.srOnly.close")}</span>
+          <span className="sr-only">
+            {t("app.common.accessibility.srOnly.close")}
+          </span>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
     </DialogPortal>
@@ -151,10 +160,17 @@ export function DialogContent({
 }
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
-export function DialogHeader({ className, style, children }: DialogHeaderProps): React.JSX.Element {
+export function DialogHeader({
+  className,
+  style,
+  children,
+}: DialogHeaderProps): React.JSX.Element {
   return (
     <div
-      className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)}
+      className={cn(
+        "flex flex-col space-y-1.5 text-center sm:text-left",
+        className,
+      )}
       style={style}
     >
       {children}
@@ -163,10 +179,17 @@ export function DialogHeader({ className, style, children }: DialogHeaderProps):
 }
 DialogHeader.displayName = "DialogHeader";
 
-export function DialogFooter({ className, style, children }: DialogFooterProps): React.JSX.Element {
+export function DialogFooter({
+  className,
+  style,
+  children,
+}: DialogFooterProps): React.JSX.Element {
   return (
     <div
-      className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)}
+      className={cn(
+        "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+        className,
+      )}
       style={style}
     >
       {children}
@@ -175,10 +198,17 @@ export function DialogFooter({ className, style, children }: DialogFooterProps):
 }
 DialogFooter.displayName = "DialogFooter";
 
-export function DialogTitle({ className, style, ...props }: DialogTitleProps): React.JSX.Element {
+export function DialogTitle({
+  className,
+  style,
+  ...props
+}: DialogTitleProps): React.JSX.Element {
   return (
     <DialogPrimitive.Title
-      className={cn("text-lg font-semibold leading-none tracking-tight", className)}
+      className={cn(
+        "text-lg font-semibold leading-none tracking-tight",
+        className,
+      )}
       style={style}
       {...props}
     />

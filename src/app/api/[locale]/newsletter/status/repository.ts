@@ -7,7 +7,11 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -15,7 +19,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { db } from "../../system/db";
 import { newsletterSubscriptions } from "../db";
 import { NewsletterSubscriptionStatus } from "../enum";
-import type { StatusGetRequestOutput, StatusGetResponseOutput } from "./definition";
+import type {
+  StatusGetRequestOutput,
+  StatusGetResponseOutput,
+} from "./definition";
 
 export interface NewsletterStatusRepository {
   getStatus(
@@ -50,10 +57,13 @@ export class NewsletterStatusRepositoryImpl implements NewsletterStatusRepositor
         });
       }
 
-      const isSubscribed = subscription.status === NewsletterSubscriptionStatus.SUBSCRIBED;
+      const isSubscribed =
+        subscription.status === NewsletterSubscriptionStatus.SUBSCRIBED;
 
       logger.debug(
-        isSubscribed ? "User is subscribed to newsletter" : "User is unsubscribed from newsletter",
+        isSubscribed
+          ? "User is subscribed to newsletter"
+          : "User is unsubscribed from newsletter",
         {
           email: data.email,
           status: subscription.status,

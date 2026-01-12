@@ -23,7 +23,8 @@ export const translations: typeof enTranslations = {
         title: "Kontaktinformationen",
         community: "Community",
         discord: "Treten Sie unserem Discord bei",
-        discordDescription: "Erhalten Sie Hilfe von unserer Community und unserem Team",
+        discordDescription:
+          "Erhalten Sie Hilfe von unserer Community und unserem Team",
         twitter: "Folgen Sie uns auf Twitter",
         website: "Webseite",
       },

@@ -89,7 +89,9 @@ export function MetricCardWidget<const TKey extends string>({
   const data = extractMetricCardData(value);
 
   if (!data) {
-    return <Div className={cn("text-muted-foreground italic", className)}>—</Div>;
+    return (
+      <Div className={cn("text-muted-foreground italic", className)}>—</Div>
+    );
   }
 
   const { value: metricValue, label, icon, color, trend } = data;
@@ -106,7 +108,11 @@ export function MetricCardWidget<const TKey extends string>({
   const trendColorClassName = getTrendColorClassName(trendDirection);
 
   const TrendIcon =
-    trendDirection === "up" ? TrendingUp : trendDirection === "down" ? TrendingDown : null;
+    trendDirection === "up"
+      ? TrendingUp
+      : trendDirection === "down"
+        ? TrendingDown
+        : null;
 
   return (
     <Card className={className}>
@@ -117,11 +123,20 @@ export function MetricCardWidget<const TKey extends string>({
           headerPaddingClass || "pb-2",
         )}
       >
-        <CardTitle className={cn("font-medium text-muted-foreground", titleSizeClass || "text-sm")}>
+        <CardTitle
+          className={cn(
+            "font-medium text-muted-foreground",
+            titleSizeClass || "text-sm",
+          )}
+        >
           {translatedLabel}
         </CardTitle>
         {icon && (
-          <Span className={cn(iconSizeClass || "text-2xl")} role="img" aria-label={translatedLabel}>
+          <Span
+            className={cn(iconSizeClass || "text-2xl")}
+            role="img"
+            aria-label={translatedLabel}
+          >
             {icon}
           </Span>
         )}

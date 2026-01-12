@@ -16,7 +16,8 @@ import { LeadAuthRepository } from "../../../leads/auth/repository";
 import { createEndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import { shouldSkipPath } from "../utils";
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Check if leadId needs to be created
@@ -62,7 +63,12 @@ export async function createLeadId(
       undefined,
   };
 
-  const result = await LeadAuthRepository.ensurePublicLeadId(undefined, clientInfo, locale, logger);
+  const result = await LeadAuthRepository.ensurePublicLeadId(
+    undefined,
+    clientInfo,
+    locale,
+    logger,
+  );
 
   const response = NextResponseClass.next();
 

@@ -33,9 +33,12 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
   // Get locale-specific pricing for starter plan
   const country = getCountryFromLocale(locale);
   const allPlans = getPricingPlansArray();
-  const starterPlan = allPlans.find((plan) => plan.id === SubscriptionPlan.SUBSCRIPTION);
+  const starterPlan = allPlans.find(
+    (plan) => plan.id === SubscriptionPlan.SUBSCRIPTION,
+  );
   const starterPrice = starterPlan?.priceByCountry[country].monthly || 0;
-  const starterCurrency = starterPlan?.priceByCountry[country].currency || "EUR";
+  const starterCurrency =
+    starterPlan?.priceByCountry[country].currency || "EUR";
 
   const emailContent = (
     <EmailLayout
@@ -159,7 +162,11 @@ export const resultsReactivationEmail: EmailTemplateFunction = ({
             {t(
               "app.api.leads.campaigns.emails.journeys.results.templates.resultsJourney.reactivation.discountOffer",
               {
-                price: formatCurrencyNoDecimals(starterPrice, starterCurrency, locale),
+                price: formatCurrencyNoDecimals(
+                  starterPrice,
+                  starterCurrency,
+                  locale,
+                ),
               },
             )}
           </span>

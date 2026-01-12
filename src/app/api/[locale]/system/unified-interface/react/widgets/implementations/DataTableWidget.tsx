@@ -14,10 +14,16 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import type { WidgetType } from "../../../shared/types/enums";
-import { extractDataTableData, formatCellValue } from "../../../shared/widgets/logic/data-table";
+import {
+  extractDataTableData,
+  formatCellValue,
+} from "../../../shared/widgets/logic/data-table";
 import type { ReactWidgetProps } from "../../../shared/widgets/types";
 import { isWidgetDataString } from "../../../shared/widgets/utils/field-type-guards";
-import { extractColumnConfig, sortTableRows } from "../../../shared/widgets/utils/widget-helpers";
+import {
+  extractColumnConfig,
+  sortTableRows,
+} from "../../../shared/widgets/utils/widget-helpers";
 
 /**
  * Data Table Widget - Displays sortable tabular data with column configuration
@@ -82,7 +88,9 @@ export const DataTableWidget = <const TKey extends string>({
   // Get initial sort from field.ui.sorting config, NOT from value
   const initialSort = sorting?.defaultSort?.[0];
   const [sortBy, setSortBy] = useState<string | null>(initialSort?.key ?? null);
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(initialSort?.direction ?? "asc");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(
+    initialSort?.direction ?? "asc",
+  );
 
   const data = extractDataTableData(value);
 
@@ -121,7 +129,9 @@ export const DataTableWidget = <const TKey extends string>({
                 <TableHead
                   key={key}
                   className={`px-6 py-3 ${align} text-xs font-medium tracking-wider text-gray-500 dark:text-gray-400 ${
-                    sortable ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700" : ""
+                    sortable
+                      ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                      : ""
                   }`}
                   width={width}
                   onClick={(): void => {
@@ -162,7 +172,10 @@ export const DataTableWidget = <const TKey extends string>({
         <TableBody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
           {sortedRows.map((row, rowIndex: number) => {
             return (
-              <TableRow key={rowIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+              <TableRow
+                key={rowIndex}
+                className="hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
                 {columns.map((column) => {
                   const key = column.key;
 
@@ -197,10 +210,13 @@ export const DataTableWidget = <const TKey extends string>({
         value.totalRows > rows.length && (
           <Div className="mt-4 flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-700">
             <Div className="text-sm text-gray-700 dark:text-gray-300">
-              {context.t("app.api.system.unifiedInterface.react.widgets.dataTable.showingResults", {
-                count: rows.length,
-                total: value.totalRows,
-              })}
+              {context.t(
+                "app.api.system.unifiedInterface.react.widgets.dataTable.showingResults",
+                {
+                  count: rows.length,
+                  total: value.totalRows,
+                },
+              )}
             </Div>
           </Div>
         )}

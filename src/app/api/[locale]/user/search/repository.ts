@@ -11,7 +11,10 @@ import { success } from "next-vibe/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { UserRepository } from "../repository";
-import type { UserSearchGetRequestOutput, UserSearchGetResponseOutput } from "./definition";
+import type {
+  UserSearchGetRequestOutput,
+  UserSearchGetResponseOutput,
+} from "./definition";
 
 /**
  * User Search Repository - Static class pattern

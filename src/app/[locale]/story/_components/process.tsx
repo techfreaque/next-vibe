@@ -1,7 +1,13 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import { BarChart3, CheckCircle2, Lightbulb, MessageSquare, PenTool } from "next-vibe-ui/ui/icons";
+import {
+  BarChart3,
+  CheckCircle2,
+  Lightbulb,
+  MessageSquare,
+  PenTool,
+} from "next-vibe-ui/ui/icons";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
@@ -37,29 +43,45 @@ const Process: FC<ProcessProps> = ({ locale }) => {
   const steps: ProcessStep[] = [
     {
       number: "01",
-      title: t("app.story._components.home.process.steps.strategyDevelopment.title"),
-      description: t("app.story._components.home.process.steps.strategyDevelopment.description"),
+      title: t(
+        "app.story._components.home.process.steps.strategyDevelopment.title",
+      ),
+      description: t(
+        "app.story._components.home.process.steps.strategyDevelopment.description",
+      ),
       icon: <Lightbulb className="h-8 w-8 text-amber-500" />,
       image: "/images/process/strategy.png",
     },
     {
       number: "02",
-      title: t("app.story._components.home.process.steps.contentCreation.title"),
-      description: t("app.story._components.home.process.steps.contentCreation.description"),
+      title: t(
+        "app.story._components.home.process.steps.contentCreation.title",
+      ),
+      description: t(
+        "app.story._components.home.process.steps.contentCreation.description",
+      ),
       icon: <PenTool className="h-8 w-8 text-blue-500" />,
       image: "/images/process/content.png",
     },
     {
       number: "03",
-      title: t("app.story._components.home.process.steps.publishingManagement.title"),
-      description: t("app.story._components.home.process.steps.publishingManagement.description"),
+      title: t(
+        "app.story._components.home.process.steps.publishingManagement.title",
+      ),
+      description: t(
+        "app.story._components.home.process.steps.publishingManagement.description",
+      ),
       icon: <MessageSquare className="h-8 w-8 text-green-500" />,
       image: "/images/process/publishing.png",
     },
     {
       number: "04",
-      title: t("app.story._components.home.process.steps.analysisOptimization.title"),
-      description: t("app.story._components.home.process.steps.analysisOptimization.description"),
+      title: t(
+        "app.story._components.home.process.steps.analysisOptimization.title",
+      ),
+      description: t(
+        "app.story._components.home.process.steps.analysisOptimization.description",
+      ),
       icon: <BarChart3 className="h-8 w-8 text-purple-500" />,
       image: "/images/process/analysis.png",
     },
@@ -78,7 +100,9 @@ const Process: FC<ProcessProps> = ({ locale }) => {
             animate={inView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Span className="font-medium">{t("app.story._components.home.process.badge")}</Span>
+            <Span className="font-medium">
+              {t("app.story._components.home.process.badge")}
+            </Span>
           </MotionDiv>
 
           <MotionDiv

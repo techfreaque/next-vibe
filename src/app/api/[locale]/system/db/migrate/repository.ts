@@ -7,7 +7,11 @@ import { spawnSync } from "node:child_process";
 
 import { sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -110,15 +114,19 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
         }
 
         if (generateResult.status !== 0) {
-          const errorOutput = generateResult.stderr || generateResult.stdout || "Unknown error";
+          const errorOutput =
+            generateResult.stderr || generateResult.stdout || "Unknown error";
           return fail({
             message: "app.api.system.db.migrate.post.errors.network.title",
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
-              error: t("app.api.system.db.migrate.errors.generationFailedWithCode", {
-                code: String(generateResult.status ?? "unknown"),
-                output: errorOutput,
-              }),
+              error: t(
+                "app.api.system.db.migrate.errors.generationFailedWithCode",
+                {
+                  code: String(generateResult.status ?? "unknown"),
+                  output: errorOutput,
+                },
+              ),
             },
           });
         }
@@ -158,7 +166,9 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
         });
       }
 
-      const output = [pushResult.stdout, pushResult.stderr].filter(Boolean).join("\n");
+      const output = [pushResult.stdout, pushResult.stderr]
+        .filter(Boolean)
+        .join("\n");
 
       if (pushResult.status !== 0) {
         logger.error("Migration failed", { output });
@@ -299,4 +309,5 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
 /**
  * Default repository instance
  */
-export const databaseMigrationRepository = new DatabaseMigrationRepositoryImpl();
+export const databaseMigrationRepository =
+  new DatabaseMigrationRepositoryImpl();

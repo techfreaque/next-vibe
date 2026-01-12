@@ -17,7 +17,13 @@ import {
 import { Icon } from "../../icons";
 
 // Color variants for different stat types
-type StatVariant = "default" | "success" | "warning" | "danger" | "info" | "muted";
+type StatVariant =
+  | "default"
+  | "success"
+  | "warning"
+  | "danger"
+  | "info"
+  | "muted";
 
 const variantClasses: Record<StatVariant, string> = {
   default: "text-foreground",
@@ -115,10 +121,21 @@ export function StatWidget<const TKey extends string>({
   // Size defaults based on size prop
   const sizeDefaults = {
     sm: { value: "text-lg", label: "text-xs", icon: "h-4 w-4", padding: "p-3" },
-    md: { value: "text-2xl", label: "text-xs", icon: "h-5 w-5", padding: "p-4" },
-    lg: { value: "text-3xl", label: "text-sm", icon: "h-6 w-6", padding: "p-5" },
+    md: {
+      value: "text-2xl",
+      label: "text-xs",
+      icon: "h-5 w-5",
+      padding: "p-4",
+    },
+    lg: {
+      value: "text-3xl",
+      label: "text-sm",
+      icon: "h-6 w-6",
+      padding: "p-5",
+    },
   };
-  const sizeDefault = sizeDefaults[size as keyof typeof sizeDefaults] || sizeDefaults.md;
+  const sizeDefault =
+    sizeDefaults[size as keyof typeof sizeDefaults] || sizeDefaults.md;
 
   // Handle non-numeric values
   if (typeof value !== "number") {
@@ -149,7 +166,8 @@ export function StatWidget<const TKey extends string>({
   const formattedValue = formatStatValue(value, format, context.locale);
 
   // Get variant class
-  const variantClass = variantClasses[variant as StatVariant] || variantClasses.default;
+  const variantClass =
+    variantClasses[variant as StatVariant] || variantClasses.default;
 
   // Trend icon and color
   const TrendIcon =
@@ -161,7 +179,11 @@ export function StatWidget<const TKey extends string>({
           ? Minus
           : null;
   const trendColorClass =
-    trend === "up" ? "text-green-500" : trend === "down" ? "text-red-500" : "text-muted-foreground";
+    trend === "up"
+      ? "text-green-500"
+      : trend === "down"
+        ? "text-red-500"
+        : "text-muted-foreground";
 
   return (
     <Card className={cn("h-full hover:shadow-md transition-shadow", className)}>

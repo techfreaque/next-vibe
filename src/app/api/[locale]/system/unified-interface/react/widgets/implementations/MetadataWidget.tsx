@@ -40,7 +40,11 @@ export function MetadataWidget<const TKey extends string>({
 
   const text = typeof value === "string" ? context.t(value) : String(value);
 
-  return <Span className={cn("text-[11px] text-muted-foreground/70", className)}>{text}</Span>;
+  return (
+    <Span className={cn("text-[11px] text-muted-foreground/70", className)}>
+      {text}
+    </Span>
+  );
 }
 
 MetadataWidget.displayName = "MetadataWidget";

@@ -28,7 +28,10 @@ export function Progress({
 }: ProgressRootProps): React.JSX.Element {
   return (
     <ProgressPrimitive.Root
-      className={cn("relative h-2 w-full overflow-hidden rounded-full bg-primary/20", className)}
+      className={cn(
+        "relative h-2 w-full overflow-hidden rounded-full bg-primary/20",
+        className,
+      )}
       value={value ?? undefined}
       max={max}
       getValueLabel={getValueLabel}
@@ -47,7 +50,10 @@ export function ProgressIndicator({
 }: ProgressIndicatorProps): React.JSX.Element {
   return (
     <ProgressPrimitive.Indicator
-      className={cn("h-full w-full flex-1 bg-primary transition-all", className)}
+      className={cn(
+        "h-full w-full flex-1 bg-primary transition-all",
+        className,
+      )}
       style={{ transform: `translateX(-${100 - (value ?? 0)}%)` }}
       {...props}
     />

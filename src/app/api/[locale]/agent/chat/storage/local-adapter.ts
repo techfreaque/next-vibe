@@ -110,7 +110,11 @@ export class LocalStorageAdapter implements StorageAdapter {
       return;
     }
 
-    const filePath = path.join(agentEnv.CHAT_STORAGE_PATH, metadata.threadId, metadata.filename);
+    const filePath = path.join(
+      agentEnv.CHAT_STORAGE_PATH,
+      metadata.threadId,
+      metadata.filename,
+    );
     const metadataPath = path.join(
       agentEnv.CHAT_STORAGE_PATH,
       metadata.threadId,
@@ -187,7 +191,11 @@ export class LocalStorageAdapter implements StorageAdapter {
     }
 
     try {
-      const filePath = path.join(agentEnv.CHAT_STORAGE_PATH, metadata.threadId, metadata.filename);
+      const filePath = path.join(
+        agentEnv.CHAT_STORAGE_PATH,
+        metadata.threadId,
+        metadata.filename,
+      );
       await fs.access(filePath);
       return true;
     } catch {
@@ -195,7 +203,10 @@ export class LocalStorageAdapter implements StorageAdapter {
     }
   }
 
-  async readFileAsBase64(fileId: string, threadId: string): Promise<string | null> {
+  async readFileAsBase64(
+    fileId: string,
+    threadId: string,
+  ): Promise<string | null> {
     if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
       return null;
     }
@@ -212,7 +223,11 @@ export class LocalStorageAdapter implements StorageAdapter {
       const metadata = JSON.parse(metadataContent) as FileMetadata;
 
       // Read the file
-      const filePath = path.join(agentEnv.CHAT_STORAGE_PATH, threadId, metadata.filename);
+      const filePath = path.join(
+        agentEnv.CHAT_STORAGE_PATH,
+        threadId,
+        metadata.filename,
+      );
       const buffer = await fs.readFile(filePath);
       return buffer.toString("base64");
     } catch (error) {

@@ -15,7 +15,9 @@ import definitions from "./definition";
  * Hook for customer portal management
  * Provides mutation (POST) operations for creating portal sessions
  */
-export function useCustomerPortal(logger: EndpointLogger): EndpointReturn<typeof definitions> {
+export function useCustomerPortal(
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
   return useEndpoint(definitions, {}, logger);
 }
 

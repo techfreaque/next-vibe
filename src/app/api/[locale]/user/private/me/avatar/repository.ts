@@ -17,7 +17,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserDetailLevel } from "../../../enum";
 import { UserRepository } from "../../../repository";
-import type { AvatarDeleteResponseOutput, AvatarPostResponseOutput } from "./definition";
+import type {
+  AvatarDeleteResponseOutput,
+  AvatarPostResponseOutput,
+} from "./definition";
 
 /**
  * Avatar Repository - Static class pattern
@@ -62,7 +65,13 @@ export class AvatarRepository {
       }
 
       // Validate file type
-      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+      ];
       if (!allowedTypes.includes(file.type)) {
         return fail({
           message: "app.api.user.private.me.avatar.errors.invalid_file_type",
@@ -131,7 +140,8 @@ export class AvatarRepository {
         parseError(error),
       );
       return fail({
-        message: "app.api.user.private.me.avatar.errors.failed_to_upload_avatar",
+        message:
+          "app.api.user.private.me.avatar.errors.failed_to_upload_avatar",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { userId, error: String(error) },
       });
@@ -199,7 +209,8 @@ export class AvatarRepository {
         parseError(error),
       );
       return fail({
-        message: "app.api.user.private.me.avatar.errors.failed_to_delete_avatar",
+        message:
+          "app.api.user.private.me.avatar.errors.failed_to_delete_avatar",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { userId, error: String(error) },
       });

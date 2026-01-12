@@ -57,7 +57,8 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.agent.speechToText.hotkey.post.form.title" as const,
-      description: "app.api.agent.speechToText.hotkey.post.form.description" as const,
+      description:
+        "app.api.agent.speechToText.hotkey.post.form.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -69,7 +70,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.agent.speechToText.hotkey.post.action.label" as const,
-          description: "app.api.agent.speechToText.hotkey.post.action.description" as const,
+          description:
+            "app.api.agent.speechToText.hotkey.post.action.description" as const,
           columns: 12,
           options: HotkeyActionOptions,
         },
@@ -94,10 +96,13 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.speechToText.hotkey.post.insertPrefix.label" as const,
-          description: "app.api.agent.speechToText.hotkey.post.insertPrefix.description" as const,
+          label:
+            "app.api.agent.speechToText.hotkey.post.insertPrefix.label" as const,
+          description:
+            "app.api.agent.speechToText.hotkey.post.insertPrefix.description" as const,
           columns: 6,
-          placeholder: "app.api.agent.speechToText.hotkey.post.insertPrefix.placeholder" as const,
+          placeholder:
+            "app.api.agent.speechToText.hotkey.post.insertPrefix.placeholder" as const,
         },
         z.string().default(""),
       ),
@@ -106,10 +111,13 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.speechToText.hotkey.post.insertSuffix.label" as const,
-          description: "app.api.agent.speechToText.hotkey.post.insertSuffix.description" as const,
+          label:
+            "app.api.agent.speechToText.hotkey.post.insertSuffix.label" as const,
+          description:
+            "app.api.agent.speechToText.hotkey.post.insertSuffix.description" as const,
           columns: 6,
-          placeholder: "app.api.agent.speechToText.hotkey.post.insertSuffix.placeholder" as const,
+          placeholder:
+            "app.api.agent.speechToText.hotkey.post.insertSuffix.placeholder" as const,
         },
         z.string().default(" "),
       ),
@@ -118,8 +126,10 @@ const { POST } = createEndpoint({
       response: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.agent.speechToText.hotkey.post.response.title" as const,
-          description: "app.api.agent.speechToText.hotkey.post.response.description" as const,
+          title:
+            "app.api.agent.speechToText.hotkey.post.response.title" as const,
+          description:
+            "app.api.agent.speechToText.hotkey.post.response.description" as const,
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -128,7 +138,8 @@ const { POST } = createEndpoint({
           success: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.agent.speechToText.hotkey.post.response.success" as const,
+              content:
+                "app.api.agent.speechToText.hotkey.post.response.success" as const,
             },
             z.boolean(),
           ),
@@ -144,7 +155,8 @@ const { POST } = createEndpoint({
           message: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.agent.speechToText.hotkey.post.response.message" as const,
+              content:
+                "app.api.agent.speechToText.hotkey.post.response.message" as const,
             },
             z.string(),
           ),
@@ -152,7 +164,8 @@ const { POST } = createEndpoint({
           text: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.agent.speechToText.hotkey.post.response.text" as const,
+              content:
+                "app.api.agent.speechToText.hotkey.post.response.text" as const,
             },
             z.string().optional(),
           ),
@@ -160,7 +173,8 @@ const { POST } = createEndpoint({
           recordingDuration: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.agent.speechToText.hotkey.post.response.recordingDuration" as const,
+              content:
+                "app.api.agent.speechToText.hotkey.post.response.recordingDuration" as const,
             },
             z.coerce.number().optional(),
           ),
@@ -171,47 +185,65 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.speechToText.hotkey.post.errors.unauthorized.title" as const,
+      title:
+        "app.api.agent.speechToText.hotkey.post.errors.unauthorized.title" as const,
       description:
         "app.api.agent.speechToText.hotkey.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.speechToText.hotkey.post.errors.validation.title" as const,
-      description: "app.api.agent.speechToText.hotkey.post.errors.validation.description" as const,
+      title:
+        "app.api.agent.speechToText.hotkey.post.errors.validation.title" as const,
+      description:
+        "app.api.agent.speechToText.hotkey.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.speechToText.hotkey.post.errors.server.title" as const,
-      description: "app.api.agent.speechToText.hotkey.post.errors.server.description" as const,
+      title:
+        "app.api.agent.speechToText.hotkey.post.errors.server.title" as const,
+      description:
+        "app.api.agent.speechToText.hotkey.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.speechToText.hotkey.post.errors.conflict.title" as const,
-      description: "app.api.agent.speechToText.hotkey.post.errors.conflict.description" as const,
+      title:
+        "app.api.agent.speechToText.hotkey.post.errors.conflict.title" as const,
+      description:
+        "app.api.agent.speechToText.hotkey.post.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.speechToText.hotkey.post.errors.forbidden.title" as const,
-      description: "app.api.agent.speechToText.hotkey.post.errors.forbidden.description" as const,
+      title:
+        "app.api.agent.speechToText.hotkey.post.errors.forbidden.title" as const,
+      description:
+        "app.api.agent.speechToText.hotkey.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.speechToText.hotkey.post.errors.network.title" as const,
-      description: "app.api.agent.speechToText.hotkey.post.errors.network.description" as const,
+      title:
+        "app.api.agent.speechToText.hotkey.post.errors.network.title" as const,
+      description:
+        "app.api.agent.speechToText.hotkey.post.errors.network.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.speechToText.hotkey.post.errors.notFound.title" as const,
-      description: "app.api.agent.speechToText.hotkey.post.errors.notFound.description" as const,
+      title:
+        "app.api.agent.speechToText.hotkey.post.errors.notFound.title" as const,
+      description:
+        "app.api.agent.speechToText.hotkey.post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.agent.speechToText.hotkey.post.errors.unsaved.title" as const,
-      description: "app.api.agent.speechToText.hotkey.post.errors.unsaved.description" as const,
+      title:
+        "app.api.agent.speechToText.hotkey.post.errors.unsaved.title" as const,
+      description:
+        "app.api.agent.speechToText.hotkey.post.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.speechToText.hotkey.post.errors.unknown.title" as const,
-      description: "app.api.agent.speechToText.hotkey.post.errors.unknown.description" as const,
+      title:
+        "app.api.agent.speechToText.hotkey.post.errors.unknown.title" as const,
+      description:
+        "app.api.agent.speechToText.hotkey.post.errors.unknown.description" as const,
     },
   },
 
   successTypes: {
     title: "app.api.agent.speechToText.hotkey.post.success.title" as const,
-    description: "app.api.agent.speechToText.hotkey.post.success.description" as const,
+    description:
+      "app.api.agent.speechToText.hotkey.post.success.description" as const,
   },
 
   examples: {

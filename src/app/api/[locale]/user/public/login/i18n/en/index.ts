@@ -99,7 +99,8 @@ export const translations = {
     title: "Login Error",
     account_locked: "Account is locked",
     accountLocked: "Account is locked",
-    accountLockedDescription: "Your account has been locked. Please contact support.",
+    accountLockedDescription:
+      "Your account has been locked. Please contact support.",
     invalid_credentials: "Invalid email or password",
     two_factor_required: "Two-factor authentication required",
     auth_error: "Authentication error occurred",

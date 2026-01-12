@@ -6,7 +6,11 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -104,7 +108,10 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
         },
       });
     } catch (error) {
-      logger.error("SMS service: Critical error in SMS sending", parseError(error));
+      logger.error(
+        "SMS service: Critical error in SMS sending",
+        parseError(error),
+      );
       return fail({
         message: "app.api.emails.smsService.errors.send.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

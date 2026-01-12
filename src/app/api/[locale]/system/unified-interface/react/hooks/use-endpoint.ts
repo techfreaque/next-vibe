@@ -21,8 +21,15 @@ import type {
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { useTranslation } from "@/i18n/core/client";
 
-import type { EndpointReturn, FormAlertState, UseEndpointOptions } from "./endpoint-types";
-import { useAvailableMethods, usePrimaryMutationMethod } from "./endpoint-utils";
+import type {
+  EndpointReturn,
+  FormAlertState,
+  UseEndpointOptions,
+} from "./endpoint-types";
+import {
+  useAvailableMethods,
+  usePrimaryMutationMethod,
+} from "./endpoint-utils";
 import type { ApiMutationOptions } from "./types";
 import { useEndpointCreate } from "./use-endpoint-create";
 import { useEndpointDelete } from "./use-endpoint-delete";
@@ -50,7 +57,9 @@ import { useEndpointRead } from "./use-endpoint-read";
  * @param logger - Logger instance for debugging
  * @returns Object with all available operations based on endpoint methods
  */
-export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointAny>>>(
+export function useEndpoint<
+  T extends Partial<Record<Methods, CreateApiEndpointAny>>,
+>(
   endpoints: T,
   options: UseEndpointOptions<T> = {},
   logger: EndpointLogger,
@@ -63,15 +72,22 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   // Extract endpoints
   const readEndpoint = endpoints.GET ?? null;
 
-  const primaryEndpoint = primaryMutationMethod ? (endpoints[primaryMutationMethod] ?? null) : null;
+  const primaryEndpoint = primaryMutationMethod
+    ? (endpoints[primaryMutationMethod] ?? null)
+    : null;
 
   const deleteEndpoint = endpoints.DELETE ?? null;
 
   // Use hook options directly (endpoint-level options not accessible due to dynamic endpoint selection)
   const readQueryEnabled =
-    options.read?.queryOptions?.enabled ?? options.enabled ?? options.queryOptions?.enabled ?? true;
+    options.read?.queryOptions?.enabled ??
+    options.enabled ??
+    options.queryOptions?.enabled ??
+    true;
   const readUrlPathParams =
-    options.read?.urlPathParams ?? options.urlPathParams ?? options.queryOptions?.urlPathParams;
+    options.read?.urlPathParams ??
+    options.urlPathParams ??
+    options.queryOptions?.urlPathParams;
   const readStaleTime =
     options.read?.queryOptions?.staleTime ??
     options.staleTime ??
@@ -89,35 +105,41 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   const isLocalStorageMode = storageMode === "localStorage";
 
   // Use read hook for GET endpoints - conditionally use API or localStorage
-  const apiRead = useEndpointRead(isLocalStorageMode ? null : readEndpoint, logger, {
-    formOptions: {
-      persistForm: options.read?.formOptions?.persistForm ?? false,
-      persistenceKey: options.read?.formOptions?.persistenceKey,
-      autoSubmit: options.read?.formOptions?.autoSubmit,
-      debounceMs: options.read?.formOptions?.debounceMs,
+  const apiRead = useEndpointRead(
+    isLocalStorageMode ? null : readEndpoint,
+    logger,
+    {
+      formOptions: {
+        persistForm: options.read?.formOptions?.persistForm ?? false,
+        persistenceKey: options.read?.formOptions?.persistenceKey,
+        autoSubmit: options.read?.formOptions?.autoSubmit,
+        debounceMs: options.read?.formOptions?.debounceMs,
+      },
+      queryOptions: {
+        enabled: readQueryEnabled,
+        staleTime: readStaleTime,
+        refetchOnWindowFocus: readRefetchOnWindowFocus,
+      },
+      urlPathParams: readUrlPathParams,
+      autoPrefillConfig: {
+        autoPrefill: autoPrefillEnabled,
+        autoPrefillFromLocalStorage: false,
+        showUnsavedChangesAlert: false,
+        clearStorageAfterSubmit: false,
+      },
+      initialState:
+        options.read?.initialState ?? options.filterOptions?.initialFilters,
+      initialData: options.read?.initialData,
     },
-    queryOptions: {
-      enabled: readQueryEnabled,
-      staleTime: readStaleTime,
-      refetchOnWindowFocus: readRefetchOnWindowFocus,
-    },
-    urlPathParams: readUrlPathParams,
-    autoPrefillConfig: {
-      autoPrefill: autoPrefillEnabled,
-      autoPrefillFromLocalStorage: false,
-      showUnsavedChangesAlert: false,
-      clearStorageAfterSubmit: false,
-    },
-    initialState: options.read?.initialState ?? options.filterOptions?.initialFilters,
-    initialData: options.read?.initialData,
-  });
+  );
 
   const localStorageRead = useLocalStorageRead<T>(
     isLocalStorageMode ? readEndpoint : null,
     options.storage?.callbacks?.read,
     {
       urlPathParams: readUrlPathParams,
-      initialState: options.read?.initialState ?? options.filterOptions?.initialFilters,
+      initialState:
+        options.read?.initialState ?? options.filterOptions?.initialFilters,
       enabled: readQueryEnabled,
     },
   );
@@ -154,11 +176,15 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
     return options.create?.mutationOptions;
   }, [options.create?.mutationOptions]);
 
-  const createInitialState = useMemo((): DeepPartial<PrimaryMutationRequest<T>> | undefined => {
+  const createInitialState = useMemo(():
+    | DeepPartial<PrimaryMutationRequest<T>>
+    | undefined => {
     return options.create?.initialState;
   }, [options.create?.initialState]);
 
-  const createAutoPrefillData = useMemo((): DeepPartial<PrimaryMutationRequest<T>> | undefined => {
+  const createAutoPrefillData = useMemo(():
+    | DeepPartial<PrimaryMutationRequest<T>>
+    | undefined => {
     return autoPrefillData ?? options.create?.autoPrefillData;
   }, [autoPrefillData, options.create?.autoPrefillData]);
 
@@ -190,7 +216,10 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
     isLocalStorageMode ? primaryEndpoint : null,
     options.storage?.callbacks?.create ?? options.storage?.callbacks?.update,
     {
-      urlPathParams: options.create?.urlPathParams ?? options.urlPathParams ?? readUrlPathParams,
+      urlPathParams:
+        options.create?.urlPathParams ??
+        options.urlPathParams ??
+        readUrlPathParams,
       defaultValues:
         options.create?.formOptions?.defaultValues ??
         options.formOptions?.defaultValues ??
@@ -200,27 +229,40 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   );
 
   // Use the appropriate create operation based on storage mode
-  const createOperation = isLocalStorageMode ? localStorageCreateOperation : apiCreateOperation;
+  const createOperation = isLocalStorageMode
+    ? localStorageCreateOperation
+    : apiCreateOperation;
 
   // Merge delete options - only use hook-provided options (endpoint-level options not accessible due to dynamic endpoint selection)
   const deleteMutationOptions = useMemo(():
-    | ApiMutationOptions<DeleteRequest<T>, DeleteResponse<T>, DeleteUrlVariables<T>>
+    | ApiMutationOptions<
+        DeleteRequest<T>,
+        DeleteResponse<T>,
+        DeleteUrlVariables<T>
+      >
     | undefined => {
     return options.delete?.mutationOptions;
   }, [options.delete?.mutationOptions]);
 
-  const deleteUrlPathParams = options.delete?.urlPathParams ?? options.urlPathParams;
+  const deleteUrlPathParams =
+    options.delete?.urlPathParams ?? options.urlPathParams;
 
-  const deleteAutoPrefillData = useMemo((): DeepPartial<DeleteRequest<T>> | undefined => {
+  const deleteAutoPrefillData = useMemo(():
+    | DeepPartial<DeleteRequest<T>>
+    | undefined => {
     return options.delete?.autoPrefillData;
   }, [options.delete?.autoPrefillData]);
 
   // Hook will merge endpoint options with passed options internally
-  const apiDeleteOperation = useEndpointDelete(isLocalStorageMode ? null : deleteEndpoint, logger, {
-    mutationOptions: deleteMutationOptions,
-    urlPathParams: deleteUrlPathParams,
-    autoPrefillData: deleteAutoPrefillData,
-  });
+  const apiDeleteOperation = useEndpointDelete(
+    isLocalStorageMode ? null : deleteEndpoint,
+    logger,
+    {
+      mutationOptions: deleteMutationOptions,
+      urlPathParams: deleteUrlPathParams,
+      autoPrefillData: deleteAutoPrefillData,
+    },
+  );
 
   const localStorageDeleteOperation = useLocalStorageDelete<T>(
     isLocalStorageMode ? deleteEndpoint : null,
@@ -231,14 +273,22 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   );
 
   // Use the appropriate delete operation based on storage mode
-  const deleteOperation = isLocalStorageMode ? localStorageDeleteOperation : apiDeleteOperation;
+  const deleteOperation = isLocalStorageMode
+    ? localStorageDeleteOperation
+    : apiDeleteOperation;
 
   const isLoading =
-    read?.isLoading || createOperation?.isSubmitting || deleteOperation?.isSubmitting || false;
+    read?.isLoading ||
+    createOperation?.isSubmitting ||
+    deleteOperation?.isSubmitting ||
+    false;
 
   // Combined error state - all hooks return compatible error types
   const error: ErrorResponseType | null =
-    read?.error || createOperation?.submitError || deleteOperation?.submitError || null;
+    read?.error ||
+    createOperation?.submitError ||
+    deleteOperation?.submitError ||
+    null;
 
   // Memoize create operation wrapper
   const createValues = createOperation?.form.watch();
@@ -256,7 +306,8 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
       isSuccess: createOperation.isSubmitSuccessful,
       isDirty: createOperation.form.formState.isDirty,
       error:
-        createOperation.submitError && Object.keys(createOperation.submitError).length > 0
+        createOperation.submitError &&
+        Object.keys(createOperation.submitError).length > 0
           ? createOperation.submitError
           : null,
     };
@@ -339,16 +390,24 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   }, [options.update?.formOptions, options.formOptions, options.defaultValues]);
 
   const updateMutationOptions = useMemo(():
-    | ApiMutationOptions<PatchRequest<T>, PatchResponse<T>, PatchUrlVariables<T>>
+    | ApiMutationOptions<
+        PatchRequest<T>,
+        PatchResponse<T>,
+        PatchUrlVariables<T>
+      >
     | undefined => {
     return options.update?.mutationOptions;
   }, [options.update?.mutationOptions]);
 
-  const updateInitialState = useMemo((): DeepPartial<PatchRequest<T>> | undefined => {
+  const updateInitialState = useMemo(():
+    | DeepPartial<PatchRequest<T>>
+    | undefined => {
     return options.update?.initialState;
   }, [options.update?.initialState]);
 
-  const updateAutoPrefillData = useMemo((): DeepPartial<PatchRequest<T>> | undefined => {
+  const updateAutoPrefillData = useMemo(():
+    | DeepPartial<PatchRequest<T>>
+    | undefined => {
     return autoPrefillData ?? options.update?.autoPrefillData;
   }, [autoPrefillData, options.update?.autoPrefillData]);
 
@@ -356,13 +415,17 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
     options.update?.urlPathParams ?? options.urlPathParams ?? readUrlPathParams;
 
   // Hook will merge endpoint options with passed options internally
-  const apiUpdateOperation = useEndpointCreate(isLocalStorageMode ? null : patchEndpoint, logger, {
-    formOptions: updateFormOptions,
-    mutationOptions: updateMutationOptions,
-    urlPathParams: updateUrlPathParams,
-    autoPrefillData: updateAutoPrefillData,
-    initialState: updateInitialState,
-  });
+  const apiUpdateOperation = useEndpointCreate(
+    isLocalStorageMode ? null : patchEndpoint,
+    logger,
+    {
+      formOptions: updateFormOptions,
+      mutationOptions: updateMutationOptions,
+      urlPathParams: updateUrlPathParams,
+      autoPrefillData: updateAutoPrefillData,
+      initialState: updateInitialState,
+    },
+  );
 
   const localStorageUpdateOperation = useLocalStorageCreate<T>(
     isLocalStorageMode ? patchEndpoint : null,
@@ -375,7 +438,9 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
   );
 
   // Use the appropriate update operation based on storage mode
-  const updateOperation = isLocalStorageMode ? localStorageUpdateOperation : apiUpdateOperation;
+  const updateOperation = isLocalStorageMode
+    ? localStorageUpdateOperation
+    : apiUpdateOperation;
 
   // Memoize update operation wrapper
   const updateValues = updateOperation?.form.watch();
@@ -389,13 +454,16 @@ export function useEndpoint<T extends Partial<Record<Methods, CreateApiEndpointA
       response: updateOperation.response,
       isSuccess: updateOperation.isSubmitSuccessful,
       error:
-        updateOperation.submitError && Object.keys(updateOperation.submitError).length > 0
+        updateOperation.submitError &&
+        Object.keys(updateOperation.submitError).length > 0
           ? updateOperation.submitError
           : null,
       values: updateValues,
       setValue: updateOperation.form.setValue.bind(updateOperation.form),
       submit: async (
-        data: typeof updateOperation.form extends UseFormReturn<infer TValues> ? TValues : never,
+        data: typeof updateOperation.form extends UseFormReturn<infer TValues>
+          ? TValues
+          : never,
       ): Promise<void> => {
         updateOperation.form.reset(data);
         await updateOperation.submitForm();

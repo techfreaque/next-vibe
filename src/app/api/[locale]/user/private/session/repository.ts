@@ -8,7 +8,11 @@ import "server-only";
 import { eq, lt, or } from "drizzle-orm";
 import { cookies } from "next/headers";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -35,7 +39,10 @@ export class SessionRepository {
 
       // First, try to find the session in the database
       // This handles both regular sessions and JWT tokens stored during login
-      const results = await db.select().from(sessions).where(eq(sessions.token, token));
+      const results = await db
+        .select()
+        .from(sessions)
+        .where(eq(sessions.token, token));
 
       if (results.length > 0) {
         return success(results[0]);
@@ -97,7 +104,8 @@ export class SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal cleanup methods
       return fail({
-        message: "app.api.user.private.session.errors.expired_sessions_delete_failed",
+        message:
+          "app.api.user.private.session.errors.expired_sessions_delete_failed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: {
           error: parseError(error).message,
@@ -112,7 +120,10 @@ export class SessionRepository {
    * @param newExpiresAt - The new expiration date
    * @returns Success or error response
    */
-  static async extendSession(token: string, newExpiresAt: Date): Promise<ResponseType<void>> {
+  static async extendSession(
+    token: string,
+    newExpiresAt: Date,
+  ): Promise<ResponseType<void>> {
     try {
       // Note: Logger not available for internal session methods
 
@@ -159,7 +170,8 @@ export class SessionRepository {
 
       if (results.length === 0) {
         return fail({
-          message: "app.api.user.private.session.errors.session_creation_failed",
+          message:
+            "app.api.user.private.session.errors.session_creation_failed",
           errorType: ErrorResponseTypes.DATABASE_ERROR,
           messageParams: { userId: data.userId, operation: "create" },
         });
@@ -169,7 +181,8 @@ export class SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal session methods
       return fail({
-        message: "app.api.user.private.session.errors.session_creation_database_error",
+        message:
+          "app.api.user.private.session.errors.session_creation_database_error",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: {
           userId: data.userId,
@@ -195,7 +208,8 @@ export class SessionRepository {
     } catch (error) {
       // Note: Logger not available for internal session methods
       return fail({
-        message: "app.api.user.private.session.errors.user_sessions_delete_failed",
+        message:
+          "app.api.user.private.session.errors.user_sessions_delete_failed",
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: {
           userId,

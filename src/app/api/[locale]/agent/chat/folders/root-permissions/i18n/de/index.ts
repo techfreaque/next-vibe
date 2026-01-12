@@ -10,7 +10,8 @@ export const translations: typeof enTranslations = {
     },
     rootFolderId: {
       label: "Root-Ordner-ID",
-      description: "Die ID des Root-Ordners, für den Berechtigungen geprüft werden sollen",
+      description:
+        "Die ID des Root-Ordners, für den Berechtigungen geprüft werden sollen",
       placeholder: "private, shared, public oder incognito",
     },
     response: {

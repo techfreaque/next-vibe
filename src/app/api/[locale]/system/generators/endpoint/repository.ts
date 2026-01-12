@@ -8,7 +8,11 @@ import "server-only";
 import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -309,7 +313,9 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
     // Generate alias map entries (with trailing commas)
     // Only quote keys when they contain special characters (hyphens, etc.)
     // Split long lines at 100+ characters
-    const entries = Object.entries(aliasToPathMap).toSorted(([a], [b]) => a.localeCompare(b));
+    const entries = Object.entries(aliasToPathMap).toSorted(([a], [b]) =>
+      a.localeCompare(b),
+    );
     const aliasMapEntries = entries
       .map(([alias, fullPath]) => {
         const needsQuotes = /[^a-zA-Z0-9_$]/.test(alias);
@@ -366,4 +372,5 @@ ${cases.join("\n")}
   }
 }
 
-export const endpointGeneratorRepository = new EndpointGeneratorRepositoryImpl();
+export const endpointGeneratorRepository =
+  new EndpointGeneratorRepositoryImpl();

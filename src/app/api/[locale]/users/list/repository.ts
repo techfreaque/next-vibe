@@ -7,7 +7,11 @@ import "server-only";
 
 import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -161,10 +165,12 @@ export class UserListRepository {
       }
 
       // Build where clause
-      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+      const whereClause =
+        conditions.length > 0 ? and(...conditions) : undefined;
 
       // Get sort configuration
-      const sortField = requestData.sortingOptions?.sortBy || UserSortField.CREATED_AT;
+      const sortField =
+        requestData.sortingOptions?.sortBy || UserSortField.CREATED_AT;
       const sortOrder = requestData.sortingOptions?.sortOrder || SortOrder.DESC;
       const sortColumn = UserListRepository.getSortColumn(sortField);
 

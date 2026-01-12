@@ -72,11 +72,14 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.messages.stats.get.timePeriod.label",
-          description: "app.api.emails.messages.stats.get.timePeriod.description",
+          description:
+            "app.api.emails.messages.stats.get.timePeriod.description",
           options: TimePeriodOptions,
           columns: 4,
         },
-        z.enum(Object.values(TimePeriod) as [string, ...string[]]).default(TimePeriod.day),
+        z
+          .enum(Object.values(TimePeriod) as [string, ...string[]])
+          .default(TimePeriod.day),
       ),
 
       dateRangePreset: requestDataField(
@@ -84,7 +87,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.messages.stats.get.dateRangePreset.label",
-          description: "app.api.emails.messages.stats.get.dateRangePreset.description",
+          description:
+            "app.api.emails.messages.stats.get.dateRangePreset.description",
           options: DateRangePresetOptions,
           columns: 4,
         },
@@ -120,11 +124,14 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.messages.stats.get.chartType.label",
-          description: "app.api.emails.messages.stats.get.chartType.description",
+          description:
+            "app.api.emails.messages.stats.get.chartType.description",
           options: ChartTypeOptions,
           columns: 4,
         },
-        z.enum(Object.values(ChartType) as [string, ...string[]]).default(ChartType.line),
+        z
+          .enum(Object.values(ChartType) as [string, ...string[]])
+          .default(ChartType.line),
       ),
 
       includeComparison: requestDataField(
@@ -132,7 +139,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.emails.messages.stats.get.includeComparison.label",
-          description: "app.api.emails.messages.stats.get.includeComparison.description",
+          description:
+            "app.api.emails.messages.stats.get.includeComparison.description",
           columns: 6,
         },
         z.coerce.boolean().default(false),
@@ -198,11 +206,14 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.emails.messages.stats.get.sortOrder.label",
-          description: "app.api.emails.messages.stats.get.sortOrder.description",
+          description:
+            "app.api.emails.messages.stats.get.sortOrder.description",
           options: SortOrderOptions,
           columns: 6,
         },
-        z.enum(Object.values(SortOrder) as [string, ...string[]]).default(SortOrder.DESC),
+        z
+          .enum(Object.values(SortOrder) as [string, ...string[]])
+          .default(SortOrder.DESC),
       ),
 
       // === RESPONSE FIELDS ===
@@ -306,14 +317,16 @@ const { GET } = createEndpoint({
       emailsByProvider: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.emailsByProvider",
+          content:
+            "app.api.emails.messages.stats.get.response.emailsByProvider",
         },
         z.record(z.string(), z.coerce.number()),
       ),
       emailsByTemplate: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.emailsByTemplate",
+          content:
+            "app.api.emails.messages.stats.get.response.emailsByTemplate",
         },
         z.record(z.string(), z.coerce.number()),
       ),
@@ -336,28 +349,32 @@ const { GET } = createEndpoint({
       emailsWithUserId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.emailsWithUserId",
+          content:
+            "app.api.emails.messages.stats.get.response.emailsWithUserId",
         },
         z.coerce.number(),
       ),
       emailsWithoutUserId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.emailsWithoutUserId",
+          content:
+            "app.api.emails.messages.stats.get.response.emailsWithoutUserId",
         },
         z.coerce.number(),
       ),
       emailsWithLeadId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.emailsWithLeadId",
+          content:
+            "app.api.emails.messages.stats.get.response.emailsWithLeadId",
         },
         z.coerce.number(),
       ),
       emailsWithoutLeadId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.emailsWithoutLeadId",
+          content:
+            "app.api.emails.messages.stats.get.response.emailsWithoutLeadId",
         },
         z.coerce.number(),
       ),
@@ -366,21 +383,24 @@ const { GET } = createEndpoint({
       emailsWithErrors: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.emailsWithErrors",
+          content:
+            "app.api.emails.messages.stats.get.response.emailsWithErrors",
         },
         z.coerce.number(),
       ),
       emailsWithoutErrors: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.emailsWithoutErrors",
+          content:
+            "app.api.emails.messages.stats.get.response.emailsWithoutErrors",
         },
         z.coerce.number(),
       ),
       averageRetryCount: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.averageRetryCount",
+          content:
+            "app.api.emails.messages.stats.get.response.averageRetryCount",
         },
         z.coerce.number(),
       ),
@@ -396,14 +416,16 @@ const { GET } = createEndpoint({
       averageProcessingTime: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.averageProcessingTime",
+          content:
+            "app.api.emails.messages.stats.get.response.averageProcessingTime",
         },
         z.coerce.number(),
       ),
       averageDeliveryTime: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.averageDeliveryTime",
+          content:
+            "app.api.emails.messages.stats.get.response.averageDeliveryTime",
         },
         z.coerce.number(),
       ),
@@ -456,7 +478,8 @@ const { GET } = createEndpoint({
       topPerformingTemplates: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.topPerformingTemplates",
+          content:
+            "app.api.emails.messages.stats.get.response.topPerformingTemplates",
         },
         z.array(z.any()),
       ),
@@ -464,7 +487,8 @@ const { GET } = createEndpoint({
       topPerformingProviders: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.emails.messages.stats.get.response.topPerformingProviders",
+          content:
+            "app.api.emails.messages.stats.get.response.topPerformingProviders",
         },
         z.array(z.any()),
       ),
@@ -474,39 +498,48 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.emails.messages.stats.get.errors.validation.title",
-      description: "app.api.emails.messages.stats.get.errors.validation.description",
+      description:
+        "app.api.emails.messages.stats.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.emails.messages.stats.get.errors.unauthorized.title",
-      description: "app.api.emails.messages.stats.get.errors.unauthorized.description",
+      description:
+        "app.api.emails.messages.stats.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.emails.messages.stats.get.errors.server.title",
-      description: "app.api.emails.messages.stats.get.errors.server.description",
+      description:
+        "app.api.emails.messages.stats.get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.messages.stats.get.errors.unknown.title",
-      description: "app.api.emails.messages.stats.get.errors.unknown.description",
+      description:
+        "app.api.emails.messages.stats.get.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.emails.messages.stats.get.errors.network.title",
-      description: "app.api.emails.messages.stats.get.errors.network.description",
+      description:
+        "app.api.emails.messages.stats.get.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.emails.messages.stats.get.errors.forbidden.title",
-      description: "app.api.emails.messages.stats.get.errors.forbidden.description",
+      description:
+        "app.api.emails.messages.stats.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.emails.messages.stats.get.errors.notFound.title",
-      description: "app.api.emails.messages.stats.get.errors.notFound.description",
+      description:
+        "app.api.emails.messages.stats.get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.emails.messages.stats.get.errors.unsavedChanges.title",
-      description: "app.api.emails.messages.stats.get.errors.unsavedChanges.description",
+      description:
+        "app.api.emails.messages.stats.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.emails.messages.stats.get.errors.conflict.title",
-      description: "app.api.emails.messages.stats.get.errors.conflict.description",
+      description:
+        "app.api.emails.messages.stats.get.errors.conflict.description",
     },
   },
 

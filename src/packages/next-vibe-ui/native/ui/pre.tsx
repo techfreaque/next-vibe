@@ -13,7 +13,9 @@ import { convertCSSToTextStyle } from "../utils/style-converter";
 const StyledText = styled(Text, { className: "style" });
 
 export function Pre({ className, style, children, id }: PreProps): JSX.Element {
-  const nativeStyle: TextStyle | undefined = style ? convertCSSToTextStyle(style) : undefined;
+  const nativeStyle: TextStyle | undefined = style
+    ? convertCSSToTextStyle(style)
+    : undefined;
 
   return (
     <StyledText

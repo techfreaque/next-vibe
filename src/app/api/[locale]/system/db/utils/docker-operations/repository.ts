@@ -7,7 +7,11 @@
 import { spawn } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -15,7 +19,10 @@ import { formatDuration } from "@/app/api/[locale]/system/unified-interface/shar
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import type { DockerOperationRequestOutput, DockerOperationResponseOutput } from "./definition";
+import type {
+  DockerOperationRequestOutput,
+  DockerOperationResponseOutput,
+} from "./definition";
 
 /**
  * Docker command constants
@@ -39,7 +46,9 @@ const HIDDEN_DOCKER_LOG_PATTERNS = [
  * Check if a log line should be hidden
  */
 function shouldHideLogLine(line: string): boolean {
-  return HIDDEN_DOCKER_LOG_PATTERNS.some((pattern) => pattern.test(line.trim()));
+  return HIDDEN_DOCKER_LOG_PATTERNS.some((pattern) =>
+    pattern.test(line.trim()),
+  );
 }
 
 /**
@@ -113,7 +122,8 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       logger.error("🗄️  Docker command execution failed", parsedError);
 
       return fail({
-        message: "app.api.system.db.utils.dockerOperations.errors.executionFailed.title",
+        message:
+          "app.api.system.db.utils.dockerOperations.errors.executionFailed.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -148,7 +158,9 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       });
 
       const duration = Date.now() - startTime;
-      logger.info(`🗄️  Docker Compose down completed in ${formatDuration(duration)}`);
+      logger.info(
+        `🗄️  Docker Compose down completed in ${formatDuration(duration)}`,
+      );
 
       return success(result.success);
     } catch (error) {
@@ -156,7 +168,8 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       logger.error("🗄️ Docker Compose down failed", parsedError);
 
       return fail({
-        message: "app.api.system.db.utils.dockerOperations.errors.composeDownFailed.title",
+        message:
+          "app.api.system.db.utils.dockerOperations.errors.composeDownFailed.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -192,7 +205,9 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       });
 
       const duration = Date.now() - startTime;
-      logger.debug(`Docker Compose up completed in ${formatDuration(duration)}`);
+      logger.debug(
+        `Docker Compose up completed in ${formatDuration(duration)}`,
+      );
 
       return success(result.success);
     } catch (error) {
@@ -200,7 +215,8 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       logger.error("🗄️  Docker Compose up failed", parsedError);
 
       return fail({
-        message: "app.api.system.db.utils.dockerOperations.errors.composeUpFailed.title",
+        message:
+          "app.api.system.db.utils.dockerOperations.errors.composeUpFailed.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -220,7 +236,13 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       logger: EndpointLogger;
     },
   ): Promise<{ success: boolean; output: string; error?: string }> {
-    const { timeout = 30000, hideStandardLogs = true, description, locale, logger } = options;
+    const {
+      timeout = 30000,
+      hideStandardLogs = true,
+      description,
+      locale,
+      logger,
+    } = options;
 
     const { t } = simpleT(locale);
 
@@ -229,7 +251,10 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         logger.debug(description);
       } else {
         logger.debug(
-          t("app.api.system.db.utils.dockerOperations.messages.executingCommand", { command }),
+          t(
+            "app.api.system.db.utils.dockerOperations.messages.executingCommand",
+            { command },
+          ),
         );
       }
 
@@ -252,10 +277,13 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
           }
           resolved = true;
           child.kill("SIGTERM");
-          const errorMessage = t("app.api.system.db.utils.dockerOperations.messages.timeoutError", {
-            timeout,
-            command,
-          });
+          const errorMessage = t(
+            "app.api.system.db.utils.dockerOperations.messages.timeoutError",
+            {
+              timeout,
+              command,
+            },
+          );
           reject(new Error(errorMessage));
         }, timeout);
       });
@@ -309,10 +337,13 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
 
         if (!success && error) {
           logger.error(
-            t("app.api.system.db.utils.dockerOperations.messages.commandFailed", {
-              code: String(code),
-              command,
-            }),
+            t(
+              "app.api.system.db.utils.dockerOperations.messages.commandFailed",
+              {
+                code: String(code),
+                command,
+              },
+            ),
           );
         }
 
@@ -332,7 +363,10 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         resolved = true;
         clearTimeout(timeoutId);
         logger.error(
-          t("app.api.system.db.utils.dockerOperations.messages.executionFailed", { command }),
+          t(
+            "app.api.system.db.utils.dockerOperations.messages.executionFailed",
+            { command },
+          ),
           err,
         );
         // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved

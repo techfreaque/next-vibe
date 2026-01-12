@@ -3,7 +3,10 @@
  * Handles routing logic for threads and folders
  */
 
-import { DefaultFolderId, isDefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import {
+  DefaultFolderId,
+  isDefaultFolderId,
+} from "@/app/api/[locale]/agent/chat/config";
 import type { ChatFolder } from "@/app/api/[locale]/agent/chat/hooks/store";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -59,7 +62,9 @@ export function buildFolderUrl(
  * @param rootFolderId - ID of the root folder
  * @returns Translation key like "app.chat.common.newPrivateChat"
  */
-export function getNewChatTranslationKey(rootFolderId: DefaultFolderId): TranslationKey {
+export function getNewChatTranslationKey(
+  rootFolderId: DefaultFolderId,
+): TranslationKey {
   switch (rootFolderId) {
     case DefaultFolderId.PRIVATE:
       return "app.chat.common.newPrivateChat";
@@ -79,7 +84,9 @@ export function getNewChatTranslationKey(rootFolderId: DefaultFolderId): Transla
  * @param rootFolderId - ID of the root folder
  * @returns Translation key like "app.chat.common.newPrivateFolder"
  */
-export function getNewFolderTranslationKey(rootFolderId: DefaultFolderId): TranslationKey {
+export function getNewFolderTranslationKey(
+  rootFolderId: DefaultFolderId,
+): TranslationKey {
   switch (rootFolderId) {
     case DefaultFolderId.PRIVATE:
       return "app.chat.common.newPrivateFolder";
@@ -99,7 +106,9 @@ export function getNewFolderTranslationKey(rootFolderId: DefaultFolderId): Trans
  * @param rootFolderId - ID of the root folder
  * @returns Translation key like "app.chat.common.createNewPrivateFolder"
  */
-export function getCreateFolderTranslationKey(rootFolderId: DefaultFolderId): TranslationKey {
+export function getCreateFolderTranslationKey(
+  rootFolderId: DefaultFolderId,
+): TranslationKey {
   switch (rootFolderId) {
     case DefaultFolderId.PRIVATE:
       return "app.chat.common.createNewPrivateFolder";

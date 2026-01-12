@@ -91,7 +91,8 @@ export const translations: typeof enTranslations = {
     },
     unknownError: {
       title: "Unbekannter Fehler",
-      description: "Ein unbekannter Fehler ist während der Reset-Task-Operation aufgetreten",
+      description:
+        "Ein unbekannter Fehler ist während der Reset-Task-Operation aufgetreten",
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
@@ -113,22 +114,31 @@ export const translations: typeof enTranslations = {
   },
   messages: {
     noUnauthorizedResetOperations: "Keine unbefugten Reset-Operationen erkannt",
-    safetyCheckSkippedNotProduction: "Sicherheitsprüfung übersprungen (nicht in Produktion)",
+    safetyCheckSkippedNotProduction:
+      "Sicherheitsprüfung übersprungen (nicht in Produktion)",
     safetyCheckFailed: "Datenbank-Reset-Sicherheitsprüfung fehlgeschlagen",
     autoResetSkippedNotDevelopment:
       "Automatischer Reset übersprungen (nicht in Entwicklungsumgebung)",
-    operationOnlyAllowedInDevelopment: "Operation nur in Entwicklungsumgebung erlaubt",
+    operationOnlyAllowedInDevelopment:
+      "Operation nur in Entwicklungsumgebung erlaubt",
     autoResetTaskNotFound: "Automatische Reset-Aufgabe nicht gefunden",
     taskConfigurationMissing: "Task-Konfiguration fehlt",
-    autoResetStartedSuccessfully: "Automatische Datenbank-Reset-Aufgabe erfolgreich gestartet",
+    autoResetStartedSuccessfully:
+      "Automatische Datenbank-Reset-Aufgabe erfolgreich gestartet",
     failedToStartAutoReset: "Automatischer Reset konnte nicht gestartet werden",
-    backupVerificationTaskNotFound: "Backup-Verifizierungsaufgabe nicht gefunden",
-    backupVerificationStartedSuccessfully: "Datenbank-Backup-Verifizierung erfolgreich gestartet",
-    failedToStartBackupVerification: "Backup-Verifizierung konnte nicht gestartet werden",
-    autoResetStoppedSuccessfully: "Automatische Reset-Aufgabe erfolgreich gestoppt",
+    backupVerificationTaskNotFound:
+      "Backup-Verifizierungsaufgabe nicht gefunden",
+    backupVerificationStartedSuccessfully:
+      "Datenbank-Backup-Verifizierung erfolgreich gestartet",
+    failedToStartBackupVerification:
+      "Backup-Verifizierung konnte nicht gestartet werden",
+    autoResetStoppedSuccessfully:
+      "Automatische Reset-Aufgabe erfolgreich gestoppt",
     failedToStopAutoReset: "Automatischer Reset konnte nicht gestoppt werden",
-    backupVerificationStoppedSuccessfully: "Backup-Verifizierungsaufgabe erfolgreich gestoppt",
-    failedToStopBackupVerification: "Backup-Verifizierung konnte nicht gestoppt werden",
+    backupVerificationStoppedSuccessfully:
+      "Backup-Verifizierungsaufgabe erfolgreich gestoppt",
+    failedToStopBackupVerification:
+      "Backup-Verifizierung konnte nicht gestoppt werden",
     taskNotFound: "Aufgabe nicht gefunden",
     taskDoesNotExist: "Aufgabe '{taskName}' existiert nicht",
     taskStatusRetrieved: "Status der Aufgabe '{taskName}' abgerufen",
@@ -138,11 +148,13 @@ export const translations: typeof enTranslations = {
   },
   tasks: {
     resetSafetyCheck: {
-      description: "Überwachung auf versehentliche Datenbank-Resets in der Produktion",
+      description:
+        "Überwachung auf versehentliche Datenbank-Resets in der Produktion",
       schedule: "0 */12 * * *",
     },
     devAutoReset: {
-      description: "Automatisches Zurücksetzen der Entwicklungsdatenbank nach Zeitplan",
+      description:
+        "Automatisches Zurücksetzen der Entwicklungsdatenbank nach Zeitplan",
       schedule: "0 6 * * 1",
     },
     backupVerification: {

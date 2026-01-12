@@ -16,7 +16,8 @@ export const LocaleSelectorContent: FC = () => {
   const translationContext = useTranslation();
   const countries: readonly CountryInfo[] = translationContext.countries;
   const currentCountry: CountryInfo = translationContext.currentCountry;
-  const changeLocale: (country: Countries) => void = translationContext.changeLocale;
+  const changeLocale: (country: Countries) => void =
+    translationContext.changeLocale;
   const language: Languages = translationContext.language;
   const country: Countries = translationContext.country;
   const setLanguage: (lang: Languages) => void = translationContext.setLanguage;
@@ -42,8 +43,8 @@ export const LocaleSelectorContent: FC = () => {
 
   const uniqueLanguages = getUniqueLanguages();
   const currentLanguageFlag =
-    uniqueLanguages.find(([code]) => code === language)?.[1].countries[0]?.flag ||
-    currentCountry.flag;
+    uniqueLanguages.find(([code]) => code === language)?.[1].countries[0]
+      ?.flag || currentCountry.flag;
 
   return (
     <Div className="w-72 p-2">
@@ -91,10 +92,14 @@ export const LocaleSelectorContent: FC = () => {
                   <Span className="text-lg mr-1">{countryItem.flag}</Span>
                   <Div className="flex flex-col items-start">
                     <Span className="font-medium">{countryItem.name}</Span>
-                    <Span className="text-xs text-muted-foreground">{countryItem.langName}</Span>
+                    <Span className="text-xs text-muted-foreground">
+                      {countryItem.langName}
+                    </Span>
                   </Div>
                 </Div>
-                {country === countryItem.code && <Check className="h-4 w-4 text-primary" />}
+                {country === countryItem.code && (
+                  <Check className="h-4 w-4 text-primary" />
+                )}
               </Button>
             ))}
           </Div>
@@ -123,7 +128,9 @@ export const LocaleSelectorContent: FC = () => {
                     <Span className="font-medium">{langInfo.name}</Span>
                   </Div>
                 </Div>
-                {language === langCode && <Check className="h-4 w-4 text-primary" />}
+                {language === langCode && (
+                  <Check className="h-4 w-4 text-primary" />
+                )}
               </Button>
             ))}
           </Div>

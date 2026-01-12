@@ -52,9 +52,13 @@ export abstract class BaseRecorder implements Recorder {
   async start(destPath: string): Promise<void> {
     if (this._isRecording) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Recorder initialization error
-      throw new RecorderError("Recording already in progress", "RECORDING_IN_PROGRESS", {
-        currentPath: this._currentPath,
-      });
+      throw new RecorderError(
+        "Recording already in progress",
+        "RECORDING_IN_PROGRESS",
+        {
+          currentPath: this._currentPath,
+        },
+      );
     }
 
     await this.checkDependencies();
@@ -77,11 +81,15 @@ export abstract class BaseRecorder implements Recorder {
       this._isRecording = false;
       this._currentPath = null;
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Recorder initialization error
-      throw new RecorderError(`Failed to start recording: ${String(error)}`, "START_FAILED", {
-        command,
-        args: args.join(" "),
-        error: error instanceof Error ? error.message : String(error),
-      });
+      throw new RecorderError(
+        `Failed to start recording: ${String(error)}`,
+        "START_FAILED",
+        {
+          command,
+          args: args.join(" "),
+          error: error instanceof Error ? error.message : String(error),
+        },
+      );
     }
   }
 
@@ -103,9 +111,13 @@ export abstract class BaseRecorder implements Recorder {
       this._process = undefined;
     } catch (error) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Recorder stop error
-      throw new RecorderError(`Failed to stop recording: ${String(error)}`, "STOP_FAILED", {
-        error: error instanceof Error ? error.message : String(error),
-      });
+      throw new RecorderError(
+        `Failed to stop recording: ${String(error)}`,
+        "STOP_FAILED",
+        {
+          error: error instanceof Error ? error.message : String(error),
+        },
+      );
     }
   }
 
@@ -131,7 +143,9 @@ export abstract class BaseRecorder implements Recorder {
   /**
    * Read stderr stream
    */
-  private async readStderr(reader: ReadableStreamDefaultReader<Uint8Array>): Promise<void> {
+  private async readStderr(
+    reader: ReadableStreamDefaultReader<Uint8Array>,
+  ): Promise<void> {
     try {
       const decoder = new TextDecoder();
       let buffer = "";

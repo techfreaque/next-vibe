@@ -2,24 +2,28 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Lista żądań sieciowych",
-  description: "Lista wszystkich żądań dla aktualnie wybranej strony od ostatniej nawigacji",
+  description:
+    "Lista wszystkich żądań dla aktualnie wybranej strony od ostatniej nawigacji",
   form: {
     label: "Lista żądań sieciowych",
     description: "Pobierz wszystkie żądania sieciowe ze strony przeglądarki",
     fields: {
       includePreservedRequests: {
         label: "Uwzględnij zachowane żądania",
-        description: "Ustaw na true, aby zwrócić zachowane żądania z ostatnich 3 nawigacji",
+        description:
+          "Ustaw na true, aby zwrócić zachowane żądania z ostatnich 3 nawigacji",
         placeholder: "false",
       },
       pageIdx: {
         label: "Indeks strony",
-        description: "Numer strony do zwrócenia (0-based, pomiń dla pierwszej strony)",
+        description:
+          "Numer strony do zwrócenia (0-based, pomiń dla pierwszej strony)",
         placeholder: "Wprowadź indeks strony",
       },
       pageSize: {
         label: "Rozmiar strony",
-        description: "Maksymalna liczba żądań do zwrócenia (pomiń, aby zwrócić wszystkie żądania)",
+        description:
+          "Maksymalna liczba żądań do zwrócenia (pomiń, aby zwrócić wszystkie żądania)",
         placeholder: "Wprowadź rozmiar strony",
       },
       resourceTypes: {
@@ -91,7 +95,8 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description: "Wystąpił wewnętrzny błąd serwera podczas listowania żądań sieciowych",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas listowania żądań sieciowych",
     },
     unknown: {
       title: "Nieznany błąd",

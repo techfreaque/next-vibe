@@ -27,8 +27,15 @@ export class FinishStepHandler {
     encoder: TextEncoder;
     logger: EndpointLogger;
   }): Promise<{ shouldAbort: boolean }> {
-    const { ctx, streamResult, isIncognito, streamAbortController, controller, encoder, logger } =
-      params;
+    const {
+      ctx,
+      streamResult,
+      isIncognito,
+      streamAbortController,
+      controller,
+      encoder,
+      logger,
+    } = params;
 
     // Finalize current ASSISTANT message before resetting for next step
     if (ctx.currentAssistantMessageId && ctx.currentAssistantContent) {
@@ -53,9 +60,12 @@ export class FinishStepHandler {
     // Check if any tools in this step require confirmation
     // If yes, abort stream AFTER all tool calls have been processed
     if (ctx.stepHasToolsAwaitingConfirmation) {
-      logger.info("[AI Stream] Step complete - tools require confirmation, aborting stream", {
-        toolCallsInStep: ctx.pendingToolMessages.size,
-      });
+      logger.info(
+        "[AI Stream] Step complete - tools require confirmation, aborting stream",
+        {
+          toolCallsInStep: ctx.pendingToolMessages.size,
+        },
+      );
 
       // Abort the stream to stop the AI SDK from processing further
       streamAbortController.abort(new Error("Tool requires user confirmation"));

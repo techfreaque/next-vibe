@@ -1,10 +1,18 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { smsEnv } from "../env";
-import type { SendSmsParams, SmsProvider, SmsResult, SmsResultMetadata } from "../utils";
+import type {
+  SendSmsParams,
+  SmsProvider,
+  SmsResult,
+  SmsResultMetadata,
+} from "../utils";
 import { SmsProviders } from "../utils";
 
 // Define interfaces for MessageBird responses
@@ -53,7 +61,10 @@ export function getMessageBirdProvider(): SmsProvider {
   return {
     name: SmsProviders.MESSAGEBIRD,
 
-    async sendSms(params: SendSmsParams, logger: EndpointLogger): Promise<ResponseType<SmsResult>> {
+    async sendSms(
+      params: SendSmsParams,
+      logger: EndpointLogger,
+    ): Promise<ResponseType<SmsResult>> {
       try {
         // Validate access key early
         if (!accessKey) {
@@ -90,7 +101,11 @@ export function getMessageBirdProvider(): SmsProvider {
           });
         }
 
-        if (!params.message || typeof params.message !== "string" || params.message.trim() === "") {
+        if (
+          !params.message ||
+          typeof params.message !== "string" ||
+          params.message.trim() === ""
+        ) {
           return fail({
             message: "app.api.sms.sms.error.empty_message",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
@@ -132,11 +147,17 @@ export function getMessageBirdProvider(): SmsProvider {
             requestData.reference = options.reference;
           }
 
-          if (typeof options.validity === "number" || typeof options.validity === "string") {
+          if (
+            typeof options.validity === "number" ||
+            typeof options.validity === "string"
+          ) {
             requestData.validity = options.validity;
           }
 
-          if (typeof options.gateway === "number" || typeof options.gateway === "string") {
+          if (
+            typeof options.gateway === "number" ||
+            typeof options.gateway === "string"
+          ) {
             requestData.gateway = options.gateway;
           }
         }

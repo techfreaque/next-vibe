@@ -42,7 +42,9 @@ export function Checkbox({
     >
       {children ?? (
         <CheckboxPrimitive.Indicator
-          className={cn("flex flex-row items-center justify-center text-current")}
+          className={cn(
+            "flex flex-row items-center justify-center text-current",
+          )}
         >
           <CheckIcon className="h-3.5 w-3.5" />
         </CheckboxPrimitive.Indicator>
@@ -60,7 +62,10 @@ export function CheckboxIndicator({
 }: CheckboxIndicatorProps): React.JSX.Element {
   return (
     <CheckboxPrimitive.Indicator
-      className={cn("flex flex-row items-center justify-center text-current", className)}
+      className={cn(
+        "flex flex-row items-center justify-center text-current",
+        className,
+      )}
       style={style}
       {...props}
     >

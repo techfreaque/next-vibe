@@ -30,12 +30,18 @@ export function createUncensoredAI(logger: EndpointLogger): {
   const apiKey = agentEnv.UNCENSORED_AI_API_KEY;
   const provider = "uncensored-ai" as const;
 
-  const customFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+  const customFetch = async (
+    input: RequestInfo | URL,
+    init?: RequestInit,
+  ): Promise<Response> => {
     if (!init?.body) {
       logger.error("No request body provided to Uncensored AI fetch override");
-      return new Response(JSON.stringify({ error: "No request body provided" }), {
-        status: 400,
-      });
+      return new Response(
+        JSON.stringify({ error: "No request body provided" }),
+        {
+          status: 400,
+        },
+      );
     }
 
     const parsedBody = JSON.parse(init.body as string) as OpenAIRequestBody;
@@ -105,7 +111,13 @@ export function createUncensoredAI(logger: EndpointLogger): {
  * OpenAI API Types
  */
 
-type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue };
+type JSONValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JSONValue[]
+  | { [key: string]: JSONValue };
 
 interface OpenAIMessage {
   role: string;
@@ -269,7 +281,9 @@ function parseToolCalls(
 /**
  * Convert "developer" role messages to "system" role for API compatibility
  */
-function convertDeveloperToSystemMessages(messages: OpenAIMessage[]): OpenAIMessage[] {
+function convertDeveloperToSystemMessages(
+  messages: OpenAIMessage[],
+): OpenAIMessage[] {
   return messages.map((msg) => {
     if (msg.role === "developer") {
       return { ...msg, role: "system" };
@@ -281,14 +295,18 @@ function convertDeveloperToSystemMessages(messages: OpenAIMessage[]): OpenAIMess
 /**
  * Inject tool calling instructions into the first system message
  */
-function injectToolInstructions(messages: OpenAIMessage[], tools: OpenAITool[]): OpenAIMessage[] {
+function injectToolInstructions(
+  messages: OpenAIMessage[],
+  tools: OpenAITool[],
+): OpenAIMessage[] {
   const toolSystemPrompt = generateToolSystemPrompt(tools);
   const firstSystemIdx = messages.findIndex((msg) => msg.role === "system");
 
   if (firstSystemIdx !== -1) {
     // Append to existing system message
     const existingContent = messages[firstSystemIdx].content;
-    const contentStr = typeof existingContent === "string" ? existingContent : "";
+    const contentStr =
+      typeof existingContent === "string" ? existingContent : "";
     const updatedMessages = [...messages];
     updatedMessages[firstSystemIdx] = {
       ...messages[firstSystemIdx],
@@ -310,7 +328,10 @@ function injectToolInstructions(messages: OpenAIMessage[], tools: OpenAITool[]):
 /**
  * Convert JSON response to Server-Sent Events (SSE) streaming format
  */
-function createStreamingResponse(jsonResponse: OpenAIResponse, logger: EndpointLogger): Response {
+function createStreamingResponse(
+  jsonResponse: OpenAIResponse,
+  logger: EndpointLogger,
+): Response {
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     start(controller): void {
@@ -322,7 +343,10 @@ function createStreamingResponse(jsonResponse: OpenAIResponse, logger: EndpointL
 
       for (const choice of jsonResponse.choices || []) {
         const content = choice.message?.content || "";
-        const { textContent, toolCalls, isDone } = parseToolCalls(content, logger);
+        const { textContent, toolCalls, isDone } = parseToolCalls(
+          content,
+          logger,
+        );
 
         // Send role chunk
         controller.enqueue(

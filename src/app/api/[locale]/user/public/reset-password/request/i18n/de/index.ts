@@ -17,7 +17,8 @@ export const translations: typeof enTranslations = {
     instructions:
       "Klicken Sie auf die Schaltfläche unten, um ein neues Passwort zu erstellen. Dieser Link ist 24 Stunden gültig und kann nur einmal verwendet werden.",
     buttonText: "Mein Passwort zurücksetzen",
-    expirationInfo: "Dieser sichere Link läuft in 24 Stunden zu Ihrem Schutz ab.",
+    expirationInfo:
+      "Dieser sichere Link läuft in 24 Stunden zu Ihrem Schutz ab.",
     securityInfo:
       "Zu Ihrer Sicherheit wurde diese Passwortzurücksetzung von {{ipAddress}} am {{requestTime}} angefordert.",
     didntRequest: "Nicht angefordert?",
@@ -28,12 +29,14 @@ export const translations: typeof enTranslations = {
       "Wenn Sie Probleme beim Zurücksetzen Ihres Passworts oder beim Zugriff auf Ihr Konto haben, steht Ihnen unser Support-Team zur Verfügung.",
     supportButton: "Support kontaktieren",
     signoff: "Bleiben Sie sicher,\nDas {{appName}} Team",
-    footer: "Dies ist eine automatische Sicherheitsbenachrichtigung von {{appName}}",
+    footer:
+      "Dies ist eine automatische Sicherheitsbenachrichtigung von {{appName}}",
   },
   groups: {
     emailInput: {
       title: "E-Mail-Eingabe",
-      description: "Geben Sie Ihre E-Mail-Adresse ein, um Reset-Anweisungen zu erhalten",
+      description:
+        "Geben Sie Ihre E-Mail-Adresse ein, um Reset-Anweisungen zu erhalten",
     },
   },
   fields: {

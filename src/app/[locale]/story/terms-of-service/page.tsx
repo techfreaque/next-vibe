@@ -52,7 +52,9 @@ export async function generateMetadata(
   });
 }
 
-export default async function TermsOfServicePage({ params }: Props): Promise<JSX.Element> {
+export default async function TermsOfServicePage({
+  params,
+}: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
   const appName = t("config.appName");
@@ -87,40 +89,58 @@ export default async function TermsOfServicePage({ params }: Props): Promise<JSX
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
               <FileText className="h-5 w-5 mr-2" />
-              {t("app.story._components.home.termsOfService.sections.agreement.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.agreement.title",
+              )}
             </H2>
             <P className="mt-2">
-              {t("app.story._components.home.termsOfService.sections.agreement.content", {
-                appName: t("config.appName"),
-              })}
+              {t(
+                "app.story._components.home.termsOfService.sections.agreement.content",
+                {
+                  appName: t("config.appName"),
+                },
+              )}
             </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.termsOfService.sections.description.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.description.title",
+              )}
             </H2>
             <P className="mt-2">
-              {t("app.story._components.home.termsOfService.sections.description.content", {
-                appName: appName,
-              })}
+              {t(
+                "app.story._components.home.termsOfService.sections.description.content",
+                {
+                  appName: appName,
+                },
+              )}
             </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.termsOfService.sections.subscriptions.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.subscriptions.title",
+              )}
             </H2>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("app.story._components.home.termsOfService.sections.subscriptions.plans.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.subscriptions.plans.title",
+              )}
             </H3>
             <P className="mt-2">
-              {t("app.story._components.home.termsOfService.sections.subscriptions.plans.content")}
+              {t(
+                "app.story._components.home.termsOfService.sections.subscriptions.plans.content",
+              )}
             </P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("app.story._components.home.termsOfService.sections.subscriptions.billing.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.subscriptions.billing.title",
+              )}
             </H3>
             <P className="mt-2">
               {t(
@@ -142,11 +162,15 @@ export default async function TermsOfServicePage({ params }: Props): Promise<JSX
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.termsOfService.sections.userAccounts.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.userAccounts.title",
+              )}
             </H2>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("app.story._components.home.termsOfService.sections.userAccounts.creation.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.userAccounts.creation.title",
+              )}
             </H3>
             <P className="mt-2">
               {t(
@@ -168,11 +192,15 @@ export default async function TermsOfServicePage({ params }: Props): Promise<JSX
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.termsOfService.sections.userContent.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.userContent.title",
+              )}
             </H2>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("app.story._components.home.termsOfService.sections.userContent.ownership.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.userContent.ownership.title",
+              )}
             </H3>
             <P className="mt-2">
               {t(
@@ -181,10 +209,14 @@ export default async function TermsOfServicePage({ params }: Props): Promise<JSX
             </P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200 mt-6">
-              {t("app.story._components.home.termsOfService.sections.userContent.guidelines.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.userContent.guidelines.title",
+              )}
             </H3>
             <P className="mt-2">
-              {t("app.story._components.home.termsOfService.sections.userContent.guidelines.intro")}
+              {t(
+                "app.story._components.home.termsOfService.sections.userContent.guidelines.intro",
+              )}
             </P>
             <Ul className="flex flex-col gap-1 mt-4">
               <Li className="flex items-start">
@@ -216,7 +248,9 @@ export default async function TermsOfServicePage({ params }: Props): Promise<JSX
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.termsOfService.sections.intellectualProperty.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.intellectualProperty.title",
+              )}
             </H2>
             <P className="mt-2">
               {t(
@@ -230,53 +264,76 @@ export default async function TermsOfServicePage({ params }: Props): Promise<JSX
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.termsOfService.sections.limitation.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.limitation.title",
+              )}
             </H2>
             <P className="mt-2">
-              {t("app.story._components.home.termsOfService.sections.limitation.content", {
-                appName,
-              })}
+              {t(
+                "app.story._components.home.termsOfService.sections.limitation.content",
+                {
+                  appName,
+                },
+              )}
             </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.termsOfService.sections.indemnification.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.indemnification.title",
+              )}
             </H2>
             <P className="mt-2">
-              {t("app.story._components.home.termsOfService.sections.indemnification.content", {
-                appName,
-              })}
+              {t(
+                "app.story._components.home.termsOfService.sections.indemnification.content",
+                {
+                  appName,
+                },
+              )}
             </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.termsOfService.sections.termination.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.termination.title",
+              )}
             </H2>
             <P className="mt-2">
-              {t("app.story._components.home.termsOfService.sections.termination.content")}
+              {t(
+                "app.story._components.home.termsOfService.sections.termination.content",
+              )}
             </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.termsOfService.sections.changes.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.changes.title",
+              )}
             </H2>
             <P className="mt-2">
-              {t("app.story._components.home.termsOfService.sections.changes.content")}
+              {t(
+                "app.story._components.home.termsOfService.sections.changes.content",
+              )}
             </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.termsOfService.sections.governingLaw.title")}
+              {t(
+                "app.story._components.home.termsOfService.sections.governingLaw.title",
+              )}
             </H2>
             <P className="mt-2">
-              {t("app.story._components.home.termsOfService.sections.governingLaw.content", {
-                jurisdictionCountry: t("config.group.jurisdiction.country"),
-                jurisdictionCity: t("config.group.jurisdiction.city"),
-              })}
+              {t(
+                "app.story._components.home.termsOfService.sections.governingLaw.content",
+                {
+                  jurisdictionCountry: t("config.group.jurisdiction.country"),
+                  jurisdictionCity: t("config.group.jurisdiction.city"),
+                },
+              )}
             </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />

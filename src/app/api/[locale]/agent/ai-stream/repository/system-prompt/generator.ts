@@ -147,7 +147,9 @@ You are currently operating in the following context:`);
 
     if (rootFolderId) {
       const folderDescription = getFolderDescription(rootFolderId);
-      sections.push(`- **Root Folder:** ${rootFolderId} - ${folderDescription}`);
+      sections.push(
+        `- **Root Folder:** ${rootFolderId} - ${folderDescription}`,
+      );
     }
 
     if (subFolderId) {

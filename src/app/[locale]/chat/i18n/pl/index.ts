@@ -143,7 +143,8 @@ export const translations: typeof enTranslations = {
 
   createCharacter: {
     title: "Utwórz własną postać",
-    description: "Zaprojektuj własną postać AI z niestandardową osobowością, wiedzą i zachowaniem.",
+    description:
+      "Zaprojektuj własną postać AI z niestandardową osobowością, wiedzą i zachowaniem.",
     icon: "Ikona",
     name: "Nazwa",
     namePlaceholder: "np. Recenzent kodu",
@@ -267,8 +268,10 @@ export const translations: typeof enTranslations = {
   input: {
     placeholder: "Wpisz swoją wiadomość...",
     noPermission: "Nie masz uprawnień do publikowania wiadomości",
-    noPostPermission: "Nie masz uprawnień do publikowania wiadomości w tym wątku",
-    noCreateThreadPermission: "Nie masz uprawnień do tworzenia wątków w tym folderze",
+    noPostPermission:
+      "Nie masz uprawnień do publikowania wiadomości w tym wątku",
+    noCreateThreadPermission:
+      "Nie masz uprawnień do tworzenia wątków w tym folderze",
     noCreateThreadPermissionInRootFolder:
       "Nie masz uprawnień do tworzenia wątków w tym folderze. Zaloguj się lub wybierz podfolder.",
     keyboardShortcuts: {
@@ -477,7 +480,8 @@ export const translations: typeof enTranslations = {
     all: "Wszystkie",
     noFavorites: "Brak ulubionych. Oznacz je gwiazdką.",
     noModels: "Brak dostępnych modeli",
-    filteredByCharacter: "Pokazuję {{compatible}} z {{total}} modeli (filtrowane przez postać)",
+    filteredByCharacter:
+      "Pokazuję {{compatible}} z {{total}} modeli (filtrowane przez postać)",
     selectCharacter: "Wybierz postać",
     allCharacters: "Wszystkie",
   },
@@ -561,7 +565,8 @@ export const translations: typeof enTranslations = {
     manualSelect: "Wybierz ręcznie...",
     best: "NAJLEPSZY",
     noMatchingModels: "Żadne modele nie pasują do filtrów",
-    noModelsWarning: "Żadne modele nie pasują do tych filtrów. Dostosuj ustawienia.",
+    noModelsWarning:
+      "Żadne modele nie pasują do tych filtrów. Dostosuj ustawienia.",
     allModelsCount: "{{count}} dostępnych modeli",
     filteredModelsCount: "{{count}} pasujących modeli",
     showAllModels: "Pokaż wszystkie",
@@ -648,7 +653,8 @@ export const translations: typeof enTranslations = {
       searchPlaceholder: "Wyszukaj persony...",
       noResults: "Nie znaleziono person",
       keepSettings: "Zachowaj obecne ustawienia modelu",
-      keepSettingsDesc: "Użyj obecnych filtrów inteligencji, ceny i treści z nową personą",
+      keepSettingsDesc:
+        "Użyj obecnych filtrów inteligencji, ceny i treści z nową personą",
       cancel: "Anuluj",
       confirm: "Zmień personę",
     },
@@ -762,7 +768,8 @@ export const translations: typeof enTranslations = {
   dialogs: {
     searchAndCreate: "Szukaj i utwórz",
     deleteChat: 'Usunąć czat "{{title}}"?',
-    deleteFolderConfirm: 'Usunąć folder "{{name}}" i przenieść {{count}} czat(ów) do Ogólne?',
+    deleteFolderConfirm:
+      'Usunąć folder "{{name}}" i przenieść {{count}} czat(ów) do Ogólne?',
   },
   newFolder: {
     title: "Utwórz nowy folder",
@@ -827,7 +834,8 @@ export const translations: typeof enTranslations = {
     noMessages:
       "Nie można znaleźć obszaru wiadomości czatu. Upewnij się, że masz wiadomości w czacie.",
     quotaExceeded: "Przekroczono limit pamięci. Zrzut ekranu jest za duży.",
-    canvasError: "Nie udało się przekonwertować zrzutu ekranu na format obrazu.",
+    canvasError:
+      "Nie udało się przekonwertować zrzutu ekranu na format obrazu.",
   },
   errors: {
     noResponse:
@@ -840,7 +848,8 @@ export const translations: typeof enTranslations = {
     deleteFailed: "Nie udało się usunąć",
     cannotBranchFromFirst: "Nie można rozgałęzić od pierwszej wiadomości",
     parentMessageNotFound: "Nie znaleziono wiadomości nadrzędnej",
-    parentMessageNotInPath: "Wiadomość nadrzędna nie znajduje się w bieżącej ścieżce",
+    parentMessageNotInPath:
+      "Wiadomość nadrzędna nie znajduje się w bieżącej ścieżce",
     messageNotFound: "Nie znaleziono wiadomości",
     invalidBranchIndex: "Nieprawidłowy indeks gałęzi",
     messageNotInPath: "Wiadomość nie znajduje się w bieżącej ścieżce",
@@ -891,9 +900,11 @@ export const translations: typeof enTranslations = {
     threadNotFound: "Nie znaleziono wątku",
   },
   storage: {
-    parsePreferencesFailed: "Nie udało się przeanalizować preferencji użytkownika z pamięci",
+    parsePreferencesFailed:
+      "Nie udało się przeanalizować preferencji użytkownika z pamięci",
     parseStateFailed: "Nie udało się przeanalizować stanu czatu z pamięci",
-    syncPreferencesFailed: "Nie udało się zsynchronizować preferencji z pamięcią",
+    syncPreferencesFailed:
+      "Nie udało się zsynchronizować preferencji z pamięcią",
     syncStateFailed: "Nie udało się zsynchronizować stanu czatu z pamięcią",
   },
   hooks: {
@@ -1034,16 +1045,21 @@ export const translations: typeof enTranslations = {
       claudeSonnet45: "Najnowszy model Claude z doskonałą wydajnością",
       gpt5: "Najnowszy model GPT z doskonałą wydajnością",
       gpt51: "Najnowszy model GPT 5.1 z ulepszonym rozumowaniem",
-      gpt5Pro: "Najnowszy model GPT z doskonałą wydajnością do zadań programistycznych",
+      gpt5Pro:
+        "Najnowszy model GPT z doskonałą wydajnością do zadań programistycznych",
       gpt5Codex: "Najnowszy model GPT z doskonałą wydajnością",
-      gpt51Codex: "Najnowszy model GPT 5.1 Codex zoptymalizowany do programowania",
-      gpt5Mini: "Najnowszy model mini z doskonałym stosunkiem wydajności do kosztów",
-      gpt5Nano: "Najnowszy model nano z doskonałym stosunkiem wydajności do kosztów",
+      gpt51Codex:
+        "Najnowszy model GPT 5.1 Codex zoptymalizowany do programowania",
+      gpt5Mini:
+        "Najnowszy model mini z doskonałym stosunkiem wydajności do kosztów",
+      gpt5Nano:
+        "Najnowszy model nano z doskonałym stosunkiem wydajności do kosztów",
       gptOss120b: "Model GPT open-source z 120B parametrami",
       geminiFlash25Pro: "Ultraszybki i wydajny model 14B z dużym kontekstem",
       geminiFlash25Flash: "Ultraszybki i wydajny model 14B z dużym kontekstem",
       geminiFlash25Lite: "Ultraszybki i wydajny model 14B z dużym kontekstem",
-      mistralNemo: "Europejski model AI z silną wydajnością i naciskiem na prywatność",
+      mistralNemo:
+        "Europejski model AI z silną wydajnością i naciskiem na prywatność",
       kimiK2Free:
         "Kimi K2 Instruct to wielki model językowy Mixture-of-Experts (MoE) opracowany przez Moonshot AI.",
       kimiK2:
@@ -1051,29 +1067,35 @@ export const translations: typeof enTranslations = {
       kimiK2Thinking:
         "Kimi K2 Thinking - wariant skupiony na rozumowaniu z rozszerzonymi możliwościami analitycznymi",
       deepseekV31Free: "Potężny model z 671B parametrami - całkowicie darmowy!",
-      deepseekV31: "Potężny model z 671B parametrami z zaawansowanymi możliwościami",
+      deepseekV31:
+        "Potężny model z 671B parametrami z zaawansowanymi możliwościami",
       qwen3235bFree:
         "Model Mixture-of-Experts (MoE) opracowany przez Qwen, obsługuje płynne przełączanie między trybami.",
       deepseekR1Distill: "Destylowany model rozumowania z silną wydajnością",
-      deepseekR1: "Zaawansowany model rozumowania z głębokimi możliwościami myślenia",
+      deepseekR1:
+        "Zaawansowany model rozumowania z głębokimi możliwościami myślenia",
       qwen257b: "Wydajny model z 7B parametrami",
       grok4: "X-AI Grok 4 - model premium",
       grok4Fast:
         "Grok 4 Fast to najnowszy multimodalny model xAI z najlepszą efektywnością kosztową i oknem kontekstu 2M tokenów. Dostępny w dwóch wariantach: bez rozumowania i z rozumowaniem.",
       glm46: "GLM 4.6 - wydajny model z 7B parametrami i dużym oknem kontekstu",
       glm45Air: "GLM 4.5 AIR - ultraszybki lekki model z dużym oknem kontekstu",
-      glm45v: "GLM 4.5v - multimodalny model z obsługą wizji i dużym oknem kontekstu",
-      uncensoredLmV11: "Niecenzurowany model językowy bez filtrowania treści - model premium",
+      glm45v:
+        "GLM 4.5v - multimodalny model z obsługą wizji i dużym oknem kontekstu",
+      uncensoredLmV11:
+        "Niecenzurowany model językowy bez filtrowania treści - model premium",
       freedomgptLiberty:
         "FreedomGPT Liberty - Niecenzurowany model AI skoncentrowany na wolności wypowiedzi i treściach kreatywnych",
       gabAiArya:
         "Gab AI Arya - Niecenzurowany model konwersacyjny AI z wolnością wypowiedzi i kreatywnymi możliwościami",
       gpt52Pro:
         "GPT 5.2 Pro - zaawansowany model rozumowania z ulepszonymi możliwościami dla złożonych zadań",
-      gpt52: "GPT 5.2 - model najnowszej generacji z ulepszoną wydajnością i efektywnością",
+      gpt52:
+        "GPT 5.2 - model najnowszej generacji z ulepszoną wydajnością i efektywnością",
       gpt52_chat:
         "GPT 5.2 Chat - wariant konwersacyjny zoptymalizowany pod kątem dialogu i interakcji",
-      veniceUncensored: "Venice Uncensored - Niecenzurowany model AI do nieograniczonych rozmów",
+      veniceUncensored:
+        "Venice Uncensored - Niecenzurowany model AI do nieograniczonych rozmów",
       dolphinLlama3_70B:
         "Dolphin Llama 3 70B - Niecenzurowany duży model językowy oparty na Llama 3",
       dolphin3_0_r1_mistral_24b:
@@ -1083,7 +1105,8 @@ export const translations: typeof enTranslations = {
   tones: {
     professional: {
       description: "Standardowy profesjonalny ton",
-      systemPrompt: "Utrzymuj profesjonalny, informacyjny i przystępny ton w swoich odpowiedziach.",
+      systemPrompt:
+        "Utrzymuj profesjonalny, informacyjny i przystępny ton w swoich odpowiedziach.",
     },
     pirate: {
       description: "Ahoj przyjacielu! Mów jak pirat",
@@ -1126,13 +1149,15 @@ export const translations: typeof enTranslations = {
       network: "Błąd sieci. Sprawdź swoje połączenie.",
       serviceNotAllowed: "Usługa rozpoznawania mowy niedozwolona.",
       badGrammar: "Błąd rozpoznawania mowy. Spróbuj ponownie.",
-      languageNotSupported: "Ten język nie jest obsługiwany przez rozpoznawanie mowy.",
+      languageNotSupported:
+        "Ten język nie jest obsługiwany przez rozpoznawanie mowy.",
       aborted: "Nagrywanie anulowane.",
       unknown: "Błąd rozpoznawania mowy: {{errorCode}}",
       apiNotFound: "Nie znaleziono API rozpoznawania mowy",
       initializationFailed: "Nie udało się zainicjować rozpoznawania mowy",
       microphoneAccessDenied: "Odmowa dostępu do mikrofonu",
-      microphonePermissionDenied: "Odmowa dostępu do mikrofonu. Zezwól na dostęp do mikrofonu.",
+      microphonePermissionDenied:
+        "Odmowa dostępu do mikrofonu. Zezwól na dostęp do mikrofonu.",
       noMicrophoneFound: "Nie znaleziono mikrofonu. Podłącz mikrofon.",
       microphoneInUse: "Mikrofon jest już używany przez inną aplikację.",
       startFailed: "Nie udało się rozpocząć nagrywania. Spróbuj ponownie.",
@@ -1141,7 +1166,8 @@ export const translations: typeof enTranslations = {
   linearMessageView: {
     retryModal: {
       title: "Ponów z innymi ustawieniami",
-      description: "Wybierz model i personę, aby ponownie wygenerować odpowiedź",
+      description:
+        "Wybierz model i personę, aby ponownie wygenerować odpowiedź",
       confirmLabel: "Ponów",
     },
     answerModal: {
@@ -1161,7 +1187,8 @@ export const translations: typeof enTranslations = {
     copied: "Skopiowano!",
     retryModal: {
       title: "Ponów z innymi ustawieniami",
-      description: "Wybierz model i personę, aby ponownie wygenerować odpowiedź",
+      description:
+        "Wybierz model i personę, aby ponownie wygenerować odpowiedź",
       confirmLabel: "Ponów",
     },
     answerModal: {
@@ -1246,7 +1273,8 @@ export const translations: typeof enTranslations = {
     },
   },
   folderList: {
-    confirmDelete: 'Usunąć folder "{{folderName}}" i przenieść {{count}} czat(ów) do Ogólne?',
+    confirmDelete:
+      'Usunąć folder "{{folderName}}" i przenieść {{count}} czat(ów) do Ogólne?',
     enterFolderName: "Wprowadź nazwę folderu:",
     newChatInFolder: "Nowy czat w folderze",
     moveUp: "Przenieś w górę",
@@ -1332,7 +1360,8 @@ export const translations: typeof enTranslations = {
     },
     visibility: {
       label: "Kto może to zobaczyć?",
-      description: "Wybierz, które role użytkowników mogą przeglądać ten folder/wątek",
+      description:
+        "Wybierz, które role użytkowników mogą przeglądać ten folder/wątek",
       public: "Publiczny (Wszyscy użytkownicy)",
       customer: "Tylko klienci",
       admin: "Tylko administratorzy",
@@ -1359,7 +1388,8 @@ export const translations: typeof enTranslations = {
     replies: "odpowiedzi",
     retryModal: {
       title: "Ponów z innymi ustawieniami",
-      description: "Wybierz model i personę, aby ponownie wygenerować odpowiedź",
+      description:
+        "Wybierz model i personę, aby ponownie wygenerować odpowiedź",
       confirmLabel: "Ponów",
     },
     answerModal: {
@@ -1418,11 +1448,13 @@ export const translations: typeof enTranslations = {
       thu: "Cz",
       fri: "Pt",
       sat: "Sb",
-      format: "{{month}}/{{day}}/{{year}}({{dayName}}){{hours}}:{{mins}}:{{secs}}",
+      format:
+        "{{month}}/{{day}}/{{year}}({{dayName}}){{hours}}:{{mins}}:{{secs}}",
     },
     retryModal: {
       title: "Ponów z innymi ustawieniami",
-      description: "Wybierz model i personę, aby ponownie wygenerować odpowiedź",
+      description:
+        "Wybierz model i personę, aby ponownie wygenerować odpowiedź",
       confirmLabel: "Ponów",
     },
     answerModal: {
@@ -1479,7 +1511,8 @@ export const translations: typeof enTranslations = {
       errorLabel: "Błąd:",
       noArguments: "Brak argumentów",
       noResult: "Brak wyniku",
-      metadataNotAvailable: "Metadane widgetu niedostępne. Pokazywanie surowych danych.",
+      metadataNotAvailable:
+        "Metadane widgetu niedostępne. Pokazywanie surowych danych.",
     },
   },
   threadList: {
@@ -1501,7 +1534,8 @@ export const translations: typeof enTranslations = {
     revoke: "Unieważnij",
     linkRevoked: "Link udostępniający unieważniony",
     revoked: "Unieważniony",
-    noLinksYet: "Brak linków udostępniających. Utwórz jeden, aby zacząć udostępniać.",
+    noLinksYet:
+      "Brak linków udostępniających. Utwórz jeden, aby zacząć udostępniać.",
     activeLinks: "Aktywne linki udostępniające",
     existingLinks: "Istniejące linki",
     linkSettings: "Ustawienia linku",
@@ -1509,9 +1543,11 @@ export const translations: typeof enTranslations = {
     linkLabel: "Etykieta linku (opcjonalnie)",
     linkLabelPlaceholder: "np. Udostępnij zespołowi",
     allowPosting: "Zezwalaj na publikowanie",
-    allowPostingDescription: "Odbiorcy mogą odpowiadać i wchodzić w interakcje w wątku",
+    allowPostingDescription:
+      "Odbiorcy mogą odpowiadać i wchodzić w interakcje w wątku",
     requireAuth: "Wymagaj logowania",
-    requireAuthDescription: "Tylko uwierzytelnieni użytkownicy mogą uzyskać dostęp do tego linku",
+    requireAuthDescription:
+      "Tylko uwierzytelnieni użytkownicy mogą uzyskać dostęp do tego linku",
     viewOnly: "Tylko podgląd",
     accessCount: "{{count}} dostęp",
     accessCount_other: "{{count}} dostępów",
@@ -1519,7 +1555,8 @@ export const translations: typeof enTranslations = {
     lastAccessed: "Ostatni dostęp {{date}}",
     neverAccessed: "Nigdy nie otwierano",
     emailSubject: "Sprawdź ten wątek: {{title}}",
-    emailBody: "Pomyślałem, że ta rozmowa może Cię zainteresować: {{url}}\n\nWątek: {{title}}",
+    emailBody:
+      "Pomyślałem, że ta rozmowa może Cię zainteresować: {{url}}\n\nWątek: {{title}}",
     emailPlaceholder: "Wprowadź adresy e-mail (rozdzielone przecinkami)",
     sendEmail: "E-mail",
     emailSent: "E-mail wysłany pomyślnie!",
@@ -1609,7 +1646,8 @@ export const translations: typeof enTranslations = {
     },
     rootFolders: {
       title: "4 sposoby na czat",
-      description: "Wybierz swój poziom prywatności - od całkowicie anonimowego do współpracy:",
+      description:
+        "Wybierz swój poziom prywatności - od całkowicie anonimowego do współpracy:",
       private: {
         name: "Prywatny",
         suffix: "Twoja osobista przestrzeń",
@@ -1680,12 +1718,14 @@ export const translations: typeof enTranslations = {
     },
     chatInput: {
       title: "Wpisz wiadomość",
-      description: "Wpisz w polu tekstowym i naciśnij Enter, aby wysłać wiadomość do AI.",
+      description:
+        "Wpisz w polu tekstowym i naciśnij Enter, aby wysłać wiadomość do AI.",
       tip: "Naciśnij Shift+Enter dla nowej linii bez wysyłania.",
     },
     voiceInput: {
       title: "Nagrywanie głosu",
-      description: "Kliknij mikrofon, aby rozpocząć nagrywanie. Po zakończeniu wybierz:",
+      description:
+        "Kliknij mikrofon, aby rozpocząć nagrywanie. Po zakończeniu wybierz:",
       options: {
         transcribe: "Transkrybuj na tekst - zamienia mowę na edytowalny tekst",
         sendAudio: "Wyślij jako głos - AI słyszy Twój prawdziwy głos",
@@ -1711,7 +1751,8 @@ export const translations: typeof enTranslations = {
       privateNote: "Idealny dla bieżących projektów i osobistych badań.",
       sharedDescription:
         "Folder Współdzielony odblokowany! Twórz rozmowy i udostępniaj przez link z szczegółową kontrolą uprawnień.",
-      sharedNote: "Idealny dla współpracy zespołowej i uzyskiwania opinii ekspertów.",
+      sharedNote:
+        "Idealny dla współpracy zespołowej i uzyskiwania opinii ekspertów.",
     },
     buttons: {
       back: "Wstecz",

@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.close-page.description",
   category: "app.api.browser.category",
   icon: "x-square",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.chromeDevTools"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.chromeDevTools",
+  ],
 
   allowedRoles: [
     UserRole.PUBLIC,
@@ -53,11 +56,17 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.browser.close-page.form.fields.pageIdx.label",
-          description: "app.api.browser.close-page.form.fields.pageIdx.description",
-          placeholder: "app.api.browser.close-page.form.fields.pageIdx.placeholder",
+          description:
+            "app.api.browser.close-page.form.fields.pageIdx.description",
+          placeholder:
+            "app.api.browser.close-page.form.fields.pageIdx.placeholder",
           columns: 6,
         },
-        z.number().describe("The index of the page to close. Call list_pages to list pages."),
+        z
+          .number()
+          .describe(
+            "The index of the page to close. Call list_pages to list pages.",
+          ),
       ),
 
       // Response fields
@@ -76,7 +85,10 @@ const { POST } = createEndpoint({
         z
           .object({
             closed: z.boolean().describe("Whether the page was closed"),
-            remainingPages: z.number().optional().describe("Number of remaining open pages"),
+            remainingPages: z
+              .number()
+              .optional()
+              .describe("Number of remaining open pages"),
           })
           .optional()
           .describe("Result of the close page operation"),
@@ -146,7 +158,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.close-page.errors.unsavedChanges.title",
-      description: "app.api.browser.close-page.errors.unsavedChanges.description",
+      description:
+        "app.api.browser.close-page.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.close-page.errors.conflict.title",

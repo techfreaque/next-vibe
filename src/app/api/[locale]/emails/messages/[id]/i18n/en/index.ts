@@ -58,7 +58,8 @@ export const translations = {
       },
       server: {
         title: "Server Error",
-        description: "An internal server error occurred while retrieving the email",
+        description:
+          "An internal server error occurred while retrieving the email",
       },
       unknown: {
         title: "Unknown Error",
@@ -85,7 +86,8 @@ export const translations = {
     },
     server: {
       title: "Server Error",
-      description: "An internal server error occurred while retrieving the email",
+      description:
+        "An internal server error occurred while retrieving the email",
     },
     conflict: {
       title: "Conflict Error",

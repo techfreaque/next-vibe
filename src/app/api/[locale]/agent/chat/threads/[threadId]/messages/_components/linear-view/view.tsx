@@ -12,7 +12,11 @@ import type { JSX } from "react";
 import React from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
-import { chatAnimations, chatProse, chatShadows } from "@/app/[locale]/chat/lib/design-tokens";
+import {
+  chatAnimations,
+  chatProse,
+  chatShadows,
+} from "@/app/[locale]/chat/lib/design-tokens";
 import { DebugSystemPrompt } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/debug-component";
 import { createMetadataSystemMessage } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/message-metadata";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
@@ -113,10 +117,13 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                 const content = sibling.content ?? "";
                 return {
                   id: sibling.id,
-                  preview: content.slice(0, 50) + (content.length > 50 ? "..." : ""),
+                  preview:
+                    content.slice(0, 50) + (content.length > 50 ? "..." : ""),
                 };
               })}
-              onSwitchBranch={(index) => onSwitchBranch(BRANCH_INDEX_KEY, index)}
+              onSwitchBranch={(index) =>
+                onSwitchBranch(BRANCH_INDEX_KEY, index)
+              }
               locale={locale}
             />
           </Div>
@@ -138,7 +145,8 @@ export const LinearMessageView = React.memo(function LinearMessageView({
 
       {messages.map((message, index) => {
         const isEditing = editingMessageId === message.id;
-        const isRetrying = retryingMessageId === message.id && !isLoadingRetryAttachments;
+        const isRetrying =
+          retryingMessageId === message.id && !isLoadingRetryAttachments;
         const isAnswering = answeringMessageId === message.id;
 
         // Check if this message has branches (multiple children)
@@ -146,7 +154,8 @@ export const LinearMessageView = React.memo(function LinearMessageView({
         const hasBranches = branches && branches.siblings.length > 1;
 
         // Get the next message in the path (the child we're following)
-        const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
+        const nextMessage =
+          index < messages.length - 1 ? messages[index + 1] : null;
 
         // Check if this is a continuation message (part of a sequence but not the primary)
         const group = messageToGroupMap.get(message.id);
@@ -213,7 +222,9 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                         if (onRetryMessage) {
                           void onRetryMessage(
                             message.id,
-                            editorAttachments.length > 0 ? editorAttachments : undefined,
+                            editorAttachments.length > 0
+                              ? editorAttachments
+                              : undefined,
                           );
                         }
                         onCancelAction();
@@ -244,54 +255,61 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                         />
                       </Div>
                     )}
-                    {(message.role === "assistant" || message.role === "tool") && group && (
-                      <GroupedAssistantMessage
-                        group={group}
-                        locale={locale}
-                        onAnswerAsModel={onStartAnswer}
-                        onDelete={onDeleteMessage}
-                        showAuthor={true}
-                        logger={logger}
-                        collapseState={collapseState}
-                      />
+                    {(message.role === "assistant" ||
+                      message.role === "tool") &&
+                      group && (
+                        <GroupedAssistantMessage
+                          group={group}
+                          locale={locale}
+                          onAnswerAsModel={onStartAnswer}
+                          onDelete={onDeleteMessage}
+                          showAuthor={true}
+                          logger={logger}
+                          collapseState={collapseState}
+                        />
+                      )}
+                    {message.role === "error" && (
+                      <ErrorMessageBubble message={message} />
                     )}
-                    {message.role === "error" && <ErrorMessageBubble message={message} />}
                     {/* Debug mode: Show system messages inline */}
-                    {viewMode === ViewMode.DEBUG && message.role === ChatMessageRole.SYSTEM && (
-                      <Div className="flex items-start gap-3">
-                        <Div className="flex-1 max-w-full">
-                          <Div className="mb-2">
-                            <MessageAuthorInfo
-                              authorName={t("app.chat.debugView.systemMessage")}
-                              authorId={null}
-                              currentUserId={undefined}
-                              isAI={true}
-                              model={message.model}
-                              timestamp={message.createdAt}
-                              edited={message.edited}
-                              character={null}
-                              locale={locale}
-                              rootFolderId={rootFolderId}
-                              compact
-                            />
-                          </Div>
+                    {viewMode === ViewMode.DEBUG &&
+                      message.role === ChatMessageRole.SYSTEM && (
+                        <Div className="flex items-start gap-3">
+                          <Div className="flex-1 max-w-full">
+                            <Div className="mb-2">
+                              <MessageAuthorInfo
+                                authorName={t(
+                                  "app.chat.debugView.systemMessage",
+                                )}
+                                authorId={null}
+                                currentUserId={undefined}
+                                isAI={true}
+                                model={message.model}
+                                timestamp={message.createdAt}
+                                edited={message.edited}
+                                character={null}
+                                locale={locale}
+                                rootFolderId={rootFolderId}
+                                compact
+                              />
+                            </Div>
 
-                          <Div
-                            className={cn(
-                              chatProse.all,
-                              "pl-2 py-2.5 sm:py-3",
-                              "border border-blue-500/30 bg-blue-500/5 rounded-md",
-                            )}
-                          >
-                            <Markdown content={message.content ?? ""} />
-                          </Div>
+                            <Div
+                              className={cn(
+                                chatProse.all,
+                                "pl-2 py-2.5 sm:py-3",
+                                "border border-blue-500/30 bg-blue-500/5 rounded-md",
+                              )}
+                            >
+                              <Markdown content={message.content ?? ""} />
+                            </Div>
 
-                          <Div className="mt-1 text-xs text-muted-foreground pl-2">
-                            {t("app.chat.debugView.systemMessageHint")}
+                            <Div className="mt-1 text-xs text-muted-foreground pl-2">
+                              {t("app.chat.debugView.systemMessageHint")}
+                            </Div>
                           </Div>
                         </Div>
-                      </Div>
-                    )}
+                      )}
                   </>
                 )}
               </Div>
@@ -321,7 +339,11 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                   inputPlaceholderKey="app.chat.linearMessageView.answerModal.inputPlaceholder"
                   onConfirm={async (): Promise<void> => {
                     if (onAnswerAsModel) {
-                      await onAnswerAsModel(message.id, answerContent, undefined);
+                      await onAnswerAsModel(
+                        message.id,
+                        answerContent,
+                        undefined,
+                      );
                     }
                     onCancelAction();
                   }}
@@ -344,7 +366,9 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                     const content = sibling.content ?? "";
                     return {
                       id: sibling.id,
-                      preview: content.slice(0, 50) + (content.length > 50 ? "..." : ""),
+                      preview:
+                        content.slice(0, 50) +
+                        (content.length > 50 ? "..." : ""),
                     };
                   })}
                   onSwitchBranch={(index) => onSwitchBranch(message.id, index)}

@@ -29,13 +29,17 @@ export function useUpdatePassword(
       onSuccess: () => {
         toast({
           title: t("app.api.user.private.me.password.update.success.title"),
-          description: t("app.api.user.private.me.password.update.success.description"),
+          description: t(
+            "app.api.user.private.me.password.update.success.description",
+          ),
           variant: "default",
         });
       },
       onError: ({ error }) => {
         toast({
-          title: t("app.api.user.private.me.password.update.errors.unknown.title"),
+          title: t(
+            "app.api.user.private.me.password.update.errors.unknown.title",
+          ),
           description: error.message,
           variant: "destructive",
         });

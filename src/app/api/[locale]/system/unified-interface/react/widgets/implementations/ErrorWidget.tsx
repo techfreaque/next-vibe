@@ -61,12 +61,21 @@ export function ErrorWidget<const TKey extends string>({
   context,
   className,
 }: ReactWidgetProps<typeof WidgetType.ERROR, TKey>): JSX.Element {
-  const { iconSize, descriptionSpacing, codeSize, sectionSpacing, stackSize, stackPadding } =
-    field.ui;
+  const {
+    iconSize,
+    descriptionSpacing,
+    codeSize,
+    sectionSpacing,
+    stackSize,
+    stackPadding,
+  } = field.ui;
 
   // Get classes from config (no hardcoding!)
   const iconSizeClass = getIconSizeClassName(iconSize);
-  const descriptionSpacingClass = getSpacingClassName("margin", descriptionSpacing);
+  const descriptionSpacingClass = getSpacingClassName(
+    "margin",
+    descriptionSpacing,
+  );
   const codeSizeClass = getTextSizeClassName(codeSize);
   const sectionSpacingClass = getSpacingClassName("margin", sectionSpacing);
   const stackSizeClass = getTextSizeClassName(stackSize);
@@ -92,12 +101,19 @@ export function ErrorWidget<const TKey extends string>({
       <AlertTitle>{title}</AlertTitle>
 
       {message && (
-        <AlertDescription className={descriptionSpacingClass || "mt-2"}>{message}</AlertDescription>
+        <AlertDescription className={descriptionSpacingClass || "mt-2"}>
+          {message}
+        </AlertDescription>
       )}
 
       {code && (
         <Div className={sectionSpacingClass || "mt-3"}>
-          <P className={cn("font-mono text-muted-foreground", codeSizeClass || "text-xs")}>
+          <P
+            className={cn(
+              "font-mono text-muted-foreground",
+              codeSizeClass || "text-xs",
+            )}
+          >
             {context.t("system.ui.widgets.error.errorCode")}: {code}
           </P>
         </Div>

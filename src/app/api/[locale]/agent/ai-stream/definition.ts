@@ -5,7 +5,10 @@
 
 import { z } from "zod";
 
-import { ModelId, ModelIdOptions } from "@/app/api/[locale]/agent/models/models";
+import {
+  ModelId,
+  ModelIdOptions,
+} from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -36,13 +39,22 @@ import { DEFAULT_TTS_VOICE, TtsVoice } from "../text-to-speech/enum";
 const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["agent", "ai-stream"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.PUBLIC, UserRole.AI_TOOL_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.CUSTOMER,
+    UserRole.PUBLIC,
+    UserRole.AI_TOOL_OFF,
+  ],
 
   title: "app.api.agent.chat.aiStream.post.title",
   description: "app.api.agent.chat.aiStream.post.description",
   icon: "sparkles",
   category: "app.api.agent.category",
-  tags: ["app.api.agent.tags.streaming", "app.api.agent.tags.chat", "app.api.agent.tags.ai"],
+  tags: [
+    "app.api.agent.tags.streaming",
+    "app.api.agent.tags.chat",
+    "app.api.agent.tags.ai",
+  ],
 
   fields: objectField(
     {
@@ -65,19 +77,23 @@ const { POST } = createEndpoint({
           options: [
             {
               value: "send",
-              label: "app.api.agent.chat.aiStream.post.operation.options.send" as const,
+              label:
+                "app.api.agent.chat.aiStream.post.operation.options.send" as const,
             },
             {
               value: "retry",
-              label: "app.api.agent.chat.aiStream.post.operation.options.retry" as const,
+              label:
+                "app.api.agent.chat.aiStream.post.operation.options.retry" as const,
             },
             {
               value: "edit",
-              label: "app.api.agent.chat.aiStream.post.operation.options.edit" as const,
+              label:
+                "app.api.agent.chat.aiStream.post.operation.options.edit" as const,
             },
             {
               value: "answer-as-ai",
-              label: "app.api.agent.chat.aiStream.post.operation.options.answerAsAi" as const,
+              label:
+                "app.api.agent.chat.aiStream.post.operation.options.answerAsAi" as const,
             },
           ],
         },
@@ -88,7 +104,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.agent.chat.aiStream.post.rootFolderId.label",
-          description: "app.api.agent.chat.aiStream.post.rootFolderId.description",
+          description:
+            "app.api.agent.chat.aiStream.post.rootFolderId.description",
           columns: 3,
           options: [
             {
@@ -116,7 +133,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.agent.chat.aiStream.post.subFolderId.label",
-          description: "app.api.agent.chat.aiStream.post.subFolderId.description",
+          description:
+            "app.api.agent.chat.aiStream.post.subFolderId.description",
           columns: 3,
         },
         z.string().nullable(),
@@ -136,7 +154,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.agent.chat.aiStream.post.userMessageId.label",
-          description: "app.api.agent.chat.aiStream.post.userMessageId.description",
+          description:
+            "app.api.agent.chat.aiStream.post.userMessageId.description",
           columns: 3,
         },
         z.uuid().nullable(),
@@ -146,7 +165,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.agent.chat.aiStream.post.parentMessageId.label",
-          description: "app.api.agent.chat.aiStream.post.parentMessageId.description",
+          description:
+            "app.api.agent.chat.aiStream.post.parentMessageId.description",
           columns: 3,
         },
         z.uuid().nullable(),
@@ -205,7 +225,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.agent.chat.aiStream.post.temperature.label",
-          description: "app.api.agent.chat.aiStream.post.temperature.description",
+          description:
+            "app.api.agent.chat.aiStream.post.temperature.description",
           columns: 2,
         },
         z.coerce.number().min(0).max(2).default(0.7),
@@ -241,7 +262,8 @@ const { POST } = createEndpoint({
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "app.api.agent.chat.aiStream.post.tools.toolId.label",
-                description: "app.api.agent.chat.aiStream.post.tools.toolId.description",
+                description:
+                  "app.api.agent.chat.aiStream.post.tools.toolId.description",
                 columns: 6,
               },
               z.string(),
@@ -250,7 +272,8 @@ const { POST } = createEndpoint({
               {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
-                label: "app.api.agent.chat.aiStream.post.tools.requiresConfirmation.label",
+                label:
+                  "app.api.agent.chat.aiStream.post.tools.requiresConfirmation.label",
                 description:
                   "app.api.agent.chat.aiStream.post.tools.requiresConfirmation.description",
                 columns: 6,
@@ -264,14 +287,18 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.DATA_LIST,
           label: "app.api.agent.chat.aiStream.post.toolConfirmations.label",
-          description: "app.api.agent.chat.aiStream.post.toolConfirmation.description",
+          description:
+            "app.api.agent.chat.aiStream.post.toolConfirmation.description",
           optional: true,
         },
         z.object({
           messageId: z.string().uuid(),
           confirmed: z.boolean(),
           updatedArgs: z
-            .record(z.string(), z.union([z.string(), z.coerce.number(), z.boolean(), z.null()]))
+            .record(
+              z.string(),
+              z.union([z.string(), z.coerce.number(), z.boolean(), z.null()]),
+            )
             .optional(),
         }),
       ),
@@ -281,8 +308,10 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.DATA_LIST,
           fieldType: FieldDataType.JSON,
-          label: "app.api.agent.chat.aiStream.post.messageHistory.label" as const,
-          description: "app.api.agent.chat.aiStream.post.messageHistory.description" as const,
+          label:
+            "app.api.agent.chat.aiStream.post.messageHistory.label" as const,
+          description:
+            "app.api.agent.chat.aiStream.post.messageHistory.description" as const,
           optional: true,
         },
         z
@@ -302,7 +331,8 @@ const { POST } = createEndpoint({
           type: WidgetType.DATA_LIST,
           fieldType: FieldDataType.JSON,
           label: "app.api.agent.chat.aiStream.post.attachments.label" as const,
-          description: "app.api.agent.chat.aiStream.post.attachments.description" as const,
+          description:
+            "app.api.agent.chat.aiStream.post.attachments.description" as const,
           optional: true,
         },
         z.instanceof(File),
@@ -314,7 +344,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.agent.chat.aiStream.post.resumeToken.label",
-          description: "app.api.agent.chat.aiStream.post.resumeToken.description",
+          description:
+            "app.api.agent.chat.aiStream.post.resumeToken.description",
           columns: 6,
         },
         z.string().nullable().optional(),
@@ -336,7 +367,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "app.api.agent.chat.aiStream.post.voiceMode.enabled.label",
-              description: "app.api.agent.chat.aiStream.post.voiceMode.enabled.description",
+              description:
+                "app.api.agent.chat.aiStream.post.voiceMode.enabled.description",
               columns: 6,
             },
             z.boolean().default(false),
@@ -346,15 +378,18 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.agent.chat.aiStream.post.voiceMode.voice.label",
-              description: "app.api.agent.chat.aiStream.post.voiceMode.voice.description",
+              description:
+                "app.api.agent.chat.aiStream.post.voiceMode.voice.description",
               options: [
                 {
                   value: TtsVoice.MALE,
-                  label: "app.api.agent.chat.aiStream.post.voiceMode.voice.male",
+                  label:
+                    "app.api.agent.chat.aiStream.post.voiceMode.voice.male",
                 },
                 {
                   value: TtsVoice.FEMALE,
-                  label: "app.api.agent.chat.aiStream.post.voiceMode.voice.female",
+                  label:
+                    "app.api.agent.chat.aiStream.post.voiceMode.voice.female",
                 },
               ],
               columns: 6,
@@ -369,7 +404,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.agent.chat.aiStream.post.audioInput.title",
-          description: "app.api.agent.chat.aiStream.post.audioInput.description",
+          description:
+            "app.api.agent.chat.aiStream.post.audioInput.description",
           layoutType: LayoutType.GRID,
           columns: 12,
           optional: true,
@@ -381,22 +417,27 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.FILE,
               label: "app.api.agent.chat.aiStream.post.audioInput.file.label",
-              description: "app.api.agent.chat.aiStream.post.audioInput.file.description",
+              description:
+                "app.api.agent.chat.aiStream.post.audioInput.file.description",
               columns: 12,
               optional: true,
             },
             z
               .instanceof(File)
               .refine((file) => file.size <= 25 * 1024 * 1024, {
-                message: "app.api.agent.chat.aiStream.post.audioInput.validation.maxSize",
+                message:
+                  "app.api.agent.chat.aiStream.post.audioInput.validation.maxSize",
               })
               .refine(
                 (file) => {
                   const allowedTypes = ["audio/", "application/octet-stream"];
-                  return allowedTypes.some((type) => file.type.startsWith(type));
+                  return allowedTypes.some((type) =>
+                    file.type.startsWith(type),
+                  );
                 },
                 {
-                  message: "app.api.agent.chat.aiStream.post.audioInput.validation.audioOnly",
+                  message:
+                    "app.api.agent.chat.aiStream.post.audioInput.validation.audioOnly",
                 },
               )
               .nullable()
@@ -440,11 +481,13 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.agent.chat.aiStream.post.errors.unauthorized.title",
-      description: "app.api.agent.chat.aiStream.post.errors.unauthorized.description",
+      description:
+        "app.api.agent.chat.aiStream.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.chat.aiStream.post.errors.validation.title",
-      description: "app.api.agent.chat.aiStream.post.errors.validation.description",
+      description:
+        "app.api.agent.chat.aiStream.post.errors.validation.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.aiStream.post.errors.server.title",
@@ -452,27 +495,33 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.agent.chat.aiStream.post.errors.unknown.title",
-      description: "app.api.agent.chat.aiStream.post.errors.unknown.description",
+      description:
+        "app.api.agent.chat.aiStream.post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.agent.chat.aiStream.post.errors.network.title",
-      description: "app.api.agent.chat.aiStream.post.errors.network.description",
+      description:
+        "app.api.agent.chat.aiStream.post.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.aiStream.post.errors.forbidden.title",
-      description: "app.api.agent.chat.aiStream.post.errors.forbidden.description",
+      description:
+        "app.api.agent.chat.aiStream.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.aiStream.post.errors.notFound.title",
-      description: "app.api.agent.chat.aiStream.post.errors.notFound.description",
+      description:
+        "app.api.agent.chat.aiStream.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.agent.chat.aiStream.post.errors.unsavedChanges.title",
-      description: "app.api.agent.chat.aiStream.post.errors.unsavedChanges.description",
+      description:
+        "app.api.agent.chat.aiStream.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.aiStream.post.errors.conflict.title",
-      description: "app.api.agent.chat.aiStream.post.errors.conflict.description",
+      description:
+        "app.api.agent.chat.aiStream.post.errors.conflict.description",
     },
   },
 

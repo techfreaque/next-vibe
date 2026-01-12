@@ -174,16 +174,28 @@ export function CronTasksTable({
 
   const getStatusBadge = (task: CronTaskResponseType): React.JSX.Element => {
     if (!task.enabled) {
-      return <Badge variant="secondary">{t("app.admin.cron.table.statusBadge.disabled")}</Badge>;
+      return (
+        <Badge variant="secondary">
+          {t("app.admin.cron.table.statusBadge.disabled")}
+        </Badge>
+      );
     }
 
     // Compute status from DB fields
     if (!task.lastExecutedAt) {
-      return <Badge variant="secondary">{t("app.admin.cron.table.statusBadge.pending")}</Badge>;
+      return (
+        <Badge variant="secondary">
+          {t("app.admin.cron.table.statusBadge.pending")}
+        </Badge>
+      );
     }
 
     if (task.lastExecutionError) {
-      return <Badge variant="destructive">{t("app.admin.cron.table.statusBadge.error")}</Badge>;
+      return (
+        <Badge variant="destructive">
+          {t("app.admin.cron.table.statusBadge.error")}
+        </Badge>
+      );
     }
 
     if (task.successCount > 0) {
@@ -194,7 +206,11 @@ export function CronTasksTable({
       );
     }
 
-    return <Badge variant="outline">{t("app.admin.cron.table.statusBadge.unknown")}</Badge>;
+    return (
+      <Badge variant="outline">
+        {t("app.admin.cron.table.statusBadge.unknown")}
+      </Badge>
+    );
   };
 
   if (loading) {
@@ -256,7 +272,12 @@ export function CronTasksTable({
                 </TableCell>
                 <TableCell>
                   <Div className="text-sm">
-                    {formatCronSchedule(task.schedule, userTimezone, locale, logger)}
+                    {formatCronSchedule(
+                      task.schedule,
+                      userTimezone,
+                      locale,
+                      logger,
+                    )}
                   </Div>
                 </TableCell>
                 <TableCell>{getStatusBadge(task)}</TableCell>
@@ -275,16 +296,28 @@ export function CronTasksTable({
                   </Div>
                 </TableCell>
                 <TableCell>
-                  <TaskToggleSwitch task={task} onTaskUpdated={onTaskUpdated} locale={locale} />
+                  <TaskToggleSwitch
+                    task={task}
+                    onTaskUpdated={onTaskUpdated}
+                    locale={locale}
+                  />
                 </TableCell>
                 <TableCell>
                   <Div className="flex flex flex-row gap-1">
                     {editingTaskId === task.id ? (
-                      <Button variant="ghost" size="sm" onClick={() => setEditingTaskId(null)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingTaskId(null)}
+                      >
                         <X className="h-4 w-4" />
                       </Button>
                     ) : (
-                      <Button variant="ghost" size="sm" onClick={() => setEditingTaskId(task.id)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingTaskId(task.id)}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
                     )}

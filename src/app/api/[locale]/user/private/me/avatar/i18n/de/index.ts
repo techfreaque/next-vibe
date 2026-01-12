@@ -20,9 +20,11 @@ export const translations: typeof enTranslations = {
     deleted: "Avatar erfolgreich gelöscht",
     nextSteps: {
       visible: "Ihr Avatar ist jetzt in Ihrem Profil sichtbar",
-      update: "Sie können ihn jederzeit in Ihren Profileinstellungen aktualisieren",
+      update:
+        "Sie können ihn jederzeit in Ihren Profileinstellungen aktualisieren",
       default: "Ihr Profil zeigt jetzt den Standard-Avatar",
-      uploadNew: "Sie können jederzeit einen neuen Avatar in Ihren Profileinstellungen hochladen",
+      uploadNew:
+        "Sie können jederzeit einen neuen Avatar in Ihren Profileinstellungen hochladen",
     },
   },
   upload: {

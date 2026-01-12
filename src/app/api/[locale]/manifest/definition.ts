@@ -19,7 +19,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { IconPurpose, WebAppCategory, WebAppDisplayMode, WebAppOrientation } from "./enum";
+import {
+  IconPurpose,
+  WebAppCategory,
+  WebAppDisplayMode,
+  WebAppOrientation,
+} from "./enum";
 
 /**
  * Manifest Endpoint (GET)
@@ -28,13 +33,21 @@ import { IconPurpose, WebAppCategory, WebAppDisplayMode, WebAppOrientation } fro
 const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["manifest"],
-  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN, UserRole.AI_TOOL_OFF],
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+  ],
 
   title: "app.api.manifest.title",
   description: "app.api.manifest.description",
   icon: "file-text",
   category: "app.api.manifest.category",
-  tags: ["app.api.manifest.tags.manifest", "app.api.manifest.tags.configuration"],
+  tags: [
+    "app.api.manifest.tags.manifest",
+    "app.api.manifest.tags.configuration",
+  ],
 
   fields: objectField(
     {
@@ -233,7 +246,11 @@ const { GET } = createEndpoint({
         orientation: WebAppOrientation.PORTRAIT_PRIMARY,
         scope: "/en-GLOBAL/",
         lang: "en",
-        categories: [WebAppCategory.SOCIAL, WebAppCategory.PRODUCTIVITY, WebAppCategory.BUSINESS],
+        categories: [
+          WebAppCategory.SOCIAL,
+          WebAppCategory.PRODUCTIVITY,
+          WebAppCategory.BUSINESS,
+        ],
         icons: [
           {
             src: "/images/placeholder-logo.png",
@@ -260,7 +277,11 @@ const { GET } = createEndpoint({
         orientation: WebAppOrientation.PORTRAIT_PRIMARY,
         scope: "/de-DE/",
         lang: "de",
-        categories: [WebAppCategory.SOCIAL, WebAppCategory.PRODUCTIVITY, WebAppCategory.BUSINESS],
+        categories: [
+          WebAppCategory.SOCIAL,
+          WebAppCategory.PRODUCTIVITY,
+          WebAppCategory.BUSINESS,
+        ],
         icons: [
           {
             src: "/images/placeholder-logo.png",
@@ -287,7 +308,11 @@ const { GET } = createEndpoint({
         orientation: WebAppOrientation.PORTRAIT_PRIMARY,
         scope: "/pl-PL/",
         lang: "pl",
-        categories: [WebAppCategory.SOCIAL, WebAppCategory.PRODUCTIVITY, WebAppCategory.BUSINESS],
+        categories: [
+          WebAppCategory.SOCIAL,
+          WebAppCategory.PRODUCTIVITY,
+          WebAppCategory.BUSINESS,
+        ],
         icons: [
           {
             src: "/images/placeholder-logo.png",

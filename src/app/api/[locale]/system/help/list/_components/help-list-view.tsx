@@ -27,8 +27,12 @@ interface HelpListViewProps {
  */
 export function HelpListView({ locale, user }: HelpListViewProps): JSX.Element {
   const { t } = simpleT(locale);
-  const [responseData, setResponseData] = useState<HelpListResponseOutput | null>(null);
-  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+  const [responseData, setResponseData] =
+    useState<HelpListResponseOutput | null>(null);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
 
   const { form, submitForm, isSubmitting, submitError } = useApiForm(
     helpListEndpoints.POST,
@@ -78,7 +82,9 @@ export function HelpListView({ locale, user }: HelpListViewProps): JSX.Element {
         {submitError && (
           <Card className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 shadow-lg mb-8">
             <CardContent className="mt-6">
-              <P className="text-red-600 dark:text-red-400">{submitError.message}</P>
+              <P className="text-red-600 dark:text-red-400">
+                {submitError.message}
+              </P>
             </CardContent>
           </Card>
         )}

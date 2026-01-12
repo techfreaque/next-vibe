@@ -46,7 +46,10 @@ function createUserSeed(overrides?: Partial<NewUser>): NewUser {
 /**
  * Development seed function for auth module
  */
-export async function dev(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
+export async function dev(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding auth data for development environment");
 
   // Create admin user
@@ -89,9 +92,14 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
   for (const user of allUsers) {
     try {
       // Check if user already exists using emailExists (doesn't fetch full user)
-      const emailExistsResponse = await UserRepository.emailExists(user.email, logger);
+      const emailExistsResponse = await UserRepository.emailExists(
+        user.email,
+        logger,
+      );
       if (emailExistsResponse.success && emailExistsResponse.data) {
-        logger.debug(`User with email ${user.email} already exists, skipping creation`);
+        logger.debug(
+          `User with email ${user.email} already exists, skipping creation`,
+        );
         // Get existing user ID to fetch later after leads are created
         const results = await db
           .select({ id: users.id })
@@ -121,9 +129,14 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
         continue;
       }
       // Create new user
-      const newUserResponse = await UserRepository.createWithHashedPassword(user, logger);
+      const newUserResponse = await UserRepository.createWithHashedPassword(
+        user,
+        logger,
+      );
       if (!newUserResponse.success) {
-        logger.error(`Failed to create user ${user.email}: ${newUserResponse.message}`);
+        logger.error(
+          `Failed to create user ${user.email}: ${newUserResponse.message}`,
+        );
         continue;
       }
       createdUsers.push(newUserResponse.data);
@@ -146,7 +159,9 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
       let leadId: string;
       if (existingLeads.length > 0) {
         leadId = existingLeads[0].id;
-        logger.debug(`Lead already exists for ${user.email}, using existing lead ${leadId}`);
+        logger.debug(
+          `Lead already exists for ${user.email}, using existing lead ${leadId}`,
+        );
       } else {
         // Create lead
         const leadData = {
@@ -166,7 +181,12 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
       const existingUserLeadLinks = await db
         .select()
         .from(userLeadLinks)
-        .where(and(eq(userLeadLinks.userId, user.id), eq(userLeadLinks.leadId, leadId)))
+        .where(
+          and(
+            eq(userLeadLinks.userId, user.id),
+            eq(userLeadLinks.leadId, leadId),
+          ),
+        )
         .limit(1);
 
       if (existingUserLeadLinks.length === 0) {
@@ -177,12 +197,17 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
         });
         logger.debug(`Linked lead ${leadId} to user ${user.id}`);
       } else {
-        logger.debug(`User-lead link already exists for user ${user.id} and lead ${leadId}`);
+        logger.debug(
+          `User-lead link already exists for user ${user.id} and lead ${leadId}`,
+        );
       }
     } catch (error) {
       const errorMsg = parseError(error).message;
       if (!errorMsg.includes("duplicate key")) {
-        logger.error(`Error creating lead for user ${user.id}`, parseError(error));
+        logger.error(
+          `Error creating lead for user ${user.id}`,
+          parseError(error),
+        );
       }
     }
   }
@@ -209,7 +234,10 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
             );
             logger.debug(`Created ${role} role for admin user ${adminUserId}`);
           } catch (roleError) {
-            logger.error(`Failed to create ${role} role for admin user`, parseError(roleError));
+            logger.error(
+              `Failed to create ${role} role for admin user`,
+              parseError(roleError),
+            );
           }
         }
       }
@@ -241,11 +269,14 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
       }
     } catch (roleError) {
       // Type-safe checks for error message properties
-      const errorMessage = roleError instanceof Error ? roleError.message : String(roleError);
+      const errorMessage =
+        roleError instanceof Error ? roleError.message : String(roleError);
 
       // If the error is about the table not existing, we can ignore it
       if (errorMessage.includes('relation "user_roles" does not exist')) {
-        logger.debug("user_roles table does not exist yet, skipping role creation");
+        logger.debug(
+          "user_roles table does not exist yet, skipping role creation",
+        );
       } else if (errorMessage.includes("duplicate key")) {
         logger.debug("User roles already exist, skipping creation");
       } else {
@@ -276,9 +307,13 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
       );
 
       if (referralResult.success) {
-        logger.debug(`Created referral code FRIEND2024 for admin user ${adminUserId}`);
+        logger.debug(
+          `Created referral code FRIEND2024 for admin user ${adminUserId}`,
+        );
       } else {
-        logger.debug(`Referral code FRIEND2024 already exists or failed to create`);
+        logger.debug(
+          `Referral code FRIEND2024 already exists or failed to create`,
+        );
       }
     } catch (error) {
       logger.error("Error creating referral code", parseError(error));
@@ -301,7 +336,9 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
         logger.debug(`✅ Created CLI token for user ${adminUserId}`);
 
         // Create a persistent session for CLI operations
-        const sessionExpiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year
+        const sessionExpiresAt = new Date(
+          Date.now() + 365 * 24 * 60 * 60 * 1000,
+        ); // 1 year
         const sessionResult = await SessionRepository.create({
           userId: adminUserId,
           token: cliTokenResponse.data,
@@ -359,11 +396,16 @@ export async function test(logger: EndpointLogger): Promise<void> {
           logger,
         );
         if (existingUser.success) {
-          logger.debug(`User with email ${user.email} already exists, skipping creation`);
+          logger.debug(
+            `User with email ${user.email} already exists, skipping creation`,
+          );
           return existingUser.data;
         }
         // Create new user
-        const userResponse = await UserRepository.createWithHashedPassword(user, logger);
+        const userResponse = await UserRepository.createWithHashedPassword(
+          user,
+          logger,
+        );
         if (!userResponse.success) {
           logger.error(`Failed to create user: ${userResponse.message}`);
           // Return a minimal placeholder user that will be filtered out
@@ -433,11 +475,14 @@ export async function test(logger: EndpointLogger): Promise<void> {
       logger.debug(`Created customer role for test user ${createdUsers[1].id}`);
     } catch (roleError) {
       // Type-safe checks for error message properties
-      const errorMessage = roleError instanceof Error ? roleError.message : String(roleError);
+      const errorMessage =
+        roleError instanceof Error ? roleError.message : String(roleError);
 
       // If the error is about the table not existing, we can ignore it
       if (errorMessage.includes('relation "user_roles" does not exist')) {
-        logger.debug("user_roles table does not exist yet, skipping role creation");
+        logger.debug(
+          "user_roles table does not exist yet, skipping role creation",
+        );
       } else if (errorMessage.includes("duplicate key")) {
         logger.debug("User roles already exist, skipping creation");
       } else {
@@ -456,7 +501,10 @@ export async function test(logger: EndpointLogger): Promise<void> {
 /**
  * Production seed function for auth module
  */
-export async function prod(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
+export async function prod(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding auth data for production environment");
 
   // Create admin user
@@ -477,18 +525,29 @@ export async function prod(logger: EndpointLogger, locale: CountryLanguage): Pro
       logger,
     );
     if (existingAdmin.success && existingAdmin.data) {
-      logger.debug(`Admin user with email ${adminUser.email} already exists, skipping creation`);
+      logger.debug(
+        `Admin user with email ${adminUser.email} already exists, skipping creation`,
+      );
       createdAdmin = existingAdmin.data;
     } else {
       // User doesn't exist, create new admin user
-      logger.debug(`Admin user with email ${adminUser.email} does not exist, creating new user`);
-      const adminResponse = await UserRepository.createWithHashedPassword(adminUser, logger);
+      logger.debug(
+        `Admin user with email ${adminUser.email} does not exist, creating new user`,
+      );
+      const adminResponse = await UserRepository.createWithHashedPassword(
+        adminUser,
+        logger,
+      );
       if (!adminResponse.success) {
-        logger.error(`Failed to create admin user: ${JSON.stringify(adminResponse)}`);
+        logger.error(
+          `Failed to create admin user: ${JSON.stringify(adminResponse)}`,
+        );
         return;
       }
       createdAdmin = adminResponse.data;
-      logger.debug(`Successfully created admin user with email ${adminUser.email}`);
+      logger.debug(
+        `Successfully created admin user with email ${adminUser.email}`,
+      );
     }
 
     // Create admin role for admin user
@@ -503,13 +562,18 @@ export async function prod(logger: EndpointLogger, locale: CountryLanguage): Pro
       logger.debug(`Created admin role for user ${createdAdmin.id}`);
     } catch (roleError) {
       // Type-safe checks for error message properties
-      const errorMessage = roleError instanceof Error ? roleError.message : String(roleError);
+      const errorMessage =
+        roleError instanceof Error ? roleError.message : String(roleError);
 
       // If the error is about the table not existing, we can ignore it
       if (errorMessage.includes('relation "user_roles" does not exist')) {
-        logger.debug("user_roles table does not exist yet, skipping role creation");
+        logger.debug(
+          "user_roles table does not exist yet, skipping role creation",
+        );
       } else if (errorMessage.includes("duplicate key")) {
-        logger.debug(`Admin role for user ${createdAdmin.id} already exists, skipping creation`);
+        logger.debug(
+          `Admin role for user ${createdAdmin.id} already exists, skipping creation`,
+        );
       } else {
         // For other errors, we should log and continue
         logger.error("Error creating admin role", parseError(roleError));

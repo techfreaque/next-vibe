@@ -56,7 +56,8 @@ export const translations: typeof enTranslations = {
     },
     notFound: {
       title: "Strona nie znaleziona",
-      description: "Strona, której szukasz, nie istnieje lub została przeniesiona.",
+      description:
+        "Strona, której szukasz, nie istnieje lub została przeniesiona.",
       goBack: "Wróć",
       goHome: "Przejdź do strony głównej",
     },
@@ -74,18 +75,21 @@ export const translations: typeof enTranslations = {
     aboutUs: {
       title: "O nas - {{appName}}",
       category: "O nas",
-      description: "Poznaj misję {{appName}} dostarczania niecenzurowanych rozmów z AI",
+      description:
+        "Poznaj misję {{appName}} dostarczania niecenzurowanych rozmów z AI",
       imageAlt: "O {{appName}}",
       keywords: "o {{appName}}, niecenzurowana AI, misja AI, wartości AI",
       ogTitle: "O {{appName}} - Niecenzurowana platforma AI",
-      ogDescription: "Odkryj naszą misję demokratyzacji dostępu do niecenzurowanej AI",
+      ogDescription:
+        "Odkryj naszą misję demokratyzacji dostępu do niecenzurowanej AI",
       twitterTitle: "O {{appName}}",
       twitterDescription: "Poznaj naszą misję niecenzurowanych rozmów z AI",
     },
     privacyPolicy: {
       title: "Polityka prywatności - {{appName}}",
       category: "Prawne",
-      description: "Dowiedz się, jak {{appName}} chroni Twoją prywatność i obsługuje Twoje dane",
+      description:
+        "Dowiedz się, jak {{appName}} chroni Twoją prywatność i obsługuje Twoje dane",
       imageAlt: "Polityka prywatności",
       keywords:
         "polityka prywatności, ochrona danych, prywatność użytkownika, {{appName}} prywatność",
@@ -95,19 +99,22 @@ export const translations: typeof enTranslations = {
       category: "Prawne",
       description: "Przeczytaj warunki korzystania z {{appName}}",
       imageAlt: "Warunki korzystania",
-      keywords: "warunki korzystania, warunki, umowa użytkownika, {{appName}} warunki",
+      keywords:
+        "warunki korzystania, warunki, umowa użytkownika, {{appName}} warunki",
     },
     imprint: {
       title: "Informacje prawne - {{appName}}",
       category: "Prawne",
       description: "Informacje prawne i szczegóły firmy dla {{appName}}",
       imageAlt: "Informacje prawne",
-      keywords: "imprint, informacje prawne, informacje o firmie, {{appName}} prawne",
+      keywords:
+        "imprint, informacje prawne, informacje o firmie, {{appName}} prawne",
     },
     careers: {
       title: "Kariera - {{appName}}",
       category: "Kariera",
-      description: "Dołącz do naszego zespołu i pomóż budować przyszłość niecenzurowanej AI",
+      description:
+        "Dołącz do naszego zespołu i pomóż budować przyszłość niecenzurowanej AI",
       imageAlt: "Kariera w {{appName}}",
       keywords: "kariera, praca, praca AI, praca zdalna, {{appName}} kariera",
     },
@@ -117,7 +124,8 @@ export const translations: typeof enTranslations = {
       description:
         "Przystępne plany czatu AI dla każdego. Zacznij za darmo z 10 codziennymi wiadomościami.",
       imageAlt: "Plany cenowe",
-      keywords: "cennik, plany, subskrypcja, cennik czatu AI, {{appName}} cennik",
+      keywords:
+        "cennik, plany, subskrypcja, cennik czatu AI, {{appName}} cennik",
       ogTitle: "Plany cenowe - {{appName}}",
       ogDescription: "Prosty, przejrzysty cennik dla niecenzurowanego czatu AI",
       twitterTitle: "Cennik - {{appName}}",
@@ -189,7 +197,8 @@ export const translations: typeof enTranslations = {
       },
       features: {
         title: "Funkcje platformy",
-        description: "Ta strona działa zarówno w internecie, jak i na urządzeniach mobilnych",
+        description:
+          "Ta strona działa zarówno w internecie, jak i na urządzeniach mobilnych",
         unified: {
           title: "✅ Zunifikowane komponenty",
           description:
@@ -197,11 +206,13 @@ export const translations: typeof enTranslations = {
         },
         types: {
           title: "✅ Bezpieczeństwo typów",
-          description: "Pełne wsparcie TypeScript z prawidłową inferencją typów",
+          description:
+            "Pełne wsparcie TypeScript z prawidłową inferencją typów",
         },
         async: {
           title: "✅ Asynchroniczne komponenty serwera",
-          description: "Asynchroniczne komponenty stron Next.js 15 działają w React Native",
+          description:
+            "Asynchroniczne komponenty stron Next.js 15 działają w React Native",
         },
       },
       links: {

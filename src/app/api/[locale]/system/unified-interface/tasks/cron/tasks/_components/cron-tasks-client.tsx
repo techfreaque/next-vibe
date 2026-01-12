@@ -25,7 +25,9 @@ interface CronTasksClientProps {
   locale: CountryLanguage;
 }
 
-export function CronTasksClient({ locale }: CronTasksClientProps): React.JSX.Element {
+export function CronTasksClient({
+  locale,
+}: CronTasksClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 

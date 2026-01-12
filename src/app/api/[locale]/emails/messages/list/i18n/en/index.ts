@@ -1,6 +1,7 @@
 export const translations = {
   title: "List Emails",
-  description: "Retrieve a paginated list of emails with filtering and pagination",
+  description:
+    "Retrieve a paginated list of emails with filtering and pagination",
   container: {
     title: "Email List",
     description: "Configure email list parameters and view results",

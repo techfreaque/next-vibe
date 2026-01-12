@@ -8,7 +8,10 @@ import type { Storage } from "@/packages/next-vibe-ui/web/lib/storage";
 // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
 const logStorageError = (operation: string, error: unknown): void => {
   // __DEV__ is a React Native global variable that exists at runtime
-  if ("__DEV__" in globalThis && (globalThis as { __DEV__?: boolean }).__DEV__) {
+  if (
+    "__DEV__" in globalThis &&
+    (globalThis as { __DEV__?: boolean }).__DEV__
+  ) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     // eslint-disable-next-line i18next/no-literal-string, no-console -- Intentional dev-mode error logging
     console.error(`[Storage] Error ${operation}:`, errorMsg);

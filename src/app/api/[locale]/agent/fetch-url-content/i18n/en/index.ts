@@ -11,7 +11,8 @@ export const translations = {
     fields: {
       url: {
         title: "URL",
-        description: "The complete URL to fetch (must include http:// or https://)",
+        description:
+          "The complete URL to fetch (must include http:// or https://)",
         placeholder: "https://example.com",
       },
     },

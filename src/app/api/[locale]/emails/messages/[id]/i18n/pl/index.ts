@@ -2,7 +2,8 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Pobierz email według ID",
-  description: "Pobierz pojedynczy email na podstawie jego unikalnego identyfikatora",
+  description:
+    "Pobierz pojedynczy email na podstawie jego unikalnego identyfikatora",
   container: {
     title: "Szczegóły emaila",
     description: "Zobacz szczegółowe informacje o konkretnym emailu",
@@ -48,7 +49,8 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Brak autoryzacji",
-        description: "Musisz być uwierzytelniony, aby zobaczyć szczegóły emaila",
+        description:
+          "Musisz być uwierzytelniony, aby zobaczyć szczegóły emaila",
       },
       not_found: {
         title: "Email nie znaleziony",
@@ -60,7 +62,8 @@ export const translations: typeof enTranslations = {
       },
       server: {
         title: "Błąd serwera",
-        description: "Wystąpił wewnętrzny błąd serwera podczas pobierania emaila",
+        description:
+          "Wystąpił wewnętrzny błąd serwera podczas pobierania emaila",
       },
       unknown: {
         title: "Nieznany błąd",

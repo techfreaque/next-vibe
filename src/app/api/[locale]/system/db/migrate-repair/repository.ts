@@ -8,7 +8,11 @@ import path from "node:path";
 
 import { sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -22,8 +26,10 @@ const MIGRATION_TABLE_NAME = "__drizzle_migrations__";
 const SQL_FILE_EXTENSION = ".sql";
 const DRIZZLE_SCHEMA = "drizzle";
 
-type MigrateRepairRequestType = typeof migrateRepairEndpoints.POST.types.RequestOutput;
-type MigrateRepairResponseType = typeof migrateRepairEndpoints.POST.types.ResponseOutput;
+type MigrateRepairRequestType =
+  typeof migrateRepairEndpoints.POST.types.RequestOutput;
+type MigrateRepairResponseType =
+  typeof migrateRepairEndpoints.POST.types.ResponseOutput;
 
 /**
  * Migration state interface
@@ -80,8 +86,10 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
       logger.info("Migration files found", { count: migrationFiles.length });
 
       // Step 3: Determine what needs to be fixed
-      const needsRepair = migrationState.trackedMigrations < migrationFiles.length;
-      const repairedCount = migrationFiles.length - migrationState.trackedMigrations;
+      const needsRepair =
+        migrationState.trackedMigrations < migrationFiles.length;
+      const repairedCount =
+        migrationFiles.length - migrationState.trackedMigrations;
 
       if (!needsRepair) {
         const output = t("app.api.system.db.migrateRepair.messages.upToDate");
@@ -102,7 +110,9 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
       logger.info("Migration repair needed", { repairedCount });
 
       if (data.dryRun) {
-        const output = t("app.api.system.db.migrateRepair.messages.dryRunComplete");
+        const output = t(
+          "app.api.system.db.migrateRepair.messages.dryRunComplete",
+        );
         logger.info("Dry run completed - no changes made");
 
         return success({
@@ -161,7 +171,9 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
   /**
    * Check current migration state
    */
-  private async checkMigrationState(logger: EndpointLogger): Promise<MigrationState> {
+  private async checkMigrationState(
+    logger: EndpointLogger,
+  ): Promise<MigrationState> {
     try {
       // Ensure drizzle schema exists
       await db.execute(sql`CREATE SCHEMA IF NOT EXISTS drizzle`);
@@ -174,7 +186,8 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
         ) as exists
       `);
 
-      const exists = (drizzleTableExists.rows[0] as { exists: boolean })?.exists;
+      const exists = (drizzleTableExists.rows[0] as { exists: boolean })
+        ?.exists;
 
       if (exists) {
         // Count migrations in drizzle schema
@@ -186,7 +199,8 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
           hasTable: true,
           schema: DRIZZLE_SCHEMA,
           tableName: MIGRATION_TABLE_NAME,
-          trackedMigrations: Number((count.rows[0] as { count: string | number })?.count) || 0,
+          trackedMigrations:
+            Number((count.rows[0] as { count: string | number })?.count) || 0,
         };
       }
 
@@ -228,7 +242,9 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
   private async resetMigrationTracking(logger: EndpointLogger): Promise<void> {
     try {
       logger.debug("Clearing migration tracking table");
-      await db.execute(sql`DROP TABLE IF EXISTS drizzle.__drizzle_migrations__`);
+      await db.execute(
+        sql`DROP TABLE IF EXISTS drizzle.__drizzle_migrations__`,
+      );
       logger.info("Migration tracking reset successfully");
     } catch (error) {
       logger.error("Failed to reset migration tracking", {
@@ -271,7 +287,10 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
   ): Promise<void> {
     try {
       // Read the journal file to get the correct migration metadata
-      const journalPath = path.resolve(process.cwd(), "drizzle/meta/_journal.json");
+      const journalPath = path.resolve(
+        process.cwd(),
+        "drizzle/meta/_journal.json",
+      );
       let journalData: {
         entries: Array<{ tag: string; when: number }>;
       } = {
@@ -336,4 +355,5 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
 /**
  * Export repository instance
  */
-export const databaseMigrateRepairRepository = new DatabaseMigrateRepairRepositoryImpl();
+export const databaseMigrateRepairRepository =
+  new DatabaseMigrateRepairRepositoryImpl();

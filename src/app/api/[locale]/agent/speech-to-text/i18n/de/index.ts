@@ -8,7 +8,8 @@ export const translations: typeof enTranslations = {
   hotkey: {
     post: {
       title: "Sprache-zu-Text-Hotkey",
-      description: "Audio aufnehmen und transkribieren mit automatischer Texteinfügung",
+      description:
+        "Audio aufnehmen und transkribieren mit automatischer Texteinfügung",
       form: {
         title: "Hotkey-Konfiguration",
         description: "Sprache-zu-Text-Hotkey-Einstellungen konfigurieren",
@@ -47,7 +48,8 @@ export const translations: typeof enTranslations = {
       errors: {
         unauthorized: {
           title: "Nicht autorisiert",
-          description: "Sie müssen angemeldet sein, um diese Funktion zu nutzen",
+          description:
+            "Sie müssen angemeldet sein, um diese Funktion zu nutzen",
         },
         validation: {
           title: "Validierungsfehler",

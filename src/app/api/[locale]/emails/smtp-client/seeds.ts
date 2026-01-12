@@ -6,7 +6,10 @@
 import { eq } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
-import { EmailCampaignStage, EmailJourneyVariant } from "@/app/api/[locale]/leads/enum";
+import {
+  EmailCampaignStage,
+  EmailJourneyVariant,
+} from "@/app/api/[locale]/leads/enum";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Countries, Languages } from "@/i18n/core/config";
@@ -14,7 +17,12 @@ import { Countries, Languages } from "@/i18n/core/config";
 import { leadsCampaignsEnv } from "../../leads/campaigns/env";
 import { emailEnv } from "../env";
 import { type NewSmtpAccount, smtpAccounts } from "./db";
-import { CampaignType, SmtpAccountStatus, SmtpHealthStatus, SmtpSecurityType } from "./enum";
+import {
+  CampaignType,
+  SmtpAccountStatus,
+  SmtpHealthStatus,
+  SmtpSecurityType,
+} from "./enum";
 
 /**
  * Get SMTP account 1 from environment variables (System/General emails)
@@ -41,7 +49,9 @@ function getSmtpAccount1Config(logger: EndpointLogger): NewSmtpAccount | null {
     description: "System emails (notifications, password resets, etc.)",
     host,
     port: port || 587,
-    securityType: emailEnv.EMAIL_SECURE ? SmtpSecurityType.STARTTLS : SmtpSecurityType.NONE,
+    securityType: emailEnv.EMAIL_SECURE
+      ? SmtpSecurityType.STARTTLS
+      : SmtpSecurityType.NONE,
     username,
     password,
     fromEmail,
@@ -56,7 +66,11 @@ function getSmtpAccount1Config(logger: EndpointLogger): NewSmtpAccount | null {
     emailsSentToday: 0,
     emailsSentThisMonth: 0,
     totalEmailsSent: 0,
-    campaignTypes: [CampaignType.SYSTEM, CampaignType.TRANSACTIONAL, CampaignType.NOTIFICATION],
+    campaignTypes: [
+      CampaignType.SYSTEM,
+      CampaignType.TRANSACTIONAL,
+      CampaignType.NOTIFICATION,
+    ],
     emailJourneyVariants: [],
     emailCampaignStages: [],
     countries: [Countries.GLOBAL, Countries.DE, Countries.PL],
@@ -85,12 +99,15 @@ function getSmtpAccount2Config(logger: EndpointLogger): NewSmtpAccount | null {
   const fromEmail = leadsCampaignsEnv.LEADS_EMAIL_FROM_EMAIL;
 
   if (!host || !username || !password || !fromEmail) {
-    logger.error("❌ Leads SMTP environment variables not configured for account 2", {
-      host,
-      username,
-      password,
-      fromEmail,
-    });
+    logger.error(
+      "❌ Leads SMTP environment variables not configured for account 2",
+      {
+        host,
+        username,
+        password,
+        fromEmail,
+      },
+    );
     return null;
   }
 
@@ -155,7 +172,9 @@ export async function dev(logger: EndpointLogger): Promise<void> {
   const account2 = getSmtpAccount2Config(logger);
 
   if (!account1 && !account2) {
-    logger.debug("⚠️  SMTP seed environment variables not configured, skipping seeding");
+    logger.debug(
+      "⚠️  SMTP seed environment variables not configured, skipping seeding",
+    );
     logger.debug(
       "   Configure SMTP_SEED_1_* and SMTP_SEED_2_* environment variables to enable SMTP account seeding",
     );
@@ -177,13 +196,17 @@ export async function dev(logger: EndpointLogger): Promise<void> {
         .limit(1);
 
       if (existingAccount.length > 0) {
-        logger.debug(`✅ SMTP account already exists: ${account.name} (${account.fromEmail})`);
+        logger.debug(
+          `✅ SMTP account already exists: ${account.name} (${account.fromEmail})`,
+        );
         continue;
       }
 
       // Insert the account
       await db.insert(smtpAccounts).values([account]);
-      logger.debug(`✅ Seeded SMTP account: ${account.name} (${account.fromEmail})`);
+      logger.debug(
+        `✅ Seeded SMTP account: ${account.name} (${account.fromEmail})`,
+      );
     }
   } catch (error) {
     logger.error("❌ Failed to seed SMTP accounts:", parseError(error));

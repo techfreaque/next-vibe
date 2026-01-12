@@ -34,7 +34,8 @@ export const translations = {
     leadId: "Lead Identifier",
     subscriptionId: "Subscription ID",
     userId: "User ID",
-    alreadySubscribed: "This email address is already subscribed to our newsletter",
+    alreadySubscribed:
+      "This email address is already subscribed to our newsletter",
   },
   errors: {
     badRequest: {
@@ -76,7 +77,8 @@ export const translations = {
       },
       conflict: {
         title: "Already Subscribed",
-        description: "This email address is already subscribed to our newsletter",
+        description:
+          "This email address is already subscribed to our newsletter",
       },
       badRequest: {
         title: "Bad Request",
@@ -107,14 +109,18 @@ export const translations = {
     no_phone_number: "No phone number available for newsletter welcome SMS",
     sending_welcome: "Sending welcome SMS to newsletter subscriber",
     welcome_error: "Error sending newsletter welcome SMS",
-    no_admin_phone: "No admin phone number configured, skipping SMS notification",
-    sending_admin_notification: "Sending admin notification SMS for newsletter subscription",
+    no_admin_phone:
+      "No admin phone number configured, skipping SMS notification",
+    sending_admin_notification:
+      "Sending admin notification SMS for newsletter subscription",
     admin_notification_error: "Error sending admin notification SMS",
     welcome: {
-      message: "Hi {{name}}! Welcome to our newsletter. Stay tuned for updates!",
+      message:
+        "Hi {{name}}! Welcome to our newsletter. Stay tuned for updates!",
     },
     admin_notification: {
-      message: "New newsletter subscription: {{displayName}} ({{email}}) has subscribed",
+      message:
+        "New newsletter subscription: {{displayName}} ({{email}}) has subscribed",
     },
   },
   route: {
@@ -135,7 +141,8 @@ export const translations = {
       benefit_2: "Tips and tricks for getting the most out of uncensored AI",
       benefit_3: "Exclusive offers and early access to new features",
       benefit_4: "Community highlights and success stories",
-      frequency: "We'll send you updates every few weeks—never spam, always valuable content.",
+      frequency:
+        "We'll send you updates every few weeks—never spam, always valuable content.",
       unsubscribe_text: "Don't want to receive these emails?",
       unsubscribe_link: "Unsubscribe",
     },

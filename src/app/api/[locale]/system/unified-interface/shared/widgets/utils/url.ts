@@ -16,7 +16,10 @@ export function isExternalUrl(url: string): boolean {
  * Determine if link should open in new tab
  * Used by: link, link-card
  */
-export function shouldOpenInNewTab(url: string, openInNewTab?: boolean): boolean {
+export function shouldOpenInNewTab(
+  url: string,
+  openInNewTab?: boolean,
+): boolean {
   if (openInNewTab !== undefined) {
     return openInNewTab;
   }

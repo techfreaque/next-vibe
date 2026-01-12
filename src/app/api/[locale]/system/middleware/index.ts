@@ -57,7 +57,8 @@ export async function middleware(
   }
 
   // Step 2: Extract locale from path for leadId middleware
-  const locale = (extractLocaleFromPath(path) as CountryLanguage) || options.defaultLocale;
+  const locale =
+    (extractLocaleFromPath(path) as CountryLanguage) || options.defaultLocale;
 
   // Step 3: Handle leadId tracking
   const leadIdCheck = checkLeadId(request);

@@ -11,13 +11,15 @@ export const translations: typeof enTranslations = {
   // Free tier product
   free: {
     name: "Kostenlos",
-    description: "Starten Sie mit kostenlosen Credits - keine Karte erforderlich",
+    description:
+      "Starten Sie mit kostenlosen Credits - keine Karte erforderlich",
   },
 
   // Subscription product
   subscription: {
     name: "Monatsabonnement",
-    description: "{{subCredits}} Credits pro Monat mit allen {{modelCount}} KI-Modellen",
+    description:
+      "{{subCredits}} Credits pro Monat mit allen {{modelCount}} KI-Modellen",
     longDescription:
       "Monatsabonnement mit {{subCredits}} Credits für alle {{modelCount}} unzensierten KI-Modellen",
     price: "Monatliche Abonnementpreise",

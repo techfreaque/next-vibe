@@ -24,7 +24,14 @@ interface MobileMenuClientProps {
 // Helper function to get badge classes based on variant
 
 function getBadgeClasses(
-  variant: "default" | "secondary" | "destructive" | "outline" | "notification" | null | undefined,
+  variant:
+    | "default"
+    | "secondary"
+    | "destructive"
+    | "outline"
+    | "notification"
+    | null
+    | undefined,
 ): string {
   const VARIANT_STYLES = {
     destructive: "bg-destructive text-destructive-foreground",
@@ -49,10 +56,15 @@ function getBadgeClasses(
   }
 }
 
-export function MobileMenuClient({ locale, navigationItems }: MobileMenuClientProps): JSX.Element {
+export function MobileMenuClient({
+  locale,
+  navigationItems,
+}: MobileMenuClientProps): JSX.Element {
   const { t } = simpleT(locale);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
+    {},
+  );
 
   const toggleMenu = (): void => {
     setIsMenuOpen(!isMenuOpen);
@@ -119,22 +131,29 @@ export function MobileMenuClient({ locale, navigationItems }: MobileMenuClientPr
                           <Div className="pl-7 flex flex-col gap-3 mb-4">
                             {item.children.map((childItem) => {
                               const isChildDisabled = childItem.disabled;
-                              const childDisabledReason = childItem.disabledReason;
+                              const childDisabledReason =
+                                childItem.disabledReason;
                               const isChildActive = childItem.isActive;
                               const childBadge = childItem.badge;
                               const childBadgeVariant = childItem.badgeVariant;
-                              const childBadgePayload = childItem.badgeTranslationPayload;
+                              const childBadgePayload =
+                                childItem.badgeTranslationPayload;
 
                               if (isChildDisabled && childDisabledReason) {
                                 return (
-                                  <Div key={childItem.title} className="relative">
+                                  <Div
+                                    key={childItem.title}
+                                    className="relative"
+                                  >
                                     <Div
                                       className={cn(
                                         "text-base flex items-center py-1 opacity-50 cursor-not-allowed",
                                         isChildActive && "text-primary",
                                       )}
                                     >
-                                      <Span className="mr-2">{childItem.icon}</Span>
+                                      <Span className="mr-2">
+                                        {childItem.icon}
+                                      </Span>
                                       <Div className="flex-1">
                                         <Div className="flex items-center">
                                           <Span>{t(childItem.title)}</Span>
@@ -142,7 +161,9 @@ export function MobileMenuClient({ locale, navigationItems }: MobileMenuClientPr
                                             <Span
                                               className={cn(
                                                 "ml-2 px-2 py-0.5 text-xs rounded",
-                                                getBadgeClasses(childBadgeVariant),
+                                                getBadgeClasses(
+                                                  childBadgeVariant,
+                                                ),
                                               )}
                                             >
                                               {t(childBadge, childBadgePayload)}
@@ -167,7 +188,8 @@ export function MobileMenuClient({ locale, navigationItems }: MobileMenuClientPr
                                   href={`/${locale}/story${childItem.href}`}
                                   className={cn(
                                     "text-base flex items-center py-1 hover:text-primary transition-colors",
-                                    isChildActive && "text-primary font-semibold",
+                                    isChildActive &&
+                                      "text-primary font-semibold",
                                   )}
                                   onClick={toggleMenu}
                                 >

@@ -6,7 +6,8 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Lead-Statistiken",
-  description: "Umfassende Lead-Statistiken und Analysen mit historischen Daten",
+  description:
+    "Umfassende Lead-Statistiken und Analysen mit historischen Daten",
   category: "Lead-Verwaltung",
   tags: {
     leads: "Leads",
@@ -15,7 +16,8 @@ export const translations: typeof enTranslations = {
   },
   container: {
     title: "Statistikfilter",
-    description: "Konfigurieren Sie Ihre Lead-Statistikfilter und Ansichtsoptionen",
+    description:
+      "Konfigurieren Sie Ihre Lead-Statistikfilter und Ansichtsoptionen",
   },
   timePeriod: {
     label: "Zeitraum",
@@ -277,7 +279,8 @@ export const translations: typeof enTranslations = {
   errors: {
     unauthorized: {
       title: "Nicht autorisierter Zugriff",
-      description: "Authentifizierung erforderlich um Lead-Statistiken anzuzeigen",
+      description:
+        "Authentifizierung erforderlich um Lead-Statistiken anzuzeigen",
     },
     validation: {
       title: "Validierungsfehler",
@@ -301,7 +304,8 @@ export const translations: typeof enTranslations = {
     },
     notFound: {
       title: "Keine Daten",
-      description: "Keine statistischen Daten für die angegebenen Kriterien gefunden",
+      description:
+        "Keine statistischen Daten für die angegebenen Kriterien gefunden",
     },
     conflict: {
       title: "Konflikt",

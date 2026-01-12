@@ -29,7 +29,8 @@ export const translations: typeof enTranslations = {
       },
       amount: {
         label: "Rückerstattungsbetrag",
-        description: "Zu erstattender Betrag (optional, Standard ist voller Betrag)",
+        description:
+          "Zu erstattender Betrag (optional, Standard ist voller Betrag)",
         placeholder: "Betrag eingeben",
       },
       reason: {

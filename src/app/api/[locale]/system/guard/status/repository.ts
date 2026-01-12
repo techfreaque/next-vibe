@@ -7,15 +7,21 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type guardStatusEndpoints from "./definition";
 
-type GuardStatusRequestType = typeof guardStatusEndpoints.POST.types.RequestOutput;
-type GuardStatusResponseType = typeof guardStatusEndpoints.POST.types.ResponseOutput;
+type GuardStatusRequestType =
+  typeof guardStatusEndpoints.POST.types.RequestOutput;
+type GuardStatusResponseType =
+  typeof guardStatusEndpoints.POST.types.ResponseOutput;
 
 /**
  * Guard Status Repository Interface
@@ -55,7 +61,8 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
       return this.getAllGuardStatus(logger);
     } catch (error) {
       logger.error("Guard status check failed", parseError(error));
-      const parsedError = error instanceof Error ? error : new Error(String(error));
+      const parsedError =
+        error instanceof Error ? error : new Error(String(error));
 
       return fail({
         message: "app.api.system.guard.status.post.errors.internal.title",
@@ -144,7 +151,9 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
     return success(response);
   }
 
-  private getAllGuardStatus(logger: EndpointLogger): ResponseType<GuardStatusResponseType> {
+  private getAllGuardStatus(
+    logger: EndpointLogger,
+  ): ResponseType<GuardStatusResponseType> {
     logger.debug("Getting status for all guards");
 
     // Mock implementation - in real system would scan for all guards
@@ -158,7 +167,8 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
         securityLevel: "standard",
         isolationMethod: "rbash",
         isRunning: false,
-        userHome: "/tmp/test-guard-project/.guard_home_guard_test_guard_project",
+        userHome:
+          "/tmp/test-guard-project/.guard_home_guard_test_guard_project",
       },
     ];
 

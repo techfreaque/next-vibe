@@ -45,7 +45,12 @@ const { POST } = createEndpoint({
   category: "category",
   icon: "mail",
   aliases: [CONTACT_FORM_ALIAS] as const,
-  tags: ["tags.contactForm", "tags.contactUs", "tags.contactSubmission", "tags.helpSupport"],
+  tags: [
+    "tags.contactForm",
+    "tags.contactUs",
+    "tags.contactSubmission",
+    "tags.helpSupport",
+  ],
 
   allowedRoles: [
     UserRole.PUBLIC,
@@ -185,7 +190,8 @@ const { POST } = createEndpoint({
         email: "john.doe@example.com",
         company: "Acme Corp",
         subject: ContactSubject.GENERAL_INQUIRY,
-        message: "I would like to learn more about your social media management services.",
+        message:
+          "I would like to learn more about your social media management services.",
         priority: ContactPriority.MEDIUM,
       },
       success: {

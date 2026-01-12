@@ -5,7 +5,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { TFunction } from "@/i18n/core/static-types.js";
 
 import type { LaunchpadConfig } from "../types/types.js";
-import { cloneRepo, closePrompt, getAllRepos, repoExists } from "../utils/repo-utils.js";
+import {
+  cloneRepo,
+  closePrompt,
+  getAllRepos,
+  repoExists,
+} from "../utils/repo-utils.js";
 
 export async function cloneMissingRepos(
   logger: EndpointLogger,
@@ -23,7 +28,12 @@ export async function cloneMissingRepos(
   for (const repo of repos) {
     if (!repoExists(repo.path, rootDir) && repo.config.repoUrl) {
       try {
-        await cloneRepo(repo.config.repoUrl, join(...repo.path), repo.config.branch, rootDir);
+        await cloneRepo(
+          repo.config.repoUrl,
+          join(...repo.path),
+          repo.config.branch,
+          rootDir,
+        );
         clonedCount++;
       } catch {
         failedCount++;

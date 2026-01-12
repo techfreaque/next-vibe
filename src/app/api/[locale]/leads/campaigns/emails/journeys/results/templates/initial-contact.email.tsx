@@ -57,9 +57,12 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
   // Get locale-specific pricing for starter plan
   const country = getCountryFromLocale(locale);
   const allPlans = getPricingPlansArray();
-  const starterPlan = allPlans.find((plan) => plan.id === SubscriptionPlan.SUBSCRIPTION);
+  const starterPlan = allPlans.find(
+    (plan) => plan.id === SubscriptionPlan.SUBSCRIPTION,
+  );
   const starterPrice = starterPlan?.priceByCountry[country].monthly || 0;
-  const starterCurrency = starterPlan?.priceByCountry[country].currency || "EUR";
+  const starterCurrency =
+    starterPlan?.priceByCountry[country].currency || "EUR";
 
   const emailContent = (
     <EmailLayout
@@ -112,7 +115,11 @@ export const resultsInitialEmail: EmailTemplateFunction = async ({
           {t(
             "app.api.leads.campaigns.emails.journeys.results.templates.resultsJourney.initial.priceText",
             {
-              price: formatCurrencyNoDecimals(starterPrice, starterCurrency, locale),
+              price: formatCurrencyNoDecimals(
+                starterPrice,
+                starterCurrency,
+                locale,
+              ),
             },
           )}
         </span>

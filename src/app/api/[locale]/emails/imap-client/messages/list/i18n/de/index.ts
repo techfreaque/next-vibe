@@ -79,7 +79,8 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich zum Auflisten von Nachrichten",
+        description:
+          "Authentifizierung erforderlich zum Auflisten von Nachrichten",
       },
       forbidden: {
         title: "Verboten",
@@ -91,7 +92,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt",
-        description: "Nachrichtenlisten-Anfrage steht im Konflikt mit vorhandenen Daten",
+        description:
+          "Nachrichtenlisten-Anfrage steht im Konflikt mit vorhandenen Daten",
       },
       server: {
         title: "Serverfehler",
@@ -103,7 +105,8 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Ungespeicherte Änderungen",
-        description: "Sie haben ungespeicherte Änderungen in der Nachrichtenliste",
+        description:
+          "Sie haben ungespeicherte Änderungen in der Nachrichtenliste",
       },
       unknown: {
         title: "Unbekannter Fehler",

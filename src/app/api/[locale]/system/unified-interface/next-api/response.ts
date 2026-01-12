@@ -5,7 +5,10 @@
  */
 
 import { NextResponse } from "next/server";
-import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
 import {
   errorResponseSchema,
   ErrorResponseTypes,
@@ -50,7 +53,10 @@ function buildErrorChain(
   while (currentError && !currentError.success && depth < 10) {
     // Prevent infinite loops
     const indent = "  ".repeat(depth);
-    const translatedMessage = t(currentError.message, currentError.messageParams);
+    const translatedMessage = t(
+      currentError.message,
+      currentError.messageParams,
+    );
 
     // For logging (includes error codes)
     logChain.push(

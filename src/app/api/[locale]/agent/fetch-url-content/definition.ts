@@ -63,7 +63,8 @@ const { GET } = createEndpoint({
       type: WidgetType.CONTAINER,
       linkable: true,
       title: "app.api.agent.chat.tools.fetchUrl.get.form.title" as const,
-      description: "app.api.agent.chat.tools.fetchUrl.get.form.description" as const,
+      description:
+        "app.api.agent.chat.tools.fetchUrl.get.form.description" as const,
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -74,9 +75,12 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.agent.chat.tools.fetchUrl.get.fields.url.title" as const,
-          description: "app.api.agent.chat.tools.fetchUrl.get.fields.url.description" as const,
-          placeholder: "app.api.agent.chat.tools.fetchUrl.get.fields.url.placeholder" as const,
+          label:
+            "app.api.agent.chat.tools.fetchUrl.get.fields.url.title" as const,
+          description:
+            "app.api.agent.chat.tools.fetchUrl.get.fields.url.description" as const,
+          placeholder:
+            "app.api.agent.chat.tools.fetchUrl.get.fields.url.placeholder" as const,
           columns: 12,
         },
         z.string().url().min(1),
@@ -86,7 +90,8 @@ const { GET } = createEndpoint({
       message: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.tools.fetchUrl.get.response.message.title" as const,
+          content:
+            "app.api.agent.chat.tools.fetchUrl.get.response.message.title" as const,
           columns: 12,
         },
         z.string(),
@@ -106,7 +111,8 @@ const { GET } = createEndpoint({
       content: responseField(
         {
           type: WidgetType.MARKDOWN,
-          label: "app.api.agent.chat.tools.fetchUrl.get.response.content.title" as const,
+          label:
+            "app.api.agent.chat.tools.fetchUrl.get.response.content.title" as const,
           description:
             "app.api.agent.chat.tools.fetchUrl.get.response.content.description" as const,
           columns: 12,
@@ -117,7 +123,8 @@ const { GET } = createEndpoint({
       statusCode: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.tools.fetchUrl.get.response.statusCode.title" as const,
+          content:
+            "app.api.agent.chat.tools.fetchUrl.get.response.statusCode.title" as const,
           columns: 6,
         },
         z.number().optional(),
@@ -126,7 +133,8 @@ const { GET } = createEndpoint({
       timeElapsed: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.agent.chat.tools.fetchUrl.get.response.timeElapsed.title" as const,
+          content:
+            "app.api.agent.chat.tools.fetchUrl.get.response.timeElapsed.title" as const,
           columns: 6,
         },
         z.number().optional(),
@@ -137,48 +145,66 @@ const { GET } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.chat.tools.fetchUrl.get.errors.validation.title" as const,
-      description: "app.api.agent.chat.tools.fetchUrl.get.errors.validation.description" as const,
+      title:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.validation.title" as const,
+      description:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.agent.chat.threads.search.get.errors.unsavedChanges.title" as const,
+      title:
+        "app.api.agent.chat.threads.search.get.errors.unsavedChanges.title" as const,
       description:
         "app.api.agent.chat.threads.search.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description: "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
+      description:
+        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
     title: "app.api.agent.chat.tools.fetchUrl.get.success.title" as const,
-    description: "app.api.agent.chat.tools.fetchUrl.get.success.description" as const,
+    description:
+      "app.api.agent.chat.tools.fetchUrl.get.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -194,13 +220,15 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         message: "Successfully fetched content from: https://example.com",
-        content: "# Example Domain\n\nThis domain is for use in illustrative examples...",
+        content:
+          "# Example Domain\n\nThis domain is for use in illustrative examples...",
         fetchedUrl: "https://example.com",
         statusCode: 200,
         timeElapsed: 1234,
       },
       blog: {
-        message: "Successfully fetched content from: https://blog.example.com/article",
+        message:
+          "Successfully fetched content from: https://blog.example.com/article",
         content: "# Article Title\n\nArticle content in markdown format...",
         fetchedUrl: "https://blog.example.com/article",
         statusCode: 200,
@@ -219,5 +247,7 @@ export type FetchUrlContentGetRequestInput = typeof GET.types.RequestInput;
 export type FetchUrlContentGetRequestOutput = typeof GET.types.RequestOutput;
 export type FetchUrlContentGetResponseInput = typeof GET.types.ResponseInput;
 export type FetchUrlContentGetResponseOutput = typeof GET.types.ResponseOutput;
-export type FetchUrlContentGetUrlVariablesInput = typeof GET.types.UrlVariablesInput;
-export type FetchUrlContentGetUrlVariablesOutput = typeof GET.types.UrlVariablesOutput;
+export type FetchUrlContentGetUrlVariablesInput =
+  typeof GET.types.UrlVariablesInput;
+export type FetchUrlContentGetUrlVariablesOutput =
+  typeof GET.types.UrlVariablesOutput;

@@ -26,7 +26,9 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.MARKDOWN> {
+export class MarkdownWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.MARKDOWN
+> {
   readonly widgetType = WidgetType.MARKDOWN;
 
   /**
@@ -66,7 +68,10 @@ export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
    * @param context Rendering context with depth and options
    * @returns Formatted and indented markdown string
    */
-  private renderMarkdown(data: ProcessedMarkdown, context: WidgetRenderContext): string {
+  private renderMarkdown(
+    data: ProcessedMarkdown,
+    context: WidgetRenderContext,
+  ): string {
     const { content } = data;
     const indent = this.createIndent(context.depth, context);
 
@@ -108,7 +113,10 @@ export class MarkdownWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType
    * @param context Rendering context for styling and emoji support
    * @returns Converted text with ANSI formatting codes
    */
-  private convertMarkdownToPlainText(content: string, context: WidgetRenderContext): string {
+  private convertMarkdownToPlainText(
+    content: string,
+    context: WidgetRenderContext,
+  ): string {
     let result = content;
 
     // Convert headings (# Heading)

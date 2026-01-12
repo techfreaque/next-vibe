@@ -5,40 +5,49 @@ export const translations = {
       "Führen Sie Produktions-Datenbank-Migrationen mit Sicherheitsprüfungen für CI/CD-Pipelines aus",
     form: {
       title: "Produktions-Migration Optionen",
-      description: "Konfigurieren Sie die Einstellungen für Produktions-Migration-Operationen",
+      description:
+        "Konfigurieren Sie die Einstellungen für Produktions-Migration-Operationen",
     },
     errors: {
       validation: {
         title: "Validierungsfehler",
-        description: "Die bereitgestellten Produktions-Migration-Parameter sind ungültig",
+        description:
+          "Die bereitgestellten Produktions-Migration-Parameter sind ungültig",
       },
       network: {
         title: "Netzwerkfehler",
-        description: "Verbindung zur Datenbank für Produktions-Migration fehlgeschlagen",
+        description:
+          "Verbindung zur Datenbank für Produktions-Migration fehlgeschlagen",
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description: "Sie sind nicht berechtigt, Produktions-Migration-Operationen durchzuführen",
+        description:
+          "Sie sind nicht berechtigt, Produktions-Migration-Operationen durchzuführen",
       },
       forbidden: {
         title: "Verboten",
-        description: "Produktions-Migration-Operationen sind für Ihre Rolle nicht erlaubt",
+        description:
+          "Produktions-Migration-Operationen sind für Ihre Rolle nicht erlaubt",
       },
       notFound: {
         title: "Nicht gefunden",
-        description: "Die angeforderte Produktions-Migration-Ressource wurde nicht gefunden",
+        description:
+          "Die angeforderte Produktions-Migration-Ressource wurde nicht gefunden",
       },
       server: {
         title: "Serverfehler",
-        description: "Ein interner Serverfehler ist während der Produktions-Migration aufgetreten",
+        description:
+          "Ein interner Serverfehler ist während der Produktions-Migration aufgetreten",
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description: "Ein unerwarteter Fehler ist während der Produktions-Migration aufgetreten",
+        description:
+          "Ein unerwarteter Fehler ist während der Produktions-Migration aufgetreten",
       },
       conflict: {
         title: "Konflikt",
-        description: "Ein Konflikt ist während der Produktions-Migration-Operation aufgetreten",
+        description:
+          "Ein Konflikt ist während der Produktions-Migration-Operation aufgetreten",
       },
     },
     success: {
@@ -57,7 +66,8 @@ export const translations = {
     },
     dryRun: {
       title: "Probelauf",
-      description: "Zeigen was getan würde, ohne tatsächlich Änderungen auszuführen",
+      description:
+        "Zeigen was getan würde, ohne tatsächlich Änderungen auszuführen",
     },
     success: {
       title: "Erfolg",

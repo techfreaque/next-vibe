@@ -17,9 +17,14 @@ export const {
 } = createEnumOptions({
   CRON: "app.api.system.unifiedInterface.tasks.type.cron" as const,
   SIDE: "app.api.system.unifiedInterface.tasks.type.side" as const,
-  TASK_RUNNER: "app.api.system.unifiedInterface.tasks.type.task_runner" as const,
+  TASK_RUNNER:
+    "app.api.system.unifiedInterface.tasks.type.task_runner" as const,
 });
-export const TaskTypeDB = [TaskType.CRON, TaskType.SIDE, TaskType.TASK_RUNNER] as const;
+export const TaskTypeDB = [
+  TaskType.CRON,
+  TaskType.SIDE,
+  TaskType.TASK_RUNNER,
+] as const;
 
 /**
  * Task Priority Levels
@@ -34,7 +39,8 @@ export const {
   HIGH: "app.api.system.unifiedInterface.tasks.priority.high" as const,
   MEDIUM: "app.api.system.unifiedInterface.tasks.priority.medium" as const,
   LOW: "app.api.system.unifiedInterface.tasks.priority.low" as const,
-  BACKGROUND: "app.api.system.unifiedInterface.tasks.priority.background" as const,
+  BACKGROUND:
+    "app.api.system.unifiedInterface.tasks.priority.background" as const,
 } as const);
 export const CronTaskPriorityDB = [
   CronTaskPriority.CRITICAL,
@@ -57,9 +63,12 @@ export const {
   HIGH: "app.api.system.unifiedInterface.tasks.priority.high" as const,
   MEDIUM: "app.api.system.unifiedInterface.tasks.priority.medium" as const,
   LOW: "app.api.system.unifiedInterface.tasks.priority.low" as const,
-  BACKGROUND: "app.api.system.unifiedInterface.tasks.priority.background" as const,
-  HIGH_AND_ABOVE: "app.api.system.unifiedInterface.tasks.priority.filter.highAndAbove" as const,
-  MEDIUM_AND_ABOVE: "app.api.system.unifiedInterface.tasks.priority.filter.mediumAndAbove" as const,
+  BACKGROUND:
+    "app.api.system.unifiedInterface.tasks.priority.background" as const,
+  HIGH_AND_ABOVE:
+    "app.api.system.unifiedInterface.tasks.priority.filter.highAndAbove" as const,
+  MEDIUM_AND_ABOVE:
+    "app.api.system.unifiedInterface.tasks.priority.filter.mediumAndAbove" as const,
 });
 
 /**
@@ -124,15 +133,20 @@ export const {
   options: TaskCategoryOptions,
   Value: TaskCategoryValue,
 } = createEnumOptions({
-  DEVELOPMENT: "app.api.system.unifiedInterface.tasks.taskCategory.development" as const,
+  DEVELOPMENT:
+    "app.api.system.unifiedInterface.tasks.taskCategory.development" as const,
   BUILD: "app.api.system.unifiedInterface.tasks.taskCategory.build" as const,
   WATCH: "app.api.system.unifiedInterface.tasks.taskCategory.watch" as const,
-  GENERATOR: "app.api.system.unifiedInterface.tasks.taskCategory.generator" as const,
+  GENERATOR:
+    "app.api.system.unifiedInterface.tasks.taskCategory.generator" as const,
   TEST: "app.api.system.unifiedInterface.tasks.taskCategory.test" as const,
-  MAINTENANCE: "app.api.system.unifiedInterface.tasks.taskCategory.maintenance" as const,
-  DATABASE: "app.api.system.unifiedInterface.tasks.taskCategory.database" as const,
+  MAINTENANCE:
+    "app.api.system.unifiedInterface.tasks.taskCategory.maintenance" as const,
+  DATABASE:
+    "app.api.system.unifiedInterface.tasks.taskCategory.database" as const,
   SYSTEM: "app.api.system.unifiedInterface.tasks.taskCategory.system" as const,
-  MONITORING: "app.api.system.unifiedInterface.tasks.taskCategory.monitoring" as const,
+  MONITORING:
+    "app.api.system.unifiedInterface.tasks.taskCategory.monitoring" as const,
 });
 export const TaskCategoryDB = [
   TaskCategory.DEVELOPMENT,
@@ -167,10 +181,14 @@ export const {
   options: PulseHealthStatusOptions,
   Value: PulseHealthStatusValue,
 } = createEnumOptions({
-  HEALTHY: "app.api.system.unifiedInterface.tasks.pulse.health.healthy" as const,
-  WARNING: "app.api.system.unifiedInterface.tasks.pulse.health.warning" as const,
-  CRITICAL: "app.api.system.unifiedInterface.tasks.pulse.health.critical" as const,
-  UNKNOWN: "app.api.system.unifiedInterface.tasks.pulse.health.unknown" as const,
+  HEALTHY:
+    "app.api.system.unifiedInterface.tasks.pulse.health.healthy" as const,
+  WARNING:
+    "app.api.system.unifiedInterface.tasks.pulse.health.warning" as const,
+  CRITICAL:
+    "app.api.system.unifiedInterface.tasks.pulse.health.critical" as const,
+  UNKNOWN:
+    "app.api.system.unifiedInterface.tasks.pulse.health.unknown" as const,
 });
 export const PulseHealthStatusDB = [
   PulseHealthStatus.HEALTHY,
@@ -188,11 +206,16 @@ export const {
   options: PulseExecutionStatusOptions,
   Value: PulseExecutionStatusValue,
 } = createEnumOptions({
-  SUCCESS: "app.api.system.unifiedInterface.tasks.pulse.execution.success" as const,
-  FAILURE: "app.api.system.unifiedInterface.tasks.pulse.execution.failure" as const,
-  TIMEOUT: "app.api.system.unifiedInterface.tasks.pulse.execution.timeout" as const,
-  CANCELLED: "app.api.system.unifiedInterface.tasks.pulse.execution.cancelled" as const,
-  PENDING: "app.api.system.unifiedInterface.tasks.pulse.execution.pending" as const,
+  SUCCESS:
+    "app.api.system.unifiedInterface.tasks.pulse.execution.success" as const,
+  FAILURE:
+    "app.api.system.unifiedInterface.tasks.pulse.execution.failure" as const,
+  TIMEOUT:
+    "app.api.system.unifiedInterface.tasks.pulse.execution.timeout" as const,
+  CANCELLED:
+    "app.api.system.unifiedInterface.tasks.pulse.execution.cancelled" as const,
+  PENDING:
+    "app.api.system.unifiedInterface.tasks.pulse.execution.pending" as const,
 });
 export const PulseExecutionStatusDB = [
   PulseExecutionStatus.SUCCESS,
@@ -228,7 +251,11 @@ export function mapPriorityFilter(
     case CronTaskPriorityFilter.HIGH_AND_ABOVE:
       return [CronTaskPriority.CRITICAL, CronTaskPriority.HIGH];
     case CronTaskPriorityFilter.MEDIUM_AND_ABOVE:
-      return [CronTaskPriority.CRITICAL, CronTaskPriority.HIGH, CronTaskPriority.MEDIUM];
+      return [
+        CronTaskPriority.CRITICAL,
+        CronTaskPriority.HIGH,
+        CronTaskPriority.MEDIUM,
+      ];
     default:
       return Object.values(CronTaskPriority);
   }
@@ -244,7 +271,11 @@ export function mapStatusFilter(
     case CronTaskStatusFilter.ALL:
       return Object.values(CronTaskStatus);
     case CronTaskStatusFilter.ACTIVE:
-      return [CronTaskStatus.PENDING, CronTaskStatus.RUNNING, CronTaskStatus.SCHEDULED];
+      return [
+        CronTaskStatus.PENDING,
+        CronTaskStatus.RUNNING,
+        CronTaskStatus.SCHEDULED,
+      ];
     case CronTaskStatusFilter.COMPLETED:
       return [CronTaskStatus.COMPLETED];
     case CronTaskStatusFilter.FAILED:
@@ -254,7 +285,11 @@ export function mapStatusFilter(
     case CronTaskStatusFilter.PENDING:
       return [CronTaskStatus.PENDING];
     case CronTaskStatusFilter.ERROR:
-      return [CronTaskStatus.FAILED, CronTaskStatus.TIMEOUT, CronTaskStatus.ERROR];
+      return [
+        CronTaskStatus.FAILED,
+        CronTaskStatus.TIMEOUT,
+        CronTaskStatus.ERROR,
+      ];
     case CronTaskStatusFilter.STOPPED:
       return [CronTaskStatus.STOPPED];
     default:
@@ -265,7 +300,9 @@ export function mapStatusFilter(
 /**
  * Get priority weight for sorting (higher number = higher priority)
  */
-export function getPriorityWeight(priority: typeof CronTaskPriorityValue): number {
+export function getPriorityWeight(
+  priority: typeof CronTaskPriorityValue,
+): number {
   switch (priority) {
     case CronTaskPriority.CRITICAL:
       return 5;

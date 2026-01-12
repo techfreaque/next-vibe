@@ -21,7 +21,10 @@ interface ContactInfoProps {
  * Contact information component
  * Displays company contact details and office locations
  */
-export default function ContactInfo({ locale, supportEmail }: ContactInfoProps): JSX.Element {
+export default function ContactInfo({
+  locale,
+  supportEmail,
+}: ContactInfoProps): JSX.Element {
   const { t } = simpleT(locale);
 
   return (
@@ -80,7 +83,9 @@ export default function ContactInfo({ locale, supportEmail }: ContactInfoProps):
               </H3>
             </Div>
             <P className="text-gray-600 dark:text-gray-300 ml-8 mb-2">
-              {t("app.api.contact._components.pages.help.info.discordDescription")}
+              {t(
+                "app.api.contact._components.pages.help.info.discordDescription",
+              )}
             </P>
             <Link
               href={t("config.social.discordInvite")}

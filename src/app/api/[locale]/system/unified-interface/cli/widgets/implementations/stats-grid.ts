@@ -19,7 +19,9 @@ import {
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class StatsGridWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.STATS_GRID> {
+export class StatsGridWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.STATS_GRID
+> {
   readonly widgetType = WidgetType.STATS_GRID;
 
   render(props: CLIWidgetProps<typeof WidgetType.STATS_GRID, string>): string {
@@ -42,7 +44,9 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
       return `${indent}${icon}${label}: ${formattedValue}`;
     }
 
-    const stringValue = isWidgetDataObject(value) ? JSON.stringify(value) : String(value);
+    const stringValue = isWidgetDataObject(value)
+      ? JSON.stringify(value)
+      : String(value);
     return `${indent}${stringValue}`;
   }
 
@@ -65,7 +69,10 @@ export class StatsGridWidgetRenderer extends BaseWidgetRenderer<typeof WidgetTyp
     for (const row of rows) {
       const rowItems = row
         .filter(
-          (entry) => isWidgetDataPrimitive(entry[1]) && entry[1] !== null && entry[1] !== undefined,
+          (entry) =>
+            isWidgetDataPrimitive(entry[1]) &&
+            entry[1] !== null &&
+            entry[1] !== undefined,
         )
         .map(([key, val]) => {
           // Use centralized renderValue for consistent formatting

@@ -6,8 +6,9 @@
 import type { RangeSliderProps } from "../../web/ui/range-slider";
 import type { JSX } from "react";
 
-export function RangeSlider(_props: RangeSliderProps): JSX.Element {
+export function RangeSlider(_props: RangeSliderProps): JSX.Element {}
 
-}
-
-export type { RangeSliderOption, RangeSliderProps } from "../../web/ui/range-slider";
+export type {
+  RangeSliderOption,
+  RangeSliderProps,
+} from "../../web/ui/range-slider";

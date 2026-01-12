@@ -12,7 +12,8 @@ export const translations = {
     },
     branchIndices: {
       label: "Branch Indices",
-      description: "Map of depth to branch index for selecting conversation path",
+      description:
+        "Map of depth to branch index for selecting conversation path",
     },
     response: {
       title: "Path Messages",

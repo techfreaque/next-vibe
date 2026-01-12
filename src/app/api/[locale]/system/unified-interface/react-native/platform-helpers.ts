@@ -36,7 +36,9 @@ export const generateMetadata = undefined;
  * Helper to conditionally import Next.js specific modules
  * Returns undefined on native platforms
  */
-export async function importNextModule<T>(importFn: () => Promise<T>): Promise<T | undefined> {
+export async function importNextModule<T>(
+  importFn: () => Promise<T>,
+): Promise<T | undefined> {
   if (isWeb) {
     return await importFn();
   }

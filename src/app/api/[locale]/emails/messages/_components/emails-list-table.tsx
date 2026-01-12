@@ -52,7 +52,9 @@ const getStatusBadgeVariant = (
   }
 };
 
-const getTypeBadgeVariant = (type: string): "default" | "secondary" | "outline" | "destructive" => {
+const getTypeBadgeVariant = (
+  type: string,
+): "default" | "secondary" | "outline" | "destructive" => {
   switch (type) {
     case "transactional":
       return "default";
@@ -67,7 +69,11 @@ const getTypeBadgeVariant = (type: string): "default" | "secondary" | "outline" 
   }
 };
 
-export function EmailsListTable({ emails, loading, locale }: EmailsListTableProps): JSX.Element {
+export function EmailsListTable({
+  emails,
+  loading,
+  locale,
+}: EmailsListTableProps): JSX.Element {
   const { t } = simpleT(locale);
 
   if (loading) {
@@ -107,19 +113,31 @@ export function EmailsListTable({ emails, loading, locale }: EmailsListTableProp
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("app.admin.emails.list.admin.table.subject")}</TableHead>
-            <TableHead>{t("app.admin.emails.list.admin.table.recipient")}</TableHead>
-            <TableHead>{t("app.admin.emails.list.admin.table.status")}</TableHead>
+            <TableHead>
+              {t("app.admin.emails.list.admin.table.subject")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.list.admin.table.recipient")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.list.admin.table.status")}
+            </TableHead>
             <TableHead>{t("app.admin.emails.list.admin.table.type")}</TableHead>
-            <TableHead>{t("app.admin.emails.list.admin.table.sentAt")}</TableHead>
-            <TableHead>{t("app.admin.emails.list.admin.table.actions")}</TableHead>
+            <TableHead>
+              {t("app.admin.emails.list.admin.table.sentAt")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.list.admin.table.actions")}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {emails.map((email) => (
             <TableRow key={email.emailCore.id}>
               <TableCell className="font-medium">
-                <Div className="max-w-48 truncate">{email.emailCore.subject}</Div>
+                <Div className="max-w-48 truncate">
+                  {email.emailCore.subject}
+                </Div>
               </TableCell>
               <TableCell>
                 <Div className="flex flex-col gap-1">
@@ -146,7 +164,9 @@ export function EmailsListTable({ emails, loading, locale }: EmailsListTableProp
               <TableCell>
                 {email.emailEngagement.sentAt ? (
                   <Div className="text-sm">
-                    {new Date(email.emailEngagement.sentAt).toLocaleDateString(locale)}
+                    {new Date(email.emailEngagement.sentAt).toLocaleDateString(
+                      locale,
+                    )}
                   </Div>
                 ) : (
                   <Span className="text-muted-foreground">-</Span>
@@ -154,7 +174,9 @@ export function EmailsListTable({ emails, loading, locale }: EmailsListTableProp
               </TableCell>
               <TableCell>
                 <Div className="flex items-center gap-2">
-                  {email.emailEngagement.openedAt && <Eye className="h-4 w-4 text-green-600" />}
+                  {email.emailEngagement.openedAt && (
+                    <Eye className="h-4 w-4 text-green-600" />
+                  )}
                   {email.emailEngagement.clickedAt && (
                     <MousePointer className="h-4 w-4 text-blue-600" />
                   )}

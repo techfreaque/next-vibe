@@ -57,7 +57,8 @@ const JOURNEY_VARIANT_METADATA: Record<
 > = {
   [EmailJourneyVariant.PERSONAL_APPROACH]: {
     name: "Personal & Human Touch",
-    description: "Emphasizes personal connection, human expertise, and relationship building",
+    description:
+      "Emphasizes personal connection, human expertise, and relationship building",
     color: "#10B981", // Emerald
     icon: "user",
     characteristics: [
@@ -192,7 +193,10 @@ export class ABTestingService {
   /**
    * Check if lead meets target audience criteria
    */
-  private isTargetAudience(leadData?: { country?: string; source?: string }): boolean {
+  private isTargetAudience(leadData?: {
+    country?: string;
+    source?: string;
+  }): boolean {
     if (!leadData || !this.config.targetAudience) {
       return true; // Include all if no criteria specified
     }
@@ -252,7 +256,8 @@ export function validateABTestConfig(config: ABTestConfig): {
   if (Math.abs(totalWeight - 100) > 0.01) {
     errors.push(
       fail({
-        message: "app.api.leads.campaigns.emails.services.abTesting.invalidWeights",
+        message:
+          "app.api.leads.campaigns.emails.services.abTesting.invalidWeights",
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: { totalWeight },
       }),
@@ -264,7 +269,8 @@ export function validateABTestConfig(config: ABTestConfig): {
     if (variantConfig.weight <= 0) {
       errors.push(
         fail({
-          message: "app.api.leads.campaigns.emails.services.abTesting.negativeWeight",
+          message:
+            "app.api.leads.campaigns.emails.services.abTesting.negativeWeight",
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { variant, weight: variantConfig.weight },
         }),
@@ -281,7 +287,9 @@ export function validateABTestConfig(config: ABTestConfig): {
 /**
  * Get A/B Test Summary (standalone function)
  */
-export function getABTestSummary(config: ABTestConfig = DEFAULT_AB_TEST_CONFIG): {
+export function getABTestSummary(
+  config: ABTestConfig = DEFAULT_AB_TEST_CONFIG,
+): {
   enabled: boolean;
   totalVariants: number;
   variants: Array<{

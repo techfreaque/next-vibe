@@ -4,7 +4,8 @@ export const translations: typeof enTranslations = {
   tag: "schema-verify",
   post: {
     title: "Weryfikacja schematu",
-    description: "Sprawdź integralność schematu bazy danych i opcjonalnie napraw problemy",
+    description:
+      "Sprawdź integralność schematu bazy danych i opcjonalnie napraw problemy",
     form: {
       title: "Konfiguracja weryfikacji schematu",
       description: "Skonfiguruj parametry weryfikacji schematu",
@@ -88,7 +89,9 @@ export const translations: typeof enTranslations = {
     constraints: "✅ Zweryfikowano {{count}} ograniczeń",
   },
   fixed: "🔧 Naprawiono {{count}} problemów ze schematem",
-  validationPassed: "\n✅ Walidacja schematu zakończona pomyślnie - wszystkie sprawdzenia OK",
-  validationFailed: "\n❌ Walidacja schematu nie powiodła się - znaleziono {{count}} problemów",
+  validationPassed:
+    "\n✅ Walidacja schematu zakończona pomyślnie - wszystkie sprawdzenia OK",
+  validationFailed:
+    "\n❌ Walidacja schematu nie powiodła się - znaleziono {{count}} problemów",
   dbConnectionFailed: "Nie udało się połączyć z bazą danych",
 };

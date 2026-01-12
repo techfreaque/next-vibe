@@ -4,7 +4,8 @@ export const translations: typeof enTranslations = {
   task: {
     description:
       "Oczyszczanie wygasłych sesji użytkowników w celu utrzymania bezpieczeństwa systemu",
-    purpose: "Usuwa wygasłe sesje w celu utrzymania bezpieczeństwa i wydajności",
+    purpose:
+      "Usuwa wygasłe sesje w celu utrzymania bezpieczeństwa i wydajności",
     impact:
       "Poprawia wydajność systemu i bezpieczeństwo poprzez usuwanie przestarzałych danych sesji",
     rollback: "Rollback nie ma zastosowania dla operacji czyszczenia",

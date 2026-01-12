@@ -2,9 +2,18 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { FormAlert, type FormAlertState } from "next-vibe-ui/ui/form/form-alert";
+import {
+  FormAlert,
+  type FormAlertState,
+} from "next-vibe-ui/ui/form/form-alert";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useWatch } from "react-hook-form";
@@ -15,9 +24,18 @@ import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { UnifiedField } from "../../../shared/types/endpoint";
-import { WidgetType, type WidgetType as WidgetTypeEnum } from "../../../shared/types/enums";
-import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
-import { isFormInputField, isResponseField } from "../../../shared/widgets/utils/field-helpers";
+import {
+  WidgetType,
+  type WidgetType as WidgetTypeEnum,
+} from "../../../shared/types/enums";
+import type {
+  ReactWidgetProps,
+  WidgetData,
+} from "../../../shared/widgets/types";
+import {
+  isFormInputField,
+  isResponseField,
+} from "../../../shared/widgets/utils/field-helpers";
 import {
   hasChildren,
   hasWidgetTypeInTree,
@@ -102,7 +120,8 @@ export function ContainerWidget<const TKey extends string>({
 
   // Check if this is an array field
   const isArrayField =
-    "type" in field && (field.type === "array" || field.type === "array-optional");
+    "type" in field &&
+    (field.type === "array" || field.type === "array-optional");
 
   // Determine field type using type guards
   const isUnionField = isObjectUnionField(field);
@@ -159,7 +178,8 @@ export function ContainerWidget<const TKey extends string>({
 
   // Calculate default column span for children based on conceptual columns
   // E.g., if parent wants 4 columns, each child by default takes 12/4 = 3 grid columns
-  const defaultChildSpan = layoutType === "grid" ? Math.floor(12 / conceptualColumns) : undefined;
+  const defaultChildSpan =
+    layoutType === "grid" ? Math.floor(12 / conceptualColumns) : undefined;
 
   // Translate title and description early (before any early returns)
   let title = titleKey ? context.t(titleKey) : undefined;
@@ -177,18 +197,30 @@ export function ContainerWidget<const TKey extends string>({
     }
   }
 
-  const showHeaderButton = submitButtonConfig?.position === "header" && onSubmit && form;
-  const showBottomButton = submitButtonConfig?.position === "bottom" && onSubmit && form;
+  const showHeaderButton =
+    submitButtonConfig?.position === "header" && onSubmit && form;
+  const showBottomButton =
+    submitButtonConfig?.position === "bottom" && onSubmit && form;
 
-  const buttonIcon = submitButtonConfig?.icon ? (submitButtonConfig.icon as IconKey) : undefined;
+  const buttonIcon = submitButtonConfig?.icon
+    ? (submitButtonConfig.icon as IconKey)
+    : undefined;
 
   // Get classes from config (no hardcoding!)
   const contentGap = getSpacingClassName("gap", spacing) || "space-y-6";
-  const topPadding = paddingTop ? getSpacingClassName("padding", paddingTop) : "";
-  const bottomPadding = paddingBottom ? getSpacingClassName("padding", paddingBottom) : "";
+  const topPadding = paddingTop
+    ? getSpacingClassName("padding", paddingTop)
+    : "";
+  const bottomPadding = paddingBottom
+    ? getSpacingClassName("padding", paddingBottom)
+    : "";
   const bottomBorder = borderBottom ? "border-b" : "";
   const titleAlignClass =
-    titleAlign === "center" ? "text-center" : titleAlign === "right" ? "text-right" : "text-left";
+    titleAlign === "center"
+      ? "text-center"
+      : titleAlign === "right"
+        ? "text-right"
+        : "text-left";
   const titleSizeClass = getTextSizeClassName(titleSize);
   const descriptionSizeClass = getTextSizeClassName(descriptionSize);
   const buttonGapClass = getSpacingClassName("gap", buttonGap);
@@ -199,22 +231,29 @@ export function ContainerWidget<const TKey extends string>({
 
   const buttonText = submitButtonConfig?.text
     ? context.t(submitButtonConfig.text)
-    : globalT("app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit");
+    : globalT(
+        "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit",
+      );
 
   const loadingText = submitButtonConfig?.loadingText
     ? context.t(submitButtonConfig.loadingText)
-    : globalT("app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting");
+    : globalT(
+        "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
+      );
 
   // Handle array fields - render each item based on child field definition
   if (isArrayField && Array.isArray(value)) {
     // Get child field definition
-    const childField = "child" in field ? (field.child as UnifiedField<string>) : null;
+    const childField =
+      "child" in field ? (field.child as UnifiedField<string>) : null;
 
     if (!childField) {
       if (noCard) {
         return (
           <Div className={cn("text-muted-foreground italic", className)}>
-            {globalT("app.api.system.unifiedInterface.react.widgets.container.noContent")}
+            {globalT(
+              "app.api.system.unifiedInterface.react.widgets.container.noContent",
+            )}
           </Div>
         );
       }
@@ -222,7 +261,9 @@ export function ContainerWidget<const TKey extends string>({
         <Card className={className}>
           <CardContent>
             <P className="italic text-muted-foreground">
-              {globalT("app.api.system.unifiedInterface.react.widgets.container.noContent")}
+              {globalT(
+                "app.api.system.unifiedInterface.react.widgets.container.noContent",
+              )}
             </P>
           </CardContent>
         </Card>
@@ -254,16 +295,31 @@ export function ContainerWidget<const TKey extends string>({
     // If noCard, render without Card wrapper
     if (noCard) {
       return (
-        <Div className={cn(contentGap, topPadding, bottomPadding, bottomBorder, className)}>
+        <Div
+          className={cn(
+            contentGap,
+            topPadding,
+            bottomPadding,
+            bottomBorder,
+            className,
+          )}
+        >
           {(title || description) && (
             <Div className={titleAlignClass}>
               {title && (
-                <H1 className={cn("font-bold", titleSizeClass || "text-3xl md:text-4xl")}>
+                <H1
+                  className={cn(
+                    "font-bold",
+                    titleSizeClass || "text-3xl md:text-4xl",
+                  )}
+                >
                   {title}
                 </H1>
               )}
               {description && (
-                <P className={cn(descriptionSizeClass || "text-lg")}>{description}</P>
+                <P className={cn(descriptionSizeClass || "text-lg")}>
+                  {description}
+                </P>
               )}
             </Div>
           )}
@@ -281,7 +337,11 @@ export function ContainerWidget<const TKey extends string>({
             {description && <CardDescription>{description}</CardDescription>}
           </CardHeader>
         )}
-        <CardContent className={!title && !description ? contentPaddingClass || "pt-6" : ""}>
+        <CardContent
+          className={
+            !title && !description ? contentPaddingClass || "pt-6" : ""
+          }
+        >
           {arrayContent}
         </CardContent>
       </Card>
@@ -300,7 +360,9 @@ export function ContainerWidget<const TKey extends string>({
       if (noCard) {
         return (
           <Div className={cn("text-muted-foreground italic", className)}>
-            {globalT("app.api.system.unifiedInterface.react.widgets.container.noContent")}
+            {globalT(
+              "app.api.system.unifiedInterface.react.widgets.container.noContent",
+            )}
           </Div>
         );
       }
@@ -308,7 +370,9 @@ export function ContainerWidget<const TKey extends string>({
         <Card className={className}>
           <CardContent>
             <P className="italic text-muted-foreground">
-              {globalT("app.api.system.unifiedInterface.react.widgets.container.noContent")}
+              {globalT(
+                "app.api.system.unifiedInterface.react.widgets.container.noContent",
+              )}
             </P>
           </CardContent>
         </Card>
@@ -317,7 +381,10 @@ export function ContainerWidget<const TKey extends string>({
 
     // Get discriminator value from form watch or value prop
     let discriminatorValue: string | undefined;
-    if (watchedDiscriminator !== undefined && typeof watchedDiscriminator === "string") {
+    if (
+      watchedDiscriminator !== undefined &&
+      typeof watchedDiscriminator === "string"
+    ) {
       discriminatorValue = watchedDiscriminator;
     } else if (
       value &&
@@ -348,7 +415,8 @@ export function ContainerWidget<const TKey extends string>({
         const schema = variantDiscriminator.schema;
         // Zod's z.literal() stores the value in _def.value (string) or _def.values (array with single element)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const literalValue = (schema as any)._def?.value ?? (schema as any)._def?.values?.[0];
+        const literalValue =
+          (schema as any)._def?.value ?? (schema as any)._def?.values?.[0];
         return literalValue === discriminatorValue;
       }
 
@@ -382,7 +450,9 @@ export function ContainerWidget<const TKey extends string>({
       if (noCard) {
         return (
           <Div className={cn("text-muted-foreground italic", className)}>
-            {globalT("app.api.system.unifiedInterface.react.widgets.container.noContent")}
+            {globalT(
+              "app.api.system.unifiedInterface.react.widgets.container.noContent",
+            )}
           </Div>
         );
       }
@@ -391,7 +461,9 @@ export function ContainerWidget<const TKey extends string>({
         <Card className={className}>
           <CardContent>
             <P className="italic text-muted-foreground">
-              {globalT("app.api.system.unifiedInterface.react.widgets.container.noContent")}
+              {globalT(
+                "app.api.system.unifiedInterface.react.widgets.container.noContent",
+              )}
             </P>
           </CardContent>
         </Card>
@@ -404,7 +476,9 @@ export function ContainerWidget<const TKey extends string>({
   // Check if there are any actual form input fields (FORM_FIELD widgets with request usage)
   // This determines if auto FormAlert and auto submit button should be shown
   // Only FORM_FIELD widgets count - not TEXT or other widgets with request usage
-  const hasFormInputFields = children.some(([, childField]) => isFormInputField(childField));
+  const hasFormInputFields = children.some(([, childField]) =>
+    isFormInputField(childField),
+  );
 
   // Check if container or any nested child has explicit FORM_ALERT or SUBMIT_BUTTON widgets
   const hasExplicitFormAlert = children.some(([, childField]) =>
@@ -416,7 +490,8 @@ export function ContainerWidget<const TKey extends string>({
 
   // Determine if we should show auto-features
   // Auto FormAlert: only show if enabled AND has form input fields AND no explicit FormAlert anywhere in subtree
-  const shouldShowAutoFormAlert = showFormAlert && hasFormInputFields && !hasExplicitFormAlert;
+  const shouldShowAutoFormAlert =
+    showFormAlert && hasFormInputFields && !hasExplicitFormAlert;
   // Auto SubmitButton: only show if enabled AND has form input fields AND no explicit config AND no explicit widget in subtree AND form context exists
   const shouldShowAutoSubmitButton =
     showSubmitButton &&
@@ -438,14 +513,21 @@ export function ContainerWidget<const TKey extends string>({
     };
   } else if (context.response && context.response.success === true) {
     const data = context.response.data;
-    if (data && typeof data === "object" && "message" in data && typeof data.message === "string") {
+    if (
+      data &&
+      typeof data === "object" &&
+      "message" in data &&
+      typeof data.message === "string"
+    ) {
       formAlertState = {
         variant: "success",
         message: {
           message: data.message as TranslationKey,
           messageParams:
             "messageParams" in data && typeof data.messageParams === "object"
-              ? (data.messageParams as Record<string, string | number> | undefined)
+              ? (data.messageParams as
+                  | Record<string, string | number>
+                  | undefined)
               : undefined,
         },
       };
@@ -460,13 +542,20 @@ export function ContainerWidget<const TKey extends string>({
   );
 
   // Find backButton field to render it with submit button
-  const backButtonEntry = children.find(([childName]) => childName === "backButton");
+  const backButtonEntry = children.find(
+    ([childName]) => childName === "backButton",
+  );
   const hasBackButton = backButtonEntry !== undefined;
 
   // Helper to render children based on layoutType
   const renderChildren = (): (JSX.Element | null)[] => {
     const getChildData = (childName: string): WidgetData => {
-      if (value && typeof value === "object" && !Array.isArray(value) && childName in value) {
+      if (
+        value &&
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        childName in value
+      ) {
         const valueObj = value as Record<string, WidgetData>;
         return valueObj[childName];
       }
@@ -492,9 +581,13 @@ export function ContainerWidget<const TKey extends string>({
         const childUi = field.ui;
         const isChildContainer = childUi.type === WidgetType.CONTAINER;
         const childColumns =
-          isChildContainer || !("columns" in childUi) ? undefined : (childUi.columns as number);
+          isChildContainer || !("columns" in childUi)
+            ? undefined
+            : (childUi.columns as number);
         const effectiveSpan =
-          layoutType === "grid" ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12) : undefined;
+          layoutType === "grid"
+            ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12)
+            : undefined;
 
         const colSpanMap: Record<number, string> = {
           1: "col-span-1",
@@ -512,10 +605,13 @@ export function ContainerWidget<const TKey extends string>({
         };
 
         const colSpanClass =
-          layoutType === "grid" && effectiveSpan ? colSpanMap[effectiveSpan] : undefined;
+          layoutType === "grid" && effectiveSpan
+            ? colSpanMap[effectiveSpan]
+            : undefined;
 
         // For NAVIGATE_BUTTON widgets, pass parent value so extractParams can access all fields
-        const dataToPass = childUi.type === WidgetType.NAVIGATE_BUTTON ? value : data;
+        const dataToPass =
+          childUi.type === WidgetType.NAVIGATE_BUTTON ? value : data;
 
         result.push(
           <WidgetRenderer
@@ -535,12 +631,16 @@ export function ContainerWidget<const TKey extends string>({
       } else {
         // Multiple inline fields - wrap in flex container
         result.push(
-          <Div key={`inline-group-${inlineGroup[0].name}`} className="flex items-center gap-2">
+          <Div
+            key={`inline-group-${inlineGroup[0].name}`}
+            className="flex items-center gap-2"
+          >
             {inlineGroup.map(({ name, field, data }) => {
               const childFieldName = fieldName ? `${fieldName}.${name}` : name;
               const childUi = field.ui;
               // For NAVIGATE_BUTTON widgets, pass parent value so extractParams can access all fields
-              const dataToPass = childUi.type === WidgetType.NAVIGATE_BUTTON ? value : data;
+              const dataToPass =
+                childUi.type === WidgetType.NAVIGATE_BUTTON ? value : data;
 
               return (
                 <WidgetRenderer
@@ -567,7 +667,9 @@ export function ContainerWidget<const TKey extends string>({
     for (const [childName, childField] of children) {
       // Skip hidden fields
       if (childField.ui?.hidden) {
-        context.logger.debug(`ContainerWidget: Skipping hidden field "${childName}"`);
+        context.logger.debug(
+          `ContainerWidget: Skipping hidden field "${childName}"`,
+        );
         continue;
       }
 
@@ -575,14 +677,17 @@ export function ContainerWidget<const TKey extends string>({
       // In nested containers (like topActions), backButton should render normally
       // fieldName is empty/undefined at root level, has a value in nested containers
       if (childName === "backButton" && !fieldName) {
-        context.logger.debug(`ContainerWidget: Skipping backButton at root level`);
+        context.logger.debug(
+          `ContainerWidget: Skipping backButton at root level`,
+        );
         continue;
       }
 
       const childData = getChildData(childName);
 
       // Check if this is a widget field or widget-only object container
-      const isWidgetField = "type" in childField && childField.type === "widget";
+      const isWidgetField =
+        "type" in childField && childField.type === "widget";
       const isWidgetOnlyObject =
         "type" in childField &&
         childField.type === "object" &&
@@ -633,13 +738,19 @@ export function ContainerWidget<const TKey extends string>({
         flushInlineGroup();
 
         // Render this field normally
-        const childFieldName = fieldName ? `${fieldName}.${childName}` : childName;
+        const childFieldName = fieldName
+          ? `${fieldName}.${childName}`
+          : childName;
         const childUi = childField.ui;
         const isChildContainer = childUi.type === WidgetType.CONTAINER;
         const childColumns =
-          isChildContainer || !("columns" in childUi) ? undefined : (childUi.columns as number);
+          isChildContainer || !("columns" in childUi)
+            ? undefined
+            : (childUi.columns as number);
         const effectiveSpan =
-          layoutType === "grid" ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12) : undefined;
+          layoutType === "grid"
+            ? Math.min(childColumns ?? defaultChildSpan ?? 12, 12)
+            : undefined;
 
         const colSpanMap: Record<number, string> = {
           1: "col-span-1",
@@ -657,7 +768,9 @@ export function ContainerWidget<const TKey extends string>({
         };
 
         const colSpanClass =
-          layoutType === "grid" && effectiveSpan ? colSpanMap[effectiveSpan] : undefined;
+          layoutType === "grid" && effectiveSpan
+            ? colSpanMap[effectiveSpan]
+            : undefined;
 
         // For NAVIGATE_BUTTON widgets, pass parent value so extractParams can access all fields
         // For widget-only containers (like topActions), also pass parent value so nested navigate buttons work
@@ -672,7 +785,9 @@ export function ContainerWidget<const TKey extends string>({
           );
 
         const dataToPass =
-          childUi.type === WidgetType.NAVIGATE_BUTTON || isWidgetOnlyContainer ? value : childData;
+          childUi.type === WidgetType.NAVIGATE_BUTTON || isWidgetOnlyContainer
+            ? value
+            : childData;
 
         result.push(
           <WidgetRenderer
@@ -701,13 +816,32 @@ export function ContainerWidget<const TKey extends string>({
   // If noCard is true, render without Card wrapper
   if (noCard) {
     return (
-      <Div className={cn(contentGap, topPadding, bottomPadding, bottomBorder, className)}>
+      <Div
+        className={cn(
+          contentGap,
+          topPadding,
+          bottomPadding,
+          bottomBorder,
+          className,
+        )}
+      >
         {(title || description) && (
           <Div className={titleAlignClass}>
             {title && (
-              <H1 className={cn("font-bold", titleSizeClass || "text-3xl md:text-4xl")}>{title}</H1>
+              <H1
+                className={cn(
+                  "font-bold",
+                  titleSizeClass || "text-3xl md:text-4xl",
+                )}
+              >
+                {title}
+              </H1>
             )}
-            {description && <P className={cn(descriptionSizeClass || "text-lg")}>{description}</P>}
+            {description && (
+              <P className={cn(descriptionSizeClass || "text-lg")}>
+                {description}
+              </P>
+            )}
           </Div>
         )}
         {/* Auto FormAlert at top */}
@@ -750,7 +884,10 @@ export function ContainerWidget<const TKey extends string>({
               {buttonIcon && (
                 <Icon
                   icon={buttonIcon}
-                  className={cn(iconSizeClass || "h-4 w-4", iconSpacingClass || "mr-2")}
+                  className={cn(
+                    iconSizeClass || "h-4 w-4",
+                    iconSpacingClass || "mr-2",
+                  )}
                 />
               )}
               {isSubmitting ? loadingText : buttonText}
@@ -802,7 +939,9 @@ export function ContainerWidget<const TKey extends string>({
     <Card className={cn(topPadding, bottomPadding, bottomBorder, className)}>
       {(title ?? description ?? showHeaderButton) && (
         <CardHeader>
-          <Div className={cn("flex items-center justify-between", headerGapClass)}>
+          <Div
+            className={cn("flex items-center justify-between", headerGapClass)}
+          >
             <Div>
               {title && <CardTitle>{title}</CardTitle>}
               {description && <CardDescription>{description}</CardDescription>}
@@ -828,7 +967,10 @@ export function ContainerWidget<const TKey extends string>({
                 {buttonIcon && (
                   <Icon
                     icon={buttonIcon}
-                    className={cn(iconSizeClass || "h-4 w-4", iconSpacingClass || "mr-2")}
+                    className={cn(
+                      iconSizeClass || "h-4 w-4",
+                      iconSpacingClass || "mr-2",
+                    )}
                   />
                 )}
                 {isSubmitting ? loadingText : buttonText}
@@ -845,7 +987,10 @@ export function ContainerWidget<const TKey extends string>({
       )}
       <CardContent
         className={
-          !title && !description && !showHeaderButton && !shouldShowAutoFormAlert
+          !title &&
+          !description &&
+          !showHeaderButton &&
+          !shouldShowAutoFormAlert
             ? contentPaddingClass || "pt-6"
             : ""
         }
@@ -890,7 +1035,10 @@ export function ContainerWidget<const TKey extends string>({
               {buttonIcon && (
                 <Icon
                   icon={buttonIcon}
-                  className={cn(iconSizeClass || "h-4 w-4", iconSpacingClass || "mr-2")}
+                  className={cn(
+                    iconSizeClass || "h-4 w-4",
+                    iconSpacingClass || "mr-2",
+                  )}
                 />
               )}
               {isSubmitting ? loadingText : buttonText}
@@ -910,7 +1058,9 @@ export function ContainerWidget<const TKey extends string>({
                 variant="outline"
                 className="flex-1"
               >
-                {globalT("app.api.system.unifiedInterface.react.widgets.endpointRenderer.cancel")}
+                {globalT(
+                  "app.api.system.unifiedInterface.react.widgets.endpointRenderer.cancel",
+                )}
               </Button>
             )}
             <Button

@@ -3,7 +3,10 @@
  * Tasks for database reset functionality
  */
 
-import { CronTaskPriority, TaskCategory } from "../../unified-interface/tasks/enum";
+import {
+  CronTaskPriority,
+  TaskCategory,
+} from "../../unified-interface/tasks/enum";
 import type { Task } from "../../unified-interface/tasks/types/repository";
 
 /**
@@ -105,6 +108,10 @@ const dbBackupVerificationTask: Task = {
 /**
  * Export all tasks for database reset subdomain
  */
-export const tasks: Task[] = [dbResetSafetyCheckTask, devDbAutoResetTask, dbBackupVerificationTask];
+export const tasks: Task[] = [
+  dbResetSafetyCheckTask,
+  devDbAutoResetTask,
+  dbBackupVerificationTask,
+];
 
 export default tasks;

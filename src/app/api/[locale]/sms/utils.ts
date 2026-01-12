@@ -110,7 +110,10 @@ export interface SmsResult {
  */
 export interface SmsProvider {
   name: SmsProviders;
-  sendSms(params: SendSmsParams, logger: EndpointLogger): Promise<ResponseType<SmsResult>>;
+  sendSms(
+    params: SendSmsParams,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SmsResult>>;
   validatePhoneNumber?(
     phoneNumber: string,
     logger: EndpointLogger,
@@ -123,7 +126,9 @@ export interface SmsProvider {
 /**
  * Return type for SMS render functions
  */
-export type SmsRenderReturnType = ResponseType<SmsTemplateReturnType | SmsTemplateReturnType[]>;
+export type SmsRenderReturnType = ResponseType<
+  SmsTemplateReturnType | SmsTemplateReturnType[]
+>;
 
 export interface SmsRenderProps<TRequest, TResponse, TUrlVariables> {
   requestData: TRequest;
@@ -139,7 +144,8 @@ export type SmsFunctionType<TRequest, TResponse, TUrlVariables> = (
   props: SmsRenderProps<TRequest, TResponse, TUrlVariables>,
 ) =>
   | Promise<
-      SuccessResponseType<SmsTemplateReturnType | SmsTemplateReturnType[]> | ErrorResponseType
+      | SuccessResponseType<SmsTemplateReturnType | SmsTemplateReturnType[]>
+      | ErrorResponseType
     >
   | SuccessResponseType<SmsTemplateReturnType | SmsTemplateReturnType[]>
   | ErrorResponseType;
@@ -196,16 +202,20 @@ export interface SmsHandler<TRequest, TResponse, TUrlVariables> {
  * Explicit interface for SMS configuration
  */
 export interface SmsConfig<TRequest, TResponse, TUrlVariables> {
-  afterHandlerSms?: ReadonlyArray<SmsHandler<TRequest, TResponse, TUrlVariables>>;
+  afterHandlerSms?: ReadonlyArray<
+    SmsHandler<TRequest, TResponse, TUrlVariables>
+  >;
 }
 
 /**
  * Zod schema for E.164 phone number validation
  * Shared across all SMS providers for consistency
  */
-export const phoneNumberSchema = z.string().refine((value) => /^\+[1-9]\d{1,14}$/.test(value), {
-  message: "errors.sms_phone_number_format",
-});
+export const phoneNumberSchema = z
+  .string()
+  .refine((value) => /^\+[1-9]\d{1,14}$/.test(value), {
+    message: "errors.sms_phone_number_format",
+  });
 
 /**
  * Validates a phone number for a specific provider

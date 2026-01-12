@@ -19,5 +19,7 @@ export default async function ImapAdminLayout({
 }: ImapAdminLayoutProps): Promise<JSX.Element> {
   const { locale } = await params;
 
-  return <ImapAdminLayoutClient locale={locale}>{children}</ImapAdminLayoutClient>;
+  return (
+    <ImapAdminLayoutClient locale={locale}>{children}</ImapAdminLayoutClient>
+  );
 }

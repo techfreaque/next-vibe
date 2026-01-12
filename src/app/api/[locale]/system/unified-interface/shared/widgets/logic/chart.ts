@@ -49,7 +49,9 @@ export interface ChartData<TTranslationKey extends string = string> {
 /**
  * Safely checks if a value has the structure of a chart data point
  */
-function isChartDataPoint(item: WidgetData): item is Record<string, WidgetData> {
+function isChartDataPoint(
+  item: WidgetData,
+): item is Record<string, WidgetData> {
   if (typeof item !== "object" || item === null || Array.isArray(item)) {
     return false;
   }
@@ -67,7 +69,12 @@ function isChartSeries(item: WidgetData): item is Record<string, WidgetData> {
   }
 
   const obj = item as Record<string, WidgetData>;
-  return "name" in obj && typeof obj.name === "string" && "data" in obj && Array.isArray(obj.data);
+  return (
+    "name" in obj &&
+    typeof obj.name === "string" &&
+    "data" in obj &&
+    Array.isArray(obj.data)
+  );
 }
 
 /**
@@ -121,7 +128,10 @@ function toChartSeries<TTranslationKey extends string>(
   return {
     name: item.name,
     data: dataPoints,
-    color: "color" in item && typeof item.color === "string" ? item.color : undefined,
+    color:
+      "color" in item && typeof item.color === "string"
+        ? item.color
+        : undefined,
   };
 }
 

@@ -7,7 +7,8 @@ export const translations = {
     fields: {
       pageIdx: {
         label: "Page Index",
-        description: "The index of the page to select (call list_pages to list pages)",
+        description:
+          "The index of the page to select (call list_pages to list pages)",
         placeholder: "Enter page index",
       },
     },

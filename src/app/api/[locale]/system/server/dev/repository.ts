@@ -67,7 +67,10 @@ const SHUTDOWN_MESSAGES = [
  * @param maxAttempts - Maximum number of connection attempts
  * @param delayMs - Delay between attempts in milliseconds
  */
-const getDatabaseTimeoutMessage = (maxAttempts: number, delayMs: number): string =>
+const getDatabaseTimeoutMessage = (
+  maxAttempts: number,
+  delayMs: number,
+): string =>
   // eslint-disable-next-line i18next/no-literal-string -- Internal dev error message not user-facing
   `${DATABASE_TIMEOUT_PREFIX} ${maxAttempts} ${DATABASE_TIMEOUT_SUFFIX} (${(maxAttempts * delayMs) / 1000}s)`;
 
@@ -75,7 +78,11 @@ const getDatabaseTimeoutMessage = (maxAttempts: number, delayMs: number): string
  * Dev Repository Interface
  */
 export interface DevRepositoryInterface {
-  execute(data: RequestType, locale: CountryLanguage, logger: EndpointLogger): Promise<never>;
+  execute(
+    data: RequestType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<never>;
 }
 
 /**
@@ -95,7 +102,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     // Handle uncaught exceptions
     process.on("uncaughtException", (error) => {
       // eslint-disable-next-line i18next/no-literal-string
-      process.stderr.write(`\n❌ Uncaught exception: ${error.message}\n${error.stack || ""}\n`);
+      process.stderr.write(
+        `\n❌ Uncaught exception: ${error.message}\n${error.stack || ""}\n`,
+      );
 
       // Kill child processes
       for (const childProcess of this.runningProcesses.values()) {
@@ -111,10 +120,13 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
     // Handle unhandled promise rejections
     process.on("unhandledRejection", (reason) => {
-      const errorMsg = reason instanceof Error ? reason.message : String(reason);
+      const errorMsg =
+        reason instanceof Error ? reason.message : String(reason);
       const stack = reason instanceof Error ? reason.stack : "";
       // eslint-disable-next-line i18next/no-literal-string
-      process.stderr.write(`\n❌ Unhandled promise rejection: ${errorMsg}\n${stack || ""}\n`);
+      process.stderr.write(
+        `\n❌ Unhandled promise rejection: ${errorMsg}\n${stack || ""}\n`,
+      );
 
       // Kill child processes
       for (const childProcess of this.runningProcesses.values()) {
@@ -166,7 +178,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         error: upResult.message || "Unknown error",
       });
       // Continue execution - don't throw, let the process continue
-      logger.vibe(formatError("Database startup failed, continuing without database"));
+      logger.vibe(
+        formatError("Database startup failed, continuing without database"),
+      );
     }
     // 4. Wait for database to be ready
     await this.waitForDatabaseConnection(logger);
@@ -175,7 +189,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   /**
    * Delete postgres data volume for clean reset
    */
-  private async deletePostgresDataVolume(logger: EndpointLogger): Promise<void> {
+  private async deletePostgresDataVolume(
+    logger: EndpointLogger,
+  ): Promise<void> {
     try {
       const { exec } = await import("node:child_process");
       const { promisify } = await import("node:util");
@@ -200,7 +216,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
    * Wait for database connection to be ready using proper database ping
    * Uses the same approach as CLI reset script for consistency
    */
-  private async waitForDatabaseConnection(logger: EndpointLogger): Promise<void> {
+  private async waitForDatabaseConnection(
+    logger: EndpointLogger,
+  ): Promise<void> {
     const maxAttempts = 60; // 60 attempts = 30 seconds
     const delayMs = 500; // 500ms between attempts
 
@@ -236,18 +254,24 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           await pool.end().catch(() => {});
           // Log progress every 10 attempts
           if (attempt % 10 === 0) {
-            logger.debug(`⏳ Still waiting for database... (${attempt}/${maxAttempts})`);
+            logger.debug(
+              `⏳ Still waiting for database... (${attempt}/${maxAttempts})`,
+            );
           }
         }
       } catch {
         if (attempt === maxAttempts) {
-          logger.error("❌ Database connection timeout - this will cause errors");
+          logger.error(
+            "❌ Database connection timeout - this will cause errors",
+          );
           // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI fatal error requires throw to halt execution
           throw new Error(getDatabaseTimeoutMessage(maxAttempts, delayMs));
         }
 
         if (attempt % 10 === 0) {
-          logger.debug(`⏳ Database not ready yet, retrying (${attempt}/${maxAttempts})...`);
+          logger.debug(
+            `⏳ Database not ready yet, retrying (${attempt}/${maxAttempts})...`,
+          );
         }
       }
     }
@@ -259,7 +283,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     logger: EndpointLogger,
   ): Promise<never> {
     // Convert string port to number if needed (CLI compatibility)
-    const port = typeof data.port === "string" ? parseInt(data.port, 10) : data.port;
+    const port =
+      typeof data.port === "string" ? parseInt(data.port, 10) : data.port;
 
     this.logStartupInfo(port, logger, data);
 
@@ -280,7 +305,11 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   /**
    * Log startup information
    */
-  private logStartupInfo(port: number, logger: EndpointLogger, data: RequestType): void {
+  private logStartupInfo(
+    port: number,
+    logger: EndpointLogger,
+    data: RequestType,
+  ): void {
     logger.vibe(formatStartup("Starting Development Server", "⚡"));
     log("");
     log(`  ${formatConfig("Port", port)}  ${formatHint("(--port=N)")}`);
@@ -294,7 +323,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         `  ${formatConfig("Database", "DISABLED")} ${formatHint("(remove --skip-db-setup to enable)")}`,
       );
     } else {
-      log(`  ${formatConfig("Database", "ENABLED")} ${formatHint("(--skip-db-setup to disable)")}`);
+      log(
+        `  ${formatConfig("Database", "ENABLED")} ${formatHint("(--skip-db-setup to disable)")}`,
+      );
       log(
         `    ${formatConfig("Reset", data.dbReset || data.r ? "YES" : "NO")} ${formatHint(data.dbReset || data.r ? "(remove -r to skip)" : "(-r to reset)")}`,
       );
@@ -340,16 +371,23 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     }
 
     try {
-      const dockerCheckResult = await dbUtilsRepository.isDockerAvailable(logger);
+      const dockerCheckResult =
+        await dbUtilsRepository.isDockerAvailable(logger);
 
       if (!dockerCheckResult.success || !dockerCheckResult.data) {
         logger.vibe(formatWarning("Docker unavailable (continuing anyway)"));
-        logger.vibe(`� ${formatCommand("Install Docker")} to enable database functionality`);
+        logger.vibe(
+          `� ${formatCommand("Install Docker")} to enable database functionality`,
+        );
         return true;
       }
 
       // Perform database operations based on reset flag
-      const dbOperationSuccess = await this.performDatabaseOperations(data, locale, logger);
+      const dbOperationSuccess = await this.performDatabaseOperations(
+        data,
+        locale,
+        logger,
+      );
 
       if (!dbOperationSuccess) {
         return false; // Critical failure, start Next.js immediately
@@ -470,7 +508,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         error: dbStartResult.message,
       });
       logger.vibe(formatError("Database startup failed"));
-      logger.vibe(`   Try: ${formatCommand("docker compose -f docker-compose-dev.yml up -d")}`);
+      logger.vibe(
+        `   Try: ${formatCommand("docker compose -f docker-compose-dev.yml up -d")}`,
+      );
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI fatal error requires throw to halt execution
       throw new Error("Failed to start database");
     }
@@ -515,7 +555,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       logger.info(formatTask("Task runner started"));
     } catch (error) {
       const parsedError = parseError(error);
-      logger.vibe(formatWarning("Task runner startup failed (continuing anyway)"));
+      logger.vibe(
+        formatWarning("Task runner startup failed (continuing anyway)"),
+      );
       logger.error("Task runner startup error details", parsedError);
       if (logger.isDebugEnabled) {
         logger.vibe(`💡 Error: ${parsedError.message}`);
@@ -526,7 +568,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   /**
    * Start Next.js and wait for it to exit
    */
-  private async startNextJsAndWait(port: number, logger: EndpointLogger): Promise<never> {
+  private async startNextJsAndWait(
+    port: number,
+    logger: EndpointLogger,
+  ): Promise<never> {
     logger.info(`🌐 Starting Next.js on port ${port}...`);
 
     const nextProcess = this.startNextJsProcess(port);
@@ -553,7 +598,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         setTimeout(() => {
           // Pick a random shutdown message
           const randomMessage =
-            SHUTDOWN_MESSAGES[Math.floor(Math.random() * SHUTDOWN_MESSAGES.length)];
+            SHUTDOWN_MESSAGES[
+              Math.floor(Math.random() * SHUTDOWN_MESSAGES.length)
+            ];
           // eslint-disable-next-line i18next/no-literal-string
           process.stdout.write(`\n${randomMessage}\n`);
           // Exit with the same code as Next.js
@@ -580,10 +627,15 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   ): Promise<void> {
     try {
       // Load the task registry
-      const { taskRegistry } = await import("@/app/api/[locale]/system/generated/tasks-index");
+      const { taskRegistry } =
+        await import("@/app/api/[locale]/system/generated/tasks-index");
 
       // Filter tasks for development environment
-      const devTasks = this.filterTasksForDevelopment(taskRegistry.allTasks, data, logger);
+      const devTasks = this.filterTasksForDevelopment(
+        taskRegistry.allTasks,
+        data,
+        logger,
+      );
 
       logger.debug("Loading task registry for development", {
         totalAvailable: taskRegistry.allTasks.length,
@@ -597,7 +649,12 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
       // Start the task runner with filtered tasks
       const signal = new AbortController().signal;
-      const startResult = unifiedTaskRunnerRepository.start(devTasks, signal, locale, logger);
+      const startResult = unifiedTaskRunnerRepository.start(
+        devTasks,
+        signal,
+        locale,
+        logger,
+      );
 
       if (startResult.success) {
         logger.debug("Unified task runner started successfully", {
@@ -631,7 +688,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   ): Task[] {
     const filtered = allTasks.filter((task) => {
       if (DEV_WATCHER_TASK_NAME === task.name && data.skipGeneratorWatcher) {
-        logger.debug("Skipping generator watcher (disabled by skipGeneratorWatcher)");
+        logger.debug(
+          "Skipping generator watcher (disabled by skipGeneratorWatcher)",
+        );
         return false;
       }
 
@@ -658,12 +717,16 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
    */
   private startNextJsProcess(port: number): ChildProcess {
     const turbo = useTurbopack ? ["--turbo"] : [];
-    const nextProcess = spawn("bun", ["run", "next", "dev", ...turbo, "--port", port.toString()], {
-      stdio: "inherit", // Pass output directly to stdout/stderr
-      // Keep in same process group (default) so Ctrl+C propagates naturally
-      // When terminal sends SIGINT, both parent and child receive it
-      detached: false,
-    });
+    const nextProcess = spawn(
+      "bun",
+      ["run", "next", "dev", ...turbo, "--port", port.toString()],
+      {
+        stdio: "inherit", // Pass output directly to stdout/stderr
+        // Keep in same process group (default) so Ctrl+C propagates naturally
+        // When terminal sends SIGINT, both parent and child receive it
+        detached: false,
+      },
+    );
 
     // Store the process for cleanup
     this.runningProcesses.set("next-dev", nextProcess);

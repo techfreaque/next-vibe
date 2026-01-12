@@ -6,7 +6,10 @@
 import { z } from "zod";
 
 import { createFormEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create-form";
-import { field, objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import {
+  field,
+  objectField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -267,7 +270,10 @@ const { GET, POST } = createFormEndpoint({
         default: {
           priceId: "price_1234567890",
           mode: CheckoutMode.PAYMENT,
-          paymentMethodTypes: [PaymentMethodType.CARD, PaymentMethodType.PAYPAL],
+          paymentMethodTypes: [
+            PaymentMethodType.CARD,
+            PaymentMethodType.PAYPAL,
+          ],
           successUrl: "https://example.com/success",
           cancelUrl: "https://example.com/cancel",
           customerEmail: "user@example.com",
@@ -287,7 +293,10 @@ const { GET, POST } = createFormEndpoint({
         default: {
           priceId: "price_1234567890",
           mode: CheckoutMode.PAYMENT,
-          paymentMethodTypes: [PaymentMethodType.CARD, PaymentMethodType.PAYPAL],
+          paymentMethodTypes: [
+            PaymentMethodType.CARD,
+            PaymentMethodType.PAYPAL,
+          ],
           successUrl: "https://example.com/success",
           cancelUrl: "https://example.com/cancel",
           customerEmail: "user@example.com",
@@ -301,7 +310,10 @@ const { GET, POST } = createFormEndpoint({
         default: {
           priceId: "price_1234567890",
           mode: CheckoutMode.PAYMENT,
-          paymentMethodTypes: [PaymentMethodType.CARD, PaymentMethodType.PAYPAL],
+          paymentMethodTypes: [
+            PaymentMethodType.CARD,
+            PaymentMethodType.PAYPAL,
+          ],
           successUrl: "https://example.com/success",
           cancelUrl: "https://example.com/cancel",
           customerEmail: "user@example.com",

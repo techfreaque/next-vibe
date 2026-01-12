@@ -7,14 +7,21 @@ import "server-only";
 
 import { and, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Countries, Languages } from "@/i18n/core/config";
 
-import type { EmailCampaignStage, EmailJourneyVariant } from "../../../../leads/enum";
+import type {
+  EmailCampaignStage,
+  EmailJourneyVariant,
+} from "../../../../leads/enum";
 import type { JwtPayloadType } from "../../../../user/auth/types";
 import { smtpAccounts } from "../../db";
 import type { CampaignType, SmtpSecurityType } from "../../enum";
@@ -37,8 +44,12 @@ interface SmtpAccountUpdateData {
   priority?: number;
   isDefault?: boolean;
   campaignTypes?: Array<(typeof CampaignType)[keyof typeof CampaignType]>;
-  emailJourneyVariants?: Array<(typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]>;
-  emailCampaignStages?: Array<(typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]>;
+  emailJourneyVariants?: Array<
+    (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]
+  >;
+  emailCampaignStages?: Array<
+    (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]
+  >;
   countries?: Countries[];
   languages?: Languages[];
 }
@@ -168,7 +179,8 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
 
       // Check if setting as default and unset other defaults for overlapping campaign types
       if (data.isDefault) {
-        const campaignTypesToCheck = data.campaignTypes || existingAccount.campaignTypes;
+        const campaignTypesToCheck =
+          data.campaignTypes || existingAccount.campaignTypes;
         if (
           campaignTypesToCheck &&
           Array.isArray(campaignTypesToCheck) &&
@@ -218,7 +230,8 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
 
       // Only include password in update if it's provided and not empty
       if (updateFields.password && updateFields.password.trim() !== "") {
-        (updateData as typeof updateData & { password?: string }).password = updateFields.password;
+        (updateData as typeof updateData & { password?: string }).password =
+          updateFields.password;
       }
 
       const [updatedAccount] = await db
@@ -232,7 +245,8 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
           message: "app.api.emails.smtpClient.edit.id.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            error: "app.api.emails.smtpClient.edit.id.errors.server.description",
+            error:
+              "app.api.emails.smtpClient.edit.id.errors.server.description",
           },
         });
       }
@@ -267,7 +281,10 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
 
       // Check for unique constraint violations
       const errorMessage = parseError(error).message;
-      if (errorMessage.includes("unique") || errorMessage.includes("duplicate")) {
+      if (
+        errorMessage.includes("unique") ||
+        errorMessage.includes("duplicate")
+      ) {
         return fail({
           message: "app.api.emails.smtpClient.edit.id.errors.conflict.title",
           errorType: ErrorResponseTypes.CONFLICT,

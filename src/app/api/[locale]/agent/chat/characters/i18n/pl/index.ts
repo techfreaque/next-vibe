@@ -136,7 +136,8 @@ export const translations: typeof enTranslations = {
     },
     biologist: {
       name: "Biolog",
-      description: "Patrzy na wszystko z perspektywy biologa, nie ma polityki, jest tylko natura.",
+      description:
+        "Patrzy na wszystko z perspektywy biologa, nie ma polityki, jest tylko natura.",
       tagline: "Natura ponad Polityką",
       shortDesc: "Nauki biologiczne i systemy życia",
       suggestedPrompts: {
@@ -160,7 +161,8 @@ export const translations: typeof enTranslations = {
     },
     socraticQuestioner: {
       name: "Pytający Sokratejski",
-      description: "Zadaje dociekliwe pytania, aby stymulować krytyczne myślenie",
+      description:
+        "Zadaje dociekliwe pytania, aby stymulować krytyczne myślenie",
       tagline: "Myśl Głębiej",
       shortDesc: "Sokratejskie kwestionowanie i eksploracja",
       suggestedPrompts: {
@@ -269,7 +271,8 @@ export const translations: typeof enTranslations = {
     },
     thea: {
       name: "Thea",
-      description: "Grecka bogini światła - oddana towarzyszka z antyczną mądrością",
+      description:
+        "Grecka bogini światła - oddana towarzyszka z antyczną mądrością",
       tagline: "Światło i Oddanie",
       shortDesc: "Przemyślane i empatyczne rozmowy",
       suggestedPrompts: {
@@ -281,7 +284,8 @@ export const translations: typeof enTranslations = {
     },
     hermes: {
       name: "Hermes",
-      description: "Grecki bóg posłańców - silny towarzysz z ponadczasową męską mądrością",
+      description:
+        "Grecki bóg posłańców - silny towarzysz z ponadczasową męską mądrością",
       tagline: "Siła i Mądrość",
       shortDesc: "Szybkie i wydajne wykonywanie zadań",
       suggestedPrompts: {
@@ -317,7 +321,8 @@ export const translations: typeof enTranslations = {
     },
     masterWriter: {
       name: "Mistrz Pisarstwa",
-      description: "Literacki rzemieślnik dla wyjątkowego pisania na poziomie publikacji",
+      description:
+        "Literacki rzemieślnik dla wyjątkowego pisania na poziomie publikacji",
       tagline: "Doskonałość Literacka",
       shortDesc: "Zaawansowane pisanie i analiza literacka",
       suggestedPrompts: {
@@ -377,7 +382,8 @@ export const translations: typeof enTranslations = {
     },
     brainstormer: {
       name: "Burza mózgów",
-      description: "Kreatywny partner do generowania pomysłów i rozwiązywania problemów",
+      description:
+        "Kreatywny partner do generowania pomysłów i rozwiązywania problemów",
       tagline: "Pomysły Uwolnione",
       shortDesc: "Kreatywna burza mózgów i generowanie pomysłów",
       suggestedPrompts: {
@@ -389,7 +395,8 @@ export const translations: typeof enTranslations = {
     },
     editor: {
       name: "Redaktor",
-      description: "Profesjonalny redaktor do polerowania i udoskonalania tekstu",
+      description:
+        "Profesjonalny redaktor do polerowania i udoskonalania tekstu",
       tagline: "Poleruj i Udoskonal",
       shortDesc: "Edycja treści i dopracowywanie",
       suggestedPrompts: {
@@ -485,7 +492,8 @@ export const translations: typeof enTranslations = {
     },
     careerCoach: {
       name: "Doradca Kariery",
-      description: "Rozwój kariery, poszukiwanie pracy i rozmowy kwalifikacyjne",
+      description:
+        "Rozwój kariery, poszukiwanie pracy i rozmowy kwalifikacyjne",
       tagline: "Rozwijaj Karierę",
       shortDesc: "Rozwój kariery i orientacja",
       suggestedPrompts: {
@@ -618,7 +626,8 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Lista postaci",
-    description: "Pobierz wszystkie dostępne postaciy (domyślne + niestandardowe)",
+    description:
+      "Pobierz wszystkie dostępne postaciy (domyślne + niestandardowe)",
     container: {
       title: "Lista postaci",
       description: "Wszystkie dostępne postaciy dla użytkownika",
@@ -667,7 +676,8 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nieautoryzowany",
-        description: "Musisz być zalogowany, aby uzyskać dostęp do niestandardowych postaci",
+        description:
+          "Musisz być zalogowany, aby uzyskać dostęp do niestandardowych postaci",
       },
       forbidden: {
         title: "Zabronione",
@@ -736,7 +746,8 @@ export const translations: typeof enTranslations = {
     },
     ownershipType: {
       label: "Typ własności",
-      description: "Kto jest właścicielem tej postaci (system, użytkownik lub publiczny)",
+      description:
+        "Kto jest właścicielem tej postaci (system, użytkownik lub publiczny)",
     },
     modelSelection: {
       title: "Wybór modelu",
@@ -750,20 +761,24 @@ export const translations: typeof enTranslations = {
     },
     preferredModel: {
       label: "Preferowany model",
-      description: "Wybierz konkretny model AI, który będzie zawsze używany z tą postacią",
+      description:
+        "Wybierz konkretny model AI, który będzie zawsze używany z tą postacią",
       helpText: "Wybór konkretnego modelu blokuje tę postacię do tego modelu",
     },
     intelligence: {
       label: "Poziom inteligencji",
-      description: "Minimalny poziom inteligencji/możliwości wymagany dla modelu",
+      description:
+        "Minimalny poziom inteligencji/możliwości wymagany dla modelu",
     },
     minIntelligence: {
       label: "Minimalna inteligencja",
-      description: "Minimalny poziom inteligencji/możliwości wymagany dla modelu",
+      description:
+        "Minimalny poziom inteligencji/możliwości wymagany dla modelu",
     },
     maxIntelligence: {
       label: "Maksymalna inteligencja",
-      description: "Maksymalny poziom inteligencji/możliwości dozwolony dla modelu",
+      description:
+        "Maksymalny poziom inteligencji/możliwości dozwolony dla modelu",
     },
     intelligenceRange: {
       label: "Zakres inteligencji",
@@ -795,11 +810,13 @@ export const translations: typeof enTranslations = {
     },
     maxPrice: {
       label: "Maksymalna cena",
-      description: "Maksymalny koszt kredytów, który jesteś gotów wydać na wiadomość z tą postacią",
+      description:
+        "Maksymalny koszt kredytów, który jesteś gotów wydać na wiadomość z tą postacią",
     },
     contentLevel: {
       label: "Poziom treści",
-      description: "Poziom filtrowania treści dla modelu (główny nurt, otwarty lub bez cenzury)",
+      description:
+        "Poziom filtrowania treści dla modelu (główny nurt, otwarty lub bez cenzury)",
     },
     minContent: {
       label: "Minimalny poziom treści",

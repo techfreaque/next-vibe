@@ -7,14 +7,22 @@ import "server-only";
 
 import Imap from "imap";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { ImapAccount } from "../db";
-import { ImapAuthMethod, ImapConnectionStatus, ImapSpecialUseType } from "../enum";
+import {
+  ImapAuthMethod,
+  ImapConnectionStatus,
+  ImapSpecialUseType,
+} from "../enum";
 import type {
   ImapConnectionCloseRequestOutput,
   ImapConnectionCloseResponseOutput,
@@ -88,7 +96,10 @@ export interface ImapConnectionRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ImapConnectionTestResponseOutput>>;
 
-  connect(account: ImapAccount, logger: EndpointLogger): Promise<ResponseType<ImapConnectionImpl>>;
+  connect(
+    account: ImapAccount,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ImapConnectionImpl>>;
 
   disconnect(
     data: ImapConnectionCloseRequestOutput,
@@ -183,7 +194,12 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
       // Implement actual IMAP connection test
       try {
         // Basic validation
-        if (!config.host || !config.port || !config.username || !config.password) {
+        if (
+          !config.host ||
+          !config.port ||
+          !config.username ||
+          !config.password
+        ) {
           logger.error("IMAP connection test failed", {
             error: "Missing required configuration",
             host: config.host,
@@ -191,7 +207,8 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             username: config.username,
           });
           return fail({
-            message: "app.api.emails.imapClient.imapErrors.validation.account.username.required",
+            message:
+              "app.api.emails.imapClient.imapErrors.validation.account.username.required",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -203,7 +220,8 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             port: config.port,
           });
           return fail({
-            message: "app.api.emails.imapClient.imapErrors.validation.account.port.invalid",
+            message:
+              "app.api.emails.imapClient.imapErrors.validation.account.port.invalid",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -215,13 +233,16 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             host: config.host,
           });
           return fail({
-            message: "app.api.emails.imapClient.imapErrors.validation.account.host.invalid",
+            message:
+              "app.api.emails.imapClient.imapErrors.validation.account.host.invalid",
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
 
         // Implement actual IMAP connection test using node-imap
-        return await new Promise<ResponseType<ImapConnectionTestResponseOutput>>((resolve) => {
+        return await new Promise<
+          ResponseType<ImapConnectionTestResponseOutput>
+        >((resolve) => {
           const imap = new Imap({
             user: config.username,
             password: config.password,
@@ -234,7 +255,9 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
           let resolved = false;
 
-          const resolveOnce = (result: ResponseType<ImapConnectionTestResponseOutput>): void => {
+          const resolveOnce = (
+            result: ResponseType<ImapConnectionTestResponseOutput>,
+          ): void => {
             if (!resolved) {
               resolved = true;
               resolve(result);
@@ -252,7 +275,8 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             resolveOnce(
               success({
                 success: true,
-                message: "app.api.emails.imapClient.imap.connection.test.success" as const,
+                message:
+                  "app.api.emails.imapClient.imap.connection.test.success" as const,
                 connectionStatus: ImapConnectionStatus.CONNECTED,
                 details: {
                   host: config.host,
@@ -280,7 +304,8 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
             resolveOnce(
               fail({
-                message: "app.api.emails.imapClient.imapErrors.connection.test.failed",
+                message:
+                  "app.api.emails.imapClient.imapErrors.connection.test.failed",
                 errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
               }),
             );
@@ -290,7 +315,8 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
           setTimeout(() => {
             resolveOnce(
               fail({
-                message: "app.api.emails.imapClient.imap.connection.test.timeout",
+                message:
+                  "app.api.emails.imapClient.imap.connection.test.timeout",
                 errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
               }),
             );
@@ -336,62 +362,67 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
       // Check if connection already exists
       if (this.connections.has(connectionKey)) {
         const existingConnection = this.connections.get(connectionKey);
-        if (existingConnection && existingConnection.state === "authenticated") {
+        if (
+          existingConnection &&
+          existingConnection.state === "authenticated"
+        ) {
           logger.debug("Reusing existing IMAP connection", { connectionKey });
           return success(existingConnection);
         }
       }
 
       // Implement actual IMAP connection using node-imap
-      return await new Promise<ResponseType<ImapConnectionImpl>>((resolve, reject) => {
-        const imap = new Imap({
-          user: config.username,
-          password: config.password,
-          host: config.host,
-          port: config.port,
-          tls: config.secure || false,
-          connTimeout: 10000,
-          authTimeout: 5000,
-        });
-
-        imap.once("ready", () => {
-          const connection: ImapConnectionImpl = {
-            state: "authenticated",
+      return await new Promise<ResponseType<ImapConnectionImpl>>(
+        (resolve, reject) => {
+          const imap = new Imap({
+            user: config.username,
+            password: config.password,
             host: config.host,
             port: config.port,
-            username: config.username,
-            capabilities: [],
-            close: () => {
-              logger.debug("Closing IMAP connection", { connectionKey });
-              this.connections.delete(connectionKey);
-              imap.end();
-            },
-          };
-
-          this.connections.set(connectionKey, connection);
-
-          logger.debug("IMAP connection established", {
-            host: config.host,
-            connectionKey,
+            tls: config.secure || false,
+            connTimeout: 10000,
+            authTimeout: 5000,
           });
 
-          resolve(success(connection));
-        });
+          imap.once("ready", () => {
+            const connection: ImapConnectionImpl = {
+              state: "authenticated",
+              host: config.host,
+              port: config.port,
+              username: config.username,
+              capabilities: [],
+              close: () => {
+                logger.debug("Closing IMAP connection", { connectionKey });
+                this.connections.delete(connectionKey);
+                imap.end();
+              },
+            };
 
-        imap.once("error", (err: Error) => {
-          logger.error("Error connecting to IMAP server", {
-            error: err.message,
-            host: config.host,
-            port: config.port,
-            secure: config.secure,
-            username: config.username,
-            errorDetails: err,
+            this.connections.set(connectionKey, connection);
+
+            logger.debug("IMAP connection established", {
+              host: config.host,
+              connectionKey,
+            });
+
+            resolve(success(connection));
           });
-          reject(err);
-        });
 
-        imap.connect();
-      });
+          imap.once("error", (err: Error) => {
+            logger.error("Error connecting to IMAP server", {
+              error: err.message,
+              host: config.host,
+              port: config.port,
+              secure: config.secure,
+              username: config.username,
+              errorDetails: err,
+            });
+            reject(err);
+          });
+
+          imap.connect();
+        },
+      );
     } catch (error) {
       logger.error("Failed to connect to IMAP server", parseError(error));
       return fail({
@@ -468,14 +499,20 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
             const folders: ImapFolderInfo[] = [];
 
-            const processBox = (box: ImapBoxInfo, name: string, path: string): void => {
+            const processBox = (
+              box: ImapBoxInfo,
+              name: string,
+              path: string,
+            ): void => {
               folders.push({
                 name,
                 displayName: box.displayName || name,
                 path,
                 delimiter: box.delimiter || "/",
                 isSelectable: !box.noselect,
-                hasChildren: Boolean(box.children && Object.keys(box.children).length > 0),
+                hasChildren: Boolean(
+                  box.children && Object.keys(box.children).length > 0,
+                ),
                 isSpecialUse: Boolean(box.special_use_attrib),
                 specialUseType: mapImapSpecialUseType(box.special_use_attrib),
                 uidValidity: box.uidvalidity || undefined,
@@ -487,7 +524,9 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
               if (box.children) {
                 Object.keys(box.children).forEach((childName) => {
-                  const childPath = path ? `${path}${box.delimiter || "/"}${childName}` : childName;
+                  const childPath = path
+                    ? `${path}${box.delimiter || "/"}${childName}`
+                    : childName;
                   processBox(box.children![childName], childName, childPath);
                 });
               }
@@ -513,7 +552,8 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
     } catch (error) {
       logger.error("Error listing IMAP folders", parseError(error));
       return fail({
-        message: "app.api.emails.imapClient.imapErrors.connection.folders.list.failed",
+        message:
+          "app.api.emails.imapClient.imapErrors.connection.folders.list.failed",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -533,135 +573,142 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
       });
 
       // Implement actual message listing using IMAP
-      const messages = await new Promise<ImapMessageInfo[]>((resolve, reject) => {
-        const imap = new Imap({
-          user: data.account.username,
-          password: data.account.password,
-          host: data.account.host,
-          port: data.account.port,
-          tls: data.account.secure || false,
-          connTimeout: 10000,
-          authTimeout: 5000,
-        });
+      const messages = await new Promise<ImapMessageInfo[]>(
+        (resolve, reject) => {
+          const imap = new Imap({
+            user: data.account.username,
+            password: data.account.password,
+            host: data.account.host,
+            port: data.account.port,
+            tls: data.account.secure || false,
+            connTimeout: 10000,
+            authTimeout: 5000,
+          });
 
-        imap.once("ready", () => {
-          imap.openBox(data.folderPath, true, (err) => {
-            if (err) {
-              reject(err);
-              return;
-            }
-
-            const searchCriteria: (string | (string | Date)[])[] = ["ALL"];
-            if (data.options?.since) {
-              searchCriteria.push(["SINCE", data.options.since]);
-            }
-            if (data.options?.before) {
-              searchCriteria.push(["BEFORE", data.options.before]);
-            }
-
-            imap.search(searchCriteria, (searchErr, results) => {
-              if (searchErr) {
-                reject(searchErr);
+          imap.once("ready", () => {
+            imap.openBox(data.folderPath, true, (err) => {
+              if (err) {
+                reject(err);
                 return;
               }
 
-              if (!results || results.length === 0) {
-                resolve([]);
-                imap.end();
-                return;
+              const searchCriteria: (string | (string | Date)[])[] = ["ALL"];
+              if (data.options?.since) {
+                searchCriteria.push(["SINCE", data.options.since]);
+              }
+              if (data.options?.before) {
+                searchCriteria.push(["BEFORE", data.options.before]);
               }
 
-              // Apply limit if specified
-              const limit = data.options?.limit || 50;
-              const limitedResults = results.slice(0, limit);
+              imap.search(searchCriteria, (searchErr, results) => {
+                if (searchErr) {
+                  reject(searchErr);
+                  return;
+                }
 
-              const fetch = imap.fetch(limitedResults, {
-                bodies: "HEADER",
-                struct: true,
-              });
+                if (!results || results.length === 0) {
+                  resolve([]);
+                  imap.end();
+                  return;
+                }
 
-              const messages: ImapMessageInfo[] = [];
+                // Apply limit if specified
+                const limit = data.options?.limit || 50;
+                const limitedResults = results.slice(0, limit);
 
-              fetch.on("message", (msg) => {
-                let headers: Record<string, string[]> = {};
-                let attributes: {
-                  uid?: number;
-                  size?: number;
-                  flags?: string[];
-                  struct?: ImapMessageStruct | ImapMessageStruct[];
-                } = {};
+                const fetch = imap.fetch(limitedResults, {
+                  bodies: "HEADER",
+                  struct: true,
+                });
 
-                msg.on("body", (stream) => {
-                  let buffer = "";
-                  stream.on("data", (chunk: Buffer) => {
-                    buffer += chunk.toString("ascii");
-                  });
-                  stream.once("end", () => {
-                    // Simple header parsing - just extract basic fields
-                    const lines = buffer.split("\r\n");
-                    for (const line of lines) {
-                      const colonIndex = line.indexOf(":");
-                      if (colonIndex > 0) {
-                        const key = line.slice(0, colonIndex).toLowerCase();
-                        const value = line.slice(colonIndex + 1).trim();
-                        if (key && value) {
-                          headers[key] = [value];
+                const messages: ImapMessageInfo[] = [];
+
+                fetch.on("message", (msg) => {
+                  let headers: Record<string, string[]> = {};
+                  let attributes: {
+                    uid?: number;
+                    size?: number;
+                    flags?: string[];
+                    struct?: ImapMessageStruct | ImapMessageStruct[];
+                  } = {};
+
+                  msg.on("body", (stream) => {
+                    let buffer = "";
+                    stream.on("data", (chunk: Buffer) => {
+                      buffer += chunk.toString("ascii");
+                    });
+                    stream.once("end", () => {
+                      // Simple header parsing - just extract basic fields
+                      const lines = buffer.split("\r\n");
+                      for (const line of lines) {
+                        const colonIndex = line.indexOf(":");
+                        if (colonIndex > 0) {
+                          const key = line.slice(0, colonIndex).toLowerCase();
+                          const value = line.slice(colonIndex + 1).trim();
+                          if (key && value) {
+                            headers[key] = [value];
+                          }
                         }
                       }
-                    }
+                    });
+                  });
+
+                  msg.once("attributes", (attrs) => {
+                    attributes = attrs as typeof attributes;
+                  });
+
+                  msg.once("end", () => {
+                    const headerRecord: Record<string, string> = {};
+                    Object.entries(headers).forEach(([key, value]) => {
+                      headerRecord[key] = Array.isArray(value)
+                        ? value[0] || ""
+                        : value;
+                    });
+
+                    messages.push({
+                      uid: attributes.uid || 0,
+                      messageId: headers["message-id"]?.[0] || "",
+                      subject: headers.subject?.[0] || "",
+                      from: headers.from?.[0] || "",
+                      to: headers.to?.[0] || "",
+                      date: new Date(headers.date?.[0] || Date.now()),
+                      size: attributes.size || 0,
+                      flags: attributes.flags || [],
+                      headers: headerRecord,
+                      hasAttachments: this.checkHasAttachments(
+                        attributes.struct,
+                      ),
+                      attachmentCount: this.countAttachments(attributes.struct),
+                    });
                   });
                 });
 
-                msg.once("attributes", (attrs) => {
-                  attributes = attrs as typeof attributes;
+                fetch.once("error", (fetchErr) => {
+                  reject(fetchErr);
                 });
 
-                msg.once("end", () => {
-                  const headerRecord: Record<string, string> = {};
-                  Object.entries(headers).forEach(([key, value]) => {
-                    headerRecord[key] = Array.isArray(value) ? value[0] || "" : value;
-                  });
-
-                  messages.push({
-                    uid: attributes.uid || 0,
-                    messageId: headers["message-id"]?.[0] || "",
-                    subject: headers.subject?.[0] || "",
-                    from: headers.from?.[0] || "",
-                    to: headers.to?.[0] || "",
-                    date: new Date(headers.date?.[0] || Date.now()),
-                    size: attributes.size || 0,
-                    flags: attributes.flags || [],
-                    headers: headerRecord,
-                    hasAttachments: this.checkHasAttachments(attributes.struct),
-                    attachmentCount: this.countAttachments(attributes.struct),
-                  });
+                fetch.once("end", () => {
+                  resolve(messages);
+                  imap.end();
                 });
-              });
-
-              fetch.once("error", (fetchErr) => {
-                reject(fetchErr);
-              });
-
-              fetch.once("end", () => {
-                resolve(messages);
-                imap.end();
               });
             });
           });
-        });
 
-        imap.once("error", (err: Error) => {
-          reject(err);
-        });
+          imap.once("error", (err: Error) => {
+            reject(err);
+          });
 
-        imap.connect();
-      });
+          imap.connect();
+        },
+      );
 
       return success({ messages });
     } catch (error) {
       logger.error("Error listing IMAP messages", parseError(error));
       return fail({
-        message: "app.api.emails.imapClient.imapErrors.connection.messages.list.failed",
+        message:
+          "app.api.emails.imapClient.imapErrors.connection.messages.list.failed",
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -701,7 +748,9 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   /**
    * Count attachments in message structure
    */
-  private countAttachments(struct: ImapMessageStruct | ImapMessageStruct[] | undefined): number {
+  private countAttachments(
+    struct: ImapMessageStruct | ImapMessageStruct[] | undefined,
+  ): number {
     if (!struct) {
       return 0;
     }
@@ -737,7 +786,9 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
       logger.debug("Closing all IMAP connections");
 
       // Close all connections synchronously (close() returns void, not Promise)
-      [...this.connections.values()].forEach((connection) => connection.close());
+      [...this.connections.values()].forEach((connection) =>
+        connection.close(),
+      );
 
       this.connections.clear();
 

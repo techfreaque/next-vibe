@@ -133,11 +133,19 @@ const { POST } = createEndpoint({
       },
       click: {
         tool: BrowserTool.CLICK,
-        arguments: JSON.stringify({ selector: "button[type='submit']" }, null, 2),
+        arguments: JSON.stringify(
+          { selector: "button[type='submit']" },
+          null,
+          2,
+        ),
       },
       performance: {
         tool: BrowserTool.PERFORMANCE_START_TRACE,
-        arguments: JSON.stringify({ categories: ["devtools.timeline"] }, null, 2),
+        arguments: JSON.stringify(
+          { categories: ["devtools.timeline"] },
+          null,
+          2,
+        ),
       },
       script: {
         tool: BrowserTool.EVALUATE_SCRIPT,

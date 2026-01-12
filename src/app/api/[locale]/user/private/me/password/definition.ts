@@ -50,7 +50,8 @@ const { POST } = createEndpoint({
       currentCredentials: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.user.private.me.password.groups.currentCredentials.title" as const,
+          title:
+            "app.api.user.private.me.password.groups.currentCredentials.title" as const,
           description:
             "app.api.user.private.me.password.groups.currentCredentials.description" as const,
           layoutType: LayoutType.GRID,
@@ -62,14 +63,19 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
-              label: "app.api.user.private.me.password.currentPassword.label" as const,
-              description: "app.api.user.private.me.password.currentPassword.description" as const,
-              placeholder: "app.api.user.private.me.password.currentPassword.placeholder" as const,
+              label:
+                "app.api.user.private.me.password.currentPassword.label" as const,
+              description:
+                "app.api.user.private.me.password.currentPassword.description" as const,
+              placeholder:
+                "app.api.user.private.me.password.currentPassword.placeholder" as const,
               columns: 12,
-              helpText: "app.api.user.private.me.password.currentPassword.description" as const,
+              helpText:
+                "app.api.user.private.me.password.currentPassword.description" as const,
             },
             z.string().min(8, {
-              message: "app.api.user.private.me.password.validation.currentPassword.minLength",
+              message:
+                "app.api.user.private.me.password.validation.currentPassword.minLength",
             }),
           ),
         },
@@ -79,7 +85,8 @@ const { POST } = createEndpoint({
       newCredentials: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.user.private.me.password.groups.newCredentials.title" as const,
+          title:
+            "app.api.user.private.me.password.groups.newCredentials.title" as const,
           description:
             "app.api.user.private.me.password.groups.newCredentials.description" as const,
           layoutType: LayoutType.GRID,
@@ -91,14 +98,19 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
-              label: "app.api.user.private.me.password.newPassword.label" as const,
-              description: "app.api.user.private.me.password.newPassword.description" as const,
-              placeholder: "app.api.user.private.me.password.newPassword.placeholder" as const,
+              label:
+                "app.api.user.private.me.password.newPassword.label" as const,
+              description:
+                "app.api.user.private.me.password.newPassword.description" as const,
+              placeholder:
+                "app.api.user.private.me.password.newPassword.placeholder" as const,
               columns: 12,
-              helpText: "app.api.user.private.me.password.newPassword.description" as const,
+              helpText:
+                "app.api.user.private.me.password.newPassword.description" as const,
             },
             z.string().min(8, {
-              message: "app.api.user.private.me.password.validation.newPassword.minLength",
+              message:
+                "app.api.user.private.me.password.validation.newPassword.minLength",
             }),
           ),
 
@@ -106,14 +118,19 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
-              label: "app.api.user.private.me.password.confirmPassword.label" as const,
-              description: "app.api.user.private.me.password.confirmPassword.description" as const,
-              placeholder: "app.api.user.private.me.password.confirmPassword.placeholder" as const,
+              label:
+                "app.api.user.private.me.password.confirmPassword.label" as const,
+              description:
+                "app.api.user.private.me.password.confirmPassword.description" as const,
+              placeholder:
+                "app.api.user.private.me.password.confirmPassword.placeholder" as const,
               columns: 12,
-              helpText: "app.api.user.private.me.password.confirmPassword.description" as const,
+              helpText:
+                "app.api.user.private.me.password.confirmPassword.description" as const,
             },
             z.string().min(8, {
-              message: "app.api.user.private.me.password.validation.confirmPassword.minLength",
+              message:
+                "app.api.user.private.me.password.validation.confirmPassword.minLength",
             }),
           ),
         },
@@ -124,11 +141,15 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.user.private.me.password.twoFactorCode.label" as const,
-          description: "app.api.user.private.me.password.twoFactorCode.description" as const,
-          placeholder: "app.api.user.private.me.password.twoFactorCode.placeholder" as const,
+          label:
+            "app.api.user.private.me.password.twoFactorCode.label" as const,
+          description:
+            "app.api.user.private.me.password.twoFactorCode.description" as const,
+          placeholder:
+            "app.api.user.private.me.password.twoFactorCode.placeholder" as const,
           columns: 12,
-          helpText: "app.api.user.private.me.password.twoFactorCode.description" as const,
+          helpText:
+            "app.api.user.private.me.password.twoFactorCode.description" as const,
         },
         z.string().length(6).optional(),
       ),
@@ -138,7 +159,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.user.private.me.password.response.title" as const,
-          description: "app.api.user.private.me.password.response.description" as const,
+          description:
+            "app.api.user.private.me.password.response.description" as const,
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -147,28 +169,32 @@ const { POST } = createEndpoint({
           success: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.private.me.password.response.success" as const,
+              content:
+                "app.api.user.private.me.password.response.success" as const,
             },
             z.boolean(),
           ),
           message: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.private.me.password.response.message" as const,
+              content:
+                "app.api.user.private.me.password.response.message" as const,
             },
             z.string(),
           ),
           securityTip: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.private.me.password.response.securityTip" as const,
+              content:
+                "app.api.user.private.me.password.response.securityTip" as const,
             },
             z.string().optional(),
           ),
           nextSteps: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.private.me.password.response.nextSteps.item" as const,
+              content:
+                "app.api.user.private.me.password.response.nextSteps.item" as const,
             },
             z.array(z.string()),
           ),
@@ -180,47 +206,60 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.user.private.me.password.errors.validation.title" as const,
-      description: "app.api.user.private.me.password.errors.validation.description" as const,
+      title:
+        "app.api.user.private.me.password.errors.validation.title" as const,
+      description:
+        "app.api.user.private.me.password.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.user.private.me.password.errors.unauthorized.title" as const,
-      description: "app.api.user.private.me.password.errors.unauthorized.description" as const,
+      title:
+        "app.api.user.private.me.password.errors.unauthorized.title" as const,
+      description:
+        "app.api.user.private.me.password.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.user.private.me.password.errors.server.title" as const,
-      description: "app.api.user.private.me.password.errors.server.description" as const,
+      description:
+        "app.api.user.private.me.password.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.user.private.me.password.errors.unknown.title" as const,
-      description: "app.api.user.private.me.password.errors.unknown.description" as const,
+      description:
+        "app.api.user.private.me.password.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.user.private.me.password.errors.network.title" as const,
-      description: "app.api.user.private.me.password.errors.network.description" as const,
+      description:
+        "app.api.user.private.me.password.errors.network.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.user.private.me.password.errors.forbidden.title" as const,
-      description: "app.api.user.private.me.password.errors.forbidden.description" as const,
+      description:
+        "app.api.user.private.me.password.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.user.private.me.password.errors.notFound.title" as const,
-      description: "app.api.user.private.me.password.errors.notFound.description" as const,
+      description:
+        "app.api.user.private.me.password.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.user.private.me.password.errors.unsavedChanges.title" as const,
-      description: "app.api.user.private.me.password.errors.unsavedChanges.description" as const,
+      title:
+        "app.api.user.private.me.password.errors.unsavedChanges.title" as const,
+      description:
+        "app.api.user.private.me.password.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.user.private.me.password.errors.conflict.title" as const,
-      description: "app.api.user.private.me.password.errors.conflict.description" as const,
+      description:
+        "app.api.user.private.me.password.errors.conflict.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
     title: "app.api.user.private.me.password.success.title" as const,
-    description: "app.api.user.private.me.password.success.description" as const,
+    description:
+      "app.api.user.private.me.password.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -259,7 +298,8 @@ const { POST } = createEndpoint({
         response: {
           success: true,
           message: "Password changed successfully",
-          securityTip: "Consider enabling two-factor authentication for additional security",
+          securityTip:
+            "Consider enabling two-factor authentication for additional security",
           nextSteps: [
             "Log out from other devices",
             "Update stored passwords",
@@ -282,8 +322,12 @@ const { POST } = createEndpoint({
         response: {
           success: false,
           message: "New password does not meet security requirements",
-          securityTip: "Use a mix of uppercase, lowercase, numbers, and special characters",
-          nextSteps: ["Choose a stronger password", "Consider using a password manager"],
+          securityTip:
+            "Use a mix of uppercase, lowercase, numbers, and special characters",
+          nextSteps: [
+            "Choose a stronger password",
+            "Consider using a password manager",
+          ],
         },
       },
     },

@@ -23,10 +23,12 @@ export const { GET, POST, PATCH, DELETE, tools } = endpointsHandler({
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ data, user, logger }) => ShareLinksRepository.update(data, user, logger),
+    handler: ({ data, user, logger }) =>
+      ShareLinksRepository.update(data, user, logger),
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: ({ data, user, logger }) => ShareLinksRepository.revoke(data, user, logger),
+    handler: ({ data, user, logger }) =>
+      ShareLinksRepository.revoke(data, user, logger),
   },
 });

@@ -48,7 +48,8 @@ const { GET } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.agent.chat.threads.get.container.title" as const,
-      description: "app.api.agent.chat.threads.get.container.description" as const,
+      description:
+        "app.api.agent.chat.threads.get.container.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { request: "data", response: true },
@@ -59,7 +60,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.agent.chat.threads.get.page.label" as const,
-          description: "app.api.agent.chat.threads.get.page.description" as const,
+          description:
+            "app.api.agent.chat.threads.get.page.description" as const,
           columns: 6,
         },
         z.coerce.number().min(1).optional().default(1),
@@ -69,7 +71,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.agent.chat.threads.get.limit.label" as const,
-          description: "app.api.agent.chat.threads.get.limit.description" as const,
+          description:
+            "app.api.agent.chat.threads.get.limit.description" as const,
           columns: 6,
         },
         z.coerce.number().min(1).max(100).optional().default(20),
@@ -81,7 +84,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.agent.chat.threads.get.rootFolderId.label" as const,
-          description: "app.api.agent.chat.threads.get.rootFolderId.description" as const,
+          description:
+            "app.api.agent.chat.threads.get.rootFolderId.description" as const,
           columns: 6,
           options: [
             {
@@ -99,15 +103,22 @@ const { GET } = createEndpoint({
           ],
         },
         z
-          .enum([DefaultFolderId.PRIVATE, DefaultFolderId.SHARED, DefaultFolderId.PUBLIC])
-          .describe("Root folder to filter threads (incognito not allowed - local-only)"),
+          .enum([
+            DefaultFolderId.PRIVATE,
+            DefaultFolderId.SHARED,
+            DefaultFolderId.PUBLIC,
+          ])
+          .describe(
+            "Root folder to filter threads (incognito not allowed - local-only)",
+          ),
       ),
       subFolderId: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.UUID,
           label: "app.api.agent.chat.threads.get.subFolderId.label" as const,
-          description: "app.api.agent.chat.threads.get.subFolderId.description" as const,
+          description:
+            "app.api.agent.chat.threads.get.subFolderId.description" as const,
           columns: 6,
         },
         z.uuid().optional().nullable(),
@@ -117,7 +128,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.agent.chat.threads.get.status.label" as const,
-          description: "app.api.agent.chat.threads.get.status.description" as const,
+          description:
+            "app.api.agent.chat.threads.get.status.description" as const,
           columns: 6,
           options: ThreadStatusOptions,
         },
@@ -128,7 +140,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.agent.chat.threads.get.search.label" as const,
-          description: "app.api.agent.chat.threads.get.search.description" as const,
+          description:
+            "app.api.agent.chat.threads.get.search.description" as const,
           columns: 12,
         },
         z.string().optional(),
@@ -138,7 +151,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.agent.chat.threads.get.isPinned.label" as const,
-          description: "app.api.agent.chat.threads.get.isPinned.description" as const,
+          description:
+            "app.api.agent.chat.threads.get.isPinned.description" as const,
           columns: 6,
         },
         z.boolean().optional(),
@@ -148,7 +162,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.agent.chat.threads.get.dateFrom.label" as const,
-          description: "app.api.agent.chat.threads.get.dateFrom.description" as const,
+          description:
+            "app.api.agent.chat.threads.get.dateFrom.description" as const,
           columns: 6,
         },
         dateSchema.optional(),
@@ -158,7 +173,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.agent.chat.threads.get.dateTo.label" as const,
-          description: "app.api.agent.chat.threads.get.dateTo.description" as const,
+          description:
+            "app.api.agent.chat.threads.get.dateTo.description" as const,
           columns: 6,
         },
         dateSchema.optional(),
@@ -169,7 +185,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.agent.chat.threads.get.response.title" as const,
-          description: "app.api.agent.chat.threads.get.response.description" as const,
+          description:
+            "app.api.agent.chat.threads.get.response.description" as const,
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -181,7 +198,8 @@ const { GET } = createEndpoint({
             objectField(
               {
                 type: WidgetType.CONTAINER,
-                title: "app.api.agent.chat.threads.get.response.threads.thread.title" as const,
+                title:
+                  "app.api.agent.chat.threads.get.response.threads.thread.title" as const,
                 layoutType: LayoutType.GRID,
                 columns: 2,
               },
@@ -250,7 +268,9 @@ const { GET } = createEndpoint({
                   z
                     .array(z.enum(UserRoleDB))
                     .nullable()
-                    .describe("Roles that can view this thread (null = inherit from folder)"),
+                    .describe(
+                      "Roles that can view this thread (null = inherit from folder)",
+                    ),
                 ),
                 rolesEdit: responseField(
                   {
@@ -259,7 +279,9 @@ const { GET } = createEndpoint({
                   z
                     .array(z.enum(UserRoleDB))
                     .nullable()
-                    .describe("Roles that can edit this thread (null = inherit from folder)"),
+                    .describe(
+                      "Roles that can edit this thread (null = inherit from folder)",
+                    ),
                 ),
                 rolesPost: responseField(
                   {
@@ -268,7 +290,9 @@ const { GET } = createEndpoint({
                   z
                     .array(z.enum(UserRoleDB))
                     .nullable()
-                    .describe("Roles that can post messages (null = inherit from folder)"),
+                    .describe(
+                      "Roles that can post messages (null = inherit from folder)",
+                    ),
                 ),
                 rolesModerate: responseField(
                   {
@@ -277,7 +301,9 @@ const { GET } = createEndpoint({
                   z
                     .array(z.enum(UserRoleDB))
                     .nullable()
-                    .describe("Roles that can moderate messages (null = inherit from folder)"),
+                    .describe(
+                      "Roles that can moderate messages (null = inherit from folder)",
+                    ),
                 ),
                 rolesAdmin: responseField(
                   {
@@ -286,7 +312,9 @@ const { GET } = createEndpoint({
                   z
                     .array(z.enum(UserRoleDB))
                     .nullable()
-                    .describe("Roles that can manage permissions (null = inherit from folder)"),
+                    .describe(
+                      "Roles that can manage permissions (null = inherit from folder)",
+                    ),
                 ),
                 // Permission flags - computed server-side based on user's roles
                 canEdit: responseField(
@@ -297,7 +325,9 @@ const { GET } = createEndpoint({
                   },
                   z
                     .boolean()
-                    .describe("Whether the current user can edit this thread (title, settings)"),
+                    .describe(
+                      "Whether the current user can edit this thread (title, settings)",
+                    ),
                 ),
                 canPost: responseField(
                   {
@@ -305,7 +335,11 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.agent.chat.threads.get.response.threads.thread.canPost.content" as const,
                   },
-                  z.boolean().describe("Whether the current user can post messages in this thread"),
+                  z
+                    .boolean()
+                    .describe(
+                      "Whether the current user can post messages in this thread",
+                    ),
                 ),
                 canModerate: responseField(
                   {
@@ -315,7 +349,9 @@ const { GET } = createEndpoint({
                   },
                   z
                     .boolean()
-                    .describe("Whether the current user can moderate/hide messages in this thread"),
+                    .describe(
+                      "Whether the current user can moderate/hide messages in this thread",
+                    ),
                 ),
                 canDelete: responseField(
                   {
@@ -323,7 +359,11 @@ const { GET } = createEndpoint({
                     content:
                       "app.api.agent.chat.threads.get.response.threads.thread.canDelete.content" as const,
                   },
-                  z.boolean().describe("Whether the current user can delete this thread"),
+                  z
+                    .boolean()
+                    .describe(
+                      "Whether the current user can delete this thread",
+                    ),
                 ),
                 canManagePermissions: responseField(
                   {
@@ -333,7 +373,9 @@ const { GET } = createEndpoint({
                   },
                   z
                     .boolean()
-                    .describe("Whether the current user can manage permissions for this thread"),
+                    .describe(
+                      "Whether the current user can manage permissions for this thread",
+                    ),
                 ),
                 createdAt: responseField(
                   {
@@ -357,28 +399,32 @@ const { GET } = createEndpoint({
           totalCount: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.agent.chat.threads.get.response.totalCount.content" as const,
+              content:
+                "app.api.agent.chat.threads.get.response.totalCount.content" as const,
             },
             z.coerce.number(),
           ),
           pageCount: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.agent.chat.threads.get.response.pageCount.content" as const,
+              content:
+                "app.api.agent.chat.threads.get.response.pageCount.content" as const,
             },
             z.coerce.number(),
           ),
           page: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.agent.chat.threads.get.response.page.content" as const,
+              content:
+                "app.api.agent.chat.threads.get.response.page.content" as const,
             },
             z.coerce.number(),
           ),
           limit: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.agent.chat.threads.get.response.limit.content" as const,
+              content:
+                "app.api.agent.chat.threads.get.response.limit.content" as const,
             },
             z.coerce.number(),
           ),
@@ -390,15 +436,18 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.chat.threads.get.errors.validation.title",
-      description: "app.api.agent.chat.threads.get.errors.validation.description",
+      description:
+        "app.api.agent.chat.threads.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.agent.chat.threads.get.errors.unauthorized.title",
-      description: "app.api.agent.chat.threads.get.errors.unauthorized.description",
+      description:
+        "app.api.agent.chat.threads.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.threads.get.errors.forbidden.title",
-      description: "app.api.agent.chat.threads.get.errors.forbidden.description",
+      description:
+        "app.api.agent.chat.threads.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.threads.get.errors.notFound.title",
@@ -418,7 +467,8 @@ const { GET } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.agent.chat.threads.get.errors.unsavedChanges.title",
-      description: "app.api.agent.chat.threads.get.errors.unsavedChanges.description",
+      description:
+        "app.api.agent.chat.threads.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.threads.get.errors.conflict.title",
@@ -481,8 +531,10 @@ const { POST } = createEndpoint({
       thread: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.agent.chat.threads.post.sections.thread.title" as const,
-          description: "app.api.agent.chat.threads.post.sections.thread.description" as const,
+          title:
+            "app.api.agent.chat.threads.post.sections.thread.title" as const,
+          description:
+            "app.api.agent.chat.threads.post.sections.thread.description" as const,
           layoutType: LayoutType.GRID,
           columns: 2,
         },
@@ -493,7 +545,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.UUID,
               label: "app.api.agent.chat.threads.post.id.label" as const,
-              description: "app.api.agent.chat.threads.post.id.description" as const,
+              description:
+                "app.api.agent.chat.threads.post.id.description" as const,
               columns: 12,
             },
             z.uuid(),
@@ -502,8 +555,10 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "app.api.agent.chat.threads.post.threadTitle.label" as const,
-              description: "app.api.agent.chat.threads.post.threadTitle.description" as const,
+              label:
+                "app.api.agent.chat.threads.post.threadTitle.label" as const,
+              description:
+                "app.api.agent.chat.threads.post.threadTitle.description" as const,
               columns: 12,
             },
             z.string().min(1).max(255).optional().default("New Chat"),
@@ -512,8 +567,10 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label: "app.api.agent.chat.threads.post.rootFolderId.label" as const,
-              description: "app.api.agent.chat.threads.post.rootFolderId.description" as const,
+              label:
+                "app.api.agent.chat.threads.post.rootFolderId.label" as const,
+              description:
+                "app.api.agent.chat.threads.post.rootFolderId.description" as const,
               columns: 6,
               options: [
                 {
@@ -534,16 +591,21 @@ const { POST } = createEndpoint({
                 },
               ],
             },
-            z.enum(DefaultFolderId).refine((val) => val !== DefaultFolderId.INCOGNITO, {
-              message: "app.api.agent.chat.threads.post.errors.forbidden.incognitoNotAllowed",
-            }),
+            z
+              .enum(DefaultFolderId)
+              .refine((val) => val !== DefaultFolderId.INCOGNITO, {
+                message:
+                  "app.api.agent.chat.threads.post.errors.forbidden.incognitoNotAllowed",
+              }),
           ),
           subFolderId: requestDataField(
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.UUID,
-              label: "app.api.agent.chat.threads.post.subFolderId.label" as const,
-              description: "app.api.agent.chat.threads.post.subFolderId.description" as const,
+              label:
+                "app.api.agent.chat.threads.post.subFolderId.label" as const,
+              description:
+                "app.api.agent.chat.threads.post.subFolderId.description" as const,
               columns: 6,
             },
             z.uuid().optional().nullable(),
@@ -552,8 +614,10 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "app.api.agent.chat.threads.post.defaultModel.label" as const,
-              description: "app.api.agent.chat.threads.post.defaultModel.description" as const,
+              label:
+                "app.api.agent.chat.threads.post.defaultModel.label" as const,
+              description:
+                "app.api.agent.chat.threads.post.defaultModel.description" as const,
               columns: 6,
             },
             z.enum(ModelId),
@@ -562,8 +626,10 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "app.api.agent.chat.threads.post.defaultTone.label" as const,
-              description: "app.api.agent.chat.threads.post.defaultTone.description" as const,
+              label:
+                "app.api.agent.chat.threads.post.defaultTone.label" as const,
+              description:
+                "app.api.agent.chat.threads.post.defaultTone.description" as const,
               columns: 6,
             },
             z.string().nullable(),
@@ -572,8 +638,10 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXTAREA,
-              label: "app.api.agent.chat.threads.post.systemPrompt.label" as const,
-              description: "app.api.agent.chat.threads.post.systemPrompt.description" as const,
+              label:
+                "app.api.agent.chat.threads.post.systemPrompt.label" as const,
+              description:
+                "app.api.agent.chat.threads.post.systemPrompt.description" as const,
               columns: 12,
             },
             z.string().optional(),
@@ -586,7 +654,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.agent.chat.threads.post.response.title" as const,
-          description: "app.api.agent.chat.threads.post.response.description" as const,
+          description:
+            "app.api.agent.chat.threads.post.response.description" as const,
           layoutType: LayoutType.STACKED,
         },
         { response: true },
@@ -594,7 +663,8 @@ const { POST } = createEndpoint({
           thread: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.agent.chat.threads.post.response.thread.title" as const,
+              title:
+                "app.api.agent.chat.threads.post.response.thread.title" as const,
               layoutType: LayoutType.GRID,
               columns: 2,
             },
@@ -603,7 +673,8 @@ const { POST } = createEndpoint({
               id: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.agent.chat.threads.post.response.thread.id.content" as const,
+                  content:
+                    "app.api.agent.chat.threads.post.response.thread.id.content" as const,
                 },
                 z.uuid(),
               ),
@@ -664,19 +735,23 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.agent.chat.threads.post.errors.validation.title",
-      description: "app.api.agent.chat.threads.post.errors.validation.description",
+      description:
+        "app.api.agent.chat.threads.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.agent.chat.threads.post.errors.unauthorized.title",
-      description: "app.api.agent.chat.threads.post.errors.unauthorized.description",
+      description:
+        "app.api.agent.chat.threads.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.agent.chat.threads.post.errors.forbidden.title",
-      description: "app.api.agent.chat.threads.post.errors.forbidden.description",
+      description:
+        "app.api.agent.chat.threads.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.agent.chat.threads.post.errors.notFound.title",
-      description: "app.api.agent.chat.threads.post.errors.notFound.description",
+      description:
+        "app.api.agent.chat.threads.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.agent.chat.threads.post.errors.server.title",
@@ -692,11 +767,13 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.agent.chat.threads.post.errors.unsavedChanges.title",
-      description: "app.api.agent.chat.threads.post.errors.unsavedChanges.description",
+      description:
+        "app.api.agent.chat.threads.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.agent.chat.threads.post.errors.conflict.title",
-      description: "app.api.agent.chat.threads.post.errors.conflict.description",
+      description:
+        "app.api.agent.chat.threads.post.errors.conflict.description",
     },
   },
 

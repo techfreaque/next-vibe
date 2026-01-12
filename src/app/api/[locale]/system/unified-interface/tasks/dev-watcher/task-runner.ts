@@ -67,7 +67,13 @@ const devWatcherTaskRunner: TaskRunner = {
   enabled: env.NODE_ENV === Environment.DEVELOPMENT,
   priority: CronTaskPriority.MEDIUM,
 
-  async run({ logger, signal }: { logger: EndpointLogger; signal: AbortSignal }): Promise<void> {
+  async run({
+    logger,
+    signal,
+  }: {
+    logger: EndpointLogger;
+    signal: AbortSignal;
+  }): Promise<void> {
     // Only run in development
     if (env.NODE_ENV !== Environment.DEVELOPMENT) {
       logger.debug("Dev watcher skipped (not in development mode)");
@@ -81,14 +87,23 @@ const devWatcherTaskRunner: TaskRunner = {
       await startSmartFileWatcher(signal, logger);
     } catch (error) {
       const errorMsg = parseError(error).message;
-      logger.error("Smart file watcher failed, falling back to polling", new Error(errorMsg));
+      logger.error(
+        "Smart file watcher failed, falling back to polling",
+        new Error(errorMsg),
+      );
 
       // Fallback to polling if file watching fails
       await startPollingWatcher(signal, logger);
     }
   },
 
-  async onError({ error, logger }: { error: Error; logger: EndpointLogger }): Promise<void> {
+  async onError({
+    error,
+    logger,
+  }: {
+    error: Error;
+    logger: EndpointLogger;
+  }): Promise<void> {
     logger.error("Dev watcher error", parseError(error));
     await Promise.resolve();
   },
@@ -122,7 +137,9 @@ const startSmartFileWatcher = async (
     try {
       changeCount++;
       const action = skipSeeds ? "File changes detected" : "Initial startup";
-      logger.debug(`📁 ${action} - Running generators (change #${changeCount})...`);
+      logger.debug(
+        `📁 ${action} - Running generators (change #${changeCount})...`,
+      );
 
       await generateAllRepository.generateAll(
         {
@@ -158,12 +175,16 @@ const startSmartFileWatcher = async (
   for (const watchPath of watchPaths) {
     try {
       if (fs.existsSync(watchPath)) {
-        const watcher = fs.watch(watchPath, { recursive: true }, (eventType, filename) => {
-          if (filename && shouldTriggerGeneration(filename)) {
-            logger.debug(`📝 File changed: ${filename} (${eventType})`);
-            debouncedRunGenerators();
-          }
-        });
+        const watcher = fs.watch(
+          watchPath,
+          { recursive: true },
+          (eventType, filename) => {
+            if (filename && shouldTriggerGeneration(filename)) {
+              logger.debug(`📝 File changed: ${filename} (${eventType})`);
+              debouncedRunGenerators();
+            }
+          },
+        );
 
         watchers.push(watcher);
         logger.debug(`👀 Watching ${watchPath} for changes...`);
@@ -216,7 +237,10 @@ const startSmartFileWatcher = async (
 /**
  * Fallback polling watcher (original implementation)
  */
-const startPollingWatcher = async (signal: AbortSignal, logger: EndpointLogger): Promise<void> => {
+const startPollingWatcher = async (
+  signal: AbortSignal,
+  logger: EndpointLogger,
+): Promise<void> => {
   logger.info("Using fallback polling watcher...");
 
   const WATCH_INTERVAL = 10000; // 10 seconds (less frequent than before)
@@ -280,12 +304,19 @@ const startPollingWatcher = async (signal: AbortSignal, logger: EndpointLogger):
 const dbHealthMonitorTaskRunner: TaskRunner = {
   type: "task-runner",
   name: "db-health-monitor",
-  description: "app.api.system.unifiedInterface.tasks.dbHealthMonitor.description",
+  description:
+    "app.api.system.unifiedInterface.tasks.dbHealthMonitor.description",
   category: TaskCategory.MONITORING,
   enabled: true,
   priority: CronTaskPriority.LOW,
 
-  async run({ logger, signal }: { logger: EndpointLogger; signal: AbortSignal }): Promise<void> {
+  async run({
+    logger,
+    signal,
+  }: {
+    logger: EndpointLogger;
+    signal: AbortSignal;
+  }): Promise<void> {
     logger.debug("Starting database health monitor...");
 
     const HEALTH_CHECK_INTERVAL = 30000; // 30 seconds
@@ -312,7 +343,9 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
 
         if (checkCount % 10 === 0) {
           // Log every 10th check (5 minutes)
-          logger.info(formatDatabase(`Database health check #${checkCount} - OK`, "🗄️ "));
+          logger.info(
+            formatDatabase(`Database health check #${checkCount} - OK`, "🗄️ "),
+          );
         }
       } catch (error) {
         consecutiveFailures++;
@@ -321,7 +354,9 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
           const errorMsg = parseError(error).message;
           logger.error("Database health check failed", new Error(errorMsg));
           if (consecutiveFailures === MAX_FAILURES_TO_LOG) {
-            logger.warn("Suppressing further database health check errors until recovery");
+            logger.warn(
+              "Suppressing further database health check errors until recovery",
+            );
           }
         }
       }
@@ -348,7 +383,13 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
     logger.info("Database health monitor stopped");
   },
 
-  async onError({ error, logger }: { error: Error; logger: EndpointLogger }): Promise<void> {
+  async onError({
+    error,
+    logger,
+  }: {
+    error: Error;
+    logger: EndpointLogger;
+  }): Promise<void> {
     logger.error("Database health monitor error", parseError(error));
     await Promise.resolve();
   },
@@ -362,6 +403,9 @@ const dbHealthMonitorTaskRunner: TaskRunner = {
 /**
  * Export task runners for discovery
  */
-export const taskRunners: TaskRunner[] = [devWatcherTaskRunner, dbHealthMonitorTaskRunner];
+export const taskRunners: TaskRunner[] = [
+  devWatcherTaskRunner,
+  dbHealthMonitorTaskRunner,
+];
 
 export default taskRunners;

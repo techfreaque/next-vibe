@@ -103,12 +103,14 @@ export const translations: typeof enTranslations = {
     },
     patterns: {
       everyIntervalMinutes: "co {interval} minut",
-      everyIntervalMinutesStarting: "co {interval} minut począwszy od minuty {start}",
+      everyIntervalMinutesStarting:
+        "co {interval} minut począwszy od minuty {start}",
       atMinutes: "o minutach {minutes}",
       fromMinuteToMinute: "od minuty {from} do {to}",
       atMinute: "o minucie {minute}",
       everyIntervalHours: "co {interval} godzin",
-      everyIntervalHoursStarting: "co {interval} godzin począwszy od godziny {start}",
+      everyIntervalHoursStarting:
+        "co {interval} godzin począwszy od godziny {start}",
       atHours: "o godzinach {hours}",
       fromHourToHour: "od godziny {from} do {to}",
       atHour: "o godzinie {hour}",
@@ -161,11 +163,15 @@ export const translations: typeof enTranslations = {
     updateSideTask: "Nie udało się zaktualizować zadania w tle",
     deleteSideTask: "Nie udało się usunąć zadania w tle",
     createSideTaskExecution: "Nie udało się utworzyć wykonania zadania w tle",
-    updateSideTaskExecution: "Nie udało się zaktualizować wykonania zadania w tle",
+    updateSideTaskExecution:
+      "Nie udało się zaktualizować wykonania zadania w tle",
     fetchSideTaskExecutions: "Nie udało się pobrać wykonań zadań w tle",
-    fetchRecentSideTaskExecutions: "Nie udało się pobrać ostatnich wykonań zadań w tle",
-    createSideTaskHealthCheck: "Nie udało się utworzyć sprawdzenia zdrowia zadania w tle",
-    fetchLatestHealthCheck: "Nie udało się pobrać ostatniego sprawdzenia zdrowia",
+    fetchRecentSideTaskExecutions:
+      "Nie udało się pobrać ostatnich wykonań zadań w tle",
+    createSideTaskHealthCheck:
+      "Nie udało się utworzyć sprawdzenia zdrowia zadania w tle",
+    fetchLatestHealthCheck:
+      "Nie udało się pobrać ostatniego sprawdzenia zdrowia",
     fetchHealthCheckHistory: "Nie udało się pobrać historii sprawdzeń zdrowia",
     fetchSideTaskStatistics: "Nie udało się pobrać statystyk zadań w tle",
     sideTaskNotFound: "Zadanie w tle nie znalezione",
@@ -202,13 +208,20 @@ export const translations: typeof enTranslations = {
   common: {
     cronRepositoryTaskUpdateFailed: "Nie udało się zaktualizować zadania cron",
     cronRepositoryTaskDeleteFailed: "Nie udało się usunąć zadania cron",
-    cronRepositoryExecutionCreateFailed: "Nie udało się utworzyć wykonania zadania cron",
-    cronRepositoryExecutionUpdateFailed: "Nie udało się zaktualizować wykonania zadania cron",
-    cronRepositoryExecutionsFetchFailed: "Nie udało się pobrać wykonań zadań cron",
-    cronRepositoryRecentExecutionsFetchFailed: "Nie udało się pobrać ostatnich wykonań zadań cron",
-    cronRepositorySchedulesFetchFailed: "Nie udało się pobrać harmonogramów zadań cron",
-    cronRepositoryScheduleUpdateFailed: "Nie udało się zaktualizować harmonogramu zadania cron",
-    cronRepositoryStatisticsFetchFailed: "Nie udało się pobrać statystyk zadań cron",
+    cronRepositoryExecutionCreateFailed:
+      "Nie udało się utworzyć wykonania zadania cron",
+    cronRepositoryExecutionUpdateFailed:
+      "Nie udało się zaktualizować wykonania zadania cron",
+    cronRepositoryExecutionsFetchFailed:
+      "Nie udało się pobrać wykonań zadań cron",
+    cronRepositoryRecentExecutionsFetchFailed:
+      "Nie udało się pobrać ostatnich wykonań zadań cron",
+    cronRepositorySchedulesFetchFailed:
+      "Nie udało się pobrać harmonogramów zadań cron",
+    cronRepositoryScheduleUpdateFailed:
+      "Nie udało się zaktualizować harmonogramu zadania cron",
+    cronRepositoryStatisticsFetchFailed:
+      "Nie udało się pobrać statystyk zadań cron",
   },
   cronSystem: cronTranslations,
   pulseSystem: pulseTranslations,

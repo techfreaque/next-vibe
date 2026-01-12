@@ -22,7 +22,10 @@ interface ImapServerConfigFormProps {
 /**
  * IMAP Server Configuration Form Component
  */
-export function ImapServerConfigForm({ control, locale }: ImapServerConfigFormProps): JSX.Element {
+export function ImapServerConfigForm({
+  control,
+  locale,
+}: ImapServerConfigFormProps): JSX.Element {
   return (
     <Div className="flex flex-col gap-4">
       <EndpointFormField

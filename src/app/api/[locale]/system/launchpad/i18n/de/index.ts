@@ -3,7 +3,8 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   category: "Release-Executor",
   errors: {
-    configNotLoaded: "Konfiguration nicht geladen. Bitte laden Sie zuerst die Konfiguration.",
+    configNotLoaded:
+      "Konfiguration nicht geladen. Bitte laden Sie zuerst die Konfiguration.",
     configFileNotFound: "Konfigurationsdatei nicht gefunden: {{path}}",
     configFileNotFoundInParents:
       "Konfigurationsdatei '{{filename}}' wurde im aktuellen Verzeichnis oder in übergeordneten Verzeichnissen nicht gefunden",
@@ -44,7 +45,8 @@ export const translations: typeof enTranslations = {
     summary: {
       title: "Abschließende Zusammenfassung:",
       allSuccess: "Alle Ziele erfolgreich verarbeitet!",
-      failedTargets: "{{count}} Ziele fehlgeschlagen. Verwenden Sie --continue zum Wiederholen.",
+      failedTargets:
+        "{{count}} Ziele fehlgeschlagen. Verwenden Sie --continue zum Wiederholen.",
     },
 
     forceUpdate: {
@@ -56,17 +58,20 @@ export const translations: typeof enTranslations = {
     },
 
     forceRelease: {
-      starting: "Erzwinge Release aller Ziele mit {{versionBump}} Versionserhöhung...",
+      starting:
+        "Erzwinge Release aller Ziele mit {{versionBump}} Versionserhöhung...",
     },
 
     weeklyUpdate: {
       starting: "Starte wöchentlichen Update-Prozess...",
       targetBranch: "Ziel-Branch: {{branchName}}",
       creatingBranch: "Erstelle Update-Branch...",
-      gitCheckout: "git checkout -b {{branchName}} || git checkout {{branchName}}",
+      gitCheckout:
+        "git checkout -b {{branchName}} || git checkout {{branchName}}",
       updatingPackages: "Aktualisiere alle Paket-Abhängigkeiten...",
       runningSnyk: "Führe Snyk-Sicherheitsüberwachung durch...",
-      noChanges: "Keine Änderungen erkannt, überspringe Commit und PR-Erstellung",
+      noChanges:
+        "Keine Änderungen erkannt, überspringe Commit und PR-Erstellung",
       committing: "Erstelle Commit...",
       pushing: "Pushe Branch...",
       gitPush: "git push origin {{branchName}}",
@@ -76,9 +81,11 @@ export const translations: typeof enTranslations = {
     },
 
     snyk: {
-      noCredentials: "Snyk-Zugangsdaten nicht gefunden, überspringe Sicherheitsüberwachung",
+      noCredentials:
+        "Snyk-Zugangsdaten nicht gefunden, überspringe Sicherheitsüberwachung",
       monitoring: "Überwache {{packageName}}...",
-      failed: "Snyk-Überwachung für {{packageFile}} fehlgeschlagen, fahre fort...",
+      failed:
+        "Snyk-Überwachung für {{packageFile}} fehlgeschlagen, fahre fort...",
     },
 
     github: {
@@ -105,8 +112,10 @@ export const translations: typeof enTranslations = {
 
   updateAll: {
     updating: "🔄 Updating all repositories...",
-    failedClone: "⚠️  Failed to clone {{repoPath}}, continuing with other repositories...",
-    failedUpdate: "⚠️  Failed to update {{repoPath}}, continuing with other repositories...",
+    failedClone:
+      "⚠️  Failed to clone {{repoPath}}, continuing with other repositories...",
+    failedUpdate:
+      "⚠️  Failed to update {{repoPath}}, continuing with other repositories...",
     clonedSuccess: "✅ Successfully cloned {{count}} missing repositories.",
     updatedSuccess: "✅ Successfully updated {{count}} existing repositories.",
     cloneFailed: "❌ Failed to clone {{count}} repositories:",

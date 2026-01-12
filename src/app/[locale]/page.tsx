@@ -18,7 +18,9 @@ interface ChatPageProps {
  * Authenticated users -> /threads/private
  * Public users -> /threads/public
  */
-export default async function ChatPage({ params }: ChatPageProps): Promise<never> {
+export default async function ChatPage({
+  params,
+}: ChatPageProps): Promise<never> {
   const { locale } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
 
@@ -35,7 +37,9 @@ export default async function ChatPage({ params }: ChatPageProps): Promise<never
   const isAuthenticated = user !== undefined && !user.isPublic;
 
   // Redirect to appropriate default folder
-  const defaultFolder = isAuthenticated ? DefaultFolderId.PRIVATE : DefaultFolderId.INCOGNITO;
+  const defaultFolder = isAuthenticated
+    ? DefaultFolderId.PRIVATE
+    : DefaultFolderId.INCOGNITO;
 
   redirect(`/${locale}/threads/${defaultFolder}`);
 }

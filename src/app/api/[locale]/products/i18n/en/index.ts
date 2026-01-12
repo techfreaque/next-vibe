@@ -15,7 +15,8 @@ export const translations = {
   // Subscription product
   subscription: {
     name: "Monthly Subscription",
-    description: "{{subCredits}} credits per month with all {{modelCount}} AI models",
+    description:
+      "{{subCredits}} credits per month with all {{modelCount}} AI models",
     longDescription:
       "Monthly subscription with {{subCredits}} credits for all {{modelCount}} uncensored AI models",
     price: "Monthly subscription pricing",

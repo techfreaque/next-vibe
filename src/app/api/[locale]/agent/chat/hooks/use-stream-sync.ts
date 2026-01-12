@@ -7,7 +7,10 @@ import { useEffect } from "react";
 
 import type { TFunction } from "@/i18n/core/static-types";
 
-import type { StreamingMessage, StreamingThread } from "../../ai-stream/hooks/store";
+import type {
+  StreamingMessage,
+  StreamingThread,
+} from "../../ai-stream/hooks/store";
 import type { ChatMessage, ChatThread } from "../db";
 import { ChatMessageRole, ThreadStatus } from "../enum";
 
@@ -49,13 +52,16 @@ export function useStreamSync(deps: StreamSyncDeps): void {
         const needsUpdate =
           existingMsg.content !== streamMsg.content ||
           existingMsg.tokens !== (streamMsg.totalTokens || null) ||
-          JSON.stringify(existingMsg.metadata?.toolCall) !== JSON.stringify(streamMsg.toolCall);
+          JSON.stringify(existingMsg.metadata?.toolCall) !==
+            JSON.stringify(streamMsg.toolCall);
 
         if (needsUpdate) {
           updateMessage(streamMsg.messageId, {
             content: streamMsg.content,
             tokens: streamMsg.totalTokens || null,
-            metadata: streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {},
+            metadata: streamMsg.toolCall
+              ? { toolCall: streamMsg.toolCall }
+              : {},
             errorType: streamMsg.error
               ? t("app.api.agent.chat.aiStream.errorTypes.streamError")
               : null,

@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.wait-for.description",
   category: "app.api.browser.category",
   icon: "clock",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.waitAutomation"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.waitAutomation",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -63,8 +66,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.browser.wait-for.form.fields.timeout.label",
-          description: "app.api.browser.wait-for.form.fields.timeout.description",
-          placeholder: "app.api.browser.wait-for.form.fields.timeout.placeholder",
+          description:
+            "app.api.browser.wait-for.form.fields.timeout.description",
+          placeholder:
+            "app.api.browser.wait-for.form.fields.timeout.placeholder",
           columns: 4,
         },
         z
@@ -91,7 +96,10 @@ const { POST } = createEndpoint({
         z
           .object({
             found: z.boolean().describe("Whether the text was found"),
-            waitTime: z.number().optional().describe("Time waited in milliseconds"),
+            waitTime: z
+              .number()
+              .optional()
+              .describe("Time waited in milliseconds"),
           })
           .optional()
           .describe("Result of wait operation"),

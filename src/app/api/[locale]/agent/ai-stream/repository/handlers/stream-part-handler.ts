@@ -210,10 +210,13 @@ export class StreamPartHandler {
         // Track if this tool requires confirmation
         if (result.requiresConfirmation) {
           ctx.stepHasToolsAwaitingConfirmation = true;
-          logger.info("[AI Stream] Tool requires confirmation - will abort at finish-step", {
-            toolName: part.toolName,
-            messageId: result.pendingToolMessage.messageId,
-          });
+          logger.info(
+            "[AI Stream] Tool requires confirmation - will abort at finish-step",
+            {
+              toolName: part.toolName,
+              messageId: result.pendingToolMessage.messageId,
+            },
+          );
         }
 
         // Update currentParentId/currentDepth to chain each tool call to the previous message

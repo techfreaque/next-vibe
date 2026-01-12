@@ -63,7 +63,8 @@ export const translations: typeof enTranslations = {
       caseStudyTimeframe: "Ramy czasowe",
       caseStudyResults: "Osiągnięte wyniki",
       roiTitle: "Twój potencjalny ROI",
-      roiExplanation: "Na podstawie podobnych klientów, oto czego możesz się spodziewać",
+      roiExplanation:
+        "Na podstawie podobnych klientów, oto czego możesz się spodziewać",
       metric1Label: "Wzrost przychodów",
       metric1Value: "Do 300%",
       metric2Label: "Zaoszczędzony czas",
@@ -90,7 +91,8 @@ export const translations: typeof enTranslations = {
       intro:
         "Rozumiemy, że chcesz podjąć właściwą decyzję. Bądźmy transparentni co do tego, co nas wyróżnia.",
       competitorTitle: "Co powinieneś wiedzieć o alternatywach",
-      competitorAnalysis: "Chociaż dostępne są inne opcje, należy wziąć pod uwagę:",
+      competitorAnalysis:
+        "Chociaż dostępne są inne opcje, należy wziąć pod uwagę:",
       competitorPoint1: "Wyższe koszty z ukrytymi opłatami, które się sumują",
       competitorPoint2: "Ograniczone wsparcie i wolniejsze czasy reakcji",
       competitorPoint3: "Mniej elastyczne warunki i sztywne wymagania umowne",
@@ -129,7 +131,8 @@ export const translations: typeof enTranslations = {
       freeResourceTitle: "Darmowy zasób dla Ciebie",
       freeResourceDescription:
         "Pobierz nasz kompleksowy przewodnik pełen praktycznych wskazówek i strategii",
-      noObligationText: "Bez zobowiązań - to nasz sposób na pomoc w Twoim sukcesie",
+      noObligationText:
+        "Bez zobowiązań - to nasz sposób na pomoc w Twoim sukcesie",
       ctaText: "Pobierz darmowy zasób",
       subject: "Spostrzeżenia, które pomogą rozwinąć Twoją firmę",
     },

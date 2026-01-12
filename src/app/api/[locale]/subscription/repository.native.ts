@@ -30,7 +30,12 @@ export class SubscriptionRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<SubscriptionGetResponseOutput>> {
-    const response = await nativeEndpoint(subscriptionEndpoints.GET, {}, logger, locale);
+    const response = await nativeEndpoint(
+      subscriptionEndpoints.GET,
+      {},
+      logger,
+      locale,
+    );
 
     if (response.success) {
       return {
@@ -97,7 +102,9 @@ export class SubscriptionRepository {
 
   static async handleInvoicePaymentSucceeded(): Promise<void> {
     // oxlint-disable-next-line restricted-syntax
-    throw new Error("handleInvoicePaymentSucceeded is not implemented on native");
+    throw new Error(
+      "handleInvoicePaymentSucceeded is not implemented on native",
+    );
   }
 
   static async handleSubscriptionCanceled(): Promise<void> {

@@ -7,7 +7,8 @@ export const translations = {
   },
   form: {
     title: "Check Newsletter Status",
-    description: "Enter an email address to check its newsletter subscription status",
+    description:
+      "Enter an email address to check its newsletter subscription status",
   },
   email: {
     label: "Email Address",

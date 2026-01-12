@@ -71,7 +71,10 @@ function isLaunchpadConfigModule(
   if (!("default" in module)) {
     return false;
   }
-  const defaultExport = module.default as Record<string, Record<string, string>> | null;
+  const defaultExport = module.default as Record<
+    string,
+    Record<string, string>
+  > | null;
   if (typeof defaultExport !== "object" || defaultExport === null) {
     return false;
   }
@@ -106,9 +109,12 @@ export async function loadConfig(
     if (!foundConfigPath) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(
-        t("app.api.system.launchpad.errors.configFileNotFoundInParents" as const, {
-          filename: configPath,
-        }),
+        t(
+          "app.api.system.launchpad.errors.configFileNotFoundInParents" as const,
+          {
+            filename: configPath,
+          },
+        ),
       );
     }
     resolvedConfigPath = foundConfigPath;
@@ -120,11 +126,15 @@ export async function loadConfig(
   try {
     // const compiledConfigPath = await getCompiledConfigPath(resolvedConfigPath);
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build Infrastructure: Dynamic config import requires 'unknown' for runtime type validation
-    const importedModule: unknown = await import(`file://${resolvedConfigPath}`);
+    const importedModule: unknown = await import(
+      `file://${resolvedConfigPath}`
+    );
 
     if (!isLaunchpadConfigModule(importedModule)) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
-      throw new Error(t("app.api.system.launchpad.errors.invalidConfigFormat" as const));
+      throw new Error(
+        t("app.api.system.launchpad.errors.invalidConfigFormat" as const),
+      );
     }
 
     const config = importedModule.default;
@@ -134,7 +144,9 @@ export async function loadConfig(
   } catch (error) {
     // Re-throw the error with additional context
     const errorMessage = error instanceof Error ? error.message : String(error);
-    const contextMessage = t("app.api.system.launchpad.errors.errorLoadingConfig" as const);
+    const contextMessage = t(
+      "app.api.system.launchpad.errors.errorLoadingConfig" as const,
+    );
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
     throw new Error(`${contextMessage} ${errorMessage}`, { cause: error });
   }

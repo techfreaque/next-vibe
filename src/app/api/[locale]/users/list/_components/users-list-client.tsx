@@ -38,7 +38,9 @@ interface UsersListClientProps {
   locale: CountryLanguage;
 }
 
-export function UsersListClient({ locale }: UsersListClientProps): React.JSX.Element {
+export function UsersListClient({
+  locale,
+}: UsersListClientProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
   const usersEndpoint: UsersListEndpointReturn = useUsersListEndpoint(logger);
@@ -47,14 +49,22 @@ export function UsersListClient({ locale }: UsersListClientProps): React.JSX.Ele
   type UserType = UserListResponseOutput["response"]["users"][number];
 
   const apiResponse = usersEndpoint.read?.response;
-  const users: UserType[] = apiResponse?.success ? apiResponse.data.response.users : [];
-  const totalUsers = apiResponse?.success ? apiResponse.data.paginationInfo.totalCount : 0;
-  const totalPages = apiResponse?.success ? apiResponse.data.paginationInfo.pageCount : 0;
+  const users: UserType[] = apiResponse?.success
+    ? apiResponse.data.response.users
+    : [];
+  const totalUsers = apiResponse?.success
+    ? apiResponse.data.paginationInfo.totalCount
+    : 0;
+  const totalPages = apiResponse?.success
+    ? apiResponse.data.paginationInfo.pageCount
+    : 0;
   const queryLoading = usersEndpoint.read?.isLoading || false;
 
   // Get current form values for pagination display
-  const currentPage = usersEndpoint.read?.form.getValues("paginationInfo.page") || 1;
-  const currentLimit = usersEndpoint.read?.form.getValues("paginationInfo.limit") || 20;
+  const currentPage =
+    usersEndpoint.read?.form.getValues("paginationInfo.page") || 1;
+  const currentLimit =
+    usersEndpoint.read?.form.getValues("paginationInfo.limit") || 20;
 
   const handleClearFilters = (): void => {
     usersEndpoint.read?.form.reset({
@@ -80,7 +90,9 @@ export function UsersListClient({ locale }: UsersListClientProps): React.JSX.Ele
         <Div className="flex items-center justify-between">
           <CardTitle className="items-center flex flex-row gap-2">
             <Span>{t("app.admin.users.list.title")}</Span>
-            {queryLoading && <RefreshCw className="h-4 w-4 animate-spin text-gray-500" />}
+            {queryLoading && (
+              <RefreshCw className="h-4 w-4 animate-spin text-gray-500" />
+            )}
           </CardTitle>
 
           <Div className="items-center flex flex-row gap-2">
@@ -118,7 +130,9 @@ export function UsersListClient({ locale }: UsersListClientProps): React.JSX.Ele
               onClick={usersEndpoint.read.refetch}
               disabled={queryLoading}
             >
-              <RefreshCw className={cn("h-4 w-4", queryLoading && "animate-spin")} />
+              <RefreshCw
+                className={cn("h-4 w-4", queryLoading && "animate-spin")}
+              />
             </Button>
           </Div>
         </Div>
@@ -200,7 +214,12 @@ export function UsersListClient({ locale }: UsersListClientProps): React.JSX.Ele
                   />
                 </Div>
 
-                <Button type="button" variant="outline" size="sm" onClick={handleClearFilters}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClearFilters}
+                >
                   {t("app.admin.users.list.filters.clear")}
                 </Button>
               </Div>
@@ -212,7 +231,8 @@ export function UsersListClient({ locale }: UsersListClientProps): React.JSX.Ele
         <Div className="mb-4 flex items-center justify-between">
           <Div className="text-sm text-gray-700 dark:text-gray-300">
             {t("app.admin.users.list.results.showing", {
-              start: totalUsers === 0 ? 0 : (currentPage - 1) * currentLimit + 1,
+              start:
+                totalUsers === 0 ? 0 : (currentPage - 1) * currentLimit + 1,
               end: Math.min(currentPage * currentLimit, totalUsers),
               total: totalUsers,
             })}
@@ -224,13 +244,17 @@ export function UsersListClient({ locale }: UsersListClientProps): React.JSX.Ele
           <Div className="flex items-center justify-center h-64">
             <Div className="text-center">
               <RefreshCw className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-4" />
-              <P className="text-gray-500">{t("app.admin.common.loading")}...</P>
+              <P className="text-gray-500">
+                {t("app.admin.common.loading")}...
+              </P>
             </Div>
           </Div>
         ) : users.length === 0 ? (
           <Div className="flex items-center justify-center h-64">
             <Div className="text-center">
-              <P className="text-gray-500 mb-4">{t("app.admin.users.list.empty.message")}</P>
+              <P className="text-gray-500 mb-4">
+                {t("app.admin.users.list.empty.message")}
+              </P>
               <Button asChild>
                 <NextLink href={`/${locale}/admin/users/create`}>
                   {t("app.admin.users.actions.add")}
@@ -256,7 +280,9 @@ export function UsersListClient({ locale }: UsersListClientProps): React.JSX.Ele
                       >
                         {user.privateName || user.publicName}
                       </NextLink>
-                      <P className="text-sm text-gray-500 dark:text-gray-400">{user.email}</P>
+                      <P className="text-sm text-gray-500 dark:text-gray-400">
+                        {user.email}
+                      </P>
                     </Div>
                   </Div>
                 </Div>

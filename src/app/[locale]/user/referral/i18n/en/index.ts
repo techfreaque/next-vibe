@@ -9,9 +9,11 @@ export const translations = {
     step1Body:
       "Generate unique codes for different audiences — friends, social media, or campaigns.",
     step2Title: "Share your link",
-    step2Body: "When someone signs up using your link and subscribes, you earn commission.",
+    step2Body:
+      "When someone signs up using your link and subscribes, you earn commission.",
     step3Title: "Get paid",
-    step3Body: "Earnings are instant. Use them as chat credits or withdraw to crypto.",
+    step3Body:
+      "Earnings are instant. Use them as chat credits or withdraw to crypto.",
   },
   overview: {
     title: "Your Earnings",
@@ -21,7 +23,8 @@ export const translations = {
     title: "Withdraw Your Earnings",
     description: "Multiple ways to use your referral earnings",
     useAsCredits: "Use as Chat Credits",
-    useAsCreditsDesc: "Instantly convert earnings to chat credits for AI conversations.",
+    useAsCreditsDesc:
+      "Instantly convert earnings to chat credits for AI conversations.",
     cryptoPayout: "Withdraw to Crypto",
     cryptoPayoutDesc: "Request payout in BTC or USDC to your wallet address.",
     minimumNote:

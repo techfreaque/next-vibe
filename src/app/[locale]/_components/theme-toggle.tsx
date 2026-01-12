@@ -13,7 +13,11 @@ import { simpleT } from "@/i18n/core/shared";
 
 export { useThemeToggle } from "next-vibe-ui/ui/theme-provider";
 
-export function ThemeToggle({ locale }: { locale: CountryLanguage }): JSX.Element {
+export function ThemeToggle({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): JSX.Element {
   const { onToggleTheme, theme, isMounted } = useThemeToggle();
   const { t } = simpleT(locale);
   return (
@@ -29,12 +33,20 @@ export function ThemeToggle({ locale }: { locale: CountryLanguage }): JSX.Elemen
           : t("app.common.accessibility.srOnly.enableDarkMode")
       }
     >
-      {theme === "dark" || !isMounted ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      {theme === "dark" || !isMounted ? (
+        <Sun className="h-5 w-5" />
+      ) : (
+        <Moon className="h-5 w-5" />
+      )}
     </Button>
   );
 }
 
-export function ThemeToggleMobile({ locale }: { locale: CountryLanguage }): JSX.Element {
+export function ThemeToggleMobile({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): JSX.Element {
   const { onToggleTheme, theme, isMounted } = useThemeToggle();
   const { t } = simpleT(locale);
   return (
@@ -56,7 +68,11 @@ export function ThemeToggleMobile({ locale }: { locale: CountryLanguage }): JSX.
   );
 }
 
-export function ThemeToggleDropdown({ locale }: { locale: CountryLanguage }): JSX.Element {
+export function ThemeToggleDropdown({
+  locale,
+}: {
+  locale: CountryLanguage;
+}): JSX.Element {
   const { onToggleTheme, theme } = useThemeToggle();
   const { t } = simpleT(locale);
   return (

@@ -10,7 +10,10 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { UserPermissionRole, type UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  UserPermissionRole,
+  type UserRoleValue,
+} from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cliEnv } from "../env";
@@ -32,7 +35,9 @@ export function getCliUserEmail(): string | null {
  * Create a default CLI user payload for auth bypass scenarios
  * Used for commands that don't require authenticated user (e.g., seed, dev)
  */
-export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> {
+export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<
+  readonly UserRoleValue[]
+> {
   return {
     isPublic: false,
     id: DEFAULT_CLI_USER_ID,
@@ -44,7 +49,9 @@ export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<readonly Us
  * Create a public CLI user payload
  * Used when VIBE_CLI_USER_EMAIL is not configured
  */
-export function createPublicCliUser(): InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> {
+export function createPublicCliUser(): InferJwtPayloadTypeFromRoles<
+  readonly UserRoleValue[]
+> {
   return {
     isPublic: true,
     leadId: DEFAULT_CLI_USER_ID,
@@ -99,7 +106,9 @@ export function createMockUser(): {
 export async function getCliUser(
   logger: EndpointLogger,
   locale: CountryLanguage,
-): Promise<ResponseType<InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>>> {
+): Promise<
+  ResponseType<InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>>
+> {
   logger.debug(
     `[CLI AUTH] Starting authentication flow (locale: ${locale}, cwd: ${process.cwd()}, env: ${process.env.NODE_ENV})`,
   );
@@ -116,8 +125,12 @@ export async function getCliUser(
       );
 
       // Verify the token is still valid
-      const { AuthRepository } = await import("@/app/api/[locale]/user/auth/repository");
-      const verifyResult = await AuthRepository.verifyJwt(sessionResult.data.token, logger);
+      const { AuthRepository } =
+        await import("@/app/api/[locale]/user/auth/repository");
+      const verifyResult = await AuthRepository.verifyJwt(
+        sessionResult.data.token,
+        logger,
+      );
 
       if (verifyResult.success && verifyResult.data) {
         logger.debug(
@@ -146,7 +159,9 @@ export async function getCliUser(
   }
 
   // Step 2: Check VIBE_CLI_USER_EMAIL environment variable
-  logger.debug("[CLI AUTH] Step 2: Checking VIBE_CLI_USER_EMAIL environment variable");
+  logger.debug(
+    "[CLI AUTH] Step 2: Checking VIBE_CLI_USER_EMAIL environment variable",
+  );
   const cliUserEmail = getCliUserEmail();
 
   logger.debug(
@@ -155,16 +170,20 @@ export async function getCliUser(
 
   // Step 3: If VIBE_CLI_USER_EMAIL is not set, return public user
   if (!cliUserEmail) {
-    logger.debug("[CLI AUTH] Step 3: CLI user email not configured, creating public user");
+    logger.debug(
+      "[CLI AUTH] Step 3: CLI user email not configured, creating public user",
+    );
 
     // Create a public user with a new lead directly from database
     // We can't use getLeadIdFromDb() here because it tries to access cookies
     try {
-      const { getLanguageAndCountryFromLocale } = await import("@/i18n/core/language-utils");
+      const { getLanguageAndCountryFromLocale } =
+        await import("@/i18n/core/language-utils");
       const { language, country } = getLanguageAndCountryFromLocale(locale);
       const { db } = await import("@/app/api/[locale]/system/db");
       const { leads } = await import("@/app/api/[locale]/leads/db");
-      const { LeadStatus, LeadSource } = await import("@/app/api/[locale]/leads/enum");
+      const { LeadStatus, LeadSource } =
+        await import("@/app/api/[locale]/leads/enum");
 
       const [newLead] = await db
         .insert(leads)
@@ -178,7 +197,9 @@ export async function getCliUser(
         })
         .returning();
 
-      logger.debug(`[CLI AUTH] Created public lead for CLI (leadId: ${newLead.id})`);
+      logger.debug(
+        `[CLI AUTH] Created public lead for CLI (leadId: ${newLead.id})`,
+      );
 
       return {
         success: true,
@@ -188,7 +209,9 @@ export async function getCliUser(
         } as InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
       };
     } catch (error) {
-      logger.error(`[CLI AUTH] Failed to create public lead for CLI: ${parseError(error).message}`);
+      logger.error(
+        `[CLI AUTH] Failed to create public lead for CLI: ${parseError(error).message}`,
+      );
 
       // Fallback to default ID if database fails
       return {
@@ -208,9 +231,14 @@ export async function getCliUser(
   );
 
   try {
-    const { AuthRepository } = await import("@/app/api/[locale]/user/auth/repository");
+    const { AuthRepository } =
+      await import("@/app/api/[locale]/user/auth/repository");
 
-    const authResult = await AuthRepository.authenticateUserByEmail(cliUserEmail, locale, logger);
+    const authResult = await AuthRepository.authenticateUserByEmail(
+      cliUserEmail,
+      locale,
+      logger,
+    );
 
     if (authResult.success && authResult.data) {
       const user = authResult.data;

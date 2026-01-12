@@ -21,7 +21,10 @@ import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 import { CreditRepository } from "../../credits/repository";
 import { TTS_COST_PER_CHARACTER } from "../../products/repository-client";
 import type { JwtPayloadType } from "../../user/auth/types";
-import type { TextToSpeechPostRequestOutput, TextToSpeechPostResponseOutput } from "./definition";
+import type {
+  TextToSpeechPostRequestOutput,
+  TextToSpeechPostResponseOutput,
+} from "./definition";
 import { TtsVoice } from "./enum";
 
 /**
@@ -112,7 +115,12 @@ export class TextToSpeechRepository {
     // Deduct credits BEFORE making the API call
     // This ensures credits are deducted even if the request is interrupted
     try {
-      await CreditRepository.deductCreditsForFeature(user, creditsNeeded, "tts", logger);
+      await CreditRepository.deductCreditsForFeature(
+        user,
+        creditsNeeded,
+        "tts",
+        logger,
+      );
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Failed to deduct credits", {
@@ -137,20 +145,23 @@ export class TextToSpeechRepository {
       });
 
       // Call Eden AI TTS API
-      const response = await fetch("https://api.edenai.run/v2/audio/text_to_speech", {
-        method: "POST",
-        headers: {
-          // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "https://api.edenai.run/v2/audio/text_to_speech",
+        {
+          method: "POST",
+          headers: {
+            // eslint-disable-next-line i18next/no-literal-string
+            Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            providers: provider,
+            text: data.text,
+            language: language.toLowerCase(),
+            option: apiVoice,
+          }),
         },
-        body: JSON.stringify({
-          providers: provider,
-          text: data.text,
-          language: language.toLowerCase(),
-          option: apiVoice,
-        }),
-      });
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -177,7 +188,8 @@ export class TextToSpeechRepository {
 
       // Check for provider-level errors
       if (providerResult?.error || providerResult?.status === "fail") {
-        const errorMessage = providerResult.error?.message || "Unknown provider error";
+        const errorMessage =
+          providerResult.error?.message || "Unknown provider error";
         logger.error("Provider returned error", {
           provider,
           error: errorMessage,
@@ -221,10 +233,14 @@ export class TextToSpeechRepository {
       }
 
       const audioBuffer = await audioResponse.arrayBuffer();
-      let contentType = audioResponse.headers.get("content-type") || "audio/mpeg";
+      let contentType =
+        audioResponse.headers.get("content-type") || "audio/mpeg";
 
       // Normalize content type - some providers return generic types
-      if (contentType === "binary/octet-stream" || contentType === "application/octet-stream") {
+      if (
+        contentType === "binary/octet-stream" ||
+        contentType === "application/octet-stream"
+      ) {
         contentType = "audio/mpeg";
         logger.debug("Normalized content type from octet-stream to audio/mpeg");
       }

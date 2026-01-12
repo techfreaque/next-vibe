@@ -94,7 +94,11 @@ export class RootFolderPermissionsRepository {
       canCreateThreadInRoot = !user.isPublic && !!userId;
     } else {
       // Use the rolesCreateThread from the root folder config
-      canCreateThreadInRoot = await hasRolePermission(user, rootConfig.rolesCreateThread, logger);
+      canCreateThreadInRoot = await hasRolePermission(
+        user,
+        rootConfig.rolesCreateThread,
+        logger,
+      );
     }
 
     // Check canCreateFolder permission

@@ -79,7 +79,10 @@ class CreditValidator implements CreditValidatorInterface {
 
       // In wallet-based system, we get the user's wallet balance directly
       // No need for canonical lead resolution - each user has their own wallet
-      const balanceResult = await CreditRepository.getBalance({ userId }, logger);
+      const balanceResult = await CreditRepository.getBalance(
+        { userId },
+        logger,
+      );
 
       if (!balanceResult.success) {
         return fail({
@@ -130,7 +133,10 @@ class CreditValidator implements CreditValidatorInterface {
       const cost = getModelCost(modelId);
 
       // Get lead's balance (with monthly rotation)
-      const balanceResult = await CreditRepository.getLeadBalance(leadId, logger);
+      const balanceResult = await CreditRepository.getLeadBalance(
+        leadId,
+        logger,
+      );
       if (!balanceResult.success) {
         return fail({
           message: "app.api.agent.chat.credits.errors.getLeadBalanceFailed",
@@ -184,7 +190,11 @@ class CreditValidator implements CreditValidatorInterface {
   > {
     try {
       // Get or create lead
-      const leadResult = await CreditRepository.getOrCreateLeadByIp(ipAddress, locale, logger);
+      const leadResult = await CreditRepository.getOrCreateLeadByIp(
+        ipAddress,
+        locale,
+        logger,
+      );
 
       if (!leadResult.success) {
         return fail({

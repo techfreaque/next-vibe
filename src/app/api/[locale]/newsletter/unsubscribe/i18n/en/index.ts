@@ -11,11 +11,13 @@ export const translations = {
       title: "Unsubscribe from Newsletter",
       preview: "You have successfully unsubscribed from our newsletter",
       greeting: "Hello",
-      confirmation: "We have successfully unsubscribed {{email}} from our newsletter",
+      confirmation:
+        "We have successfully unsubscribed {{email}} from our newsletter",
       resubscribe_info:
         "If you change your mind, you can always resubscribe by visiting our website",
       resubscribe_button: "Resubscribe",
-      support_message: "If you have any questions, please contact our support team",
+      support_message:
+        "If you have any questions, please contact our support team",
       subject: "Newsletter Unsubscribe Confirmation",
       admin_unsubscribe_notification: {
         title: "Newsletter Unsubscribe Notification",
@@ -35,7 +37,8 @@ export const translations = {
   errors: {
     internal: {
       title: "Internal Error",
-      description: "An error occurred while processing your unsubscribe request",
+      description:
+        "An error occurred while processing your unsubscribe request",
     },
   },
   post: {
@@ -43,7 +46,8 @@ export const translations = {
     description: "Unsubscribe from newsletter updates",
     form: {
       title: "Unsubscribe from Newsletter",
-      description: "Enter your email address to unsubscribe from our newsletter",
+      description:
+        "Enter your email address to unsubscribe from our newsletter",
     },
     response: {
       title: "Unsubscribe Response",
@@ -60,7 +64,8 @@ export const translations = {
       },
       internal: {
         title: "Internal Error",
-        description: "An error occurred while processing your unsubscribe request",
+        description:
+          "An error occurred while processing your unsubscribe request",
       },
       forbidden: {
         title: "Forbidden",
@@ -82,7 +87,8 @@ export const translations = {
         "You have successfully unsubscribed from {{appName}} newsletter. If this was a mistake, please visit our website to resubscribe.",
     },
     admin_notification: {
-      message: "Newsletter Unsubscribe: {{email}} has unsubscribed from the newsletter.",
+      message:
+        "Newsletter Unsubscribe: {{email}} has unsubscribed from the newsletter.",
     },
     errors: {
       confirmation_failed: {

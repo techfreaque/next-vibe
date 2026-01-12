@@ -71,7 +71,8 @@ export const translations = {
     errors: {
       internal: {
         title: "Internal server error occurred while retrieving tasks",
-        description: "An unexpected error occurred while fetching the task list",
+        description:
+          "An unexpected error occurred while fetching the task list",
       },
       unauthorized: {
         title: "Unauthorized access to task list",

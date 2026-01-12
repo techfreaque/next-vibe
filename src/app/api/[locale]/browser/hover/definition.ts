@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.hover.description",
   category: "app.api.browser.category",
   icon: "mouse-pointer",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.inputAutomation"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.inputAutomation",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -56,7 +59,11 @@ const { POST } = createEndpoint({
           placeholder: "app.api.browser.hover.form.fields.uid.placeholder",
           columns: 6,
         },
-        z.string().describe("The uid of an element on the page from the page content snapshot"),
+        z
+          .string()
+          .describe(
+            "The uid of an element on the page from the page content snapshot",
+          ),
       ),
 
       // Response fields

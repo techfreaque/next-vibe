@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.upload-file.description",
   category: "app.api.browser.category",
   icon: "upload",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.inputAutomation"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.inputAutomation",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -52,8 +55,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.browser.upload-file.form.fields.uid.label",
-          description: "app.api.browser.upload-file.form.fields.uid.description",
-          placeholder: "app.api.browser.upload-file.form.fields.uid.placeholder",
+          description:
+            "app.api.browser.upload-file.form.fields.uid.description",
+          placeholder:
+            "app.api.browser.upload-file.form.fields.uid.placeholder",
           columns: 6,
         },
         z
@@ -67,8 +72,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.browser.upload-file.form.fields.filePath.label",
-          description: "app.api.browser.upload-file.form.fields.filePath.description",
-          placeholder: "app.api.browser.upload-file.form.fields.filePath.placeholder",
+          description:
+            "app.api.browser.upload-file.form.fields.filePath.description",
+          placeholder:
+            "app.api.browser.upload-file.form.fields.filePath.placeholder",
           columns: 6,
         },
         z.string().describe("The local path of the file to upload"),
@@ -90,7 +97,10 @@ const { POST } = createEndpoint({
         z
           .object({
             uploaded: z.boolean().describe("Whether the file was uploaded"),
-            fileName: z.string().optional().describe("Name of the uploaded file"),
+            fileName: z
+              .string()
+              .optional()
+              .describe("Name of the uploaded file"),
           })
           .optional()
           .describe("Result of file upload operation"),
@@ -141,7 +151,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.browser.upload-file.errors.unauthorized.title",
-      description: "app.api.browser.upload-file.errors.unauthorized.description",
+      description:
+        "app.api.browser.upload-file.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.browser.upload-file.errors.forbidden.title",
@@ -161,7 +172,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.upload-file.errors.unsavedChanges.title",
-      description: "app.api.browser.upload-file.errors.unsavedChanges.description",
+      description:
+        "app.api.browser.upload-file.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.upload-file.errors.conflict.title",

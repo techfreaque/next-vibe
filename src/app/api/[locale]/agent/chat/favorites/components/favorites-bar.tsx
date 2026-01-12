@@ -93,7 +93,9 @@ function FavoriteRow({
       <Div
         className={cn(
           "w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-colors",
-          isActive ? "bg-primary/15 text-primary" : "bg-muted group-hover:bg-primary/10",
+          isActive
+            ? "bg-primary/15 text-primary"
+            : "bg-muted group-hover:bg-primary/10",
         )}
       >
         <Icon icon={favorite.icon} className="h-5 w-5" />
@@ -102,7 +104,9 @@ function FavoriteRow({
       {/* Info - Full Width */}
       <Div className="flex-1 min-w-0">
         <Div className="flex items-center gap-2 pr-20">
-          <Div className={cn("font-medium text-base", isActive && "text-primary")}>
+          <Div
+            className={cn("font-medium text-base", isActive && "text-primary")}
+          >
             {t(favorite.content.titleRow.name)}
           </Div>
           {isActive && (
@@ -113,16 +117,25 @@ function FavoriteRow({
         </Div>
         {favorite.content.modelRow.modelInfo && (
           <Div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
-            <Icon icon={favorite.content.modelRow.modelIcon} className="h-3 w-3" />
-            <Span className="truncate">{favorite.content.modelRow.modelInfo}</Span>
+            <Icon
+              icon={favorite.content.modelRow.modelIcon}
+              className="h-3 w-3"
+            />
+            <Span className="truncate">
+              {favorite.content.modelRow.modelInfo}
+            </Span>
             {favorite.content.modelRow.modelProvider && (
               <>
                 <Span className="text-muted-foreground/40">•</Span>
-                <Span className="shrink-0">{favorite.content.modelRow.modelProvider}</Span>
+                <Span className="shrink-0">
+                  {favorite.content.modelRow.modelProvider}
+                </Span>
               </>
             )}
             <Span className="text-muted-foreground/40">•</Span>
-            <Span className="shrink-0">{favorite.content.modelRow.creditCost}</Span>
+            <Span className="shrink-0">
+              {favorite.content.modelRow.creditCost}
+            </Span>
           </Div>
         )}
       </Div>

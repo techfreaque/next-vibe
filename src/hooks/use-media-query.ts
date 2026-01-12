@@ -17,7 +17,10 @@ interface MediaQueryOptions {
  * @param options - Configuration options
  * @returns Boolean indicating if the media query matches
  */
-export function useMediaQuery(query: string, options: MediaQueryOptions = {}): boolean {
+export function useMediaQuery(
+  query: string,
+  options: MediaQueryOptions = {},
+): boolean {
   const { defaultValue = false } = options;
 
   const [matches, setMatches] = useState<boolean>(defaultValue);

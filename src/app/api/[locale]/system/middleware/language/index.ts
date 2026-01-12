@@ -71,8 +71,12 @@ export function detectLocale(
   // Generate all possible locale combinations if mixed locales are allowed
   const supportedLocales = allowMixedLocales
     ? ((): CountryLanguage[] => {
-        const languages = [...new Set(baseLocales.map((locale) => locale.split("-")[0]))];
-        const countries = [...new Set(baseLocales.map((locale) => locale.split("-")[1]))];
+        const languages = [
+          ...new Set(baseLocales.map((locale) => locale.split("-")[0])),
+        ];
+        const countries = [
+          ...new Set(baseLocales.map((locale) => locale.split("-")[1])),
+        ];
         return languages.flatMap((lang) =>
           countries.map((country) => `${lang}-${country}` as CountryLanguage),
         );
@@ -105,7 +109,9 @@ export function detectLocale(
   }
 
   // Check for user's preferred locale from cookie
-  const cookieLocale = request.cookies.get(cookieName)?.value as CountryLanguage | undefined;
+  const cookieLocale = request.cookies.get(cookieName)?.value as
+    | CountryLanguage
+    | undefined;
 
   if (cookieLocale && supportedLocales.includes(cookieLocale)) {
     return cookieLocale;

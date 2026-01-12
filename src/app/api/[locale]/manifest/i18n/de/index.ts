@@ -67,7 +67,8 @@ export const translations: typeof enTranslations = {
     },
     unsaved_changes: {
       title: "Nicht Gespeicherte Änderungen",
-      description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
+      description:
+        "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
     },
   },
 

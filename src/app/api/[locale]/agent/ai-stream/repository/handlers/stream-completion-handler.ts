@@ -96,7 +96,12 @@ export class StreamCompletionHandler {
     });
 
     // Deduct credits AFTER successful completion (not optimistically)
-    await CreditRepository.deductCreditsForFeature(user, modelCost, model, logger);
+    await CreditRepository.deductCreditsForFeature(
+      user,
+      modelCost,
+      model,
+      logger,
+    );
 
     // Cleanup stream context
     ctx.cleanup();

@@ -18,7 +18,8 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Ujednolicony Runner Zadań",
-    description: "Zarządzaj ujednoliconym runnerem zadań dla zadań cron i zadań pobocznych",
+    description:
+      "Zarządzaj ujednoliconym runnerem zadań dla zadań cron i zadań pobocznych",
     container: {
       title: "Zarządzanie Ujednoliconym Runnerem Zadań",
       description:
@@ -46,7 +47,8 @@ export const translations: typeof enTranslations = {
       },
       dryRun: {
         label: "Próbny Przebieg",
-        description: "Wykonaj próbny przebieg bez wprowadzania rzeczywistych zmian",
+        description:
+          "Wykonaj próbny przebieg bez wprowadzania rzeczywistych zmian",
       },
     },
     response: {

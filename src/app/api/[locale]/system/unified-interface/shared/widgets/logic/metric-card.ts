@@ -42,9 +42,12 @@ export interface ProcessedMetricCard {
 /**
  * Extract and validate metric card data from WidgetData
  */
-export function extractMetricCardData(value: WidgetData): ProcessedMetricCard | null {
+export function extractMetricCardData(
+  value: WidgetData,
+): ProcessedMetricCard | null {
   // Narrow to object type first
-  const isObject = typeof value === "object" && value !== null && !Array.isArray(value);
+  const isObject =
+    typeof value === "object" && value !== null && !Array.isArray(value);
 
   if (!isObject) {
     return null;
@@ -52,7 +55,8 @@ export function extractMetricCardData(value: WidgetData): ProcessedMetricCard | 
 
   // Extract required value
   const metricValue =
-    "value" in value && (typeof value.value === "string" || typeof value.value === "number")
+    "value" in value &&
+    (typeof value.value === "string" || typeof value.value === "number")
       ? value.value
       : null;
 
@@ -61,7 +65,8 @@ export function extractMetricCardData(value: WidgetData): ProcessedMetricCard | 
   }
 
   // Extract required label
-  const label = "label" in value && typeof value.label === "string" ? value.label : "";
+  const label =
+    "label" in value && typeof value.label === "string" ? value.label : "";
 
   if (!label) {
     return null;
@@ -69,14 +74,21 @@ export function extractMetricCardData(value: WidgetData): ProcessedMetricCard | 
 
   // Extract optional properties
   const description =
-    "description" in value && typeof value.description === "string" ? value.description : undefined;
+    "description" in value && typeof value.description === "string"
+      ? value.description
+      : undefined;
 
   // Type assertion for icon: widget configuration is trusted to provide valid IconKey strings
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const icon =
-    "icon" in value && typeof value.icon === "string" ? (value.icon as IconKey) : undefined;
+    "icon" in value && typeof value.icon === "string"
+      ? (value.icon as IconKey)
+      : undefined;
 
-  const color = "color" in value && typeof value.color === "string" ? value.color : undefined;
+  const color =
+    "color" in value && typeof value.color === "string"
+      ? value.color
+      : undefined;
 
   // Extract trend if present
   let trend: ProcessedMetricCard["trend"];
@@ -87,7 +99,9 @@ export function extractMetricCardData(value: WidgetData): ProcessedMetricCard | 
     !Array.isArray(value.trend)
   ) {
     const trendValue =
-      "value" in value.trend && typeof value.trend.value === "number" ? value.trend.value : null;
+      "value" in value.trend && typeof value.trend.value === "number"
+        ? value.trend.value
+        : null;
     const trendDirection =
       "direction" in value.trend && typeof value.trend.direction === "string"
         ? value.trend.direction
@@ -95,7 +109,9 @@ export function extractMetricCardData(value: WidgetData): ProcessedMetricCard | 
 
     if (
       trendValue !== null &&
-      (trendDirection === "up" || trendDirection === "down" || trendDirection === "neutral")
+      (trendDirection === "up" ||
+        trendDirection === "down" ||
+        trendDirection === "neutral")
     ) {
       trend = {
         value: trendValue,
@@ -135,7 +151,9 @@ export function formatTrendValue(trendValue: number): string {
 /**
  * Get metric configuration from field
  */
-export function getMetricConfig<TKey extends string>(field: UnifiedField<TKey>): MetricConfig {
+export function getMetricConfig<TKey extends string>(
+  field: UnifiedField<TKey>,
+): MetricConfig {
   const defaultConfig: MetricConfig = {
     format: "number",
     precision: 2,
@@ -147,13 +165,13 @@ export function getMetricConfig<TKey extends string>(field: UnifiedField<TKey>):
 
   const config = field.ui;
 
-  const formatValue = typeof config.format === "string" ? config.format : "number";
+  const formatValue =
+    typeof config.format === "string" ? config.format : "number";
   const validFormats = ["bytes", "currency", "number", "percentage"] as const;
-  const format: "bytes" | "currency" | "number" | "percentage" = validFormats.includes(
-    formatValue as (typeof validFormats)[number],
-  )
-    ? (formatValue as (typeof validFormats)[number])
-    : "number";
+  const format: "bytes" | "currency" | "number" | "percentage" =
+    validFormats.includes(formatValue as (typeof validFormats)[number])
+      ? (formatValue as (typeof validFormats)[number])
+      : "number";
 
   return {
     icon: typeof config.icon === "string" ? config.icon : undefined,
@@ -170,7 +188,10 @@ export function getMetricConfig<TKey extends string>(field: UnifiedField<TKey>):
 /**
  * Format metric value with configuration
  */
-export function formatMetricValueWithConfig(value: WidgetData, config: MetricConfig): string {
+export function formatMetricValueWithConfig(
+  value: WidgetData,
+  config: MetricConfig,
+): string {
   if (typeof value !== "number") {
     return String(value);
   }

@@ -5,7 +5,8 @@ export const translations: typeof enTranslations = {
   description: "Eine paginierte Liste von IMAP-Konten mit Filterung abrufen",
   container: {
     title: "IMAP-Konten-Liste",
-    description: "IMAP-Konten-Listen-Parameter konfigurieren und Ergebnisse anzeigen",
+    description:
+      "IMAP-Konten-Listen-Parameter konfigurieren und Ergebnisse anzeigen",
   },
   fields: {
     page: {
@@ -91,11 +92,13 @@ export const translations: typeof enTranslations = {
     },
     unauthorized: {
       title: "Nicht autorisiert",
-      description: "Sie müssen authentifiziert sein, um auf diese Ressource zuzugreifen",
+      description:
+        "Sie müssen authentifiziert sein, um auf diese Ressource zuzugreifen",
     },
     forbidden: {
       title: "Verboten",
-      description: "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
+      description:
+        "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
     },
     notFound: {
       title: "Nicht gefunden",

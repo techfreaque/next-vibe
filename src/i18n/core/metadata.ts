@@ -175,7 +175,8 @@ export function metadataGenerator(
     Object.values(LanguagesEnum).forEach((lang) => {
       Object.values(Countries).forEach((country) => {
         const countryLang = `${lang}-${country}`;
-        languageAlternates[countryLang] = `${baseUrl}/${countryLang}${path ? `/${path}` : ""}`;
+        languageAlternates[countryLang] =
+          `${baseUrl}/${countryLang}${path ? `/${path}` : ""}`;
       });
     });
   }

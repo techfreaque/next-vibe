@@ -169,7 +169,10 @@ export class UserProfileRepository {
       }
 
       // Flatten the nested data structure for database update
-      const updateData: Record<string, string | boolean | Date | null | undefined> = {
+      const updateData: Record<
+        string,
+        string | boolean | Date | null | undefined
+      > = {
         updatedAt: new Date(),
       };
 
@@ -212,7 +215,9 @@ export class UserProfileRepository {
       }
 
       // Create list of changed fields
-      const changedFields = Object.keys(updateData).filter((key) => key !== "updatedAt");
+      const changedFields = Object.keys(updateData).filter(
+        (key) => key !== "updatedAt",
+      );
 
       // Return the correct response structure with flattened user fields
       return success({

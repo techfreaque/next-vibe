@@ -1,6 +1,10 @@
 "use client";
 import { cn } from "next-vibe/shared/utils/utils";
-import { ChevronLeftIcon, ChevronRightIcon, DotsHorizontalIcon } from "next-vibe-ui/ui/icons";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DotsHorizontalIcon,
+} from "next-vibe-ui/ui/icons";
 import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
@@ -31,7 +35,11 @@ export type PaginationNextProps = {
 
 export type PaginationEllipsisProps = StyleType;
 
-const Pagination = ({ className, style, children }: PaginationProps): React.JSX.Element => (
+const Pagination = ({
+  className,
+  style,
+  children,
+}: PaginationProps): React.JSX.Element => (
   <nav
     aria-label="pagination"
     className={cn("mx-auto flex w-full justify-center", className)}
@@ -48,14 +56,21 @@ function PaginationContent({
   children,
 }: PaginationContentProps): React.JSX.Element {
   return (
-    <ul className={cn("flex flex-row items-center gap-1", className)} style={style}>
+    <ul
+      className={cn("flex flex-row items-center gap-1", className)}
+      style={style}
+    >
       {children}
     </ul>
   );
 }
 PaginationContent.displayName = "PaginationContent";
 
-function PaginationItem({ className, style, children }: PaginationItemProps): React.JSX.Element {
+function PaginationItem({
+  className,
+  style,
+  children,
+}: PaginationItemProps): React.JSX.Element {
   return (
     <li className={cn("", className)} style={style}>
       {children}
@@ -96,7 +111,10 @@ const PaginationLink = ({
 );
 PaginationLink.displayName = "PaginationLink";
 
-const PaginationPrevious = ({ className, ...props }: PaginationLinkProps): React.JSX.Element => {
+const PaginationPrevious = ({
+  className,
+  ...props
+}: PaginationLinkProps): React.JSX.Element => {
   const { t } = useTranslation();
 
   return (
@@ -113,7 +131,10 @@ const PaginationPrevious = ({ className, ...props }: PaginationLinkProps): React
 };
 PaginationPrevious.displayName = "PaginationPrevious";
 
-const PaginationNext = ({ className, ...props }: PaginationLinkProps): React.JSX.Element => {
+const PaginationNext = ({
+  className,
+  ...props
+}: PaginationLinkProps): React.JSX.Element => {
   const { t } = useTranslation();
 
   return (
@@ -130,7 +151,10 @@ const PaginationNext = ({ className, ...props }: PaginationLinkProps): React.JSX
 };
 PaginationNext.displayName = "PaginationNext";
 
-const PaginationEllipsis = ({ className, style }: PaginationEllipsisProps): React.JSX.Element => {
+const PaginationEllipsis = ({
+  className,
+  style,
+}: PaginationEllipsisProps): React.JSX.Element => {
   const { t } = useTranslation();
 
   return (
@@ -140,7 +164,9 @@ const PaginationEllipsis = ({ className, style }: PaginationEllipsisProps): Reac
       style={style}
     >
       <DotsHorizontalIcon className="h-4 w-4" />
-      <span className="sr-only">{t("app.common.accessibility.srOnly.more")}</span>
+      <span className="sr-only">
+        {t("app.common.accessibility.srOnly.more")}
+      </span>
     </span>
   );
 };

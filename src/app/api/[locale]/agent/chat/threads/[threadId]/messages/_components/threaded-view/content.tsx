@@ -31,7 +31,10 @@ interface ThreadedMessageContentProps {
   user: JwtPayloadType;
   collapseState?: ReturnType<typeof useCollapseState>;
   currentUserId?: string;
-  onUserIdHover?: (userId: string | null, position: { x: number; y: number } | null) => void;
+  onUserIdHover?: (
+    userId: string | null,
+    position: { x: number; y: number } | null,
+  ) => void;
   logger: EndpointLogger;
   characterName: TranslationKey | null;
 }
@@ -104,7 +107,10 @@ export function ThreadedMessageContent({
             >
               {/* Show model icon for AI messages */}
               {message.role === "assistant" && message.model && (
-                <Icon icon={getModelById(message.model).icon} className="h-3 w-3" />
+                <Icon
+                  icon={getModelById(message.model).icon}
+                  className="h-3 w-3"
+                />
               )}
               {message.role === "user"
                 ? currentUserId && message.authorId === currentUserId
@@ -122,7 +128,9 @@ export function ThreadedMessageContent({
           {message.role === "assistant" && characterName && (
             <>
               <Span>•</Span>
-              <Span className="text-muted-foreground/80">{t(characterName)}</Span>
+              <Span className="text-muted-foreground/80">
+                {t(characterName)}
+              </Span>
             </>
           )}
 

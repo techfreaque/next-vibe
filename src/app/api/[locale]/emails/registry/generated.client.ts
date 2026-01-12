@@ -27,7 +27,8 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
       email: "max@example.com",
       company: "Musterfirma GmbH",
       subject: "Anfrage zu Ihren Dienstleistungen",
-      message: "Ich hätte gerne weitere Informationen zu Ihren Premium-Services.",
+      message:
+        "Ich hätte gerne weitere Informationen zu Ihren Premium-Services.",
       isForCompany: true,
       userId: "example-user-id-123",
       leadId: "example-lead-id-456",
@@ -37,7 +38,8 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
     id: "newsletter-unsubscribe",
     version: "1.0.0",
     name: "app.api.emails.templates.newsletter.unsubscribe.meta.name",
-    description: "app.api.emails.templates.newsletter.unsubscribe.meta.description",
+    description:
+      "app.api.emails.templates.newsletter.unsubscribe.meta.description",
     category: "newsletter",
     path: "/src/app/api/[locale]/newsletter/unsubscribe/email.tsx",
     exampleProps: { email: "max@example.com" },
@@ -60,16 +62,21 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
     id: "password-reset-confirm",
     version: "1.0.0",
     name: "app.api.emails.templates.password.reset.confirm.meta.name",
-    description: "app.api.emails.templates.password.reset.confirm.meta.description",
+    description:
+      "app.api.emails.templates.password.reset.confirm.meta.description",
     category: "auth",
     path: "/src/app/api/[locale]/user/public/reset-password/confirm/email.tsx",
-    exampleProps: { publicName: "Max Mustermann", userId: "example-user-id-123" },
+    exampleProps: {
+      publicName: "Max Mustermann",
+      userId: "example-user-id-123",
+    },
   },
   "password-reset-request": {
     id: "password-reset-request",
     version: "1.0.0",
     name: "app.api.emails.templates.password.reset.request.meta.name",
-    description: "app.api.emails.templates.password.reset.request.meta.description",
+    description:
+      "app.api.emails.templates.password.reset.request.meta.description",
     category: "auth",
     path: "/src/app/api/[locale]/user/public/reset-password/request/email.tsx",
     exampleProps: {
@@ -82,7 +89,8 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
     id: "signup-welcome",
     version: "1.0.0",
     name: "app.admin.emails.templates.templates.signup.welcome.meta.name",
-    description: "app.admin.emails.templates.templates.signup.welcome.meta.description",
+    description:
+      "app.admin.emails.templates.templates.signup.welcome.meta.description",
     category: "auth",
     path: "/src/app/api/[locale]/user/public/signup/email.tsx",
     exampleProps: {
@@ -95,7 +103,8 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
     id: "subscription-success",
     version: "1.0.0",
     name: "app.api.emails.templates.subscription.success.meta.name",
-    description: "app.api.emails.templates.subscription.success.meta.description",
+    description:
+      "app.api.emails.templates.subscription.success.meta.description",
     category: "subscription",
     path: "/src/app/api/[locale]/subscription/email.tsx",
     exampleProps: {
@@ -125,7 +134,9 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
 /**
  * Get template metadata without loading the component
  */
-export function getTemplateMetadata(id: string): TemplateCachedMetadata | undefined {
+export function getTemplateMetadata(
+  id: string,
+): TemplateCachedMetadata | undefined {
   return templateMetadataMap[id];
 }
 
@@ -139,6 +150,8 @@ export function getAllTemplateMetadata(): TemplateCachedMetadata[] {
 /**
  * Get templates by category (metadata only)
  */
-export function getTemplatesByCategory(category: string): TemplateCachedMetadata[] {
+export function getTemplatesByCategory(
+  category: string,
+): TemplateCachedMetadata[] {
   return getAllTemplateMetadata().filter((t) => t.category === category);
 }

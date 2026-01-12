@@ -26,7 +26,9 @@ export function Toaster(): React.JSX.Element {
             <Toast {...props}>
               <View className="flex-1">
                 {title && <ToastTitle>{title}</ToastTitle>}
-                {description && <ToastDescription>{description}</ToastDescription>}
+                {description && (
+                  <ToastDescription>{description}</ToastDescription>
+                )}
               </View>
               {action ? <>{action}</> : null}
               <ToastClose />

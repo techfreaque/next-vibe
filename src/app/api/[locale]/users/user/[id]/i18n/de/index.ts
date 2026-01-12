@@ -7,7 +7,8 @@ export const translations: typeof enTranslations = {
   id: {
     get: {
       title: "Benutzer abrufen",
-      description: "Detaillierte Informationen zu einem bestimmten Benutzer abrufen",
+      description:
+        "Detaillierte Informationen zu einem bestimmten Benutzer abrufen",
       container: {
         title: "Benutzerdetails",
         description: "Detaillierte Benutzerinformationen anzeigen",
@@ -163,7 +164,8 @@ export const translations: typeof enTranslations = {
       errors: {
         unauthorized: {
           title: "Nicht autorisierter Zugriff",
-          description: "Sie müssen angemeldet sein, um Benutzerdetails anzuzeigen",
+          description:
+            "Sie müssen angemeldet sein, um Benutzerdetails anzuzeigen",
         },
         validation: {
           title: "Validierung fehlgeschlagen",
@@ -171,7 +173,8 @@ export const translations: typeof enTranslations = {
         },
         forbidden: {
           title: "Zugriff verboten",
-          description: "Sie haben keine Berechtigung, diesen Benutzer anzuzeigen",
+          description:
+            "Sie haben keine Berechtigung, diesen Benutzer anzuzeigen",
         },
         notFound: {
           title: "Benutzer nicht gefunden",
@@ -179,7 +182,8 @@ export const translations: typeof enTranslations = {
         },
         conflict: {
           title: "Konfliktfehler",
-          description: "Benutzer kann aufgrund bestehender Konflikte nicht abgerufen werden",
+          description:
+            "Benutzer kann aufgrund bestehender Konflikte nicht abgerufen werden",
         },
         network: {
           title: "Netzwerkfehler",
@@ -187,15 +191,18 @@ export const translations: typeof enTranslations = {
         },
         unsavedChanges: {
           title: "Ungespeicherte Änderungen",
-          description: "Sie haben ungespeicherte Änderungen, die verloren gehen",
+          description:
+            "Sie haben ungespeicherte Änderungen, die verloren gehen",
         },
         server: {
           title: "Serverfehler",
-          description: "Benutzer kann aufgrund eines Serverfehlers nicht abgerufen werden",
+          description:
+            "Benutzer kann aufgrund eines Serverfehlers nicht abgerufen werden",
         },
         unknown: {
           title: "Unbekannter Fehler",
-          description: "Ein unerwarteter Fehler ist beim Abrufen des Benutzers aufgetreten",
+          description:
+            "Ein unerwarteter Fehler ist beim Abrufen des Benutzers aufgetreten",
         },
       },
       success: {
@@ -235,7 +242,8 @@ export const translations: typeof enTranslations = {
       },
       email: {
         label: "E-Mail-Adresse",
-        description: "E-Mail-Adresse des Benutzers für Anmeldung und Kommunikation",
+        description:
+          "E-Mail-Adresse des Benutzers für Anmeldung und Kommunikation",
         placeholder: "E-Mail-Adresse eingeben...",
       },
       privateName: {
@@ -361,31 +369,38 @@ export const translations: typeof enTranslations = {
       errors: {
         unauthorized: {
           title: "Nicht autorisierter Zugriff",
-          description: "Sie müssen angemeldet sein, um Benutzer zu aktualisieren",
+          description:
+            "Sie müssen angemeldet sein, um Benutzer zu aktualisieren",
         },
         validation: {
           title: "Validierung fehlgeschlagen",
-          description: "Bitte überprüfen Sie die Formulardaten und versuchen Sie es erneut",
+          description:
+            "Bitte überprüfen Sie die Formulardaten und versuchen Sie es erneut",
         },
         forbidden: {
           title: "Zugriff verboten",
-          description: "Sie haben keine Berechtigung, diesen Benutzer zu aktualisieren",
+          description:
+            "Sie haben keine Berechtigung, diesen Benutzer zu aktualisieren",
         },
         notFound: {
           title: "Benutzer nicht gefunden",
-          description: "Der zu aktualisierende Benutzer konnte nicht gefunden werden",
+          description:
+            "Der zu aktualisierende Benutzer konnte nicht gefunden werden",
         },
         conflict: {
           title: "Aktualisierungskonflikt",
-          description: "Die Benutzerdaten stehen im Konflikt mit vorhandenen Datensätzen",
+          description:
+            "Die Benutzerdaten stehen im Konflikt mit vorhandenen Datensätzen",
         },
         server: {
           title: "Serverfehler",
-          description: "Benutzer kann aufgrund eines Serverfehlers nicht aktualisiert werden",
+          description:
+            "Benutzer kann aufgrund eines Serverfehlers nicht aktualisiert werden",
         },
         unknown: {
           title: "Unbekannter Fehler",
-          description: "Ein unerwarteter Fehler ist beim Aktualisieren des Benutzers aufgetreten",
+          description:
+            "Ein unerwarteter Fehler ist beim Aktualisieren des Benutzers aufgetreten",
         },
         network: {
           title: "Netzwerkfehler",
@@ -393,7 +408,8 @@ export const translations: typeof enTranslations = {
         },
         unsavedChanges: {
           title: "Ungespeicherte Änderungen",
-          description: "Sie haben ungespeicherte Änderungen, die verloren gehen",
+          description:
+            "Sie haben ungespeicherte Änderungen, die verloren gehen",
         },
       },
       success: {
@@ -454,15 +470,18 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Serverfehler",
-          description: "Benutzer kann aufgrund eines Serverfehlers nicht gelöscht werden",
+          description:
+            "Benutzer kann aufgrund eines Serverfehlers nicht gelöscht werden",
         },
         unknown: {
           title: "Unbekannter Fehler",
-          description: "Ein unerwarteter Fehler ist beim Löschen des Benutzers aufgetreten",
+          description:
+            "Ein unerwarteter Fehler ist beim Löschen des Benutzers aufgetreten",
         },
         conflict: {
           title: "Konfliktfehler",
-          description: "Benutzer kann aufgrund bestehender Abhängigkeiten nicht gelöscht werden",
+          description:
+            "Benutzer kann aufgrund bestehender Abhängigkeiten nicht gelöscht werden",
         },
         network: {
           title: "Netzwerkfehler",
@@ -470,7 +489,8 @@ export const translations: typeof enTranslations = {
         },
         unsavedChanges: {
           title: "Ungespeicherte Änderungen",
-          description: "Sie haben ungespeicherte Änderungen, die verloren gehen",
+          description:
+            "Sie haben ungespeicherte Änderungen, die verloren gehen",
         },
       },
       success: {

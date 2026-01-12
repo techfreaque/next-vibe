@@ -8,7 +8,11 @@ import "server-only";
 import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -19,7 +23,11 @@ import {
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
-import { findFilesRecursively, generateFileHeader, writeGeneratedFile } from "../shared/utils";
+import {
+  findFilesRecursively,
+  generateFileHeader,
+  writeGeneratedFile,
+} from "../shared/utils";
 
 // Type definitions
 interface EmailTemplateRequestType {
@@ -77,7 +85,10 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
 
       // Find both email.tsx and *.email.tsx files recursively
       const emailTsxFiles = findFilesRecursively(startDir, "email.tsx");
-      const emailDotTsxFiles = findFilesRecursively(startDir, ".email.tsx").filter(
+      const emailDotTsxFiles = findFilesRecursively(
+        startDir,
+        ".email.tsx",
+      ).filter(
         (file) => !file.endsWith("/email.tsx"), // Exclude already found email.tsx
       );
 
@@ -138,7 +149,8 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
       });
 
       return fail({
-        message: "app.api.system.generators.emailTemplates.post.errors.server.title",
+        message:
+          "app.api.system.generators.emailTemplates.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           duration,
@@ -190,7 +202,11 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
           },
         });
       } catch (error) {
-        logger.warn(formatWarning(`Failed to load template: ${file}\n    ${parseError(error)}`));
+        logger.warn(
+          formatWarning(
+            `Failed to load template: ${file}\n    ${parseError(error)}`,
+          ),
+        );
       }
     }
 
@@ -202,9 +218,13 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
    */
   private generateServerContent(templates: TemplateInfo[]): string {
     // Sort templates by import path for consistent import order
-    const templatesByPath = templates.toSorted((a, b) => a.importPath.localeCompare(b.importPath));
+    const templatesByPath = templates.toSorted((a, b) =>
+      a.importPath.localeCompare(b.importPath),
+    );
     // Sort templates by ID for loader and metadata order
-    const templatesById = templates.toSorted((a, b) => a.id.localeCompare(b.id));
+    const templatesById = templates.toSorted((a, b) =>
+      a.id.localeCompare(b.id),
+    );
 
     // Generate individual type imports for each template (sorted by path)
     const importStatements = templatesByPath
@@ -361,7 +381,9 @@ export function hasTemplate(id: string): boolean {
    */
   private generateClientContent(templates: TemplateInfo[]): string {
     // Sort templates by ID for consistent output
-    const templatesById = templates.toSorted((a, b) => a.id.localeCompare(b.id));
+    const templatesById = templates.toSorted((a, b) =>
+      a.id.localeCompare(b.id),
+    );
 
     // Generate metadata map (same as server version)
     const metadataEntries = templatesById
@@ -443,4 +465,5 @@ export function getTemplatesByCategory(category: string): TemplateCachedMetadata
   }
 }
 
-export const emailTemplateGeneratorRepository = new EmailTemplateGeneratorRepositoryImpl();
+export const emailTemplateGeneratorRepository =
+  new EmailTemplateGeneratorRepositoryImpl();

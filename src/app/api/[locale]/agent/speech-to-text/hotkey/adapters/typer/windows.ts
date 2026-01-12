@@ -30,10 +30,13 @@ export class WindowsTyper extends BaseTyper {
 
     // Step 1: Set clipboard using PowerShell
     const setClipCommand = `Set-Clipboard -Value '${escapedText}'`;
-    const setClipProc = Bun.spawn(["powershell", "-NoProfile", "-Command", setClipCommand], {
-      stdout: "ignore",
-      stderr: "pipe",
-    });
+    const setClipProc = Bun.spawn(
+      ["powershell", "-NoProfile", "-Command", setClipCommand],
+      {
+        stdout: "ignore",
+        stderr: "pipe",
+      },
+    );
 
     const setClipExitCode = await setClipProc.exited;
     if (setClipExitCode !== 0) {
@@ -53,10 +56,13 @@ export class WindowsTyper extends BaseTyper {
       }
     `;
 
-    const pasteProc = Bun.spawn(["powershell", "-NoProfile", "-Command", pasteCommand], {
-      stdout: "ignore",
-      stderr: "pipe",
-    });
+    const pasteProc = Bun.spawn(
+      ["powershell", "-NoProfile", "-Command", pasteCommand],
+      {
+        stdout: "ignore",
+        stderr: "pipe",
+      },
+    );
 
     const pasteExitCode = await pasteProc.exited;
     if (pasteExitCode !== 0) {

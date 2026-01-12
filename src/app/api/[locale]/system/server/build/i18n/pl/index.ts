@@ -27,7 +27,8 @@ export const translations: typeof enTranslations = {
       },
       skipGeneration: {
         title: "Pomiń generowanie kodu",
-        description: "Pomiń generowanie punktów końcowych API podczas budowania",
+        description:
+          "Pomiń generowanie punktów końcowych API podczas budowania",
       },
       force: {
         title: "Wymuś budowanie",
@@ -115,34 +116,44 @@ export const translations: typeof enTranslations = {
         packageBuildSuccess: "✅ Budowanie pakietu zakończone pomyślnie",
         packageBuildFailed: "Budowanie pakietu nie powiodło się",
         buildPrerequisites: "Uruchamianie wymagań budowania...",
-        skipGeneration: "Pomijanie generowania punktów końcowych API (--skip-generation)",
+        skipGeneration:
+          "Pomijanie generowania punktów końcowych API (--skip-generation)",
         generatingEndpoints: "Generowanie punktów końcowych API...",
         generationSuccess: "✅ Generowanie kodu zakończone pomyślnie",
         generationFailed: "Generowanie kodu nie powiodło się",
-        skipNextBuild: "Pomijanie budowania Next.js (będzie obsługiwane przez package.json)",
+        skipNextBuild:
+          "Pomijanie budowania Next.js (będzie obsługiwane przez package.json)",
         buildingNextjs: "Budowanie aplikacji Next.js...",
         nextjsBuildSuccess: "✅ Budowanie Next.js zakończone pomyślnie",
         nextjsBuildFailed: "Budowanie Next.js nie powiodło się",
-        skipProdDb: "Pomijanie operacji produkcyjnej bazy danych (--run-prod-database=false)",
+        skipProdDb:
+          "Pomijanie operacji produkcyjnej bazy danych (--run-prod-database=false)",
         buildFailed: "❌ Budowanie nie powiodło się",
         schemaGenerationStart: "Generowanie schematu bazy danych...",
-        schemaGenerationSuccess: "✅ Generowanie schematu bazy danych zakończone",
-        schemaGenerationFailed: "Generowanie schematu bazy danych nie powiodło się",
+        schemaGenerationSuccess:
+          "✅ Generowanie schematu bazy danych zakończone",
+        schemaGenerationFailed:
+          "Generowanie schematu bazy danych nie powiodło się",
         skipSchemaGeneration:
           "Pomijanie generowania schematu bazy danych (--run-prod-database=false)",
         reportsGenerationStart: "Generowanie wszystkich raportów...",
         reportsGenerationSuccess: "✅ Wszystkie raporty wygenerowane pomyślnie",
         reportsGenerationFailed: "Generowanie raportów nie powiodło się",
         prodDbStart: "🚀 Uruchamianie operacji produkcyjnej bazy danych...",
-        prodDbSuccess: "🎉 Operacje produkcyjnej bazy danych zakończone pomyślnie",
-        prodDbFailed: "❌ Budowanie produkcyjne nie powiodło się podczas operacji bazy danych",
-        prodDbNotReady: "💡 To budowanie NIE jest gotowe do wdrożenia produkcyjnego",
-        deploymentReady: "🚀 Twoja aplikacja jest gotowa do wdrożenia produkcyjnego!",
+        prodDbSuccess:
+          "🎉 Operacje produkcyjnej bazy danych zakończone pomyślnie",
+        prodDbFailed:
+          "❌ Budowanie produkcyjne nie powiodło się podczas operacji bazy danych",
+        prodDbNotReady:
+          "💡 To budowanie NIE jest gotowe do wdrożenia produkcyjnego",
+        deploymentReady:
+          "🚀 Twoja aplikacja jest gotowa do wdrożenia produkcyjnego!",
         dbConnectionError:
           "Połączenie z bazą danych nie powiodło się. Upewnij się, że baza danych działa i jest dostępna.",
         dbStartSuggestion:
           "Spróbuj uruchomić 'docker compose -f docker-compose-dev.yml up -d', aby uruchomić bazę danych",
-        nextBuildHandled: "✅ Budowanie Next.js będzie obsługiwane przez polecenie yarn build",
+        nextBuildHandled:
+          "✅ Budowanie Next.js będzie obsługiwane przez polecenie yarn build",
         failedProdMigrations: "Nie udało się uruchomić migracji produkcyjnych",
       },
     },

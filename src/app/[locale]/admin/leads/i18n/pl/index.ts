@@ -6,7 +6,8 @@ export const translations: typeof enTranslations = {
       title: "Zarządzanie Leadami",
       abTesting: {
         title: "Konfiguracja Testów A/B",
-        subtitle: "Monitoruj i konfiguruj testy A/B dla wariantów podróży e-mailowych",
+        subtitle:
+          "Monitoruj i konfiguruj testy A/B dla wariantów podróży e-mailowych",
         status: {
           active: "Aktywny",
           inactive: "Nieaktywny",
@@ -84,7 +85,8 @@ export const translations: typeof enTranslations = {
           title: "Potwierdź usuwanie wsadowe",
         },
         result_title: "Wyniki operacji wsadowej",
-        preview_description: "Przejrzyj {{count}} leadów, które zostaną zaktualizowane",
+        preview_description:
+          "Przejrzyj {{count}} leadów, które zostaną zaktualizowane",
         delete_preview_description:
           "Przejrzyj {{count}} leadów, które zostaną usunięte. Ta akcja nie może być cofnięta.",
         planned_changes: "Planowane zmiany",
@@ -93,8 +95,10 @@ export const translations: typeof enTranslations = {
         change_source: "Źródło → {{source}}",
         confirm_update: "Potwierdź aktualizację",
         confirm_delete: "Potwierdź usunięcie",
-        success_message: "Pomyślnie zaktualizowano {{updated}} z {{total}} leadów",
-        delete_success_message: "Pomyślnie usunięto {{deleted}} z {{total}} leadów",
+        success_message:
+          "Pomyślnie zaktualizowano {{updated}} z {{total}} leadów",
+        delete_success_message:
+          "Pomyślnie usunięto {{deleted}} z {{total}} leadów",
         error_message: "Nie udało się zaktualizować leadów. Spróbuj ponownie.",
         errors_title: "Błędy ({{count}})",
         processing: "Przetwarzanie...",
@@ -108,8 +112,10 @@ export const translations: typeof enTranslations = {
       },
       campaigns: {
         title: "Kampanie E-mailowe",
-        subtitle: "Monitoruj i zarządzaj swoimi automatycznymi kampaniami e-mailowymi",
-        description: "Zarządzaj automatycznymi kampaniami e-mailowymi i sekwencjami",
+        subtitle:
+          "Monitoruj i zarządzaj swoimi automatycznymi kampaniami e-mailowymi",
+        description:
+          "Zarządzaj automatycznymi kampaniami e-mailowymi i sekwencjami",
         error: "Nie udało się załadować statystyk kampanii",
         comingSoon: "Interfejs zarządzania kampaniami już wkrótce...",
         coming_soon: "Interfejs zarządzania kampaniami wkrótce...",
@@ -137,7 +143,8 @@ export const translations: typeof enTranslations = {
         emails_this_month: "E-maile w tym miesiącu",
       },
       campaignStarter: {
-        description: "Konfiguruj automatyczne ustawienia startera kampanii i harmonogram",
+        description:
+          "Konfiguruj automatyczne ustawienia startera kampanii i harmonogram",
         form: {
           cronSettings: {
             label: "Ustawienia Zadania Cron",
@@ -180,7 +187,8 @@ export const translations: typeof enTranslations = {
           },
           enabledDays: {
             label: "Włączone Dni",
-            description: "Wybierz dni tygodnia, w które starter kampanii ma działać",
+            description:
+              "Wybierz dni tygodnia, w które starter kampanii ma działać",
             options: {
               monday: "Poniedziałek",
               tuesday: "Wtorek",
@@ -193,7 +201,8 @@ export const translations: typeof enTranslations = {
           },
           enabledHours: {
             label: "Włączone Godziny",
-            description: "Ustaw zakres czasowy, w którym starter kampanii ma działać",
+            description:
+              "Ustaw zakres czasowy, w którym starter kampanii ma działać",
             startHour: {
               label: "Godzina Rozpoczęcia",
               placeholder: "Godzina rozpoczęcia (0-23)",
@@ -205,7 +214,8 @@ export const translations: typeof enTranslations = {
           },
           leadsPerWeek: {
             label: "Leady na Tydzień",
-            description: "Ustaw tygodniowy limit leadów do przetworzenia dla każdej lokalizacji",
+            description:
+              "Ustaw tygodniowy limit leadów do przetworzenia dla każdej lokalizacji",
           },
           minAgeHours: {
             label: "Minimalny Wiek (Godziny)",
@@ -227,7 +237,8 @@ export const translations: typeof enTranslations = {
       },
       emails: {
         title: "Szablony E-mail",
-        description: "Podgląd i zarządzanie szablonami e-maili dla kampanii leadowych",
+        description:
+          "Podgląd i zarządzanie szablonami e-maili dla kampanii leadowych",
         subtitle: "Zorganizowane według podróży klienta i etapu kampanii",
         journey: "Podróż",
         stage: "Etap",
@@ -260,7 +271,8 @@ export const translations: typeof enTranslations = {
             email: {
               label: "Adres E-mail Testowy",
               placeholder: "Wprowadź adres e-mail do otrzymania testu",
-              description: "Adres e-mail, na który zostanie wysłany e-mail testowy",
+              description:
+                "Adres e-mail, na który zostanie wysłany e-mail testowy",
             },
           },
           leadData: {
@@ -447,7 +459,8 @@ export const translations: typeof enTranslations = {
         },
         options: {
           title: "Opcje Importu",
-          description: "Skonfiguruj sposób obsługi istniejących danych podczas importu",
+          description:
+            "Skonfiguruj sposób obsługi istniejących danych podczas importu",
           skipDuplicates: "Pomiń leady z duplikowanymi adresami e-mail",
           updateExisting: "Aktualizuj istniejące leady nowymi danymi",
         },
@@ -458,12 +471,14 @@ export const translations: typeof enTranslations = {
           useChunkedProcessingDescription:
             "Przetwarzaj duże pliki CSV w mniejszych partiach za pomocą zadań w tle. Zalecane dla plików z więcej niż 1000 wierszami.",
           batchSize: "Rozmiar partii",
-          batchSizeDescription: "Liczba wierszy do przetworzenia na partię (10-1000)",
+          batchSizeDescription:
+            "Liczba wierszy do przetworzenia na partię (10-1000)",
           batchSizePlaceholder: "100",
         },
         defaults: {
           title: "Wartości Domyślne",
-          description: "Ustaw domyślne wartości dla leadów, które nie określają tych pól",
+          description:
+            "Ustaw domyślne wartości dla leadów, które nie określają tych pól",
           country: "Domyślny Kraj",
           countryDescription: "Kraj używany gdy nie jest określony w CSV",
           countryPlaceholder: "Wybierz domyślny kraj",
@@ -474,7 +489,8 @@ export const translations: typeof enTranslations = {
           statusDescription: "Status używany gdy nie jest określony w CSV",
           statusPlaceholder: "Wybierz domyślny status",
           campaignStage: "Domyślny Etap Kampanii",
-          campaignStageDescription: "Etap kampanii używany gdy nie jest określony w CSV",
+          campaignStageDescription:
+            "Etap kampanii używany gdy nie jest określony w CSV",
           campaignStagePlaceholder: "Wybierz domyślny etap kampanii",
           source: "Domyślne Źródło",
           sourceDescription: "Źródło używane gdy nie jest określone w CSV",
@@ -492,7 +508,8 @@ export const translations: typeof enTranslations = {
           failed: "Nieudany",
           unknown: "Nieznany",
           rows: "wierszy",
-          summary: "{{successful}} udanych, {{failed}} nieudanych, {{duplicates}} duplikatów",
+          summary:
+            "{{successful}} udanych, {{failed}} nieudanych, {{duplicates}} duplikatów",
           andMore: "i {{count}} więcej",
           importing: "Importowanie",
           loading: "Ładowanie statusu importu...",
@@ -548,7 +565,8 @@ export const translations: typeof enTranslations = {
       stats: {
         // Page metadata
         title: "Statystyki Leadów",
-        description: "Przeglądaj i analizuj statystyki leadów oraz metryki wydajności",
+        description:
+          "Przeglądaj i analizuj statystyki leadów oraz metryki wydajności",
         filter: "Filtruj",
         refresh: "Odśwież",
 
@@ -691,7 +709,8 @@ export const translations: typeof enTranslations = {
           language_historical: "Dane Historyczne Języka",
           campaign_stage_historical: "Dane Historyczne Etapu Kampanii",
           journey_variant_historical: "Dane Historyczne Wariantów Podróży",
-          engagement_level_historical: "Dane Historyczne Poziomów Zaangażowania",
+          engagement_level_historical:
+            "Dane Historyczne Poziomów Zaangażowania",
           conversion_funnel_historical: "Dane Historyczne Lejka Konwersji",
           campaign_performance: "Wydajność Kampanii",
           source_performance: "Wydajność Źródła",
@@ -740,7 +759,8 @@ export const translations: typeof enTranslations = {
             leads: "{{count}} lead_one ({{percentage}}%)",
             leads_one: "{{count}} lead ({{percentage}}%)",
             leads_other: "{{count}} leadów ({{percentage}}%)",
-            summary: "{{visible}} z {{total}} źródeł widocznych ({{percentage}}%)",
+            summary:
+              "{{visible}} z {{total}} źródeł widocznych ({{percentage}}%)",
           },
         },
       },
@@ -782,7 +802,8 @@ export const translations: typeof enTranslations = {
         source: "Źródło",
         notes: "Notatki",
         actions: "Akcje",
-        scroll_hint: "💡 Przewiń w poziomie, aby zobaczyć wszystkie szczegóły i kolumny leadów",
+        scroll_hint:
+          "💡 Przewiń w poziomie, aby zobaczyć wszystkie szczegóły i kolumny leadów",
         select_all: "Wybierz wszystkie leady",
         select_lead: "Wybierz {{business}}",
         description: {
@@ -802,7 +823,8 @@ export const translations: typeof enTranslations = {
         emails: "Podglądy e-maili",
         emails_description: "Podgląd i zarządzanie szablonami e-maili",
         abTesting: "Testy A/B",
-        abTesting_description: "Konfiguruj i monitoruj testy A/B dla kampanii e-mailowych",
+        abTesting_description:
+          "Konfiguruj i monitoruj testy A/B dla kampanii e-mailowych",
         campaignStarter: "Starter Kampanii",
         campaignStarter_description: "Konfiguruj ustawienia startera kampanii",
         import: "Importuj",
@@ -942,7 +964,8 @@ export const translations: typeof enTranslations = {
           },
           convertedUserId: {
             label: "Konwertowany Użytkownik",
-            placeholder: "Wybierz użytkownika, na którego ten lead został konwertowany...",
+            placeholder:
+              "Wybierz użytkownika, na którego ten lead został konwertowany...",
             searchPlaceholder: "Szukaj użytkowników...",
             searchHint: "Wpisz co najmniej 2 znaki, aby wyszukać",
             noResults: "Nie znaleziono użytkowników",
@@ -969,20 +992,24 @@ export const translations: typeof enTranslations = {
         value_proposition:
           "Nasza platforma automatyzuje zarządzanie social media, zachowując autentyczne zaangażowanie z Twoją publicznością.",
         benefit_1: "Automatyczne planowanie treści na wszystkich platformach",
-        benefit_2: "Zarządzanie zaangażowaniem i odpowiedziami wspierane przez AI",
+        benefit_2:
+          "Zarządzanie zaangażowaniem i odpowiedziami wspierane przez AI",
         benefit_3: "Szczegółowe analizy i wgląd w rozwój",
         cta: "Zobacz jak to działa",
-        closing: "Chciałbym pokazać Ci, jak to mogłoby działać dla Twojej firmy. Bez zobowiązań.",
+        closing:
+          "Chciałbym pokazać Ci, jak to mogłoby działać dla Twojej firmy. Bez zobowiązań.",
       },
       followup1: {
-        subject: "{{businessName}}: Zobacz jak inni wzrosli o 300% z naszą platformą",
+        subject:
+          "{{businessName}}: Zobacz jak inni wzrosli o 300% z naszą platformą",
         greeting: "Cześć,",
         intro:
           "Chciałem nawiązać do mojego poprzedniego e-maila o pomocy {{businessName}} w rozwoju obecności w social media.",
         case_study_title: "Prawdziwe wyniki od podobnych firm",
         case_study_content:
           "Właśnie w zeszłym miesiącu firma podobna do Twojej zwiększyła zaangażowanie w social media o 340% i wygenerowała 50+ nowych leadów bezpośrednio z social media używając naszej platformy.",
-        social_proof: "Ponad 1000+ firm ufa nam w zarządzaniu rozwojem ich social media.",
+        social_proof:
+          "Ponad 1000+ firm ufa nam w zarządzaniu rozwojem ich social media.",
         cta: "Zobacz studia przypadków",
         closing:
           "Chętnie pokażę Ci dokładnie, jak osiągnęliśmy te wyniki i jak mogłoby to działać dla Twojej firmy.",
@@ -1024,7 +1051,8 @@ export const translations: typeof enTranslations = {
       update: {
         notFound: {
           title: "Lead nie znaleziony",
-          description: "Lead, który próbujesz zaktualizować, nie mógł zostać znaleziony.",
+          description:
+            "Lead, który próbujesz zaktualizować, nie mógł zostać znaleziony.",
         },
         validation: {
           title: "Nieprawidłowe dane aktualizacji",
@@ -1038,7 +1066,8 @@ export const translations: typeof enTranslations = {
         },
         validation: {
           title: "Błąd walidacji CSV",
-          description: "Niektóre wiersze w pliku CSV zawierają nieprawidłowe dane.",
+          description:
+            "Niektóre wiersze w pliku CSV zawierają nieprawidłowe dane.",
         },
       },
     },
@@ -1145,7 +1174,8 @@ export const translations: typeof enTranslations = {
     pagination: {
       page_size: "Rozmiar Strony",
       page_info: "Strona {{current}} z {{total}}",
-      page_info_with_count: "Strona {{current}} z {{total}} ({{count}} łącznie)",
+      page_info_with_count:
+        "Strona {{current}} z {{total}} ({{count}} łącznie)",
       first: "Pierwsza",
       previous: "Poprzednia",
       next: "Następna",
@@ -1156,7 +1186,8 @@ export const translations: typeof enTranslations = {
       error: {
         validation: {
           title: "Błąd walidacji",
-          description: "Proszę sprawdzić wprowadzone dane i spróbować ponownie.",
+          description:
+            "Proszę sprawdzić wprowadzone dane i spróbować ponownie.",
         },
         unauthorized: {
           title: "Brak autoryzacji",
@@ -1164,7 +1195,8 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Błąd serwera",
-          description: "Wystąpił błąd serwera. Proszę spróbować ponownie później.",
+          description:
+            "Wystąpił błąd serwera. Proszę spróbować ponownie później.",
         },
         unknown: {
           title: "Nieznany błąd",
@@ -1219,7 +1251,8 @@ export const translations: typeof enTranslations = {
       errors: {
         missingId: "ID leada jest wymagane do śledzenia",
         invalidIdFormat: "ID leada musi być w prawidłowym formacie UUID",
-        invalidCampaignIdFormat: "ID kampanii musi być w prawidłowym formacie UUID",
+        invalidCampaignIdFormat:
+          "ID kampanii musi być w prawidłowym formacie UUID",
         invalidUrl: "Nieprawidłowy format URL",
       },
     },
@@ -1242,7 +1275,8 @@ export const translations: typeof enTranslations = {
         error: {
           server: {
             title: "Aktualizacja wsadowa nie powiodła się",
-            description: "Nie można zaktualizować leadów z powodu błędu serwera",
+            description:
+              "Nie można zaktualizować leadów z powodu błędu serwera",
           },
           validation: {
             title: "Walidacja nie powiodła się",
@@ -1250,7 +1284,8 @@ export const translations: typeof enTranslations = {
           },
           unauthorized: {
             title: "Nieautoryzowany",
-            description: "Nie masz uprawnień do wykonywania aktualizacji wsadowych",
+            description:
+              "Nie masz uprawnień do wykonywania aktualizacji wsadowych",
           },
           forbidden: {
             title: "Zabronione",
@@ -1262,7 +1297,8 @@ export const translations: typeof enTranslations = {
           },
           unknown: {
             title: "Nieznany błąd",
-            description: "Wystąpił nieoczekiwany błąd podczas aktualizacji wsadowej",
+            description:
+              "Wystąpił nieoczekiwany błąd podczas aktualizacji wsadowej",
           },
         },
         validation: {
@@ -1283,15 +1319,18 @@ export const translations: typeof enTranslations = {
           },
           server: {
             title: "Błąd serwera kampanii",
-            description: "Nie można przetworzyć kampanii z powodu błędu serwera",
+            description:
+              "Nie można przetworzyć kampanii z powodu błędu serwera",
           },
           unknown: {
             title: "Operacja kampanii nie powiodła się",
-            description: "Wystąpił nieoczekiwany błąd podczas operacji kampanii",
+            description:
+              "Wystąpił nieoczekiwany błąd podczas operacji kampanii",
           },
           forbidden: {
             title: "Dostęp do kampanii zabroniony",
-            description: "Nie masz uprawnień do wykonania tej operacji kampanii",
+            description:
+              "Nie masz uprawnień do wykonania tej operacji kampanii",
           },
           notFound: {
             title: "Kampania nie znaleziona",
@@ -1327,7 +1366,8 @@ export const translations: typeof enTranslations = {
           },
           unknown: {
             title: "Operacja zarządzania kampanią nie powiodła się",
-            description: "Wystąpił nieoczekiwany błąd podczas zarządzania kampanią",
+            description:
+              "Wystąpił nieoczekiwany błąd podczas zarządzania kampanią",
           },
           forbidden: {
             title: "Dostęp do zarządzania kampanią zabroniony",
@@ -1337,7 +1377,8 @@ export const translations: typeof enTranslations = {
             title: "Kampania nie znaleziona",
             description: "Żądana kampania nie została znaleziona",
           },
-          campaignActive: "Nie można usunąć aktywnej kampanii. Najpierw ją wyłącz.",
+          campaignActive:
+            "Nie można usunąć aktywnej kampanii. Najpierw ją wyłącz.",
         },
         post: {
           success: {
@@ -1378,7 +1419,8 @@ export const translations: typeof enTranslations = {
           },
           unauthorized: {
             title: "Dostęp do statystyk kampanii odmówiony",
-            description: "Nie masz uprawnień do przeglądania statystyk kampanii",
+            description:
+              "Nie masz uprawnień do przeglądania statystyk kampanii",
           },
           server: {
             title: "Błąd serwera statystyk kampanii",
@@ -1386,11 +1428,13 @@ export const translations: typeof enTranslations = {
           },
           unknown: {
             title: "Operacja statystyk kampanii nie powiodła się",
-            description: "Wystąpił nieoczekiwany błąd podczas pobierania statystyk",
+            description:
+              "Wystąpił nieoczekiwany błąd podczas pobierania statystyk",
           },
           forbidden: {
             title: "Dostęp do statystyk kampanii zabroniony",
-            description: "Nie masz uprawnień do przeglądania statystyk kampanii",
+            description:
+              "Nie masz uprawnień do przeglądania statystyk kampanii",
           },
           notFound: {
             title: "Statystyki kampanii nie znalezione",
@@ -1413,15 +1457,18 @@ export const translations: typeof enTranslations = {
         error: {
           validation: {
             title: "Walidacja danych potencjalnych klientów nie powiodła się",
-            description: "Nie można zwalidować żądania danych potencjalnych klientów",
+            description:
+              "Nie można zwalidować żądania danych potencjalnych klientów",
           },
           unauthorized: {
             title: "Dostęp do danych potencjalnych klientów odmówiony",
-            description: "Nie masz uprawnień do dostępu do danych potencjalnych klientów",
+            description:
+              "Nie masz uprawnień do dostępu do danych potencjalnych klientów",
           },
           server: {
             title: "Błąd serwera danych potencjalnych klientów",
-            description: "Nie można załadować danych potencjalnych klientów z powodu błędu serwera",
+            description:
+              "Nie można załadować danych potencjalnych klientów z powodu błędu serwera",
           },
           unknown: {
             title: "Dostęp do danych potencjalnych klientów nie powiódł się",
@@ -1434,11 +1481,13 @@ export const translations: typeof enTranslations = {
           },
           forbidden: {
             title: "Dostęp do potencjalnego klienta zabroniony",
-            description: "Nie masz uprawnień do przeglądania tego potencjalnego klienta",
+            description:
+              "Nie masz uprawnień do przeglądania tego potencjalnego klienta",
           },
           network: {
             title: "Błąd sieci",
-            description: "Nie można załadować danych potencjalnych klientów z powodu błędu sieci",
+            description:
+              "Nie można załadować danych potencjalnych klientów z powodu błędu sieci",
           },
           unsaved_changes: {
             title: "Niezapisane zmiany",
@@ -1458,32 +1507,40 @@ export const translations: typeof enTranslations = {
       patch: {
         error: {
           validation: {
-            title: "Walidacja aktualizacji potencjalnego klienta nie powiodła się",
-            description: "Sprawdź swoje aktualizacje potencjalnych klientów i spróbuj ponownie",
+            title:
+              "Walidacja aktualizacji potencjalnego klienta nie powiodła się",
+            description:
+              "Sprawdź swoje aktualizacje potencjalnych klientów i spróbuj ponownie",
           },
           unauthorized: {
             title: "Aktualizacja potencjalnego klienta nieautoryzowana",
-            description: "Nie masz uprawnień do aktualizacji potencjalnych klientów",
+            description:
+              "Nie masz uprawnień do aktualizacji potencjalnych klientów",
           },
           server: {
             title: "Błąd serwera aktualizacji potencjalnego klienta",
-            description: "Nie można zaktualizować potencjalnego klienta z powodu błędu serwera",
+            description:
+              "Nie można zaktualizować potencjalnego klienta z powodu błędu serwera",
           },
           unknown: {
             title: "Aktualizacja potencjalnego klienta nie powiodła się",
-            description: "Wystąpił nieoczekiwany błąd podczas aktualizacji potencjalnego klienta",
+            description:
+              "Wystąpił nieoczekiwany błąd podczas aktualizacji potencjalnego klienta",
           },
           not_found: {
             title: "Potencjalny klient nie znaleziony",
-            description: "Nie można znaleźć potencjalnego klienta do aktualizacji",
+            description:
+              "Nie można znaleźć potencjalnego klienta do aktualizacji",
           },
           forbidden: {
             title: "Aktualizacja potencjalnego klienta zabroniona",
-            description: "Nie masz uprawnień do aktualizacji tego potencjalnego klienta",
+            description:
+              "Nie masz uprawnień do aktualizacji tego potencjalnego klienta",
           },
           network: {
             title: "Błąd sieci",
-            description: "Nie można zaktualizować potencjalnego klienta z powodu błędu sieci",
+            description:
+              "Nie można zaktualizować potencjalnego klienta z powodu błędu sieci",
           },
           unsaved_changes: {
             title: "Niezapisane zmiany",
@@ -1497,38 +1554,46 @@ export const translations: typeof enTranslations = {
         },
         success: {
           title: "Potencjalny klient zaktualizowany",
-          description: "Informacje o potencjalnym kliencie zaktualizowane pomyślnie",
+          description:
+            "Informacje o potencjalnym kliencie zaktualizowane pomyślnie",
         },
       },
       post: {
         error: {
           validation: {
             title: "Walidacja tworzenia potencjalnego klienta nie powiodła się",
-            description: "Sprawdź informacje o potencjalnym kliencie i spróbuj ponownie",
+            description:
+              "Sprawdź informacje o potencjalnym kliencie i spróbuj ponownie",
           },
           unauthorized: {
             title: "Tworzenie potencjalnego klienta nieautoryzowane",
-            description: "Nie masz uprawnień do tworzenia potencjalnych klientów",
+            description:
+              "Nie masz uprawnień do tworzenia potencjalnych klientów",
           },
           server: {
             title: "Błąd serwera tworzenia potencjalnego klienta",
-            description: "Nie można utworzyć potencjalnego klienta z powodu błędu serwera",
+            description:
+              "Nie można utworzyć potencjalnego klienta z powodu błędu serwera",
           },
           unknown: {
             title: "Tworzenie potencjalnego klienta nie powiodło się",
-            description: "Wystąpił nieoczekiwany błąd podczas tworzenia potencjalnego klienta",
+            description:
+              "Wystąpił nieoczekiwany błąd podczas tworzenia potencjalnego klienta",
           },
           forbidden: {
             title: "Tworzenie potencjalnego klienta zabronione",
-            description: "Nie masz uprawnień do tworzenia potencjalnych klientów",
+            description:
+              "Nie masz uprawnień do tworzenia potencjalnych klientów",
           },
           duplicate: {
             title: "Potencjalny klient już istnieje",
-            description: "Potencjalny klient z tym adresem e-mail już istnieje w systemie",
+            description:
+              "Potencjalny klient z tym adresem e-mail już istnieje w systemie",
           },
           conflict: {
             title: "Potencjalny klient już istnieje",
-            description: "Potencjalny klient z tym adresem e-mail już istnieje w systemie",
+            description:
+              "Potencjalny klient z tym adresem e-mail już istnieje w systemie",
           },
         },
         success: {
@@ -1541,12 +1606,14 @@ export const translations: typeof enTranslations = {
       post: {
         error: {
           validation: {
-            title: "Walidacja zaangażowania potencjalnych klientów nie powiodła się",
+            title:
+              "Walidacja zaangażowania potencjalnych klientów nie powiodła się",
             description: "Sprawdź swoje dane zaangażowania i spróbuj ponownie",
           },
           unauthorized: {
             title: "Zaangażowanie potencjalnych klientów nieautoryzowane",
-            description: "Nie masz uprawnień do rejestrowania zaangażowania potencjalnych klientów",
+            description:
+              "Nie masz uprawnień do rejestrowania zaangażowania potencjalnych klientów",
           },
           server: {
             title: "Błąd serwera zaangażowania potencjalnych klientów",
@@ -1560,12 +1627,14 @@ export const translations: typeof enTranslations = {
           },
           forbidden: {
             title: "Zaangażowanie potencjalnego klienta zabronione",
-            description: "Nie masz uprawnień do śledzenia zaangażowania potencjalnych klientów",
+            description:
+              "Nie masz uprawnień do śledzenia zaangażowania potencjalnych klientów",
           },
         },
         success: {
           title: "Zaangażowanie potencjalnych klientów zarejestrowane",
-          description: "Zaangażowanie potencjalnych klientów pomyślnie zarejestrowane",
+          description:
+            "Zaangażowanie potencjalnych klientów pomyślnie zarejestrowane",
         },
       },
     },
@@ -1578,15 +1647,18 @@ export const translations: typeof enTranslations = {
           },
           unauthorized: {
             title: "Eksport potencjalnych klientów nieautoryzowany",
-            description: "Nie masz uprawnień do eksportowania potencjalnych klientów",
+            description:
+              "Nie masz uprawnień do eksportowania potencjalnych klientów",
           },
           server: {
             title: "Błąd serwera eksportu potencjalnych klientów",
-            description: "Nie można wyeksportować potencjalnych klientów z powodu błędu serwera",
+            description:
+              "Nie można wyeksportować potencjalnych klientów z powodu błędu serwera",
           },
           unknown: {
             title: "Eksport potencjalnych klientów nie powiódł się",
-            description: "Wystąpił nieoczekiwany błąd podczas eksportowania potencjalnych klientów",
+            description:
+              "Wystąpił nieoczekiwany błąd podczas eksportowania potencjalnych klientów",
           },
         },
         success: {
@@ -1616,7 +1688,8 @@ export const translations: typeof enTranslations = {
           },
           server: {
             title: "Błąd serwera usuwania zadania importu",
-            description: "Zadanie importu nie mogło zostać usunięte z powodu błędu serwera",
+            description:
+              "Zadanie importu nie mogło zostać usunięte z powodu błędu serwera",
           },
         },
       },
@@ -1636,11 +1709,13 @@ export const translations: typeof enTranslations = {
           },
           server: {
             title: "Błąd serwera zadań importu",
-            description: "Nie można pobrać zadań importu z powodu błędu serwera",
+            description:
+              "Nie można pobrać zadań importu z powodu błędu serwera",
           },
           unknown: {
             title: "Pobieranie zadań importu nie powiodło się",
-            description: "Wystąpił nieoczekiwany błąd podczas pobierania zadań importu",
+            description:
+              "Wystąpił nieoczekiwany błąd podczas pobierania zadań importu",
           },
         },
       },
@@ -1660,7 +1735,8 @@ export const translations: typeof enTranslations = {
           },
           forbidden: {
             title: "Aktualizacja zadania zabroniona",
-            description: "Nie masz uprawnień do aktualizacji tego zadania importu",
+            description:
+              "Nie masz uprawnień do aktualizacji tego zadania importu",
           },
           not_found: {
             title: "Zadanie importu nie znalezione",
@@ -1668,11 +1744,13 @@ export const translations: typeof enTranslations = {
           },
           server: {
             title: "Błąd serwera aktualizacji zadania",
-            description: "Nie można zaktualizować zadania z powodu błędu serwera",
+            description:
+              "Nie można zaktualizować zadania z powodu błędu serwera",
           },
           unknown: {
             title: "Aktualizacja zadania nie powiodła się",
-            description: "Wystąpił nieoczekiwany błąd podczas aktualizacji zadania",
+            description:
+              "Wystąpił nieoczekiwany błąd podczas aktualizacji zadania",
           },
         },
       },
@@ -1697,19 +1775,23 @@ export const translations: typeof enTranslations = {
           },
           unauthorized: {
             title: "Import potencjalnych klientów nieautoryzowany",
-            description: "Nie masz uprawnień do importowania potencjalnych klientów",
+            description:
+              "Nie masz uprawnień do importowania potencjalnych klientów",
           },
           server: {
             title: "Błąd serwera importu potencjalnych klientów",
-            description: "Nie można zaimportować potencjalnych klientów z powodu błędu serwera",
+            description:
+              "Nie można zaimportować potencjalnych klientów z powodu błędu serwera",
           },
           unknown: {
             title: "Import potencjalnych klientów nie powiódł się",
-            description: "Wystąpił nieoczekiwany błąd podczas importowania potencjalnych klientów",
+            description:
+              "Wystąpił nieoczekiwany błąd podczas importowania potencjalnych klientów",
           },
           forbidden: {
             title: "Import potencjalnych klientów zabroniony",
-            description: "Nie masz uprawnień do importowania potencjalnych klientów",
+            description:
+              "Nie masz uprawnień do importowania potencjalnych klientów",
           },
           not_found: {
             title: "Zadanie importu nie znalezione",
@@ -1721,7 +1803,8 @@ export const translations: typeof enTranslations = {
       retry: {
         success: {
           title: "Zadanie importu ponowione",
-          description: "Zadanie importu zostało dodane do kolejki ponownych prób",
+          description:
+            "Zadanie importu zostało dodane do kolejki ponownych prób",
         },
         error: {
           unauthorized: {
@@ -1730,7 +1813,8 @@ export const translations: typeof enTranslations = {
           },
           forbidden: {
             title: "Ponawianie zadania importu zabronione",
-            description: "Nie masz uprawnień do ponowienia tego zadania importu",
+            description:
+              "Nie masz uprawnień do ponowienia tego zadania importu",
           },
           not_found: {
             title: "Zadanie importu nie znalezione",
@@ -1738,11 +1822,13 @@ export const translations: typeof enTranslations = {
           },
           validation: {
             title: "Nie można ponowić zadania importu",
-            description: "To zadanie importu nie może zostać ponowione w obecnym stanie",
+            description:
+              "To zadanie importu nie może zostać ponowione w obecnym stanie",
           },
           server: {
             title: "Błąd serwera ponawiania zadania importu",
-            description: "Zadanie importu nie mogło zostać ponowione z powodu błędu serwera",
+            description:
+              "Zadanie importu nie mogło zostać ponowione z powodu błędu serwera",
           },
         },
       },
@@ -1758,7 +1844,8 @@ export const translations: typeof enTranslations = {
           },
           forbidden: {
             title: "Zatrzymywanie zadania importu zabronione",
-            description: "Nie masz uprawnień do zatrzymania tego zadania importu",
+            description:
+              "Nie masz uprawnień do zatrzymania tego zadania importu",
           },
           not_found: {
             title: "Zadanie importu nie znalezione",
@@ -1766,11 +1853,13 @@ export const translations: typeof enTranslations = {
           },
           validation: {
             title: "Nie można zatrzymać zadania importu",
-            description: "To zadanie importu nie może zostać zatrzymane w obecnym stanie",
+            description:
+              "To zadanie importu nie może zostać zatrzymane w obecnym stanie",
           },
           server: {
             title: "Błąd serwera zatrzymywania zadania importu",
-            description: "Zadanie importu nie mogło zostać zatrzymane z powodu błędu serwera",
+            description:
+              "Zadanie importu nie mogło zostać zatrzymane z powodu błędu serwera",
           },
         },
       },
@@ -1779,12 +1868,15 @@ export const translations: typeof enTranslations = {
       get: {
         error: {
           validation: {
-            title: "Walidacja statystyk potencjalnych klientów nie powiodła się",
-            description: "Nie można zwalidować żądania statystyk potencjalnych klientów",
+            title:
+              "Walidacja statystyk potencjalnych klientów nie powiodła się",
+            description:
+              "Nie można zwalidować żądania statystyk potencjalnych klientów",
           },
           unauthorized: {
             title: "Dostęp do statystyk potencjalnych klientów odmówiony",
-            description: "Nie masz uprawnień do dostępu do statystyk potencjalnych klientów",
+            description:
+              "Nie masz uprawnień do dostępu do statystyk potencjalnych klientów",
           },
           server: {
             title: "Błąd serwera statystyk potencjalnych klientów",
@@ -1798,7 +1890,8 @@ export const translations: typeof enTranslations = {
           },
           forbidden: {
             title: "Dostęp do statystyk potencjalnych klientów zabroniony",
-            description: "Nie masz uprawnień do dostępu do statystyk potencjalnych klientów",
+            description:
+              "Nie masz uprawnień do dostępu do statystyk potencjalnych klientów",
           },
         },
         success: {
@@ -1820,7 +1913,8 @@ export const translations: typeof enTranslations = {
           },
           server: {
             title: "Błąd serwera śledzenia leadów",
-            description: "Nie można przetworzyć śledzenia z powodu błędu serwera",
+            description:
+              "Nie można przetworzyć śledzenia z powodu błędu serwera",
           },
           unknown: {
             title: "Śledzenie leadów nie powiodło się",
@@ -1850,19 +1944,23 @@ export const translations: typeof enTranslations = {
           },
           unauthorized: {
             title: "Wypisanie potencjalnego klienta nieautoryzowane",
-            description: "Nie masz uprawnień do wypisywania potencjalnych klientów",
+            description:
+              "Nie masz uprawnień do wypisywania potencjalnych klientów",
           },
           server: {
             title: "Błąd serwera wypisania potencjalnego klienta",
-            description: "Nie można wypisać potencjalnego klienta z powodu błędu serwera",
+            description:
+              "Nie można wypisać potencjalnego klienta z powodu błędu serwera",
           },
           unknown: {
             title: "Wypisanie potencjalnego klienta nie powiodło się",
-            description: "Wystąpił nieoczekiwany błąd podczas wypisywania potencjalnego klienta",
+            description:
+              "Wystąpił nieoczekiwany błąd podczas wypisywania potencjalnego klienta",
           },
           forbidden: {
             title: "Wypisanie potencjalnego klienta zabronione",
-            description: "Nie masz uprawnień do wypisywania potencjalnych klientów",
+            description:
+              "Nie masz uprawnień do wypisywania potencjalnych klientów",
           },
         },
         success: {
@@ -1883,11 +1981,13 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Błąd serwera e-maila testowego",
-          description: "Nie można wysłać e-maila testowego z powodu błędu serwera",
+          description:
+            "Nie można wysłać e-maila testowego z powodu błędu serwera",
         },
         unknown: {
           title: "E-mail testowy nie powiódł się",
-          description: "Wystąpił nieoczekiwany błąd podczas wysyłania e-maila testowego",
+          description:
+            "Wystąpił nieoczekiwany błąd podczas wysyłania e-maila testowego",
         },
         templateNotFound: {
           title: "Szablon e-maila nie został znaleziony",
@@ -1899,7 +1999,8 @@ export const translations: typeof enTranslations = {
         },
         invalidConfiguration: {
           title: "Nieprawidłowa konfiguracja e-maila",
-          description: "Konfiguracja e-maila jest nieprawidłowa lub niekompletna",
+          description:
+            "Konfiguracja e-maila jest nieprawidłowa lub niekompletna",
         },
       },
       fields: {
@@ -1910,7 +2011,8 @@ export const translations: typeof enTranslations = {
           description: "Wybierz etap kampanii e-mailowej do testowania",
         },
         testEmail: {
-          description: "Wprowadź adres e-mail, na który zostanie wysłany e-mail testowy",
+          description:
+            "Wprowadź adres e-mail, na który zostanie wysłany e-mail testowy",
         },
         leadData: {
           email: {
@@ -1920,25 +2022,31 @@ export const translations: typeof enTranslations = {
             description: "Nazwa firmy, która pojawi się w szablonie e-maila",
           },
           contactName: {
-            description: "Imię i nazwisko kontaktu, które pojawi się w szablonie e-maila",
+            description:
+              "Imię i nazwisko kontaktu, które pojawi się w szablonie e-maila",
           },
           phone: {
             description: "Numer telefonu, który pojawi się w szablonie e-maila",
           },
           website: {
-            description: "Adres URL strony, który pojawi się w szablonie e-maila",
+            description:
+              "Adres URL strony, który pojawi się w szablonie e-maila",
           },
           country: {
-            description: "Kraj, który zostanie użyty do lokalizacji w szablonie e-maila",
+            description:
+              "Kraj, który zostanie użyty do lokalizacji w szablonie e-maila",
           },
           language: {
-            description: "Język, który zostanie użyty do lokalizacji w szablonie e-maila",
+            description:
+              "Język, który zostanie użyty do lokalizacji w szablonie e-maila",
           },
           status: {
-            description: "Status leada, który zostanie użyty w szablonie e-maila",
+            description:
+              "Status leada, który zostanie użyty w szablonie e-maila",
           },
           source: {
-            description: "Źródło leada, które zostanie użyte w szablonie e-maila",
+            description:
+              "Źródło leada, które zostanie użyte w szablonie e-maila",
           },
           notes: {
             description: "Notatki, które zostaną użyte w szablonie e-maila",

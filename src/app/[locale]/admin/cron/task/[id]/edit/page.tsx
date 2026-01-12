@@ -65,16 +65,26 @@ export default async function CronTaskEditPage({
   return (
     <Div className="container mx-auto py-6">
       <Div className="mb-6">
-        <H1 className="text-3xl font-bold">{t("app.admin.cron.taskDetails.edit")}</H1>
-        <P className="text-muted-foreground">{t("app.admin.cron.taskDetails.editDescription")}</P>
+        <H1 className="text-3xl font-bold">
+          {t("app.admin.cron.taskDetails.edit")}
+        </H1>
+        <P className="text-muted-foreground">
+          {t("app.admin.cron.taskDetails.editDescription")}
+        </P>
       </Div>
 
-      <CronTaskEditClient taskId={id} locale={locale} initialData={taskWithComputedFields} />
+      <CronTaskEditClient
+        taskId={id}
+        locale={locale}
+        initialData={taskWithComputedFields}
+      />
     </Div>
   );
 }
 
-export async function generateMetadata({ params }: CronTaskEditPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: CronTaskEditPageProps): Promise<Metadata> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 

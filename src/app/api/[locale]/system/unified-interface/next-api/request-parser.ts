@@ -14,7 +14,13 @@ import type { EndpointLogger } from "../shared/logger/endpoint";
 /**
  * Parsed JSON value type - recursive type for any JSON-compatible structure
  */
-type ParsedValue = string | number | boolean | null | ParsedObject | readonly ParsedValue[];
+type ParsedValue =
+  | string
+  | number
+  | boolean
+  | null
+  | ParsedObject
+  | readonly ParsedValue[];
 interface ParsedObject {
   [key: string]: ParsedValue;
 }
@@ -172,7 +178,10 @@ function parseFormData(
           if (!(part in current)) {
             current[part] = {};
           }
-          current = current[part] as Record<string, string | number | boolean | null | File>;
+          current = current[part] as Record<
+            string,
+            string | number | boolean | null | File
+          >;
         }
       }
 
@@ -227,7 +236,10 @@ function deepMerge(target: MergedObject, source: MergedObject): MergedObject {
       !(targetValue instanceof File)
     ) {
       // Recursively merge nested objects
-      result[key] = deepMerge(targetValue as MergedObject, sourceValue as MergedObject);
+      result[key] = deepMerge(
+        targetValue as MergedObject,
+        sourceValue as MergedObject,
+      );
     } else {
       // Overwrite with source value
       result[key] = sourceValue;
@@ -313,7 +325,11 @@ export async function parseRequestBody(
     // Parse the JSON body
     const body = JSON.parse(bodyText) as Record<
       string,
-      string | number | boolean | null | Record<string, string | number | boolean | null>
+      | string
+      | number
+      | boolean
+      | null
+      | Record<string, string | number | boolean | null>
     >;
     return body;
   } catch (error) {

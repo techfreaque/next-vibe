@@ -46,7 +46,11 @@ export function ImapAccountCreateForm({
     }
   };
   return (
-    <Form form={endpoint.create.form} onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <Form
+      form={endpoint.create.form}
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-6"
+    >
       <Div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Basic Information */}
         <Div className="flex flex-col gap-4">

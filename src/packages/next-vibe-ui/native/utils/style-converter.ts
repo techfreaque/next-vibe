@@ -50,7 +50,9 @@ export function styledNativeRef<T extends React.ComponentType<any>, R = any>(
  * Convert React.CSSProperties to React Native ViewStyle
  * Only converts properties that exist in both web CSS and React Native ViewStyle
  */
-export function convertCSSToViewStyle(cssStyle: React.CSSProperties): ViewStyle {
+export function convertCSSToViewStyle(
+  cssStyle: React.CSSProperties,
+): ViewStyle {
   const viewStyle: ViewStyle = {};
 
   // Layout
@@ -96,7 +98,8 @@ export function convertCSSToViewStyle(cssStyle: React.CSSProperties): ViewStyle 
     viewStyle.paddingTop = cssStyle.paddingTop as ViewStyle["paddingTop"];
   }
   if (cssStyle.paddingBottom !== undefined) {
-    viewStyle.paddingBottom = cssStyle.paddingBottom as ViewStyle["paddingBottom"];
+    viewStyle.paddingBottom =
+      cssStyle.paddingBottom as ViewStyle["paddingBottom"];
   }
   if (cssStyle.paddingLeft !== undefined) {
     viewStyle.paddingLeft = cssStyle.paddingLeft as ViewStyle["paddingLeft"];
@@ -107,7 +110,8 @@ export function convertCSSToViewStyle(cssStyle: React.CSSProperties): ViewStyle 
 
   // Background & Border
   if (cssStyle.backgroundColor !== undefined) {
-    viewStyle.backgroundColor = cssStyle.backgroundColor as ViewStyle["backgroundColor"];
+    viewStyle.backgroundColor =
+      cssStyle.backgroundColor as ViewStyle["backgroundColor"];
   }
   if (cssStyle.borderRadius !== undefined) {
     viewStyle.borderRadius = cssStyle.borderRadius as ViewStyle["borderRadius"];
@@ -119,16 +123,20 @@ export function convertCSSToViewStyle(cssStyle: React.CSSProperties): ViewStyle 
     viewStyle.borderColor = cssStyle.borderColor as ViewStyle["borderColor"];
   }
   if (cssStyle.borderTopWidth !== undefined) {
-    viewStyle.borderTopWidth = cssStyle.borderTopWidth as ViewStyle["borderTopWidth"];
+    viewStyle.borderTopWidth =
+      cssStyle.borderTopWidth as ViewStyle["borderTopWidth"];
   }
   if (cssStyle.borderBottomWidth !== undefined) {
-    viewStyle.borderBottomWidth = cssStyle.borderBottomWidth as ViewStyle["borderBottomWidth"];
+    viewStyle.borderBottomWidth =
+      cssStyle.borderBottomWidth as ViewStyle["borderBottomWidth"];
   }
   if (cssStyle.borderLeftWidth !== undefined) {
-    viewStyle.borderLeftWidth = cssStyle.borderLeftWidth as ViewStyle["borderLeftWidth"];
+    viewStyle.borderLeftWidth =
+      cssStyle.borderLeftWidth as ViewStyle["borderLeftWidth"];
   }
   if (cssStyle.borderRightWidth !== undefined) {
-    viewStyle.borderRightWidth = cssStyle.borderRightWidth as ViewStyle["borderRightWidth"];
+    viewStyle.borderRightWidth =
+      cssStyle.borderRightWidth as ViewStyle["borderRightWidth"];
   }
 
   // Opacity
@@ -141,7 +149,8 @@ export function convertCSSToViewStyle(cssStyle: React.CSSProperties): ViewStyle 
     viewStyle.flex = cssStyle.flex as ViewStyle["flex"];
   }
   if (cssStyle.flexDirection !== undefined) {
-    viewStyle.flexDirection = cssStyle.flexDirection as ViewStyle["flexDirection"];
+    viewStyle.flexDirection =
+      cssStyle.flexDirection as ViewStyle["flexDirection"];
   }
   if (cssStyle.flexWrap !== undefined) {
     viewStyle.flexWrap = cssStyle.flexWrap as ViewStyle["flexWrap"];
@@ -156,7 +165,8 @@ export function convertCSSToViewStyle(cssStyle: React.CSSProperties): ViewStyle 
     viewStyle.alignContent = cssStyle.alignContent as ViewStyle["alignContent"];
   }
   if (cssStyle.justifyContent !== undefined) {
-    viewStyle.justifyContent = cssStyle.justifyContent as ViewStyle["justifyContent"];
+    viewStyle.justifyContent =
+      cssStyle.justifyContent as ViewStyle["justifyContent"];
   }
   if (cssStyle.flexGrow !== undefined) {
     viewStyle.flexGrow = cssStyle.flexGrow as ViewStyle["flexGrow"];
@@ -203,7 +213,9 @@ export function convertCSSToViewStyle(cssStyle: React.CSSProperties): ViewStyle 
  * Convert React.CSSProperties to React Native TextStyle
  * Only converts properties that exist in both web CSS and React Native TextStyle
  */
-export function convertCSSToTextStyle(cssStyle: React.CSSProperties): TextStyle {
+export function convertCSSToTextStyle(
+  cssStyle: React.CSSProperties,
+): TextStyle {
   const textStyle: TextStyle = {};
 
   // Typography
@@ -229,7 +241,8 @@ export function convertCSSToTextStyle(cssStyle: React.CSSProperties): TextStyle 
     textStyle.textAlign = cssStyle.textAlign as TextStyle["textAlign"];
   }
   if (cssStyle.textDecorationLine !== undefined) {
-    textStyle.textDecorationLine = cssStyle.textDecorationLine as TextStyle["textDecorationLine"];
+    textStyle.textDecorationLine =
+      cssStyle.textDecorationLine as TextStyle["textDecorationLine"];
   }
   if (cssStyle.textDecorationStyle !== undefined) {
     textStyle.textDecorationStyle =
@@ -240,10 +253,12 @@ export function convertCSSToTextStyle(cssStyle: React.CSSProperties): TextStyle 
       cssStyle.textDecorationColor as TextStyle["textDecorationColor"];
   }
   if (cssStyle.textTransform !== undefined) {
-    textStyle.textTransform = cssStyle.textTransform as TextStyle["textTransform"];
+    textStyle.textTransform =
+      cssStyle.textTransform as TextStyle["textTransform"];
   }
   if (cssStyle.letterSpacing !== undefined) {
-    textStyle.letterSpacing = cssStyle.letterSpacing as TextStyle["letterSpacing"];
+    textStyle.letterSpacing =
+      cssStyle.letterSpacing as TextStyle["letterSpacing"];
   }
 
   // Opacity
@@ -274,7 +289,8 @@ export function convertCSSToTextStyle(cssStyle: React.CSSProperties): TextStyle 
     textStyle.paddingTop = cssStyle.paddingTop as TextStyle["paddingTop"];
   }
   if (cssStyle.paddingBottom !== undefined) {
-    textStyle.paddingBottom = cssStyle.paddingBottom as TextStyle["paddingBottom"];
+    textStyle.paddingBottom =
+      cssStyle.paddingBottom as TextStyle["paddingBottom"];
   }
   if (cssStyle.paddingLeft !== undefined) {
     textStyle.paddingLeft = cssStyle.paddingLeft as TextStyle["paddingLeft"];
@@ -290,7 +306,9 @@ export function convertCSSToTextStyle(cssStyle: React.CSSProperties): TextStyle 
  * Convert React.CSSProperties to React Native ImageStyle
  * Only converts properties that exist in both web CSS and React Native ImageStyle
  */
-export function convertCSSToImageStyle(cssStyle: React.CSSProperties): ImageStyle {
+export function convertCSSToImageStyle(
+  cssStyle: React.CSSProperties,
+): ImageStyle {
   const imageStyle: ImageStyle = {};
 
   // Layout
@@ -308,7 +326,8 @@ export function convertCSSToImageStyle(cssStyle: React.CSSProperties): ImageStyl
 
   // Border
   if (cssStyle.borderRadius !== undefined) {
-    imageStyle.borderRadius = cssStyle.borderRadius as ImageStyle["borderRadius"];
+    imageStyle.borderRadius =
+      cssStyle.borderRadius as ImageStyle["borderRadius"];
   }
   if (cssStyle.borderWidth !== undefined) {
     imageStyle.borderWidth = cssStyle.borderWidth as ImageStyle["borderWidth"];
@@ -317,21 +336,26 @@ export function convertCSSToImageStyle(cssStyle: React.CSSProperties): ImageStyl
     imageStyle.borderColor = cssStyle.borderColor as ImageStyle["borderColor"];
   }
   if (cssStyle.borderTopWidth !== undefined) {
-    imageStyle.borderTopWidth = cssStyle.borderTopWidth as ImageStyle["borderTopWidth"];
+    imageStyle.borderTopWidth =
+      cssStyle.borderTopWidth as ImageStyle["borderTopWidth"];
   }
   if (cssStyle.borderBottomWidth !== undefined) {
-    imageStyle.borderBottomWidth = cssStyle.borderBottomWidth as ImageStyle["borderBottomWidth"];
+    imageStyle.borderBottomWidth =
+      cssStyle.borderBottomWidth as ImageStyle["borderBottomWidth"];
   }
   if (cssStyle.borderLeftWidth !== undefined) {
-    imageStyle.borderLeftWidth = cssStyle.borderLeftWidth as ImageStyle["borderLeftWidth"];
+    imageStyle.borderLeftWidth =
+      cssStyle.borderLeftWidth as ImageStyle["borderLeftWidth"];
   }
   if (cssStyle.borderRightWidth !== undefined) {
-    imageStyle.borderRightWidth = cssStyle.borderRightWidth as ImageStyle["borderRightWidth"];
+    imageStyle.borderRightWidth =
+      cssStyle.borderRightWidth as ImageStyle["borderRightWidth"];
   }
 
   // Background color
   if (cssStyle.backgroundColor !== undefined) {
-    imageStyle.backgroundColor = cssStyle.backgroundColor as ImageStyle["backgroundColor"];
+    imageStyle.backgroundColor =
+      cssStyle.backgroundColor as ImageStyle["backgroundColor"];
   }
 
   // Overflow
@@ -364,7 +388,8 @@ export function convertCSSToImageStyle(cssStyle: React.CSSProperties): ImageStyl
     imageStyle.marginTop = cssStyle.marginTop as ImageStyle["marginTop"];
   }
   if (cssStyle.marginBottom !== undefined) {
-    imageStyle.marginBottom = cssStyle.marginBottom as ImageStyle["marginBottom"];
+    imageStyle.marginBottom =
+      cssStyle.marginBottom as ImageStyle["marginBottom"];
   }
   if (cssStyle.marginLeft !== undefined) {
     imageStyle.marginLeft = cssStyle.marginLeft as ImageStyle["marginLeft"];

@@ -1,7 +1,13 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { ExternalLink } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
@@ -31,7 +37,8 @@ export function LinkListWidget<const TKey extends string>({
   className,
 }: ReactWidgetProps<typeof WidgetType.LINK_LIST, TKey>): JSX.Element {
   const { t } = simpleT(context.locale);
-  const { containerGap, headerGap, gridGap, titleSize, descriptionSize } = field.ui;
+  const { containerGap, headerGap, gridGap, titleSize, descriptionSize } =
+    field.ui;
 
   // Get classes from config (no hardcoding!)
   const containerGapClass = getSpacingClassName("gap", containerGap);
@@ -47,7 +54,11 @@ export function LinkListWidget<const TKey extends string>({
   if (!data) {
     return (
       <Div className={cn("py-8 text-center text-muted-foreground", className)}>
-        <P>{t("app.api.system.unifiedInterface.react.widgets.linkList.noResults")}</P>
+        <P>
+          {t(
+            "app.api.system.unifiedInterface.react.widgets.linkList.noResults",
+          )}
+        </P>
       </Div>
     );
   }
@@ -57,12 +68,21 @@ export function LinkListWidget<const TKey extends string>({
   const gridClass = getGridClassName(gridCols as 1 | 2 | 3 | 4);
 
   return (
-    <Div className={cn("flex flex-col", containerGapClass || "gap-4", className)}>
+    <Div
+      className={cn("flex flex-col", containerGapClass || "gap-4", className)}
+    >
       {title && (
         <Div className={cn("flex flex-col", headerGapClass || "gap-1")}>
-          <H3 className={cn("font-semibold", titleSizeClass || "text-lg")}>{title}</H3>
+          <H3 className={cn("font-semibold", titleSizeClass || "text-lg")}>
+            {title}
+          </H3>
           {description && (
-            <P className={cn("text-muted-foreground", descriptionSizeClass || "text-sm")}>
+            <P
+              className={cn(
+                "text-muted-foreground",
+                descriptionSizeClass || "text-sm",
+              )}
+            >
               {description}
             </P>
           )}
@@ -78,10 +98,14 @@ export function LinkListWidget<const TKey extends string>({
         {items.map((item, index) => {
           const displayUrl = getDisplayUrl(item.url);
           const openInNewTab = item.openInNewTab !== false;
-          const snippetText = typeof item.snippet === "string" ? item.snippet : undefined;
+          const snippetText =
+            typeof item.snippet === "string" ? item.snippet : undefined;
 
           return (
-            <Card key={item.url ?? index} className="hover:bg-accent/50 transition-colors">
+            <Card
+              key={item.url ?? index}
+              className="hover:bg-accent/50 transition-colors"
+            >
               <Link
                 href={item.url}
                 target={openInNewTab ? "_blank" : undefined}
@@ -93,12 +117,20 @@ export function LinkListWidget<const TKey extends string>({
                     <Span>{item.title || displayUrl}</Span>
                     {openInNewTab && <ExternalLink className="h-4 w-4" />}
                   </CardTitle>
-                  {item.description && <CardDescription>{item.description}</CardDescription>}
+                  {item.description && (
+                    <CardDescription>{item.description}</CardDescription>
+                  )}
                 </CardHeader>
                 {(snippetText || displayUrl) && (
                   <CardContent>
-                    {snippetText && <P className="text-sm text-muted-foreground">{snippetText}</P>}
-                    <P className="text-xs text-muted-foreground mt-1">{displayUrl}</P>
+                    {snippetText && (
+                      <P className="text-sm text-muted-foreground">
+                        {snippetText}
+                      </P>
+                    )}
+                    <P className="text-xs text-muted-foreground mt-1">
+                      {displayUrl}
+                    </P>
                   </CardContent>
                 )}
               </Link>

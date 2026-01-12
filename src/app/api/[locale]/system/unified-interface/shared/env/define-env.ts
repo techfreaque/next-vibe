@@ -46,7 +46,9 @@ type BuildUnionSchemaFromVariants<V extends Record<string, Fields>> = {
   [K in keyof V]: z.ZodObject<{ [F in keyof V[K]]: V[K][F]["schema"] }>;
 }[keyof V];
 
-type InferUnionEnv<V extends Record<string, Fields>> = z.infer<BuildUnionSchemaFromVariants<V>>;
+type InferUnionEnv<V extends Record<string, Fields>> = z.infer<
+  BuildUnionSchemaFromVariants<V>
+>;
 
 export interface EnvExample {
   key: string;
@@ -61,7 +63,10 @@ export function defineEnv<T extends Fields>(
   schema: z.ZodObject<{ [K in keyof T]: T[K]["schema"] }>;
   examples: EnvExample[];
 };
-export function defineEnv<T extends string, V extends Record<string, Fields>>(input: {
+export function defineEnv<
+  T extends string,
+  V extends Record<string, Fields>,
+>(input: {
   discriminator: T;
   variants: V;
 }): {
@@ -86,7 +91,10 @@ export function defineEnv(
     } {
   // Check if input is a union fields definition
   if ("discriminator" in input && "variants" in input) {
-    const unionInput = input as { discriminator: string; variants: Record<string, Fields> };
+    const unionInput = input as {
+      discriminator: string;
+      variants: Record<string, Fields>;
+    };
     const schemas = Object.values(unionInput.variants).map((variantFields) => {
       const schemaShape: Record<string, z.ZodTypeAny> = {};
       for (const [key, def] of Object.entries(variantFields)) {
@@ -102,7 +110,11 @@ export function defineEnv(
     );
 
     // Validate using discriminated union
-    const env = validateEnv(process.env, discriminatedUnionSchema, envValidationLogger);
+    const env = validateEnv(
+      process.env,
+      discriminatedUnionSchema,
+      envValidationLogger,
+    );
 
     // Create a mergeable object schema by combining all fields from all variants
     const mergeableSchemaShape: Record<string, z.ZodTypeAny> = {};

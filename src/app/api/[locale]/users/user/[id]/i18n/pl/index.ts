@@ -163,7 +163,8 @@ export const translations: typeof enTranslations = {
       errors: {
         unauthorized: {
           title: "Brak autoryzacji",
-          description: "Musisz być zalogowany, aby wyświetlić szczegóły użytkownika",
+          description:
+            "Musisz być zalogowany, aby wyświetlić szczegóły użytkownika",
         },
         validation: {
           title: "Walidacja nie powiodła się",
@@ -183,11 +184,13 @@ export const translations: typeof enTranslations = {
         },
         unknown: {
           title: "Nieznany błąd",
-          description: "Wystąpił nieoczekiwany błąd podczas pobierania użytkownika",
+          description:
+            "Wystąpił nieoczekiwany błąd podczas pobierania użytkownika",
         },
         conflict: {
           title: "Błąd konfliktu",
-          description: "Nie można pobrać użytkownika z powodu istniejących konfliktów",
+          description:
+            "Nie można pobrać użytkownika z powodu istniejących konfliktów",
         },
         network: {
           title: "Błąd sieci",
@@ -240,11 +243,13 @@ export const translations: typeof enTranslations = {
       },
       privateName: {
         label: "Nazwa prywatna",
-        description: "Pełne imię i nazwisko użytkownika (widoczne tylko dla administratorów)",
+        description:
+          "Pełne imię i nazwisko użytkownika (widoczne tylko dla administratorów)",
       },
       publicName: {
         label: "Nazwa publiczna",
-        description: "Nazwa wyświetlana użytkownika (widoczna dla wszystkich użytkowników)",
+        description:
+          "Nazwa wyświetlana użytkownika (widoczna dla wszystkich użytkowników)",
       },
       firstName: {
         label: "Imię",
@@ -376,15 +381,18 @@ export const translations: typeof enTranslations = {
         },
         conflict: {
           title: "Konflikt aktualizacji",
-          description: "Dane użytkownika są w konflikcie z istniejącymi rekordami",
+          description:
+            "Dane użytkownika są w konflikcie z istniejącymi rekordami",
         },
         server: {
           title: "Błąd serwera",
-          description: "Nie można zaktualizować użytkownika z powodu błędu serwera",
+          description:
+            "Nie można zaktualizować użytkownika z powodu błędu serwera",
         },
         unknown: {
           title: "Nieznany błąd",
-          description: "Wystąpił nieoczekiwany błąd podczas aktualizacji użytkownika",
+          description:
+            "Wystąpił nieoczekiwany błąd podczas aktualizacji użytkownika",
         },
         network: {
           title: "Błąd sieci",
@@ -397,7 +405,8 @@ export const translations: typeof enTranslations = {
       },
       success: {
         title: "Użytkownik zaktualizowany pomyślnie",
-        description: "Informacje o użytkowniku zostały pomyślnie zaktualizowane",
+        description:
+          "Informacje o użytkowniku zostały pomyślnie zaktualizowane",
       },
     },
     delete: {
@@ -457,11 +466,13 @@ export const translations: typeof enTranslations = {
         },
         unknown: {
           title: "Nieznany błąd",
-          description: "Wystąpił nieoczekiwany błąd podczas usuwania użytkownika",
+          description:
+            "Wystąpił nieoczekiwany błąd podczas usuwania użytkownika",
         },
         conflict: {
           title: "Błąd konfliktu",
-          description: "Nie można usunąć użytkownika z powodu istniejących zależności",
+          description:
+            "Nie można usunąć użytkownika z powodu istniejących zależności",
         },
         network: {
           title: "Błąd sieci",

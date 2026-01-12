@@ -8,7 +8,11 @@ import "server-only";
 import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -133,23 +137,27 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
 
       // Discover server env files (only from API directory, not manual config)
       logger.debug("Discovering server env files");
-      const serverEnvFilePaths = findFilesRecursively(apiDir, "env.ts", excludeDirs).filter(
-        (filePath) => {
-          // Exclude the generated output file itself
-          const serverOutputPath = join(data.outputDir, "env.ts");
-          return filePath !== join(process.cwd(), serverOutputPath);
-        },
-      );
+      const serverEnvFilePaths = findFilesRecursively(
+        apiDir,
+        "env.ts",
+        excludeDirs,
+      ).filter((filePath) => {
+        // Exclude the generated output file itself
+        const serverOutputPath = join(data.outputDir, "env.ts");
+        return filePath !== join(process.cwd(), serverOutputPath);
+      });
 
       // Discover client env files (only from API directory, not manual config)
       logger.debug("Discovering client env files");
-      const clientEnvFilePaths = findFilesRecursively(apiDir, "env-client.ts", excludeDirs).filter(
-        (filePath) => {
-          // Exclude the generated output file itself
-          const clientOutputPath = join(data.outputDir, "env-client.ts");
-          return filePath !== join(process.cwd(), clientOutputPath);
-        },
-      );
+      const clientEnvFilePaths = findFilesRecursively(
+        apiDir,
+        "env-client.ts",
+        excludeDirs,
+      ).filter((filePath) => {
+        // Exclude the generated output file itself
+        const clientOutputPath = join(data.outputDir, "env-client.ts");
+        return filePath !== join(process.cwd(), clientOutputPath);
+      });
 
       if (data.verbose) {
         logger.debug(`Found ${serverEnvFilePaths.length} server env files`);
@@ -198,7 +206,11 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
           result.schemaExportName &&
           result.examplesExportName
         ) {
-          const outputFile = join(process.cwd(), data.outputDir, "env-client.ts");
+          const outputFile = join(
+            process.cwd(),
+            data.outputDir,
+            "env-client.ts",
+          );
           validClientModules.push({
             filePath,
             relativePath: getRelativeImportPath(filePath, outputFile),
@@ -260,21 +272,33 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
           validServerModules,
           join(process.cwd(), serverOutputPath),
         );
-        await writeGeneratedFile(join(process.cwd(), serverOutputPath), serverContent, false);
+        await writeGeneratedFile(
+          join(process.cwd(), serverOutputPath),
+          serverContent,
+          false,
+        );
 
         // Generate client env file
         const clientContent = this.generateClientEnvContent(
           validClientModules,
           join(process.cwd(), clientOutputPath),
         );
-        await writeGeneratedFile(join(process.cwd(), clientOutputPath), clientContent, false);
+        await writeGeneratedFile(
+          join(process.cwd(), clientOutputPath),
+          clientContent,
+          false,
+        );
 
         // Generate .env.example file
         const envExampleContent = await this.generateEnvExampleContent([
           ...validServerModules,
           ...validClientModules,
         ]);
-        await writeGeneratedFile(join(process.cwd(), envExamplePath), envExampleContent, false);
+        await writeGeneratedFile(
+          join(process.cwd(), envExamplePath),
+          envExampleContent,
+          false,
+        );
       }
 
       const duration = Date.now() - startTime;
@@ -321,26 +345,40 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
   /**
    * Generate server env file content
    */
-  private generateServerEnvContent(modules: EnvFileInfo[], outputFile: string): string {
-    const header = generateFileHeader("AUTO-GENERATED FILE - DO NOT EDIT", "Env Generator", {
-      command: "vibe generate:env",
-    });
+  private generateServerEnvContent(
+    modules: EnvFileInfo[],
+    outputFile: string,
+  ): string {
+    const header = generateFileHeader(
+      "AUTO-GENERATED FILE - DO NOT EDIT",
+      "Env Generator",
+      {
+        command: "vibe generate:env",
+      },
+    );
 
     // Generate imports
     const imports: string[] = [];
     for (const mod of modules) {
       const relativePath = getRelativeImportPath(mod.filePath, outputFile);
-      imports.push(`import { ${mod.exportName}, ${mod.schemaExportName} } from "${relativePath}";`);
+      imports.push(
+        `import { ${mod.exportName}, ${mod.schemaExportName} } from "${relativePath}";`,
+      );
     }
 
     // Generate module names for registry
     const moduleEntries = modules
-      .map((m) => `  "${m.moduleName}": { env: ${m.exportName}, schema: ${m.schemaExportName} },`)
+      .map(
+        (m) =>
+          `  "${m.moduleName}": { env: ${m.exportName}, schema: ${m.schemaExportName} },`,
+      )
       .join("\n");
 
     // Generate schema merge chain
     const schemaChain = modules
-      .map((m, i) => (i === 0 ? `${m.schemaExportName}` : `.merge(${m.schemaExportName})`))
+      .map((m, i) =>
+        i === 0 ? `${m.schemaExportName}` : `.merge(${m.schemaExportName})`,
+      )
       .join("\n  ");
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -411,26 +449,40 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
   /**
    * Generate client env file content
    */
-  private generateClientEnvContent(modules: EnvFileInfo[], outputFile: string): string {
-    const header = generateFileHeader("AUTO-GENERATED FILE - DO NOT EDIT", "Env Generator", {
-      command: "vibe generate:env",
-    });
+  private generateClientEnvContent(
+    modules: EnvFileInfo[],
+    outputFile: string,
+  ): string {
+    const header = generateFileHeader(
+      "AUTO-GENERATED FILE - DO NOT EDIT",
+      "Env Generator",
+      {
+        command: "vibe generate:env",
+      },
+    );
 
     // Generate imports
     const imports: string[] = [];
     for (const mod of modules) {
       const relativePath = getRelativeImportPath(mod.filePath, outputFile);
-      imports.push(`import { ${mod.exportName}, ${mod.schemaExportName} } from "${relativePath}";`);
+      imports.push(
+        `import { ${mod.exportName}, ${mod.schemaExportName} } from "${relativePath}";`,
+      );
     }
 
     // Generate module names for registry
     const moduleEntries = modules
-      .map((m) => `  "${m.moduleName}": { env: ${m.exportName}, schema: ${m.schemaExportName} },`)
+      .map(
+        (m) =>
+          `  "${m.moduleName}": { env: ${m.exportName}, schema: ${m.schemaExportName} },`,
+      )
       .join("\n");
 
     // Generate schema merge chain
     const schemaChain = modules
-      .map((m, i) => (i === 0 ? `${m.schemaExportName}` : `.merge(${m.schemaExportName})`))
+      .map((m, i) =>
+        i === 0 ? `${m.schemaExportName}` : `.merge(${m.schemaExportName})`,
+      )
       .join("\n  ");
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -496,7 +548,9 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
   /**
    * Generate .env.example file content
    */
-  private async generateEnvExampleContent(modules: EnvFileInfo[]): Promise<string> {
+  private async generateEnvExampleContent(
+    modules: EnvFileInfo[],
+  ): Promise<string> {
     const lines: string[] = [
       "# ============================================================================",
       "# AUTO-GENERATED FILE - DO NOT EDIT MANUALLY",
@@ -516,7 +570,9 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
       }
 
       // Add source file comment
-      const relativeSourcePath = mod.filePath.replace(process.cwd(), "").replace(/^\//, "");
+      const relativeSourcePath = mod.filePath
+        .replace(process.cwd(), "")
+        .replace(/^\//, "");
       lines.push(`# Source: ${relativeSourcePath}`);
       lines.push(`# ${mod.moduleName}`);
 

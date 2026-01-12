@@ -51,7 +51,10 @@ export class AudioQueueManager {
   /**
    * Preload audio in the background so it's ready when needed
    */
-  private async preloadAudio(audioData: string, chunkIndex: number): Promise<void> {
+  private async preloadAudio(
+    audioData: string,
+    chunkIndex: number,
+  ): Promise<void> {
     // Skip if already preloaded
     if (this.preloadedAudio.has(chunkIndex)) {
       return;

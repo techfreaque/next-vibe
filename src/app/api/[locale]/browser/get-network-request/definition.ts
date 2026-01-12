@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.get-network-request.description",
   category: "app.api.browser.category",
   icon: "network",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.networkAnalysis"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.networkAnalysis",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -52,8 +55,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.browser.get-network-request.form.fields.reqid.label",
-          description: "app.api.browser.get-network-request.form.fields.reqid.description",
-          placeholder: "app.api.browser.get-network-request.form.fields.reqid.placeholder",
+          description:
+            "app.api.browser.get-network-request.form.fields.reqid.description",
+          placeholder:
+            "app.api.browser.get-network-request.form.fields.reqid.placeholder",
           columns: 6,
         },
         z
@@ -70,7 +75,11 @@ const { POST } = createEndpoint({
           type: WidgetType.TEXT,
           content: "app.api.browser.get-network-request.response.success",
         },
-        z.boolean().describe("Whether the network request retrieval operation succeeded"),
+        z
+          .boolean()
+          .describe(
+            "Whether the network request retrieval operation succeeded",
+          ),
       ),
       result: responseField(
         {
@@ -84,7 +93,10 @@ const { POST } = createEndpoint({
               .object({
                 url: z.string().describe("Request URL"),
                 method: z.string().describe("HTTP method"),
-                status: z.coerce.number().optional().describe("Response status code"),
+                status: z.coerce
+                  .number()
+                  .optional()
+                  .describe("Response status code"),
                 type: z.string().optional().describe("Resource type"),
               })
               .optional()
@@ -133,39 +145,48 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.browser.get-network-request.errors.validation.title",
-      description: "app.api.browser.get-network-request.errors.validation.description",
+      description:
+        "app.api.browser.get-network-request.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.browser.get-network-request.errors.network.title",
-      description: "app.api.browser.get-network-request.errors.network.description",
+      description:
+        "app.api.browser.get-network-request.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.browser.get-network-request.errors.unauthorized.title",
-      description: "app.api.browser.get-network-request.errors.unauthorized.description",
+      description:
+        "app.api.browser.get-network-request.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.browser.get-network-request.errors.forbidden.title",
-      description: "app.api.browser.get-network-request.errors.forbidden.description",
+      description:
+        "app.api.browser.get-network-request.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.browser.get-network-request.errors.notFound.title",
-      description: "app.api.browser.get-network-request.errors.notFound.description",
+      description:
+        "app.api.browser.get-network-request.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.browser.get-network-request.errors.serverError.title",
-      description: "app.api.browser.get-network-request.errors.serverError.description",
+      description:
+        "app.api.browser.get-network-request.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.browser.get-network-request.errors.unknown.title",
-      description: "app.api.browser.get-network-request.errors.unknown.description",
+      description:
+        "app.api.browser.get-network-request.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.get-network-request.errors.unsavedChanges.title",
-      description: "app.api.browser.get-network-request.errors.unsavedChanges.description",
+      description:
+        "app.api.browser.get-network-request.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.get-network-request.errors.conflict.title",
-      description: "app.api.browser.get-network-request.errors.conflict.description",
+      description:
+        "app.api.browser.get-network-request.errors.conflict.description",
     },
   },
   successTypes: {

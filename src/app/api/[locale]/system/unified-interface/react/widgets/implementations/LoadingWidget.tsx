@@ -100,8 +100,18 @@ export function LoadingWidget<const TKey extends string>({
       {/* Indeterminate loading */}
       {indeterminate && progress === undefined && (
         <Div className={cn("flex items-center", gapClass || "gap-3")}>
-          <Loader2 className={cn("animate-spin text-primary", spinnerSizeClass || "h-5 w-5")} />
-          <Span className={cn("text-muted-foreground", messageSizeClass || "text-sm")}>
+          <Loader2
+            className={cn(
+              "animate-spin text-primary",
+              spinnerSizeClass || "h-5 w-5",
+            )}
+          />
+          <Span
+            className={cn(
+              "text-muted-foreground",
+              messageSizeClass || "text-sm",
+            )}
+          >
             {message}
           </Span>
         </Div>
@@ -109,9 +119,14 @@ export function LoadingWidget<const TKey extends string>({
 
       {/* Progress bar */}
       {progress !== undefined && (
-        <Div className={cn("w-full max-w-xs", progressSpacingClass || "space-y-2")}>
+        <Div
+          className={cn("w-full max-w-xs", progressSpacingClass || "space-y-2")}
+        >
           <Span
-            className={cn("text-muted-foreground text-center block", messageSizeClass || "text-sm")}
+            className={cn(
+              "text-muted-foreground text-center block",
+              messageSizeClass || "text-sm",
+            )}
           >
             {message}
           </Span>
@@ -131,7 +146,9 @@ export function LoadingWidget<const TKey extends string>({
 
       {/* Default (neither indeterminate nor progress) */}
       {!indeterminate && progress === undefined && (
-        <Span className={cn("text-muted-foreground", messageSizeClass || "text-sm")}>
+        <Span
+          className={cn("text-muted-foreground", messageSizeClass || "text-sm")}
+        >
           {message}
         </Span>
       )}

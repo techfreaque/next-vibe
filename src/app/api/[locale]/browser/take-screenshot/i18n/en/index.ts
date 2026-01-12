@@ -7,7 +7,8 @@ export const translations = {
     fields: {
       uid: {
         label: "Element UID",
-        description: "The uid of an element to screenshot (omit to screenshot the entire page)",
+        description:
+          "The uid of an element to screenshot (omit to screenshot the entire page)",
         placeholder: "Enter element uid",
       },
       fullPage: {
@@ -69,7 +70,8 @@ export const translations = {
     },
     serverError: {
       title: "Server Error",
-      description: "An internal server error occurred while capturing the screenshot",
+      description:
+        "An internal server error occurred while capturing the screenshot",
     },
     unknown: {
       title: "Unknown Error",

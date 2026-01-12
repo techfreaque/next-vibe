@@ -85,10 +85,13 @@ export class UserMessageHandler {
 
     // For tool confirmations, we don't create a user message
     if (hasToolConfirmations) {
-      logger.debug("[Setup] ✅ SKIPPING user message creation for tool confirmations", {
-        count: hasToolConfirmations,
-        operation,
-      });
+      logger.debug(
+        "[Setup] ✅ SKIPPING user message creation for tool confirmations",
+        {
+          count: hasToolConfirmations,
+          operation,
+        },
+      );
       return success({ userMessageId });
     }
 
@@ -110,7 +113,9 @@ export class UserMessageHandler {
       });
     }
 
-    const authorName = isIncognito ? null : await UserRepository.getUserPublicName(userId, logger);
+    const authorName = isIncognito
+      ? null
+      : await UserRepository.getUserPublicName(userId, logger);
 
     let fileUploadPromise:
       | Promise<{
@@ -180,10 +185,13 @@ export class UserMessageHandler {
               attachments: result.data,
             };
           } else {
-            logger.error("[File Processing] Failed to upload attachments to storage", {
-              messageId: userMessageId,
-              errorMessage: result.message,
-            });
+            logger.error(
+              "[File Processing] Failed to upload attachments to storage",
+              {
+                messageId: userMessageId,
+                errorMessage: result.message,
+              },
+            );
 
             return {
               success: false,
@@ -206,14 +214,16 @@ export class UserMessageHandler {
         userId,
         authorName,
         logger,
-        attachments: attachmentMetadata.length > 0 ? attachmentMetadata : undefined,
+        attachments:
+          attachmentMetadata.length > 0 ? attachmentMetadata : undefined,
       });
     }
 
     return success({
       userMessageId,
       fileUploadPromise,
-      attachmentMetadata: attachmentMetadata.length > 0 ? attachmentMetadata : undefined,
+      attachmentMetadata:
+        attachmentMetadata.length > 0 ? attachmentMetadata : undefined,
     });
   }
 }

@@ -25,7 +25,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.performance-stop-trace.description",
   category: "app.api.browser.category",
   icon: "pause-circle",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.performanceAutomation"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.performanceAutomation",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -84,7 +87,8 @@ const { POST } = createEndpoint({
       executionId: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.browser.performance-stop-trace.response.executionId",
+          content:
+            "app.api.browser.performance-stop-trace.response.executionId",
         },
         z.string().optional().describe("Unique identifier for this execution"),
       ),
@@ -114,39 +118,49 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.browser.performance-stop-trace.errors.validation.title",
-      description: "app.api.browser.performance-stop-trace.errors.validation.description",
+      description:
+        "app.api.browser.performance-stop-trace.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.browser.performance-stop-trace.errors.network.title",
-      description: "app.api.browser.performance-stop-trace.errors.network.description",
+      description:
+        "app.api.browser.performance-stop-trace.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.browser.performance-stop-trace.errors.unauthorized.title",
-      description: "app.api.browser.performance-stop-trace.errors.unauthorized.description",
+      description:
+        "app.api.browser.performance-stop-trace.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.browser.performance-stop-trace.errors.forbidden.title",
-      description: "app.api.browser.performance-stop-trace.errors.forbidden.description",
+      description:
+        "app.api.browser.performance-stop-trace.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.browser.performance-stop-trace.errors.notFound.title",
-      description: "app.api.browser.performance-stop-trace.errors.notFound.description",
+      description:
+        "app.api.browser.performance-stop-trace.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.browser.performance-stop-trace.errors.serverError.title",
-      description: "app.api.browser.performance-stop-trace.errors.serverError.description",
+      description:
+        "app.api.browser.performance-stop-trace.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.browser.performance-stop-trace.errors.unknown.title",
-      description: "app.api.browser.performance-stop-trace.errors.unknown.description",
+      description:
+        "app.api.browser.performance-stop-trace.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.performance-stop-trace.errors.unsavedChanges.title",
-      description: "app.api.browser.performance-stop-trace.errors.unsavedChanges.description",
+      title:
+        "app.api.browser.performance-stop-trace.errors.unsavedChanges.title",
+      description:
+        "app.api.browser.performance-stop-trace.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.performance-stop-trace.errors.conflict.title",
-      description: "app.api.browser.performance-stop-trace.errors.conflict.description",
+      description:
+        "app.api.browser.performance-stop-trace.errors.conflict.description",
     },
   },
   successTypes: {
@@ -158,7 +172,8 @@ const { POST } = createEndpoint({
 export type PerformanceStopTraceRequestInput = typeof POST.types.RequestInput;
 export type PerformanceStopTraceRequestOutput = typeof POST.types.RequestOutput;
 export type PerformanceStopTraceResponseInput = typeof POST.types.ResponseInput;
-export type PerformanceStopTraceResponseOutput = typeof POST.types.ResponseOutput;
+export type PerformanceStopTraceResponseOutput =
+  typeof POST.types.ResponseOutput;
 
 const endpoints = { POST };
 export default endpoints;

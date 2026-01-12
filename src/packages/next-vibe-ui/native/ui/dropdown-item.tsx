@@ -39,14 +39,19 @@ export function DropdownItem({
             {React.isValidElement(icon)
               ? icon
               : typeof icon === "function"
-                ? React.createElement(icon as React.ComponentType<{ className?: string }>, {
-                    className: "w-6 h-6",
-                  })
+                ? React.createElement(
+                    icon as React.ComponentType<{ className?: string }>,
+                    {
+                      className: "w-6 h-6",
+                    },
+                  )
                 : null}
           </View>
         )}
         <View className="flex flex-col items-start flex-1">
-          <RNText className="font-medium text-sm text-foreground">{label}</RNText>
+          <RNText className="font-medium text-sm text-foreground">
+            {label}
+          </RNText>
           {description && (
             <RNText className="text-xs text-muted-foreground/80 leading-tight mt-0.5">
               {description}

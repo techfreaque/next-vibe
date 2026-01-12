@@ -11,7 +11,10 @@ import { useState } from "react";
 import type { UnifiedField } from "../../../shared/types/endpoint";
 import type { WidgetType } from "../../../shared/types/enums";
 import { extractDataCardsData } from "../../../shared/widgets/logic/data-cards";
-import type { ReactWidgetProps, WidgetData } from "../../../shared/widgets/types";
+import type {
+  ReactWidgetProps,
+  WidgetData,
+} from "../../../shared/widgets/types";
 import { isWidgetDataObject } from "../../../shared/widgets/utils/field-type-guards";
 import {
   getBorderRadiusClassName,
@@ -24,7 +27,10 @@ import { WidgetRenderer } from "../renderers/WidgetRenderer";
 /**
  * Helper to get field value from card object
  */
-const getFieldValue = (card: WidgetData, fieldName: string | undefined): WidgetData => {
+const getFieldValue = (
+  card: WidgetData,
+  fieldName: string | undefined,
+): WidgetData => {
   if (!fieldName || !isWidgetDataObject(card)) {
     return undefined;
   }
@@ -71,7 +77,9 @@ export const DataCardsWidget = <const TKey extends string>({
   } = field.ui;
 
   // Track expanded state for sections (by section index)
-  const [expandedSections, setExpandedSections] = useState<Set<number>>(new Set());
+  const [expandedSections, setExpandedSections] = useState<Set<number>>(
+    new Set(),
+  );
 
   // Get classes from config (no hardcoding!)
   const gapClass = getSpacingClassName("gap", gap);
@@ -79,7 +87,10 @@ export const DataCardsWidget = <const TKey extends string>({
   const groupGapClass = getSpacingClassName("gap", groupGap);
   const groupInnerGapClass = getSpacingClassName("gap", groupInnerGap);
   const groupHeaderGapClass = getSpacingClassName("gap", groupHeaderGap);
-  const groupHeaderPaddingClass = getSpacingClassName("padding", groupHeaderPadding);
+  const groupHeaderPaddingClass = getSpacingClassName(
+    "padding",
+    groupHeaderPadding,
+  );
   const cardGapClass = getSpacingClassName("gap", cardGap);
   const groupTitleSizeClass = getTextSizeClassName(groupTitleSize);
   const badgeSizeClass = getTextSizeClassName(badgeSize);
@@ -105,7 +116,12 @@ export const DataCardsWidget = <const TKey extends string>({
   let childField: UnifiedField<string> | null = null;
   if (field.type === "array" || field.type === "array-optional") {
     const child = field.child;
-    if (typeof child === "object" && child !== null && "ui" in child && "type" in child) {
+    if (
+      typeof child === "object" &&
+      child !== null &&
+      "ui" in child &&
+      "type" in child
+    ) {
       childField = child as UnifiedField<string>;
     }
   }
@@ -126,14 +142,28 @@ export const DataCardsWidget = <const TKey extends string>({
     : null;
 
   // Render a single card
-  const renderCard = (card: (typeof cards)[number], index: number): JSX.Element => {
+  const renderCard = (
+    card: (typeof cards)[number],
+    index: number,
+  ): JSX.Element => {
     // Check if card click navigation is configured
     const onCardClickMetadata = field.ui.metadata?.onCardClick;
     const handleCardClick = (): void => {
-      if (onCardClickMetadata && context.navigation && isWidgetDataObject(card)) {
-        const params = onCardClickMetadata.extractParams(card as Record<string, WidgetData>);
+      if (
+        onCardClickMetadata &&
+        context.navigation &&
+        isWidgetDataObject(card)
+      ) {
+        const params = onCardClickMetadata.extractParams(
+          card as Record<string, WidgetData>,
+        );
         context.logger.debug("DataCardsWidget: extracted params", { params });
-        context.navigation.push(onCardClickMetadata.targetEndpoint, params, false, undefined);
+        context.navigation.push(
+          onCardClickMetadata.targetEndpoint,
+          params,
+          false,
+          undefined,
+        );
       }
     };
 
@@ -176,7 +206,10 @@ export const DataCardsWidget = <const TKey extends string>({
       <Div className={cn("flex flex-col", groupGapClass || "gap-6", className)}>
         {Object.entries(groupedCards).map(([groupKey, groupCards]) => {
           return (
-            <Div key={groupKey} className={cn("flex flex-col", groupInnerGapClass || "gap-3")}>
+            <Div
+              key={groupKey}
+              className={cn("flex flex-col", groupInnerGapClass || "gap-3")}
+            >
               {/* Group header */}
               <Div
                 className={cn(
@@ -185,7 +218,12 @@ export const DataCardsWidget = <const TKey extends string>({
                   groupHeaderPaddingClass || "px-1",
                 )}
               >
-                <Span className={cn("font-medium", groupTitleSizeClass || "text-sm")}>
+                <Span
+                  className={cn(
+                    "font-medium",
+                    groupTitleSizeClass || "text-sm",
+                  )}
+                >
                   {context.t(groupKey)}
                 </Span>
                 <Div
@@ -213,11 +251,14 @@ export const DataCardsWidget = <const TKey extends string>({
 
   // Render ungrouped cards in a simple grid
   const translatedTitle = title ? context.t(title) : undefined;
-  const translatedDescription = description ? context.t(description) : undefined;
+  const translatedDescription = description
+    ? context.t(description)
+    : undefined;
 
   const isExpanded = expandedSections.has(0); // Use index 0 for ungrouped section
   const hasMore = maxItems && cards.length > maxItems;
-  const visibleCards = hasMore && !isExpanded ? cards.slice(0, maxItems) : cards;
+  const visibleCards =
+    hasMore && !isExpanded ? cards.slice(0, maxItems) : cards;
   const remainingCount = hasMore && !isExpanded ? cards.length - maxItems : 0;
 
   const toggleExpanded = (): void => {
@@ -238,10 +279,17 @@ export const DataCardsWidget = <const TKey extends string>({
       {(translatedTitle || translatedDescription) && (
         <Div className="flex flex-col gap-2">
           {translatedTitle && (
-            <Div className={cn("font-bold", titleSizeClass || "text-2xl")}>{translatedTitle}</Div>
+            <Div className={cn("font-bold", titleSizeClass || "text-2xl")}>
+              {translatedTitle}
+            </Div>
           )}
           {translatedDescription && (
-            <Div className={cn("text-muted-foreground", descriptionSizeClass || "text-sm")}>
+            <Div
+              className={cn(
+                "text-muted-foreground",
+                descriptionSizeClass || "text-sm",
+              )}
+            >
               {translatedDescription}
             </Div>
           )}
@@ -263,11 +311,18 @@ export const DataCardsWidget = <const TKey extends string>({
             )}
             onClick={toggleExpanded}
           >
-            <Button variant="ghost" size="sm" className="text-muted-foreground gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground gap-2"
+            >
               <ChevronDown className="h-4 w-4" />
-              {context.t("app.api.system.unifiedInterface.react.widgets.dataCards.showMore", {
-                count: remainingCount,
-              })}
+              {context.t(
+                "app.api.system.unifiedInterface.react.widgets.dataCards.showMore",
+                {
+                  count: remainingCount,
+                },
+              )}
             </Button>
           </Div>
         )}

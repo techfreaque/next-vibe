@@ -50,18 +50,28 @@ export function EmailPreviewClient({
 }: EmailPreviewClientProps): ReactElement {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
 
-  const initialLanguageCountry = useMemo(() => getLanguageAndCountryFromLocale(locale), [locale]);
+  const initialLanguageCountry = useMemo(
+    () => getLanguageAndCountryFromLocale(locale),
+    [locale],
+  );
 
-  const [selectedLanguage, setSelectedLanguage] = useState(initialLanguageCountry.language);
-  const [selectedCountry, setSelectedCountry] = useState(initialLanguageCountry.country);
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    initialLanguageCountry.language,
+  );
+  const [selectedCountry, setSelectedCountry] = useState(
+    initialLanguageCountry.country,
+  );
 
   const previewEndpoint = useEmailPreviewRender(logger);
 
-  const [currentProps, setCurrentProps] = useState<Record<string, string | number | boolean>>(
-    exampleProps,
-  );
+  const [currentProps, setCurrentProps] = useState<
+    Record<string, string | number | boolean>
+  >(exampleProps);
 
   // Update current props when example props change
   useEffect(() => {
@@ -82,7 +92,14 @@ export function EmailPreviewClient({
   // Initial preview render
   useEffect(() => {
     updatePreview(currentProps);
-  }, [templateId, selectedLanguage, selectedCountry, exampleProps, currentProps, updatePreview]);
+  }, [
+    templateId,
+    selectedLanguage,
+    selectedCountry,
+    exampleProps,
+    currentProps,
+    updatePreview,
+  ]);
 
   const handlePropsChange = useCallback(
     (newProps: Record<string, string | number | boolean>) => {
@@ -97,7 +114,9 @@ export function EmailPreviewClient({
       {/* Language and Country Selectors */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("app.admin.emails.templates.preview.locale.title")}</CardTitle>
+          <CardTitle>
+            {t("app.admin.emails.templates.preview.locale.title")}
+          </CardTitle>
           <P className="text-sm text-gray-600 dark:text-gray-400">
             {t("app.admin.emails.templates.preview.locale.description")}
           </P>
@@ -120,13 +139,19 @@ export function EmailPreviewClient({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="en">
-                    {t("app.admin.emails.templates.preview.locale.languages.en")}
+                    {t(
+                      "app.admin.emails.templates.preview.locale.languages.en",
+                    )}
                   </SelectItem>
                   <SelectItem value="de">
-                    {t("app.admin.emails.templates.preview.locale.languages.de")}
+                    {t(
+                      "app.admin.emails.templates.preview.locale.languages.de",
+                    )}
                   </SelectItem>
                   <SelectItem value="pl">
-                    {t("app.admin.emails.templates.preview.locale.languages.pl")}
+                    {t(
+                      "app.admin.emails.templates.preview.locale.languages.pl",
+                    )}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -148,13 +173,19 @@ export function EmailPreviewClient({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="GLOBAL">
-                    {t("app.admin.emails.templates.preview.locale.countries.GLOBAL")}
+                    {t(
+                      "app.admin.emails.templates.preview.locale.countries.GLOBAL",
+                    )}
                   </SelectItem>
                   <SelectItem value="DE">
-                    {t("app.admin.emails.templates.preview.locale.countries.DE")}
+                    {t(
+                      "app.admin.emails.templates.preview.locale.countries.DE",
+                    )}
                   </SelectItem>
                   <SelectItem value="PL">
-                    {t("app.admin.emails.templates.preview.locale.countries.PL")}
+                    {t(
+                      "app.admin.emails.templates.preview.locale.countries.PL",
+                    )}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -201,7 +232,9 @@ export function EmailPreviewClient({
         <CardContent>
           {previewEndpoint.create && previewEndpoint.create.isSubmitting && (
             <Div className="flex items-center justify-center py-12">
-              <P className="text-gray-500">{t("app.admin.emails.templates.preview.loading")}</P>
+              <P className="text-gray-500">
+                {t("app.admin.emails.templates.preview.loading")}
+              </P>
             </Div>
           )}
 

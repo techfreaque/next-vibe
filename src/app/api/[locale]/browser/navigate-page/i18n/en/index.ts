@@ -3,7 +3,8 @@ export const translations = {
   description: "Navigate the currently selected page",
   form: {
     label: "Navigate Page",
-    description: "Navigate the currently selected page to a URL or through history",
+    description:
+      "Navigate the currently selected page to a URL or through history",
     fields: {
       type: {
         label: "Navigation Type",

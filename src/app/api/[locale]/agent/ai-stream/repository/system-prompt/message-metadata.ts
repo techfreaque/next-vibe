@@ -29,9 +29,13 @@ export function getRelativeTime(date: Date): string {
     });
   }
   if (diffHours < 24) {
-    return t("app.api.agent.chat.aiStream.post.systemPrompt.hoursAgo", { hours: diffHours });
+    return t("app.api.agent.chat.aiStream.post.systemPrompt.hoursAgo", {
+      hours: diffHours,
+    });
   }
-  return t("app.api.agent.chat.aiStream.post.systemPrompt.daysAgo", { days: diffDays });
+  return t("app.api.agent.chat.aiStream.post.systemPrompt.daysAgo", {
+    days: diffDays,
+  });
 }
 
 /**
@@ -58,7 +62,10 @@ export function createMessageMetadata(
   }
 
   // Author information (public/shared threads only)
-  if ((rootFolderId === "public" || rootFolderId === "shared") && message.authorName) {
+  if (
+    (rootFolderId === "public" || rootFolderId === "shared") &&
+    message.authorName
+  ) {
     const authorInfo = message.authorId
       ? `${message.authorName}(${message.authorId.slice(-8)})`
       : message.authorName;

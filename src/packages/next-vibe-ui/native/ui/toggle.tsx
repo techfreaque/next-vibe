@@ -36,23 +36,27 @@ const toggleVariants = cva(
   },
 );
 
-const toggleTextVariants = cva("text-sm text-base text-foreground font-medium", {
-  variants: {
-    variant: {
-      default: "",
-      outline: "group-hover:text-accent-foreground group-active:text-accent-foreground",
+const toggleTextVariants = cva(
+  "text-sm text-base text-foreground font-medium",
+  {
+    variants: {
+      variant: {
+        default: "",
+        outline:
+          "group-hover:text-accent-foreground group-active:text-accent-foreground",
+      },
+      size: {
+        default: "",
+        sm: "",
+        lg: "",
+      },
     },
-    size: {
-      default: "",
-      sm: "",
-      lg: "",
+    defaultVariants: {
+      variant: "default",
+      size: "default",
     },
   },
-  defaultVariants: {
-    variant: "default",
-    size: "default",
-  },
-});
+);
 
 export type { ToggleRootProps, ToggleSize, ToggleVariant };
 
@@ -78,7 +82,9 @@ export function Toggle({
     <TextClassContext.Provider
       value={cn(
         toggleTextVariants({ variant, size }),
-        isPressed ? "text-accent-foreground" : "group-hover:text-muted-foreground",
+        isPressed
+          ? "text-accent-foreground"
+          : "group-hover:text-muted-foreground",
       )}
     >
       <StyledToggleRoot

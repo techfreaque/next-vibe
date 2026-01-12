@@ -32,7 +32,9 @@ import { extractTitleData } from "@/app/api/[locale]/system/unified-interface/sh
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps, WidgetRenderContext } from "../core/types";
 
-export class TitleWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TITLE> {
+export class TitleWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.TITLE
+> {
   readonly widgetType = WidgetType.TITLE;
 
   /**
@@ -101,7 +103,8 @@ export class TitleWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.TI
     context: WidgetRenderContext,
   ): string {
     // Apply bold styling for prominent headings (levels 1-3)
-    const styledText = level <= 3 ? this.styleText(text, "bold", context) : text;
+    const styledText =
+      level <= 3 ? this.styleText(text, "bold", context) : text;
 
     // For alignment in CLI, we could add padding, but for now keep it simple
     // CLI doesn't have the same layout flexibility as React

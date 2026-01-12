@@ -29,7 +29,11 @@ export const { GET, POST, tools } = endpointsHandler({
         typeof definitions.GET.allowedRoles
       >,
     ): Promise<ResponseType<ThreadListResponseOutput>> => {
-      return await ThreadsRepository.listThreads(props.data, props.user, props.logger);
+      return await ThreadsRepository.listThreads(
+        props.data,
+        props.user,
+        props.logger,
+      );
     },
   },
   [Methods.POST]: {

@@ -38,10 +38,16 @@ type PathValue<T, P extends string> = P extends `${infer K}.${infer Rest}`
     : never;
 
 // Type for getting the value type of a translation key
-export type TranslationValue<K extends TranslationKey> = PathValue<TranslationSchema, K>;
+export type TranslationValue<K extends TranslationKey> = PathValue<
+  TranslationSchema,
+  K
+>;
 
 export type TParams = Record<string, string | number>;
-export type TFunction = <K extends TranslationKey>(key: K, params?: TParams) => string;
+export type TFunction = <K extends TranslationKey>(
+  key: K,
+  params?: TParams,
+) => string;
 
 /**
  * Utility type to extract the scoped key type from a scopedT function or scoped translation object

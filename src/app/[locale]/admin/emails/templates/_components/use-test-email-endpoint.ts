@@ -30,12 +30,16 @@ interface UseTestEmailEndpointReturn {
   data: TestEmailResponse | null;
 }
 
-export function useTestEmailEndpoint(locale: CountryLanguage): UseTestEmailEndpointReturn {
+export function useTestEmailEndpoint(
+  locale: CountryLanguage,
+): UseTestEmailEndpointReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<TestEmailResponse | null>(null);
 
-  const execute = async (requestData: TestEmailRequest): Promise<TestEmailResponse | null> => {
+  const execute = async (
+    requestData: TestEmailRequest,
+  ): Promise<TestEmailResponse | null> => {
     setIsLoading(true);
     setError(null);
     setData(null);

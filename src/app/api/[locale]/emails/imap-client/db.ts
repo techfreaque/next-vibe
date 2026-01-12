@@ -4,7 +4,16 @@
  */
 
 import { relations } from "drizzle-orm";
-import { boolean, index, integer, json, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  index,
+  integer,
+  json,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 
@@ -43,7 +52,9 @@ export const imapAccounts = pgTable(
     // Authentication
     username: text("username").notNull(),
     password: text("password").notNull(), // Should be encrypted in production
-    authMethod: text("auth_method", { enum: ImapAuthMethodDB }).default(ImapAuthMethod.PLAIN),
+    authMethod: text("auth_method", { enum: ImapAuthMethodDB }).default(
+      ImapAuthMethod.PLAIN,
+    ),
 
     // Connection settings
     connectionTimeout: integer("connection_timeout").default(30000),
@@ -60,7 +71,9 @@ export const imapAccounts = pgTable(
 
     // Status tracking
     lastSyncAt: timestamp("last_sync_at"),
-    syncStatus: text("sync_status", { enum: ImapSyncStatusDB }).default(ImapSyncStatus.PENDING),
+    syncStatus: text("sync_status", { enum: ImapSyncStatusDB }).default(
+      ImapSyncStatus.PENDING,
+    ),
     syncError: text("sync_error"),
     isConnected: boolean("is_connected").default(false),
 
@@ -111,7 +124,9 @@ export const imapFolders = pgTable(
 
     // Sync tracking
     lastSyncAt: timestamp("last_sync_at"),
-    syncStatus: text("sync_status", { enum: ImapSyncStatusDB }).default(ImapSyncStatus.PENDING),
+    syncStatus: text("sync_status", { enum: ImapSyncStatusDB }).default(
+      ImapSyncStatus.PENDING,
+    ),
     syncError: json("sync_error").$type<ErrorResponseType | null>(),
 
     // Audit fields
@@ -122,7 +137,9 @@ export const imapFolders = pgTable(
     accountIdIdx: index("imap_folders_account_id_idx").on(table.accountId),
     pathIdx: index("imap_folders_path_idx").on(table.path),
     nameIdx: index("imap_folders_name_idx").on(table.name),
-    specialUseIdx: index("imap_folders_special_use_idx").on(table.specialUseType),
+    specialUseIdx: index("imap_folders_special_use_idx").on(
+      table.specialUseType,
+    ),
     lastSyncIdx: index("imap_folders_last_sync_idx").on(table.lastSyncAt),
   }),
 );

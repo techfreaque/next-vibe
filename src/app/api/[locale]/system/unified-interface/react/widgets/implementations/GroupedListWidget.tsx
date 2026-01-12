@@ -110,7 +110,8 @@ export function GroupedListWidget<const TKey extends string>({
 
   const { t } = simpleT(context.locale);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
-  const config = field.type === "array" && groupBy ? { groupBy, sortBy } : undefined;
+  const config =
+    field.type === "array" && groupBy ? { groupBy, sortBy } : undefined;
 
   const data = extractGroupedListData(value, config);
   const prevGroupCount = useRef<number | undefined>(undefined);
@@ -118,7 +119,11 @@ export function GroupedListWidget<const TKey extends string>({
   useEffect(() => {
     const currentGroupCount = data?.groups.length ?? 0;
     // Only update expanded groups when the count actually changes
-    if (prevGroupCount.current !== currentGroupCount && data && data.groups.length > 0) {
+    if (
+      prevGroupCount.current !== currentGroupCount &&
+      data &&
+      data.groups.length > 0
+    ) {
       prevGroupCount.current = currentGroupCount;
       const groupKeys = data.groups.map((g) => g.key).join(",");
       setExpandedGroups(new Set(groupKeys.split(",")));
@@ -153,8 +158,15 @@ export function GroupedListWidget<const TKey extends string>({
 
         const isExpanded = expandedGroups.has(groupKey);
         const itemCount = groupItems.length;
-        const displayItems = getDisplayItems(groupItems, maxItemsPerGroup, isExpanded);
-        const remainingCount = getRemainingItemsCount(itemCount, maxItemsPerGroup);
+        const displayItems = getDisplayItems(
+          groupItems,
+          maxItemsPerGroup,
+          isExpanded,
+        );
+        const remainingCount = getRemainingItemsCount(
+          itemCount,
+          maxItemsPerGroup,
+        );
 
         return (
           <Div
@@ -170,7 +182,9 @@ export function GroupedListWidget<const TKey extends string>({
               )}
               type="button"
             >
-              <Div className={cn("flex items-center", headerGapClass || "gap-3")}>
+              <Div
+                className={cn("flex items-center", headerGapClass || "gap-3")}
+              >
                 <Span
                   className={cn(
                     "font-semibold text-gray-900 dark:text-gray-100",
@@ -205,11 +219,16 @@ export function GroupedListWidget<const TKey extends string>({
                   summaryPaddingClass || "px-4 py-2",
                 )}
               >
-                <Div className={cn("flex flex-wrap", summaryGapClass || "gap-4")}>
+                <Div
+                  className={cn("flex flex-wrap", summaryGapClass || "gap-4")}
+                >
                   {Object.entries(groupSummary).map(([key, value]) => {
                     const translatedKey = isWidgetDataString(key, context);
                     return (
-                      <Div key={key} className={cn(summarySizeClass || "text-sm")}>
+                      <Div
+                        key={key}
+                        className={cn(summarySizeClass || "text-sm")}
+                      >
                         <Span className="font-medium text-gray-700 dark:text-gray-300">
                           {translatedKey}:
                         </Span>{" "}
@@ -242,9 +261,15 @@ export function GroupedListWidget<const TKey extends string>({
                         )}
                       >
                         {Object.entries(item).map(([key, value]) => {
-                          const translatedKey = isWidgetDataString(key, context);
+                          const translatedKey = isWidgetDataString(
+                            key,
+                            context,
+                          );
                           return (
-                            <Div key={key} className={cn(itemSizeClass || "text-sm")}>
+                            <Div
+                              key={key}
+                              className={cn(itemSizeClass || "text-sm")}
+                            >
                               <Div className="font-medium text-gray-700 dark:text-gray-300">
                                 {translatedKey}
                               </Div>
@@ -271,9 +296,12 @@ export function GroupedListWidget<const TKey extends string>({
                       buttonSizeClass || "text-sm",
                     )}
                   >
-                    {t("app.api.system.unifiedInterface.react.widgets.groupedList.showMore", {
-                      count: remainingCount,
-                    })}
+                    {t(
+                      "app.api.system.unifiedInterface.react.widgets.groupedList.showMore",
+                      {
+                        count: remainingCount,
+                      },
+                    )}
                   </Button>
                 )}
               </Div>

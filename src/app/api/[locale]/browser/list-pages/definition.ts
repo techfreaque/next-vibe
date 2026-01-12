@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.list-pages.description",
   category: "app.api.browser.category",
   icon: "layers",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.navigationAutomation"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.navigationAutomation",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -79,28 +82,32 @@ const { POST } = createEndpoint({
                 idx: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.browser.list-pages.response.result.pages.idx",
+                    content:
+                      "app.api.browser.list-pages.response.result.pages.idx",
                   },
                   z.coerce.number().describe("Page index"),
                 ),
                 title: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.browser.list-pages.response.result.pages.title",
+                    content:
+                      "app.api.browser.list-pages.response.result.pages.title",
                   },
                   z.string().describe("Page title"),
                 ),
                 url: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.browser.list-pages.response.result.pages.url",
+                    content:
+                      "app.api.browser.list-pages.response.result.pages.url",
                   },
                   z.string().describe("Page URL"),
                 ),
                 active: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.browser.list-pages.response.result.pages.active",
+                    content:
+                      "app.api.browser.list-pages.response.result.pages.active",
                   },
                   z.boolean().describe("Whether this is the active page"),
                 ),
@@ -186,7 +193,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.browser.list-pages.errors.unsavedChanges.title",
-      description: "app.api.browser.list-pages.errors.unsavedChanges.description",
+      description:
+        "app.api.browser.list-pages.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.browser.list-pages.errors.conflict.title",

@@ -20,7 +20,10 @@ export const {
   MANUAL: "app.api.agent.chat.favorites.enums.mode.manual",
 });
 
-export const ModelSelectionModeDB = [ModelSelectionMode.AUTO, ModelSelectionMode.MANUAL] as const;
+export const ModelSelectionModeDB = [
+  ModelSelectionMode.AUTO,
+  ModelSelectionMode.MANUAL,
+] as const;
 
 /**
  * Model Selection Type Enum (for API discriminator)
@@ -111,7 +114,11 @@ export const {
 /**
  * Database enum array for Drizzle (uses translation keys)
  */
-export const PriceLevelDB = [PriceLevel.CHEAP, PriceLevel.STANDARD, PriceLevel.PREMIUM] as const;
+export const PriceLevelDB = [
+  PriceLevel.CHEAP,
+  PriceLevel.STANDARD,
+  PriceLevel.PREMIUM,
+] as const;
 
 export const PriceLevelFilterDB = [
   PriceLevelFilter.ANY,
@@ -191,7 +198,11 @@ export const {
 /**
  * Database enum array for Drizzle
  */
-export const SpeedLevelDB = [SpeedLevel.FAST, SpeedLevel.BALANCED, SpeedLevel.THOROUGH] as const;
+export const SpeedLevelDB = [
+  SpeedLevel.FAST,
+  SpeedLevel.BALANCED,
+  SpeedLevel.THOROUGH,
+] as const;
 
 export const SpeedLevelFilterDB = [
   SpeedLevelFilter.ANY,
@@ -207,7 +218,9 @@ interface TierDisplayConfig<T extends string> {
   description?: TranslationKey;
 }
 
-export const INTELLIGENCE_DISPLAY: TierDisplayConfig<typeof IntelligenceLevelFilterValue>[] = [
+export const INTELLIGENCE_DISPLAY: TierDisplayConfig<
+  typeof IntelligenceLevelFilterValue
+>[] = [
   {
     value: IntelligenceLevelFilter.QUICK,
     label: "app.chat.tiers.intelligence.quick",
@@ -228,28 +241,31 @@ export const INTELLIGENCE_DISPLAY: TierDisplayConfig<typeof IntelligenceLevelFil
   },
 ];
 
-export const PRICE_DISPLAY: TierDisplayConfig<typeof PriceLevelFilterValue>[] = [
-  {
-    value: PriceLevelFilter.CHEAP,
-    label: "app.chat.tiers.price.cheap",
-    icon: "coins",
-    description: "app.chat.tiers.price.cheapDesc",
-  },
-  {
-    value: PriceLevelFilter.STANDARD,
-    label: "app.chat.tiers.price.standard",
-    icon: "coins",
-    description: "app.chat.tiers.price.standardDesc",
-  },
-  {
-    value: PriceLevelFilter.PREMIUM,
-    label: "app.chat.tiers.price.premium",
-    icon: "crown",
-    description: "app.chat.tiers.price.premiumDesc",
-  },
-];
+export const PRICE_DISPLAY: TierDisplayConfig<typeof PriceLevelFilterValue>[] =
+  [
+    {
+      value: PriceLevelFilter.CHEAP,
+      label: "app.chat.tiers.price.cheap",
+      icon: "coins",
+      description: "app.chat.tiers.price.cheapDesc",
+    },
+    {
+      value: PriceLevelFilter.STANDARD,
+      label: "app.chat.tiers.price.standard",
+      icon: "coins",
+      description: "app.chat.tiers.price.standardDesc",
+    },
+    {
+      value: PriceLevelFilter.PREMIUM,
+      label: "app.chat.tiers.price.premium",
+      icon: "crown",
+      description: "app.chat.tiers.price.premiumDesc",
+    },
+  ];
 
-export const CONTENT_DISPLAY: TierDisplayConfig<typeof ContentLevelFilterValue>[] = [
+export const CONTENT_DISPLAY: TierDisplayConfig<
+  typeof ContentLevelFilterValue
+>[] = [
   {
     value: ContentLevelFilter.MAINSTREAM,
     label: "app.chat.tiers.content.mainstream",
@@ -270,23 +286,24 @@ export const CONTENT_DISPLAY: TierDisplayConfig<typeof ContentLevelFilterValue>[
   },
 ];
 
-export const SPEED_DISPLAY: TierDisplayConfig<typeof SpeedLevelFilterValue>[] = [
-  {
-    value: SpeedLevelFilter.FAST,
-    label: "app.chat.tiers.speed.fast",
-    icon: "zap",
-    description: "app.chat.tiers.speed.fastDesc",
-  },
-  {
-    value: SpeedLevelFilter.BALANCED,
-    label: "app.chat.tiers.speed.balanced",
-    icon: "scale",
-    description: "app.chat.tiers.speed.balancedDesc",
-  },
-  {
-    value: SpeedLevelFilter.THOROUGH,
-    label: "app.chat.tiers.speed.thorough",
-    icon: "microscope",
-    description: "app.chat.tiers.speed.thoroughDesc",
-  },
-];
+export const SPEED_DISPLAY: TierDisplayConfig<typeof SpeedLevelFilterValue>[] =
+  [
+    {
+      value: SpeedLevelFilter.FAST,
+      label: "app.chat.tiers.speed.fast",
+      icon: "zap",
+      description: "app.chat.tiers.speed.fastDesc",
+    },
+    {
+      value: SpeedLevelFilter.BALANCED,
+      label: "app.chat.tiers.speed.balanced",
+      icon: "scale",
+      description: "app.chat.tiers.speed.balancedDesc",
+    },
+    {
+      value: SpeedLevelFilter.THOROUGH,
+      label: "app.chat.tiers.speed.thorough",
+      icon: "microscope",
+      description: "app.chat.tiers.speed.thoroughDesc",
+    },
+  ];

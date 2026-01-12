@@ -70,7 +70,11 @@ export function FileAttachments({
  * Single file attachment item
  * Handles URL generation for incognito mode (base64 -> blob URL)
  */
-function FileAttachmentItem({ attachment }: { attachment: FileAttachment }): JSX.Element {
+function FileAttachmentItem({
+  attachment,
+}: {
+  attachment: FileAttachment;
+}): JSX.Element {
   const [displayUrl, setDisplayUrl] = useState<string>(attachment.url);
   const isImg = isImage(attachment.mimeType);
 
@@ -109,7 +113,12 @@ function FileAttachmentItem({ attachment }: { attachment: FileAttachment }): JSX
     <Div className="border border-border rounded-lg overflow-hidden bg-background/50">
       {/* Image preview */}
       {isImg && displayUrl && (
-        <Link href={displayUrl} target="_blank" rel="noopener noreferrer" className="block">
+        <Link
+          href={displayUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block"
+        >
           <Image
             src={displayUrl}
             alt={attachment.filename}
@@ -126,8 +135,12 @@ function FileAttachmentItem({ attachment }: { attachment: FileAttachment }): JSX
         <Div className="shrink-0">{getFileIcon(attachment.mimeType)}</Div>
 
         <Div className="flex-1 min-w-0">
-          <Div className="text-sm font-medium truncate">{attachment.filename}</Div>
-          <Div className="text-xs text-muted-foreground">{formatFileSize(attachment.size)}</Div>
+          <Div className="text-sm font-medium truncate">
+            {attachment.filename}
+          </Div>
+          <Div className="text-xs text-muted-foreground">
+            {formatFileSize(attachment.size)}
+          </Div>
         </Div>
 
         {displayUrl && (

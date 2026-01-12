@@ -15,7 +15,8 @@ export const translations = {
     text: {
       label: "Text",
       description: "In Sprache umzuwandelnder Text",
-      placeholder: "Geben Sie den Text ein, den Sie in Sprache umwandeln möchten...",
+      placeholder:
+        "Geben Sie den Text ein, den Sie in Sprache umwandeln möchten...",
     },
     provider: {
       label: "Anbieter",
@@ -47,11 +48,13 @@ export const translations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description: "Sie müssen angemeldet sein, um Text-zu-Sprache zu verwenden",
+        description:
+          "Sie müssen angemeldet sein, um Text-zu-Sprache zu verwenden",
       },
       forbidden: {
         title: "Verboten",
-        description: "Sie haben keine Berechtigung, Text-zu-Sprache zu verwenden",
+        description:
+          "Sie haben keine Berechtigung, Text-zu-Sprache zu verwenden",
       },
       not_found: {
         title: "Nicht gefunden",
@@ -59,7 +62,8 @@ export const translations = {
       },
       server_error: {
         title: "Serverfehler",
-        description: "Beim Konvertieren von Text zu Sprache ist ein Fehler aufgetreten",
+        description:
+          "Beim Konvertieren von Text zu Sprache ist ein Fehler aufgetreten",
       },
       unknown_error: {
         title: "Unbekannter Fehler",

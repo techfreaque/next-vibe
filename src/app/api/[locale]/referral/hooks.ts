@@ -45,7 +45,9 @@ export function useReferralCreate(): EndpointReturn<typeof definitions> {
  * Hook for listing user's referral codes
  * Provides query (GET) operations for fetching referral codes with stats
  */
-export function useReferralCodesList(): EndpointReturn<typeof codesListDefinitions> {
+export function useReferralCodesList(): EndpointReturn<
+  typeof codesListDefinitions
+> {
   const { locale } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
 
@@ -66,7 +68,9 @@ export function useReferralCodesList(): EndpointReturn<typeof codesListDefinitio
  * Hook for linking referral code to lead
  * Provides mutation (POST) operations for linking referral codes to leads
  */
-export function useReferralLinkToLead(): EndpointReturn<typeof linkToLeadDefinitions> {
+export function useReferralLinkToLead(): EndpointReturn<
+  typeof linkToLeadDefinitions
+> {
   const { locale } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
 

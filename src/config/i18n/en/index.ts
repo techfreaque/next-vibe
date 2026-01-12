@@ -16,7 +16,8 @@ export const translations = {
       street: "123 AI Innovation Drive",
       city: "San Francisco, CA 94105",
       country: "United States",
-      addressIn1Line: "123 AI Innovation Drive, San Francisco, CA 94105, United States",
+      addressIn1Line:
+        "123 AI Innovation Drive, San Francisco, CA 94105, United States",
     },
     responsiblePerson: {
       name: "Chief Executive Officer",
@@ -25,8 +26,10 @@ export const translations = {
       phone: "+1 (555) 123-4567",
       telephone: "+1-555-0123",
       title: "Contact",
-      description: "If you have any questions about this Privacy Policy, please contact us at",
-      content: "If you have any questions about these Terms of Service, please contact us at",
+      description:
+        "If you have any questions about this Privacy Policy, please contact us at",
+      content:
+        "If you have any questions about these Terms of Service, please contact us at",
     },
   },
   emails: {

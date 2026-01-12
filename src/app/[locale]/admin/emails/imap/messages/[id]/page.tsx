@@ -36,7 +36,10 @@ export default async function ImapMessageDetailPage({
 
   // Fetch message data
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const messageResponse = await imapMessagesRepository.getMessageById({ id }, logger);
+  const messageResponse = await imapMessagesRepository.getMessageById(
+    { id },
+    logger,
+  );
 
   if (!messageResponse.success) {
     notFound();

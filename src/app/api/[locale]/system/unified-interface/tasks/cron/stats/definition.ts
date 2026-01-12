@@ -38,7 +38,8 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["system", "tasks", "cron", "stats"],
   title: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.title",
-  description: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.description",
+  description:
+    "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.description",
   icon: "clock",
   category: "app.api.system.unifiedInterface.tasks.category",
   allowedRoles: [UserRole.ADMIN],
@@ -47,8 +48,10 @@ const { GET } = createEndpoint({
   fields: objectField(
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.form.title",
-      description: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.form.description",
+      title:
+        "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.form.title",
+      description:
+        "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.form.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -59,25 +62,30 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.period.title",
+          label:
+            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.period.title",
           description:
             "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.period.description",
           options: [
             {
               value: "hour",
-              label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.hour",
+              label:
+                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.hour",
             },
             {
               value: "day",
-              label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.day",
+              label:
+                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.day",
             },
             {
               value: "week",
-              label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.week",
+              label:
+                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.week",
             },
             {
               value: "month",
-              label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.month",
+              label:
+                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.period.month",
             },
           ],
           columns: 3,
@@ -89,25 +97,30 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.type.title",
+          label:
+            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.type.title",
           description:
             "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.type.description",
           options: [
             {
               value: "overview",
-              label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.overview",
+              label:
+                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.overview",
             },
             {
               value: "performance",
-              label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.performance",
+              label:
+                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.performance",
             },
             {
               value: "errors",
-              label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.errors",
+              label:
+                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.errors",
             },
             {
               value: "trends",
-              label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.trends",
+              label:
+                "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.type.trends",
             },
           ],
           columns: 3,
@@ -119,7 +132,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskId.title",
+          label:
+            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskId.title",
           description:
             "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskId.description",
           columns: 3,
@@ -131,7 +145,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
-          label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.limit.title",
+          label:
+            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.limit.title",
           description:
             "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.limit.description",
           columns: 3,
@@ -166,7 +181,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskName.title",
+          label:
+            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.taskName.title",
           columns: 3,
         },
         z.string().optional(),
@@ -275,7 +291,8 @@ const { GET } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
-          label: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.search.title",
+          label:
+            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.fields.search.title",
           columns: 12,
         },
         z.string().optional(),
@@ -294,7 +311,8 @@ const { GET } = createEndpoint({
       data: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.data.title",
+          content:
+            "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.response.data.title",
         },
         z.object({
           // Basic stats fields
@@ -324,8 +342,12 @@ const { GET } = createEndpoint({
           runningExecutions: z.coerce.number().optional(),
 
           // Distribution fields
-          tasksByPriority: z.record(z.enum(CronTaskPriority), z.coerce.number()).optional(),
-          tasksByStatus: z.record(z.enum(CronTaskStatus), z.coerce.number()).optional(),
+          tasksByPriority: z
+            .record(z.enum(CronTaskPriority), z.coerce.number())
+            .optional(),
+          tasksByStatus: z
+            .record(z.enum(CronTaskStatus), z.coerce.number())
+            .optional(),
           executionsByHour: z.record(z.string(), z.coerce.number()).optional(),
           executionsByDay: z.record(z.string(), z.coerce.number()).optional(),
 
@@ -447,7 +469,10 @@ const { GET } = createEndpoint({
 
           // Historical data for charts
           historicalData: z
-            .record(z.string(), z.array(z.object({ date: z.string(), value: z.coerce.number() })))
+            .record(
+              z.string(),
+              z.array(z.object({ date: z.string(), value: z.coerce.number() })),
+            )
             .optional(),
         }),
       ),
@@ -458,42 +483,50 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.server.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.server.title",
       description:
         "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.server.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.validation.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.validation.title",
       description:
         "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.unauthorized.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.unauthorized.title",
       description:
         "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.forbidden.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.forbidden.title",
       description:
         "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.notFound.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.notFound.title",
       description:
         "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.conflict.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.conflict.title",
       description:
         "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.network.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.network.title",
       description:
         "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.unknown.title",
+      title:
+        "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.unknown.title",
       description:
         "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.unknown.description",
     },
@@ -506,8 +539,10 @@ const { GET } = createEndpoint({
   },
 
   successTypes: {
-    title: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.success.title",
-    description: "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.success.description",
+    title:
+      "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.success.title",
+    description:
+      "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.success.description",
   },
 
   examples: {

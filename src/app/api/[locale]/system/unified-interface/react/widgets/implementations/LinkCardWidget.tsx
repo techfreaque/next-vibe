@@ -108,7 +108,16 @@ export function LinkCardWidget<const TKey extends string>({
     );
   }
 
-  const { url, title, description, snippet, age, source, thumbnail, openInNewTab = true } = data;
+  const {
+    url,
+    title,
+    description,
+    snippet,
+    age,
+    source,
+    thumbnail,
+    openInNewTab = true,
+  } = data;
 
   const translatedTitle = isWidgetDataString(title, context);
   const translatedDescription = isWidgetDataString(description, context);
@@ -137,7 +146,12 @@ export function LinkCardWidget<const TKey extends string>({
         )}
       >
         <CardHeader className="pb-3">
-          <Div className={cn("flex items-start justify-between", titleGapClass || "gap-2")}>
+          <Div
+            className={cn(
+              "flex items-start justify-between",
+              titleGapClass || "gap-2",
+            )}
+          >
             <Div className="min-w-0 flex-1">
               <CardTitle
                 className={cn(
@@ -164,7 +178,9 @@ export function LinkCardWidget<const TKey extends string>({
                   metaSizeClass || "text-xs",
                 )}
               >
-                {translatedSource && <Span className="font-medium">{translatedSource}</Span>}
+                {translatedSource && (
+                  <Span className="font-medium">{translatedSource}</Span>
+                )}
                 {translatedAge && translatedSource && <Span>•</Span>}
                 {translatedAge && <Span>{translatedAge}</Span>}
               </Div>
@@ -175,14 +191,19 @@ export function LinkCardWidget<const TKey extends string>({
                 alt={translatedTitle || ""}
                 width={64}
                 height={64}
-                className={cn(thumbnailSizeClass, "object-cover rounded shrink-0")}
+                className={cn(
+                  thumbnailSizeClass,
+                  "object-cover rounded shrink-0",
+                )}
               />
             )}
           </Div>
         </CardHeader>
         {displayDescription && (
           <CardContent className="pt-0">
-            <CardDescription className={cn("line-clamp-3", descriptionSizeClass || "text-sm")}>
+            <CardDescription
+              className={cn("line-clamp-3", descriptionSizeClass || "text-sm")}
+            >
               {displayDescription}
             </CardDescription>
           </CardContent>

@@ -18,7 +18,11 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
   },
   [Methods.PUT]: {
     handler: async ({ data, urlPathParams, logger }) => {
-      return await CronTasksRepository.updateTask(urlPathParams.id, data, logger);
+      return await CronTasksRepository.updateTask(
+        urlPathParams.id,
+        data,
+        logger,
+      );
     },
   },
   [Methods.DELETE]: {

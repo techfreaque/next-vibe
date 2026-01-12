@@ -25,7 +25,9 @@ interface NotFoundPageProps {
 /**
  * Generate metadata for the 404 page with translations
  */
-export async function generateMetadata({ params }: NotFoundPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: NotFoundPageProps): Promise<Metadata> {
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "not-found",
@@ -44,7 +46,9 @@ export async function generateMetadata({ params }: NotFoundPageProps): Promise<M
  *
  * @returns JSX Element for the 404 page
  */
-export default async function NotFound({ params }: NotFoundPageProps): Promise<JSX.Element> {
+export default async function NotFound({
+  params,
+}: NotFoundPageProps): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
   return (
@@ -66,7 +70,9 @@ export default async function NotFound({ params }: NotFoundPageProps): Promise<J
                       className="mx-auto"
                     />
                   </Div>
-                  <H1 className="text-7xl font-bold mt-4 animate-pulse-slow">404</H1>
+                  <H1 className="text-7xl font-bold mt-4 animate-pulse-slow">
+                    404
+                  </H1>
                 </Div>
               </Div>
 

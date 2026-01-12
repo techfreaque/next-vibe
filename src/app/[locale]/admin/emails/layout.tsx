@@ -19,5 +19,9 @@ export default async function EmailsAdminLayout({
 }: EmailsAdminLayoutProps): Promise<JSX.Element> {
   const { locale } = await params;
 
-  return <EmailsAdminLayoutClient locale={locale}>{children}</EmailsAdminLayoutClient>;
+  return (
+    <EmailsAdminLayoutClient locale={locale}>
+      {children}
+    </EmailsAdminLayoutClient>
+  );
 }

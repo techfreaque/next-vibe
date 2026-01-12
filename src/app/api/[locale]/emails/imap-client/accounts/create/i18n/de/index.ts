@@ -7,7 +7,8 @@ export const translations = {
   },
   container: {
     title: "Neues IMAP-Konto",
-    description: "Ein neues IMAP-Konto für E-Mail-Synchronisation konfigurieren",
+    description:
+      "Ein neues IMAP-Konto für E-Mail-Synchronisation konfigurieren",
   },
   name: {
     label: "Kontoname",

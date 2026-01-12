@@ -13,9 +13,15 @@ import type {
 } from "@/packages/next-vibe-ui/web/ui/carousel";
 
 import { applyStyleType } from "../../web/utils/style-type";
-import { convertCSSToViewStyle, styledNative, styledNativeRef } from "../utils/style-converter";
+import {
+  convertCSSToViewStyle,
+  styledNative,
+  styledNativeRef,
+} from "../utils/style-converter";
 
-const StyledScrollView = styledNativeRef<typeof ScrollView, RNScrollView>(ScrollView);
+const StyledScrollView = styledNativeRef<typeof ScrollView, RNScrollView>(
+  ScrollView,
+);
 const StyledView = styledNative(View);
 const StyledPressable = styledNative(Pressable);
 const StyledText = styledNative(RNText);
@@ -95,7 +101,10 @@ function Carousel({
         horizontal={orientation === "horizontal"}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
-        className={cn(orientation === "horizontal" ? "flex flex-row" : "flex flex-col", className)}
+        className={cn(
+          orientation === "horizontal" ? "flex flex-row" : "flex flex-col",
+          className,
+        )}
       >
         {children}
       </StyledScrollView>
@@ -105,7 +114,11 @@ function Carousel({
 
 Carousel.displayName = "Carousel";
 
-function CarouselItem({ className, style, children }: CarouselItemProps): React.JSX.Element {
+function CarouselItem({
+  className,
+  style,
+  children,
+}: CarouselItemProps): React.JSX.Element {
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;
 
   return (
@@ -147,7 +160,9 @@ function CarouselPrevious({
       disabled={!canScrollPrev}
       className={cn("absolute", className)}
       accessibilityRole="button"
-      accessibilityLabel={t("packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide")}
+      accessibilityLabel={t(
+        "packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide",
+      )}
     >
       <StyledText>
         {t("packages.nextVibeUi.web.common.accessibility.srOnly.previousSlide")}
@@ -172,9 +187,13 @@ function CarouselNext({
       disabled={!canScrollNext}
       className={cn("absolute", className)}
       accessibilityRole="button"
-      accessibilityLabel={t("packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide")}
+      accessibilityLabel={t(
+        "packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide",
+      )}
     >
-      <StyledText>{t("packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide")}</StyledText>
+      <StyledText>
+        {t("packages.nextVibeUi.web.common.accessibility.srOnly.nextSlide")}
+      </StyledText>
     </StyledPressable>
   );
 }

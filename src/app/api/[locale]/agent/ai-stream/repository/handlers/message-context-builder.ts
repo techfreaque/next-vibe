@@ -7,7 +7,10 @@ import "server-only";
 import type { ModelMessage } from "ai";
 import { eq } from "drizzle-orm";
 
-import { getModelById, type ModelId } from "@/app/api/[locale]/agent/models/models";
+import {
+  getModelById,
+  type ModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { db } from "../../../../system/db";
@@ -42,26 +45,30 @@ export class MessageContextBuilder {
       const originalCount = message.metadata.attachments.length;
 
       // Filter out image and file attachments
-      message.metadata.attachments = message.metadata.attachments.filter((attachment) => {
-        const mimeType = attachment.mimeType?.toLowerCase() || "";
-        const isImage = mimeType.startsWith("image/");
-        const isFile = mimeType.startsWith("application/") || mimeType.startsWith("text/");
+      message.metadata.attachments = message.metadata.attachments.filter(
+        (attachment) => {
+          const mimeType = attachment.mimeType?.toLowerCase() || "";
+          const isImage = mimeType.startsWith("image/");
+          const isFile =
+            mimeType.startsWith("application/") || mimeType.startsWith("text/");
 
-        if (isImage || isFile) {
-          totalRemoved++;
-          formatSet.add(isImage ? "image" : "file");
-          return false;
-        }
+          if (isImage || isFile) {
+            totalRemoved++;
+            formatSet.add(isImage ? "image" : "file");
+            return false;
+          }
 
-        return true;
-      });
+          return true;
+        },
+      );
 
       // If all attachments were removed, remove the attachments array
       if (message.metadata.attachments.length === 0) {
         delete message.metadata.attachments;
       }
 
-      const removedCount = originalCount - (message.metadata.attachments?.length || 0);
+      const removedCount =
+        originalCount - (message.metadata.attachments?.length || 0);
       if (removedCount > 0) {
         // Optionally clear content if it was only describing the attachment
         // For now, we keep the text content even if attachments are removed
@@ -123,13 +130,20 @@ export class MessageContextBuilder {
     });
     // SECURITY: Reject non-empty messageHistory for non-incognito threads
     // Non-incognito threads must fetch history from database to prevent manipulation
-    if (!params.isIncognito && params.messageHistory && params.messageHistory.length > 0) {
-      params.logger.error("Security violation: messageHistory provided for non-incognito thread", {
-        operation: params.operation,
-        threadId: params.threadId,
-        isIncognito: params.isIncognito,
-        messageHistoryLength: params.messageHistory.length,
-      });
+    if (
+      !params.isIncognito &&
+      params.messageHistory &&
+      params.messageHistory.length > 0
+    ) {
+      params.logger.error(
+        "Security violation: messageHistory provided for non-incognito thread",
+        {
+          operation: params.operation,
+          threadId: params.threadId,
+          isIncognito: params.isIncognito,
+          messageHistoryLength: params.messageHistory.length,
+        },
+      );
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Security violation should throw immediately
       throw new Error(
         "messageHistory is only allowed for incognito mode. Server-side threads fetch history from database.",
@@ -142,10 +156,13 @@ export class MessageContextBuilder {
     if (params.isIncognito && params.messageHistory) {
       // Incognito: use passed message history
       history = params.messageHistory;
-      params.logger.debug("[BuildMessageContext] Using passed message history (incognito)", {
-        operation: params.operation,
-        historyLength: history.length,
-      });
+      params.logger.debug(
+        "[BuildMessageContext] Using passed message history (incognito)",
+        {
+          operation: params.operation,
+          historyLength: history.length,
+        },
+      );
     } else if (!params.isIncognito && params.threadId) {
       // Server: fetch message history from database
       if (params.operation === "answer-as-ai" && params.parentMessageId) {
@@ -156,7 +173,9 @@ export class MessageContextBuilder {
           .where(eq(chatMessages.threadId, params.threadId))
           .orderBy(chatMessages.createdAt);
 
-        const parentIndex = allMessages.findIndex((msg) => msg.id === params.parentMessageId);
+        const parentIndex = allMessages.findIndex(
+          (msg) => msg.id === params.parentMessageId,
+        );
 
         if (parentIndex !== -1) {
           history = allMessages.slice(0, parentIndex + 1);
@@ -183,28 +202,40 @@ export class MessageContextBuilder {
         if (message.metadata?.attachments) {
           for (const attachment of message.metadata.attachments) {
             if (attachment.url && !attachment.data) {
-              const base64Data = await storage.readFileAsBase64(attachment.id, params.threadId);
+              const base64Data = await storage.readFileAsBase64(
+                attachment.id,
+                params.threadId,
+              );
               if (base64Data) {
                 attachment.data = base64Data;
-                params.logger.debug("[BuildMessageContext] Fetched file data for attachment", {
-                  attachmentId: attachment.id,
-                  filename: attachment.filename,
-                });
+                params.logger.debug(
+                  "[BuildMessageContext] Fetched file data for attachment",
+                  {
+                    attachmentId: attachment.id,
+                    filename: attachment.filename,
+                  },
+                );
               }
             }
           }
         }
       }
 
-      params.logger.debug("[BuildMessageContext] Fetched message history from DB (server)", {
-        operation: params.operation,
-        historyLength: history.length,
-      });
+      params.logger.debug(
+        "[BuildMessageContext] Fetched message history from DB (server)",
+        {
+          operation: params.operation,
+          historyLength: history.length,
+        },
+      );
     } else {
-      params.logger.debug("[BuildMessageContext] No history (new conversation)", {
-        operation: params.operation,
-        hasThreadId: !!params.threadId,
-      });
+      params.logger.debug(
+        "[BuildMessageContext] No history (new conversation)",
+        {
+          operation: params.operation,
+          hasThreadId: !!params.threadId,
+        },
+      );
     }
 
     // ============================================================================
@@ -214,7 +245,9 @@ export class MessageContextBuilder {
 
     // Add current user message to context (unless it's answer-as-ai or tool confirmations)
     const shouldAddCurrentMessage =
-      params.operation !== "answer-as-ai" && !params.hasToolConfirmations && params.content.trim();
+      params.operation !== "answer-as-ai" &&
+      !params.hasToolConfirmations &&
+      params.content.trim();
 
     if (shouldAddCurrentMessage) {
       const currentMessage: ChatMessage = {
@@ -247,11 +280,14 @@ export class MessageContextBuilder {
       };
       contextMessages.push(currentMessage);
 
-      params.logger.debug("[BuildMessageContext] Added current message to context", {
-        role: params.role,
-        hasMetadata: !!params.userMessageMetadata,
-        attachmentCount: params.userMessageMetadata?.attachments?.length ?? 0,
-      });
+      params.logger.debug(
+        "[BuildMessageContext] Added current message to context",
+        {
+          role: params.role,
+          hasMetadata: !!params.userMessageMetadata,
+          attachmentCount: params.userMessageMetadata?.attachments?.length ?? 0,
+        },
+      );
     }
 
     params.logger.debug("[BuildMessageContext] Built message context", {
@@ -265,18 +301,26 @@ export class MessageContextBuilder {
     let visionWarningMessage: string | null = null;
 
     if (params.upcomingResponseContext?.model) {
-      const modelConfig = getModelById(params.upcomingResponseContext.model as ModelId);
+      const modelConfig = getModelById(
+        params.upcomingResponseContext.model as ModelId,
+      );
 
       if (!modelConfig.features.imageInput) {
-        const result = this.stripAttachmentsFromMessages(contextMessages, modelConfig.name);
+        const result = this.stripAttachmentsFromMessages(
+          contextMessages,
+          modelConfig.name,
+        );
 
         if (result.totalRemoved > 0) {
           visionWarningMessage = result.warningMessage;
-          params.logger.info("[BuildMessageContext] Removed attachments for non-vision model", {
-            model: modelConfig.name,
-            attachmentsRemoved: result.totalRemoved,
-            formats: result.formats.join(", "),
-          });
+          params.logger.info(
+            "[BuildMessageContext] Removed attachments for non-vision model",
+            {
+              model: modelConfig.name,
+              attachmentsRemoved: result.totalRemoved,
+              formats: result.formats.join(", "),
+            },
+          );
         }
       }
     }
@@ -311,9 +355,12 @@ export class MessageContextBuilder {
     // Tool messages are created in DB AFTER buildMessageContext is called (during streaming)
     // So we need to manually add them here from toolConfirmationResults
     if (params.hasToolConfirmations && params.toolConfirmationResults?.length) {
-      params.logger.debug("[BuildMessageContext] Adding tool confirmation results", {
-        count: params.toolConfirmationResults.length,
-      });
+      params.logger.debug(
+        "[BuildMessageContext] Adding tool confirmation results",
+        {
+          count: params.toolConfirmationResults.length,
+        },
+      );
 
       const { simpleT } = await import("@/i18n/core/shared");
       const { defaultLocale } = await import("@/i18n/core/config");
@@ -327,7 +374,8 @@ export class MessageContextBuilder {
           ? {
               type: "error-text" as const,
               value:
-                toolCall.error.message === "app.api.agent.chat.aiStream.errors.userDeclinedTool"
+                toolCall.error.message ===
+                "app.api.agent.chat.aiStream.errors.userDeclinedTool"
                   ? simpleT(defaultLocale).t(toolCall.error.message)
                   : JSON.stringify({
                       message: toolCall.error.message,
@@ -363,9 +411,12 @@ export class MessageContextBuilder {
         });
       }
 
-      params.logger.debug("[BuildMessageContext] Added tool confirmation results", {
-        totalMessages: messages.length,
-      });
+      params.logger.debug(
+        "[BuildMessageContext] Added tool confirmation results",
+        {
+          totalMessages: messages.length,
+        },
+      );
     }
 
     // ============================================================================
@@ -374,15 +425,19 @@ export class MessageContextBuilder {
     // For answer-as-ai operation, add CONTINUE_CONVERSATION_PROMPT as a system message
     // User can optionally provide additional instructions via content
     if (params.operation === "answer-as-ai") {
-      const { CONTINUE_CONVERSATION_PROMPT } = await import("../system-prompt/generator");
+      const { CONTINUE_CONVERSATION_PROMPT } =
+        await import("../system-prompt/generator");
       const systemContent = params.content.trim()
         ? `${CONTINUE_CONVERSATION_PROMPT}\n\nAdditional instructions: ${params.content}`
         : CONTINUE_CONVERSATION_PROMPT;
 
       messages.push({ role: "system", content: systemContent });
-      params.logger.debug("[BuildMessageContext] Added CONTINUE_CONVERSATION_PROMPT", {
-        hasAdditionalContent: !!params.content.trim(),
-      });
+      params.logger.debug(
+        "[BuildMessageContext] Added CONTINUE_CONVERSATION_PROMPT",
+        {
+          hasAdditionalContent: !!params.content.trim(),
+        },
+      );
     }
 
     // ============================================================================

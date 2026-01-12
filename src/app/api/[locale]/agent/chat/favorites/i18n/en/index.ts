@@ -214,11 +214,13 @@ export const translations = {
     },
     minIntelligence: {
       label: "Minimum Intelligence",
-      description: "Minimum intelligence/capability level required for the model",
+      description:
+        "Minimum intelligence/capability level required for the model",
     },
     maxIntelligence: {
       label: "Maximum Intelligence",
-      description: "Maximum intelligence/capability level allowed for the model",
+      description:
+        "Maximum intelligence/capability level allowed for the model",
     },
     priceRange: {
       label: "Price Range",

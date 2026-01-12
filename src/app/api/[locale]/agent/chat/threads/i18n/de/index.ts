@@ -9,7 +9,8 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Chat-Threads auflisten",
-    description: "Eine paginierte Liste von Chat-Threads mit Filteroptionen abrufen",
+    description:
+      "Eine paginierte Liste von Chat-Threads mit Filteroptionen abrufen",
     container: {
       title: "Thread-Liste",
       description: "Chat-Threads durchsuchen und filtern",
@@ -34,7 +35,8 @@ export const translations: typeof enTranslations = {
     },
     rootFolderId: {
       label: "Stammordner",
-      description: "Nach Stammordner filtern (private, shared, public, incognito)",
+      description:
+        "Nach Stammordner filtern (private, shared, public, incognito)",
     },
     subFolderId: {
       label: "Unterordner",
@@ -266,7 +268,8 @@ export const translations: typeof enTranslations = {
       forbidden: {
         title: "Verboten",
         description: "Sie haben keine Berechtigung, Threads zu erstellen",
-        incognitoNotAllowed: "Inkognito-Threads können nicht auf dem Server erstellt werden",
+        incognitoNotAllowed:
+          "Inkognito-Threads können nicht auf dem Server erstellt werden",
       },
       notFound: {
         title: "Nicht gefunden",

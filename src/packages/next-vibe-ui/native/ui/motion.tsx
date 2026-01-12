@@ -1,8 +1,18 @@
 import type { MotiProps } from "moti";
-import { AnimatePresence as MotiAnimatePresence, MotiImage, MotiText, MotiView } from "moti";
+import {
+  AnimatePresence as MotiAnimatePresence,
+  MotiImage,
+  MotiText,
+  MotiView,
+} from "moti";
 import { styled } from "nativewind";
 import * as React from "react";
-import type { ImageSourcePropType, ImageStyle, TextStyle, ViewStyle } from "react-native";
+import type {
+  ImageSourcePropType,
+  ImageStyle,
+  TextStyle,
+  ViewStyle,
+} from "react-native";
 import { Pressable, Text as RNText } from "react-native";
 
 import type {
@@ -44,7 +54,10 @@ export function AnimatePresence({
 }: AnimatePresenceProps): React.JSX.Element {
   // Moti AnimatePresence doesn't support mode directly, but we can handle initial and onExitComplete
   return (
-    <MotiAnimatePresence exitBeforeEnter={mode === "wait"} onExitComplete={onExitComplete}>
+    <MotiAnimatePresence
+      exitBeforeEnter={mode === "wait"}
+      onExitComplete={onExitComplete}
+    >
       {children}
     </MotiAnimatePresence>
   );
@@ -60,8 +73,9 @@ function convertTransitionToMoti(
 
   // Handle object transition
   if (typeof transition === "object" && transition !== null) {
-    const motiTransition: NonNullable<MotiProps<ViewStyle | TextStyle | ImageStyle>["transition"]> =
-      {};
+    const motiTransition: NonNullable<
+      MotiProps<ViewStyle | TextStyle | ImageStyle>["transition"]
+    > = {};
 
     // Map type
     if ("type" in transition) {
@@ -99,7 +113,10 @@ function convertTransitionToMoti(
     if ("repeat" in transition && typeof transition.repeat === "number") {
       Object.assign(motiTransition, { loop: transition.repeat === Infinity });
     }
-    if ("repeatType" in transition && typeof transition.repeatType === "string") {
+    if (
+      "repeatType" in transition &&
+      typeof transition.repeatType === "string"
+    ) {
       Object.assign(motiTransition, {
         repeatReverse: transition.repeatType === "reverse",
       });
@@ -308,7 +325,9 @@ export function MotionImg({
   alt,
 }: MotionImgProps): React.JSX.Element {
   // Convert src to ImageSourcePropType
-  const source: ImageSourcePropType | undefined = src ? { uri: src } : undefined;
+  const source: ImageSourcePropType | undefined = src
+    ? { uri: src }
+    : undefined;
 
   // Convert CSS style to React Native ImageStyle if provided
   const nativeStyle = style ? convertCSSToImageStyle(style) : undefined;

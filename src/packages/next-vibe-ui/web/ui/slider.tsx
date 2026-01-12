@@ -40,7 +40,10 @@ export function Slider({
 }: SliderRootProps): React.JSX.Element {
   return (
     <SliderPrimitive.Root
-      className={cn("relative flex w-full touch-none select-none items-center", className)}
+      className={cn(
+        "relative flex w-full touch-none select-none items-center",
+        className,
+      )}
       style={style}
       value={value}
       defaultValue={defaultValue}
@@ -78,7 +81,11 @@ export function SliderTrack({
 }
 SliderTrack.displayName = SliderPrimitive.Track.displayName;
 
-export function SliderRange({ className, style, ...props }: SliderRangeProps): React.JSX.Element {
+export function SliderRange({
+  className,
+  style,
+  ...props
+}: SliderRangeProps): React.JSX.Element {
   return (
     <SliderPrimitive.Range
       className={cn("absolute h-full bg-primary", className)}
@@ -89,7 +96,11 @@ export function SliderRange({ className, style, ...props }: SliderRangeProps): R
 }
 SliderRange.displayName = SliderPrimitive.Range.displayName;
 
-export function SliderThumb({ className, style, ...props }: SliderThumbProps): React.JSX.Element {
+export function SliderThumb({
+  className,
+  style,
+  ...props
+}: SliderThumbProps): React.JSX.Element {
   return (
     <SliderPrimitive.Thumb
       className={cn(

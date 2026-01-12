@@ -20,7 +20,12 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { Countries, CountriesOptions, Languages, LanguagesOptions } from "@/i18n/core/config";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 import {
   EmailCampaignStage,
@@ -85,8 +90,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.leads.import.post.fileName.label" as const,
-          description: "app.api.leads.import.post.fileName.description" as const,
-          placeholder: "app.api.leads.import.post.fileName.placeholder" as const,
+          description:
+            "app.api.leads.import.post.fileName.description" as const,
+          placeholder:
+            "app.api.leads.import.post.fileName.placeholder" as const,
           helpText: "app.api.leads.import.post.fileName.helpText" as const,
           columns: 12,
         },
@@ -97,8 +104,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.leads.import.post.skipDuplicates.label" as const,
-          description: "app.api.leads.import.post.skipDuplicates.description" as const,
-          helpText: "app.api.leads.import.post.skipDuplicates.helpText" as const,
+          description:
+            "app.api.leads.import.post.skipDuplicates.description" as const,
+          helpText:
+            "app.api.leads.import.post.skipDuplicates.helpText" as const,
           columns: 6,
         },
         z.boolean().default(true),
@@ -108,8 +117,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.leads.import.post.updateExisting.label" as const,
-          description: "app.api.leads.import.post.updateExisting.description" as const,
-          helpText: "app.api.leads.import.post.updateExisting.helpText" as const,
+          description:
+            "app.api.leads.import.post.updateExisting.description" as const,
+          helpText:
+            "app.api.leads.import.post.updateExisting.helpText" as const,
           columns: 6,
         },
         z.boolean().default(false),
@@ -119,8 +130,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.leads.import.post.defaultCountry.label" as const,
-          description: "app.api.leads.import.post.defaultCountry.description" as const,
-          helpText: "app.api.leads.import.post.defaultCountry.helpText" as const,
+          description:
+            "app.api.leads.import.post.defaultCountry.description" as const,
+          helpText:
+            "app.api.leads.import.post.defaultCountry.helpText" as const,
           columns: 6,
           options: CountriesOptions,
         },
@@ -131,8 +144,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.leads.import.post.defaultLanguage.label" as const,
-          description: "app.api.leads.import.post.defaultLanguage.description" as const,
-          helpText: "app.api.leads.import.post.defaultLanguage.helpText" as const,
+          description:
+            "app.api.leads.import.post.defaultLanguage.description" as const,
+          helpText:
+            "app.api.leads.import.post.defaultLanguage.helpText" as const,
           columns: 6,
           options: LanguagesOptions,
         },
@@ -143,7 +158,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.leads.import.post.defaultStatus.label" as const,
-          description: "app.api.leads.import.post.defaultStatus.description" as const,
+          description:
+            "app.api.leads.import.post.defaultStatus.description" as const,
           helpText: "app.api.leads.import.post.defaultStatus.helpText" as const,
           columns: 6,
           options: LeadStatusOptions,
@@ -154,20 +170,26 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
-          label: "app.api.leads.import.post.defaultCampaignStage.label" as const,
-          description: "app.api.leads.import.post.defaultCampaignStage.description" as const,
-          helpText: "app.api.leads.import.post.defaultCampaignStage.helpText" as const,
+          label:
+            "app.api.leads.import.post.defaultCampaignStage.label" as const,
+          description:
+            "app.api.leads.import.post.defaultCampaignStage.description" as const,
+          helpText:
+            "app.api.leads.import.post.defaultCampaignStage.helpText" as const,
           columns: 6,
           options: EmailCampaignStageOptions,
         },
-        z.nativeEnum(EmailCampaignStage).default(EmailCampaignStage.NOT_STARTED),
+        z
+          .nativeEnum(EmailCampaignStage)
+          .default(EmailCampaignStage.NOT_STARTED),
       ),
       defaultSource: requestDataField(
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.leads.import.post.defaultSource.label" as const,
-          description: "app.api.leads.import.post.defaultSource.description" as const,
+          description:
+            "app.api.leads.import.post.defaultSource.description" as const,
           helpText: "app.api.leads.import.post.defaultSource.helpText" as const,
           columns: 6,
           options: LeadSourceOptions,
@@ -178,9 +200,12 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.leads.import.post.useChunkedProcessing.label" as const,
-          description: "app.api.leads.import.post.useChunkedProcessing.description" as const,
-          helpText: "app.api.leads.import.post.useChunkedProcessing.helpText" as const,
+          label:
+            "app.api.leads.import.post.useChunkedProcessing.label" as const,
+          description:
+            "app.api.leads.import.post.useChunkedProcessing.description" as const,
+          helpText:
+            "app.api.leads.import.post.useChunkedProcessing.helpText" as const,
           columns: 6,
         },
         z.boolean().default(false),
@@ -190,7 +215,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.leads.import.post.batchSize.label" as const,
-          description: "app.api.leads.import.post.batchSize.description" as const,
+          description:
+            "app.api.leads.import.post.batchSize.description" as const,
           helpText: "app.api.leads.import.post.batchSize.helpText" as const,
           columns: 6,
         },
@@ -215,7 +241,8 @@ const { POST } = createEndpoint({
       successfulImports: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.import.post.response.successfulImports" as const,
+          content:
+            "app.api.leads.import.post.response.successfulImports" as const,
         },
         z.coerce.number(),
       ),
@@ -229,7 +256,8 @@ const { POST } = createEndpoint({
       duplicateEmails: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.import.post.response.duplicateEmails" as const,
+          content:
+            "app.api.leads.import.post.response.duplicateEmails" as const,
         },
         z.coerce.number(),
       ),
@@ -311,7 +339,8 @@ const { POST } = createEndpoint({
       isChunkedProcessing: responseField(
         {
           type: WidgetType.TEXT,
-          content: "app.api.leads.import.post.response.isChunkedProcessing" as const,
+          content:
+            "app.api.leads.import.post.response.isChunkedProcessing" as const,
         },
         z.boolean().default(false),
       ),
@@ -328,39 +357,48 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.leads.import.post.errors.validation.title" as const,
-      description: "app.api.leads.import.post.errors.validation.description" as const,
+      description:
+        "app.api.leads.import.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.leads.import.post.errors.unauthorized.title" as const,
-      description: "app.api.leads.import.post.errors.unauthorized.description" as const,
+      description:
+        "app.api.leads.import.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.leads.import.post.errors.forbidden.title" as const,
-      description: "app.api.leads.import.post.errors.forbidden.description" as const,
+      description:
+        "app.api.leads.import.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.leads.import.post.errors.notFound.title" as const,
-      description: "app.api.leads.import.post.errors.notFound.description" as const,
+      description:
+        "app.api.leads.import.post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.leads.import.post.errors.conflict.title" as const,
-      description: "app.api.leads.import.post.errors.conflict.description" as const,
+      description:
+        "app.api.leads.import.post.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.leads.import.post.errors.server.title" as const,
-      description: "app.api.leads.import.post.errors.server.description" as const,
+      description:
+        "app.api.leads.import.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.leads.import.post.errors.unknown.title" as const,
-      description: "app.api.leads.import.post.errors.unknown.description" as const,
+      description:
+        "app.api.leads.import.post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.leads.import.post.errors.network.title" as const,
-      description: "app.api.leads.import.post.errors.network.description" as const,
+      description:
+        "app.api.leads.import.post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.leads.import.post.errors.unsavedChanges.title" as const,
-      description: "app.api.leads.import.post.errors.unsavedChanges.description" as const,
+      description:
+        "app.api.leads.import.post.errors.unsavedChanges.description" as const,
     },
   },
 

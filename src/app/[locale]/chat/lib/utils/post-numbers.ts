@@ -33,7 +33,9 @@ function isPostNumberMap(
 /**
  * Get post number map from storage
  */
-async function getPostNumberMap(logger: EndpointLogger): Promise<PostNumberMap> {
+async function getPostNumberMap(
+  logger: EndpointLogger,
+): Promise<PostNumberMap> {
   if (typeof window === "undefined") {
     return {};
   }
@@ -43,7 +45,12 @@ async function getPostNumberMap(logger: EndpointLogger): Promise<PostNumberMap> 
     if (!stored) {
       return {};
     }
-    const parsed = JSON.parse(stored) as Record<string, number> | null | string | number | boolean;
+    const parsed = JSON.parse(stored) as
+      | Record<string, number>
+      | null
+      | string
+      | number
+      | boolean;
     if (!isPostNumberMap(parsed)) {
       logger.error("Storage", "Invalid post number map format", {
         message: "Stored data is not a valid PostNumberMap",
@@ -60,7 +67,10 @@ async function getPostNumberMap(logger: EndpointLogger): Promise<PostNumberMap> 
 /**
  * Save post number map to storage
  */
-async function savePostNumberMap(map: PostNumberMap, logger: EndpointLogger): Promise<void> {
+async function savePostNumberMap(
+  map: PostNumberMap,
+  logger: EndpointLogger,
+): Promise<void> {
   if (typeof window === "undefined") {
     return;
   }
@@ -92,7 +102,10 @@ async function getCounter(logger: EndpointLogger): Promise<number> {
 /**
  * Save counter value
  */
-async function saveCounter(counter: number, logger: EndpointLogger): Promise<void> {
+async function saveCounter(
+  counter: number,
+  logger: EndpointLogger,
+): Promise<void> {
   if (typeof window === "undefined") {
     return;
   }
@@ -108,7 +121,10 @@ async function saveCounter(counter: number, logger: EndpointLogger): Promise<voi
  * Get or generate post number for a message
  * Returns existing number if already assigned, otherwise generates new one
  */
-export async function getPostNumber(messageId: string, logger: EndpointLogger): Promise<number> {
+export async function getPostNumber(
+  messageId: string,
+  logger: EndpointLogger,
+): Promise<number> {
   const map = await getPostNumberMap(logger);
 
   // Return existing number if found
@@ -181,7 +197,10 @@ export async function clearPostNumbers(logger: EndpointLogger): Promise<void> {
 /**
  * Format post number for display (e.g., "No.1234567")
  */
-export function formatPostNumber(postNumber: string, locale: CountryLanguage): string {
+export function formatPostNumber(
+  postNumber: string,
+  locale: CountryLanguage,
+): string {
   const { t } = simpleT(locale);
   return t("app.chat.messages.postNumber", { number: postNumber });
 }

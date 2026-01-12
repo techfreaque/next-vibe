@@ -38,11 +38,13 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description: "Wystąpił wewnętrzny błąd serwera podczas zatrzymywania trace wydajności",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas zatrzymywania trace wydajności",
     },
     unknown: {
       title: "Nieznany błąd",
-      description: "Wystąpił nieznany błąd podczas zatrzymywania trace wydajności",
+      description:
+        "Wystąpił nieznany błąd podczas zatrzymywania trace wydajności",
     },
     unsavedChanges: {
       title: "Niezapisane zmiany",

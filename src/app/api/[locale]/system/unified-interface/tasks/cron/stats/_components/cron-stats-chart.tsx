@@ -32,7 +32,10 @@ const CHART_CONSTANTS = {
  */
 function getSeriesColor(series: { color?: string }, index: number): string {
   return (
-    series.color || CHART_CONSTANTS.DEFAULT_COLORS[index % CHART_CONSTANTS.DEFAULT_COLORS.length]
+    series.color ||
+    CHART_CONSTANTS.DEFAULT_COLORS[
+      index % CHART_CONSTANTS.DEFAULT_COLORS.length
+    ]
   );
 }
 
@@ -56,12 +59,14 @@ export function CronStatsChart({
   const chartData = Object.entries(data).reduce(
     (acc, [key, series]) => {
       if (Array.isArray(series) && series.length > 0) {
-        series.forEach((point: { date: string; value: number }, index: number) => {
-          if (!acc[index]) {
-            acc[index] = { date: point.date };
-          }
-          acc[index][key] = point.value;
-        });
+        series.forEach(
+          (point: { date: string; value: number }, index: number) => {
+            if (!acc[index]) {
+              acc[index] = { date: point.date };
+            }
+            acc[index][key] = point.value;
+          },
+        );
       }
       return acc;
     },
@@ -95,7 +100,13 @@ export function CronStatsChart({
           );
         case "bar":
           return (
-            <Bar key={key} data={chartData} x="date" y={key} style={{ data: { fill: color } }} />
+            <Bar
+              key={key}
+              data={chartData}
+              x="date"
+              y={key}
+              style={{ data: { fill: color } }}
+            />
           );
         default:
           return (
@@ -117,7 +128,8 @@ export function CronStatsChart({
         <Axis
           dependentAxis
           tickFormat={(value: number | string) => {
-            const val = typeof value === "string" ? Number.parseFloat(value) : value;
+            const val =
+              typeof value === "string" ? Number.parseFloat(value) : value;
             if (val >= 1000) {
               return `${(val / 1000).toFixed(1)}K`;
             }
@@ -135,7 +147,9 @@ export function CronStatsChart({
         <CardTitle className="text-lg font-semibold">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>{renderChart()}</Div>
+        <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>
+          {renderChart()}
+        </Div>
       </CardContent>
     </Card>
   );
@@ -167,28 +181,44 @@ export function CronStatsDistributionChart({
   const renderChart = (): JSX.Element => {
     if (type === "bar") {
       return (
-        <Chart height={height} width={600} padding={{ top: 5, right: 30, left: 50, bottom: 40 }}>
+        <Chart
+          height={height}
+          width={600}
+          padding={{ top: 5, right: 30, left: 50, bottom: 40 }}
+        >
           <Axis />
           <Axis
             dependentAxis
             tickFormat={(value: number | string) => {
-              const val = typeof value === "string" ? Number.parseFloat(value) : value;
+              const val =
+                typeof value === "string" ? Number.parseFloat(value) : value;
               if (val >= 1000) {
                 return `${(val / 1000).toFixed(1)}K`;
               }
               return val.toString();
             }}
           />
-          <Bar data={data} x="name" y="value" style={{ data: { fill: "hsl(var(--chart-1))" } }} />
+          <Bar
+            data={data}
+            x="name"
+            y="value"
+            style={{ data: { fill: "hsl(var(--chart-1))" } }}
+          />
         </Chart>
       );
     }
 
     return (
-      <Chart height={height} width={600} padding={{ top: 5, right: 30, left: 50, bottom: 40 }}>
+      <Chart
+        height={height}
+        width={600}
+        padding={{ top: 5, right: 30, left: 50, bottom: 40 }}
+      >
         <Pie
           data={data.map((entry) => ({ x: entry.name, y: entry.value }))}
-          colorScale={data.map((entry, index) => entry.color || COLORS[index % COLORS.length])}
+          colorScale={data.map(
+            (entry, index) => entry.color || COLORS[index % COLORS.length],
+          )}
           innerRadius={0}
         />
       </Chart>
@@ -201,7 +231,9 @@ export function CronStatsDistributionChart({
         <CardTitle className="text-lg font-semibold">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>{renderChart()}</Div>
+        <Div style={{ width: CHART_CONSTANTS.FULL_WIDTH, height }}>
+          {renderChart()}
+        </Div>
       </CardContent>
     </Card>
   );

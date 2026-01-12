@@ -36,11 +36,17 @@ import type {
   PaymentInvoiceRequestOutput,
   PaymentInvoiceResponseOutput,
 } from "./invoice/definition";
-import type { PaymentPortalRequestOutput, PaymentPortalResponseOutput } from "./portal/definition";
+import type {
+  PaymentPortalRequestOutput,
+  PaymentPortalResponseOutput,
+} from "./portal/definition";
 import { stripeAdminTools } from "./providers/stripe/admin";
 import { stripe as getStripe } from "./providers/stripe/repository";
 import type { CreditPackCheckoutSession, WebhookData } from "./providers/types";
-import type { PaymentRefundRequestOutput, PaymentRefundResponseOutput } from "./refund/definition";
+import type {
+  PaymentRefundRequestOutput,
+  PaymentRefundResponseOutput,
+} from "./refund/definition";
 
 export class PaymentRepository {
   static async createPaymentSession(
@@ -71,7 +77,11 @@ export class PaymentRepository {
       });
 
       // Get user information
-      const [userRecord] = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+      const [userRecord] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, user.id))
+        .limit(1);
 
       if (!userRecord) {
         logger.error("payment.create.error.userNotFound", { userId: user.id });
@@ -109,19 +119,27 @@ export class PaymentRepository {
           return "";
         }
         // Convert camelCase to snake_case for Stripe (applePay -> apple_pay)
-        return value.replaceAll(/([A-Z])/g, (match) => `_${match}`).toLowerCase();
-      }) || ["card"]) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
+        return value
+          .replaceAll(/([A-Z])/g, (match) => `_${match}`)
+          .toLowerCase();
+      }) || [
+        "card",
+      ]) as Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
 
       // Extract mode value from translation key
       const modeParts = data.mode.split(".");
-      const modeValue = modeParts.at(-1) as Stripe.Checkout.SessionCreateParams.Mode;
+      const modeValue = modeParts.at(
+        -1,
+      ) as Stripe.Checkout.SessionCreateParams.Mode;
 
       const sessionConfig: Stripe.Checkout.SessionCreateParams = {
         customer: stripeCustomerId,
         payment_method_types: paymentMethodTypes,
         mode: modeValue,
-        success_url: data.successUrl || `${env.NEXT_PUBLIC_APP_URL}/payment/success`,
-        cancel_url: data.cancelUrl || `${env.NEXT_PUBLIC_APP_URL}/payment/cancel`,
+        success_url:
+          data.successUrl || `${env.NEXT_PUBLIC_APP_URL}/payment/success`,
+        cancel_url:
+          data.cancelUrl || `${env.NEXT_PUBLIC_APP_URL}/payment/cancel`,
         line_items: [
           {
             price: data.priceId,
@@ -341,7 +359,11 @@ export class PaymentRepository {
       const paymentProvider = getPaymentProvider(provider);
 
       // Verify webhook signature using provider
-      const verificationResult = await paymentProvider.verifyWebhook(body, signature, logger);
+      const verificationResult = await paymentProvider.verifyWebhook(
+        body,
+        signature,
+        logger,
+      );
 
       if (!verificationResult.success) {
         logger.error("Webhook verification failed", {
@@ -453,7 +475,9 @@ export class PaymentRepository {
           status: PaymentStatus.SUCCEEDED,
           updatedAt: new Date(),
         })
-        .where(eq(paymentTransactions.providerPaymentIntentId, paymentIntentId));
+        .where(
+          eq(paymentTransactions.providerPaymentIntentId, paymentIntentId),
+        );
 
       logger.debug("Payment succeeded processed", {
         paymentIntentId,
@@ -479,7 +503,9 @@ export class PaymentRepository {
           status: PaymentStatus.FAILED,
           updatedAt: new Date(),
         })
-        .where(eq(paymentTransactions.providerPaymentIntentId, paymentIntentId));
+        .where(
+          eq(paymentTransactions.providerPaymentIntentId, paymentIntentId),
+        );
 
       logger.debug("Payment failed processed", {
         paymentIntentId,
@@ -498,9 +524,12 @@ export class PaymentRepository {
     try {
       const invoiceId = data.id;
 
-      logger.debug("Invoice payment succeeded - delegating to subscription module", {
-        invoiceId,
-      });
+      logger.debug(
+        "Invoice payment succeeded - delegating to subscription module",
+        {
+          invoiceId,
+        },
+      );
 
       // Try to get subscription ID from various possible fields
       let subscriptionId: string | undefined;
@@ -509,28 +538,43 @@ export class PaymentRepository {
         subscriptionId = data.subscription;
       }
 
-      if (!subscriptionId && "parent" in data && data.parent && typeof data.parent === "object") {
+      if (
+        !subscriptionId &&
+        "parent" in data &&
+        data.parent &&
+        typeof data.parent === "object"
+      ) {
         if (
           "subscription_details" in data.parent &&
           data.parent.subscription_details &&
           typeof data.parent.subscription_details === "object"
         ) {
           if ("subscription" in data.parent.subscription_details) {
-            subscriptionId = String(data.parent.subscription_details.subscription);
+            subscriptionId = String(
+              data.parent.subscription_details.subscription,
+            );
           }
         }
       }
 
       if (!subscriptionId) {
-        logger.debug("No subscription ID found in invoice - skipping subscription processing", {
-          invoiceId,
-        });
+        logger.debug(
+          "No subscription ID found in invoice - skipping subscription processing",
+          {
+            invoiceId,
+          },
+        );
         return;
       }
 
       // Subscription module handles its own business logic
-      const { SubscriptionRepository } = await import("../subscription/repository");
-      await SubscriptionRepository.handleInvoicePaymentSucceeded(data, subscriptionId, logger);
+      const { SubscriptionRepository } =
+        await import("../subscription/repository");
+      await SubscriptionRepository.handleInvoicePaymentSucceeded(
+        data,
+        subscriptionId,
+        logger,
+      );
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {
         logger.error("Failed to process invoice payment succeeded", {
@@ -560,10 +604,13 @@ export class PaymentRepository {
           ? String(metadata.type)
           : undefined;
 
-      logger.debug("Checkout session completed - routing to appropriate module", {
-        sessionId,
-        type,
-      });
+      logger.debug(
+        "Checkout session completed - routing to appropriate module",
+        {
+          sessionId,
+          type,
+        },
+      );
 
       // Route to appropriate module based on purchase type
       if (type === "credit_pack") {
@@ -573,12 +620,18 @@ export class PaymentRepository {
           id: sessionId,
           metadata:
             metadata && typeof metadata === "object"
-              ? Object.fromEntries(Object.entries(metadata).map(([k, v]) => [k, String(v)]))
+              ? Object.fromEntries(
+                  Object.entries(metadata).map(([k, v]) => [k, String(v)]),
+                )
               : undefined,
         };
-        await CreditRepository.handleCreditPackPurchase(creditPackSession, logger);
+        await CreditRepository.handleCreditPackPurchase(
+          creditPackSession,
+          logger,
+        );
       } else if (type === "subscription") {
-        const { SubscriptionRepository } = await import("../subscription/repository");
+        const { SubscriptionRepository } =
+          await import("../subscription/repository");
         await SubscriptionRepository.handleSubscriptionCheckout(data, logger);
       } else {
         logger.debug("Unhandled checkout session type", {
@@ -612,7 +665,8 @@ export class PaymentRepository {
 
         // Apply referral payout using credits (currency-independent)
         // Credits are determined from product type, not payment amount
-        const { productsRepository, ProductIds } = await import("../products/repository-client");
+        const { productsRepository, ProductIds } =
+          await import("../products/repository-client");
 
         let creditsAmount = 0;
         if (type === "subscription") {
@@ -629,7 +683,10 @@ export class PaymentRepository {
             metadata && typeof metadata === "object" && "quantity" in metadata
               ? Number(metadata.quantity) || 1
               : 1;
-          const creditPackProduct = productsRepository.getProduct(ProductIds.CREDIT_PACK, "en-US");
+          const creditPackProduct = productsRepository.getProduct(
+            ProductIds.CREDIT_PACK,
+            "en-US",
+          );
           creditsAmount = quantity * creditPackProduct.credits; // quantity * 500
         }
 
@@ -672,8 +729,12 @@ export class PaymentRepository {
         subscriptionId,
       });
 
-      const { SubscriptionRepository } = await import("../subscription/repository");
-      await SubscriptionRepository.handleSubscriptionCanceled(subscriptionId, logger);
+      const { SubscriptionRepository } =
+        await import("../subscription/repository");
+      await SubscriptionRepository.handleSubscriptionCanceled(
+        subscriptionId,
+        logger,
+      );
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {
         logger.error("Failed to process subscription deleted", {
@@ -697,9 +758,13 @@ export class PaymentRepository {
         subscriptionId: data.id,
       });
 
-      const { SubscriptionRepository } = await import("../subscription/repository");
+      const { SubscriptionRepository } =
+        await import("../subscription/repository");
       // The webhook data is actually a Stripe.Subscription object from the event
-      await SubscriptionRepository.handleSubscriptionUpdated(data as Stripe.Subscription, logger);
+      await SubscriptionRepository.handleSubscriptionUpdated(
+        data as Stripe.Subscription,
+        logger,
+      );
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {
         logger.error("Failed to process subscription updated", {

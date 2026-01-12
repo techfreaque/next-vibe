@@ -143,7 +143,8 @@ export const translations: typeof enTranslations = {
   pageDescription: "Zobacz statystyki i metryki wydajności zadań cron",
   pageTitle: "Statystyki Cron",
   performanceMetrics: "Metryki wydajności",
-  priorityAndHealth: "{{priorityLabel}}: {{priority}}, {{healthLabel}}: {{health}}",
+  priorityAndHealth:
+    "{{priorityLabel}}: {{priority}}, {{healthLabel}}: {{health}}",
   priority: {
     low: "Niski",
     high: "Wysoki",

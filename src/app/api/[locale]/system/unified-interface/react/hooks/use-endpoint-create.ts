@@ -10,7 +10,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 
 import { deepMerge } from "./endpoint-utils";
-import type { ApiFormOptions, ApiFormReturn, ApiMutationOptions } from "./types";
+import type {
+  ApiFormOptions,
+  ApiFormReturn,
+  ApiMutationOptions,
+} from "./types";
 import { useApiForm } from "./use-api-mutation-form";
 
 /**
@@ -56,10 +60,9 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
   // Merge endpoint and hook options (hook takes priority)
   // Merge defaultValues separately to combine autoPrefillData and initialState
   const mergedFormOptions = useMemo(() => {
-    const merged = deepMerge<ApiFormOptions<TEndpoint["types"]["RequestOutput"]>>(
-      primaryEndpoint.options?.formOptions,
-      options.formOptions,
-    );
+    const merged = deepMerge<
+      ApiFormOptions<TEndpoint["types"]["RequestOutput"]>
+    >(primaryEndpoint.options?.formOptions, options.formOptions);
 
     // Merge defaultValues priority: endpoint < hook < autoPrefill < initialState
     const mergedDefaultValues = deepMerge(
@@ -73,7 +76,12 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
       ...merged,
       defaultValues: mergedDefaultValues,
     };
-  }, [primaryEndpoint.options, options.formOptions, options.autoPrefillData, options.initialState]);
+  }, [
+    primaryEndpoint.options,
+    options.formOptions,
+    options.autoPrefillData,
+    options.initialState,
+  ]);
 
   const mergedMutationOptions = useMemo(() => {
     return deepMerge<
@@ -86,7 +94,12 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
   }, [primaryEndpoint.options, options.mutationOptions]);
 
   // Use the existing mutation form hook with merged options
-  const formResult = useApiForm(primaryEndpoint, logger, mergedFormOptions, mergedMutationOptions);
+  const formResult = useApiForm(
+    primaryEndpoint,
+    logger,
+    mergedFormOptions,
+    mergedMutationOptions,
+  );
 
   // Reset form when autoPrefillData or initialState changes (after initial render)
   // This handles cases where data is loaded asynchronously after mount

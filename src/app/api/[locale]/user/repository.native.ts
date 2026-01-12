@@ -28,7 +28,9 @@ import type { UserRoleValue } from "./user-roles/enum";
  * Native User Repository - Static class pattern
  */
 export class UserRepository {
-  static async getUserById<T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD>(
+  static async getUserById<
+    T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD,
+  >(
     // oxlint-disable-next-line no-unused-vars
     _userId: DbId,
     // oxlint-disable-next-line no-unused-vars
@@ -42,7 +44,9 @@ export class UserRepository {
     throw new Error("getUserById is not implemented on native");
   }
 
-  static async getUserByEmail<T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD>(
+  static async getUserByEmail<
+    T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD,
+  >(
     // oxlint-disable-next-line no-unused-vars
     _email: string,
     // oxlint-disable-next-line no-unused-vars
@@ -65,7 +69,12 @@ export class UserRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UserType<T>>> {
-    const response = await nativeEndpoint(userProfileEndpoints.GET, {}, logger, locale);
+    const response = await nativeEndpoint(
+      userProfileEndpoints.GET,
+      {},
+      logger,
+      locale,
+    );
 
     if (response.success) {
       return {

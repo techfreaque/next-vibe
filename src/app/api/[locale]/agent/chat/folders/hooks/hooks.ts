@@ -21,7 +21,9 @@ import definitions from "../definition";
  * - Component can transform to tree structure as needed
  * - Supports filtering by parentId
  */
-export function useFoldersList(logger: EndpointLogger): EndpointReturn<typeof definitions> {
+export function useFoldersList(
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {
@@ -53,7 +55,9 @@ export function useFoldersList(logger: EndpointLogger): EndpointReturn<typeof de
  * - Icon and color customization
  * - Auto-refetches folder list on success
  */
-export function useCreateFolder(logger: EndpointLogger): EndpointReturn<typeof definitions> {
+export function useCreateFolder(
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

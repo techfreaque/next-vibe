@@ -25,7 +25,9 @@ interface ReferralCodesListProps {
   locale: CountryLanguage;
 }
 
-export function ReferralCodesList({ locale }: ReferralCodesListProps): React.JSX.Element {
+export function ReferralCodesList({
+  locale,
+}: ReferralCodesListProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const endpoint = useReferralCodesList();
   const country = getCountryFromLocale(locale);
@@ -63,10 +65,16 @@ export function ReferralCodesList({ locale }: ReferralCodesListProps): React.JSX
               <Div className="flex items-center gap-2">
                 <Span className="font-mono font-bold text-lg">{code.code}</Span>
                 {code.label && (
-                  <Span className="text-sm text-muted-foreground">({code.label})</Span>
+                  <Span className="text-sm text-muted-foreground">
+                    ({code.label})
+                  </Span>
                 )}
               </Div>
-              <Button variant="outline" size="sm" onClick={() => handleCopy(code.code)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleCopy(code.code)}
+              >
                 {copiedCode === code.code ? (
                   <>
                     <Check className="h-4 w-4 mr-2" />
@@ -83,29 +91,47 @@ export function ReferralCodesList({ locale }: ReferralCodesListProps): React.JSX
 
             <Div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <Div>
-                <P className="text-muted-foreground">{t("app.user.referral.myCodes.uses")}</P>
+                <P className="text-muted-foreground">
+                  {t("app.user.referral.myCodes.uses")}
+                </P>
                 <P className="font-semibold">{code.currentUses}</P>
               </Div>
               <Div>
-                <P className="text-muted-foreground">{t("app.user.referral.myCodes.signups")}</P>
+                <P className="text-muted-foreground">
+                  {t("app.user.referral.myCodes.signups")}
+                </P>
                 <P className="font-semibold">{code.totalSignups}</P>
               </Div>
               <Div>
-                <P className="text-muted-foreground">{t("app.user.referral.myCodes.revenue")}</P>
+                <P className="text-muted-foreground">
+                  {t("app.user.referral.myCodes.revenue")}
+                </P>
                 <P className="font-semibold">
-                  {formatCurrency(code.totalRevenueCents / 100, currency, locale)}
+                  {formatCurrency(
+                    code.totalRevenueCents / 100,
+                    currency,
+                    locale,
+                  )}
                 </P>
               </Div>
               <Div>
-                <P className="text-muted-foreground">{t("app.user.referral.myCodes.earnings")}</P>
+                <P className="text-muted-foreground">
+                  {t("app.user.referral.myCodes.earnings")}
+                </P>
                 <P className="font-semibold">
-                  {formatCurrency(code.totalEarningsCents / 100, currency, locale)}
+                  {formatCurrency(
+                    code.totalEarningsCents / 100,
+                    currency,
+                    locale,
+                  )}
                 </P>
               </Div>
             </Div>
 
             {!code.isActive && (
-              <P className="text-sm text-red-500">{t("app.user.referral.myCodes.inactive")}</P>
+              <P className="text-sm text-red-500">
+                {t("app.user.referral.myCodes.inactive")}
+              </P>
             )}
           </Div>
         </Card>

@@ -33,13 +33,16 @@ export const translations: typeof enTranslations = {
       basicInfo: "Grundinformationen",
       basicInfoDescription: "Grundlegende Kontodetails und Zweck konfigurieren",
       connectionSettings: "Verbindungseinstellungen",
-      connectionSettingsDescription: "SMTP-Server-Verbindungsdetails konfigurieren",
+      connectionSettingsDescription:
+        "SMTP-Server-Verbindungsdetails konfigurieren",
       emailSettings: "E-Mail-Einstellungen",
       emailSettingsDescription: "Absender-E-Mail und Anzeigename konfigurieren",
       advancedSettings: "Erweiterte Einstellungen",
-      advancedSettingsDescription: "Timeouts, Limits und Priorität konfigurieren",
+      advancedSettingsDescription:
+        "Timeouts, Limits und Priorität konfigurieren",
       selectionCriteria: "Auswahlkriterien",
-      selectionCriteriaDescription: "Automatische Kontoauswahlregeln konfigurieren",
+      selectionCriteriaDescription:
+        "Automatische Kontoauswahlregeln konfigurieren",
     },
     fields: {
       name: "Kontoname",
@@ -65,7 +68,8 @@ export const translations: typeof enTranslations = {
       replyToName: "Antwort-an Name",
       replyToNamePlaceholder: "Support-Team",
       isDefault: "Standardkonto",
-      isDefaultDescription: "Dieses Konto als Standard für seinen Zweck verwenden",
+      isDefaultDescription:
+        "Dieses Konto als Standard für seinen Zweck verwenden",
       priority: "Priorität",
       priorityPlaceholder: "1-100 (höher = mehr Priorität)",
       connectionTimeout: "Verbindungs-Timeout (ms)",
@@ -85,19 +89,25 @@ export const translations: typeof enTranslations = {
       weight: "Gewicht",
       weightPlaceholder: "1-100 (höher = wahrscheinlicher ausgewählt)",
       failoverPriority: "Failover-Priorität",
-      failoverPriorityPlaceholder: "0-100 (höher = zuerst bei Failover verwendet)",
+      failoverPriorityPlaceholder:
+        "0-100 (höher = zuerst bei Failover verwendet)",
       isExactMatch: "Nur exakte Übereinstimmung",
-      isExactMatchDescription: "Dieses Konto nur für exakte Kriterienübereinstimmungen verwenden",
+      isExactMatchDescription:
+        "Dieses Konto nur für exakte Kriterienübereinstimmungen verwenden",
       isFailover: "Failover-Konto",
-      isFailoverDescription: "Dieses Konto verwenden, wenn primäre Konten fehlschlagen",
+      isFailoverDescription:
+        "Dieses Konto verwenden, wenn primäre Konten fehlschlagen",
       campaignTypes: "Kampagnentypen",
-      campaignTypesDescription: "Auswählen, welche Kampagnentypen dieses Konto verwenden können",
+      campaignTypesDescription:
+        "Auswählen, welche Kampagnentypen dieses Konto verwenden können",
       campaignTypesPlaceholder: "Kampagnentyp-Beschränkungen konfigurieren",
       countries: "Länder",
-      countriesDescription: "Auswählen, welche Länder dieses Konto verwenden können",
+      countriesDescription:
+        "Auswählen, welche Länder dieses Konto verwenden können",
       countriesPlaceholder: "Länderbeschränkungen konfigurieren",
       languages: "Sprachen",
-      languagesDescription: "Auswählen, welche Sprachen dieses Konto verwenden können",
+      languagesDescription:
+        "Auswählen, welche Sprachen dieses Konto verwenden können",
       languagesPlaceholder: "Sprachbeschränkungen konfigurieren",
       // New multi-select fields
       emailJourneyVariants: "E-Mail-Journey-Varianten",
@@ -262,15 +272,18 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisierte Suche",
-        description: "Sie haben keine Berechtigung, SMTP-Konten zu durchsuchen.",
+        description:
+          "Sie haben keine Berechtigung, SMTP-Konten zu durchsuchen.",
       },
       server: {
         title: "Such-Serverfehler",
-        description: "Ein Serverfehler ist beim Durchsuchen der SMTP-Konten aufgetreten.",
+        description:
+          "Ein Serverfehler ist beim Durchsuchen der SMTP-Konten aufgetreten.",
       },
       unknown: {
         title: "Suchfehler",
-        description: "Ein unerwarteter Fehler ist beim Durchsuchen der SMTP-Konten aufgetreten.",
+        description:
+          "Ein unerwarteter Fehler ist beim Durchsuchen der SMTP-Konten aufgetreten.",
       },
     },
     success: {

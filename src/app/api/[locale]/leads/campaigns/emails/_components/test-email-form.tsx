@@ -28,7 +28,10 @@ import {
 } from "@/app/api/[locale]/leads/enum";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTranslation } from "@/i18n/core/client";
-import { getCountryFromLocale, getLanguageFromLocale } from "@/i18n/core/language-utils";
+import {
+  getCountryFromLocale,
+  getLanguageFromLocale,
+} from "@/i18n/core/language-utils";
 
 interface TestEmailFormProps {
   emailJourneyVariant: typeof EmailJourneyVariantValues;
@@ -86,11 +89,17 @@ export function TestEmailForm({
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
-        <Form form={endpoint.create.form} onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <Form
+          form={endpoint.create.form}
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-6"
+        >
           {/* Test Email Recipient */}
           <Div className="flex flex-col gap-4">
             <H3 className="text-lg font-medium">
-              {t("app.admin.leads.leads.admin.emails.testEmail.recipient.title")}
+              {t(
+                "app.admin.leads.leads.admin.emails.testEmail.recipient.title",
+              )}
             </H3>
             <EndpointFormField
               name="testEmail"
@@ -108,7 +117,9 @@ export function TestEmailForm({
               {t("app.admin.emails.smtp.admin.form.selectionCriteria")}
             </H3>
             <P className="text-sm text-muted-foreground">
-              {t("app.admin.emails.smtp.admin.form.selectionCriteriaDescription")}
+              {t(
+                "app.admin.emails.smtp.admin.form.selectionCriteriaDescription",
+              )}
             </P>
 
             <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">

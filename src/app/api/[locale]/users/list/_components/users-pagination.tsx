@@ -7,7 +7,12 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "next-vibe-ui/ui/icons";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "next-vibe-ui/ui/icons";
 import {
   Select,
   SelectContent,
@@ -59,7 +64,10 @@ export function UsersPagination({
     if (!usersEndpoint.read) {
       return;
     }
-    usersEndpoint.read.form.setValue("paginationInfo.limit", parseInt(limit, 10));
+    usersEndpoint.read.form.setValue(
+      "paginationInfo.limit",
+      parseInt(limit, 10),
+    );
     usersEndpoint.read.form.setValue("paginationInfo.page", 1); // Reset to first page
   };
 
@@ -84,7 +92,10 @@ export function UsersPagination({
           <P className="text-sm text-gray-700 dark:text-gray-300">
             {t("app.admin.users.list.pagination.per_page")}
           </P>
-          <Select value={currentLimit.toString()} onValueChange={handleLimitChange}>
+          <Select
+            value={currentLimit.toString()}
+            onValueChange={handleLimitChange}
+          >
             <SelectTrigger className="w-17.5">
               <SelectValue />
             </SelectTrigger>

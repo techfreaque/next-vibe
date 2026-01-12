@@ -19,7 +19,12 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { Countries, CountriesOptions, Languages, LanguagesOptions } from "@/i18n/core/config";
+import {
+  Countries,
+  CountriesOptions,
+  Languages,
+  LanguagesOptions,
+} from "@/i18n/core/config";
 
 import type {
   ExportFormatValues,
@@ -173,7 +178,8 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.leads.export.get.includeEngagementData.label",
-          description: "app.api.leads.export.get.includeEngagementData.description",
+          description:
+            "app.api.leads.export.get.includeEngagementData.description",
           columns: 6,
         },
         z.coerce.boolean().default(false),

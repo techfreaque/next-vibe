@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 import type { JSX } from "react";
 
-import { type CreditBalance, CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { ProductIds, productsRepository } from "@/app/api/[locale]/products/repository-client";
+import {
+  type CreditBalance,
+  CreditRepository,
+} from "@/app/api/[locale]/credits/repository";
+import {
+  ProductIds,
+  productsRepository,
+} from "@/app/api/[locale]/products/repository-client";
 import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -22,7 +28,9 @@ interface OverviewPageProps {
 /**
  * Generate metadata for the subscription overview page
  */
-export async function generateMetadata({ params }: OverviewPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: OverviewPageProps): Promise<Metadata> {
   const { locale } = await params;
   return metadataGenerator(locale, {
     path: "subscription/overview",
@@ -38,7 +46,9 @@ export async function generateMetadata({ params }: OverviewPageProps): Promise<M
   });
 }
 
-export default async function OverviewPage({ params }: OverviewPageProps): Promise<JSX.Element> {
+export default async function OverviewPage({
+  params,
+}: OverviewPageProps): Promise<JSX.Element> {
   const { locale } = await params;
 
   // Check authentication
@@ -85,7 +95,9 @@ export default async function OverviewPage({ params }: OverviewPageProps): Promi
       logger,
       locale,
     );
-    subscription = subscriptionResponse.success ? subscriptionResponse.data : null;
+    subscription = subscriptionResponse.success
+      ? subscriptionResponse.data
+      : null;
   }
 
   // Get pricing

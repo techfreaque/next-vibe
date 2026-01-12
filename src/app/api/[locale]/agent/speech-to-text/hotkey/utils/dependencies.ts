@@ -7,7 +7,10 @@
 
 import "server-only";
 
-import type { CommandResult, DependencyChecker as IDependencyChecker } from "../types";
+import type {
+  CommandResult,
+  DependencyChecker as IDependencyChecker,
+} from "../types";
 import { DependencyError } from "../types";
 
 /**
@@ -67,7 +70,9 @@ class DependencyCheckerImpl implements IDependencyChecker {
   /**
    * Check multiple dependencies at once
    */
-  async checkMultiple(dependencies: Record<string, string>): Promise<Record<string, boolean>> {
+  async checkMultiple(
+    dependencies: Record<string, string>,
+  ): Promise<Record<string, boolean>> {
     const results: Record<string, boolean> = {};
 
     await Promise.all(
@@ -84,7 +89,8 @@ class DependencyCheckerImpl implements IDependencyChecker {
 /**
  * Singleton instance
  */
-export const dependencyChecker: IDependencyChecker = new DependencyCheckerImpl();
+export const dependencyChecker: IDependencyChecker =
+  new DependencyCheckerImpl();
 
 /**
  * Execute shell command and capture output
@@ -158,7 +164,11 @@ export function getTempDirectory(): string {
 /**
  * Generate unique temporary file path
  */
-export function generateTempFilePath(prefix: string, extension: string, tmpDir?: string): string {
+export function generateTempFilePath(
+  prefix: string,
+  extension: string,
+  tmpDir?: string,
+): string {
   const dir = tmpDir || getTempDirectory();
   const timestamp = Date.now();
   const random = Math.random().toString(36).slice(2, 15);

@@ -76,7 +76,9 @@ export function SelectGroup({
   children,
   ...props
 }: SelectGroupProps): React.JSX.Element {
-  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
+  const nativeStyle: ViewStyle | undefined = style
+    ? convertCSSToViewStyle(style)
+    : undefined;
 
   return (
     <SelectPrimitive.Group asChild {...props}>
@@ -99,7 +101,9 @@ export function SelectValue({
   placeholder,
   ...props
 }: SelectValueProps): React.JSX.Element {
-  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
+  const nativeStyle: ViewStyle | undefined = style
+    ? convertCSSToViewStyle(style)
+    : undefined;
 
   return (
     <SelectPrimitive.Value
@@ -121,7 +125,9 @@ export function SelectTrigger({
   disabled,
   ...props
 }: SelectTriggerProps): React.JSX.Element {
-  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
+  const nativeStyle: ViewStyle | undefined = style
+    ? convertCSSToViewStyle(style)
+    : undefined;
 
   return (
     <SelectPrimitive.Trigger asChild disabled={disabled} {...props}>
@@ -150,7 +156,10 @@ export function SelectScrollUpButton({
 }: SelectLabelProps): React.JSX.Element {
   return (
     <SelectPrimitive.ScrollUpButton
-      className={cn("flex cursor-default items-center justify-center py-1", className)}
+      className={cn(
+        "flex cursor-default items-center justify-center py-1",
+        className,
+      )}
       {...props}
     >
       {children ?? <ChevronUp />}
@@ -166,7 +175,10 @@ export function SelectScrollDownButton({
 }: SelectLabelProps): React.JSX.Element {
   return (
     <SelectPrimitive.ScrollDownButton
-      className={cn("flex cursor-default items-center justify-center py-1", className)}
+      className={cn(
+        "flex cursor-default items-center justify-center py-1",
+        className,
+      )}
       {...props}
     >
       {children ?? <ChevronDown />}
@@ -182,7 +194,9 @@ export function SelectContent({
   position = "popper",
   ...props
 }: SelectContentProps): React.JSX.Element {
-  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
+  const nativeStyle: ViewStyle | undefined = style
+    ? convertCSSToViewStyle(style)
+    : undefined;
 
   const animatedViewClassName = "z-[9999]";
   const contentClassName = cn(
@@ -200,7 +214,11 @@ export function SelectContent({
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Overlay style={StyleSheet.absoluteFill}>
-        <StyledAnimatedView className={animatedViewClassName} entering={FadeIn} exiting={FadeOut}>
+        <StyledAnimatedView
+          className={animatedViewClassName}
+          entering={FadeIn}
+          exiting={FadeOut}
+        >
           <SelectPrimitive.Content asChild position={position} {...props}>
             <StyledView
               {...applyStyleType({
@@ -228,7 +246,9 @@ export function SelectLabel({
   children,
   ...props
 }: SelectLabelProps): React.JSX.Element {
-  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
+  const nativeStyle: ViewStyle | undefined = style
+    ? convertCSSToViewStyle(style)
+    : undefined;
 
   return (
     <SelectPrimitive.Label asChild {...props}>
@@ -255,11 +275,20 @@ export function SelectItem({
   ...props
 }: SelectItemProps): React.JSX.Element {
   // Use children as label if provided (for API consistency with web)
-  const itemLabel = label ?? (typeof children === "string" ? children : undefined) ?? value;
-  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
+  const itemLabel =
+    label ?? (typeof children === "string" ? children : undefined) ?? value;
+  const nativeStyle: ViewStyle | undefined = style
+    ? convertCSSToViewStyle(style)
+    : undefined;
 
   return (
-    <SelectPrimitive.Item asChild value={value} label={itemLabel} disabled={disabled} {...props}>
+    <SelectPrimitive.Item
+      asChild
+      value={value}
+      label={itemLabel}
+      disabled={disabled}
+      {...props}
+    >
       <StyledPressable
         {...applyStyleType({
           nativeStyle,
@@ -288,7 +317,9 @@ export function SelectSeparator({
   style,
   ...props
 }: SelectSeparatorProps): React.JSX.Element {
-  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
+  const nativeStyle: ViewStyle | undefined = style
+    ? convertCSSToViewStyle(style)
+    : undefined;
 
   return (
     <SelectPrimitive.Separator asChild {...props}>

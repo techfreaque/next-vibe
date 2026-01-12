@@ -90,7 +90,10 @@ export function BadgeWidget<const TKey extends string>({
   // Handle null/empty case
   if (!data) {
     return (
-      <Badge variant="outline" className={cn("text-muted-foreground", className)}>
+      <Badge
+        variant="outline"
+        className={cn("text-muted-foreground", className)}
+      >
         —
       </Badge>
     );

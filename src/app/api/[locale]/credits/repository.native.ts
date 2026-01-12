@@ -31,7 +31,12 @@ export class CreditRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<CreditBalance>> {
-    const response = await nativeEndpoint(creditsDefinitions.GET, {}, logger, locale);
+    const response = await nativeEndpoint(
+      creditsDefinitions.GET,
+      {},
+      logger,
+      locale,
+    );
     if (response.success) {
       return { success: true, data: response.data, message: response.message };
     }
@@ -177,7 +182,9 @@ export class CreditRepository {
     }>
   > {
     // oxlint-disable-next-line restricted-syntax
-    throw new Error("getCreditIdentifierBySubscription is not implemented on native");
+    throw new Error(
+      "getCreditIdentifierBySubscription is not implemented on native",
+    );
   }
 
   static async deductCreditsForFeature(
@@ -353,7 +360,9 @@ export class CreditRepository {
     _userId: string,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
-  ): Promise<ResponseType<{ total: number; available: number; locked: number }>> {
+  ): Promise<
+    ResponseType<{ total: number; available: number; locked: number }>
+  > {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("getEarnedCreditsBalance is not implemented on native");
   }

@@ -52,7 +52,9 @@ export async function generateMetadata(
   });
 }
 
-export default async function PrivacyPolicyPage({ params }: Props): Promise<JSX.Element> {
+export default async function PrivacyPolicyPage({
+  params,
+}: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
   const supportEmail = contactClientRepository.getSupportEmail(locale);
@@ -86,7 +88,9 @@ export default async function PrivacyPolicyPage({ params }: Props): Promise<JSX.
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 flex items-center">
               <Lock className="h-5 w-5 mr-2" />
-              {t("app.story._components.home.privacyPolicy.sections.informationCollect.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.informationCollect.title",
+              )}
             </H2>
             <P>
               {t(
@@ -95,57 +99,87 @@ export default async function PrivacyPolicyPage({ params }: Props): Promise<JSX.
             </P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("app.story._components.home.privacyPolicy.sections.personalData.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.personalData.title",
+              )}
             </H3>
-            <P>{t("app.story._components.home.privacyPolicy.sections.personalData.description")}</P>
+            <P>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.personalData.description",
+              )}
+            </P>
             <Ul className="flex flex-col gap-1">
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t("app.story._components.home.privacyPolicy.sections.personalData.items.name")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.personalData.items.name",
+                )}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t("app.story._components.home.privacyPolicy.sections.personalData.items.email")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.personalData.items.email",
+                )}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t("app.story._components.home.privacyPolicy.sections.personalData.items.phone")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.personalData.items.phone",
+                )}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t("app.story._components.home.privacyPolicy.sections.personalData.items.company")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.personalData.items.company",
+                )}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t("app.story._components.home.privacyPolicy.sections.personalData.items.billing")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.personalData.items.billing",
+                )}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t("app.story._components.home.privacyPolicy.sections.personalData.items.payment")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.personalData.items.payment",
+                )}
               </Li>
             </Ul>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("app.story._components.home.privacyPolicy.sections.socialMediaData.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.socialMediaData.title",
+              )}
             </H3>
             <P>
-              {t("app.story._components.home.privacyPolicy.sections.socialMediaData.description")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.socialMediaData.description",
+              )}
             </P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("app.story._components.home.privacyPolicy.sections.derivativeData.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.derivativeData.title",
+              )}
             </H3>
             <P>
-              {t("app.story._components.home.privacyPolicy.sections.derivativeData.description")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.derivativeData.description",
+              )}
             </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.privacyPolicy.sections.useOfInformation.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.useOfInformation.title",
+              )}
             </H2>
             <P>
-              {t("app.story._components.home.privacyPolicy.sections.useOfInformation.description")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.useOfInformation.description",
+              )}
             </P>
             <Ul className="flex flex-col gap-1">
               <Li className="flex items-start">
@@ -162,7 +196,9 @@ export default async function PrivacyPolicyPage({ params }: Props): Promise<JSX.
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t("app.story._components.home.privacyPolicy.sections.useOfInformation.items.send")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.useOfInformation.items.send",
+                )}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
@@ -187,92 +223,158 @@ export default async function PrivacyPolicyPage({ params }: Props): Promise<JSX.
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.privacyPolicy.sections.disclosure.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.disclosure.title",
+              )}
             </H2>
-            <P>{t("app.story._components.home.privacyPolicy.sections.disclosure.description")}</P>
-
-            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("app.story._components.home.privacyPolicy.sections.businessTransfers.title")}
-            </H3>
             <P>
-              {t("app.story._components.home.privacyPolicy.sections.businessTransfers.description")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.disclosure.description",
+              )}
             </P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("app.story._components.home.privacyPolicy.sections.thirdParty.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.businessTransfers.title",
+              )}
             </H3>
-            <P>{t("app.story._components.home.privacyPolicy.sections.thirdParty.description")}</P>
+            <P>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.businessTransfers.description",
+              )}
+            </P>
 
             <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
-              {t("app.story._components.home.privacyPolicy.sections.legal.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.thirdParty.title",
+              )}
             </H3>
-            <P>{t("app.story._components.home.privacyPolicy.sections.legal.description")}</P>
+            <P>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.thirdParty.description",
+              )}
+            </P>
+
+            <H3 className="text-xl font-medium text-gray-800 dark:text-gray-200">
+              {t(
+                "app.story._components.home.privacyPolicy.sections.legal.title",
+              )}
+            </H3>
+            <P>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.legal.description",
+              )}
+            </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.privacyPolicy.sections.security.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.security.title",
+              )}
             </H2>
-            <P>{t("app.story._components.home.privacyPolicy.sections.security.description")}</P>
+            <P>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.security.description",
+              )}
+            </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.privacyPolicy.sections.rights.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.rights.title",
+              )}
             </H2>
-            <P>{t("app.story._components.home.privacyPolicy.sections.rights.description")}</P>
+            <P>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.rights.description",
+              )}
+            </P>
             <Ul className="flex flex-col gap-1">
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t("app.story._components.home.privacyPolicy.sections.rights.items.access")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.rights.items.access",
+                )}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t("app.story._components.home.privacyPolicy.sections.rights.items.correction")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.rights.items.correction",
+                )}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t("app.story._components.home.privacyPolicy.sections.rights.items.deletion")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.rights.items.deletion",
+                )}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t("app.story._components.home.privacyPolicy.sections.rights.items.objection")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.rights.items.objection",
+                )}
               </Li>
               <Li className="flex items-start">
                 <Span className="mr-2 text-blue-500">•</Span>
-                {t("app.story._components.home.privacyPolicy.sections.rights.items.portability")}
+                {t(
+                  "app.story._components.home.privacyPolicy.sections.rights.items.portability",
+                )}
               </Li>
             </Ul>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.privacyPolicy.sections.cookies.title")}
-            </H2>
-            <P>{t("app.story._components.home.privacyPolicy.sections.cookies.description")}</P>
-
-            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
-
-            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.privacyPolicy.sections.thirdPartySites.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.cookies.title",
+              )}
             </H2>
             <P>
-              {t("app.story._components.home.privacyPolicy.sections.thirdPartySites.description")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.cookies.description",
+              )}
             </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.privacyPolicy.sections.children.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.thirdPartySites.title",
+              )}
             </H2>
-            <P>{t("app.story._components.home.privacyPolicy.sections.children.description")}</P>
+            <P>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.thirdPartySites.description",
+              )}
+            </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.privacyPolicy.sections.changes.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.children.title",
+              )}
             </H2>
-            <P>{t("app.story._components.home.privacyPolicy.sections.changes.description")}</P>
+            <P>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.children.description",
+              )}
+            </P>
+
+            <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
+
+            <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+              {t(
+                "app.story._components.home.privacyPolicy.sections.changes.title",
+              )}
+            </H2>
+            <P>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.changes.description",
+              )}
+            </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
@@ -284,16 +386,28 @@ export default async function PrivacyPolicyPage({ params }: Props): Promise<JSX.
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.privacyPolicy.sections.gdpr.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.gdpr.title",
+              )}
             </H2>
-            <P>{t("app.story._components.home.privacyPolicy.sections.gdpr.description")}</P>
+            <P>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.gdpr.description",
+              )}
+            </P>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
 
             <H2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-              {t("app.story._components.home.privacyPolicy.sections.ccpa.title")}
+              {t(
+                "app.story._components.home.privacyPolicy.sections.ccpa.title",
+              )}
             </H2>
-            <P>{t("app.story._components.home.privacyPolicy.sections.ccpa.description")}</P>
+            <P>
+              {t(
+                "app.story._components.home.privacyPolicy.sections.ccpa.description",
+              )}
+            </P>
           </Div>
         </Div>
 

@@ -47,7 +47,10 @@ export class LeadAuthRepository {
   ): Promise<{ leadId: string; isNew: boolean }> {
     // If cookie has leadId, validate it
     if (cookieLeadId) {
-      const isValid = await LeadAuthRepository.validateLeadId(cookieLeadId, logger);
+      const isValid = await LeadAuthRepository.validateLeadId(
+        cookieLeadId,
+        logger,
+      );
       if (isValid) {
         logger.debug("Valid lead cookie found", { leadId: cookieLeadId });
         return { leadId: cookieLeadId, isNew: false };
@@ -56,7 +59,11 @@ export class LeadAuthRepository {
     }
 
     // Create new anonymous lead
-    const leadId = await LeadAuthRepository.createAnonymousLead(clientInfo, locale, logger);
+    const leadId = await LeadAuthRepository.createAnonymousLead(
+      clientInfo,
+      locale,
+      logger,
+    );
     logger.debug("Created new anonymous lead", { leadId });
     return { leadId, isNew: true };
   }
@@ -80,7 +87,11 @@ export class LeadAuthRepository {
 
     if (!userLeadLink) {
       logger.debug("No lead found for user, creating one", { userId });
-      const newLeadId = await LeadAuthRepository.createLeadForUser(userId, locale, logger);
+      const newLeadId = await LeadAuthRepository.createLeadForUser(
+        userId,
+        locale,
+        logger,
+      );
       return {
         leadId: newLeadId,
         shouldUpdateCookie: true,
@@ -137,7 +148,10 @@ export class LeadAuthRepository {
   /**
    * Validate that leadId exists in database
    */
-  static async validateLeadId(leadId: string, logger: EndpointLogger): Promise<boolean> {
+  static async validateLeadId(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<boolean> {
     try {
       const [lead] = await db
         .select({ id: leads.id })
@@ -174,7 +188,11 @@ export class LeadAuthRepository {
     }
 
     // Create new lead
-    return await LeadAuthRepository.createAnonymousLead(clientInfo, locale, logger);
+    return await LeadAuthRepository.createAnonymousLead(
+      clientInfo,
+      locale,
+      logger,
+    );
   }
 
   /**
@@ -197,11 +215,15 @@ export class LeadAuthRepository {
     ];
 
     if (clientInfo.ipAddress) {
-      conditions.push(sql`${leads.metadata}->>'ipAddress' = ${clientInfo.ipAddress}`);
+      conditions.push(
+        sql`${leads.metadata}->>'ipAddress' = ${clientInfo.ipAddress}`,
+      );
     }
 
     if (clientInfo.userAgent) {
-      conditions.push(sql`${leads.metadata}->>'userAgent' = ${clientInfo.userAgent}`);
+      conditions.push(
+        sql`${leads.metadata}->>'userAgent' = ${clientInfo.userAgent}`,
+      );
     }
 
     const [existingLead] = await db
@@ -357,7 +379,10 @@ export class LeadAuthRepository {
   /**
    * Get all leadIds for a user
    */
-  static async getUserLeadIds(userId: string, logger: EndpointLogger): Promise<string[]> {
+  static async getUserLeadIds(
+    userId: string,
+    logger: EndpointLogger,
+  ): Promise<string[]> {
     try {
       const userLeadRecords = await db
         .select({ leadId: userLeadLinks.leadId })

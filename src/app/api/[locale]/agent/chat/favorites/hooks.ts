@@ -21,7 +21,9 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import favoriteByIdDefinition, { type FavoriteUpdateRequestOutput } from "./[id]/definition";
+import favoriteByIdDefinition, {
+  type FavoriteUpdateRequestOutput,
+} from "./[id]/definition";
 import type { FavoriteItem } from "./components/favorites-bar";
 import favoritesDefinition from "./definition";
 
@@ -70,7 +72,10 @@ function saveLocalFavorites(favorites: FavoriteItem[]): void {
   if (typeof window === "undefined") {
     return;
   }
-  localStorage.setItem(STORAGE_KEYS.FAVORITE_CHARACTERS, JSON.stringify(favorites));
+  localStorage.setItem(
+    STORAGE_KEYS.FAVORITE_CHARACTERS,
+    JSON.stringify(favorites),
+  );
 }
 
 interface UseChatFavoritesOptions {
@@ -84,7 +89,10 @@ interface UseChatFavoritesReturn {
   isAuthenticated: boolean;
   setFavorites: (favorites: FavoriteItem[]) => void;
   addFavorite: (favorite: Omit<FavoriteItem, "id">) => Promise<FavoriteItem>;
-  updateFavorite: (id: string, updates: FavoriteUpdateRequestOutput) => Promise<void>;
+  updateFavorite: (
+    id: string,
+    updates: FavoriteUpdateRequestOutput,
+  ) => Promise<void>;
   deleteFavorite: (id: string) => Promise<void>;
   refetch: () => void;
 }
@@ -98,7 +106,10 @@ export function useChatFavorites({
   user,
   logger,
 }: UseChatFavoritesOptions): UseChatFavoritesReturn {
-  const isAuthenticated = useMemo(() => user !== undefined && !user.isPublic, [user]);
+  const isAuthenticated = useMemo(
+    () => user !== undefined && !user.isPublic,
+    [user],
+  );
 
   // Use server storage only for authenticated users
   const useServerStorage = isAuthenticated;
@@ -167,7 +178,10 @@ export function useChatFavorites({
     async (favorite: Omit<FavoriteItem, "id">): Promise<FavoriteItem> => {
       if (useServerStorage && endpoint.create) {
         // Set form values for server creation
-        endpoint.create.form.setValue("characterId", favorite.characterId ?? "");
+        endpoint.create.form.setValue(
+          "characterId",
+          favorite.characterId ?? "",
+        );
         if (favorite.customName) {
           endpoint.create.form.setValue("customName", favorite.customName);
         }
@@ -175,7 +189,10 @@ export function useChatFavorites({
           endpoint.create.form.setValue("voice", favorite.voice);
         }
         // Set model selection
-        endpoint.create.form.setValue("modelSelection", favorite.modelSelection);
+        endpoint.create.form.setValue(
+          "modelSelection",
+          favorite.modelSelection,
+        );
 
         // Use submitForm with onSuccess callback to get the response
         return new Promise<FavoriteItem>((resolve, reject) => {

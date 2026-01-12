@@ -133,7 +133,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.system.releaseTool.fields.configPath.title",
-          description: "app.api.system.releaseTool.fields.configPath.description",
+          description:
+            "app.api.system.releaseTool.fields.configPath.description",
         },
         z.string().optional().default("release.config.ts"),
       ),
@@ -176,7 +177,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.releaseTool.fields.forceUpdate.title",
-          description: "app.api.system.releaseTool.fields.forceUpdate.description",
+          description:
+            "app.api.system.releaseTool.fields.forceUpdate.description",
         },
         z.boolean().optional(), // No default - undefined means "ask user"
       ),
@@ -197,7 +199,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.releaseTool.fields.skipTypecheck.title",
-          description: "app.api.system.releaseTool.fields.skipTypecheck.description",
+          description:
+            "app.api.system.releaseTool.fields.skipTypecheck.description",
         },
         z.boolean().optional().default(false),
       ),
@@ -207,7 +210,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.releaseTool.fields.skipBuild.title",
-          description: "app.api.system.releaseTool.fields.skipBuild.description",
+          description:
+            "app.api.system.releaseTool.fields.skipBuild.description",
         },
         z.boolean().optional().default(false),
       ),
@@ -217,7 +221,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.releaseTool.fields.skipTests.title",
-          description: "app.api.system.releaseTool.fields.skipTests.description",
+          description:
+            "app.api.system.releaseTool.fields.skipTests.description",
         },
         z.boolean().optional().default(false),
       ),
@@ -237,7 +242,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.releaseTool.fields.skipChangelog.title",
-          description: "app.api.system.releaseTool.fields.skipChangelog.description",
+          description:
+            "app.api.system.releaseTool.fields.skipChangelog.description",
         },
         z.boolean().optional().default(false),
       ),
@@ -247,7 +253,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.releaseTool.fields.skipGitTag.title",
-          description: "app.api.system.releaseTool.fields.skipGitTag.description",
+          description:
+            "app.api.system.releaseTool.fields.skipGitTag.description",
         },
         z.boolean().optional().default(false),
       ),
@@ -257,7 +264,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.releaseTool.fields.skipGitPush.title",
-          description: "app.api.system.releaseTool.fields.skipGitPush.description",
+          description:
+            "app.api.system.releaseTool.fields.skipGitPush.description",
         },
         z.boolean().optional().default(false),
       ),
@@ -267,7 +275,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.releaseTool.fields.skipInstall.title",
-          description: "app.api.system.releaseTool.fields.skipInstall.description",
+          description:
+            "app.api.system.releaseTool.fields.skipInstall.description",
         },
         z.boolean().optional().default(false),
       ),
@@ -277,7 +286,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.system.releaseTool.fields.skipClean.title",
-          description: "app.api.system.releaseTool.fields.skipClean.description",
+          description:
+            "app.api.system.releaseTool.fields.skipClean.description",
         },
         z.boolean().optional().default(false),
       ),
@@ -288,7 +298,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.system.releaseTool.fields.versionIncrement.title",
-          description: "app.api.system.releaseTool.fields.versionIncrement.description",
+          description:
+            "app.api.system.releaseTool.fields.versionIncrement.description",
           options: [
             {
               value: "patch",
@@ -304,19 +315,23 @@ const { POST } = createEndpoint({
             },
             {
               value: "prepatch",
-              label: "app.api.system.releaseTool.enums.versionIncrement.prepatch",
+              label:
+                "app.api.system.releaseTool.enums.versionIncrement.prepatch",
             },
             {
               value: "preminor",
-              label: "app.api.system.releaseTool.enums.versionIncrement.preminor",
+              label:
+                "app.api.system.releaseTool.enums.versionIncrement.preminor",
             },
             {
               value: "premajor",
-              label: "app.api.system.releaseTool.enums.versionIncrement.premajor",
+              label:
+                "app.api.system.releaseTool.enums.versionIncrement.premajor",
             },
             {
               value: "prerelease",
-              label: "app.api.system.releaseTool.enums.versionIncrement.prerelease",
+              label:
+                "app.api.system.releaseTool.enums.versionIncrement.prerelease",
             },
           ],
           optional: true,
@@ -329,7 +344,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.system.releaseTool.fields.prereleaseId.title",
-          description: "app.api.system.releaseTool.fields.prereleaseId.description",
+          description:
+            "app.api.system.releaseTool.fields.prereleaseId.description",
           optional: true,
         },
         z.string().optional(),
@@ -340,7 +356,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.system.releaseTool.fields.targetPackage.title",
-          description: "app.api.system.releaseTool.fields.targetPackage.description",
+          description:
+            "app.api.system.releaseTool.fields.targetPackage.description",
           optional: true,
         },
         z.string().optional(),
@@ -351,7 +368,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.system.releaseTool.fields.commitMessage.title",
-          description: "app.api.system.releaseTool.fields.commitMessage.description",
+          description:
+            "app.api.system.releaseTool.fields.commitMessage.description",
           optional: true,
         },
         z.string().optional(),
@@ -364,7 +382,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.CONTAINER,
           title: "app.api.system.releaseTool.fields.configObject.title",
-          description: "app.api.system.releaseTool.fields.configObject.description",
+          description:
+            "app.api.system.releaseTool.fields.configObject.description",
           layoutType: LayoutType.GRID,
           columns: 12,
           optional: true,
@@ -376,7 +395,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
               label: "app.api.system.releaseTool.fields.packageManager.title",
-              description: "app.api.system.releaseTool.fields.packageManager.description",
+              description:
+                "app.api.system.releaseTool.fields.packageManager.description",
               options: [
                 {
                   value: "bun",
@@ -408,7 +428,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.system.releaseTool.fields.globalVersion.title",
-              description: "app.api.system.releaseTool.fields.globalVersion.description",
+              description:
+                "app.api.system.releaseTool.fields.globalVersion.description",
               optional: true,
             },
             z.string().optional(),
@@ -419,7 +440,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "app.api.system.releaseTool.fields.parallel.title",
-              description: "app.api.system.releaseTool.fields.parallel.description",
+              description:
+                "app.api.system.releaseTool.fields.parallel.description",
               optional: true,
             },
             z.boolean().optional(),
@@ -430,7 +452,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
               label: "app.api.system.releaseTool.fields.maxParallelJobs.title",
-              description: "app.api.system.releaseTool.fields.maxParallelJobs.description",
+              description:
+                "app.api.system.releaseTool.fields.maxParallelJobs.description",
               optional: true,
             },
             z.coerce.number().optional(),
@@ -441,7 +464,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "app.api.system.releaseTool.fields.continueOnError.title",
-              description: "app.api.system.releaseTool.fields.continueOnError.description",
+              description:
+                "app.api.system.releaseTool.fields.continueOnError.description",
               optional: true,
             },
             z.boolean().optional(),
@@ -452,7 +476,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "app.api.system.releaseTool.fields.verifyGitStatus.title",
-              description: "app.api.system.releaseTool.fields.verifyGitStatus.description",
+              description:
+                "app.api.system.releaseTool.fields.verifyGitStatus.description",
               optional: true,
             },
             z.boolean().optional(),
@@ -462,8 +487,10 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.system.releaseTool.fields.requireCleanWorkingDir.title",
-              description: "app.api.system.releaseTool.fields.requireCleanWorkingDir.description",
+              label:
+                "app.api.system.releaseTool.fields.requireCleanWorkingDir.title",
+              description:
+                "app.api.system.releaseTool.fields.requireCleanWorkingDir.description",
               optional: true,
             },
             z.boolean().optional(),
@@ -474,7 +501,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "app.api.system.releaseTool.fields.verifyLockfile.title",
-              description: "app.api.system.releaseTool.fields.verifyLockfile.description",
+              description:
+                "app.api.system.releaseTool.fields.verifyLockfile.description",
               optional: true,
             },
             z.boolean().optional(),
@@ -485,7 +513,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.system.releaseTool.fields.branch.title",
-              description: "app.api.system.releaseTool.fields.branch.description",
+              description:
+                "app.api.system.releaseTool.fields.branch.description",
               layoutType: LayoutType.GRID,
               columns: 12,
               optional: true,
@@ -504,7 +533,8 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.releaseTool.fields.branchDevelop.title",
+                  label:
+                    "app.api.system.releaseTool.fields.branchDevelop.title",
                   optional: true,
                 },
                 z.string().optional(),
@@ -521,7 +551,8 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.releaseTool.fields.protectedBranches.title",
+                  label:
+                    "app.api.system.releaseTool.fields.protectedBranches.title",
                   optional: true,
                 },
                 z.array(z.string()).optional(),
@@ -534,7 +565,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.system.releaseTool.fields.notifications.title",
-              description: "app.api.system.releaseTool.fields.notifications.description",
+              description:
+                "app.api.system.releaseTool.fields.notifications.description",
               layoutType: LayoutType.GRID,
               columns: 12,
               optional: true,
@@ -545,7 +577,8 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.BOOLEAN,
-                  label: "app.api.system.releaseTool.fields.notificationsEnabled.title",
+                  label:
+                    "app.api.system.releaseTool.fields.notificationsEnabled.title",
                 },
                 z.boolean().optional().default(false),
               ),
@@ -566,19 +599,23 @@ const { POST } = createEndpoint({
                   options: [
                     {
                       value: "slack",
-                      label: "app.api.system.releaseTool.enums.webhookType.slack",
+                      label:
+                        "app.api.system.releaseTool.enums.webhookType.slack",
                     },
                     {
                       value: "discord",
-                      label: "app.api.system.releaseTool.enums.webhookType.discord",
+                      label:
+                        "app.api.system.releaseTool.enums.webhookType.discord",
                     },
                     {
                       value: "teams",
-                      label: "app.api.system.releaseTool.enums.webhookType.teams",
+                      label:
+                        "app.api.system.releaseTool.enums.webhookType.teams",
                     },
                     {
                       value: "custom",
-                      label: "app.api.system.releaseTool.enums.webhookType.custom",
+                      label:
+                        "app.api.system.releaseTool.enums.webhookType.custom",
                     },
                   ],
                   optional: true,
@@ -605,7 +642,8 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.releaseTool.fields.messageTemplate.title",
+                  label:
+                    "app.api.system.releaseTool.fields.messageTemplate.title",
                   optional: true,
                 },
                 z.string().optional(),
@@ -614,7 +652,8 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.BOOLEAN,
-                  label: "app.api.system.releaseTool.fields.includeTimings.title",
+                  label:
+                    "app.api.system.releaseTool.fields.includeTimings.title",
                   optional: true,
                 },
                 z.boolean().optional(),
@@ -627,7 +666,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.system.releaseTool.fields.retry.title",
-              description: "app.api.system.releaseTool.fields.retry.description",
+              description:
+                "app.api.system.releaseTool.fields.retry.description",
               layoutType: LayoutType.GRID,
               columns: 12,
               optional: true,
@@ -654,7 +694,8 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.NUMBER,
-                  label: "app.api.system.releaseTool.fields.backoffMultiplier.title",
+                  label:
+                    "app.api.system.releaseTool.fields.backoffMultiplier.title",
                 },
                 z.coerce.number().optional().default(2),
               ),
@@ -674,7 +715,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.system.releaseTool.fields.rollback.title",
-              description: "app.api.system.releaseTool.fields.rollback.description",
+              description:
+                "app.api.system.releaseTool.fields.rollback.description",
               layoutType: LayoutType.GRID,
               columns: 12,
               optional: true,
@@ -685,7 +727,8 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.BOOLEAN,
-                  label: "app.api.system.releaseTool.fields.rollbackEnabled.title",
+                  label:
+                    "app.api.system.releaseTool.fields.rollbackEnabled.title",
                 },
                 z.boolean().optional().default(false),
               ),
@@ -701,7 +744,8 @@ const { POST } = createEndpoint({
                 {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.BOOLEAN,
-                  label: "app.api.system.releaseTool.fields.rollbackVersion.title",
+                  label:
+                    "app.api.system.releaseTool.fields.rollbackVersion.title",
                 },
                 z.boolean().optional().default(true),
               ),
@@ -713,7 +757,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.system.releaseTool.fields.packages.title",
-              description: "app.api.system.releaseTool.fields.packages.description",
+              description:
+                "app.api.system.releaseTool.fields.packages.description",
               layoutType: LayoutType.GRID,
               columns: 12,
               optional: true,
@@ -749,7 +794,8 @@ const { POST } = createEndpoint({
                     type: WidgetType.FORM_FIELD,
                     fieldType: FieldDataType.TEXT,
                     label: "app.api.system.releaseTool.fields.updateDeps.title",
-                    description: "app.api.system.releaseTool.fields.updateDeps.description",
+                    description:
+                      "app.api.system.releaseTool.fields.updateDeps.description",
                   },
                   z
                     .union([z.boolean(), z.literal("force")])
@@ -761,7 +807,8 @@ const { POST } = createEndpoint({
                     type: WidgetType.FORM_FIELD,
                     fieldType: FieldDataType.TEXT,
                     label: "app.api.system.releaseTool.fields.clean.title",
-                    description: "app.api.system.releaseTool.fields.clean.description",
+                    description:
+                      "app.api.system.releaseTool.fields.clean.description",
                     optional: true,
                   },
                   z.union([z.boolean(), z.string()]).optional(),
@@ -771,7 +818,8 @@ const { POST } = createEndpoint({
                     type: WidgetType.FORM_FIELD,
                     fieldType: FieldDataType.TEXT,
                     label: "app.api.system.releaseTool.fields.lint.title",
-                    description: "app.api.system.releaseTool.fields.lint.description",
+                    description:
+                      "app.api.system.releaseTool.fields.lint.description",
                   },
                   z.union([z.boolean(), z.string()]).optional().default(true),
                 ),
@@ -780,7 +828,8 @@ const { POST } = createEndpoint({
                     type: WidgetType.FORM_FIELD,
                     fieldType: FieldDataType.TEXT,
                     label: "app.api.system.releaseTool.fields.typecheck.title",
-                    description: "app.api.system.releaseTool.fields.typecheck.description",
+                    description:
+                      "app.api.system.releaseTool.fields.typecheck.description",
                     optional: true,
                   },
                   z.union([z.boolean(), z.string()]).optional(),
@@ -790,7 +839,8 @@ const { POST } = createEndpoint({
                     type: WidgetType.FORM_FIELD,
                     fieldType: FieldDataType.TEXT,
                     label: "app.api.system.releaseTool.fields.build.title",
-                    description: "app.api.system.releaseTool.fields.build.description",
+                    description:
+                      "app.api.system.releaseTool.fields.build.description",
                   },
                   z.union([z.boolean(), z.string()]).optional().default(true),
                 ),
@@ -799,7 +849,8 @@ const { POST } = createEndpoint({
                     type: WidgetType.FORM_FIELD,
                     fieldType: FieldDataType.TEXT,
                     label: "app.api.system.releaseTool.fields.test.title",
-                    description: "app.api.system.releaseTool.fields.test.description",
+                    description:
+                      "app.api.system.releaseTool.fields.test.description",
                   },
                   z.union([z.boolean(), z.string()]).optional().default(true),
                 ),
@@ -817,7 +868,8 @@ const { POST } = createEndpoint({
                     type: WidgetType.FORM_FIELD,
                     fieldType: FieldDataType.TEXT,
                     label: "app.api.system.releaseTool.fields.install.title",
-                    description: "app.api.system.releaseTool.fields.install.description",
+                    description:
+                      "app.api.system.releaseTool.fields.install.description",
                     optional: true,
                   },
                   z.union([z.boolean(), z.string()]).optional(),
@@ -838,7 +890,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.releaseVersion.title",
+                        label:
+                          "app.api.system.releaseTool.fields.releaseVersion.title",
                         optional: true,
                       },
                       z.string().optional(),
@@ -847,7 +900,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.tagPrefix.title",
+                        label:
+                          "app.api.system.releaseTool.fields.tagPrefix.title",
                       },
                       z.string().optional().default("v"),
                     ),
@@ -855,7 +909,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.tagSuffix.title",
+                        label:
+                          "app.api.system.releaseTool.fields.tagSuffix.title",
                         optional: true,
                       },
                       z.string().optional(),
@@ -864,7 +919,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.prereleaseId.title",
+                        label:
+                          "app.api.system.releaseTool.fields.prereleaseId.title",
                         optional: true,
                       },
                       z.string().optional(),
@@ -872,7 +928,8 @@ const { POST } = createEndpoint({
                     ciReleaseCommand: objectOptionalField(
                       {
                         type: WidgetType.CONTAINER,
-                        title: "app.api.system.releaseTool.fields.ciReleaseCommand.title",
+                        title:
+                          "app.api.system.releaseTool.fields.ciReleaseCommand.title",
                         description:
                           "app.api.system.releaseTool.fields.ciReleaseCommand.description",
                         layoutType: LayoutType.GRID,
@@ -885,8 +942,10 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.ciCommand.title",
-                            description: "app.api.system.releaseTool.fields.ciCommand.description",
+                            label:
+                              "app.api.system.releaseTool.fields.ciCommand.title",
+                            description:
+                              "app.api.system.releaseTool.fields.ciCommand.description",
                           },
                           z.array(z.string()),
                         ),
@@ -894,7 +953,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.ciEnvMapping.title",
+                            label:
+                              "app.api.system.releaseTool.fields.ciEnvMapping.title",
                             description:
                               "app.api.system.releaseTool.fields.ciEnvMapping.description",
                             optional: true,
@@ -919,7 +979,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.skipTag.title",
+                            label:
+                              "app.api.system.releaseTool.fields.skipTag.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -928,7 +989,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.skipPush.title",
+                            label:
+                              "app.api.system.releaseTool.fields.skipPush.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -937,7 +999,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.skipCommit.title",
+                            label:
+                              "app.api.system.releaseTool.fields.skipCommit.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -946,7 +1009,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.commitMessage.title",
+                            label:
+                              "app.api.system.releaseTool.fields.commitMessage.title",
                             optional: true,
                           },
                           z.string().optional(),
@@ -955,7 +1019,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.signCommit.title",
+                            label:
+                              "app.api.system.releaseTool.fields.signCommit.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -964,7 +1029,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.signTag.title",
+                            label:
+                              "app.api.system.releaseTool.fields.signTag.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -973,7 +1039,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.remote.title",
+                            label:
+                              "app.api.system.releaseTool.fields.remote.title",
                             optional: true,
                           },
                           z.string().optional(),
@@ -996,7 +1063,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.npmEnabled.title",
+                            label:
+                              "app.api.system.releaseTool.fields.npmEnabled.title",
                           },
                           z.boolean().optional().default(true),
                         ),
@@ -1004,7 +1072,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.npmRegistry.title",
+                            label:
+                              "app.api.system.releaseTool.fields.npmRegistry.title",
                             optional: true,
                           },
                           z.string().optional(),
@@ -1013,7 +1082,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.npmTag.title",
+                            label:
+                              "app.api.system.releaseTool.fields.npmTag.title",
                             optional: true,
                           },
                           z.string().optional(),
@@ -1022,15 +1092,18 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.SELECT,
-                            label: "app.api.system.releaseTool.fields.npmAccess.title",
+                            label:
+                              "app.api.system.releaseTool.fields.npmAccess.title",
                             options: [
                               {
                                 value: "public",
-                                label: "app.api.system.releaseTool.enums.npmAccess.public",
+                                label:
+                                  "app.api.system.releaseTool.enums.npmAccess.public",
                               },
                               {
                                 value: "restricted",
-                                label: "app.api.system.releaseTool.enums.npmAccess.restricted",
+                                label:
+                                  "app.api.system.releaseTool.enums.npmAccess.restricted",
                               },
                             ],
                             optional: true,
@@ -1041,7 +1114,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.otpEnvVar.title",
+                            label:
+                              "app.api.system.releaseTool.fields.otpEnvVar.title",
                             optional: true,
                           },
                           z.string().optional(),
@@ -1050,7 +1124,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.provenance.title",
+                            label:
+                              "app.api.system.releaseTool.fields.provenance.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -1059,7 +1134,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.ignoreScripts.title",
+                            label:
+                              "app.api.system.releaseTool.fields.ignoreScripts.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -1068,7 +1144,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.npmDryRun.title",
+                            label:
+                              "app.api.system.releaseTool.fields.npmDryRun.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -1091,7 +1168,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.jsrEnabled.title",
+                            label:
+                              "app.api.system.releaseTool.fields.jsrEnabled.title",
                           },
                           z.boolean().optional().default(false),
                         ),
@@ -1099,7 +1177,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.allowSlowTypes.title",
+                            label:
+                              "app.api.system.releaseTool.fields.allowSlowTypes.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -1108,7 +1187,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.allowDirty.title",
+                            label:
+                              "app.api.system.releaseTool.fields.allowDirty.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -1117,7 +1197,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.jsrDryRun.title",
+                            label:
+                              "app.api.system.releaseTool.fields.jsrDryRun.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -1129,7 +1210,8 @@ const { POST } = createEndpoint({
                     changelog: objectOptionalField(
                       {
                         type: WidgetType.CONTAINER,
-                        title: "app.api.system.releaseTool.fields.changelog.title",
+                        title:
+                          "app.api.system.releaseTool.fields.changelog.title",
                         layoutType: LayoutType.GRID,
                         columns: 12,
                         optional: true,
@@ -1140,7 +1222,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.changelogEnabled.title",
+                            label:
+                              "app.api.system.releaseTool.fields.changelogEnabled.title",
                           },
                           z.boolean().optional().default(false),
                         ),
@@ -1148,7 +1231,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.changelogFile.title",
+                            label:
+                              "app.api.system.releaseTool.fields.changelogFile.title",
                           },
                           z.string().optional().default("CHANGELOG.md"),
                         ),
@@ -1156,7 +1240,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.changelogHeader.title",
+                            label:
+                              "app.api.system.releaseTool.fields.changelogHeader.title",
                             optional: true,
                           },
                           z.string().optional(),
@@ -1165,7 +1250,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.compareUrlFormat.title",
+                            label:
+                              "app.api.system.releaseTool.fields.compareUrlFormat.title",
                             optional: true,
                           },
                           z.string().optional(),
@@ -1174,7 +1260,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.commitUrlFormat.title",
+                            label:
+                              "app.api.system.releaseTool.fields.commitUrlFormat.title",
                             optional: true,
                           },
                           z.string().optional(),
@@ -1183,7 +1270,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.includeBody.title",
+                            label:
+                              "app.api.system.releaseTool.fields.includeBody.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -1192,7 +1280,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.SELECT,
-                            label: "app.api.system.releaseTool.fields.changelogPreset.title",
+                            label:
+                              "app.api.system.releaseTool.fields.changelogPreset.title",
                             options: [
                               {
                                 value: "conventional-commits",
@@ -1201,19 +1290,23 @@ const { POST } = createEndpoint({
                               },
                               {
                                 value: "angular",
-                                label: "app.api.system.releaseTool.enums.changelogPreset.angular",
+                                label:
+                                  "app.api.system.releaseTool.enums.changelogPreset.angular",
                               },
                               {
                                 value: "atom",
-                                label: "app.api.system.releaseTool.enums.changelogPreset.atom",
+                                label:
+                                  "app.api.system.releaseTool.enums.changelogPreset.atom",
                               },
                               {
                                 value: "eslint",
-                                label: "app.api.system.releaseTool.enums.changelogPreset.eslint",
+                                label:
+                                  "app.api.system.releaseTool.enums.changelogPreset.eslint",
                               },
                               {
                                 value: "ember",
-                                label: "app.api.system.releaseTool.enums.changelogPreset.ember",
+                                label:
+                                  "app.api.system.releaseTool.enums.changelogPreset.ember",
                               },
                             ],
                             optional: true,
@@ -1227,7 +1320,8 @@ const { POST } = createEndpoint({
                     gitRelease: objectOptionalField(
                       {
                         type: WidgetType.CONTAINER,
-                        title: "app.api.system.releaseTool.fields.gitRelease.title",
+                        title:
+                          "app.api.system.releaseTool.fields.gitRelease.title",
                         layoutType: LayoutType.GRID,
                         columns: 12,
                         optional: true,
@@ -1238,7 +1332,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.gitReleaseEnabled.title",
+                            label:
+                              "app.api.system.releaseTool.fields.gitReleaseEnabled.title",
                           },
                           z.boolean().optional().default(false),
                         ),
@@ -1246,7 +1341,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.releaseTitle.title",
+                            label:
+                              "app.api.system.releaseTool.fields.releaseTitle.title",
                             optional: true,
                           },
                           z.string().optional(),
@@ -1255,7 +1351,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.generateNotes.title",
+                            label:
+                              "app.api.system.releaseTool.fields.generateNotes.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -1264,7 +1361,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.releaseBody.title",
+                            label:
+                              "app.api.system.releaseTool.fields.releaseBody.title",
                             optional: true,
                           },
                           z.string().optional(),
@@ -1273,7 +1371,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.draft.title",
+                            label:
+                              "app.api.system.releaseTool.fields.draft.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -1282,7 +1381,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.BOOLEAN,
-                            label: "app.api.system.releaseTool.fields.prerelease.title",
+                            label:
+                              "app.api.system.releaseTool.fields.prerelease.title",
                             optional: true,
                           },
                           z.boolean().optional(),
@@ -1291,7 +1391,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.discussionCategory.title",
+                            label:
+                              "app.api.system.releaseTool.fields.discussionCategory.title",
                             optional: true,
                           },
                           z.string().optional(),
@@ -1300,7 +1401,8 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.target.title",
+                            label:
+                              "app.api.system.releaseTool.fields.target.title",
                             optional: true,
                           },
                           z.string().optional(),
@@ -1309,8 +1411,10 @@ const { POST } = createEndpoint({
                           {
                             type: WidgetType.FORM_FIELD,
                             fieldType: FieldDataType.TEXT,
-                            label: "app.api.system.releaseTool.fields.assets.title",
-                            description: "app.api.system.releaseTool.fields.assets.description",
+                            label:
+                              "app.api.system.releaseTool.fields.assets.title",
+                            description:
+                              "app.api.system.releaseTool.fields.assets.description",
                             optional: true,
                           },
                           z
@@ -1332,8 +1436,10 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.foldersToZip.title",
-                        description: "app.api.system.releaseTool.fields.foldersToZip.description",
+                        label:
+                          "app.api.system.releaseTool.fields.foldersToZip.title",
+                        description:
+                          "app.api.system.releaseTool.fields.foldersToZip.description",
                         optional: true,
                       },
                       z
@@ -1351,8 +1457,10 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.versionBumper.title",
-                        description: "app.api.system.releaseTool.fields.versionBumper.description",
+                        label:
+                          "app.api.system.releaseTool.fields.versionBumper.title",
+                        description:
+                          "app.api.system.releaseTool.fields.versionBumper.description",
                         optional: true,
                       },
                       z
@@ -1374,7 +1482,8 @@ const { POST } = createEndpoint({
                   {
                     type: WidgetType.CONTAINER,
                     title: "app.api.system.releaseTool.fields.hooks.title",
-                    description: "app.api.system.releaseTool.fields.hooks.description",
+                    description:
+                      "app.api.system.releaseTool.fields.hooks.description",
                     layoutType: LayoutType.GRID,
                     columns: 12,
                     optional: true,
@@ -1385,7 +1494,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.preInstall.title",
+                        label:
+                          "app.api.system.releaseTool.fields.preInstall.title",
                         optional: true,
                       },
                       z
@@ -1403,7 +1513,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.postInstall.title",
+                        label:
+                          "app.api.system.releaseTool.fields.postInstall.title",
                         optional: true,
                       },
                       z
@@ -1421,7 +1532,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.preClean.title",
+                        label:
+                          "app.api.system.releaseTool.fields.preClean.title",
                         optional: true,
                       },
                       z
@@ -1439,7 +1551,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.postClean.title",
+                        label:
+                          "app.api.system.releaseTool.fields.postClean.title",
                         optional: true,
                       },
                       z
@@ -1457,7 +1570,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.preLint.title",
+                        label:
+                          "app.api.system.releaseTool.fields.preLint.title",
                         optional: true,
                       },
                       z
@@ -1475,7 +1589,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.postLint.title",
+                        label:
+                          "app.api.system.releaseTool.fields.postLint.title",
                         optional: true,
                       },
                       z
@@ -1493,7 +1608,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.preBuild.title",
+                        label:
+                          "app.api.system.releaseTool.fields.preBuild.title",
                         optional: true,
                       },
                       z
@@ -1511,7 +1627,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.postBuild.title",
+                        label:
+                          "app.api.system.releaseTool.fields.postBuild.title",
                         optional: true,
                       },
                       z
@@ -1529,7 +1646,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.preTest.title",
+                        label:
+                          "app.api.system.releaseTool.fields.preTest.title",
                         optional: true,
                       },
                       z
@@ -1547,7 +1665,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.postTest.title",
+                        label:
+                          "app.api.system.releaseTool.fields.postTest.title",
                         optional: true,
                       },
                       z
@@ -1565,7 +1684,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.prePublish.title",
+                        label:
+                          "app.api.system.releaseTool.fields.prePublish.title",
                         optional: true,
                       },
                       z
@@ -1583,7 +1703,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.postPublish.title",
+                        label:
+                          "app.api.system.releaseTool.fields.postPublish.title",
                         optional: true,
                       },
                       z
@@ -1601,7 +1722,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.preRelease.title",
+                        label:
+                          "app.api.system.releaseTool.fields.preRelease.title",
                         optional: true,
                       },
                       z
@@ -1619,7 +1741,8 @@ const { POST } = createEndpoint({
                       {
                         type: WidgetType.FORM_FIELD,
                         fieldType: FieldDataType.TEXT,
-                        label: "app.api.system.releaseTool.fields.postRelease.title",
+                        label:
+                          "app.api.system.releaseTool.fields.postRelease.title",
                         optional: true,
                       },
                       z
@@ -1644,7 +1767,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.CONTAINER,
               title: "app.api.system.releaseTool.fields.globalHooks.title",
-              description: "app.api.system.releaseTool.fields.globalHooks.description",
+              description:
+                "app.api.system.releaseTool.fields.globalHooks.description",
               layoutType: LayoutType.GRID,
               columns: 12,
               optional: true,
@@ -1800,7 +1924,10 @@ const { POST } = createEndpoint({
               },
               z.string().optional(),
             ),
-            status: responseField({ type: WidgetType.BADGE }, PackageStatusSchema),
+            status: responseField(
+              { type: WidgetType.BADGE },
+              PackageStatusSchema,
+            ),
             message: responseField(
               {
                 type: WidgetType.TEXT,
@@ -1880,8 +2007,14 @@ const { POST } = createEndpoint({
               },
               z.string(),
             ),
-            version: responseField({ type: WidgetType.BADGE, variant: "success" }, z.string()),
-            registry: responseField({ type: WidgetType.BADGE, variant: "info" }, z.string()),
+            version: responseField(
+              { type: WidgetType.BADGE, variant: "success" },
+              z.string(),
+            ),
+            registry: responseField(
+              { type: WidgetType.BADGE, variant: "info" },
+              z.string(),
+            ),
             url: responseField(
               {
                 type: WidgetType.TEXT,
@@ -1939,7 +2072,10 @@ const { POST } = createEndpoint({
           },
           { response: true },
           {
-            type: responseField({ type: WidgetType.BADGE, variant: "info" }, z.string()),
+            type: responseField(
+              { type: WidgetType.BADGE, variant: "info" },
+              z.string(),
+            ),
             success: responseField({ type: WidgetType.BADGE }, z.boolean()),
             message: responseField(
               {
@@ -2042,7 +2178,8 @@ const { POST } = createEndpoint({
                   access: responseField(
                     {
                       type: WidgetType.TEXT,
-                      content: "app.api.system.releaseTool.fields.npmAccess.title",
+                      content:
+                        "app.api.system.releaseTool.fields.npmAccess.title",
                       optional: true,
                     },
                     z.enum(["public", "restricted"]).optional(),
@@ -2125,28 +2262,32 @@ const { POST } = createEndpoint({
               major: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.releaseTool.enums.versionIncrement.major",
+                  content:
+                    "app.api.system.releaseTool.enums.versionIncrement.major",
                 },
                 z.number(),
               ),
               minor: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.releaseTool.enums.versionIncrement.minor",
+                  content:
+                    "app.api.system.releaseTool.enums.versionIncrement.minor",
                 },
                 z.number(),
               ),
               patch: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.releaseTool.enums.versionIncrement.patch",
+                  content:
+                    "app.api.system.releaseTool.enums.versionIncrement.patch",
                 },
                 z.number(),
               ),
               prerelease: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.releaseTool.enums.versionIncrement.prerelease",
+                  content:
+                    "app.api.system.releaseTool.enums.versionIncrement.prerelease",
                   optional: true,
                 },
                 z.string().nullable(),
@@ -2154,7 +2295,8 @@ const { POST } = createEndpoint({
               prereleaseNumber: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.releaseTool.fields.prereleaseId.title",
+                  content:
+                    "app.api.system.releaseTool.fields.prereleaseId.title",
                   optional: true,
                 },
                 z.number().nullable(),
@@ -2245,7 +2387,8 @@ const { POST } = createEndpoint({
               body: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.releaseTool.fields.releaseBody.title",
+                  content:
+                    "app.api.system.releaseTool.fields.releaseBody.title",
                   optional: true,
                 },
                 z.string().optional(),
@@ -2306,7 +2449,8 @@ const { POST } = createEndpoint({
               packageManager: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.releaseTool.fields.packageManager.title",
+                  content:
+                    "app.api.system.releaseTool.fields.packageManager.title",
                 },
                 z.string(),
               ),
@@ -2611,7 +2755,8 @@ const { POST } = createEndpoint({
                   changelog: responseField(
                     {
                       type: WidgetType.TEXT,
-                      content: "app.api.system.releaseTool.fields.changelog.title",
+                      content:
+                        "app.api.system.releaseTool.fields.changelog.title",
                       optional: true,
                     },
                     z.number().optional(),
@@ -2669,7 +2814,8 @@ const { POST } = createEndpoint({
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.system.releaseTool.errors.unsavedChanges.title",
-      description: "app.api.system.releaseTool.errors.unsavedChanges.description",
+      description:
+        "app.api.system.releaseTool.errors.unsavedChanges.description",
     },
   },
 
@@ -2855,7 +3001,9 @@ export type RetryConfig = NonNullable<ReleaseConfig["retry"]>;
 export type RollbackConfig = NonNullable<ReleaseConfig["rollback"]>;
 
 /** Hook configuration - derived from hooks schema */
-export type ReleaseHook = NonNullable<NonNullable<ReleaseConfig["hooks"]>["preRelease"]>;
+export type ReleaseHook = NonNullable<
+  NonNullable<ReleaseConfig["hooks"]>["preRelease"]
+>;
 
 /** Folders to zip configuration - derived from package release schema */
 export type FoldersToZip = NonNullable<ReleaseOptions["foldersToZip"]>;
@@ -2873,16 +3021,22 @@ export type GitReleaseAsset = NonNullable<
 // ============================================================================
 
 /** Package result - derived from response packagesProcessed */
-export type PackageResult = NonNullable<ReleaseResponseType["packagesProcessed"]>[number];
+export type PackageResult = NonNullable<
+  ReleaseResponseType["packagesProcessed"]
+>[number];
 
 /** Published package - derived from response publishedPackages */
-export type PublishedPackage = NonNullable<ReleaseResponseType["publishedPackages"]>[number];
+export type PublishedPackage = NonNullable<
+  ReleaseResponseType["publishedPackages"]
+>[number];
 
 /** Timings breakdown - derived from response timings */
 export type Timings = NonNullable<ReleaseResponseType["timings"]>;
 
 /** Notification result - derived from response notificationsSent */
-export type NotificationResult = NonNullable<ReleaseResponseType["notificationsSent"]>[number];
+export type NotificationResult = NonNullable<
+  ReleaseResponseType["notificationsSent"]
+>[number];
 
 /** Git info - derived from response gitInfo */
 export type GitInfo = NonNullable<ReleaseResponseType["gitInfo"]>;
@@ -2916,7 +3070,9 @@ export type HookContext = NonNullable<InternalTypes["hookContext"]>;
 export type HookResult = NonNullable<InternalTypes["hookResult"]>;
 
 /** Security scan results - derived from _internal.securityScanResult */
-export type SecurityScanResult = NonNullable<InternalTypes["securityScanResult"]>;
+export type SecurityScanResult = NonNullable<
+  InternalTypes["securityScanResult"]
+>;
 
 /** Notification data for webhooks - derived from _internal.notificationData */
 export type NotificationData = NonNullable<InternalTypes["notificationData"]>;

@@ -8,11 +8,13 @@ export const translations: typeof enTranslations = {
   csv: {
     post: {
       title: "Importuj Dane CSV",
-      description: "Importuj dane z plików CSV z inteligentnym przetwarzaniem i walidacją",
+      description:
+        "Importuj dane z plików CSV z inteligentnym przetwarzaniem i walidacją",
 
       form: {
         title: "Konfiguracja Importu CSV",
-        description: "Skonfiguruj ustawienia importu CSV dla optymalnych rezultatów",
+        description:
+          "Skonfiguruj ustawienia importu CSV dla optymalnych rezultatów",
       },
 
       // === SEKCJA WGRYWANIA PLIKU ===
@@ -50,13 +52,15 @@ export const translations: typeof enTranslations = {
       skipDuplicates: {
         label: "Pomiń Duplikaty",
         description: "Pomiń rekordy z duplikowanymi adresami email",
-        helpText: "Zalecane: Zapobiega importowaniu tego samego kontaktu dwukrotnie",
+        helpText:
+          "Zalecane: Zapobiega importowaniu tego samego kontaktu dwukrotnie",
       },
 
       updateExisting: {
         label: "Aktualizuj Istniejące",
         description: "Aktualizuj istniejące rekordy nowymi danymi z CSV",
-        helpText: "Jeśli niezaznaczone, istniejące rekordy pozostaną niezmienione",
+        helpText:
+          "Jeśli niezaznaczone, istniejące rekordy pozostaną niezmienione",
       },
 
       useChunkedProcessing: {
@@ -186,7 +190,8 @@ export const translations: typeof enTranslations = {
           emptyFileName: "Podaj nazwę tego importu",
           invalidDomain: "Wybierz prawidłową domenę importu",
           invalidBatchSize: "Rozmiar partii musi być między 10 a 1000",
-          fileTooLarge: "Rozmiar pliku przekracza limit 10MB. Rozważ przetwarzanie w tle.",
+          fileTooLarge:
+            "Rozmiar pliku przekracza limit 10MB. Rozważ przetwarzanie w tle.",
         },
         unauthorized: {
           title: "Dostęp Zabroniony",
@@ -198,7 +203,8 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Import Nieudany",
-          description: "Wystąpił błąd podczas przetwarzania importu. Spróbuj ponownie.",
+          description:
+            "Wystąpił błąd podczas przetwarzania importu. Spróbuj ponownie.",
         },
         network: {
           title: "Błąd Sieci",

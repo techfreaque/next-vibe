@@ -10,7 +10,13 @@ import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { BarChart3, Database, FileText, List, Settings } from "next-vibe-ui/ui/icons";
+import {
+  BarChart3,
+  Database,
+  FileText,
+  List,
+  Settings,
+} from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, P } from "next-vibe-ui/ui/typography";
@@ -83,7 +89,9 @@ export function EmailsAdminLayoutClient({
     },
   ];
 
-  const currentSection = navigationItems.find((item) => item.pattern.test(pathname));
+  const currentSection = navigationItems.find((item) =>
+    item.pattern.test(pathname),
+  );
 
   return (
     <Div className="flex flex-col gap-6">

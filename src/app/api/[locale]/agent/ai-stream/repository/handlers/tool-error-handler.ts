@@ -7,7 +7,10 @@ import type { ReadableStreamDefaultController } from "node:stream/web";
 import type { JSONValue } from "ai";
 import { eq } from "drizzle-orm";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { db } from "@/app/api/[locale]/system/db";
@@ -77,7 +80,8 @@ export class ToolErrorHandler {
       "error" in part && part.error
         ? part.error instanceof Error
           ? fail({
-              message: "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+              message:
+                "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
               errorType: ErrorResponseTypes.UNKNOWN_ERROR,
               messageParams: { error: part.error.message },
             })
@@ -88,12 +92,14 @@ export class ToolErrorHandler {
             ? // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
               (part.error as unknown as ErrorResponseType)
             : fail({
-                message: "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+                message:
+                  "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
                 errorType: ErrorResponseTypes.UNKNOWN_ERROR,
                 messageParams: { error: String(part.error) },
               })
         : fail({
-            message: "app.api.agent.chat.aiStream.errors.toolExecutionFailed" as const,
+            message:
+              "app.api.agent.chat.aiStream.errors.toolExecutionFailed" as const,
             errorType: ErrorResponseTypes.UNKNOWN_ERROR,
           });
 
@@ -143,12 +149,15 @@ export class ToolErrorHandler {
         .returning({ id: chatMessages.id });
 
       if (updateResult.length === 0) {
-        logger.error("[AI Stream] CRITICAL: Tool message update failed - message not found in DB", {
-          messageId: toolMessageId,
-          toolCallId: part.toolCallId,
-          toolName: part.toolName,
-          threadId,
-        });
+        logger.error(
+          "[AI Stream] CRITICAL: Tool message update failed - message not found in DB",
+          {
+            messageId: toolMessageId,
+            toolCallId: part.toolCallId,
+            toolName: part.toolName,
+            threadId,
+          },
+        );
         // Fallback: create message if update failed
         await createToolMessage({
           messageId: toolMessageId,

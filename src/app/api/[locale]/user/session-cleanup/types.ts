@@ -17,7 +17,9 @@ export const sessionCleanupConfigSchema = z.object({
   dryRun: z.boolean().default(false),
 });
 
-export type SessionCleanupConfigType = z.output<typeof sessionCleanupConfigSchema>;
+export type SessionCleanupConfigType = z.output<
+  typeof sessionCleanupConfigSchema
+>;
 
 /**
  * Task Result Schema
@@ -30,18 +32,24 @@ export const sessionCleanupResultSchema = z.object({
   errors: z.array(z.string()).default([]),
 });
 
-export type SessionCleanupResultType = z.output<typeof sessionCleanupResultSchema>;
+export type SessionCleanupResultType = z.output<
+  typeof sessionCleanupResultSchema
+>;
 
 /**
  * Task Execution Request Schema
  */
 export const sessionCleanupRequestSchema = sessionCleanupConfigSchema;
 
-export type SessionCleanupRequestOutput = z.output<typeof sessionCleanupRequestSchema>;
+export type SessionCleanupRequestOutput = z.output<
+  typeof sessionCleanupRequestSchema
+>;
 
 /**
  * Task Execution Response Schema
  */
 export const sessionCleanupResponseSchema = sessionCleanupResultSchema;
 
-export type SessionCleanupResponseOutput = z.output<typeof sessionCleanupResponseSchema>;
+export type SessionCleanupResponseOutput = z.output<
+  typeof sessionCleanupResponseSchema
+>;

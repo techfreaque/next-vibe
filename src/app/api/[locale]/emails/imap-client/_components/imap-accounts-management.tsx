@@ -8,7 +8,12 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "next-vibe-ui/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { Plus } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
@@ -42,8 +47,13 @@ export function ImapAccountsManagement(): JSX.Element {
       <Card>
         <CardHeader>
           <Div className="flex items-center justify-between">
-            <CardTitle>{t("app.admin.emails.imap.admin.accounts.management.title")}</CardTitle>
-            <Button onClick={() => setShowCreateDialog(true)} className="flex items-center gap-2">
+            <CardTitle>
+              {t("app.admin.emails.imap.admin.accounts.management.title")}
+            </CardTitle>
+            <Button
+              onClick={() => setShowCreateDialog(true)}
+              className="flex items-center gap-2"
+            >
               <Plus className="h-4 w-4" />
               {t("app.admin.emails.imap.account.create")}
             </Button>
@@ -59,7 +69,9 @@ export function ImapAccountsManagement(): JSX.Element {
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t("app.admin.emails.imap.account.create")}</DialogTitle>
+            <DialogTitle>
+              {t("app.admin.emails.imap.account.create")}
+            </DialogTitle>
           </DialogHeader>
           <ImapAccountCreateForm
             locale={locale}

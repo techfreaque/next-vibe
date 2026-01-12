@@ -4,7 +4,11 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -85,7 +89,8 @@ export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterfa
         }
       }
 
-      const finalValid = schemaValid || (data.fixIssues && fixedIssues.length === issues.length);
+      const finalValid =
+        schemaValid || (data.fixIssues && fixedIssues.length === issues.length);
 
       if (!data.silent && finalValid) {
         const { t } = simpleT(locale);

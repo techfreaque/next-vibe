@@ -13,9 +13,20 @@ interface UsersStatsPageProps {
   user: JwtPayloadType;
 }
 
-export function UsersStatsClientPage({ locale, user }: UsersStatsPageProps): JSX.Element {
-  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+export function UsersStatsClientPage({
+  locale,
+  user,
+}: UsersStatsPageProps): JSX.Element {
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
   return (
-    <EndpointRenderer endpoint={definitions.GET} locale={locale} logger={logger} user={user} />
+    <EndpointRenderer
+      endpoint={definitions.GET}
+      locale={locale}
+      logger={logger}
+      user={user}
+    />
   );
 }

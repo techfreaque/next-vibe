@@ -18,7 +18,9 @@ import { extractIconData } from "@/app/api/[locale]/system/unified-interface/sha
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class IconWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.ICON> {
+export class IconWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.ICON
+> {
   readonly widgetType = WidgetType.ICON;
 
   /**

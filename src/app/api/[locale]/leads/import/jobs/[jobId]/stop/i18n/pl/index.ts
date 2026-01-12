@@ -57,7 +57,8 @@ export const translations: typeof enTranslations = {
       },
       conflict: {
         title: "Konflikt zatrzymania",
-        description: "Nie można zatrzymać zadania, które nie jest obecnie przetwarzane",
+        description:
+          "Nie można zatrzymać zadania, które nie jest obecnie przetwarzane",
       },
     },
     success: {

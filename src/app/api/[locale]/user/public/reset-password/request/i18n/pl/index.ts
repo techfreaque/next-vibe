@@ -12,11 +12,13 @@ export const translations: typeof enTranslations = {
     previewText:
       "Zresetuj swoje hasło, aby odzyskać dostęp do swojego konta {{appName}} i kontynuować rozmowy z 38 modelami AI.",
     greeting: "Witaj,",
-    requestInfo: "Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta {{appName}}.",
+    requestInfo:
+      "Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta {{appName}}.",
     instructions:
       "Kliknij przycisk poniżej, aby utworzyć nowe hasło. Ten link jest ważny przez 24 godziny i może być użyty tylko raz.",
     buttonText: "Zresetuj moje hasło",
-    expirationInfo: "Ten bezpieczny link wygasa za 24 godziny dla Twojego bezpieczeństwa.",
+    expirationInfo:
+      "Ten bezpieczny link wygasa za 24 godziny dla Twojego bezpieczeństwa.",
     securityInfo:
       "Dla Twojego bezpieczeństwa, to resetowanie hasła zostało zażądane z {{ipAddress}} dnia {{requestTime}}.",
     didntRequest: "Nie żądałeś tego?",
@@ -32,7 +34,8 @@ export const translations: typeof enTranslations = {
   groups: {
     emailInput: {
       title: "Wprowadzenie E-maila",
-      description: "Wprowadź swój adres e-mail, aby otrzymać instrukcje resetowania",
+      description:
+        "Wprowadź swój adres e-mail, aby otrzymać instrukcje resetowania",
     },
   },
   fields: {

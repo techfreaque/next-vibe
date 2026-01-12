@@ -15,7 +15,9 @@ import definitions from "./definition";
  * Hook for subscription management
  * Provides both query (GET) and mutation (POST/PUT/DELETE) operations
  */
-export function useSubscription(logger: EndpointLogger): EndpointReturn<typeof definitions> {
+export function useSubscription(
+  logger: EndpointLogger,
+): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {

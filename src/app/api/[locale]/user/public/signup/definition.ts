@@ -60,8 +60,10 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.user.public.signup.fields.privateName.label",
-              description: "app.api.user.public.signup.fields.privateName.description",
-              placeholder: "app.api.user.public.signup.fields.privateName.placeholder",
+              description:
+                "app.api.user.public.signup.fields.privateName.description",
+              placeholder:
+                "app.api.user.public.signup.fields.privateName.placeholder",
               columns: 6,
               order: 1,
             },
@@ -85,8 +87,10 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.user.public.signup.fields.publicName.label",
-              description: "app.api.user.public.signup.fields.publicName.description",
-              placeholder: "app.api.user.public.signup.fields.publicName.placeholder",
+              description:
+                "app.api.user.public.signup.fields.publicName.description",
+              placeholder:
+                "app.api.user.public.signup.fields.publicName.placeholder",
               columns: 6,
               order: 2,
             },
@@ -110,8 +114,10 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.EMAIL,
               label: "app.api.user.public.signup.fields.email.label",
-              description: "app.api.user.public.signup.fields.email.description",
-              placeholder: "app.api.user.public.signup.fields.email.placeholder",
+              description:
+                "app.api.user.public.signup.fields.email.description",
+              placeholder:
+                "app.api.user.public.signup.fields.email.placeholder",
               columns: 12,
               order: 3,
             },
@@ -136,8 +142,10 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
               label: "app.api.user.public.signup.fields.password.label",
-              description: "app.api.user.public.signup.fields.password.description",
-              placeholder: "app.api.user.public.signup.fields.password.placeholder",
+              description:
+                "app.api.user.public.signup.fields.password.description",
+              placeholder:
+                "app.api.user.public.signup.fields.password.placeholder",
               columns: 6,
               order: 4,
             },
@@ -161,8 +169,10 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.PASSWORD,
               label: "app.api.user.public.signup.fields.confirmPassword.label",
-              description: "app.api.user.public.signup.fields.confirmPassword.description",
-              placeholder: "app.api.user.public.signup.fields.confirmPassword.placeholder",
+              description:
+                "app.api.user.public.signup.fields.confirmPassword.description",
+              placeholder:
+                "app.api.user.public.signup.fields.confirmPassword.placeholder",
               columns: 6,
               order: 5,
             },
@@ -192,7 +202,8 @@ const { POST } = createEndpoint({
             {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label: "app.api.user.public.signup.fields.subscribeToNewsletter.label",
+              label:
+                "app.api.user.public.signup.fields.subscribeToNewsletter.label",
               columns: 12,
               order: 6,
             },
@@ -204,7 +215,8 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "app.api.user.public.signup.fields.acceptTerms.label",
-              description: "app.api.user.public.signup.fields.acceptTerms.description",
+              description:
+                "app.api.user.public.signup.fields.acceptTerms.description",
               columns: 12,
               order: 7,
             },
@@ -219,14 +231,17 @@ const { POST } = createEndpoint({
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "app.api.user.public.signup.fields.referralCode.label",
-              description: "app.api.user.public.signup.fields.referralCode.description",
-              placeholder: "app.api.user.public.signup.fields.referralCode.placeholder",
+              description:
+                "app.api.user.public.signup.fields.referralCode.description",
+              placeholder:
+                "app.api.user.public.signup.fields.referralCode.placeholder",
               columns: 12,
               order: 8,
               // Show as readonly card when prefilled from server (only if value unchanged)
               prefillDisplay: {
                 variant: "card",
-                labelKey: "app.api.user.public.signup.fields.referralCode.label",
+                labelKey:
+                  "app.api.user.public.signup.fields.referralCode.label",
               },
             },
             z.string().optional(),
@@ -348,7 +363,8 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        message: "Account created successfully! Please check your email to verify your account.",
+        message:
+          "Account created successfully! Please check your email to verify your account.",
       },
     },
   },

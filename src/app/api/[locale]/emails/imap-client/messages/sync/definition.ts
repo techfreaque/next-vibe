@@ -40,7 +40,8 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.emails.imapClient.messages.sync.container.title",
-      description: "app.api.emails.imapClient.messages.sync.container.description",
+      description:
+        "app.api.emails.imapClient.messages.sync.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -52,8 +53,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.imapClient.messages.sync.accountId.label",
-          description: "app.api.emails.imapClient.messages.sync.accountId.description",
-          placeholder: "app.api.emails.imapClient.messages.sync.accountId.placeholder",
+          description:
+            "app.api.emails.imapClient.messages.sync.accountId.description",
+          placeholder:
+            "app.api.emails.imapClient.messages.sync.accountId.placeholder",
           columns: 12,
         },
         z.uuid(),
@@ -64,8 +67,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.TEXT,
           label: "app.api.emails.imapClient.messages.sync.folderId.label",
-          description: "app.api.emails.imapClient.messages.sync.folderId.description",
-          placeholder: "app.api.emails.imapClient.messages.sync.folderId.placeholder",
+          description:
+            "app.api.emails.imapClient.messages.sync.folderId.description",
+          placeholder:
+            "app.api.emails.imapClient.messages.sync.folderId.placeholder",
           columns: 12,
         },
         z.uuid().optional(),
@@ -76,7 +81,8 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
           label: "app.api.emails.imapClient.messages.sync.force.label",
-          description: "app.api.emails.imapClient.messages.sync.force.description",
+          description:
+            "app.api.emails.imapClient.messages.sync.force.description",
           columns: 12,
         },
         z.boolean().default(false),
@@ -102,8 +108,10 @@ const { POST } = createEndpoint({
       results: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.emails.imapClient.messages.sync.response.results.title",
-          description: "app.api.emails.imapClient.messages.sync.response.results.description",
+          title:
+            "app.api.emails.imapClient.messages.sync.response.results.title",
+          description:
+            "app.api.emails.imapClient.messages.sync.response.results.description",
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -112,35 +120,40 @@ const { POST } = createEndpoint({
           messagesProcessed: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.emails.imapClient.messages.sync.response.results.messagesProcessed",
+              content:
+                "app.api.emails.imapClient.messages.sync.response.results.messagesProcessed",
             },
             z.coerce.number(),
           ),
           messagesAdded: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.emails.imapClient.messages.sync.response.results.messagesAdded",
+              content:
+                "app.api.emails.imapClient.messages.sync.response.results.messagesAdded",
             },
             z.coerce.number(),
           ),
           messagesUpdated: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.emails.imapClient.messages.sync.response.results.messagesUpdated",
+              content:
+                "app.api.emails.imapClient.messages.sync.response.results.messagesUpdated",
             },
             z.coerce.number(),
           ),
           messagesDeleted: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.emails.imapClient.messages.sync.response.results.messagesDeleted",
+              content:
+                "app.api.emails.imapClient.messages.sync.response.results.messagesDeleted",
             },
             z.coerce.number(),
           ),
           duration: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.emails.imapClient.messages.sync.response.results.duration",
+              content:
+                "app.api.emails.imapClient.messages.sync.response.results.duration",
             },
             z.coerce.number(),
           ),
@@ -155,7 +168,8 @@ const { POST } = createEndpoint({
         objectField(
           {
             type: WidgetType.CONTAINER,
-            title: "app.api.emails.imapClient.messages.sync.response.errors.error.title",
+            title:
+              "app.api.emails.imapClient.messages.sync.response.errors.error.title",
             description:
               "app.api.emails.imapClient.messages.sync.response.errors.error.description",
             layoutType: LayoutType.GRID,
@@ -173,7 +187,8 @@ const { POST } = createEndpoint({
             message: responseField(
               {
                 type: WidgetType.TEXT,
-                content: "app.api.emails.imapClient.messages.sync.response.errors.error.message",
+                content:
+                  "app.api.emails.imapClient.messages.sync.response.errors.error.message",
               },
               z.string(),
             ),
@@ -187,39 +202,49 @@ const { POST } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.emails.imapClient.messages.sync.errors.validation.title",
-      description: "app.api.emails.imapClient.messages.sync.errors.validation.description",
+      description:
+        "app.api.emails.imapClient.messages.sync.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.emails.imapClient.messages.sync.errors.unauthorized.title",
-      description: "app.api.emails.imapClient.messages.sync.errors.unauthorized.description",
+      title:
+        "app.api.emails.imapClient.messages.sync.errors.unauthorized.title",
+      description:
+        "app.api.emails.imapClient.messages.sync.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.emails.imapClient.messages.sync.errors.forbidden.title",
-      description: "app.api.emails.imapClient.messages.sync.errors.forbidden.description",
+      description:
+        "app.api.emails.imapClient.messages.sync.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.emails.imapClient.messages.sync.errors.server.title",
-      description: "app.api.emails.imapClient.messages.sync.errors.server.description",
+      description:
+        "app.api.emails.imapClient.messages.sync.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.emails.imapClient.messages.sync.errors.unknown.title",
-      description: "app.api.emails.imapClient.messages.sync.errors.unknown.description",
+      description:
+        "app.api.emails.imapClient.messages.sync.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.emails.imapClient.messages.sync.errors.unknown.title",
-      description: "app.api.emails.imapClient.messages.sync.errors.unknown.description",
+      description:
+        "app.api.emails.imapClient.messages.sync.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.emails.imapClient.messages.sync.errors.unknown.title",
-      description: "app.api.emails.imapClient.messages.sync.errors.unknown.description",
+      description:
+        "app.api.emails.imapClient.messages.sync.errors.unknown.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.emails.imapClient.messages.sync.errors.unknown.title",
-      description: "app.api.emails.imapClient.messages.sync.errors.unknown.description",
+      description:
+        "app.api.emails.imapClient.messages.sync.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.emails.imapClient.messages.sync.errors.unknown.title",
-      description: "app.api.emails.imapClient.messages.sync.errors.unknown.description",
+      description:
+        "app.api.emails.imapClient.messages.sync.errors.unknown.description",
     },
   },
 
@@ -259,7 +284,8 @@ const { POST } = createEndpoint({
 export type ImapMessageSyncPostRequestInput = typeof POST.types.RequestInput;
 export type ImapMessageSyncPostRequestOutput = typeof POST.types.RequestOutput;
 export type ImapMessageSyncPostResponseInput = typeof POST.types.ResponseInput;
-export type ImapMessageSyncPostResponseOutput = typeof POST.types.ResponseOutput;
+export type ImapMessageSyncPostResponseOutput =
+  typeof POST.types.ResponseOutput;
 
 // Export repository types for import standardization
 export type ImapMessageSyncRequestOutput = ImapMessageSyncPostRequestOutput;

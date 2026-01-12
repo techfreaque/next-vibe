@@ -27,7 +27,9 @@ export interface SettingsOperations {
   setTTSVoice: (voice: typeof TtsVoiceValue) => void;
   setTheme: (theme: "light" | "dark") => void;
   setViewMode: (mode: ChatSettings["viewMode"]) => void;
-  setEnabledTools: (tools: Array<{ id: string; requiresConfirmation: boolean }>) => void;
+  setEnabledTools: (
+    tools: Array<{ id: string; requiresConfirmation: boolean }>,
+  ) => void;
 }
 
 /**
@@ -49,7 +51,10 @@ export function useSettings(deps: {
   const hydrateSettings = chatStore.hydrateSettings;
 
   // Fetch full character details for selected character
-  const selectedCharacterData = useCharacter(chatStore.settings.selectedCharacter, logger);
+  const selectedCharacterData = useCharacter(
+    chatStore.settings.selectedCharacter,
+    logger,
+  );
 
   // Hydrate settings from localStorage after mount
   useEffect(() => {
@@ -62,7 +67,11 @@ export function useSettings(deps: {
     if (characterVoice && characterVoice !== chatStore.settings.ttsVoice) {
       updateSettings({ ttsVoice: characterVoice });
     }
-  }, [selectedCharacterData.read?.data?.voice, chatStore.settings.ttsVoice, updateSettings]);
+  }, [
+    selectedCharacterData.read?.data?.voice,
+    chatStore.settings.ttsVoice,
+    updateSettings,
+  ]);
 
   // Zustand store methods are stable, so we only depend on the specific method
   const setSelectedCharacter = useCallback(

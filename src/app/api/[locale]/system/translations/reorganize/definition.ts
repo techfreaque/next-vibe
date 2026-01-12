@@ -59,7 +59,8 @@ const { POST } = createEndpoint({
     {
       type: WidgetType.CONTAINER,
       title: "app.api.system.translations.reorganize.post.container.title",
-      description: "app.api.system.translations.reorganize.post.container.description",
+      description:
+        "app.api.system.translations.reorganize.post.container.description",
       layoutType: LayoutType.GRID,
       columns: 12,
     },
@@ -70,7 +71,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.translations.reorganize.post.fields.removeUnused.title" as const,
+          label:
+            "app.api.system.translations.reorganize.post.fields.removeUnused.title" as const,
           description:
             "app.api.system.translations.reorganize.post.fields.removeUnused.description" as const,
           columns: 6,
@@ -82,7 +84,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.translations.reorganize.post.fields.dryRun.title" as const,
+          label:
+            "app.api.system.translations.reorganize.post.fields.dryRun.title" as const,
           description:
             "app.api.system.translations.reorganize.post.fields.dryRun.description" as const,
           columns: 6,
@@ -94,7 +97,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.translations.reorganize.post.fields.backup.title" as const,
+          label:
+            "app.api.system.translations.reorganize.post.fields.backup.title" as const,
           description:
             "app.api.system.translations.reorganize.post.fields.backup.description" as const,
           columns: 6,
@@ -119,7 +123,8 @@ const { POST } = createEndpoint({
         {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
-          label: "app.api.system.translations.reorganize.post.fields.regenerateKeys.title" as const,
+          label:
+            "app.api.system.translations.reorganize.post.fields.regenerateKeys.title" as const,
           description:
             "app.api.system.translations.reorganize.post.fields.regenerateKeys.description" as const,
           columns: 6,
@@ -131,8 +136,10 @@ const { POST } = createEndpoint({
       response: objectField(
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.system.translations.reorganize.post.success.title" as const,
-          description: "app.api.system.translations.reorganize.post.success.description" as const,
+          title:
+            "app.api.system.translations.reorganize.post.success.title" as const,
+          description:
+            "app.api.system.translations.reorganize.post.success.description" as const,
           layoutType: LayoutType.GRID,
           columns: 12,
         },
@@ -141,7 +148,8 @@ const { POST } = createEndpoint({
           success: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.translations.reorganize.post.fields.success.title",
+              content:
+                "app.api.system.translations.reorganize.post.fields.success.title",
             },
             z.boolean(),
           ),
@@ -149,8 +157,10 @@ const { POST } = createEndpoint({
           summary: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.system.translations.reorganize.post.fields.summary.title" as const,
-              description: "app.api.system.translations.reorganize.post.description" as const,
+              title:
+                "app.api.system.translations.reorganize.post.fields.summary.title" as const,
+              description:
+                "app.api.system.translations.reorganize.post.description" as const,
               layoutType: LayoutType.GRID,
               columns: 12,
             },
@@ -159,28 +169,32 @@ const { POST } = createEndpoint({
               totalKeys: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.translations.reorganize.post.messages.foundKeys",
+                  content:
+                    "app.api.system.translations.reorganize.post.messages.foundKeys",
                 },
                 z.coerce.number(),
               ),
               usedKeys: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.translations.reorganize.post.messages.foundKeys",
+                  content:
+                    "app.api.system.translations.reorganize.post.messages.foundKeys",
                 },
                 z.coerce.number(),
               ),
               unusedKeys: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.translations.reorganize.post.messages.foundKeys",
+                  content:
+                    "app.api.system.translations.reorganize.post.messages.foundKeys",
                 },
                 z.coerce.number(),
               ),
               keysRemoved: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.translations.reorganize.post.messages.removingKeys",
+                  content:
+                    "app.api.system.translations.reorganize.post.messages.removingKeys",
                 },
                 z.coerce.number(),
               ),
@@ -203,7 +217,8 @@ const { POST } = createEndpoint({
               backupCreated: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.system.translations.reorganize.post.messages.backupCreated",
+                  content:
+                    "app.api.system.translations.reorganize.post.messages.backupCreated",
                 },
                 z.boolean(),
               ),
@@ -213,7 +228,8 @@ const { POST } = createEndpoint({
           output: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.translations.reorganize.post.fields.output.title",
+              content:
+                "app.api.system.translations.reorganize.post.fields.output.title",
             },
             z.string(),
           ),
@@ -221,7 +237,8 @@ const { POST } = createEndpoint({
           duration: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.translations.reorganize.post.fields.duration.title",
+              content:
+                "app.api.system.translations.reorganize.post.fields.duration.title",
             },
             z.coerce.number(),
           ),
@@ -229,7 +246,8 @@ const { POST } = createEndpoint({
           backupPath: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.system.translations.reorganize.post.fields.backupPath.title",
+              content:
+                "app.api.system.translations.reorganize.post.fields.backupPath.title",
             },
             z.string().optional(),
           ),
@@ -242,8 +260,10 @@ const { POST } = createEndpoint({
             objectField(
               {
                 type: WidgetType.CONTAINER,
-                title: "app.api.system.translations.reorganize.post.fields.changes.title" as const,
-                description: "app.api.system.translations.reorganize.post.description" as const,
+                title:
+                  "app.api.system.translations.reorganize.post.fields.changes.title" as const,
+                description:
+                  "app.api.system.translations.reorganize.post.description" as const,
                 layoutType: LayoutType.GRID,
                 columns: 12,
               },
@@ -252,21 +272,24 @@ const { POST } = createEndpoint({
                 type: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.translations.reorganize.post.fields.changes.title",
+                    content:
+                      "app.api.system.translations.reorganize.post.fields.changes.title",
                   },
                   z.enum(["removed", "updated", "created", "regenerated"]),
                 ),
                 path: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.translations.reorganize.post.fields.changes.title",
+                    content:
+                      "app.api.system.translations.reorganize.post.fields.changes.title",
                   },
                   z.string(),
                 ),
                 description: responseField(
                   {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.translations.reorganize.post.description",
+                    content:
+                      "app.api.system.translations.reorganize.post.description",
                   },
                   z.string(),
                 ),
@@ -281,47 +304,66 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.translations.reorganize.post.errors.validation.title",
-      description: "app.api.system.translations.reorganize.post.errors.validation.description",
+      title:
+        "app.api.system.translations.reorganize.post.errors.validation.title",
+      description:
+        "app.api.system.translations.reorganize.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.translations.reorganize.post.errors.validation.title",
-      description: "app.api.system.translations.reorganize.post.errors.validation.description",
+      title:
+        "app.api.system.translations.reorganize.post.errors.validation.title",
+      description:
+        "app.api.system.translations.reorganize.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.translations.reorganize.post.errors.unauthorized.title",
-      description: "app.api.system.translations.reorganize.post.errors.unauthorized.description",
+      title:
+        "app.api.system.translations.reorganize.post.errors.unauthorized.title",
+      description:
+        "app.api.system.translations.reorganize.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.translations.reorganize.post.errors.forbidden.title",
-      description: "app.api.system.translations.reorganize.post.errors.forbidden.description",
+      title:
+        "app.api.system.translations.reorganize.post.errors.forbidden.title",
+      description:
+        "app.api.system.translations.reorganize.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.translations.reorganize.post.errors.validation.title",
-      description: "app.api.system.translations.reorganize.post.errors.validation.description",
+      title:
+        "app.api.system.translations.reorganize.post.errors.validation.title",
+      description:
+        "app.api.system.translations.reorganize.post.errors.validation.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.translations.reorganize.post.errors.validation.title",
-      description: "app.api.system.translations.reorganize.post.errors.validation.description",
+      title:
+        "app.api.system.translations.reorganize.post.errors.validation.title",
+      description:
+        "app.api.system.translations.reorganize.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.translations.reorganize.post.errors.validation.title",
-      description: "app.api.system.translations.reorganize.post.errors.validation.description",
+      title:
+        "app.api.system.translations.reorganize.post.errors.validation.title",
+      description:
+        "app.api.system.translations.reorganize.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.translations.reorganize.post.errors.validation.title",
-      description: "app.api.system.translations.reorganize.post.errors.validation.description",
+      title:
+        "app.api.system.translations.reorganize.post.errors.validation.title",
+      description:
+        "app.api.system.translations.reorganize.post.errors.validation.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.translations.reorganize.post.errors.validation.title",
-      description: "app.api.system.translations.reorganize.post.errors.validation.description",
+      title:
+        "app.api.system.translations.reorganize.post.errors.validation.title",
+      description:
+        "app.api.system.translations.reorganize.post.errors.validation.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
     title: "app.api.system.translations.reorganize.post.success.title",
-    description: "app.api.system.translations.reorganize.post.success.description",
+    description:
+      "app.api.system.translations.reorganize.post.success.description",
   },
 
   // === EXAMPLES ===
@@ -352,7 +394,8 @@ const { POST } = createEndpoint({
             "🌍 Translation Reorganization Tool\nℹ️ Dry run completed. No changes were made.\n📊 Found 1189/1247 translation keys in use\n📋 58 unused keys would be removed",
           duration: 1200,
           changes: [],
-          backupPath: ".tmp/translations-backup/translations-2024-01-15T10-30-00-000Z",
+          backupPath:
+            ".tmp/translations-backup/translations-2024-01-15T10-30-00-000Z",
         },
       },
     },
@@ -361,9 +404,12 @@ const { POST } = createEndpoint({
 
 // Extract types using the new enhanced system
 export type TranslationReorganizeRequestInput = typeof POST.types.RequestInput;
-export type TranslationReorganizeRequestOutput = typeof POST.types.RequestOutput;
-export type TranslationReorganizeRequestUrlVariables = typeof POST.types.ResponseInput;
-export type TranslationReorganizeResponseOutput = typeof POST.types.ResponseOutput;
+export type TranslationReorganizeRequestOutput =
+  typeof POST.types.RequestOutput;
+export type TranslationReorganizeRequestUrlVariables =
+  typeof POST.types.ResponseInput;
+export type TranslationReorganizeResponseOutput =
+  typeof POST.types.ResponseOutput;
 
 const definitions = {
   POST,

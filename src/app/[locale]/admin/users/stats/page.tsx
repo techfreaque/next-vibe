@@ -18,7 +18,9 @@ interface UsersStatsPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: UsersStatsPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: UsersStatsPageProps): Promise<Metadata> {
   const { locale } = await params;
   const { t } = simpleT(locale);
 

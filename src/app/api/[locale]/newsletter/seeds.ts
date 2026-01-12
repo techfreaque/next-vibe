@@ -34,7 +34,10 @@ function createNewsletterSeed(
 /**
  * Development seed function for newsletter module
  */
-export async function dev(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
+export async function dev(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("🌱 Seeding newsletter data for development environment");
 
   try {
@@ -57,7 +60,9 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
     const subscriptions = [
       createNewsletterSeed({
         email: "demo@example.com",
-        userId: demoUserResponse.success ? demoUserResponse.data?.id : undefined,
+        userId: demoUserResponse.success
+          ? demoUserResponse.data?.id
+          : undefined,
         status: NewsletterSubscriptionStatus.SUBSCRIBED,
         preferences: {
           frequency: "weekly",
@@ -66,7 +71,9 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
       }),
       createNewsletterSeed({
         email: "admin@example.com",
-        userId: adminUserResponse.success ? adminUserResponse.data?.id : undefined,
+        userId: adminUserResponse.success
+          ? adminUserResponse.data?.id
+          : undefined,
         status: NewsletterSubscriptionStatus.SUBSCRIBED,
         preferences: {
           frequency: "daily",
@@ -86,9 +93,12 @@ export async function dev(logger: EndpointLogger, locale: CountryLanguage): Prom
     // Note: Newsletter functionality may need repository implementation
     // For now, we'll just log the intended subscriptions
     for (const subscription of subscriptions) {
-      logger.debug(`✅ Would create newsletter subscription for ${subscription.email}`, {
-        subscription,
-      });
+      logger.debug(
+        `✅ Would create newsletter subscription for ${subscription.email}`,
+        {
+          subscription,
+        },
+      );
     }
 
     logger.debug("✅ Newsletter subscription data ready for development");
@@ -135,7 +145,10 @@ export async function prod(logger: EndpointLogger): Promise<void> {
     await Promise.resolve(); // Add await expression for async function
     logger.debug("✅ Newsletter system ready for production subscriptions");
   } catch (error) {
-    logger.error("Error seeding production newsletter data:", parseError(error));
+    logger.error(
+      "Error seeding production newsletter data:",
+      parseError(error),
+    );
   }
 }
 

@@ -13,7 +13,11 @@ import type {
 import type { StyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
 import { applyStyleType } from "@/packages/next-vibe-ui/web/utils/style-type";
 
-import { convertCSSToViewStyle, styledNative, styledNativeRef } from "../utils/style-converter";
+import {
+  convertCSSToViewStyle,
+  styledNative,
+  styledNativeRef,
+} from "../utils/style-converter";
 
 const StyledView = styledNativeRef(View);
 const StyledPressable = styledNative(Pressable);
@@ -158,7 +162,10 @@ export const Div = React.forwardRef<DivRefObject, Omit<DivProps, "ref">>(
     },
     ref,
   ): JSX.Element => {
-    const wrappedChildren = React.useMemo(() => wrapTextChildren(children), [children]);
+    const wrappedChildren = React.useMemo(
+      () => wrapTextChildren(children),
+      [children],
+    );
 
     const viewRef = React.useRef<View>(null);
 

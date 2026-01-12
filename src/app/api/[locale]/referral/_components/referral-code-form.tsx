@@ -22,7 +22,9 @@ interface ReferralCodeFormProps {
   locale: CountryLanguage;
 }
 
-export function ReferralCodeForm({ locale }: ReferralCodeFormProps): React.JSX.Element {
+export function ReferralCodeForm({
+  locale,
+}: ReferralCodeFormProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const endpoint = useReferralCreate();
 

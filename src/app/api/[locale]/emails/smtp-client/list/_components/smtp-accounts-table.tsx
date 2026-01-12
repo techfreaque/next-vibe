@@ -69,7 +69,9 @@ export function SmtpAccountsTable({
       <Div className="flex items-center justify-center h-64">
         <Div className="text-center">
           <Div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <P className="text-gray-500">{t("app.admin.emails.smtp.list.loading")}</P>
+          <P className="text-gray-500">
+            {t("app.admin.emails.smtp.list.loading")}
+          </P>
         </Div>
       </Div>
     );
@@ -79,8 +81,12 @@ export function SmtpAccountsTable({
     return (
       <Div className="flex items-center justify-center h-64">
         <Div className="text-center">
-          <P className="text-gray-500 mb-4">{t("app.admin.emails.smtp.list.no_results")}</P>
-          <P className="text-sm text-gray-400">{t("app.admin.emails.smtp.list.description")}</P>
+          <P className="text-gray-500 mb-4">
+            {t("app.admin.emails.smtp.list.no_results")}
+          </P>
+          <P className="text-sm text-gray-400">
+            {t("app.admin.emails.smtp.list.description")}
+          </P>
         </Div>
       </Div>
     );
@@ -93,11 +99,21 @@ export function SmtpAccountsTable({
           <TableRow>
             <TableHead>{t("app.admin.emails.smtp.list.table.name")}</TableHead>
             <TableHead>{t("app.admin.emails.smtp.list.table.host")}</TableHead>
-            <TableHead>{t("app.admin.emails.smtp.admin.fields.campaignTypes")}</TableHead>
-            <TableHead>{t("app.admin.emails.smtp.list.table.status")}</TableHead>
-            <TableHead>{t("app.admin.emails.smtp.list.table.health")}</TableHead>
-            <TableHead>{t("app.admin.emails.smtp.list.table.fromEmail")}</TableHead>
-            <TableHead>{t("app.admin.emails.smtp.list.table.actions")}</TableHead>
+            <TableHead>
+              {t("app.admin.emails.smtp.admin.fields.campaignTypes")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.smtp.list.table.status")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.smtp.list.table.health")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.smtp.list.table.fromEmail")}
+            </TableHead>
+            <TableHead>
+              {t("app.admin.emails.smtp.list.table.actions")}
+            </TableHead>
             <TableHead className="text-right">
               {t("app.admin.emails.smtp.list.table.actions")}
             </TableHead>
@@ -109,13 +125,16 @@ export function SmtpAccountsTable({
               <TableCell>
                 <Div>
                   <Div className="font-medium">{account.name}</Div>
-                  <Div className="text-sm text-gray-500">{account.id.slice(0, 13)}...</Div>
+                  <Div className="text-sm text-gray-500">
+                    {account.id.slice(0, 13)}...
+                  </Div>
                 </Div>
               </TableCell>
               <TableCell>
                 <Div className="text-sm">
                   <Div className="text-gray-500">
-                    {t("app.admin.emails.smtp.list.table.status")}: {account.status}
+                    {t("app.admin.emails.smtp.list.table.status")}:{" "}
+                    {account.status}
                   </Div>
                 </Div>
               </TableCell>
@@ -123,7 +142,9 @@ export function SmtpAccountsTable({
                 <Span className="text-sm text-gray-500">-</Span>
               </TableCell>
               <TableCell>
-                <Badge variant={getStatusBadgeVariant(account.status)}>{account.status}</Badge>
+                <Badge variant={getStatusBadgeVariant(account.status)}>
+                  {account.status}
+                </Badge>
               </TableCell>
               <TableCell>
                 <Div className="text-sm">
@@ -132,7 +153,8 @@ export function SmtpAccountsTable({
                       variant={
                         account.healthCheckStatus === SmtpHealthStatus.HEALTHY
                           ? "default"
-                          : account.healthCheckStatus === SmtpHealthStatus.DEGRADED
+                          : account.healthCheckStatus ===
+                              SmtpHealthStatus.DEGRADED
                             ? "outline"
                             : "destructive"
                       }
@@ -169,7 +191,9 @@ export function SmtpAccountsTable({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link href={`/${locale}/admin/emails/smtp/edit/${account.id}`}>
+                      <Link
+                        href={`/${locale}/admin/emails/smtp/edit/${account.id}`}
+                      >
                         <Edit className="mr-2 h-4 w-4" />
                         {t("app.admin.emails.smtp.admin.edit.title")}
                       </Link>

@@ -65,9 +65,13 @@ export function EditSmtpAccountForm({
     return (
       <Div className="flex items-center justify-center h-64">
         <Div className="text-center">
-          <P className="text-gray-500 mb-4">{t("app.admin.emails.smtp.pages.edit.notFound")}</P>
+          <P className="text-gray-500 mb-4">
+            {t("app.admin.emails.smtp.pages.edit.notFound")}
+          </P>
           <Button asChild>
-            <Link href={`/${locale}/admin/emails/smtp`}>{t("app.admin.common.actions.back")}</Link>
+            <Link href={`/${locale}/admin/emails/smtp`}>
+              {t("app.admin.common.actions.back")}
+            </Link>
           </Button>
         </Div>
       </Div>
@@ -93,7 +97,11 @@ export function EditSmtpAccountForm({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Form form={endpoint.create.form} onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <Form
+            form={endpoint.create.form}
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-6"
+          >
             {/* Basic Information */}
             <FormFieldGroup
               title="app.admin.emails.smtp.admin.form.basicInfo"
@@ -167,7 +175,9 @@ export function EditSmtpAccountForm({
 
             {/* Authentication */}
             <FormFieldGroup
-              title={"app.admin.emails.smtp.admin.form.connectionSettings" as const}
+              title={
+                "app.admin.emails.smtp.admin.form.connectionSettings" as const
+              }
               description={
                 "app.admin.emails.smtp.admin.form.connectionSettingsDescription" as const
               }
@@ -198,7 +208,9 @@ export function EditSmtpAccountForm({
             {/* Email Settings */}
             <FormFieldGroup
               title={"app.admin.emails.smtp.admin.form.emailSettings" as const}
-              description={"app.admin.emails.smtp.admin.form.emailSettingsDescription" as const}
+              description={
+                "app.admin.emails.smtp.admin.form.emailSettingsDescription" as const
+              }
             >
               <EndpointFormField
                 name="fromEmail"

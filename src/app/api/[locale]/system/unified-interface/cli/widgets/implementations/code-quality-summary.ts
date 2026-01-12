@@ -29,7 +29,9 @@ export class CodeQualitySummaryWidgetRenderer extends BaseWidgetRenderer<
    * Displays total files, total issues, and error counts.
    * Shows "X of Y" format when results are truncated.
    */
-  render(props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_SUMMARY, string>): string {
+  render(
+    props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_SUMMARY, string>,
+  ): string {
     const { value, context } = props;
 
     if (!isWidgetDataObject(value)) {
@@ -43,20 +45,35 @@ export class CodeQualitySummaryWidgetRenderer extends BaseWidgetRenderer<
     const headerTitle = context.t(
       "app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.codeQualitySummary.summary",
     );
-    const headerText = this.styleText(`${headerIcon}${headerTitle}`, "bold", context);
+    const headerText = this.styleText(
+      `${headerIcon}${headerTitle}`,
+      "bold",
+      context,
+    );
     result.push(headerText);
 
     // Separator
     result.push(this.createSeparator(50));
 
     // Extract values
-    const totalFiles = isWidgetDataNumber(value.totalFiles) ? value.totalFiles : 0;
-    const displayedFiles = isWidgetDataNumber(value.displayedFiles) ? value.displayedFiles : 0;
-    const totalIssues = isWidgetDataNumber(value.totalIssues) ? value.totalIssues : 0;
-    const displayedIssues = isWidgetDataNumber(value.displayedIssues) ? value.displayedIssues : 0;
-    const totalErrors = isWidgetDataNumber(value.totalErrors) ? value.totalErrors : 0;
+    const totalFiles = isWidgetDataNumber(value.totalFiles)
+      ? value.totalFiles
+      : 0;
+    const displayedFiles = isWidgetDataNumber(value.displayedFiles)
+      ? value.displayedFiles
+      : 0;
+    const totalIssues = isWidgetDataNumber(value.totalIssues)
+      ? value.totalIssues
+      : 0;
+    const displayedIssues = isWidgetDataNumber(value.displayedIssues)
+      ? value.displayedIssues
+      : 0;
+    const totalErrors = isWidgetDataNumber(value.totalErrors)
+      ? value.totalErrors
+      : 0;
 
-    const isTruncated = displayedIssues < totalIssues || displayedFiles < totalFiles;
+    const isTruncated =
+      displayedIssues < totalIssues || displayedFiles < totalFiles;
 
     // Files stat
     const filesLabel = context.t(
@@ -103,7 +120,11 @@ export class CodeQualitySummaryWidgetRenderer extends BaseWidgetRenderer<
           : context.t(
               "app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.errors",
             );
-      const errorText = this.styleText(`${totalErrors} ${errorWord}`, "red", context);
+      const errorText = this.styleText(
+        `${totalErrors} ${errorWord}`,
+        "red",
+        context,
+      );
       result.push(`   ${errorIcon}${errorText}`);
     }
 

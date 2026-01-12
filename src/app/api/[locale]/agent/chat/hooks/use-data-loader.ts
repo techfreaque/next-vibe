@@ -15,7 +15,9 @@ import { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import type { FolderListResponseOutput } from "../folders/definition";
 import foldersDefinition from "../folders/definition";
-import threadsDefinition, { type ThreadListResponseOutput } from "../threads/definition";
+import threadsDefinition, {
+  type ThreadListResponseOutput,
+} from "../threads/definition";
 
 /**
  * Load incognito data from localStorage
@@ -91,7 +93,11 @@ async function loadIncognitoData(
       folderCount: Object.keys(incognitoState.folders).length,
     });
   } catch (error) {
-    logger.error("useDataLoader", "Failed to load incognito data", parseError(error));
+    logger.error(
+      "useDataLoader",
+      "Failed to load incognito data",
+      parseError(error),
+    );
   }
 }
 
@@ -101,7 +107,10 @@ async function loadIncognitoData(
 async function loadThreadsFromServer(
   logger: EndpointLogger,
   locale: CountryLanguage,
-  rootFolderId: DefaultFolderId.PRIVATE | DefaultFolderId.SHARED | DefaultFolderId.PUBLIC,
+  rootFolderId:
+    | DefaultFolderId.PRIVATE
+    | DefaultFolderId.SHARED
+    | DefaultFolderId.PUBLIC,
   addThread: (thread: ChatThread) => void,
 ): Promise<void> {
   try {
@@ -177,7 +186,10 @@ async function loadThreadsFromServer(
 async function loadFoldersFromServer(
   logger: EndpointLogger,
   locale: CountryLanguage,
-  rootFolderId: DefaultFolderId.PRIVATE | DefaultFolderId.SHARED | DefaultFolderId.PUBLIC,
+  rootFolderId:
+    | DefaultFolderId.PRIVATE
+    | DefaultFolderId.SHARED
+    | DefaultFolderId.PUBLIC,
   addFolder: (folder: ChatFolder) => void,
 ): Promise<void> {
   try {
@@ -300,5 +312,14 @@ export function useDataLoader(
     };
 
     void loadData();
-  }, [locale, user, logger, currentRootFolderId, addThread, addMessage, addFolder, setDataLoaded]);
+  }, [
+    locale,
+    user,
+    logger,
+    currentRootFolderId,
+    addThread,
+    addMessage,
+    addFolder,
+    setDataLoaded,
+  ]);
 }

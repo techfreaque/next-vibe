@@ -64,7 +64,9 @@ interface FolderOperationsDeps {
 /**
  * Hook for folder operations
  */
-export function useFolderOperations(deps: FolderOperationsDeps): FolderOperations {
+export function useFolderOperations(
+  deps: FolderOperationsDeps,
+): FolderOperations {
   const { locale, logger, chatStore } = deps;
 
   const createFolder = useCallback(
@@ -86,13 +88,17 @@ export function useFolderOperations(deps: FolderOperationsDeps): FolderOperation
 
       // Handle incognito folder creation
       if (rootFolderId === DefaultFolderId.INCOGNITO) {
-        logger.debug("Folder operations: Creating incognito folder (localStorage only)", {
-          name,
-          rootFolderId,
-          parentId,
-        });
+        logger.debug(
+          "Folder operations: Creating incognito folder (localStorage only)",
+          {
+            name,
+            rootFolderId,
+            parentId,
+          },
+        );
 
-        const { generateIncognitoId, saveFolder } = await import("../../incognito/storage");
+        const { generateIncognitoId, saveFolder } =
+          await import("../../incognito/storage");
 
         const folder: ChatFolder = {
           id: generateIncognitoId(),
@@ -165,7 +171,10 @@ export function useFolderOperations(deps: FolderOperationsDeps): FolderOperation
 
         return folder.id;
       } catch (error) {
-        logger.error("Folder operations: Failed to create folder", parseError(error));
+        logger.error(
+          "Folder operations: Failed to create folder",
+          parseError(error),
+        );
         return "";
       }
     },
@@ -205,9 +214,12 @@ export function useFolderOperations(deps: FolderOperationsDeps): FolderOperation
 
       const folder = chatStore.folders[folderId];
       if (folder && folder.rootFolderId === "incognito") {
-        logger.debug("Folder operations: Updating incognito folder (localStorage only)", {
-          folderId,
-        });
+        logger.debug(
+          "Folder operations: Updating incognito folder (localStorage only)",
+          {
+            folderId,
+          },
+        );
 
         const { saveFolder } = await import("../../incognito/storage");
 
@@ -224,13 +236,16 @@ export function useFolderOperations(deps: FolderOperationsDeps): FolderOperation
 
       // Handle server-side folder update
       try {
-        const response = await fetch(`/api/${locale}/agent/chat/folders/${folderId}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `/api/${locale}/agent/chat/folders/${folderId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ updates: storeUpdates }),
           },
-          body: JSON.stringify({ updates: storeUpdates }),
-        });
+        );
 
         if (!response.ok) {
           logger.error("Folder operations: Failed to update folder", {
@@ -241,7 +256,10 @@ export function useFolderOperations(deps: FolderOperationsDeps): FolderOperation
 
         chatStore.updateFolder(folderId, storeUpdates);
       } catch (error) {
-        logger.error("Folder operations: Failed to update folder", parseError(error));
+        logger.error(
+          "Folder operations: Failed to update folder",
+          parseError(error),
+        );
       }
     },
     [logger, chatStore, locale],
@@ -253,11 +271,15 @@ export function useFolderOperations(deps: FolderOperationsDeps): FolderOperation
 
       const folder = chatStore.folders[folderId];
       if (folder && folder.rootFolderId === "incognito") {
-        logger.debug("Folder operations: Deleting incognito folder (localStorage only)", {
-          folderId,
-        });
+        logger.debug(
+          "Folder operations: Deleting incognito folder (localStorage only)",
+          {
+            folderId,
+          },
+        );
 
-        const { deleteFolder: deleteIncognitoFolder } = await import("../../incognito/storage");
+        const { deleteFolder: deleteIncognitoFolder } =
+          await import("../../incognito/storage");
 
         deleteIncognitoFolder(folderId);
         chatStore.deleteFolder(folderId);
@@ -267,9 +289,12 @@ export function useFolderOperations(deps: FolderOperationsDeps): FolderOperation
 
       // Handle server-side folder deletion
       try {
-        const response = await fetch(`/api/${locale}/agent/chat/folders/${folderId}`, {
-          method: "DELETE",
-        });
+        const response = await fetch(
+          `/api/${locale}/agent/chat/folders/${folderId}`,
+          {
+            method: "DELETE",
+          },
+        );
 
         if (!response.ok) {
           logger.error("Folder operations: Failed to delete folder", {
@@ -280,7 +305,10 @@ export function useFolderOperations(deps: FolderOperationsDeps): FolderOperation
 
         chatStore.deleteFolder(folderId);
       } catch (error) {
-        logger.error("Folder operations: Failed to delete folder", parseError(error));
+        logger.error(
+          "Folder operations: Failed to delete folder",
+          parseError(error),
+        );
       }
     },
     [logger, chatStore, locale],

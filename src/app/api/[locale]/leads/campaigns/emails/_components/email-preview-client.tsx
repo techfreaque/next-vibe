@@ -76,14 +76,18 @@ export function EmailPreviewClient({
                 {t("app.admin.leads.leads.admin.emails.preview.actions.title")}
               </H2>
               <P className="text-sm text-gray-600 dark:text-gray-400">
-                {t("app.admin.leads.leads.admin.emails.preview.actions.description")}
+                {t(
+                  "app.admin.leads.leads.admin.emails.preview.actions.description",
+                )}
               </P>
             </Div>
             <Dialog open={isTestEmailOpen} onOpenChange={setIsTestEmailOpen}>
               <DialogTrigger asChild>
                 <Button className="flex items-center flex flex-row gap-2">
                   <Send className="h-4 w-4" />
-                  <Span>{t("app.admin.leads.leads.admin.emails.testEmail.button")}</Span>
+                  <Span>
+                    {t("app.admin.leads.leads.admin.emails.testEmail.button")}
+                  </Span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -116,7 +120,9 @@ export function EmailPreviewClient({
                 <Span className="font-medium text-gray-700 dark:text-gray-300">
                   {t("app.admin.leads.leads.admin.emails.recipient")}:
                 </Span>
-                <Span className="ml-2 text-gray-600 dark:text-gray-400">{emailPreview.to}</Span>
+                <Span className="ml-2 text-gray-600 dark:text-gray-400">
+                  {emailPreview.to}
+                </Span>
               </Div>
               <Div>
                 <Span className="font-medium text-gray-700 dark:text-gray-300">

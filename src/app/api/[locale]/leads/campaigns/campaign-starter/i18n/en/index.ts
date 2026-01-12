@@ -5,7 +5,8 @@ export const translations = {
   errors: {
     server: {
       title: "Server Error",
-      description: "An error occurred while processing the campaign starter request",
+      description:
+        "An error occurred while processing the campaign starter request",
     },
   },
 };

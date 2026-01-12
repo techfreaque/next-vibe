@@ -4,7 +4,11 @@
  */
 
 import { Button, Hr, Section, Text } from "@react-email/components";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
 import { z } from "zod";
 
@@ -20,7 +24,10 @@ import {
   createTrackingContext,
   type TrackingContext,
 } from "../../emails/smtp-client/components/tracking_context.email";
-import type { UserCreateRequestOutput, UserCreateResponseOutput } from "./definition";
+import type {
+  UserCreateRequestOutput,
+  UserCreateResponseOutput,
+} from "./definition";
 
 // ============================================================================
 // TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
@@ -192,40 +199,46 @@ const userWelcomeTemplate: EmailTemplateDefinition<UserWelcomeProps> = {
     description: "app.api.emails.templates.users.welcome.meta.description",
     category: "users",
     path: "/users/create/email.tsx",
-    defaultSubject: (t) => t("app.api.users.create.email.users.welcome.subject", { appName: "" }),
+    defaultSubject: (t) =>
+      t("app.api.users.create.email.users.welcome.subject", { appName: "" }),
     previewFields: {
       userId: {
         type: "text",
         label: "app.api.emails.templates.users.welcome.preview.userId",
-        description: "app.api.emails.templates.users.welcome.preview.userId.description",
+        description:
+          "app.api.emails.templates.users.welcome.preview.userId.description",
         defaultValue: "example-user-id-123",
         required: true,
       },
       email: {
         type: "email",
         label: "app.api.emails.templates.users.welcome.preview.email",
-        description: "app.api.emails.templates.users.welcome.preview.email.description",
+        description:
+          "app.api.emails.templates.users.welcome.preview.email.description",
         defaultValue: "max@example.com",
         required: true,
       },
       privateName: {
         type: "text",
         label: "app.api.emails.templates.users.welcome.preview.privateName",
-        description: "app.api.emails.templates.users.welcome.preview.privateName.description",
+        description:
+          "app.api.emails.templates.users.welcome.preview.privateName.description",
         defaultValue: "Max",
         required: true,
       },
       publicName: {
         type: "text",
         label: "app.api.emails.templates.users.welcome.preview.publicName",
-        description: "app.api.emails.templates.users.welcome.preview.publicName.description",
+        description:
+          "app.api.emails.templates.users.welcome.preview.publicName.description",
         defaultValue: "Max Mustermann",
         required: true,
       },
       leadId: {
         type: "text",
         label: "app.api.emails.templates.users.welcome.preview.leadId",
-        description: "app.api.emails.templates.users.welcome.preview.leadId.description",
+        description:
+          "app.api.emails.templates.users.welcome.preview.leadId.description",
         defaultValue: "example-lead-id-456",
       },
     },
@@ -471,7 +484,8 @@ export const renderWelcomeEmail: EmailFunctionType<
     });
   } catch {
     return fail({
-      message: "app.api.users.create.email.users.error.general.internal_server_error",
+      message:
+        "app.api.users.create.email.users.error.general.internal_server_error",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -509,7 +523,8 @@ export const renderAdminNotificationEmail: EmailFunctionType<
     });
   } catch {
     return fail({
-      message: "app.api.users.create.email.users.error.general.internal_server_error",
+      message:
+        "app.api.users.create.email.users.error.general.internal_server_error",
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

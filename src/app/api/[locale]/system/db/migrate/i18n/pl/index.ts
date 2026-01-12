@@ -124,7 +124,8 @@ export const translations: typeof enTranslations = {
       description: "Wykryto konflikt migracji",
     },
     generationFailed: "Nie udało się wygenerować migracji: {{message}}",
-    generationFailedWithCode: "Generowanie migracji nie powiodło się z kodem {{code}}: {{output}}",
+    generationFailedWithCode:
+      "Generowanie migracji nie powiodło się z kodem {{code}}: {{output}}",
     migrationFailed: "Nie udało się uruchomić migracji: {{message}}",
   },
   success: {
@@ -160,7 +161,8 @@ export const translations: typeof enTranslations = {
     trackingReset: "Śledzenie migracji zresetowane pomyślnie",
     productionCompleted: "Migracje produkcyjne zakończone pomyślnie",
     productionWithBackup: " (z kopią zapasową)",
-    syncCompleted: "Synchronizacja migracji zakończona pomyślnie ({{direction}})",
+    syncCompleted:
+      "Synchronizacja migracji zakończona pomyślnie ({{direction}})",
     failedToGenerate: "Nie udało się wygenerować migracji: {{error}}",
     failedToExecute: "Nie udało się wykonać migracji: {{error}}",
     failedToRedo: "Nie udało się ponowić migracji: {{error}}",

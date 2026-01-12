@@ -297,7 +297,9 @@ const oxlint: CheckConfig["oxlint"] = {
 
     // ── Pedantic rule overrides ─────────────────────────────────
     "max-lines": "off",
-    ...(features.pedantic ? { "max-lines-per-function": ["warn", { max: 150 }] } : {}),
+    ...(features.pedantic
+      ? { "max-lines-per-function": ["warn", { max: 150 }] }
+      : {}),
     // Disable rules that conflict with TypeScript strict null checks
     // (.at() and .codePointAt() return T | undefined)
     "unicorn/prefer-at": "off",
@@ -355,7 +357,15 @@ const oxlint: CheckConfig["oxlint"] = {
                 ".spec.tsx",
                 "/__tests__/",
               ],
-              typographyElements: ["h1", "h2", "h3", "h4", "p", "blockquote", "code"],
+              typographyElements: [
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "p",
+                "blockquote",
+                "code",
+              ],
               standaloneElements: ["span", "pre"],
               svgElements: [
                 "svg",
@@ -740,11 +750,15 @@ const config = (): CheckConfig => {
           plugins: {
             "simple-import-sort": simpleImportSortPlugin,
             ...(features.react ? { "react-hooks": reactHooksPlugin } : {}),
-            ...(features.reactCompiler ? { "react-compiler": reactCompilerPlugin } : {}),
+            ...(features.reactCompiler
+              ? { "react-compiler": reactCompilerPlugin }
+              : {}),
             // Stubs for oxlint rules
             i18next: createEslintStub(["no-literal-string"]),
             "oxlint-plugin-restricted": createEslintStub(["restricted-syntax"]),
-            "oxlint-plugin-jsx-capitalization": createEslintStub(["jsx-capitalization"]),
+            "oxlint-plugin-jsx-capitalization": createEslintStub([
+              "jsx-capitalization",
+            ]),
             "oxlint-plugin-i18n": createEslintStub(["no-literal-string"]),
             "@typescript-eslint": createEslintStub([
               "no-explicit-any",
@@ -768,8 +782,13 @@ const config = (): CheckConfig => {
               "no-unsafe-member-access",
               "no-implied-eval",
             ]),
-            "typescript-eslint": createEslintStub(["no-explicit-any", "no-unused-vars"]),
-            "eslint-plugin-unicorn": createEslintStub(["require-module-specifiers"]),
+            "typescript-eslint": createEslintStub([
+              "no-explicit-any",
+              "no-unused-vars",
+            ]),
+            "eslint-plugin-unicorn": createEslintStub([
+              "require-module-specifiers",
+            ]),
             prettier: createEslintStub(["prettier"]),
             "eslint-plugin-promise": createEslintStub(["no-multiple-resolved"]),
             "eslint-plugin-next": createEslintStub([
@@ -793,7 +812,9 @@ const config = (): CheckConfig => {
                   "react-hooks/exhaustive-deps": "error",
                 }
               : {}),
-            ...(features.reactCompiler ? { "react-compiler/react-compiler": "error" } : {}),
+            ...(features.reactCompiler
+              ? { "react-compiler/react-compiler": "error" }
+              : {}),
             "no-unused-vars": "off",
             "no-console": "off",
             "no-template-curly-in-string": "off",
@@ -809,8 +830,13 @@ const config = (): CheckConfig => {
             ...(features.react ? { "react-hooks": reactHooksPlugin } : {}),
             i18next: createEslintStub(["no-literal-string"]),
             "oxlint-plugin-restricted": createEslintStub(["restricted-syntax"]),
-            "@typescript-eslint": createEslintStub(["no-explicit-any", "no-unused-vars"]),
-            "eslint-plugin-unicorn": createEslintStub(["require-module-specifiers"]),
+            "@typescript-eslint": createEslintStub([
+              "no-explicit-any",
+              "no-unused-vars",
+            ]),
+            "eslint-plugin-unicorn": createEslintStub([
+              "require-module-specifiers",
+            ]),
             prettier: createEslintStub(["prettier"]),
             "eslint-plugin-promise": createEslintStub(["no-multiple-resolved"]),
             "eslint-plugin-next": createEslintStub([

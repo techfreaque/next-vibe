@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import {
   BarChart3,
@@ -63,24 +69,35 @@ export default function Features({
     {
       icon: <Brush className="h-10 w-10 text-cyan-500" />,
       title: t("app.story._components.home.features.contentCreation.title"),
-      description: t("app.story._components.home.features.contentCreation.description", {
-        modelCount,
-      }),
+      description: t(
+        "app.story._components.home.features.contentCreation.description",
+        {
+          modelCount,
+        },
+      ),
     },
     {
       icon: <LayoutTemplate className="h-10 w-10 text-blue-500" />,
       title: t("app.story._components.home.features.strategyDevelopment.title"),
-      description: t("app.story._components.home.features.strategyDevelopment.description"),
+      description: t(
+        "app.story._components.home.features.strategyDevelopment.description",
+      ),
     },
     {
       icon: <BarChart3 className="h-10 w-10 text-cyan-500" />,
-      title: t("app.story._components.home.features.performanceAnalytics.title"),
-      description: t("app.story._components.home.features.performanceAnalytics.description"),
+      title: t(
+        "app.story._components.home.features.performanceAnalytics.title",
+      ),
+      description: t(
+        "app.story._components.home.features.performanceAnalytics.description",
+      ),
     },
     {
       icon: <MessageSquare className="h-10 w-10 text-blue-500" />,
       title: t("app.story._components.home.features.communityEngagement.title"),
-      description: t("app.story._components.home.features.communityEngagement.description"),
+      description: t(
+        "app.story._components.home.features.communityEngagement.description",
+      ),
     },
     {
       icon: <TrendingUp className="h-10 w-10 text-cyan-500" />,
@@ -92,7 +109,9 @@ export default function Features({
     {
       icon: <Users className="h-10 w-10 text-blue-500" />,
       title: t("app.story._components.home.features.audience.title"),
-      description: t("app.story._components.home.features.audience.description"),
+      description: t(
+        "app.story._components.home.features.audience.description",
+      ),
     },
     {
       icon: <Globe className="h-10 w-10 text-cyan-500" />,
@@ -102,14 +121,17 @@ export default function Features({
     {
       icon: <Zap className="h-10 w-10 text-blue-500" />,
       title: t("app.story._components.home.features.adCampaigns.title"),
-      description: t("app.story._components.home.features.adCampaigns.description", {
-        subCurrency,
-        subPrice,
-        subCredits,
-        packCurrency,
-        packPrice,
-        packCredits,
-      }),
+      description: t(
+        "app.story._components.home.features.adCampaigns.description",
+        {
+          subCurrency,
+          subPrice,
+          subCredits,
+          packCurrency,
+          packPrice,
+          packCredits,
+        },
+      ),
     },
   ];
 
@@ -129,7 +151,11 @@ export default function Features({
   };
 
   return (
-    <Div id="features" className="container px-4 md:px-6 py-24 md:py-32" ref={ref as never}>
+    <Div
+      id="features"
+      className="container px-4 md:px-6 py-24 md:py-32"
+      ref={ref as never}
+    >
       <Div className="text-center mb-16">
         <MotionDiv
           className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2"
@@ -175,7 +201,9 @@ export default function Features({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-base">{feature.description}</CardDescription>
+                <CardDescription className="text-base">
+                  {feature.description}
+                </CardDescription>
               </CardContent>
             </Card>
           </MotionDiv>

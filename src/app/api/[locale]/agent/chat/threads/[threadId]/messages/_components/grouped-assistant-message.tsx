@@ -68,29 +68,44 @@ export function GroupedAssistantMessage({
   collapseState,
 }: GroupedAssistantMessageProps): JSX.Element {
   // Get rootFolderId from context
-  const { currentRootFolderId: rootFolderId, user, sendMessage } = useChatContext();
+  const {
+    currentRootFolderId: rootFolderId,
+    user,
+    sendMessage,
+  } = useChatContext();
 
   const { t } = simpleT(locale);
   const { primary, continuations } = group;
 
   // Get character for assistant messages
   const character =
-    primary.role === "assistant" || primary.role === "user" ? primary.character : null;
+    primary.role === "assistant" || primary.role === "user"
+      ? primary.character
+      : null;
 
   // Get display name for assistant
   const displayName = primary.model
     ? getModelById(primary.model).name
     : t("app.chat.messages.assistant");
 
-  const allMessages = useMemo(() => [primary, ...continuations], [primary, continuations]);
+  const allMessages = useMemo(
+    () => [primary, ...continuations],
+    [primary, continuations],
+  );
 
-  const hasContent = allMessages.some((msg) => (msg.content ?? "").trim().length > 0);
+  const hasContent = allMessages.some(
+    (msg) => (msg.content ?? "").trim().length > 0,
+  );
 
   // Find tools waiting for confirmation
   const toolsWaitingForConfirmation = useMemo(
     () =>
       allMessages
-        .filter((msg) => msg.role === "tool" && msg.metadata?.toolCall?.waitingForConfirmation)
+        .filter(
+          (msg) =>
+            msg.role === "tool" &&
+            msg.metadata?.toolCall?.waitingForConfirmation,
+        )
         .map((msg) => ({
           messageId: msg.id,
           toolCall: msg.metadata!.toolCall!,
@@ -102,7 +117,9 @@ export function GroupedAssistantMessage({
 
   // Confirmation state - used for both single and multiple tools
   // All tools require explicit user decision before submitting
-  const [batchDecisions, setBatchDecisions] = useState<Map<string, ToolDecision>>(new Map());
+  const [batchDecisions, setBatchDecisions] = useState<
+    Map<string, ToolDecision>
+  >(new Map());
 
   // Track if we've already submitted to prevent double submission
   const hasSubmittedRef = useRef(false);
@@ -111,15 +128,26 @@ export function GroupedAssistantMessage({
   useEffect(() => {
     if (toolsWaitingForConfirmation.length > 0 && batchDecisions.size === 0) {
       setBatchDecisions(
-        new Map(toolsWaitingForConfirmation.map((tool) => [tool.messageId, { type: "pending" }])),
+        new Map(
+          toolsWaitingForConfirmation.map((tool) => [
+            tool.messageId,
+            { type: "pending" },
+          ]),
+        ),
       );
     }
   }, [toolsWaitingForConfirmation, batchDecisions.size]);
 
   // Counter stats for the batch confirmation banner
-  const pendingCount = [...batchDecisions.values()].filter((d) => d.type === "pending").length;
-  const confirmedCount = [...batchDecisions.values()].filter((d) => d.type === "confirmed").length;
-  const declinedCount = [...batchDecisions.values()].filter((d) => d.type === "declined").length;
+  const pendingCount = [...batchDecisions.values()].filter(
+    (d) => d.type === "pending",
+  ).length;
+  const confirmedCount = [...batchDecisions.values()].filter(
+    (d) => d.type === "confirmed",
+  ).length;
+  const declinedCount = [...batchDecisions.values()].filter(
+    (d) => d.type === "declined",
+  ).length;
 
   // Show streaming placeholder when no content yet AND no tools waiting for confirmation
   const isStreaming = !hasContent && !hasToolWaitingForConfirmation;
@@ -132,13 +160,19 @@ export function GroupedAssistantMessage({
 
   useEffect(() => {
     // Process for TTS (used by speech)
-    void processMessageGroupForTTS(allMessages, locale, logger).then(setAllContent);
+    void processMessageGroupForTTS(allMessages, locale, logger).then(
+      setAllContent,
+    );
 
     // Process for copying - markdown format (includes tool calls with formatting)
-    void processMessageGroupForCopy(allMessages, locale, true, logger).then(setContentMarkdown);
+    void processMessageGroupForCopy(allMessages, locale, true, logger).then(
+      setContentMarkdown,
+    );
 
     // Process for copying - plain text format (includes tool calls, strips markdown)
-    void processMessageGroupForCopy(allMessages, locale, false, logger).then(setContentText);
+    void processMessageGroupForCopy(allMessages, locale, false, logger).then(
+      setContentText,
+    );
   }, [allMessages, locale, logger]);
 
   // Batch confirmation handlers
@@ -173,7 +207,11 @@ export function GroupedAssistantMessage({
         return decision && decision.type !== "pending";
       });
 
-      if (allDecided && hasToolWaitingForConfirmation && !hasSubmittedRef.current) {
+      if (
+        allDecided &&
+        hasToolWaitingForConfirmation &&
+        !hasSubmittedRef.current
+      ) {
         hasSubmittedRef.current = true;
 
         const toolConfirmations = toolsWaitingForConfirmation
@@ -186,7 +224,10 @@ export function GroupedAssistantMessage({
             return {
               messageId: tool.messageId,
               confirmed: decision.type === "confirmed",
-              updatedArgs: decision.type === "confirmed" ? decision.updatedArgs : undefined,
+              updatedArgs:
+                decision.type === "confirmed"
+                  ? decision.updatedArgs
+                  : undefined,
             };
           })
           .filter((conf): conf is NonNullable<typeof conf> => conf !== null);
@@ -225,7 +266,11 @@ export function GroupedAssistantMessage({
         return decision && decision.type !== "pending";
       });
 
-      if (allDecided && hasToolWaitingForConfirmation && !hasSubmittedRef.current) {
+      if (
+        allDecided &&
+        hasToolWaitingForConfirmation &&
+        !hasSubmittedRef.current
+      ) {
         hasSubmittedRef.current = true;
 
         const toolConfirmations = toolsWaitingForConfirmation
@@ -238,7 +283,10 @@ export function GroupedAssistantMessage({
             return {
               messageId: tool.messageId,
               confirmed: decision.type === "confirmed",
-              updatedArgs: decision.type === "confirmed" ? decision.updatedArgs : undefined,
+              updatedArgs:
+                decision.type === "confirmed"
+                  ? decision.updatedArgs
+                  : undefined,
             };
           })
           .filter((conf): conf is NonNullable<typeof conf> => conf !== null);
@@ -292,7 +340,9 @@ export function GroupedAssistantMessage({
                   {t("app.chat.batchToolConfirmation.title")}
                 </Span>
                 <Div className="flex items-center gap-2 text-xs">
-                  <Span className="text-green-600 dark:text-green-500">✓ {confirmedCount}</Span>
+                  <Span className="text-green-600 dark:text-green-500">
+                    ✓ {confirmedCount}
+                  </Span>
                   <Span className="text-destructive">✕ {declinedCount}</Span>
                   <Span className="text-muted-foreground">{pendingCount}</Span>
                 </Div>
@@ -325,7 +375,9 @@ export function GroupedAssistantMessage({
                       : undefined
                   }
                   onCancel={
-                    hasToolWaitingForConfirmation ? () => handleBatchCancel(message.id) : undefined
+                    hasToolWaitingForConfirmation
+                      ? () => handleBatchCancel(message.id)
+                      : undefined
                   }
                   parentId={primary.id}
                   decision={decision}
@@ -348,7 +400,10 @@ export function GroupedAssistantMessage({
               );
             }
 
-            if (message.role === "assistant" && (message.content ?? "").trim()) {
+            if (
+              message.role === "assistant" &&
+              (message.content ?? "").trim()
+            ) {
               return (
                 <Div key={message.id} className="mb-3 last:mb-0">
                   <Markdown
@@ -358,9 +413,12 @@ export function GroupedAssistantMessage({
                     collapseState={collapseState}
                   />
                   {/* File Attachments */}
-                  {message.metadata?.attachments && message.metadata.attachments.length > 0 && (
-                    <FileAttachments attachments={message.metadata.attachments} />
-                  )}
+                  {message.metadata?.attachments &&
+                    message.metadata.attachments.length > 0 && (
+                      <FileAttachments
+                        attachments={message.metadata.attachments}
+                      />
+                    )}
                 </Div>
               );
             }

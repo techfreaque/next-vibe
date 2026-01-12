@@ -43,7 +43,10 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
 
   const { t, locale, currentCountry } = useTranslation();
   // Create logger once - memoize to prevent recreating on every render
-  const logger = useMemo(() => createEndpointLogger(false, Date.now(), locale), [locale]);
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
   // Use server-provided user prop to determine authentication status immediately
   // This prevents hydration mismatch - no client-side delay
   const isAuthenticated = user !== undefined && !user.isPublic;
@@ -101,7 +104,9 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
         <AlertDialog open={deleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>{t("app.admin.common.actions.delete")}</AlertDialogTitle>
+              <AlertDialogTitle>
+                {t("app.admin.common.actions.delete")}
+              </AlertDialogTitle>
               <AlertDialogDescription>
                 {t("app.chat.confirmations.deleteMessage")}
               </AlertDialogDescription>
@@ -126,7 +131,9 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
         <AlertDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>{t("app.chat.welcomeTour.authDialog.title")}</AlertDialogTitle>
+              <AlertDialogTitle>
+                {t("app.chat.welcomeTour.authDialog.title")}
+              </AlertDialogTitle>
               <AlertDialogDescription>
                 {t("app.chat.welcomeTour.authDialog.description")}
               </AlertDialogDescription>
@@ -150,7 +157,11 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
 
       {/* Welcome Tour */}
       <ErrorBoundary locale={locale}>
-        <WelcomeTour isAuthenticated={isAuthenticated} locale={locale} autoStart={true} />
+        <WelcomeTour
+          isAuthenticated={isAuthenticated}
+          locale={locale}
+          autoStart={true}
+        />
       </ErrorBoundary>
     </>
   );

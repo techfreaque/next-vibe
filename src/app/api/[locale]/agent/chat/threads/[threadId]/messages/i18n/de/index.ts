@@ -86,8 +86,10 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Verboten",
-        description: "Sie haben keine Berechtigung, diese Nachrichten anzuzeigen",
-        incognitoNotAllowed: "Inkognito-Threads können nicht auf dem Server aufgerufen werden",
+        description:
+          "Sie haben keine Berechtigung, diese Nachrichten anzuzeigen",
+        incognitoNotAllowed:
+          "Inkognito-Threads können nicht auf dem Server aufgerufen werden",
       },
       notFound: {
         title: "Not Found",
@@ -204,7 +206,8 @@ export const translations: typeof enTranslations = {
       forbidden: {
         title: "Forbidden",
         description: "You don't have permission to create messages",
-        incognitoNotAllowed: "Inkognito-Threads können nicht auf dem Server aufgerufen werden",
+        incognitoNotAllowed:
+          "Inkognito-Threads können nicht auf dem Server aufgerufen werden",
       },
       notFound: {
         title: "Not Found",

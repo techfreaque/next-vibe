@@ -63,7 +63,8 @@ export function LinkWidget<const TKey extends string>({
 
   // If we have a value but can't extract link data, show the translated raw value
   if (!data) {
-    const displayValue = typeof value === "string" ? context.t(value) : String(value);
+    const displayValue =
+      typeof value === "string" ? context.t(value) : String(value);
     return <Span className={className}>{displayValue}</Span>;
   }
 
@@ -86,7 +87,9 @@ export function LinkWidget<const TKey extends string>({
       rel={isExternal && openInNewTab ? "noopener noreferrer" : undefined}
     >
       <Span className="truncate">{translatedText}</Span>
-      {openInNewTab && <ExternalLink className={cn(iconSizeClass, "shrink-0 opacity-70")} />}
+      {openInNewTab && (
+        <ExternalLink className={cn(iconSizeClass, "shrink-0 opacity-70")} />
+      )}
     </Link>
   );
 }

@@ -18,7 +18,9 @@ import {
 /**
  * Helper to get alignment class from config value
  */
-function getAlignmentClass(align: "left" | "center" | "right" | undefined): string {
+function getAlignmentClass(
+  align: "left" | "center" | "right" | undefined,
+): string {
   if (!align) {
     return "text-left";
   }
@@ -66,7 +68,15 @@ export function TitleWidget<const TKey extends string>({
   context,
   className,
 }: ReactWidgetProps<typeof WidgetType.TITLE, TKey>): JSX.Element {
-  const { content, level: configLevel, fieldType, textAlign, size, gap, subtitleGap } = field.ui;
+  const {
+    content,
+    level: configLevel,
+    fieldType,
+    textAlign,
+    size,
+    gap,
+    subtitleGap,
+  } = field.ui;
 
   // Get classes from config (no hardcoding!)
   const sizeClass = getTextSizeClassName(size);
@@ -82,7 +92,9 @@ export function TitleWidget<const TKey extends string>({
     // For card titles (simple display)
     if (level >= 4) {
       return (
-        <Div className={cn("font-medium", sizeClass, alignmentClass, className)}>
+        <Div
+          className={cn("font-medium", sizeClass, alignmentClass, className)}
+        >
           {translatedContent}
         </Div>
       );
@@ -132,7 +144,11 @@ export function TitleWidget<const TKey extends string>({
 
   // For card titles (no subtitle, simple display), render as font-medium text
   if (!subtitle && finalLevel >= 4) {
-    return <Div className={cn("font-medium", sizeClass, alignmentClass, className)}>{text}</Div>;
+    return (
+      <Div className={cn("font-medium", sizeClass, alignmentClass, className)}>
+        {text}
+      </Div>
+    );
   }
 
   return (
@@ -142,7 +158,11 @@ export function TitleWidget<const TKey extends string>({
       </Title>
 
       {subtitle && (
-        <Span className={cn(subtitleGapClass, sizeClass, "text-muted-foreground")}>{subtitle}</Span>
+        <Span
+          className={cn(subtitleGapClass, sizeClass, "text-muted-foreground")}
+        >
+          {subtitle}
+        </Span>
       )}
     </Div>
   );

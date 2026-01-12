@@ -14,7 +14,11 @@ import { useCallback, useMemo } from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { CountryFilter, type CountryLanguage, LanguageFilter } from "@/i18n/core/config";
+import {
+  CountryFilter,
+  type CountryLanguage,
+  LanguageFilter,
+} from "@/i18n/core/config";
 
 import type {
   EndpointReturn,
@@ -105,17 +109,22 @@ export function useLeadsStats(
   const formatNumber = useCallback(
     (value: number): string => {
       const GLOBAL_SUFFIX = "-GLOBAL";
-      return new Intl.NumberFormat(locale.replace(GLOBAL_SUFFIX, "")).format(value);
+      return new Intl.NumberFormat(locale.replace(GLOBAL_SUFFIX, "")).format(
+        value,
+      );
     },
     [locale],
   );
 
-  const calculatePercentageChange = useCallback((current: number, previous: number): number => {
-    if (previous === 0) {
-      return current > 0 ? 100 : 0;
-    }
-    return ((current - previous) / previous) * 100;
-  }, []);
+  const calculatePercentageChange = useCallback(
+    (current: number, previous: number): number => {
+      if (previous === 0) {
+        return current > 0 ? 100 : 0;
+      }
+      return ((current - previous) / previous) * 100;
+    },
+    [],
+  );
 
   const getTrendIndicator = useCallback(
     (current: number, previous: number): "up" | "down" | "neutral" => {
@@ -168,7 +177,10 @@ export interface UseLeadsStatsReturn {
   formatPercentage: (num: number) => string;
   formatNumber: (num: number) => string;
   calculatePercentageChange: (current: number, previous: number) => number;
-  getTrendIndicator: (current: number, previous: number) => "up" | "down" | "neutral";
+  getTrendIndicator: (
+    current: number,
+    previous: number,
+  ) => "up" | "down" | "neutral";
   form: LeadsStatsEndpointReturn["read"]["form"];
   alert: FormAlertState | null;
 }

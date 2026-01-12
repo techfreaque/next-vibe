@@ -18,8 +18,10 @@ import type { CampaignSchedulingOptions } from "../types";
 import { abTestingService } from "./ab-testing";
 
 // Type aliases for enum values
-type EmailCampaignStageValues = (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
-type EmailJourneyVariantValues = (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
+type EmailCampaignStageValues =
+  (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
+type EmailJourneyVariantValues =
+  (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant];
 type EmailProviderValues = (typeof EmailProvider)[keyof typeof EmailProvider];
 
 /**
@@ -27,7 +29,10 @@ type EmailProviderValues = (typeof EmailProvider)[keyof typeof EmailProvider];
  * Defines timing between email stages
  */
 const SCHEDULING_RULES: {
-  [stage in Exclude<EmailCampaignStageValues, (typeof EmailCampaignStage)["NOT_STARTED"]>]: {
+  [stage in Exclude<
+    EmailCampaignStageValues,
+    (typeof EmailCampaignStage)["NOT_STARTED"]
+  >]: {
     delay: number; // In milliseconds
     nextStage: EmailCampaignStageValues | null;
   };
@@ -67,7 +72,9 @@ export class CampaignSchedulerService {
    * Leads are ineligible if they are converted, unsubscribed, or have invalid status
    */
   private isLeadEligibleForCampaign(lead: typeof leads.$inferSelect): boolean {
-    const ineligibleStatuses: Array<(typeof LeadStatus)[keyof typeof LeadStatus]> = [
+    const ineligibleStatuses: Array<
+      (typeof LeadStatus)[keyof typeof LeadStatus]
+    > = [
       LeadStatus.UNSUBSCRIBED,
       LeadStatus.SIGNED_UP,
       LeadStatus.CONSULTATION_BOOKED,
@@ -102,7 +109,11 @@ export class CampaignSchedulerService {
       logger.info("campaign.schedule.initial.start", { leadId, options });
 
       // Get lead data
-      const [lead] = await db.select().from(leads).where(eq(leads.id, leadId)).limit(1);
+      const [lead] = await db
+        .select()
+        .from(leads)
+        .where(eq(leads.id, leadId))
+        .limit(1);
 
       if (!lead) {
         logger.error("campaign.schedule.initial.lead.not.found", { leadId });
@@ -151,7 +162,12 @@ export class CampaignSchedulerService {
 
       if (campaignId) {
         // Schedule next stage
-        await this.scheduleNextStage(leadId, EmailCampaignStage.INITIAL, journeyVariant, logger);
+        await this.scheduleNextStage(
+          leadId,
+          EmailCampaignStage.INITIAL,
+          journeyVariant,
+          logger,
+        );
       }
 
       return campaignId;
@@ -171,7 +187,13 @@ export class CampaignSchedulerService {
     logger: EndpointLogger,
   ): Promise<string | null> {
     try {
-      const { leadId, journeyVariant, stage, scheduledAt, metadata = {} } = options;
+      const {
+        leadId,
+        journeyVariant,
+        stage,
+        scheduledAt,
+        metadata = {},
+      } = options;
 
       // Check if email already scheduled for this stage
       const existingCampaign = await db
@@ -224,7 +246,10 @@ export class CampaignSchedulerService {
    */
   async scheduleNextStage(
     leadId: string,
-    currentStage: Exclude<EmailCampaignStageValues, (typeof EmailCampaignStage)["NOT_STARTED"]>,
+    currentStage: Exclude<
+      EmailCampaignStageValues,
+      (typeof EmailCampaignStage)["NOT_STARTED"]
+    >,
     journeyVariant: EmailJourneyVariantValues,
     logger: EndpointLogger,
   ): Promise<string | null> {
@@ -385,7 +410,10 @@ export class CampaignSchedulerService {
           status: EmailStatus.FAILED,
           metadata: {
             cancelReason:
-              reason || t("app.api.leads.campaigns.emails.services.scheduler.cancelledBySystem"),
+              reason ||
+              t(
+                "app.api.leads.campaigns.emails.services.scheduler.cancelledBySystem",
+              ),
           },
         })
         .where(
@@ -404,9 +432,13 @@ export class CampaignSchedulerService {
 
       return result.rowCount || 0;
     } catch (error) {
-      logger.error("campaign.cancel.scheduled.emails.error", parseError(error), {
-        leadId,
-      });
+      logger.error(
+        "campaign.cancel.scheduled.emails.error",
+        parseError(error),
+        {
+          leadId,
+        },
+      );
       return 0;
     }
   }
@@ -440,7 +472,11 @@ export class CampaignSchedulerService {
           failed: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.FAILED} then 1 end)`,
         })
         .from(emailCampaigns)
-        .where(journeyVariant ? eq(emailCampaigns.journeyVariant, journeyVariant) : undefined);
+        .where(
+          journeyVariant
+            ? eq(emailCampaigns.journeyVariant, journeyVariant)
+            : undefined,
+        );
 
       const result = stats[0] || {
         total: 0,

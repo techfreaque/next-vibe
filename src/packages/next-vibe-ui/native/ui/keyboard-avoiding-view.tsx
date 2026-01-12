@@ -2,7 +2,10 @@ import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils/utils";
 import * as React from "react";
 import type { ViewStyle } from "react-native";
-import { KeyboardAvoidingView as RNKeyboardAvoidingView, Platform } from "react-native";
+import {
+  KeyboardAvoidingView as RNKeyboardAvoidingView,
+  Platform,
+} from "react-native";
 
 import type { KeyboardAvoidingViewProps } from "@/packages/next-vibe-ui/web/ui/keyboard-avoiding-view";
 
@@ -25,7 +28,9 @@ export function KeyboardAvoidingView({
   style,
 }: KeyboardAvoidingViewProps): React.JSX.Element {
   // Convert web CSSProperties to native ViewStyle if style is provided
-  const nativeStyle: ViewStyle | undefined = style ? convertCSSToViewStyle(style) : undefined;
+  const nativeStyle: ViewStyle | undefined = style
+    ? convertCSSToViewStyle(style)
+    : undefined;
 
   // Use platform-specific default behavior if not provided
   const defaultBehavior = Platform.OS === "ios" ? "padding" : "height";

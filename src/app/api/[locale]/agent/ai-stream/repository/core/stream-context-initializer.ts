@@ -38,10 +38,14 @@ export class StreamContextInitializer {
     const initialAiDepth = userMessageId ? messageDepth + 1 : messageDepth;
 
     // Initialize stream context OUTSIDE try block so it's accessible in catch blocks
-    const lastConfirmedTool = toolConfirmationResults[toolConfirmationResults.length - 1];
+    const lastConfirmedTool =
+      toolConfirmationResults[toolConfirmationResults.length - 1];
     const sequenceId = lastConfirmedTool?.sequenceId ?? crypto.randomUUID();
-    const initialParentForContext = lastConfirmedTool?.messageId ?? initialAiParentId;
-    const initialDepthForContext = lastConfirmedTool ? messageDepth + 1 : initialAiDepth;
+    const initialParentForContext =
+      lastConfirmedTool?.messageId ?? initialAiParentId;
+    const initialDepthForContext = lastConfirmedTool
+      ? messageDepth + 1
+      : initialAiDepth;
 
     const ctx = new StreamContext({
       sequenceId,

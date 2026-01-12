@@ -6,7 +6,11 @@
 import "server-only";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { envClient } from "@/config/env-client";
@@ -21,7 +25,10 @@ import { UserDetailLevel } from "../../user/enum";
 import { UserRepository } from "../../user/repository";
 import { PaymentProvider } from "../enum";
 import { getPaymentProvider } from "../providers";
-import type { CheckoutRequestOutput, CheckoutResponseOutput } from "./definition";
+import type {
+  CheckoutRequestOutput,
+  CheckoutResponseOutput,
+} from "./definition";
 
 /**
  * Subscription Checkout Repository Interface
@@ -66,7 +73,10 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
 
       // Get payment provider from request data or default to stripe
       logger.debug("Step 3: Getting payment provider");
-      const providerKey = data.provider === PaymentProvider.NOWPAYMENTS ? "nowpayments" : "stripe";
+      const providerKey =
+        data.provider === PaymentProvider.NOWPAYMENTS
+          ? "nowpayments"
+          : "stripe";
       const provider = getPaymentProvider(providerKey);
       logger.debug("Step 4: Payment provider retrieved", {
         providerName: provider.name,
@@ -76,7 +86,8 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
 
       // Check if user already has an active subscription
       logger.debug("Step 5: Checking for existing subscription");
-      const { SubscriptionRepository } = await import("../../subscription/repository");
+      const { SubscriptionRepository } =
+        await import("../../subscription/repository");
       const existingSubscription = await SubscriptionRepository.getSubscription(
         user.id,
         logger,
@@ -91,7 +102,8 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
             subscriptionId: existingSubscription.data.id,
           });
           return fail({
-            message: "app.api.payment.checkout.post.errors.alreadySubscribed.title",
+            message:
+              "app.api.payment.checkout.post.errors.alreadySubscribed.title",
             errorType: ErrorResponseTypes.BAD_REQUEST,
             messageParams: { userId: user.id },
           });
@@ -135,7 +147,8 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
       const country = getCountryFromLocale(locale);
 
       // Map billing interval to payment interval
-      const interval = data.billingInterval === BillingInterval.MONTHLY ? "month" : "year";
+      const interval =
+        data.billingInterval === BillingInterval.MONTHLY ? "month" : "year";
 
       // Generate callback token for webhook verification
       const callbackToken = crypto.randomUUID();
@@ -181,7 +194,8 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
         message: t("app.api.payment.checkout.post.success.description"),
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
       logger.error("Failed to create checkout session", {
         errorMessage,
@@ -201,4 +215,5 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
 /**
  * Subscription Checkout Repository Instance
  */
-export const subscriptionCheckoutRepository = new SubscriptionCheckoutRepositoryImpl();
+export const subscriptionCheckoutRepository =
+  new SubscriptionCheckoutRepositoryImpl();

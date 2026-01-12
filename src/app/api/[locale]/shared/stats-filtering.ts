@@ -13,46 +13,50 @@ import type { TranslationKey } from "@/i18n/core/static-types";
  * Time Period Enum
  * Defines different time periods for historical data aggregation
  */
-export const { enum: TimePeriod, options: TimePeriodOptions } = createEnumOptions({
-  DAY: "app.api.shared.stats.timePeriod.day",
-  WEEK: "app.api.shared.stats.timePeriod.week",
-  MONTH: "app.api.shared.stats.timePeriod.month",
-  QUARTER: "app.api.shared.stats.timePeriod.quarter",
-  YEAR: "app.api.shared.stats.timePeriod.year",
-});
+export const { enum: TimePeriod, options: TimePeriodOptions } =
+  createEnumOptions({
+    DAY: "app.api.shared.stats.timePeriod.day",
+    WEEK: "app.api.shared.stats.timePeriod.week",
+    MONTH: "app.api.shared.stats.timePeriod.month",
+    QUARTER: "app.api.shared.stats.timePeriod.quarter",
+    YEAR: "app.api.shared.stats.timePeriod.year",
+  });
 
 /**
  * Date Range Preset Enum
  * Common date range presets for quick filtering
  */
-export const { enum: DateRangePreset, options: DateRangePresetOptions } = createEnumOptions({
-  TODAY: "app.api.shared.stats.dateRange.today",
-  YESTERDAY: "app.api.shared.stats.dateRange.yesterday",
-  LAST_7_DAYS: "app.api.shared.stats.dateRange.last7Days",
-  LAST_30_DAYS: "app.api.shared.stats.dateRange.last30Days",
-  LAST_90_DAYS: "app.api.shared.stats.dateRange.last90Days",
-  THIS_WEEK: "app.api.shared.stats.dateRange.thisWeek",
-  LAST_WEEK: "app.api.shared.stats.dateRange.lastWeek",
-  THIS_MONTH: "app.api.shared.stats.dateRange.thisMonth",
-  LAST_MONTH: "app.api.shared.stats.dateRange.lastMonth",
-  THIS_QUARTER: "app.api.shared.stats.dateRange.thisQuarter",
-  LAST_QUARTER: "app.api.shared.stats.dateRange.lastQuarter",
-  THIS_YEAR: "app.api.shared.stats.dateRange.thisYear",
-  LAST_YEAR: "app.api.shared.stats.dateRange.lastYear",
-  CUSTOM: "app.api.shared.stats.dateRange.custom",
-});
+export const { enum: DateRangePreset, options: DateRangePresetOptions } =
+  createEnumOptions({
+    TODAY: "app.api.shared.stats.dateRange.today",
+    YESTERDAY: "app.api.shared.stats.dateRange.yesterday",
+    LAST_7_DAYS: "app.api.shared.stats.dateRange.last7Days",
+    LAST_30_DAYS: "app.api.shared.stats.dateRange.last30Days",
+    LAST_90_DAYS: "app.api.shared.stats.dateRange.last90Days",
+    THIS_WEEK: "app.api.shared.stats.dateRange.thisWeek",
+    LAST_WEEK: "app.api.shared.stats.dateRange.lastWeek",
+    THIS_MONTH: "app.api.shared.stats.dateRange.thisMonth",
+    LAST_MONTH: "app.api.shared.stats.dateRange.lastMonth",
+    THIS_QUARTER: "app.api.shared.stats.dateRange.thisQuarter",
+    LAST_QUARTER: "app.api.shared.stats.dateRange.lastQuarter",
+    THIS_YEAR: "app.api.shared.stats.dateRange.thisYear",
+    LAST_YEAR: "app.api.shared.stats.dateRange.lastYear",
+    CUSTOM: "app.api.shared.stats.dateRange.custom",
+  });
 
 /**
  * Chart Type Enum
  * Different chart visualization types
  */
-export const { enum: ChartType, options: ChartTypeOptions } = createEnumOptions({
-  LINE: "app.api.shared.stats.chartType.line",
-  BAR: "app.api.shared.stats.chartType.bar",
-  AREA: "app.api.shared.stats.chartType.area",
-  PIE: "app.api.shared.stats.chartType.pie",
-  DONUT: "app.api.shared.stats.chartType.donut",
-});
+export const { enum: ChartType, options: ChartTypeOptions } = createEnumOptions(
+  {
+    LINE: "app.api.shared.stats.chartType.line",
+    BAR: "app.api.shared.stats.chartType.bar",
+    AREA: "app.api.shared.stats.chartType.area",
+    PIE: "app.api.shared.stats.chartType.pie",
+    DONUT: "app.api.shared.stats.chartType.donut",
+  },
+);
 
 /**
  * Historical Data Point Schema
@@ -65,7 +69,11 @@ export const historicalDataPointSchema = z.object({
   metadata: z
     .record(
       z.string(),
-      z.union([z.string() as z.ZodType<TranslationKey>, z.coerce.number(), z.boolean()]),
+      z.union([
+        z.string() as z.ZodType<TranslationKey>,
+        z.coerce.number(),
+        z.boolean(),
+      ]),
     )
     .optional(),
 });
@@ -131,17 +139,37 @@ export function getDateRangeFromPreset(
         to: now,
       };
     case DateRangePreset.LAST_MONTH: {
-      const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-      const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59, 999);
+      const lastMonthStart = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        1,
+      );
+      const lastMonthEnd = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        0,
+        23,
+        59,
+        59,
+        999,
+      );
       return { from: lastMonthStart, to: lastMonthEnd };
     }
     case DateRangePreset.THIS_QUARTER: {
-      const quarterStart = new Date(today.getFullYear(), Math.floor(today.getMonth() / 3) * 3, 1);
+      const quarterStart = new Date(
+        today.getFullYear(),
+        Math.floor(today.getMonth() / 3) * 3,
+        1,
+      );
       return { from: quarterStart, to: now };
     }
     case DateRangePreset.LAST_QUARTER: {
       const lastQuarterMonth = Math.floor(today.getMonth() / 3) * 3 - 3;
-      const lastQuarterStart = new Date(today.getFullYear(), lastQuarterMonth, 1);
+      const lastQuarterStart = new Date(
+        today.getFullYear(),
+        lastQuarterMonth,
+        1,
+      );
       if (lastQuarterMonth < 0) {
         lastQuarterStart.setFullYear(today.getFullYear() - 1);
         lastQuarterStart.setMonth(9);

@@ -4,7 +4,14 @@
  */
 
 import { relations } from "drizzle-orm";
-import { integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
@@ -41,7 +48,9 @@ export const chatFavorites = pgTable("chat_favorites", {
   // Custom TTS voice (overrides character voice)
   voice: text("voice").$type<typeof TtsVoiceValue>(),
 
-  modelSelection: jsonb("model_selection").$type<FavoriteModelSelection>().notNull(),
+  modelSelection: jsonb("model_selection")
+    .$type<FavoriteModelSelection>()
+    .notNull(),
   position: integer("position").notNull(),
   color: text("color"),
 

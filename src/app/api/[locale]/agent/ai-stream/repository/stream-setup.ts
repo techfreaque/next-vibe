@@ -14,7 +14,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { getModelById, type ModelOption } from "@/app/api/[locale]/agent/models/models";
+import {
+  getModelById,
+  type ModelOption,
+} from "@/app/api/[locale]/agent/models/models";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -25,7 +28,10 @@ import type { ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
 import { calculateMessageDepth } from "../../chat/threads/[threadId]/messages/repository";
 import { ensureThread } from "../../chat/threads/repository";
-import { DEFAULT_TTS_VOICE, type TtsVoiceValue } from "../../text-to-speech/enum";
+import {
+  DEFAULT_TTS_VOICE,
+  type TtsVoiceValue,
+} from "../../text-to-speech/enum";
 import { type AiStreamPostRequestOutput } from "../definition";
 import { AbortControllerSetup } from "./core/abort-controller-setup";
 import { CreditValidatorHandler } from "./core/credit-validator-handler";
@@ -147,7 +153,8 @@ export async function setupAiStream(params: {
     isIncognito,
     userId,
     leadId,
-    hasToolConfirmations: !!data.toolConfirmations && data.toolConfirmations.length > 0,
+    hasToolConfirmations:
+      !!data.toolConfirmations && data.toolConfirmations.length > 0,
     toolConfirmationCount: data.toolConfirmations?.length ?? 0,
   });
 
@@ -183,7 +190,8 @@ export async function setupAiStream(params: {
       rootFolderId: data.rootFolderId,
     });
     return fail({
-      message: "app.api.agent.chat.aiStream.route.errors.authenticationRequired",
+      message:
+        "app.api.agent.chat.aiStream.route.errors.authenticationRequired",
       errorType: ErrorResponseTypes.AUTH_ERROR,
     });
   }
@@ -240,7 +248,8 @@ export async function setupAiStream(params: {
   } catch (error) {
     logger.error("Failed to ensure thread - RAW ERROR", parseError(error), {
       errorType: typeof error,
-      errorConstructor: error instanceof Error ? error.constructor.name : "unknown",
+      errorConstructor:
+        error instanceof Error ? error.constructor.name : "unknown",
     });
 
     const errorMessage = parseError(error).message;
@@ -261,14 +270,26 @@ export async function setupAiStream(params: {
     });
   }
 
-  const messageDepth = await calculateMessageDepth(effectiveParentMessageId, isIncognito);
+  const messageDepth = await calculateMessageDepth(
+    effectiveParentMessageId,
+    isIncognito,
+  );
 
   // Check if we have tool confirmations (don't need userMessageId in this case)
-  const hasToolConfirmations = !!(data.toolConfirmations && data.toolConfirmations.length > 0);
+  const hasToolConfirmations = !!(
+    data.toolConfirmations && data.toolConfirmations.length > 0
+  );
 
   // Only require userMessageId if we're NOT doing answer-as-ai AND NOT doing tool confirmations
-  if (!data.userMessageId && data.operation !== "answer-as-ai" && !hasToolConfirmations) {
-    logger.error("User message ID must be provided by client", data.userMessageId);
+  if (
+    !data.userMessageId &&
+    data.operation !== "answer-as-ai" &&
+    !hasToolConfirmations
+  ) {
+    logger.error(
+      "User message ID must be provided by client",
+      data.userMessageId,
+    );
     return fail({
       message: "app.api.agent.chat.aiStream.route.errors.invalidJson",
       errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -277,23 +298,25 @@ export async function setupAiStream(params: {
 
   // For "answer-as-ai", we don't create a user message, so userMessageId should be the parent message
   // This ensures the AI message uses parentMessageId as its parent, not a non-existent userMessageId
-  const userMessageId = data.operation === "answer-as-ai" ? null : data.userMessageId;
+  const userMessageId =
+    data.operation === "answer-as-ai" ? null : data.userMessageId;
 
   // Create user message with attachments (if applicable)
-  const userMessageResult = await UserMessageHandler.createUserMessageWithAttachments({
-    userMessageId,
-    operation: data.operation,
-    hasToolConfirmations,
-    isIncognito,
-    threadId: threadResult.threadId,
-    effectiveRole,
-    effectiveContent,
-    effectiveParentMessageId,
-    messageDepth,
-    userId,
-    attachments: data.attachments ?? undefined,
-    logger,
-  });
+  const userMessageResult =
+    await UserMessageHandler.createUserMessageWithAttachments({
+      userMessageId,
+      operation: data.operation,
+      hasToolConfirmations,
+      isIncognito,
+      threadId: threadResult.threadId,
+      effectiveRole,
+      effectiveContent,
+      effectiveParentMessageId,
+      messageDepth,
+      userId,
+      attachments: data.attachments ?? undefined,
+      logger,
+    });
 
   if (!userMessageResult.success) {
     return userMessageResult;

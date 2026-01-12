@@ -42,7 +42,8 @@ export const translations: typeof enTranslations = {
     description: "Alle gespeicherten Favoriten-Konfigurationen abrufen",
     container: {
       title: "Ihre Favoriten",
-      description: "Verwalten Sie Ihre bevorzugten Charakter- und Modellkonfigurationen",
+      description:
+        "Verwalten Sie Ihre bevorzugten Charakter- und Modellkonfigurationen",
     },
     response: {
       favorite: {
@@ -142,7 +143,8 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Verboten",
-        description: "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
+        description:
+          "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -158,11 +160,13 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
-        description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
+        description:
+          "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
       },
       conflict: {
         title: "Konflikt",
-        description: "Bei der Verarbeitung Ihrer Anfrage ist ein Konflikt aufgetreten",
+        description:
+          "Bei der Verarbeitung Ihrer Anfrage ist ein Konflikt aufgetreten",
       },
     },
     success: {
@@ -209,11 +213,13 @@ export const translations: typeof enTranslations = {
     },
     minIntelligence: {
       label: "Minimale Intelligenz",
-      description: "Minimale Intelligenz-/Fähigkeitsstufe, die für das Modell erforderlich ist",
+      description:
+        "Minimale Intelligenz-/Fähigkeitsstufe, die für das Modell erforderlich ist",
     },
     maxIntelligence: {
       label: "Maximale Intelligenz",
-      description: "Maximale Intelligenz-/Fähigkeitsstufe, die für das Modell zulässig ist",
+      description:
+        "Maximale Intelligenz-/Fähigkeitsstufe, die für das Modell zulässig ist",
     },
     intelligenceRange: {
       label: "Intelligenzbereich",
@@ -257,11 +263,13 @@ export const translations: typeof enTranslations = {
     },
     minSpeed: {
       label: "Minimale Geschwindigkeit",
-      description: "Minimale Geschwindigkeitsstufe, die für das Modell erforderlich ist",
+      description:
+        "Minimale Geschwindigkeitsstufe, die für das Modell erforderlich ist",
     },
     maxSpeed: {
       label: "Maximale Geschwindigkeit",
-      description: "Maximale Geschwindigkeitsstufe, die für das Modell zulässig ist",
+      description:
+        "Maximale Geschwindigkeitsstufe, die für das Modell zulässig ist",
     },
     content: {
       label: "Inhaltsstufe",
@@ -287,7 +295,8 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Validierungsfehler",
-        description: "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+        description:
+          "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
       },
       network: {
         title: "Netzwerkfehler",
@@ -303,7 +312,8 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Nicht gefunden",
-        description: "Das Element, das Sie als Favorit markieren möchten, existiert nicht",
+        description:
+          "Das Element, das Sie als Favorit markieren möchten, existiert nicht",
       },
       server: {
         title: "Serverfehler",
@@ -315,7 +325,8 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
-        description: "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
+        description:
+          "Sie haben nicht gespeicherte Änderungen, die verloren gehen",
       },
       conflict: {
         title: "Konflikt",

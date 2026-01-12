@@ -3,7 +3,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
 import { useCallback, useEffect, useMemo } from "react";
 import type { DefaultValues, UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -67,9 +70,14 @@ export function useEndpointDelete<TEndpoint extends CreateApiEndpointAny>(
   // Compute default values from autoPrefillData or form options
   const defaultValues = useMemo(() => {
     if (autoPrefillData) {
-      return autoPrefillData as DefaultValues<TEndpoint["types"]["RequestOutput"]>;
+      return autoPrefillData as DefaultValues<
+        TEndpoint["types"]["RequestOutput"]
+      >;
     }
-    return formOptions?.defaultValues ?? ({} as DefaultValues<TEndpoint["types"]["RequestOutput"]>);
+    return (
+      formOptions?.defaultValues ??
+      ({} as DefaultValues<TEndpoint["types"]["RequestOutput"]>)
+    );
   }, [autoPrefillData, formOptions?.defaultValues]);
 
   // Create form instance
@@ -81,19 +89,30 @@ export function useEndpointDelete<TEndpoint extends CreateApiEndpointAny>(
   // Reset form when autoPrefillData changes
   useEffect(() => {
     if (autoPrefillData) {
-      logger.debug("useEndpointDelete: Resetting form with autoPrefillData", { autoPrefillData });
-      form.reset(autoPrefillData as DefaultValues<TEndpoint["types"]["RequestOutput"]>);
+      logger.debug("useEndpointDelete: Resetting form with autoPrefillData", {
+        autoPrefillData,
+      });
+      form.reset(
+        autoPrefillData as DefaultValues<TEndpoint["types"]["RequestOutput"]>,
+      );
     }
   }, [autoPrefillData, form, logger]);
 
   // Use the existing mutation hook for consistency
-  const mutation = useApiMutation(deleteEndpoint, logger, options.mutationOptions ?? {});
+  const mutation = useApiMutation(
+    deleteEndpoint,
+    logger,
+    options.mutationOptions ?? {},
+  );
 
   // Create a submit function that calls the mutation
   const submit = useCallback(
     async (data?: TEndpoint["types"]["RequestOutput"]): Promise<void> => {
       const formData = data ?? form.getValues();
-      logger.debug("useEndpointDelete: Submitting delete", { formData, urlPathParams });
+      logger.debug("useEndpointDelete: Submitting delete", {
+        formData,
+        urlPathParams,
+      });
 
       const mutationVariables: MutationVariables<
         TEndpoint["types"]["RequestOutput"],

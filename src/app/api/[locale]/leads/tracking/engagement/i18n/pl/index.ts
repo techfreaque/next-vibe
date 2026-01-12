@@ -41,7 +41,8 @@ export const translations: typeof enTranslations = {
       label: "ID użytkownika",
       description: "Powiązany identyfikator użytkownika",
       placeholder: "Wprowadź ID użytkownika",
-      helpText: "Opcjonalny ID użytkownika, jeśli lead jest powiązany z użytkownikiem",
+      helpText:
+        "Opcjonalny ID użytkownika, jeśli lead jest powiązany z użytkownikiem",
     },
     response: {
       id: "ID zaangażowania",
@@ -185,7 +186,8 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Kliknięcie zarejestrowane",
-      description: "Kliknięcie leada zostało pomyślnie zarejestrowane i przekierowane",
+      description:
+        "Kliknięcie leada zostało pomyślnie zarejestrowane i przekierowane",
     },
   },
   enums: {

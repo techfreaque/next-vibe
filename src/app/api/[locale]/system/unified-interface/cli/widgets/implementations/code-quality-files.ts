@@ -31,7 +31,9 @@ export class CodeQualityFilesWidgetRenderer extends BaseWidgetRenderer<
    * Each file displays its path and counts of errors, warnings, or total issues.
    * Uses file path formatting for better readability in CLI.
    */
-  render(props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_FILES, string>): string {
+  render(
+    props: CLIWidgetProps<typeof WidgetType.CODE_QUALITY_FILES, string>,
+  ): string {
     const { value, context } = props;
 
     if (!isWidgetDataArray(value) || value.length === 0) {
@@ -45,7 +47,11 @@ export class CodeQualityFilesWidgetRenderer extends BaseWidgetRenderer<
     const headerTitle = context.t(
       "app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.codeQualityFiles.affectedFiles",
     );
-    const headerText = this.styleText(`${headerIcon}${headerTitle}`, "bold", context);
+    const headerText = this.styleText(
+      `${headerIcon}${headerTitle}`,
+      "bold",
+      context,
+    );
     result.push(headerText);
 
     // Separator
@@ -63,7 +69,9 @@ export class CodeQualityFilesWidgetRenderer extends BaseWidgetRenderer<
       }
 
       const errors = isWidgetDataNumber(fileData.errors) ? fileData.errors : 0;
-      const warnings = isWidgetDataNumber(fileData.warnings) ? fileData.warnings : 0;
+      const warnings = isWidgetDataNumber(fileData.warnings)
+        ? fileData.warnings
+        : 0;
       const total = isWidgetDataNumber(fileData.total) ? fileData.total : 0;
 
       const displayPath = formatFilePath(file);

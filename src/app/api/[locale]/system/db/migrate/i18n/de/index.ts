@@ -41,7 +41,8 @@ export const translations: typeof enTranslations = {
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description: "Ein unbekannter Fehler ist während der Migration aufgetreten",
+        description:
+          "Ein unbekannter Fehler ist während der Migration aufgetreten",
       },
       conflict: {
         title: "Konflikt",
@@ -117,14 +118,16 @@ export const translations: typeof enTranslations = {
     },
     unknown: {
       title: "Unbekannter Fehler",
-      description: "Ein unbekannter Fehler ist während der Migration aufgetreten",
+      description:
+        "Ein unbekannter Fehler ist während der Migration aufgetreten",
     },
     conflict: {
       title: "Konflikt",
       description: "Migrationskonflikt erkannt",
     },
     generationFailed: "Migrationen konnten nicht generiert werden: {{message}}",
-    generationFailedWithCode: "Migrationsgenerierung fehlgeschlagen mit Code {{code}}: {{output}}",
+    generationFailedWithCode:
+      "Migrationsgenerierung fehlgeschlagen mit Code {{code}}: {{output}}",
     migrationFailed: "Migrationen konnten nicht ausgeführt werden: {{message}}",
   },
   success: {
@@ -160,7 +163,8 @@ export const translations: typeof enTranslations = {
     trackingReset: "Migrationsverfolgung erfolgreich zurückgesetzt",
     productionCompleted: "Produktionsmigrationen erfolgreich abgeschlossen",
     productionWithBackup: " (mit Backup)",
-    syncCompleted: "Migrationssynchronisierung erfolgreich abgeschlossen ({{direction}})",
+    syncCompleted:
+      "Migrationssynchronisierung erfolgreich abgeschlossen ({{direction}})",
     failedToGenerate: "Fehler beim Generieren von Migrationen: {{error}}",
     failedToExecute: "Fehler beim Ausführen von Migrationen: {{error}}",
     failedToRedo: "Fehler beim Wiederholen der Migration: {{error}}",

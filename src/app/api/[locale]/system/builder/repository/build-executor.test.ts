@@ -24,7 +24,11 @@ import { buildExecutor } from "./build-executor";
 const TEST_PROJECT_PATH = resolve(__dirname, "../test-files/test-project");
 
 describe("BuildExecutor", () => {
-  const mockLogger: EndpointLogger = createEndpointLogger(true, Date.now(), defaultLocale);
+  const mockLogger: EndpointLogger = createEndpointLogger(
+    true,
+    Date.now(),
+    defaultLocale,
+  );
 
   afterEach(() => {
     // Bun test automatically cleans up mocks

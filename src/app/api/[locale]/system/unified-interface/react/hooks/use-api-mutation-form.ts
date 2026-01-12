@@ -1,8 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { ErrorResponseType, ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail } from "next-vibe/shared/types/response.schema";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { isErrorResponseType } from "next-vibe/shared/utils/parse-error";
 import { storage } from "next-vibe-ui/lib/storage";
@@ -74,7 +80,9 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   // Auto-generate default values from schema if not provided
   // This ensures form fields start with empty strings instead of undefined
   const schemaDefaultValues = useMemo(() => {
-    const extracted = extractSchemaDefaults<TEndpoint["types"]["RequestOutput"]>(
+    const extracted = extractSchemaDefaults<
+      TEndpoint["types"]["RequestOutput"]
+    >(
       endpoint.requestSchema,
       logger,
       "",
@@ -93,13 +101,14 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   }, [endpoint.requestSchema, logger]);
 
   // Merge schema defaults with provided defaultValues (provided values take priority)
-  const mergedDefaultValues: TEndpoint["types"]["RequestOutput"] = useMemo(() => {
-    const provided = options.defaultValues;
-    if (provided && Object.keys(provided).length > 0) {
-      return { ...schemaDefaultValues, ...provided };
-    }
-    return schemaDefaultValues;
-  }, [schemaDefaultValues, options.defaultValues]);
+  const mergedDefaultValues: TEndpoint["types"]["RequestOutput"] =
+    useMemo(() => {
+      const provided = options.defaultValues;
+      if (provided && Object.keys(provided).length > 0) {
+        return { ...schemaDefaultValues, ...provided };
+      }
+      return schemaDefaultValues;
+    }, [schemaDefaultValues, options.defaultValues]);
 
   // Extract persistence and custom options
   const {
@@ -129,7 +138,9 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
     endpoint: endpoint.path.join("/"),
     defaultValues: options.defaultValues,
     hasDefaultValues: !!options.defaultValues,
-    defaultValuesKeys: options.defaultValues ? Object.keys(options.defaultValues) : [],
+    defaultValuesKeys: options.defaultValues
+      ? Object.keys(options.defaultValues)
+      : [],
     requestSchemaShape:
       endpoint.requestSchema &&
       "shape" in endpoint.requestSchema &&
@@ -139,7 +150,8 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   });
 
   // Generate a storage key based on the endpoint if not provided
-  const storageKey = persistenceKey || buildKey("query-form", endpoint, undefined, logger);
+  const storageKey =
+    persistenceKey || buildKey("query-form", endpoint, undefined, logger);
 
   const formMethods = useForm<TEndpoint["types"]["RequestOutput"]>(formConfig);
 
@@ -156,7 +168,10 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
         // Reset the form to merged default values (schema + provided)
         formMethods.reset(mergedDefaultValues);
       } catch (error) {
-        logger.error("Error clearing form data from storage:", parseError(error));
+        logger.error(
+          "Error clearing form data from storage:",
+          parseError(error),
+        );
       }
     })();
   }, [formMethods, storageKey, mergedDefaultValues, logger]);
@@ -171,11 +186,16 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
       try {
         const savedFormData = await storage.getItem(storageKey);
         if (savedFormData) {
-          const parsedData = JSON.parse(savedFormData) as TEndpoint["types"]["RequestOutput"];
+          const parsedData = JSON.parse(
+            savedFormData,
+          ) as TEndpoint["types"]["RequestOutput"];
           formMethods.reset(parsedData);
         }
       } catch (error) {
-        logger.error("Error loading form data from storage:", parseError(error));
+        logger.error(
+          "Error loading form data from storage:",
+          parseError(error),
+        );
       }
     })();
   }, [formMethods, storageKey, persistForm, logger]);
@@ -202,7 +222,10 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
             try {
               await storage.setItem(storageKey, JSON.stringify(formValues));
             } catch (error) {
-              logger.error("Error saving form data to storage:", parseError(error));
+              logger.error(
+                "Error saving form data to storage:",
+                parseError(error),
+              );
             }
           })();
         }, debounceMs);
@@ -353,7 +376,9 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   >;
 
   // Create the response object from mutation data
-  const response: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined = mutation.data
+  const response:
+    | ResponseType<TEndpoint["types"]["ResponseOutput"]>
+    | undefined = mutation.data
     ? mutation.data
     : mutation.error
       ? mutation.error

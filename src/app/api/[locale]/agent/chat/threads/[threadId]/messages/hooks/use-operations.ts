@@ -44,7 +44,10 @@ export interface MessageOperations {
       subFolderId: string | null,
     ) => void,
   ) => Promise<void>;
-  retryMessage: (messageId: string, attachments: File[] | undefined) => Promise<void>;
+  retryMessage: (
+    messageId: string,
+    attachments: File[] | undefined,
+  ) => Promise<void>;
   branchMessage: (
     messageId: string,
     newContent: string,
@@ -106,7 +109,9 @@ interface MessageOperationsDeps {
 /**
  * Hook for message operations
  */
-export function useMessageOperations(deps: MessageOperationsDeps): MessageOperations {
+export function useMessageOperations(
+  deps: MessageOperationsDeps,
+): MessageOperations {
   const {
     locale,
     logger,
@@ -174,7 +179,10 @@ export function useMessageOperations(deps: MessageOperationsDeps): MessageOperat
   );
 
   const retryMessage = useCallback(
-    async (messageId: string, attachments: File[] | undefined): Promise<void> => {
+    async (
+      messageId: string,
+      attachments: File[] | undefined,
+    ): Promise<void> => {
       await retryMessageOp(messageId, attachments, {
         logger,
         aiStream,
@@ -185,7 +193,15 @@ export function useMessageOperations(deps: MessageOperationsDeps): MessageOperat
         deductCredits,
       });
     },
-    [logger, aiStream, currentRootFolderId, currentSubFolderId, chatStore, settings, deductCredits],
+    [
+      logger,
+      aiStream,
+      currentRootFolderId,
+      currentSubFolderId,
+      chatStore,
+      settings,
+      deductCredits,
+    ],
   );
 
   const branchMessage = useCallback(
@@ -205,11 +221,23 @@ export function useMessageOperations(deps: MessageOperationsDeps): MessageOperat
         deductCredits,
       });
     },
-    [logger, aiStream, currentRootFolderId, currentSubFolderId, chatStore, settings, deductCredits],
+    [
+      logger,
+      aiStream,
+      currentRootFolderId,
+      currentSubFolderId,
+      chatStore,
+      settings,
+      deductCredits,
+    ],
   );
 
   const answerAsAI = useCallback(
-    async (messageId: string, content: string, attachments: File[] | undefined): Promise<void> => {
+    async (
+      messageId: string,
+      content: string,
+      attachments: File[] | undefined,
+    ): Promise<void> => {
       await answerAsAIOp(messageId, content, attachments, {
         logger,
         aiStream,
@@ -220,7 +248,15 @@ export function useMessageOperations(deps: MessageOperationsDeps): MessageOperat
         deductCredits,
       });
     },
-    [logger, aiStream, currentRootFolderId, currentSubFolderId, chatStore, settings, deductCredits],
+    [
+      logger,
+      aiStream,
+      currentRootFolderId,
+      currentSubFolderId,
+      chatStore,
+      settings,
+      deductCredits,
+    ],
   );
 
   const deleteMessage = useCallback(
@@ -244,8 +280,10 @@ export function useMessageOperations(deps: MessageOperationsDeps): MessageOperat
 
       // Determine if this is an incognito thread or streaming message
       // Both are handled client-side only
-      const isIncognitoThread = thread.rootFolderId === DefaultFolderId.INCOGNITO;
-      const isStreamingMessage = streamStore.streamingMessages[messageId] !== undefined;
+      const isIncognitoThread =
+        thread.rootFolderId === DefaultFolderId.INCOGNITO;
+      const isStreamingMessage =
+        streamStore.streamingMessages[messageId] !== undefined;
 
       logger.debug("Message operations: Delete message thread type check", {
         messageId,
@@ -257,17 +295,23 @@ export function useMessageOperations(deps: MessageOperationsDeps): MessageOperat
 
       // Handle incognito or streaming message deletion (client-side only)
       if (isIncognitoThread || isStreamingMessage) {
-        logger.debug("Message operations: Deleting message (client-side only)", {
-          messageId,
-          rootFolderId: thread.rootFolderId,
-          reason: isIncognitoThread ? "incognito thread" : "streaming message",
-        });
+        logger.debug(
+          "Message operations: Deleting message (client-side only)",
+          {
+            messageId,
+            rootFolderId: thread.rootFolderId,
+            reason: isIncognitoThread
+              ? "incognito thread"
+              : "streaming message",
+          },
+        );
 
         chatStore.deleteMessage(messageId);
 
         if (streamStore.streamingMessages[messageId]) {
           // eslint-disable-next-line no-unused-vars -- Rest destructuring to exclude key
-          const { [messageId]: excluded, ...remainingMessages } = streamStore.streamingMessages;
+          const { [messageId]: excluded, ...remainingMessages } =
+            streamStore.streamingMessages;
           streamStore.reset();
           Object.values(remainingMessages).forEach((msg) => {
             streamStore.addMessage(msg);
@@ -278,9 +322,12 @@ export function useMessageOperations(deps: MessageOperationsDeps): MessageOperat
           const { deleteMessage: deleteIncognitoMessage } =
             await import("../../../../incognito/storage");
           deleteIncognitoMessage(messageId);
-          logger.debug("Message operations: Deleted incognito message from localStorage", {
-            messageId,
-          });
+          logger.debug(
+            "Message operations: Deleted incognito message from localStorage",
+            {
+              messageId,
+            },
+          );
         } catch (error) {
           logger.error(
             "Message operations: Failed to delete incognito message from localStorage",
@@ -344,14 +391,18 @@ export function useMessageOperations(deps: MessageOperationsDeps): MessageOperat
 
         if (streamStore.streamingMessages[messageId]) {
           // eslint-disable-next-line no-unused-vars -- Rest destructuring to exclude key
-          const { [messageId]: excluded, ...remainingMessages } = streamStore.streamingMessages;
+          const { [messageId]: excluded, ...remainingMessages } =
+            streamStore.streamingMessages;
           streamStore.reset();
           Object.values(remainingMessages).forEach((msg) => {
             streamStore.addMessage(msg);
           });
         }
       } catch (error) {
-        logger.error("Message operations: Exception during message deletion", parseError(error));
+        logger.error(
+          "Message operations: Exception during message deletion",
+          parseError(error),
+        );
       }
     },
     [logger, chatStore, streamStore, locale],
@@ -380,13 +431,17 @@ export function useMessageOperations(deps: MessageOperationsDeps): MessageOperat
       }
 
       // Voting is only supported for server threads (not incognito)
-      const isIncognitoThread = thread.rootFolderId === DefaultFolderId.INCOGNITO;
+      const isIncognitoThread =
+        thread.rootFolderId === DefaultFolderId.INCOGNITO;
 
       if (isIncognitoThread) {
-        logger.debug("Message operations: Voting not supported in incognito mode", {
-          messageId,
-          rootFolderId: thread.rootFolderId,
-        });
+        logger.debug(
+          "Message operations: Voting not supported in incognito mode",
+          {
+            messageId,
+            rootFolderId: thread.rootFolderId,
+          },
+        );
         return;
       }
 
@@ -419,7 +474,10 @@ export function useMessageOperations(deps: MessageOperationsDeps): MessageOperat
         }
         chatStore.updateMessage(messageId, updates);
       } catch (error) {
-        logger.error("Message operations: Failed to vote on message", parseError(error));
+        logger.error(
+          "Message operations: Failed to vote on message",
+          parseError(error),
+        );
       }
     },
     [logger, chatStore, locale],
@@ -439,7 +497,10 @@ export function useMessageOperations(deps: MessageOperationsDeps): MessageOperat
           return undefined;
         })
         .catch((error) => {
-          logger.error("Message operations: Failed to stop TTS playback", parseError(error));
+          logger.error(
+            "Message operations: Failed to stop TTS playback",
+            parseError(error),
+          );
         });
     }
   }, [logger, aiStream]);

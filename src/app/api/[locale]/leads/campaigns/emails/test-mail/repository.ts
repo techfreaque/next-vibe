@@ -7,7 +7,11 @@ import "server-only";
 
 import { render } from "@react-email/render";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { ErrorResponseTypes, fail, success } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
@@ -21,7 +25,10 @@ import { simpleT } from "@/i18n/core/shared";
 
 import type { LeadWithEmailType } from "../../../types";
 import { emailService } from "../index";
-import type { TestEmailRequestOutput, TestEmailResponseOutput } from "./definition";
+import type {
+  TestEmailRequestOutput,
+  TestEmailResponseOutput,
+} from "./definition";
 
 /**
  * Test Email Repository Class
@@ -82,9 +89,15 @@ export class TestEmailRepository {
         userId: user.id,
       });
 
-      if (!emailService.hasTemplate(data.emailJourneyVariant, data.emailCampaignStage)) {
+      if (
+        !emailService.hasTemplate(
+          data.emailJourneyVariant,
+          data.emailCampaignStage,
+        )
+      ) {
         return fail({
-          message: "app.api.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
+          message:
+            "app.api.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
             emailJourneyVariant: data.emailJourneyVariant,
@@ -114,7 +127,8 @@ export class TestEmailRepository {
 
       if (!emailContent) {
         return fail({
-          message: "app.api.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
+          message:
+            "app.api.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
             emailJourneyVariant: data.emailJourneyVariant,
@@ -162,7 +176,8 @@ export class TestEmailRepository {
             errorParams: emailResponse.messageParams,
           });
           return fail({
-            message: "app.api.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
+            message:
+              "app.api.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
             errorType: ErrorResponseTypes.EMAIL_ERROR,
             messageParams: {
               recipient: data.testEmail,
@@ -180,7 +195,8 @@ export class TestEmailRepository {
 
         // Extract messageId from SMTP response
         // The response structure is: { success: true, data: { messageId, accountId, ... } }
-        const messageId: string = emailResponse.data?.messageId || "unknown-message-id";
+        const messageId: string =
+          emailResponse.data?.messageId || "unknown-message-id";
 
         logger.info("test.email.send.success", {
           messageId,
@@ -201,7 +217,8 @@ export class TestEmailRepository {
       } catch (error) {
         logger.error("test.email.send.error", parseError(error));
         return fail({
-          message: "app.api.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
+          message:
+            "app.api.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
           errorType: ErrorResponseTypes.EMAIL_ERROR,
           messageParams: {
             recipient: data.testEmail,
@@ -213,7 +230,8 @@ export class TestEmailRepository {
     } catch (error) {
       logger.error("test.email.send.server.error", parseError(error));
       return fail({
-        message: "app.api.leads.campaigns.emails.testMail.post.errors.server.title",
+        message:
+          "app.api.leads.campaigns.emails.testMail.post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

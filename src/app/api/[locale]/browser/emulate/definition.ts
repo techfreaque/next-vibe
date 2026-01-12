@@ -27,7 +27,10 @@ const { POST } = createEndpoint({
   description: "app.api.browser.emulate.description",
   category: "app.api.browser.category",
   icon: "settings",
-  tags: ["app.api.browser.tags.browserAutomation", "app.api.browser.tags.performanceAutomation"],
+  tags: [
+    "app.api.browser.tags.browserAutomation",
+    "app.api.browser.tags.performanceAutomation",
+  ],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -52,38 +55,53 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.SELECT,
           label: "app.api.browser.emulate.form.fields.networkConditions.label",
-          description: "app.api.browser.emulate.form.fields.networkConditions.description",
-          placeholder: "app.api.browser.emulate.form.fields.networkConditions.placeholder",
+          description:
+            "app.api.browser.emulate.form.fields.networkConditions.description",
+          placeholder:
+            "app.api.browser.emulate.form.fields.networkConditions.placeholder",
           columns: 6,
           options: [
             {
               value: "No emulation",
-              label: "app.api.browser.emulate.form.fields.networkConditions.options.noEmulation",
+              label:
+                "app.api.browser.emulate.form.fields.networkConditions.options.noEmulation",
             },
             {
               value: "Offline",
-              label: "app.api.browser.emulate.form.fields.networkConditions.options.offline",
+              label:
+                "app.api.browser.emulate.form.fields.networkConditions.options.offline",
             },
             {
               value: "Slow 3G",
-              label: "app.api.browser.emulate.form.fields.networkConditions.options.slow3g",
+              label:
+                "app.api.browser.emulate.form.fields.networkConditions.options.slow3g",
             },
             {
               value: "Fast 3G",
-              label: "app.api.browser.emulate.form.fields.networkConditions.options.fast3g",
+              label:
+                "app.api.browser.emulate.form.fields.networkConditions.options.fast3g",
             },
             {
               value: "Slow 4G",
-              label: "app.api.browser.emulate.form.fields.networkConditions.options.slow4g",
+              label:
+                "app.api.browser.emulate.form.fields.networkConditions.options.slow4g",
             },
             {
               value: "Fast 4G",
-              label: "app.api.browser.emulate.form.fields.networkConditions.options.fast4g",
+              label:
+                "app.api.browser.emulate.form.fields.networkConditions.options.fast4g",
             },
           ],
         },
         z
-          .enum(["No emulation", "Offline", "Slow 3G", "Fast 3G", "Slow 4G", "Fast 4G"])
+          .enum([
+            "No emulation",
+            "Offline",
+            "Slow 3G",
+            "Fast 3G",
+            "Slow 4G",
+            "Fast 4G",
+          ])
           .optional()
           .describe(
             'Throttle network. Set to "No emulation" to disable. If omitted, conditions remain unchanged.',
@@ -94,8 +112,10 @@ const { POST } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.NUMBER,
           label: "app.api.browser.emulate.form.fields.cpuThrottlingRate.label",
-          description: "app.api.browser.emulate.form.fields.cpuThrottlingRate.description",
-          placeholder: "app.api.browser.emulate.form.fields.cpuThrottlingRate.placeholder",
+          description:
+            "app.api.browser.emulate.form.fields.cpuThrottlingRate.description",
+          placeholder:
+            "app.api.browser.emulate.form.fields.cpuThrottlingRate.placeholder",
           columns: 6,
         },
         z
@@ -123,9 +143,17 @@ const { POST } = createEndpoint({
         },
         z
           .object({
-            applied: z.boolean().describe("Whether emulation settings were applied"),
-            network: z.string().optional().describe("Applied network condition"),
-            cpuThrottling: z.number().optional().describe("Applied CPU throttling rate"),
+            applied: z
+              .boolean()
+              .describe("Whether emulation settings were applied"),
+            network: z
+              .string()
+              .optional()
+              .describe("Applied network condition"),
+            cpuThrottling: z
+              .number()
+              .optional()
+              .describe("Applied CPU throttling rate"),
           })
           .optional()
           .describe("Result of the emulation operation"),

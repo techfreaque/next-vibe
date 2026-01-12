@@ -3,14 +3,20 @@
  */
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { base64ToFile, urlToFile } from "@/app/api/[locale]/agent/chat/incognito/file-utils";
+import {
+  base64ToFile,
+  urlToFile,
+} from "@/app/api/[locale]/agent/chat/incognito/file-utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 export async function loadMessageAttachments(
   message: ChatMessage,
   logger: EndpointLogger,
 ): Promise<File[]> {
-  if (!message.metadata?.attachments || message.metadata.attachments.length === 0) {
+  if (
+    !message.metadata?.attachments ||
+    message.metadata.attachments.length === 0
+  ) {
     return [];
   }
 

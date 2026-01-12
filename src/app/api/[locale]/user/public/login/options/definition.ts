@@ -56,8 +56,10 @@ const { GET } = createEndpoint({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.EMAIL,
           label: "app.api.user.public.login.options.fields.email.label",
-          description: "app.api.user.public.login.options.fields.email.description",
-          placeholder: "app.api.user.public.login.options.fields.email.placeholder",
+          description:
+            "app.api.user.public.login.options.fields.email.description",
+          placeholder:
+            "app.api.user.public.login.options.fields.email.placeholder",
         },
         z.email().optional(),
       ),
@@ -77,27 +79,36 @@ const { GET } = createEndpoint({
               type: WidgetType.BADGE,
               text: "app.api.user.public.login.options.response.success.badge",
             },
-            z.boolean().describe("Whether login options were retrieved successfully"),
+            z
+              .boolean()
+              .describe("Whether login options were retrieved successfully"),
           ),
           message: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.public.login.options.response.message.content",
+              content:
+                "app.api.user.public.login.options.response.message.content",
             },
             z.string().describe("Human-readable status message"),
           ),
           forUser: responseField(
             {
               type: WidgetType.TEXT,
-              content: "app.api.user.public.login.options.response.forUser.content",
+              content:
+                "app.api.user.public.login.options.response.forUser.content",
             },
-            z.string().optional().describe("Email address these options are specific to"),
+            z
+              .string()
+              .optional()
+              .describe("Email address these options are specific to"),
           ),
           loginMethods: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.user.public.login.options.response.loginMethods.title",
-              description: "app.api.user.public.login.options.response.loginMethods.description",
+              title:
+                "app.api.user.public.login.options.response.loginMethods.title",
+              description:
+                "app.api.user.public.login.options.response.loginMethods.description",
               layoutType: LayoutType.VERTICAL,
             },
             { response: true },
@@ -105,7 +116,8 @@ const { GET } = createEndpoint({
               password: objectField(
                 {
                   type: WidgetType.CONTAINER,
-                  title: "app.api.user.public.login.options.response.loginMethods.password.title",
+                  title:
+                    "app.api.user.public.login.options.response.loginMethods.password.title",
                   description:
                     "app.api.user.public.login.options.response.loginMethods.password.description",
                   layoutType: LayoutType.HORIZONTAL,
@@ -132,7 +144,8 @@ const { GET } = createEndpoint({
               social: objectField(
                 {
                   type: WidgetType.CONTAINER,
-                  title: "app.api.user.public.login.options.response.loginMethods.social.title",
+                  title:
+                    "app.api.user.public.login.options.response.loginMethods.social.title",
                   description:
                     "app.api.user.public.login.options.response.loginMethods.social.description",
                   layoutType: LayoutType.VERTICAL,
@@ -171,7 +184,11 @@ const { GET } = createEndpoint({
                             content:
                               "app.api.user.public.login.options.response.loginMethods.social.providers.name.content",
                           },
-                          z.string().describe("Provider display name (e.g., 'Google', 'GitHub')"),
+                          z
+                            .string()
+                            .describe(
+                              "Provider display name (e.g., 'Google', 'GitHub')",
+                            ),
                         ),
                         id: responseField(
                           {
@@ -186,7 +203,9 @@ const { GET } = createEndpoint({
                             type: WidgetType.BADGE,
                             text: "app.api.user.public.login.options.response.loginMethods.social.providers.enabled.badge",
                           },
-                          z.boolean().describe("Whether this provider is available"),
+                          z
+                            .boolean()
+                            .describe("Whether this provider is available"),
                         ),
                         description: responseField(
                           {
@@ -194,7 +213,9 @@ const { GET } = createEndpoint({
                             content:
                               "app.api.user.public.login.options.response.loginMethods.social.providers.description",
                           },
-                          z.string().describe("Human-readable provider description"),
+                          z
+                            .string()
+                            .describe("Human-readable provider description"),
                         ),
                       },
                     ),
@@ -206,8 +227,10 @@ const { GET } = createEndpoint({
           security: objectField(
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.user.public.login.options.response.security.title",
-              description: "app.api.user.public.login.options.response.security.description",
+              title:
+                "app.api.user.public.login.options.response.security.title",
+              description:
+                "app.api.user.public.login.options.response.security.description",
               layoutType: LayoutType.HORIZONTAL,
             },
             { response: true },
@@ -218,19 +241,26 @@ const { GET } = createEndpoint({
                   content:
                     "app.api.user.public.login.options.response.security.maxAttempts.content",
                 },
-                z.number().optional().describe("Maximum login attempts allowed"),
+                z
+                  .number()
+                  .optional()
+                  .describe("Maximum login attempts allowed"),
               ),
               requireTwoFactor: responseField(
                 {
                   type: WidgetType.BADGE,
                   text: "app.api.user.public.login.options.response.security.requireTwoFactor.badge",
                 },
-                z.boolean().optional().describe("Whether 2FA is required for this user"),
+                z
+                  .boolean()
+                  .optional()
+                  .describe("Whether 2FA is required for this user"),
               ),
               securityDescription: responseField(
                 {
                   type: WidgetType.TEXT,
-                  content: "app.api.user.public.login.options.response.security.description",
+                  content:
+                    "app.api.user.public.login.options.response.security.description",
                 },
                 z.string().describe("Security requirements summary"),
               ),
@@ -251,39 +281,48 @@ const { GET } = createEndpoint({
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "app.api.user.public.login.options.errors.validation.title",
-      description: "app.api.user.public.login.options.errors.validation.description",
+      description:
+        "app.api.user.public.login.options.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
       title: "app.api.user.public.login.options.errors.unauthorized.title",
-      description: "app.api.user.public.login.options.errors.unauthorized.description",
+      description:
+        "app.api.user.public.login.options.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
       title: "app.api.user.public.login.options.errors.server.title",
-      description: "app.api.user.public.login.options.errors.server.description",
+      description:
+        "app.api.user.public.login.options.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
       title: "app.api.user.public.login.options.errors.unknown.title",
-      description: "app.api.user.public.login.options.errors.unknown.description",
+      description:
+        "app.api.user.public.login.options.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
       title: "app.api.user.public.login.options.errors.network.title",
-      description: "app.api.user.public.login.options.errors.network.description",
+      description:
+        "app.api.user.public.login.options.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
       title: "app.api.user.public.login.options.errors.forbidden.title",
-      description: "app.api.user.public.login.options.errors.forbidden.description",
+      description:
+        "app.api.user.public.login.options.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
       title: "app.api.user.public.login.options.errors.notFound.title",
-      description: "app.api.user.public.login.options.errors.notFound.description",
+      description:
+        "app.api.user.public.login.options.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
       title: "app.api.user.public.login.options.errors.unsavedChanges.title",
-      description: "app.api.user.public.login.options.errors.unsavedChanges.description",
+      description:
+        "app.api.user.public.login.options.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
       title: "app.api.user.public.login.options.errors.conflict.title",
-      description: "app.api.user.public.login.options.errors.conflict.description",
+      description:
+        "app.api.user.public.login.options.errors.conflict.description",
     },
   },
 
@@ -345,7 +384,10 @@ const { GET } = createEndpoint({
             requireTwoFactor: false,
             securityDescription: "Standard security requirements",
           },
-          recommendations: ["Try password login first", "Social login is faster for new users"],
+          recommendations: [
+            "Try password login first",
+            "Social login is faster for new users",
+          ],
         },
       },
       withoutEmail: {
@@ -375,7 +417,9 @@ const { GET } = createEndpoint({
             requireTwoFactor: false,
             securityDescription: "Standard security requirements",
           },
-          recommendations: ["Enter your email to see personalized login options"],
+          recommendations: [
+            "Enter your email to see personalized login options",
+          ],
         },
       },
       checkOptions: {
@@ -386,7 +430,8 @@ const { GET } = createEndpoint({
           loginMethods: {
             password: {
               enabled: true,
-              passwordDescription: "Log in with your email and password (2FA required)",
+              passwordDescription:
+                "Log in with your email and password (2FA required)",
             },
             social: {
               enabled: false,
@@ -397,9 +442,13 @@ const { GET } = createEndpoint({
           security: {
             maxAttempts: 3,
             requireTwoFactor: true,
-            securityDescription: "Enhanced security: 2FA required, limited attempts",
+            securityDescription:
+              "Enhanced security: 2FA required, limited attempts",
           },
-          recommendations: ["Use password login with 2FA", "Keep your authenticator app ready"],
+          recommendations: [
+            "Use password login with 2FA",
+            "Keep your authenticator app ready",
+          ],
         },
       },
     },

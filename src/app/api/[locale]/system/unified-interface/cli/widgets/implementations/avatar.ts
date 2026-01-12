@@ -14,7 +14,9 @@ import { extractAvatarData } from "@/app/api/[locale]/system/unified-interface/s
 import { BaseWidgetRenderer } from "../core/base-renderer";
 import type { CLIWidgetProps } from "../core/types";
 
-export class AvatarWidgetRenderer extends BaseWidgetRenderer<typeof WidgetType.AVATAR> {
+export class AvatarWidgetRenderer extends BaseWidgetRenderer<
+  typeof WidgetType.AVATAR
+> {
   readonly widgetType = WidgetType.AVATAR;
 
   /**

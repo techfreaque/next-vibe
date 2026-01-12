@@ -43,11 +43,13 @@ export const translations: typeof enTranslations = {
     },
     serverError: {
       title: "Błąd serwera",
-      description: "Wystąpił wewnętrzny błąd serwera podczas pobierania wiadomości konsoli",
+      description:
+        "Wystąpił wewnętrzny błąd serwera podczas pobierania wiadomości konsoli",
     },
     unknown: {
       title: "Nieznany błąd",
-      description: "Wystąpił nieznany błąd podczas pobierania wiadomości konsoli",
+      description:
+        "Wystąpił nieznany błąd podczas pobierania wiadomości konsoli",
     },
     unsavedChanges: {
       title: "Niezapisane zmiany",

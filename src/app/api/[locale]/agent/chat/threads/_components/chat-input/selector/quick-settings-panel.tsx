@@ -35,14 +35,20 @@ import {
   modelOptions,
   modelProviders,
 } from "@/app/api/[locale]/agent/models/models";
-import { Icon, type IconKey } from "@/app/api/[locale]/system/unified-interface/react/icons";
+import {
+  Icon,
+  type IconKey,
+} from "@/app/api/[locale]/system/unified-interface/react/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 interface QuickSettingsPanelProps {
   favorite: FavoriteGetResponseOutput;
-  onSave: (settings: FavoriteGetResponseOutput["modelSelection"], saveMode: SaveMode) => void;
+  onSave: (
+    settings: FavoriteGetResponseOutput["modelSelection"],
+    saveMode: SaveMode,
+  ) => void;
   onCancel: () => void;
   onDelete?: () => void;
   onEditCharacter?: (characterId: string) => void;
@@ -86,7 +92,10 @@ function FilterPill<T extends string>({
         !selected && "hover:border-primary/50 hover:bg-primary/5",
       )}
     >
-      <Icon icon={icon} className={cn("h-4 w-4", selected && "text-primary-foreground")} />
+      <Icon
+        icon={icon}
+        className={cn("h-4 w-4", selected && "text-primary-foreground")}
+      />
       <Span className="text-xs font-medium">{t(label)}</Span>
     </Button>
   );
@@ -133,7 +142,12 @@ function ModelCard({
 
       <Div className="flex-1 min-w-0">
         <Div className="flex items-center gap-1.5">
-          <Span className={cn("text-sm font-medium truncate", selected && "text-primary")}>
+          <Span
+            className={cn(
+              "text-sm font-medium truncate",
+              selected && "text-primary",
+            )}
+          >
             {model.name}
           </Span>
           {isBest && (
@@ -148,7 +162,10 @@ function ModelCard({
       </Div>
 
       <Div className="flex items-center gap-1.5 shrink-0">
-        <Badge variant={selected ? "outline" : "secondary"} className="text-[10px] h-5">
+        <Badge
+          variant={selected ? "outline" : "secondary"}
+          className="text-[10px] h-5"
+        >
           {CharactersRepositoryClient.formatCreditCost(model.creditCost, t)}
         </Badge>
         {selected && <Check className="h-4 w-4 text-primary" />}
@@ -178,18 +195,24 @@ export function QuickSettingsPanel({
       return null;
     }
     // Get character from API data
-    return CharactersRepositoryClient.getCharacterById(characters, favorite.characterId);
+    return CharactersRepositoryClient.getCharacterById(
+      characters,
+      favorite.characterId,
+    );
   }, [favorite.characterId, characters]);
 
   const isModelOnly = !character;
 
   // Extract filters from modelSelection
-  const initialFilters = CharactersRepositoryClient.extractFiltersFromModelSelection(
-    favorite.modelSelection,
-  );
+  const initialFilters =
+    CharactersRepositoryClient.extractFiltersFromModelSelection(
+      favorite.modelSelection,
+    );
 
   // Local state for editing
-  const [intelligenceRange, setIntelligenceRange] = useState(initialFilters.intelligenceRange);
+  const [intelligenceRange, setIntelligenceRange] = useState(
+    initialFilters.intelligenceRange,
+  );
   const [priceRange, setPriceRange] = useState(initialFilters.priceRange);
   const [contentRange, setContentRange] = useState(initialFilters.contentRange);
   const [mode, setMode] = useState(favorite.modelSelection.selectionType);
@@ -228,7 +251,15 @@ export function QuickSettingsPanel({
       },
     );
     return CharactersRepositoryClient.findModelById(allModels, selectedModelId);
-  }, [allModels, character, mode, manualModelId, intelligenceRange, priceRange, contentRange]);
+  }, [
+    allModels,
+    character,
+    mode,
+    manualModelId,
+    intelligenceRange,
+    priceRange,
+    contentRange,
+  ]);
 
   const filteredModels = useMemo(() => {
     return CharactersRepositoryClient.applyModelFilters(compatibleModels, {
@@ -287,7 +318,11 @@ export function QuickSettingsPanel({
       : bestModel;
 
   // Get display info - consolidated logic
-  const displayIcon = CharactersRepositoryClient.getDisplayIcon(favorite, character, resolvedModel);
+  const displayIcon = CharactersRepositoryClient.getDisplayIcon(
+    favorite,
+    character,
+    resolvedModel,
+  );
   const displayName = CharactersRepositoryClient.getDisplayName(
     favorite,
     character,
@@ -299,7 +334,13 @@ export function QuickSettingsPanel({
     <Div className="flex flex-col max-h-[70vh] overflow-hidden">
       {/* Header with back and delete */}
       <Div className="flex items-center justify-between p-3 border-b shrink-0">
-        <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={onCancel}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={onCancel}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
 
@@ -327,7 +368,9 @@ export function QuickSettingsPanel({
                 <Icon icon={displayIcon} className="h-6 w-6 text-primary" />
               </Div>
               <Div className="flex-1 min-w-0">
-                <Span className="font-semibold text-lg block">{displayName}</Span>
+                <Span className="font-semibold text-lg block">
+                  {displayName}
+                </Span>
                 <Span className="text-xs text-muted-foreground">
                   {isModelOnly
                     ? t("app.chat.selector.modelOnly")
@@ -371,7 +414,10 @@ export function QuickSettingsPanel({
           {resolvedModel && (
             <Div className="flex items-center gap-3 p-3 bg-linear-to-r from-primary/10 to-primary/5 border border-primary/25 rounded-xl">
               <Div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-                <Icon icon={resolvedModel.icon} className="h-5 w-5 text-primary" />
+                <Icon
+                  icon={resolvedModel.icon}
+                  className="h-5 w-5 text-primary"
+                />
               </Div>
               <Div className="flex-1 min-w-0">
                 <Span className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">
@@ -380,9 +426,17 @@ export function QuickSettingsPanel({
                     : t("app.chat.selector.manualSelectedModel")}
                 </Span>
                 <Div className="flex items-center gap-2">
-                  <Span className="text-sm font-semibold text-primary">{resolvedModel.name}</Span>
-                  <Badge variant="secondary" className="text-[10px] h-5 shrink-0">
-                    {CharactersRepositoryClient.formatCreditCost(resolvedModel.creditCost, t)}
+                  <Span className="text-sm font-semibold text-primary">
+                    {resolvedModel.name}
+                  </Span>
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] h-5 shrink-0"
+                  >
+                    {CharactersRepositoryClient.formatCreditCost(
+                      resolvedModel.creditCost,
+                      t,
+                    )}
                   </Badge>
                 </Div>
               </Div>
@@ -466,7 +520,9 @@ export function QuickSettingsPanel({
             <Div className="flex items-center gap-2">
               <Button
                 type="button"
-                variant={mode === ModelSelectionType.FILTERS ? "default" : "outline"}
+                variant={
+                  mode === ModelSelectionType.FILTERS ? "default" : "outline"
+                }
                 size="sm"
                 className="flex-1 h-9"
                 onClick={() => setMode(ModelSelectionType.FILTERS)}
@@ -475,7 +531,9 @@ export function QuickSettingsPanel({
               </Button>
               <Button
                 type="button"
-                variant={mode === ModelSelectionType.MANUAL ? "default" : "outline"}
+                variant={
+                  mode === ModelSelectionType.MANUAL ? "default" : "outline"
+                }
                 size="sm"
                 className="flex-1 h-9"
                 onClick={() => setMode(ModelSelectionType.MANUAL)}
@@ -518,7 +576,8 @@ export function QuickSettingsPanel({
                   <>
                     {displayModels.map((model) => {
                       const isOutsideFilter =
-                        showUnfilteredModels && !filteredModels.some((m) => m.id === model.id);
+                        showUnfilteredModels &&
+                        !filteredModels.some((m) => m.id === model.id);
                       return (
                         <ModelCard
                           key={model.id}
@@ -564,91 +623,103 @@ export function QuickSettingsPanel({
             )}
 
             {/* Warning when no models match in filters mode */}
-            {mode === ModelSelectionType.FILTERS && filteredModels.length === 0 && (
-              <Div className="flex flex-col gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive">
-                <Div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 shrink-0" />
-                  <Span className="text-sm font-medium">
-                    {t("app.chat.selector.noModelsWarning")}
-                  </Span>
-                </Div>
-                {!isModelOnly && character?.requirements && (
-                  <Div className="flex flex-col gap-1 text-xs pl-6">
-                    {(() => {
-                      if (!character) {
-                        return null;
-                      }
-                      const violations: string[] = [];
-                      const intelligenceOrder = [
-                        IntelligenceLevelFilter.ANY,
-                        IntelligenceLevelFilter.QUICK,
-                        IntelligenceLevelFilter.SMART,
-                        IntelligenceLevelFilter.BRILLIANT,
-                      ];
-                      const contentOrder = [
-                        ContentLevelFilter.ANY,
-                        ContentLevelFilter.MAINSTREAM,
-                        ContentLevelFilter.OPEN,
-                        ContentLevelFilter.UNCENSORED,
-                      ];
-
-                      // Check intelligence requirements
-                      if (
-                        character.requirements?.minIntelligence &&
-                        intelligenceOrder.indexOf(intelligence) <
-                          intelligenceOrder.indexOf(character.requirements.minIntelligence)
-                      ) {
-                        violations.push(
-                          `${t("app.chat.selector.intelligence")}: ${t("app.chat.selector.requirements.tooLow")} (${t("app.chat.selector.requirements.min")}: ${t(character.requirements.minIntelligence)})`,
-                        );
-                      }
-
-                      if (
-                        character.requirements?.maxIntelligence &&
-                        intelligenceOrder.indexOf(intelligence) >
-                          intelligenceOrder.indexOf(character.requirements.maxIntelligence)
-                      ) {
-                        violations.push(
-                          `${t("app.chat.selector.intelligence")}: ${t("app.chat.selector.requirements.tooHigh")} (${t("app.chat.selector.requirements.max")}: ${t(character.requirements.maxIntelligence)})`,
-                        );
-                      }
-
-                      // Check content requirements
-                      if (
-                        character.requirements?.minContent &&
-                        contentOrder.indexOf(content) <
-                          contentOrder.indexOf(character.requirements.minContent)
-                      ) {
-                        violations.push(
-                          `${t("app.chat.selector.content")}: ${t("app.chat.selector.requirements.tooLow")} (${t("app.chat.selector.requirements.min")}: ${t(character.requirements.minContent)})`,
-                        );
-                      }
-
-                      if (
-                        character.requirements?.maxContent &&
-                        contentOrder.indexOf(content) >
-                          contentOrder.indexOf(character.requirements.maxContent)
-                      ) {
-                        violations.push(
-                          `${t("app.chat.selector.content")}: ${t("app.chat.selector.requirements.tooHigh")} (${t("app.chat.selector.requirements.max")}: ${t(character.requirements.maxContent)})`,
-                        );
-                      }
-
-                      return violations.length > 0 ? (
-                        <>
-                          <Span className="font-medium">
-                            {t("app.chat.selector.requirements.characterConflict")}:
-                          </Span>
-                          {violations.map((v, i) => (
-                            <Span key={i}>• {v}</Span>
-                          ))}
-                        </>
-                      ) : null;
-                    })()}
+            {mode === ModelSelectionType.FILTERS &&
+              filteredModels.length === 0 && (
+                <Div className="flex flex-col gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive">
+                  <Div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 shrink-0" />
+                    <Span className="text-sm font-medium">
+                      {t("app.chat.selector.noModelsWarning")}
+                    </Span>
                   </Div>
-                )}
-              </Div>
-            )}
+                  {!isModelOnly && character?.requirements && (
+                    <Div className="flex flex-col gap-1 text-xs pl-6">
+                      {(() => {
+                        if (!character) {
+                          return null;
+                        }
+                        const violations: string[] = [];
+                        const intelligenceOrder = [
+                          IntelligenceLevelFilter.ANY,
+                          IntelligenceLevelFilter.QUICK,
+                          IntelligenceLevelFilter.SMART,
+                          IntelligenceLevelFilter.BRILLIANT,
+                        ];
+                        const contentOrder = [
+                          ContentLevelFilter.ANY,
+                          ContentLevelFilter.MAINSTREAM,
+                          ContentLevelFilter.OPEN,
+                          ContentLevelFilter.UNCENSORED,
+                        ];
+
+                        // Check intelligence requirements
+                        if (
+                          character.requirements?.minIntelligence &&
+                          intelligenceOrder.indexOf(intelligence) <
+                            intelligenceOrder.indexOf(
+                              character.requirements.minIntelligence,
+                            )
+                        ) {
+                          violations.push(
+                            `${t("app.chat.selector.intelligence")}: ${t("app.chat.selector.requirements.tooLow")} (${t("app.chat.selector.requirements.min")}: ${t(character.requirements.minIntelligence)})`,
+                          );
+                        }
+
+                        if (
+                          character.requirements?.maxIntelligence &&
+                          intelligenceOrder.indexOf(intelligence) >
+                            intelligenceOrder.indexOf(
+                              character.requirements.maxIntelligence,
+                            )
+                        ) {
+                          violations.push(
+                            `${t("app.chat.selector.intelligence")}: ${t("app.chat.selector.requirements.tooHigh")} (${t("app.chat.selector.requirements.max")}: ${t(character.requirements.maxIntelligence)})`,
+                          );
+                        }
+
+                        // Check content requirements
+                        if (
+                          character.requirements?.minContent &&
+                          contentOrder.indexOf(content) <
+                            contentOrder.indexOf(
+                              character.requirements.minContent,
+                            )
+                        ) {
+                          violations.push(
+                            `${t("app.chat.selector.content")}: ${t("app.chat.selector.requirements.tooLow")} (${t("app.chat.selector.requirements.min")}: ${t(character.requirements.minContent)})`,
+                          );
+                        }
+
+                        if (
+                          character.requirements?.maxContent &&
+                          contentOrder.indexOf(content) >
+                            contentOrder.indexOf(
+                              character.requirements.maxContent,
+                            )
+                        ) {
+                          violations.push(
+                            `${t("app.chat.selector.content")}: ${t("app.chat.selector.requirements.tooHigh")} (${t("app.chat.selector.requirements.max")}: ${t(character.requirements.maxContent)})`,
+                          );
+                        }
+
+                        return violations.length > 0 ? (
+                          <>
+                            <Span className="font-medium">
+                              {t(
+                                "app.chat.selector.requirements.characterConflict",
+                              )}
+                              :
+                            </Span>
+                            {violations.map((v, i) => (
+                              <Span key={i}>• {v}</Span>
+                            ))}
+                          </>
+                        ) : null;
+                      })()}
+                    </Div>
+                  )}
+                </Div>
+              )}
           </Div>
         </Div>
       </Div>
@@ -664,7 +735,12 @@ export function QuickSettingsPanel({
         >
           {t("app.chat.selector.useOnce")}
         </Button>
-        <Button type="button" onClick={handleSave} disabled={!canSave} className="flex-1 h-10">
+        <Button
+          type="button"
+          onClick={handleSave}
+          disabled={!canSave}
+          className="flex-1 h-10"
+        >
           {t("app.chat.selector.saveAsDefault")}
         </Button>
       </Div>

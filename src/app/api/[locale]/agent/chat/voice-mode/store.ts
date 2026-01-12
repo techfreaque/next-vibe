@@ -82,7 +82,9 @@ export const useVoiceModeStore = create<VoiceModeState>()(
 
       getCallMode: (modelId, characterId): boolean => {
         const key = getCallModeKey(modelId, characterId);
-        return useVoiceModeStore.getState().settings.callModeByConfig[key] ?? false;
+        return (
+          useVoiceModeStore.getState().settings.callModeByConfig[key] ?? false
+        );
       },
 
       // Runtime actions
@@ -128,7 +130,9 @@ export const useVoiceModeStore = create<VoiceModeState>()(
       partialize: (state) => ({ settings: state.settings }),
       // Migrate old storage format to new format
       merge: (persisted, current) => {
-        const persistedState = persisted as { settings?: Partial<VoiceMode> } | undefined;
+        const persistedState = persisted as
+          | { settings?: Partial<VoiceMode> }
+          | undefined;
         return {
           ...current,
           settings: {
